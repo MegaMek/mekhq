@@ -48,6 +48,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Ralgith
@@ -122,7 +123,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         injuriesTable.getSelectionModel().addListSelectionListener(this::injuriesTableValueChanged);
 
-        JScrollPane scrollInjuryTable = new JScrollPane();
+        JScrollPane scrollInjuryTable = new JScrollPaneWithSpeed();
         scrollInjuryTable.setName("scrollInjuryTable");
         scrollInjuryTable.setViewportView(injuriesTable);
         getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);

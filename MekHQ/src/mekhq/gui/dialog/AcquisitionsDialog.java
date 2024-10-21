@@ -55,6 +55,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.RepairTab;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 
@@ -121,7 +122,7 @@ public class AcquisitionsDialog extends JDialog {
 
         pnlSummary.firePropertyChange("counts", -1, 0);
 
-        JScrollPane scrollMain = new JScrollPane(pnlMain);
+        JScrollPane scrollMain = new JScrollPaneWithSpeed(pnlMain);
         scrollMain.setPreferredSize(new Dimension(700, 500));
 
         content.add(scrollMain, BorderLayout.CENTER);

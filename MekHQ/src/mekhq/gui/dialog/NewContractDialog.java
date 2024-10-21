@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
@@ -185,7 +186,7 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         newContractPanel.add(btnClose, gridBagConstraints);
 
-        JScrollPane scrollPane = new JScrollPane(newContractPanel);
+        JScrollPane scrollPane = new JScrollPaneWithSpeed(newContractPanel);
 
         getContentPane().add(scrollPane);
 

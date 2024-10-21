@@ -58,6 +58,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -140,7 +141,7 @@ public class PartsStoreDialog extends JDialog {
         }
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
-        JScrollPane scrollPartsTable = new JScrollPane();
+        JScrollPane scrollPartsTable = new JScrollPaneWithSpeed();
         scrollPartsTable.setName("scrollPartsTable");
         scrollPartsTable.setViewportView(partsTable);
         getContentPane().add(scrollPartsTable, BorderLayout.CENTER);

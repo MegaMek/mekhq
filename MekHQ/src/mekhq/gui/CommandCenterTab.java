@@ -45,6 +45,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
 
@@ -374,7 +375,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         listObjectives.setModel(new DefaultListModel<>());
         refreshObjectives();
 
-        panObjectives.add(new JScrollPane(listObjectives), BorderLayout.CENTER);
+        panObjectives.add(new JScrollPaneWithSpeed(listObjectives), BorderLayout.CENTER);
     }
 
     /**
@@ -488,7 +489,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             }
         });
 
-        JScrollPane scrollProcurement = new JScrollPane(procurementTable);
+        JScrollPane scrollProcurement = new JScrollPaneWithSpeed(procurementTable);
         panProcurement = new JPanel(new GridBagLayout());
         panProcurement.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panProcurement.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();

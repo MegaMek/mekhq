@@ -55,6 +55,7 @@ import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of
@@ -200,7 +201,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         });
         PartsTableMouseAdapter.connect(getCampaignGui(), partsTable, partsModel);
 
-        JScrollPane scrollPartsTable = new JScrollPane(partsTable);
+        JScrollPane scrollPartsTable = new JScrollPaneWithSpeed(partsTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -245,7 +246,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         textTargetWarehouse.setText("");
         textTargetWarehouse.setWrapStyleWord(true);
         textTargetWarehouse.setBorder(null);
-        JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
+        JScrollPane scrTargetWarehouse = new JScrollPaneWithSpeed(textTargetWarehouse);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -283,7 +284,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         ArrayList<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
-        JScrollPane scrollTechTable = new JScrollPane(techTable);
+        JScrollPane scrollTechTable = new JScrollPaneWithSpeed(techTable);
         scrollTechTable.setMinimumSize(new Dimension(200, 200));
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
         gridBagConstraints = new GridBagConstraints();

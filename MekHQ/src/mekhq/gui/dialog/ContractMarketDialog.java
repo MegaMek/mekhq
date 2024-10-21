@@ -35,6 +35,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.ContractSummaryPanel;
 
 import javax.swing.*;
@@ -123,8 +124,8 @@ public class ContractMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-        JScrollPane scrollTableContracts = new JScrollPane();
-        scrollContractView = new JScrollPane();
+        JScrollPane scrollTableContracts = new JScrollPaneWithSpeed();
+        scrollContractView = new JScrollPaneWithSpeed();
         JPanel panelTable = new JPanel();
         JPanel panelFees = new JPanel();
         JPanel panelRetainer = new JPanel();

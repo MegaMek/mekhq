@@ -38,6 +38,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Neoancient
@@ -55,7 +56,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
 
         getContentPane().setLayout(new BorderLayout());
         mainPanel = new BayMunitionsChoicePanel(unit.getEntity(), unit.getCampaign().getGame());
-        getContentPane().add(new JScrollPane(mainPanel), BorderLayout.CENTER);
+        getContentPane().add(new JScrollPaneWithSpeed(mainPanel), BorderLayout.CENTER);
         JPanel panButtons = new JPanel();
         JButton button = new JButton("OK");
         button.addActionListener(ev -> apply());

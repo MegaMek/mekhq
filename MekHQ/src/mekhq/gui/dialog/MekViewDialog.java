@@ -35,6 +35,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MekView;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -58,7 +59,7 @@ public class MekViewDialog extends JDialog {
 
     private void initComponents() {
 
-        jScrollPane2 = new JScrollPane();
+        jScrollPane2 = new JScrollPaneWithSpeed();
         txtMek = new JTextPane();
         btnOkay = new JButton();
 

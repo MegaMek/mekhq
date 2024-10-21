@@ -23,6 +23,7 @@ package mekhq.gui;
 
 import megamek.codeUtilities.StringUtility;
 import mekhq.Utilities;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -91,7 +92,7 @@ public class DailyReportLogPanel extends JPanel {
         getTxtLog().getAccessibleContext().setAccessibleName("Daily Log");
         getTxtLog().addHyperlinkListener(gui.getReportHLL());
 
-        final JScrollPane logPanel = new JScrollPane(getTxtLog());
+        final JScrollPane logPanel = new JScrollPaneWithSpeed(getTxtLog());
         logPanel.setBorder(new EmptyBorder(2,5,2,2));
         add(logPanel, BorderLayout.CENTER);
     }

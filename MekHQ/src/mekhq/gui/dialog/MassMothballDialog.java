@@ -49,6 +49,7 @@ import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
@@ -115,7 +116,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.gridy++;
         addExecuteButton(activating, gbc);
 
-        JScrollPane scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPaneWithSpeed();
         scrollPane.setViewportView(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setMaximumSize(new Dimension(600, 600));
@@ -196,7 +197,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         techList.setBorder(new LineBorder(Color.GRAY, 1));
         techList.setCellRenderer(new TechListCellRenderer());
 
-        JScrollPane techListPane = new JScrollPane();
+        JScrollPane techListPane = new JScrollPaneWithSpeed();
         techListPane.setViewportView(techList);
         techListPane.setMaximumSize(new Dimension(200, 100));
         techListPane.setPreferredSize(new Dimension(200, 50));

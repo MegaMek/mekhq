@@ -56,6 +56,7 @@ import megamek.server.ServerBoardHelper;
 import megamek.server.totalwarfare.TWGameManager;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class EditMapSettingsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(EditMapSettingsDialog.class);
@@ -133,7 +134,7 @@ public class EditMapSettingsDialog extends JDialog {
         panSizeFixed = new JPanel(new BorderLayout());
         JPanel panButtons = new JPanel(new FlowLayout());
 
-        scrChooseMap = new JScrollPane();
+        scrChooseMap = new JScrollPaneWithSpeed();
         scrChooseMap.setMinimumSize(new Dimension(600, 800));
         scrChooseMap.setPreferredSize(new Dimension(600, 800));
 

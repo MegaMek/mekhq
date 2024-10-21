@@ -47,6 +47,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A dialog to decide how you want to pay off collateral when you
@@ -134,7 +135,7 @@ public class PayCollateralDialog extends JDialog {
             pnlUnits.add(box, gridBagConstraints);
             i++;
         }
-        JScrollPane scrUnits = new JScrollPane();
+        JScrollPane scrUnits = new JScrollPaneWithSpeed();
         scrUnits.setViewportView(pnlUnits);
         scrUnits.setMinimumSize(new Dimension(400, 300));
         scrUnits.setPreferredSize(new Dimension(400, 300));
@@ -181,7 +182,7 @@ public class PayCollateralDialog extends JDialog {
                     + p.getActualValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
             i++;
         }
-        JScrollPane scrParts = new JScrollPane();
+        JScrollPane scrParts = new JScrollPaneWithSpeed();
         scrParts.setViewportView(pnlParts);
         scrParts.setMinimumSize(new Dimension(400, 300));
         scrParts.setPreferredSize(new Dimension(400, 300));
@@ -228,7 +229,7 @@ public class PayCollateralDialog extends JDialog {
             pnlAssets.add(box, gridBagConstraints);
             i++;
         }
-        JScrollPane scrAssets = new JScrollPane(pnlAssets);
+        JScrollPane scrAssets = new JScrollPaneWithSpeed(pnlAssets);
         scrAssets.setMinimumSize(new Dimension(400, 300));
         scrAssets.setPreferredSize(new Dimension(400, 300));
 
