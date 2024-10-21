@@ -1752,8 +1752,8 @@ public class Campaign implements ITechManager {
             recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 currentSpouse.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceSpouse.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
@@ -1799,8 +1799,8 @@ public class Campaign implements ITechManager {
             recruitPerson(child, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 child.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceChild.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
@@ -2250,13 +2250,11 @@ public class Campaign implements ITechManager {
             boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
 
         if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
-            return;
         } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
             partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
             if (incomingPart.isPresent()) {
                 if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
-                    return;
                 } else {
                     partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
                     partInUse.addSpare(incomingPart);
@@ -2273,7 +2271,7 @@ public class Campaign implements ITechManager {
      * @param ignoreMothballedUnits don't count parts in mothballed units
      * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
-    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits, 
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
             PartQuality ignoreSparesUnderQuality) {
         partInUse.setUseCount(0);
         partInUse.setStoreCount(0);
@@ -2290,7 +2288,7 @@ public class Campaign implements ITechManager {
             PartInUse newPiu = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPiu)) {
                 partInUse.setPlannedCount(partInUse.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? 
+                        + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
                             (Part) maybePart) * maybePart.getQuantity());
             }
@@ -2334,7 +2332,7 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             partInUse.setPlannedCount(partInUse.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? 
+                    + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
                             (Part) maybePart) * maybePart.getQuantity());
 
@@ -8002,7 +8000,7 @@ public class Campaign implements ITechManager {
                 // }
                 break;
         }
-        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) { 
+        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) {
             partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
                     "new quality is " + p.getQualityName());
