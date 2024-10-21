@@ -523,7 +523,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         loan.setInstitution(txtName.getText());
         loan.setReferenceNumber(txtNumber.getText());
         loan.setPrincipal(principal);
-        loan.setRate(Math.max(1, sldInterest.getValue()));
+        loan.setRate(sldInterest.getValue());
         loan.setYears(sldLength.getValue());
         loan.setFinancialTerm(choiceSchedule.getSelectedItem());
         loan.setCollateral(sldCollateral.getValue());
@@ -625,7 +625,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         if (campaign.getCampaignOptions().isUseLoanLimits()) {
             if (Objects.equals(e.getSource(), sldInterest)) {
                 sldCollateral.removeChangeListener(this);
-                sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, Math.max(1, sldInterest.getValue())));
+                sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, sldInterest.getValue()));
                 sldCollateral.addChangeListener(this);
             } else if (Objects.equals(e.getSource(), sldCollateral)) {
                 sldInterest.removeChangeListener(this);
