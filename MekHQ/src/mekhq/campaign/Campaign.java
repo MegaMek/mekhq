@@ -7689,7 +7689,7 @@ public class Campaign implements ITechManager {
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
             if (onOrder instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
-                nOrdered += ((Armor) onOrder).getAmount();
+                nOrdered += ((Armor) onOrder).getAmount() * ((Armor) onOrder).getQuantity();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
             } else {
