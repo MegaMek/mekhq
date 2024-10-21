@@ -1448,27 +1448,32 @@ public class Campaign implements ITechManager {
     // region Personnel
     // region Person Creation
     /**
-     * Creates a new {@link Person} instance who is a dependent.
-     * If {@code baby} is false and the random dependent origin option is enabled,
-     * the new person will have a random origin.
+     * Creates a new dependent with given gender. The origin faction and planet are set to null.
      *
-     * @param baby          a boolean indicating if the person is a baby or not
-     * @param gender        the Gender enum for the person (should normally be Gender.RANDOMIZE)
-     * @return a new {@link Person} instance who is a dependent
+     * @param gender The {@link Gender} of the new dependent.
+     * @return Return a {@link Person} object representing the new dependent.
      */
-    public Person newDependent(boolean baby, Gender gender) {
-        Person person;
+    public Person newDependent(Gender gender) {
+        return newDependent(gender, null, null);
+    }
 
-        if ((!baby) && (getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin())) {
-            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
-                    new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
-                    new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
-                    Gender.RANDOMIZE);
-        } else {
-            person = newPerson(PersonnelRole.DEPENDENT);
-        }
-
-        return person;
+    /**
+     * Creates a new dependent with given gender, origin faction and origin planet.
+     *
+     * @param gender The {@link Gender} of the new dependent.
+     * @param originFaction The {@link Faction} that represents the origin faction for the new dependent.
+     *                      This can be null, suggesting the faction will be chosen based on campaign options.
+     * @param originPlanet The {@link Planet} that represents the origin planet for the new dependent.
+     *                     This can be null, suggesting the planet will be chosen based on campaign options.
+     * @return Return a {@link Person} object representing the new dependent.
+     */
+    public Person newDependent(Gender gender, @Nullable Faction originFaction,
+                               @Nullable Planet originPlanet) {
+        return newPerson(PersonnelRole.DEPENDENT,
+            PersonnelRole.NONE,
+            new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), originFaction),
+            new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions(), originPlanet),
+            gender);
     }
 
     /**
@@ -2250,13 +2255,11 @@ public class Campaign implements ITechManager {
             boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
 
         if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
-            return;
         } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
             partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
             if (incomingPart.isPresent()) {
                 if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
-                    return;
                 } else {
                     partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
                     partInUse.addSpare(incomingPart);
@@ -2273,7 +2276,7 @@ public class Campaign implements ITechManager {
      * @param ignoreMothballedUnits don't count parts in mothballed units
      * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
-    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits, 
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
             PartQuality ignoreSparesUnderQuality) {
         partInUse.setUseCount(0);
         partInUse.setStoreCount(0);
@@ -2290,7 +2293,7 @@ public class Campaign implements ITechManager {
             PartInUse newPiu = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPiu)) {
                 partInUse.setPlannedCount(partInUse.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? 
+                        + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
                             (Part) maybePart) * maybePart.getQuantity());
             }
@@ -2334,7 +2337,7 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             partInUse.setPlannedCount(partInUse.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? 
+                    + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
                             (Part) maybePart) * maybePart.getQuantity());
 
@@ -4462,7 +4465,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (roll <= (getAtBUnitRatingMod() * 2)) {
-                    final Person dependent = newDependent(false, Gender.RANDOMIZE);
+                    final Person dependent = newDependent(Gender.RANDOMIZE);
 
                     recruitPerson(dependent, PrisonerStatus.FREE, true, false);
 
@@ -8002,7 +8005,7 @@ public class Campaign implements ITechManager {
                 // }
                 break;
         }
-        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) { 
+        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) {
             partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
                     "new quality is " + p.getQualityName());

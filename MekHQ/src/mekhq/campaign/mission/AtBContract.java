@@ -43,7 +43,6 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -662,7 +661,7 @@ public class AtBContract extends Contract {
                     campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
-                        Person p = campaign.newDependent(false, Gender.RANDOMIZE);
+                        Person p = campaign.newDependent(Gender.RANDOMIZE);
                         campaign.recruitPerson(p);
                     }
                 }
@@ -1934,7 +1933,7 @@ public class AtBContract extends Contract {
             // getMekSummary(int index) is NULL for salvage.
             int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
             int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
-            
+
             totalBattleValue += battleValue * weight;
             totalGBV += genericBattleValue * weight;
             rollingCount += weight;
