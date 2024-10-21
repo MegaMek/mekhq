@@ -768,7 +768,7 @@ public class PlanetarySystem {
             }
         }
         int score = calculateHiringHallScore(date);
-        return resolveHiringHallScore(score);
+        return resolveHiringHallLevel(score);
     }
 
     private int calculateHiringHallScore(LocalDate date) {
@@ -778,7 +778,7 @@ public class PlanetarySystem {
         return score;
     }
 
-    private HiringHallLevel resolveHiringHallScore(int score) {
+    private HiringHallLevel resolveHiringHallLevel(int score) {
         if (score > 9) {
             return HiringHallLevel.GREAT;
         } else if (score > 6) {
