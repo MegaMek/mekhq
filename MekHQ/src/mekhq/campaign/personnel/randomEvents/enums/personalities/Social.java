@@ -18,9 +18,10 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import java.util.ResourceBundle;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum Social {
     // region Enum Declarations
@@ -101,129 +102,8 @@ public enum Social {
     // endregion Getters
 
     // region Boolean Comparison Methods
-
     public boolean isNone() {
         return this == NONE;
-    }
-
-    public boolean isAltruistic() {
-        return this == ALTRUISTIC;
-    }
-
-    public boolean isApathetic() {
-        return this == APATHETIC;
-    }
-
-    public boolean isAuthentic() {
-        return this == AUTHENTIC;
-    }
-
-    public boolean isBlunt() {
-        return this == BLUNT;
-    }
-
-    public boolean isCallous() {
-        return this == CALLOUS;
-    }
-
-    public boolean isCompassionate() {
-        return this == COMPASSIONATE;
-    }
-
-    public boolean isCondescending() {
-        return this == CONDESCENDING;
-    }
-
-    public boolean isConsiderate() {
-        return this == CONSIDERATE;
-    }
-
-    public boolean isDisingenuous() {
-        return this == DISINGENUOUS;
-    }
-
-    public boolean isDismissive() {
-        return this == DISMISSIVE;
-    }
-
-    public boolean isEncouraging() {
-        return this == ENCOURAGING;
-    }
-
-    public boolean isErratic() {
-        return this == ERRATIC;
-    }
-
-    public boolean isEmpathetic() {
-        return this == EMPATHETIC;
-    }
-
-    public boolean isFriendly() {
-        return this == FRIENDLY;
-    }
-
-    public boolean isGregarious() {
-        return this == GREGARIOUS;
-    }
-
-    public boolean isInspiring() {
-        return this == INSPIRING;
-    }
-
-    public boolean isIndifferent() {
-        return this == INDIFFERENT;
-    }
-
-    public boolean isIntroverted() {
-        return this == INTROVERTED;
-    }
-
-    public boolean isIrritable() {
-        return this == IRRITABLE;
-    }
-
-    public boolean isNarcissistic() {
-        return this == NARCISSISTIC;
-    }
-
-    public boolean isNeglectful() {
-        return this == NEGLECTFUL;
-    }
-
-    public boolean isPompous() {
-        return this == POMPOUS;
-    }
-
-    public boolean isPetty() {
-        return this == PETTY;
-    }
-
-    public boolean isPersuasive() {
-        return this == PERSUASIVE;
-    }
-
-    public boolean isReceptive() {
-        return this == RECEPTIVE;
-    }
-
-    public boolean isScheming() {
-        return this == SCHEMING;
-    }
-
-    public boolean isSincere() {
-        return this == SINCERE;
-    }
-
-    public boolean isSupportive() {
-        return this == SUPPORTIVE;
-    }
-
-    public boolean isTactful() {
-        return this == TACTFUL;
-    }
-
-    public boolean isUntrustworthy() {
-        return this == UNTRUSTWORTHY;
     }
     // endregion Boolean Comparison Methods
 
@@ -237,7 +117,7 @@ public enum Social {
      * @throws IllegalStateException if the given string does not match any valid
      *                               Social
      */
-
+    @Deprecated
     public static Social parseFromString(final String social) {
         return switch (social) {
             case "0", "None" -> NONE;
@@ -281,54 +161,23 @@ public enum Social {
     }
 
     /**
-     * Parses an integer value into an Social enum.
+     * Returns the {@link Social} associated with the given ordinal.
      *
-     * @param social the integer value representing the Social level
-     * @return the corresponding Social enum value
-     * @throws IllegalStateException if the integer value does not correspond to any
-     *                               valid Social enum value
+     * @param ordinal the ordinal value of the {@link Social}
+     * @return the {@link Social} associated with the given ordinal, or default value
+     * {@code NONE} if not found
      */
+    public static Social fromOrdinal(int ordinal) {
+        for (Social social : values()) {
+            if (social.ordinal() == ordinal) {
+                return social;
+            }
+        }
 
-    public static Social parseFromInt(final int social) {
-        return switch (social) {
-            case 0 -> NONE;
-            // Minor Characteristics
-            case 1 -> APATHETIC;
-            case 2 -> AUTHENTIC;
-            case 3 -> BLUNT;
-            case 4 -> CALLOUS;
-            case 5 -> CONDESCENDING;
-            case 6 -> CONSIDERATE;
-            case 7 -> DISINGENUOUS;
-            case 8 -> DISMISSIVE;
-            case 9 -> ENCOURAGING;
-            case 10 -> ERRATIC;
-            case 11 -> EMPATHETIC;
-            case 12 -> FRIENDLY;
-            case 13 -> INSPIRING;
-            case 14 -> INDIFFERENT;
-            case 15 -> INTROVERTED;
-            case 16 -> IRRITABLE;
-            case 17 -> NEGLECTFUL;
-            case 18 -> PETTY;
-            case 19 -> PERSUASIVE;
-            case 20 -> RECEPTIVE;
-            case 21 -> SINCERE;
-            case 22 -> SUPPORTIVE;
-            case 23 -> TACTFUL;
-            case 24 -> UNTRUSTWORTHY;
-            // Major Characteristics
-            case 25 -> ALTRUISTIC;
-            case 26 -> COMPASSIONATE;
-            case 27 -> GREGARIOUS;
-            case 28 -> NARCISSISTIC;
-            case 29 -> POMPOUS;
-            case 30 -> SCHEMING;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromInt: "
-                                + social);
-        };
+        final MMLogger logger = MMLogger.create(Social.class);
+        logger.error(String.format("Unknown Social ordinal: %s - returning NONE.", ordinal));
+
+        return NONE;
     }
 
     @Override

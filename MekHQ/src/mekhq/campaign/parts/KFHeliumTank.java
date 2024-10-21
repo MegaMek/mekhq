@@ -72,6 +72,7 @@ public class KFHeliumTank extends Part {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Helium Tank";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -259,8 +260,7 @@ public class KFHeliumTank extends Part {
         if (!details.isEmpty()) {
             joiner.add(details);
         }
-        joiner.add(getUnitTonnage() + " tons")
-                .add(getDocks() + " collars");
+        joiner.add(getDocks() + " collars");
         return joiner.toString();
     }
 

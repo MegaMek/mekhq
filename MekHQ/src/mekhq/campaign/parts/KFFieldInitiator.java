@@ -72,6 +72,7 @@ public class KFFieldInitiator extends Part {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Field Initiator";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -257,8 +258,7 @@ public class KFFieldInitiator extends Part {
         if (!details.isEmpty()) {
             joiner.add(details);
         }
-        joiner.add(getUnitTonnage() + " tons")
-                .add(getDocks() + " collars");
+        joiner.add(getDocks() + " collars");
         return joiner.toString();
     }
 

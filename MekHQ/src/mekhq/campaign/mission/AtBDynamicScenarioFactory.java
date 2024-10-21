@@ -284,6 +284,7 @@ public class AtBDynamicScenarioFactory {
                 } else {
                     int weightClass = randomForceWeight();
 
+                    logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
@@ -645,7 +646,7 @@ public class AtBDynamicScenarioFactory {
 
                         if (unitWeights != null) {
                             generatedLance = generateLance(factionCode, skill, quality, unitTypes, unitWeights,
-                                requiredRoles, campaign, scenario);
+                                requiredRoles, campaign, scenario, allowsTanks);
                         } else {
                             generatedLance = new ArrayList<>();
                         }
@@ -656,7 +657,7 @@ public class AtBDynamicScenarioFactory {
                         }
                     } else {
                         generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles,
-                            campaign, scenario);
+                            campaign);
 
                         // If extreme temperatures are present and XCT infantry is not being generated,
                         // swap out standard armor for snowsuits or heat suits as appropriate
@@ -2825,83 +2826,29 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a lance or similar tactical grouping (star, Level II, etc.) of
-     * entities with given
-     * parameters.
-     * This overload is included as a convenience for when weight class is not
-     * important or doesn't
-     * apply to the desired entity types.
+     * Generates a lance or similar tactical grouping (star, Level II, etc.) of entities with the given parameters.
+     * This overload acts as a convenience method for situations where weight class is not applicable
+     * or is not an important factor in the desired entity types.
      *
-     * @param faction     The faction from which to generate entities.
-     * @param skill       {@link SkillLevel} target for all units
-     * @param quality     Quality of the units.
-     * @param unitTypes   List of {@link UnitType}, one for each unit to generate
-     * @param rolesByType Collections of roles required for each unit type
-     * @param campaign    working campaign.
-     * @return List of entities created for this lance/tactical group
+     * @param faction      The faction code from which to generate entities.
+     * @param skill        The targeted {@link SkillLevel} for all units.
+     * @param quality      The quality of the units.
+     * @param unitTypes    A {@link List} of {@link UnitType} integers, each entry corresponds to each
+     *                    unit to be created.
+     * @param rolesByType  A {@link Map} wherein the key is a unit type and the value is a {@link Collection}
+     *                    of roles required for that unit type.
+     * @param campaign     The current {@link Campaign}.
+     * @return             A {@link List} of {@link Entity} objects created for this lance or a tactical group.
      */
-    private static List<Entity> generateLance(String faction,
-            SkillLevel skill,
-            int quality,
-            List<Integer> unitTypes,
-            Map<Integer, Collection<MissionRole>> rolesByType,
-            Campaign campaign, Scenario scenario) {
+    private static List<Entity> generateLance(String faction, SkillLevel skill, int quality,
+            List<Integer> unitTypes, Map<Integer, Collection<MissionRole>> rolesByType,
+            Campaign campaign) {
 
         List<Entity> generatedEntities = new ArrayList<>();
 
-        for (int i = 0; i < unitTypes.size(); i++) {
-            Entity newEntity = getEntity(faction,
-                    skill,
-                    quality,
-                    unitTypes.get(i),
-                    UNIT_WEIGHT_UNSPECIFIED,
-                    rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
-                    campaign);
-
-            if (newEntity == null) {
-                // We reset the count locally, so that we're passing through the entire list.
-                // The idea is that this will give us the best chance of hitting a valid unit.
-                int freshIteration = 0;
-
-                while (freshIteration < unitTypes.size()) {
-                    newEntity = getEntity(faction,
-                        skill,
-                        quality,
-                        unitTypes.get(i),
-                        UNIT_WEIGHT_UNSPECIFIED,
-                        rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
-                        campaign);
-
-                    if (newEntity != null) {
-                        break;
-                    }
-
-                    freshIteration++;
-                }
-
-                // If we still haven't got a valid entity, use hardcoded fallbacks.
-                if (newEntity == null) {
-                    if (unitTypes.get(0) == UnitType.DROPSHIP) {
-                        newEntity = getEntity(faction,
-                            skill,
-                            quality,
-                            UnitType.DROPSHIP,
-                            UNIT_WEIGHT_UNSPECIFIED,
-                            List.of(CIVILIAN),
-                            campaign);
-                    } else {
-                        if (scenario.getBoardType() == T_GROUND) {
-                            getEntity(faction,
-                                skill,
-                                quality,
-                                UnitType.TANK,
-                                UNIT_WEIGHT_UNSPECIFIED,
-                                null,
-                                campaign);
-                        }
-                    }
-                }
-            }
+        for (Integer unitType : unitTypes) {
+            Entity newEntity = getEntity(faction, skill, quality, unitType, UNIT_WEIGHT_UNSPECIFIED,
+                rolesByType.getOrDefault(unitType, new ArrayList<>()), campaign);
 
             if (newEntity != null) {
                 generatedEntities.add(newEntity);
@@ -2912,32 +2859,28 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a lance or similar tactical grouping (star, Level II, etc.) of
-     * entities with given
-     * parameters. The number of entities generated is the lowest of number of unit
-     * types or number
-     * of provided weight classes.
+     * Generates a lance or similar tactical grouping (star, Level II, etc.) of entities with given parameters.
+     * The number of entities generated is tapered by the smallest length between the number of unit
+     * types and the number of provided weight classes.
      *
-     * @param faction     The faction from which to generate entities.
-     * @param skill       {@link SkillLevel} target for all units
-     * @param quality     Quality of the units.
-     * @param unitTypes   List of {@link UnitType}, one for each unit to generate;
-     *                    should be the same
-     *                    length as list of weights
-     * @param weights     Weight class string suitable for
-     *                    AtBConfiguration.decodeWeightStr
-     *                    e.g. "LMMH" generates one light, two medium, and one heavy
-     * @param rolesByType Collections of roles required for each unit type
-     * @param campaign    Working campaign
-     * @return List of entities created for this lance/tactical group
+     * @param faction         The faction code from which to generate entities.
+     * @param skill           The targeted {@link SkillLevel} for all units.
+     * @param quality         The quality of the units.
+     * @param unitTypes       A {@link List} of {@link UnitType} integers, should contain one entry
+     *                       for each unit to generate.
+     * @param weights         A weight class string suitable for AtBConfiguration.decodeWeightStr
+     *                       (e.g., "LMMH" generates one light, two medium, and one heavy).
+     * @param rolesByType     A {@link Map} where the key is a unit type and the value is a {@link Collection}
+     *                       of roles required for that unit type.
+     * @param campaign        The working {@link Campaign}.
+     * @param scenario        The {@link AtBScenario} the generated lance is for.
+     * @param allowsTanks     A boolean flag indicating whether the generation allows tanks.
+     * @return                A {@link List} of {@link Entity} objects created for this lance or a
+     *                        tactical group.
      */
-    private static List<Entity> generateLance(String faction,
-            SkillLevel skill,
-            int quality,
-            List<Integer> unitTypes,
-            String weights,
-            Map<Integer, Collection<MissionRole>> rolesByType,
-            Campaign campaign, AtBScenario scenario) {
+    private static List<Entity> generateLance(String faction, SkillLevel skill, int quality,
+            List<Integer> unitTypes, String weights, Map<Integer, Collection<MissionRole>> rolesByType,
+            Campaign campaign, AtBScenario scenario, boolean allowsTanks) {
         List<Entity> generatedEntities = new ArrayList<>();
 
         // If the number of unit types and number of weight classes don't match,
@@ -2957,32 +2900,55 @@ public class AtBDynamicScenarioFactory {
                 campaign, i);
 
             if (newEntity == null) {
-                // We reset the count locally, so that we're passing through the entire list.
-                // The idea is that this will give us the best chance of hitting a valid unit.
-                int freshIteration = 0;
+                logger.info(String.format("Failed to generate unit of type %s, weight %s. Beginning substitution.",
+                    UnitType.getTypeName(unitTypes.get(i)),
+                    EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, i))));
 
-                while (freshIteration < unitTypeSize) {
-                    newEntity = getNewEntity(faction, skill, quality, unitTypes, weights, rolesByType,
-                        campaign, freshIteration);
+                // If we've failed to get an entity, we start adjusting weight categories to see
+                // if we hit something valid.
+                // We start at lighter weights as, generally, they're less impactful than heavier units.
+                List<Integer> individualType = List.of(unitTypes.get(i));
+
+                Map<Integer, Collection<MissionRole>> individualRole = new HashMap<>();
+                individualRole.put(0, rolesByType.getOrDefault(unitTypes.get(i), List.of()));
+
+                List<String> weightClasses = List.of("UL", "L", "M", "H", "A");
+
+                for (String weight : weightClasses) {
+                    newEntity = getNewEntity(faction, skill, quality, individualType, weight, individualRole, campaign, 0);
 
                     if (newEntity != null) {
+                        logger.info(String.format("Substitution successful (%s)",
+                            EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, i))));
                         break;
                     }
-
-                    freshIteration++;
                 }
 
                 // If we still haven't got a valid entity, use hardcoded fallbacks.
                 if (newEntity == null) {
+                    logger.info("Substitution unsuccessful. Using hardcoded fallbacks");
+
                     if (unitTypes.get(0) == UnitType.DROPSHIP) {
-                        newEntity = getNewEntity(faction, skill, quality, List.of(UnitType.TANK),
+                        newEntity = getNewEntity(faction, skill, quality, List.of(UnitType.DROPSHIP),
                             weights, Map.of(UnitType.DROPSHIP, List.of(CIVILIAN)),
                             campaign, 0);
+
+                        if (newEntity != null) {
+                            logger.info("Substitution successful. Substituted with Civilian DropShip.");
+                        }
                     } else {
-                        if (scenario.getBoardType() == T_GROUND) {
+                        if (scenario.getBoardType() == T_GROUND && allowsTanks) {
                             newEntity = getNewEntity(faction, skill, quality, List.of(UnitType.TANK),
                                 weights, null, campaign, 0);
+
+                            if (newEntity != null) {
+                                logger.info("Substitution successful. Substituted with Tank.");
+                            }
                         }
+                    }
+
+                    if (newEntity == null) {
+                        logger.info("Substitution unsuccessful. Abandoning attempts to generate unit.");
                     }
                 }
             }

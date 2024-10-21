@@ -1221,13 +1221,11 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
-                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
-        rdd.setLocation(rdd.getLocation().x, 0);
-        rdd.setVisible(true);
+        boolean doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
+        RetirementDefectionDialog dialog = new RetirementDefectionDialog(this, null, doRetirement);
 
-        if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+        if (!dialog.wasAborted()) {
+            getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
             return true;
         } else {
             return false;
@@ -2419,7 +2417,7 @@ public class CampaignGUI extends JPanel {
                         continue;
                     }
                     scenario.addForces(sub.getId());
-                    sub.setScenarioId(scenario.getId());
+                    sub.setScenarioId(scenario.getId(), getCampaign());
                 }
                 prevId = parent.getId();
             }

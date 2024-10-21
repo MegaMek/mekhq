@@ -65,6 +65,7 @@ public class ProtoMekArmActuator extends Part {
         super(tonnage, c);
         this.name = "ProtoMek Arm Actuator";
         this.location = loc;
+        this.unitTonnageMatters = true;
     }
 
     public void setLocation(int loc) {

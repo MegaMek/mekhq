@@ -64,7 +64,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
      * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
     @Override
     public String getLocationName() {
-        if (unit.getEntity() instanceof Aero
+        if ((null != unit) && (unit.getEntity() instanceof Aero)
                 && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return "Fuselage";
         }
@@ -73,7 +73,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     @Override
     public int getLocation() {
-        if (unit.getEntity() instanceof Aero
+        if ((null != unit) && (unit.getEntity() instanceof Aero)
                 && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))) {
             return Aero.LOC_NONE;
         }

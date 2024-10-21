@@ -27,12 +27,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.util.StringJoiner;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -77,6 +75,7 @@ public class MekActuator extends Part {
         Mek m = new BipedMek();
         this.name = m.getSystemName(type) + " Actuator";
         this.location = loc;
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -228,21 +227,6 @@ public class MekActuator extends Part {
     @Override
     public String getDetails() {
         return getDetails(true);
-    }
-
-    @Override
-    public String getDetails(boolean includeRepairDetails) {
-        if (null != unit) {
-            StringJoiner sj = new StringJoiner(", ");
-            if (!StringUtils.isEmpty(getLocationName())) {
-                sj.add(getLocationName());
-            }
-            if (includeRepairDetails && campaign.getCampaignOptions().isPayForRepairs()) {
-                sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
-            }
-            return sj.toString();
-        }
-        return getUnitTonnage() + " tons";
     }
 
     @Override

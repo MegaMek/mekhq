@@ -41,6 +41,7 @@ public class MissingMekSensor extends MissingPart {
     public MissingMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = resources.getString("MissingMekSensor.title");
+        this.unitTonnageMatters = true;
     }
 
     @Override

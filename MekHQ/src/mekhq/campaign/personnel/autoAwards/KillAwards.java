@@ -18,25 +18,6 @@
  */
 package mekhq.campaign.personnel.autoAwards;
 
-import static mekhq.campaign.force.FormationLevel.ARMY;
-import static mekhq.campaign.force.FormationLevel.BATTALION;
-import static mekhq.campaign.force.FormationLevel.BRIGADE;
-import static mekhq.campaign.force.FormationLevel.COMPANY;
-import static mekhq.campaign.force.FormationLevel.CORPS;
-import static mekhq.campaign.force.FormationLevel.DIVISION;
-import static mekhq.campaign.force.FormationLevel.LANCE;
-import static mekhq.campaign.force.FormationLevel.NONE;
-import static mekhq.campaign.force.FormationLevel.REGIMENT;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.UUID;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
@@ -44,6 +25,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
+
+import java.util.*;
+
+import static mekhq.campaign.force.FormationLevel.*;
 
 public class KillAwards {
     private static final MMLogger logger = MMLogger.create(KillAwards.class);
@@ -136,12 +121,22 @@ public class KillAwards {
                         // origin force
                         // (the one named after the campaign), we can cheat and just total all kills
                         if (maximumDepth.getDepth() < awardDepth.getDepth()) {
-                            killCount.add(killData.keySet().stream()
-                                    .mapToInt(force -> force)
-                                    .filter(force -> force != -1) // a value of -1 means no force was recorded for that
-                                                                  // kill
-                                    .map(force -> killData.get(force).size())
-                                    .sum());
+                            Set<String> identifiers = new HashSet<>();
+                            List<Kill> sanitizedKills = new ArrayList<>();
+
+                            for (Integer force : killData.keySet()) {
+                                if (force != -1) { // a value of -1 implies no force was recorded for that kill
+                                    for (Kill kill : killData.get(force)) {
+                                        String awardIdentifier = kill.getAwardIdentifier();
+                                        if (!identifiers.contains(awardIdentifier)) {
+                                            identifiers.add(awardIdentifier);
+                                            sanitizedKills.add(kill);
+                                        }
+                                    }
+                                }
+                            }
+
+                            killCount.add(sanitizedKills.size());
 
                             // if we can't cheat, we need to read the TO&E and gather a list of appropriate
                             // kill counts.
@@ -163,8 +158,7 @@ public class KillAwards {
                             // but that's ok, in that case we just use a default value
                             try {
                                 originForce = campaign.getPerson(person).getUnit().getForceId();
-                            } catch (Exception ignored) {
-                            }
+                            } catch (Exception ignored) {}
 
                             if ((originForce != -1) && (!forceCredits.contains(originForce))) {
                                 forceCredits.add(originForce);
@@ -174,7 +168,7 @@ public class KillAwards {
                             // walking through the TO&E and gathering any associated kills
                             for (int forceId : forceCredits) {
                                 originForce = forceId;
-                                int kills;
+                                List<Kill> temporaryKills = new ArrayList<>();
 
                                 try {
                                     // Get the current formation depth of the origin force
@@ -198,11 +192,25 @@ public class KillAwards {
                                     }
 
                                     Force originNode = campaign.getForce(originForce);
-                                    kills = walkToeForKills(killData, originNode, new HashSet<>(forceCredits));
+                                    temporaryKills = walkToeForKills(killData, originNode, new HashSet<>(forceCredits));
                                 } catch (Exception e) {
-                                    kills = killData.get(forceId).size();
+                                    temporaryKills.addAll(killData.get(forceId));
                                 }
 
+                                Set<String> identifiers = new HashSet<>();
+                                List<Kill> sanitizedKills = new ArrayList<>();
+
+                                for (Kill kill : temporaryKills) {
+                                    String awardIdentifier = kill.getAwardIdentifier();
+
+                                    if (!identifiers.contains(awardIdentifier)) {
+                                        identifiers.add(awardIdentifier);
+                                        sanitizedKills.add(kill);
+                                    }
+                                }
+
+
+                                int kills = sanitizedKills.size();
                                 if (kills >= killsNeeded) {
                                     killCount.add(kills);
                                     break;
@@ -301,20 +309,19 @@ public class KillAwards {
     }
 
     /**
-     * Calculates the total number of kills from a given originNode in the killData
-     * map.
+     * Traverses the graph of Forces, starting from an origin Force, to collect associated kills from each eligible Force node in the graph.
+     * The traversal uses a depth-first search approach to visit each Force node.
      *
-     * @param killData     the map of kill records mapped to Force ID
-     * @param originNode   the Force node to start the traversal from
-     * @param forceCredits the set of Force IDs eligible for kills
-     * @return the total number of kills for the originNode
+     * @param killData the map containing kill records wherein the key is the Force ID and the value is a list of associated Kill objects.
+     * @param originNode the initial Force node from which the traversal begins.
+     * @param forceCredits the set containing the Force ID's that are eligible for collecting kills.
+     * @return a list of Kill objects that are associated with the traversed Force nodes that are also present in the 'forceCredits' set.
      */
-    private static int walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode, Set<Integer> forceCredits) {
-        int kills = 0;
+    private static List<Kill> walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode, Set<Integer> forceCredits) {
+        List<Kill> kills = new ArrayList<>();
 
         Stack<Force> stack = new Stack<>();
-        // we add visited nodes to a set, so we don't run the risk of re-evaluating
-        // previously visited nodes
+        // we add visited nodes to a set, so we don't run the risk of re-evaluating previously visited nodes
         Set<Integer> visitedForces = new HashSet<>();
         stack.push(originNode);
 
@@ -323,7 +330,7 @@ public class KillAwards {
 
             if (!visitedForces.contains(currentNode.getId())) {
                 if (forceCredits.contains(currentNode.getId())) {
-                    kills += killData.get(currentNode.getId()).size();
+                    kills.addAll(killData.get(currentNode.getId()));
                 }
 
                 for (Force subForce : currentNode.getSubForces()) {

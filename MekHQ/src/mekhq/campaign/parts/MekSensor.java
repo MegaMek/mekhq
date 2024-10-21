@@ -47,6 +47,7 @@ public class MekSensor extends Part {
     public MekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mek Sensors";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -219,20 +220,6 @@ public class MekSensor extends Part {
             }
         }
         return false;
-    }
-
-    @Override
-    public String getDetails() {
-        return getDetails(true);
-    }
-
-    @Override
-    public String getDetails(boolean includeRepairDetails) {
-        String details = super.getDetails(includeRepairDetails);
-        if (!details.isEmpty()) {
-            details += ", ";
-        }
-        return  details + getUnitTonnage() + " tons";
     }
 
     @Override

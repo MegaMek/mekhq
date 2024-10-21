@@ -18,9 +18,10 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import java.util.ResourceBundle;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum PersonalityQuirk {
     // region Enum Declarations
@@ -129,7 +130,118 @@ public enum PersonalityQuirk {
     WEATHERMAN("PersonalityQuirk.WEATHERMAN.text", "PersonalityQuirk.WEATHERMAN.description"),
     WHISTLER("PersonalityQuirk.WHISTLER.text", "PersonalityQuirk.WHISTLER.description"),
     WORRIER("PersonalityQuirk.WORRIER.text", "PersonalityQuirk.WORRIER.description"),
-    WRITER("PersonalityQuirk.WRITER.text", "PersonalityQuirk.WRITER.description");
+    WRITER("PersonalityQuirk.WRITER.text", "PersonalityQuirk.WRITER.description"),
+    BATTLEFIELD_NOSTALGIA("PersonalityQuirk.BATTLEFIELD_NOSTALGIA.text", "PersonalityQuirk.BATTLEFIELD_NOSTALGIA.description"),
+    HEAVY_HANDED("PersonalityQuirk.HEAVY_HANDED.text", "PersonalityQuirk.HEAVY_HANDED.description"),
+    RATION_HOARDER("PersonalityQuirk.RATION_HOARDER.text", "PersonalityQuirk.RATION_HOARDER.description"),
+    EMERGENCY_MANUAL_READER("PersonalityQuirk.EMERGENCY_MANUAL_READER.text", "PersonalityQuirk.EMERGENCY_MANUAL_READER.description"),
+    QUICK_TO_QUIP("PersonalityQuirk.QUICK_TO_QUIP.text", "PersonalityQuirk.QUICK_TO_QUIP.description"),
+    TECH_SKEPTIC("PersonalityQuirk.TECH_SKEPTIC.text", "PersonalityQuirk.TECH_SKEPTIC.description"),
+    POST_BATTLE_RITUALS("PersonalityQuirk.POST_BATTLE_RITUALS.text", "PersonalityQuirk.POST_BATTLE_RITUALS.description"),
+    OVER_COMMUNICATOR("PersonalityQuirk.OVER_COMMUNICATOR.text", "PersonalityQuirk.OVER_COMMUNICATOR.description"),
+    FIELD_MEDIC("PersonalityQuirk.FIELD_MEDIC.text", "PersonalityQuirk.FIELD_MEDIC.description"),
+    SYSTEM_CALIBRATOR("PersonalityQuirk.SYSTEM_CALIBRATOR.text", "PersonalityQuirk.SYSTEM_CALIBRATOR.description"),
+    AMMO_COUNTER("PersonalityQuirk.AMMO_COUNTER.text", "PersonalityQuirk.AMMO_COUNTER.description"),
+    BRAVADO("PersonalityQuirk.BRAVADO.text", "PersonalityQuirk.BRAVADO.description"),
+    COMBAT_SONG("PersonalityQuirk.COMBAT_SONG.text", "PersonalityQuirk.COMBAT_SONG.description"),
+    COMMS_TOGGLE("PersonalityQuirk.COMMS_TOGGLE.text", "PersonalityQuirk.COMMS_TOGGLE.description"),
+    EJECTION_READY("PersonalityQuirk.EJECTION_READY.text", "PersonalityQuirk.EJECTION_READY.description"),
+    HAND_SIGNS("PersonalityQuirk.HAND_SIGNS.text", "PersonalityQuirk.HAND_SIGNS.description"),
+    HATE_FOR_MEKS("PersonalityQuirk.HATE_FOR_MEKS.text", "PersonalityQuirk.HATE_FOR_MEKS.description"),
+    IMPROVISED_WEAPONRY("PersonalityQuirk.IMPROVISED_WEAPONRY.text", "PersonalityQuirk.IMPROVISED_WEAPONRY.description"),
+    PRE_BATTLE_SUPERSTITIONS("PersonalityQuirk.PRE_BATTLE_SUPERSTITIONS.text", "PersonalityQuirk.PRE_BATTLE_SUPERSTITIONS.description"),
+    SILENT_LEADER("PersonalityQuirk.SILENT_LEADER.text", "PersonalityQuirk.SILENT_LEADER.description"),
+    BATTLE_CRITIC("PersonalityQuirk.BATTLE_CRITIC.text", "PersonalityQuirk.BATTLE_CRITIC.description"),
+    CHECKS_WEAPON_SAFETY("PersonalityQuirk.CHECKS_WEAPON_SAFETY.text", "PersonalityQuirk.CHECKS_WEAPON_SAFETY.description"),
+    CLOSE_COMBAT_PREF("PersonalityQuirk.CLOSE_COMBAT_PREF.text", "PersonalityQuirk.CLOSE_COMBAT_PREF.description"),
+    COMBAT_POET("PersonalityQuirk.COMBAT_POET.text", "PersonalityQuirk.COMBAT_POET.description"),
+    CUSTOM_DECALS("PersonalityQuirk.CUSTOM_DECALS.text", "PersonalityQuirk.CUSTOM_DECALS.description"),
+    DISPLAYS_TROPHIES("PersonalityQuirk.DISPLAYS_TROPHIES.text", "PersonalityQuirk.DISPLAYS_TROPHIES.description"),
+    DO_IT_YOURSELF("PersonalityQuirk.DO_IT_YOURSELF.text", "PersonalityQuirk.DO_IT_YOURSELF.description"),
+    FIELD_IMPROVISER("PersonalityQuirk.FIELD_IMPROVISER.text", "PersonalityQuirk.FIELD_IMPROVISER.description"),
+    LOUD_COMMS("PersonalityQuirk.LOUD_COMMS.text", "PersonalityQuirk.LOUD_COMMS.description"),
+    WAR_STORIES("PersonalityQuirk.WAR_STORIES.text", "PersonalityQuirk.WAR_STORIES.description"),
+    ALL_OR_NOTHING("PersonalityQuirk.ALL_OR_NOTHING.text", "PersonalityQuirk.ALL_OR_NOTHING.description"),
+    BOOTS_ON_THE_GROUND("PersonalityQuirk.BOOTS_ON_THE_GROUND.text", "PersonalityQuirk.BOOTS_ON_THE_GROUND.description"),
+    BRAVERY_BOASTER("PersonalityQuirk.BRAVERY_BOASTER.text", "PersonalityQuirk.BRAVERY_BOASTER.description"),
+    COCKPIT_DRIFTER("PersonalityQuirk.COCKPIT_DRIFTER.text", "PersonalityQuirk.COCKPIT_DRIFTER.description"),
+    CONSPIRACY_THEORIST("PersonalityQuirk.CONSPIRACY_THEORIST.text", "PersonalityQuirk.CONSPIRACY_THEORIST.description"),
+    DEVOUT_WARRIOR("PersonalityQuirk.DEVOUT_WARRIOR.text", "PersonalityQuirk.DEVOUT_WARRIOR.description"),
+    DUAL_WIELDING("PersonalityQuirk.DUAL_WIELDING.text", "PersonalityQuirk.DUAL_WIELDING.description"),
+    EMBLEM_LOVER("PersonalityQuirk.EMBLEM_LOVER.text", "PersonalityQuirk.EMBLEM_LOVER.description"),
+    EXCESSIVE_DEBRIEFING("PersonalityQuirk.EXCESSIVE_DEBRIEFING.text", "PersonalityQuirk.EXCESSIVE_DEBRIEFING.description"),
+    EYE_FOR_ART("PersonalityQuirk.EYE_FOR_ART.text", "PersonalityQuirk.EYE_FOR_ART.description"),
+    FAST_TALKER("PersonalityQuirk.FAST_TALKER.text", "PersonalityQuirk.FAST_TALKER.description"),
+    FINGER_GUNS("PersonalityQuirk.FINGER_GUNS.text", "PersonalityQuirk.FINGER_GUNS.description"),
+    FLARE_DEPLOYER("PersonalityQuirk.FLARE_DEPLOYER.text", "PersonalityQuirk.FLARE_DEPLOYER.description"),
+    FRIENDLY_INTERROGATOR("PersonalityQuirk.FRIENDLY_INTERROGATOR.text", "PersonalityQuirk.FRIENDLY_INTERROGATOR.description"),
+    GUN_NUT("PersonalityQuirk.GUN_NUT.text", "PersonalityQuirk.GUN_NUT.description"),
+    LAST_MAN_STANDING("PersonalityQuirk.LAST_MAN_STANDING.text", "PersonalityQuirk.LAST_MAN_STANDING.description"),
+    LEGENDARY_MEK("PersonalityQuirk.LEGENDARY_MEK.text", "PersonalityQuirk.LEGENDARY_MEK.description"),
+    PASSIVE_LEADER("PersonalityQuirk.PASSIVE_LEADER.text", "PersonalityQuirk.PASSIVE_LEADER.description"),
+    REBEL_WITHOUT_CAUSE("PersonalityQuirk.REBEL_WITHOUT_CAUSE.text", "PersonalityQuirk.REBEL_WITHOUT_CAUSE.description"),
+    SIMPLE_LIFE("PersonalityQuirk.SIMPLE_LIFE.text", "PersonalityQuirk.SIMPLE_LIFE.description"),
+    ANTI_AUTHORITY("PersonalityQuirk.ANTI_AUTHORITY.text", "PersonalityQuirk.ANTI_AUTHORITY.description"),
+    BLOODLUST("PersonalityQuirk.BLOODLUST.text", "PersonalityQuirk.BLOODLUST.description"),
+    BRAVERY_IN_DOUBT("PersonalityQuirk.BRAVERY_IN_DOUBT.text", "PersonalityQuirk.BRAVERY_IN_DOUBT.description"),
+    CLOSE_QUARTERS_ONLY("PersonalityQuirk.CLOSE_QUARTERS_ONLY.text", "PersonalityQuirk.CLOSE_QUARTERS_ONLY.description"),
+    COOL_UNDER_FIRE("PersonalityQuirk.COOL_UNDER_FIRE.text", "PersonalityQuirk.COOL_UNDER_FIRE.description"),
+    CRASH_TEST("PersonalityQuirk.CRASH_TEST.text", "PersonalityQuirk.CRASH_TEST.description"),
+    DEAD_PAN_HUMOR("PersonalityQuirk.DEAD_PAN_HUMOR.text", "PersonalityQuirk.DEAD_PAN_HUMOR.description"),
+    DRILLS("PersonalityQuirk.DRILLS.text", "PersonalityQuirk.DRILLS.description"),
+    ENEMY_RESPECT("PersonalityQuirk.ENEMY_RESPECT.text", "PersonalityQuirk.ENEMY_RESPECT.description"),
+    EXTREME_MORNING_PERSON("PersonalityQuirk.EXTREME_MORNING_PERSON.text", "PersonalityQuirk.EXTREME_MORNING_PERSON.description"),
+    GALLANT("PersonalityQuirk.GALLANT.text", "PersonalityQuirk.GALLANT.description"),
+    IRON_STOMACH("PersonalityQuirk.IRON_STOMACH.text", "PersonalityQuirk.IRON_STOMACH.description"),
+    MISSION_CRITIC("PersonalityQuirk.MISSION_CRITIC.text", "PersonalityQuirk.MISSION_CRITIC.description"),
+    NO_PAIN_NO_GAIN("PersonalityQuirk.NO_PAIN_NO_GAIN.text", "PersonalityQuirk.NO_PAIN_NO_GAIN.description"),
+    PERSONAL_ARMORY("PersonalityQuirk.PERSONAL_ARMORY.text", "PersonalityQuirk.PERSONAL_ARMORY.description"),
+    QUICK_ADAPTER("PersonalityQuirk.QUICK_ADAPTER.text", "PersonalityQuirk.QUICK_ADAPTER.description"),
+    RETALIATOR("PersonalityQuirk.RETALIATOR.text", "PersonalityQuirk.RETALIATOR.description"),
+    RUSH_HOUR("PersonalityQuirk.RUSH_HOUR.text", "PersonalityQuirk.RUSH_HOUR.description"),
+    SILENT_PROTECTOR("PersonalityQuirk.SILENT_PROTECTOR.text", "PersonalityQuirk.SILENT_PROTECTOR.description"),
+    ALWAYS_TACTICAL("PersonalityQuirk.ALWAYS_TACTICAL.text", "PersonalityQuirk.ALWAYS_TACTICAL.description"),
+    BATTLE_SCREAM("PersonalityQuirk.BATTLE_SCREAM.text", "PersonalityQuirk.BATTLE_SCREAM.description"),
+    BRIEF_AND_TO_THE_POINT("PersonalityQuirk.BRIEF_AND_TO_THE_POINT.text", "PersonalityQuirk.BRIEF_AND_TO_THE_POINT.description"),
+    CALLSIGN_COLLECTOR("PersonalityQuirk.CALLSIGN_COLLECTOR.text", "PersonalityQuirk.CALLSIGN_COLLECTOR.description"),
+    CHATTERBOX("PersonalityQuirk.CHATTERBOX.text", "PersonalityQuirk.CHATTERBOX.description"),
+    COMBAT_ARTIST("PersonalityQuirk.COMBAT_ARTIST.text", "PersonalityQuirk.COMBAT_ARTIST.description"),
+    DARING_ESCAPE("PersonalityQuirk.DARING_ESCAPE.text", "PersonalityQuirk.DARING_ESCAPE.description"),
+    DOOMSDAY_PREPPER("PersonalityQuirk.DOOMSDAY_PREPPER.text", "PersonalityQuirk.DOOMSDAY_PREPPER.description"),
+    EQUIPMENT_SCAVENGER("PersonalityQuirk.EQUIPMENT_SCAVENGER.text", "PersonalityQuirk.EQUIPMENT_SCAVENGER.description"),
+    FRIEND_TO_FOES("PersonalityQuirk.FRIEND_TO_FOES.text", "PersonalityQuirk.FRIEND_TO_FOES.description"),
+    GUNG_HO("PersonalityQuirk.GUNG_HO.text", "PersonalityQuirk.GUNG_HO.description"),
+    INSPIRATIONAL_POET("PersonalityQuirk.INSPIRATIONAL_POET.text", "PersonalityQuirk.INSPIRATIONAL_POET.description"),
+    MEK_MATCHMAKER("PersonalityQuirk.MEK_MATCHMAKER.text", "PersonalityQuirk.MEK_MATCHMAKER.description"),
+    MISSILE_JUNKIE("PersonalityQuirk.MISSILE_JUNKIE.text", "PersonalityQuirk.MISSILE_JUNKIE.description"),
+    NEVER_RETREAT("PersonalityQuirk.NEVER_RETREAT.text", "PersonalityQuirk.NEVER_RETREAT.description"),
+    OPTIMISTIC_TO_A_FAULT("PersonalityQuirk.OPTIMISTIC_TO_A_FAULT.text", "PersonalityQuirk.OPTIMISTIC_TO_A_FAULT.description"),
+    REACTIVE("PersonalityQuirk.REACTIVE.text", "PersonalityQuirk.REACTIVE.description"),
+    RISK_TAKER("PersonalityQuirk.RISK_TAKER.text", "PersonalityQuirk.RISK_TAKER.description"),
+    SIGNATURE_MOVE("PersonalityQuirk.SIGNATURE_MOVE.text", "PersonalityQuirk.SIGNATURE_MOVE.description"),
+    TACTICAL_WITHDRAWAL("PersonalityQuirk.TACTICAL_WITHDRAWAL.text", "PersonalityQuirk.TACTICAL_WITHDRAWAL.description"),
+    ACCENT_SWITCHER("PersonalityQuirk.ACCENT_SWITCHER.text", "PersonalityQuirk.ACCENT_SWITCHER.description"),
+    AMBUSH_LOVER("PersonalityQuirk.AMBUSH_LOVER.text", "PersonalityQuirk.AMBUSH_LOVER.description"),
+    BATTLE_HARDENED("PersonalityQuirk.BATTLE_HARDENED.text", "PersonalityQuirk.BATTLE_HARDENED.description"),
+    BREAKS_RADIO_SILENCE("PersonalityQuirk.BREAKS_RADIO_SILENCE.text", "PersonalityQuirk.BREAKS_RADIO_SILENCE.description"),
+    CONVOY_LOVER("PersonalityQuirk.CONVOY_LOVER.text", "PersonalityQuirk.CONVOY_LOVER.description"),
+    DEBRIS_SLINGER("PersonalityQuirk.DEBRIS_SLINGER.text", "PersonalityQuirk.DEBRIS_SLINGER.description"),
+    CAMOUFLAGE("PersonalityQuirk.CAMOUFLAGE.text", "PersonalityQuirk.CAMOUFLAGE.description"),
+    DISTANT_LEADER("PersonalityQuirk.DISTANT_LEADER.text", "PersonalityQuirk.DISTANT_LEADER.description"),
+    DRAMATIC_FINISH("PersonalityQuirk.DRAMATIC_FINISH.text", "PersonalityQuirk.DRAMATIC_FINISH.description"),
+    ENGINE_REVERER("PersonalityQuirk.ENGINE_REVERER.text", "PersonalityQuirk.ENGINE_REVERER.description"),
+    FLIRTY_COMMS("PersonalityQuirk.FLIRTY_COMMS.text", "PersonalityQuirk.FLIRTY_COMMS.description"),
+    FOCUS_FREAK("PersonalityQuirk.FOCUS_FREAK.text", "PersonalityQuirk.FOCUS_FREAK.description"),
+    FOUL_MOUTHED("PersonalityQuirk.FOUL_MOUTHED.text", "PersonalityQuirk.FOUL_MOUTHED.description"),
+    FREESTYLE_COMBAT("PersonalityQuirk.FREESTYLE_COMBAT.text", "PersonalityQuirk.FREESTYLE_COMBAT.description"),
+    GEOMETRY_GURU("PersonalityQuirk.GEOMETRY_GURU.text", "PersonalityQuirk.GEOMETRY_GURU.description"),
+    ICE_COLD("PersonalityQuirk.ICE_COLD.text", "PersonalityQuirk.ICE_COLD.description"),
+    PICKY_ABOUT_GEAR("PersonalityQuirk.PICKY_ABOUT_GEAR.text", "PersonalityQuirk.PICKY_ABOUT_GEAR.description"),
+    RECORD_KEEPER("PersonalityQuirk.RECORD_KEEPER.text", "PersonalityQuirk.RECORD_KEEPER.description"),
+    RESOURCE_SCROUNGER("PersonalityQuirk.RESOURCE_SCROUNGER.text", "PersonalityQuirk.RESOURCE_SCROUNGER.description"),
+    TRASH_TALKER("PersonalityQuirk.TRASH_TALKER.text", "PersonalityQuirk.TRASH_TALKER.description"),
+    CORRECTS_PRONOUNS("PersonalityQuirk.CORRECTS_PRONOUNS.text", "PersonalityQuirk.CORRECTS_PRONOUNS.description"),
+    BODY_DISCOMFORT("PersonalityQuirk.BODY_DISCOMFORT.text", "PersonalityQuirk.BODY_DISCOMFORT.description");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -158,406 +270,6 @@ public enum PersonalityQuirk {
     public boolean isNone() {
         return this == NONE;
     }
-
-    public boolean isAdjustsClothes() {
-        return this == ADJUSTS_CLOTHES;
-    }
-
-    public boolean isAffectionate() {
-        return this == AFFECTIONATE;
-    }
-
-    public boolean isApologetic() {
-        return this == APOLOGETIC;
-    }
-
-    public boolean isBookworm() {
-        return this == BOOKWORM;
-    }
-
-    public boolean isCalendar() {
-        return this == CALENDAR;
-    }
-
-    public boolean isCandles() {
-        return this == CANDLES;
-    }
-
-    public boolean isChewingGum() {
-        return this == CHEWING_GUM;
-    }
-
-    public boolean isChronicLateness() {
-        return this == CHRONIC_LATENESS;
-    }
-
-    public boolean isCleaner() {
-        return this == CLEANER;
-    }
-
-    public boolean isCollector() {
-        return this == COLLECTOR;
-    }
-
-    public boolean isCompetitiveNature() {
-        return this == COMPETITIVE_NATURE;
-    }
-
-    public boolean isCompliments() {
-        return this == COMPLIMENTS;
-    }
-
-    public boolean isDaydreamer() {
-        return this == DAYDREAMER;
-    }
-
-    public boolean isDoodler() {
-        return this == DOODLER;
-    }
-
-    public boolean isDoolittle() {
-        return this == DOOLITTLE;
-    }
-
-    public boolean isDramatic() {
-        return this == DRAMATIC;
-    }
-
-    public boolean isEatingHabits() {
-        return this == EATING_HABITS;
-    }
-
-    public boolean isEnvironmentalSensitivity() {
-        return this == ENVIRONMENTAL_SENSITIVITY;
-    }
-
-    public boolean isExcessiveCaution() {
-        return this == EXCESSIVE_CAUTION;
-    }
-
-    public boolean isExcessiveGreeting() {
-        return this == EXCESSIVE_GREETING;
-    }
-
-    public boolean isEyeContact() {
-        return this == EYE_CONTACT;
-    }
-
-    public boolean isFashionChoices() {
-        return this == FASHION_CHOICES;
-    }
-
-    public boolean isFidgets() {
-        return this == FIDGETS;
-    }
-
-    public boolean isFitness() {
-        return this == FITNESS;
-    }
-
-    public boolean isFixates() {
-        return this == FIXATES;
-    }
-
-    public boolean isFlask() {
-        return this == FLASK;
-    }
-
-    public boolean isFootTapper() {
-        return this == FOOT_TAPPER;
-    }
-
-    public boolean isForgetful() {
-        return this == FORGETFUL;
-    }
-
-    public boolean isFormalSpeech() {
-        return this == FORMAL_SPEECH;
-    }
-
-    public boolean isFurniture() {
-        return this == FURNITURE;
-    }
-
-    public boolean isGlasses() {
-        return this == GLASSES;
-    }
-
-    public boolean isGloves() {
-        return this == GLOVES;
-    }
-
-    public boolean isHandGestures() {
-        return this == HAND_GESTURES;
-    }
-
-    public boolean isHandWringer() {
-        return this == HAND_WRINGER;
-    }
-
-    public boolean isHandshake() {
-        return this == HANDSHAKE;
-    }
-
-    public boolean isHeadphones() {
-        return this == HEADPHONES;
-    }
-
-    public boolean isHealthySnacks() {
-        return this == HEALTHY_SNACKS;
-    }
-
-    public boolean isHistorian() {
-        return this == HISTORIAN;
-    }
-
-    public boolean isHummer() {
-        return this == HUMMER;
-    }
-
-    public boolean isHygienic() {
-        return this == HYGIENIC;
-    }
-
-    public boolean isIrregularSleeper() {
-        return this == IRREGULAR_SLEEPER;
-    }
-
-    public boolean isJoker() {
-        return this == JOKER;
-    }
-
-    public boolean isLists() {
-        return this == LISTS;
-    }
-
-    public boolean isLiteral() {
-        return this == LITERAL;
-    }
-
-    public boolean isLocks() {
-        return this == LOCKS;
-    }
-
-    public boolean isMeasuredTalker() {
-        return this == MEASURED_TALKER;
-    }
-
-    public boolean isMinimalist() {
-        return this == MINIMALIST;
-    }
-
-    public boolean isMug() {
-        return this == MUG;
-    }
-
-    public boolean isNailBiter() {
-        return this == NAIL_BITER;
-    }
-
-    public boolean isNicknames() {
-        return this == NICKNAMING;
-    }
-
-    public boolean isNightOwl() {
-        return this == NIGHT_OWL;
-    }
-
-    public boolean isNoteTaker() {
-        return this == NOTE_TAKER;
-    }
-
-    public boolean isNotebook() {
-        return this == NOTEBOOK;
-    }
-
-    public boolean isObject() {
-        return this == OBJECT;
-    }
-
-    public boolean isOrganizationalTendencies() {
-        return this == ORGANIZATIONAL_TENDENCIES;
-    }
-
-    public boolean isOrganizer() {
-        return this == ORGANIZER;
-    }
-
-    public boolean isOrigami() {
-        return this == ORIGAMI;
-    }
-
-    public boolean isOverPlanner() {
-        return this == OVER_PLANNER;
-    }
-
-    public boolean isOverExplainer() {
-        return this == OVEREXPLAINER;
-    }
-
-    public boolean isPenClicker() {
-        return this == PEN_CLICKER;
-    }
-
-    public boolean isPenTwirler() {
-        return this == PEN_TWIRLER;
-    }
-
-    public boolean isPersonification() {
-        return this == PERSONIFICATION;
-    }
-
-    public boolean isPessimist() {
-        return this == PESSIMIST;
-    }
-
-    public boolean isPhrases() {
-        return this == PHRASES;
-    }
-
-    public boolean isPlants() {
-        return this == PLANTS;
-    }
-
-    public boolean isPolite() {
-        return this == POLITE;
-    }
-
-    public boolean isPracticalJoker() {
-        return this == PRACTICAL_JOKER;
-    }
-
-    public boolean isPrepared() {
-        return this == PREPARED;
-    }
-
-    public boolean isPunctual() {
-        return this == PUNCTUAL;
-    }
-
-    public boolean isPuzzles() {
-        return this == PUZZLES;
-    }
-
-    public boolean isQuotes() {
-        return this == QUOTES;
-    }
-
-    public boolean isRarelySleeps() {
-        return this == RARELY_SLEEPS;
-    }
-
-    public boolean isRoutine() {
-        return this == ROUTINE;
-    }
-
-    public boolean isSeeksApproval() {
-        return this == SEEKS_APPROVAL;
-    }
-
-    public boolean isSentimental() {
-        return this == SENTIMENTAL;
-    }
-
-    public boolean isSharpening() {
-        return this == SHARPENING;
-    }
-
-    public boolean isSings() {
-        return this == SINGS;
-    }
-
-    public boolean isSkeptical() {
-        return this == SKEPTICAL;
-    }
-
-    public boolean isSleepTalker() {
-        return this == SLEEP_TALKER;
-    }
-
-    public boolean isSmiler() {
-        return this == SMILER;
-    }
-
-    public boolean isSnacks() {
-        return this == SNACKS;
-    }
-
-    public boolean iStoryteller() {
-        return this == STORYTELLING;
-    }
-
-    public boolean isStretching() {
-        return this == STRETCHING;
-    }
-
-    public boolean isSuperstitiousRituals() {
-        return this == SUPERSTITIOUS_RITUALS;
-    }
-
-    public boolean isSupervisedHabits() {
-        return this == SUPERVISED_HABITS;
-    }
-
-    public boolean isTechTalk() {
-        return this == TECH_TALK;
-    }
-
-    public boolean isTechnophobia() {
-        return this == TECHNOPHOBIA;
-    }
-
-    public boolean isThesaurus() {
-        return this == THESAURUS;
-    }
-
-    public boolean isThirdPerson() {
-        return this == THIRD_PERSON;
-    }
-
-    public boolean isTimeManagement() {
-        return this == TIME_MANAGEMENT;
-    }
-
-    public boolean isTinkerer() {
-        return this == TINKERER;
-    }
-
-    public boolean isTruthTeller() {
-        return this == TRUTH_TELLER;
-    }
-
-    public boolean isUnnecessaryCaution() {
-        return this == UNNECESSARY_CAUTION;
-    }
-
-    public boolean isUnpredictableSpeech() {
-        return this == UNPREDICTABLE_SPEECH;
-    }
-
-    public boolean isUnusualHobbies() {
-        return this == UNUSUAL_HOBBIES;
-    }
-
-    public boolean isWatch() {
-        return this == WATCH;
-    }
-
-    public boolean isWeatherman() {
-        return this == WEATHERMAN;
-    }
-
-    public boolean isWhistler() {
-        return this == WHISTLER;
-    }
-
-    public boolean isWorrier() {
-        return this == WORRIER;
-    }
-
-    public boolean isWriter() {
-        return this == WRITER;
-    }
     // endregion Boolean Comparison Methods
 
     // region File I/O
@@ -570,7 +282,7 @@ public enum PersonalityQuirk {
      * @throws IllegalStateException if the given string does not match any valid
      *                               Quirk
      */
-
+    @Deprecated
     public static PersonalityQuirk parseFromString(final String quirk) {
         return switch (quirk) {
             case "0", "none" -> NONE;
@@ -674,11 +386,32 @@ public enum PersonalityQuirk {
             case "98", "Frequent Whistler" -> WHISTLER;
             case "99", "Persistent Worrier" -> WORRIER;
             case "100", "Writes Everything Down" -> WRITER;
+            case "101", "Constantly Reminiscing" -> BATTLEFIELD_NOSTALGIA;
             default ->
                 throw new IllegalStateException(
                         "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
                                 + quirk);
         };
+    }
+
+    /**
+     * Returns the {@link PersonalityQuirk} associated with the given ordinal.
+     *
+     * @param ordinal the ordinal value of the {@link PersonalityQuirk}
+     * @return the {@link PersonalityQuirk} associated with the given ordinal, or default value
+     * {@code NONE} if not found
+     */
+    public static PersonalityQuirk fromOrdinal(int ordinal) {
+        for (PersonalityQuirk quirk : values()) {
+            if (quirk.ordinal() == ordinal) {
+                return quirk;
+            }
+        }
+
+        final MMLogger logger = MMLogger.create(PersonalityQuirk.class);
+        logger.error(String.format("Unknown PersonalityQuirk ordinal: %s - returning NONE.", ordinal));
+
+        return NONE;
     }
 
     @Override

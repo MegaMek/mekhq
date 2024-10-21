@@ -27,7 +27,7 @@ public enum AwardBonus {
     BOTH("AwardBonuses.BOTH.text", "AwardBonuses.BOTH.toolTipText"),
     XP("AwardBonuses.XP.text", "AwardBonuses.XP.toolTipText"),
     EDGE("AwardBonuses.EDGE.text", "AwardBonuses.EDGE.toolTipText"),
-    NONE("AwardBonuses.NONE.text", "AwardBonuses.NONE.toolTipText"),;
+    NONE("AwardBonuses.NONE.text", "AwardBonuses.NONE.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
