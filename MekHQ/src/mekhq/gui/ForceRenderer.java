@@ -33,6 +33,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -51,7 +52,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         setOpaque(false);
 
         if (value instanceof Unit) {
-            String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
+            String name = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
             if (((Unit) value).getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
@@ -64,14 +66,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 name += " (" + unit.getEntity().getCrew().getGunnery() + '/'
                         + unit.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (unit.getEntity().getCrew().getHits() > 0)) {
-                    name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name
-                            + "</font>";
+                    name = ReportingUtilities.messageSurroundedBySpanWithColor(
+                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), name);
                 }
             }
-            String uname = "<i>" + unit.getName() + "</i>";
+            String unitName = "<i>" + unit.getName() + "</i>";
             if (unit.isDamaged()) {
-                uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname
-                        + "</font>";
+                unitName = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), unitName);
             }
 
             Entity entity = unit.getEntity();
@@ -127,7 +129,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 transport.append("<br>Transported by: ")
                         .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
-            String text = name + ", " + uname + c3network + transport;
+            String text = name + ", " + unitName + c3network + transport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
             if((null != person) && (null != force) && (person.getId() == force.getForceCommanderID())) {
