@@ -183,10 +183,21 @@ public class Force {
         return scenarioId;
     }
 
-    public void setScenarioId(int i) {
-        this.scenarioId = i;
+    /**
+     * Set scenario ID (e.g. deploy to scenario) for a force and all of its subforces and units
+     * @param scenarioId scenario to deploy to
+     * @param campaign campaign - required to update units
+     */
+    public void setScenarioId(int scenarioId, Campaign campaign) {
+        this.scenarioId = scenarioId;
         for (Force sub : getSubForces()) {
-            sub.setScenarioId(i);
+            sub.setScenarioId(scenarioId, campaign);
+        }
+        for (UUID uid : getUnits()) {
+            Unit unit = campaign.getUnit(uid);
+            if (null != unit) {
+                unit.setScenarioId(scenarioId);
+            }
         }
     }
 
@@ -410,7 +421,7 @@ public class Force {
                 c.getScenario(getScenarioId()).addUnit(uid);
             }
         }
-        setScenarioId(-1);
+        setScenarioId(-1,c);
     }
 
     public int getId() {

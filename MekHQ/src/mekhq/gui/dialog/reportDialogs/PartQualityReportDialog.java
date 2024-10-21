@@ -18,18 +18,15 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.MekHQ;
+import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.util.*;
 
-import static mekhq.campaign.parts.Part.QUALITY_A;
-import static mekhq.campaign.parts.Part.QUALITY_B;
-import static mekhq.campaign.parts.Part.QUALITY_E;
-import static mekhq.campaign.parts.Part.QUALITY_F;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
@@ -54,6 +51,8 @@ public class PartQualityReportDialog extends AbstractReportDialog {
         setTitle(String.format(resources.getString("PartQualityReportDialog.Unit.title"),
             unit.getName()));
         initialize();
+        pack();
+        setModal(true);
     }
     //endregion Constructors
 
@@ -90,6 +89,10 @@ public class PartQualityReportDialog extends AbstractReportDialog {
 
         // Iterate over parts, assigning each to its location in the map.
         for (Part part : unit.getParts()) {
+            if (part instanceof AmmoBin) {
+                continue;
+            }
+
             String location = part.getLocationName() != null ? part.getLocationName() : unit.getName();
             reportMap.computeIfAbsent(location, k -> new ArrayList<>()).add(part);
         }
@@ -113,20 +116,21 @@ public class PartQualityReportDialog extends AbstractReportDialog {
         for (String location : locations) {
             report.append("<b>");
             if (location.equals(unit.getName())) {
-                String colorCode = getColorCode(unit.getQuality());
+                String colorCode = unit.getQuality().getHexColor();
 
                 // Add the location and its colored quality rating to the report.
-                report.append("<span style=\"font-size: 18px;\">")
+                int headerFontSize = UIUtil.scaleForGUI(18);
+                report.append("<span style=\"font-size: ").append(headerFontSize).append("px;\">")
                     .append(location)
                     .append(" - ");
-                report.append("<span style=\"color: ")
-                    .append(colorCode)
-                    .append(";\">")
+                report.append("<span style=\"color: ").append(colorCode).append(";\">")
                     .append(unit.getQualityName())
                     .append("</span>");
                 report.append("</span>");
             } else {
-                report.append("<span style=\"font-size: 12px;\">").append(location).append("</span>");
+                int headerFontSize = UIUtil.scaleForGUI(12);
+                report.append("<span style=\"font-size: ").append(headerFontSize).append("px;\">")
+                    .append(location).append("</span>");
             }
             report.append("</b><br>");
 
@@ -134,8 +138,7 @@ public class PartQualityReportDialog extends AbstractReportDialog {
             for (Part part : reportMap.get(location)) {
                 report.append(part.getName()).append(" - ");
 
-                int qualityLevel = part.getQuality();
-                String colorCode = getColorCode(qualityLevel);
+                String colorCode = part.getQuality().getHexColor();
 
                 report.append(ReportingUtilities.spanOpeningWithCustomColor(colorCode))
                     .append(part.getQualityName()).append(CLOSING_SPAN_TAG).append("<br>");
@@ -151,17 +154,4 @@ public class PartQualityReportDialog extends AbstractReportDialog {
         return report.toString();
     }
 
-    /**
-     * Returns the color code associated with the given quality level.
-     *
-     * @param qualityLevel The quality level for which to retrieve the color code.
-     * @return The color code associated with the quality level.
-     */
-    private static String getColorCode(int qualityLevel) {
-        return switch (qualityLevel) {
-            case QUALITY_A, QUALITY_B -> MekHQ.getMHQOptions().getFontColorNegativeHexColor();
-            case QUALITY_E, QUALITY_F -> MekHQ.getMHQOptions().getFontColorPositiveHexColor();
-            default -> MekHQ.getMHQOptions().getFontColorWarningHexColor();
-        };
-    }
 }

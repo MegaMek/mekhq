@@ -18,14 +18,13 @@
  */
 package mekhq.campaign.market.enums;
 
-import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
 
 public enum UnitMarketType {
@@ -162,41 +161,22 @@ public enum UnitMarketType {
      * @param market the type of market
      * @return the quality of the unit
      */
-    public static int getQuality(Campaign campaign, UnitMarketType market) {
-        HashMap<String, Integer> qualityAndModifier = new HashMap<>();
-
-        switch (market) {
-            case OPEN:
-            case MERCENARY:
-                qualityAndModifier.put("quality", Part.QUALITY_C);
-                qualityAndModifier.put("modifier", 0);
-                break;
-            case EMPLOYER:
-                qualityAndModifier.put("quality", Part.QUALITY_B);
-                qualityAndModifier.put("modifier", -1);
-                break;
-            case BLACK_MARKET:
-                if (Compute.d6(1) <= 2) {
-                    qualityAndModifier.put("quality", Part.QUALITY_A);
-                    // this is to force a result of 0 (A)
-                    qualityAndModifier.put("modifier", -12);
-                } else {
-                    qualityAndModifier.put("quality", Part.QUALITY_F);
-                    // this is to force a result of 5 (F)
-                    qualityAndModifier.put("modifier", 12);
-                }
-                break;
-            case FACTORY:
-                qualityAndModifier.put("quality", Part.QUALITY_F);
-                // this is to force a result of 5 (F)
-                qualityAndModifier.put("modifier", 12);
-                break;
-        }
+    public static PartQuality getQuality(Campaign campaign, UnitMarketType market) {
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
-            return Unit.getRandomUnitQuality(qualityAndModifier.get("modifier"));
+            return Unit.getRandomUnitQuality(switch(market) {
+                case OPEN, MERCENARY -> 0;
+                case EMPLOYER -> -1;
+                case BLACK_MARKET -> Compute.d6(1) <= 2 ? -12 : 12; // forces A/F
+                case FACTORY -> 12; // Forces F
+            });
         } else {
-            return qualityAndModifier.get("quality");
+            return switch(market) {
+                case OPEN, MERCENARY -> PartQuality.QUALITY_C;
+                case EMPLOYER -> PartQuality.QUALITY_B;
+                case BLACK_MARKET -> Compute.d6(1) <= 2 ? PartQuality.QUALITY_A : PartQuality.QUALITY_F;
+                case FACTORY -> PartQuality.QUALITY_F;
+            };
         }
     }
 }

@@ -723,7 +723,7 @@ public class StratconRulesManager {
         for (int forceID : scenario.getPlayerTemplateForceIDs()) {
             Force force = campaign.getForce(forceID);
             force.clearScenarioIds(campaign, true);
-            force.setScenarioId(scenario.getBackingScenarioID());
+            force.setScenarioId(scenario.getBackingScenarioID(), campaign);
         }
 
         scenario.commitPrimaryForces();

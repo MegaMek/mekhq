@@ -2017,12 +2017,13 @@ class MekLocationTest {
     @Test
     void getDetailsSpareTest() {
         Campaign mockCampaign = mock(Campaign.class);
-
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        
         MekLocation mekLocation = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons", mekLocation.getDetails(false));
 
@@ -2037,7 +2038,6 @@ class MekLocationTest {
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons", mekLocation.getDetails(false));
 
@@ -2045,7 +2045,6 @@ class MekLocationTest {
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertTrue(mekLocation.getDetails().contains("[Sensors]"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons [Sensors]", mekLocation.getDetails(false));
@@ -2054,7 +2053,6 @@ class MekLocationTest {
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertTrue(mekLocation.getDetails().contains("[Sensors, Life Support]"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons [Sensors, Life Support]", mekLocation.getDetails(false));
@@ -2063,6 +2061,8 @@ class MekLocationTest {
     @Test
     void getDetailsOnUnitTest() {
         Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         Unit unit = mock(Unit.class);
         Mek entity = mock(Mek.class);
         when(unit.getEntity()).thenReturn(entity);
@@ -2075,39 +2075,39 @@ class MekLocationTest {
         mekLocation.setUnit(unit);
 
         assertNotNull(mekLocation.getDetails());
-        assertEquals("Right Arm (100%)", mekLocation.getDetails());
+        assertEquals("Right Arm, 30 tons", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
-        assertEquals("Right Arm", mekLocation.getDetails(false));
+        assertEquals("Right Arm, 30 tons", mekLocation.getDetails(false));
 
         mekLocation.setPercent(0.1);
 
         assertNotNull(mekLocation.getDetails());
-        assertEquals("Right Arm (10%)", mekLocation.getDetails());
+        assertEquals("Right Arm, 30 tons (10%)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
-        assertEquals("Right Arm", mekLocation.getDetails(false));
+        assertEquals("Right Arm, 30 tons", mekLocation.getDetails(false));
 
         mekLocation.setBlownOff(true);
 
         assertNotNull(mekLocation.getDetails());
-        assertEquals("Right Arm (Blown Off)", mekLocation.getDetails());
+        assertEquals("Right Arm, 30 tons (Blown Off)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
-        assertEquals("Right Arm", mekLocation.getDetails(false));
+        assertEquals("Right Arm, 30 tons", mekLocation.getDetails(false));
 
         mekLocation.setBlownOff(false);
         mekLocation.setBreached(true);
 
         assertNotNull(mekLocation.getDetails());
-        assertEquals("Right Arm (Breached)", mekLocation.getDetails());
+        assertEquals("Right Arm, 30 tons (Breached)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
-        assertEquals("Right Arm", mekLocation.getDetails(false));
+        assertEquals("Right Arm, 30 tons", mekLocation.getDetails(false));
 
         mekLocation.setBreached(false);
         doReturn(true).when(unit).hasBadHipOrShoulder((mekLocation.getLoc()));
 
         assertNotNull(mekLocation.getDetails());
-        assertEquals("Right Arm (Bad Hip/Shoulder)", mekLocation.getDetails());
+        assertEquals("Right Arm, 30 tons (Bad Hip/Shoulder)", mekLocation.getDetails());
         assertNotNull(mekLocation.getDetails(false));
-        assertEquals("Right Arm", mekLocation.getDetails(false));
+        assertEquals("Right Arm, 30 tons", mekLocation.getDetails(false));
     }
 
     @Test

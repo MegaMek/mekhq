@@ -138,5 +138,13 @@ public interface IPartWork extends IWork {
      */
     public abstract Money getActualValue();
 
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * but not affected by part damage
+     * @return the part's actual value if it wasn't damaged
+     */
+    public abstract Money getUndamagedValue();
+
+
     public abstract boolean isPriceAdjustedForAmount();
 }

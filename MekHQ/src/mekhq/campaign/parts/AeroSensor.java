@@ -51,6 +51,7 @@ public class AeroSensor extends Part {
         super(tonnage, c);
         this.name = "Aerospace Sensors";
         this.largeCraft = lc;
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -234,19 +235,7 @@ public class AeroSensor extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        String dropper = "";
-        if (largeCraft) {
-            dropper = " (spacecraft)";
-        }
-
-        String details = super.getDetails(includeRepairDetails);
-        if (!details.isEmpty()) {
-            details += ", ";
-        }
-
-        details += getUnitTonnage() + " tons" + dropper;
-
-        return details;
+        return super.getDetails(includeRepairDetails) + (largeCraft ? " (spacecraft)" : "");
     }
 
     @Override

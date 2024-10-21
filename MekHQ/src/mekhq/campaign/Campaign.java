@@ -72,6 +72,7 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -728,7 +729,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaignOptions.isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
@@ -895,7 +896,7 @@ public class Campaign implements ITechManager {
         int id = lastForceId + 1;
         force.setId(id);
         superForce.addSubForce(force, true);
-        force.setScenarioId(superForce.getScenarioId());
+        force.setScenarioId(superForce.getScenarioId(), this);
         forceIds.put(id, force);
         lastForceId = id;
 
@@ -916,15 +917,7 @@ public class Campaign implements ITechManager {
         }
 
         superForce.addSubForce(force, true);
-        force.setScenarioId(superForce.getScenarioId());
-
-        for (Object o : force.getAllChildren(this)) {
-            if (o instanceof Unit) {
-                ((Unit) o).setScenarioId(superForce.getScenarioId());
-            } else if (o instanceof Force) {
-                ((Force) o).setScenarioId(superForce.getScenarioId());
-            }
-        }
+        force.setScenarioId(superForce.getScenarioId(), this);
 
         // repopulate formation levels across the TO&E
         Force.populateFormationLevelsFromOrigin(this);
@@ -1316,7 +1309,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign and set its quality to 3 (D).
+     * Add a new unit to the campaign and set its quality to D.
      *
      * @param en             An <code>Entity</code> object that the new unit will be
      *                       wrapped around
@@ -1326,7 +1319,7 @@ public class Campaign implements ITechManager {
      * @return The newly added unit
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
-        return addNewUnit(en, allowNewPilots, days, 3);
+        return addNewUnit(en, allowNewPilots, days, PartQuality.QUALITY_D);
     }
 
     /**
@@ -1342,12 +1335,7 @@ public class Campaign implements ITechManager {
      * @throws IllegalArgumentException If the quality is not within the valid range
      *                                  (0-5)
      */
-    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, int quality) {
-        if ((quality < 0) || (quality > 5)) {
-            throw new IllegalArgumentException(
-                    "Invalid quality in mekhq/campaign/Campaign.java/addNewUnit: " + quality);
-        }
-
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
         Unit unit = new Unit(en, this);
         unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
         getHangar().addUnit(unit);
@@ -1467,7 +1455,7 @@ public class Campaign implements ITechManager {
             person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
                     new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
                     new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
-                    Gender.RANDOMIZE);
+                gender);
         } else {
             person = newPerson(PersonnelRole.DEPENDENT);
         }
@@ -1756,8 +1744,8 @@ public class Campaign implements ITechManager {
             recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 currentSpouse.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceSpouse.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
@@ -1803,8 +1791,8 @@ public class Campaign implements ITechManager {
             recruitPerson(child, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 child.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceChild.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
@@ -2243,76 +2231,108 @@ public class Campaign implements ITechManager {
         return (null != result.getPartToBuy()) ? result : null;
     }
 
-    private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
-            piu.setUseCount(piu.getUseCount() + getQuantity(p));
+    /**
+     * Add data from an actual part to a PartInUse data element
+     * @param partInUse part in use record to update
+     * @param incomingPart new part that needs to be added to this record
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     */
+    private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
+            boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+
+        if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
+        } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
+            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
-            if (p.isPresent()) {
-                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
-                piu.addSpare(p);
+            if (incomingPart.isPresent()) {
+                if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
+                } else {
+                    partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
+                    partInUse.addSpare(incomingPart);
+                }
             } else {
-                piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+                partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
             }
         }
     }
 
-    /** Update the piu with the current campaign data */
-    public void updatePartInUse(PartInUse piu) {
-        piu.setUseCount(0);
-        piu.setStoreCount(0);
-        piu.setTransferCount(0);
-        piu.setPlannedCount(0);
-        getWarehouse().forEachPart(p -> {
-            PartInUse newPiu = getPartInUse(p);
-            if (piu.equals(newPiu)) {
-                updatePartInUseData(piu, p);
+    /**
+     * Find all the parts that match this PartInUse and update their data
+     * @param partInUse part in use record to update
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     */
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
+            PartQuality ignoreSparesUnderQuality) {
+        partInUse.setUseCount(0);
+        partInUse.setStoreCount(0);
+        partInUse.setTransferCount(0);
+        partInUse.setPlannedCount(0);
+        getWarehouse().forEachPart(incomingPart -> {
+            PartInUse newPiu = getPartInUse(incomingPart);
+            if (partInUse.equals(newPiu)) {
+                updatePartInUseData(partInUse, incomingPart,
+                    ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPiu = getPartInUse((Part) maybePart);
-            if (piu.equals(newPiu)) {
-                piu.setPlannedCount(piu.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                                : (Part) maybePart) * maybePart.getQuantity());
+            if (partInUse.equals(newPiu)) {
+                partInUse.setPlannedCount(partInUse.getPlannedCount()
+                        + getQuantity((maybePart instanceof MissingPart) ?
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
             }
         }
     }
 
-    public Set<PartInUse> getPartsInUse() {
+    /**
+     * Create a data set detailing all the parts being used (or not) and their warehouse spares
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     * @return a Set of PartInUse data for display or inspection
+     */
+    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
+            PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        getWarehouse().forEachPart(p -> {
-            PartInUse piu = getPartInUse(p);
-            if (null == piu) {
+        getWarehouse().forEachPart(incomingPart -> {
+            PartInUse partInUse = getPartInUse(incomingPart);
+            if (null == partInUse) {
                 return;
             }
-            if (inUse.containsKey(piu)) {
-                piu = inUse.get(piu);
+            if (inUse.containsKey(partInUse)) {
+                partInUse = inUse.get(partInUse);
             } else {
-                inUse.put(piu, piu);
+                inUse.put(partInUse, partInUse);
             }
-            updatePartInUseData(piu, p);
+            updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
                 continue;
             }
-            PartInUse piu = getPartInUse((Part) maybePart);
-            if (null == piu) {
+            PartInUse partInUse = getPartInUse((Part) maybePart);
+            if (null == partInUse) {
                 continue;
             }
-            if (inUse.containsKey(piu)) {
-                piu = inUse.get(piu);
+            if (inUse.containsKey(partInUse)) {
+                partInUse = inUse.get(partInUse);
             } else {
-                inUse.put(piu, piu);
+                inUse.put(partInUse, partInUse);
             }
-            piu.setPlannedCount(piu.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                            : (Part) maybePart) * maybePart.getQuantity());
+            partInUse.setPlannedCount(partInUse.getPlannedCount()
+                    + getQuantity((maybePart instanceof MissingPart) ?
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
 
         }
-        return inUse.keySet();
+        return inUse.keySet().stream()
+            // Hacky but otherwise we end up with zero lines when filtering things out
+            .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
+            .collect(Collectors.toSet());
     }
 
     @Deprecated
@@ -3477,7 +3497,7 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().isPayForRepairs()
                     && action.equals(" fix ")
                     && !(partWork instanceof Armor)) {
-                Money cost = partWork.getActualValue().multipliedBy(0.2);
+                Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";
@@ -3667,14 +3687,8 @@ public class Campaign implements ITechManager {
                         }
 
                         if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(s.getId());
+                            forceIds.get(forceId).setScenarioId(s.getId(), this);
                             s.addForces(forceId);
-                            for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
-                                Unit u = getHangar().getUnit(uid);
-                                if (u != null) {
-                                    u.setScenarioId(s.getId());
-                                }
-                            }
 
                             addReport(MessageFormat.format(
                                     resources.getString("atbScenarioTodayWithForce.format"),
@@ -3740,7 +3754,8 @@ public class Campaign implements ITechManager {
 
                 AtBMoraleLevel morale = contract.getMoraleLevel();
 
-                String report = "<html>Current enemy condition is '" + morale + "' on contract " + contract.getName() + "<br><br>" + morale.getToolTipText() + "</html>";
+                String report = "Current enemy condition is <b>" + morale + "</b> on contract "
+                    + contract.getName() + "<br><br>" + morale.getToolTipText();
 
                 addReport(report);
             }
@@ -4192,8 +4207,7 @@ public class Campaign implements ITechManager {
         setLocalDate(getLocalDate().plusDays(1));
 
         // Determine if we have an active contract or not, as this can get used
-        // elsewhere before
-        // we actually hit the AtB new day (e.g., personnel market)
+        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
         if (getCampaignOptions().isUseAtB()) {
             setHasActiveContract();
         }
@@ -4203,6 +4217,8 @@ public class Campaign implements ITechManager {
         setCurrentReportHTML("");
         newReports.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
+
+        MekHQ.triggerEvent(new NewDayEvent(this));
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
@@ -4267,7 +4283,10 @@ public class Campaign implements ITechManager {
             processPersonnelRemoval();
         }
 
-        MekHQ.triggerEvent(new NewDayEvent(this));
+        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(this, false);
+        }
 
         // this duplicates any turnover information so that it is still available on the
         // new day.
@@ -6920,10 +6939,7 @@ public class Campaign implements ITechManager {
         if (unitRatingMethod.isFMMR()) {
             return getUnitRating().getUnitRating();
         } else if (unitRatingMethod.isCampaignOperations()) {
-            int reputationRating = reputation.getReputationRating();
-            int unitRatingMod = getAtBUnitRatingMod();
-
-            return String.format("%d (%+d)", reputationRating, unitRatingMod);
+            return String.valueOf(reputation.getReputationRating());
         } else {
             return "N/A";
         }
@@ -7659,7 +7675,7 @@ public class Campaign implements ITechManager {
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
             if (onOrder instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
-                nOrdered += ((Armor) onOrder).getAmount();
+                nOrdered += ((Armor) onOrder).getAmount() * ((Armor) onOrder).getQuantity();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
             } else {
@@ -7781,7 +7797,7 @@ public class Campaign implements ITechManager {
                 }
             }
             // it is time for a maintenance check
-            int qualityOrig = u.getQuality();
+            PartQuality qualityOrig = u.getQuality();
             String techName = "Nobody";
             String techNameLinked = techName;
             if (null != tech) {
@@ -7829,21 +7845,21 @@ public class Campaign implements ITechManager {
                 logger.info(maintenanceReport.toString());
             }
 
-            int quality = u.getQuality();
+            PartQuality quality = u.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
-            if (quality > qualityOrig) {
-                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                        + "'>Overall quality improves from "
-                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                        + "</font>";
-            } else if (quality < qualityOrig) {
-                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'>Overall quality declines from "
-                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                        + "</font>";
+            if (quality.toNumeric() > qualityOrig.toNumeric()) {
+                qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                        "Overall quality improves from " + qualityOrig.toName(reverse)
+                        + " to " + quality.toName(reverse));
+            } else if (quality.toNumeric() < qualityOrig.toNumeric()) {
+                qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "Overall quality declines from " + qualityOrig.toName(reverse)
+                    + " to " + quality.toName(reverse));
             } else {
-                qualityString = "Overall quality remains " + Part.getQualityName(quality, reverse);
+                qualityString = "Overall quality remains " + quality.toName(reverse);
             }
             String damageString = "";
             if (nDamage > 0) {
@@ -7875,7 +7891,7 @@ public class Campaign implements ITechManager {
         if (!p.needsMaintenance()) {
             return null;
         }
-        int oldQuality = p.getQuality();
+        PartQuality oldQuality = p.getQuality();
         TargetRoll target = getTargetForMaintenance(p, u.getTech());
         if (!paidMaintenance) {
             // TODO : Make this modifier user inputtable
@@ -7888,7 +7904,7 @@ public class Campaign implements ITechManager {
         partReport += " rolled a " + roll + ", margin of " + margin;
 
         switch (p.getQuality()) {
-            case Part.QUALITY_A: {
+            case QUALITY_A: {
                 if (margin >= 4) {
                     p.improveQuality();
                 }
@@ -7907,11 +7923,11 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_B: {
+            case QUALITY_B: {
                 if (margin >= 4) {
                     p.improveQuality();
                 } else if (margin < -5) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                 }
                 if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
@@ -7922,9 +7938,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_C: {
+            case QUALITY_C: {
                 if (margin < -4) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                 } else if (margin >= 5) {
                     p.improveQuality();
                 }
@@ -7937,9 +7953,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_D: {
+            case QUALITY_D: {
                 if (margin < -3) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7948,9 +7964,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_E:
+            case QUALITY_E:
                 if (margin < -2) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7958,10 +7974,10 @@ public class Campaign implements ITechManager {
                     p.improveQuality();
                 }
                 break;
-            case Part.QUALITY_F:
+            case QUALITY_F:
             default:
                 if (margin < -2) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7972,22 +7988,26 @@ public class Campaign implements ITechManager {
                 // }
                 break;
         }
-        if (p.getQuality() > oldQuality) {
-            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>new quality is "
-                    + p.getQualityName() + "</font>";
-        } else if (p.getQuality() < oldQuality) {
-            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>new quality is "
-                    + p.getQualityName() + "</font>";
+        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) {
+            partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "new quality is " + p.getQualityName());
+        } else if (p.getQuality().toNumeric() < oldQuality.toNumeric()) {
+            partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "new quality is " + p.getQualityName());
         } else {
             partReport += ": quality remains " + p.getQualityName();
         }
         if (null != partsToDamage.get(p)) {
             if (partsToDamage.get(p) > 3) {
-                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>part destroyed</b></font>";
+                partReport += ", " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b>part destroyed</b>");
             } else {
-                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>part damaged</b></font>";
+                partReport += ", " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b>part damaged</b>");
             }
         }
 

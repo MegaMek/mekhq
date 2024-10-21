@@ -26,10 +26,12 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
+import mekhq.utilities.ReportingUtilities;
 
 import java.io.PrintWriter;
 
@@ -82,43 +84,45 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDesc() {
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = '+' + bonus;
-        }
-        String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>Replace ")
+                .append(getName());
+            if(isUnitTonnageMatters()) {
+                toReturn.append(" (")
+                    .append(getUnitTonnage())
+                    .append(" ton)");
+            }
+            toReturn.append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+            .append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += ">";
-        toReturn += "<b>Replace " + getName();
-
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
-        } else {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        }
-
-        toReturn += getDetails() + "<br/>";
         if (getSkillMin() <= SkillType.EXP_ELITE) {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += " <b>TN:</b> " + bonus;
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += " <i>" + getCurrentModeName() + "</i>";
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override
     public String succeed() {
         fix();
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> replaced.</b></font>";
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                " <b>replaced</b>.");
     }
 
     @Override
@@ -177,7 +181,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                         return part;
                     } else if (bestPart.needsFixing() && !part.needsFixing()) {
                         return part;
-                    } else if (bestPart.getQuality() < part.getQuality()) {
+                    } else if (bestPart.getQuality().toNumeric() < part.getQuality().toNumeric()) {
                         return part;
                     }
                 }
@@ -205,13 +209,39 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if (isReplacementAvailable()) {
-            return "Replacement part available";
-        } else {
-            PartInventory inventories = campaign.getPartInventory(getNewPart());
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
+        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        StringBuilder toReturn = new StringBuilder();
+        
+        String superDetails = super.getDetails(includeRepairDetails);
+        toReturn.append(superDetails);
+
+        if (!(this instanceof MissingAmmoBin)) {
+            // Ammo bins don't require/have stock replacements.
+            if(!superDetails.isEmpty()) {
+                toReturn.append(", ");
+            }
+            if (isReplacementAvailable()) {
+                toReturn.append(inventories.getSupply())
+                    .append(" in stock");
+            } else {
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
+            }
+
+            String incoming = inventories.getTransitOrderedDetails();
+            if (!incoming.isEmpty()) {
+                StringBuilder incomingSB = new StringBuilder();
+
+                incomingSB.append(" (")
+                    .append(incoming)
+                    .append(")");
+
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorWarningHexColor(), incomingSB.toString()));
+            }
         }
-    }
+        return toReturn.toString();
+    } 
 
     @Override
     public boolean needsFixing() {
@@ -244,9 +274,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 part.decrementQuantity();
                 skillMin = SkillType.EXP_GREEN;
             }
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed and part destroyed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "<b> failed and part destroyed</b>") + ".";
         } else {
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "<b> failed</b>") + ".";
         }
     }
 
@@ -325,14 +359,24 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
+        // TODO: Move me to live with procurment functions?
+        // Which shopping method is this used for?
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
+        StringBuilder toReturn = new StringBuilder();
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> part found</b>"))
+                .append(". It will be delivered in ")
+                .append(transitDays)
+                .append(" days.");
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                "<b> You cannot afford this part. Transaction cancelled</b>"));
         }
+        return toReturn.toString();
     }
 
     @Override
@@ -344,7 +388,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> part not found</b>.</font>";
+        // TODO: Move me to live with procurment functions?
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> part not found</b>") + ".";
     }
 
     @Override
@@ -376,9 +422,17 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionName() {
+        // TODO: Unify shopping system to use these everywhere instead of only some places?
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append(getPartName());
+
         String details = getNewPart().getDetails();
-        details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-        return getPartName() + ' ' + details;
+        if (!details.isEmpty()) {
+            toReturn.append(" (")
+                .append(details)
+                .append(')');
+        }
+        return toReturn.toString();
     }
 
     @Override

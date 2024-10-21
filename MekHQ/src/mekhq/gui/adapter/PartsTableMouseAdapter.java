@@ -37,6 +37,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MRMSDialog;
@@ -129,31 +130,24 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.contains("SET_QUALITY")) {
-            int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = {
-                    Part.getQualityName(Part.QUALITY_A, reverse),
-                    Part.getQualityName(Part.QUALITY_B, reverse),
-                    Part.getQualityName(Part.QUALITY_C, reverse),
-                    Part.getQualityName(Part.QUALITY_D, reverse),
-                    Part.getQualityName(Part.QUALITY_E, reverse),
-                    Part.getQualityName(Part.QUALITY_F, reverse)
+                    PartQuality.QUALITY_A.toName(reverse),
+                    PartQuality.QUALITY_B.toName(reverse),
+                    PartQuality.QUALITY_C.toName(reverse),
+                    PartQuality.QUALITY_D.toName(reverse),
+                    PartQuality.QUALITY_E.toName(reverse),
+                    PartQuality.QUALITY_F.toName(reverse)
             };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
-                    Part.getQualityName(Part.QUALITY_D, reverse));
-            for (int i = 0; i < possibilities.length; i++) {
-                if (possibilities[i].equals(quality)) {
-                    q = i;
-                    break;
-                }
-            }
-            if (q != -1) {
-                for (Part p : parts) {
-                    if (p != null) {
-                        p.setQuality(q);
-                        MekHQ.triggerEvent(new PartChangedEvent(p));
-                    }
+                    PartQuality.QUALITY_D.toName(reverse));
+            
+            PartQuality q = PartQuality.fromName(quality, reverse);
+            for (Part p : parts) {
+                if (null != p) {
+                    p.setQuality(q);
+                    MekHQ.triggerEvent(new PartChangedEvent(p));
                 }
             }
         } else if (command.contains("CHANGE_MODE")) {

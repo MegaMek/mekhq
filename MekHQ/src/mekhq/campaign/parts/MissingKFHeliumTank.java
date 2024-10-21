@@ -58,6 +58,7 @@ public class MissingKFHeliumTank extends MissingPart {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Helium Tank";
+        this.unitTonnageMatters = true;
     }
 
     @Override

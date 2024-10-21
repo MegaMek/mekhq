@@ -40,6 +40,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
@@ -127,7 +128,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_GM_MOTHBALL = COMMAND_MOTHBALL + COMMAND_GM;
     public static final String COMMAND_GM_ACTIVATE = COMMAND_ACTIVATE + COMMAND_GM;
     public static final String COMMAND_UNDEPLOY = "UNDEPLOY";
-    public static final String COMMAND_HIRE_FULL_GM_RANDOM = COMMAND_HIRE_FULL + COMMAND_GM;
+    public static final String COMMAND_HIRE_FULL_GM = COMMAND_HIRE_FULL + COMMAND_GM;
     public static final String COMMAND_HIRE_FULL_GM_ELITE = COMMAND_HIRE_FULL + COMMAND_GM + "ELITE";
     public static final String COMMAND_HIRE_FULL_GM_VETERAN = COMMAND_HIRE_FULL + COMMAND_GM + "VETERAN";
     public static final String COMMAND_HIRE_FULL_GM_REGULAR = COMMAND_HIRE_FULL + COMMAND_GM + "REGULAR";
@@ -192,32 +193,24 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_PARTS_REPORT)) { // Single Unit only
             new PartQualityReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
-            // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
-            int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = {
-                    Part.getQualityName(Part.QUALITY_A, reverse),
-                    Part.getQualityName(Part.QUALITY_B, reverse),
-                    Part.getQualityName(Part.QUALITY_C, reverse),
-                    Part.getQualityName(Part.QUALITY_D, reverse),
-                    Part.getQualityName(Part.QUALITY_E, reverse),
-                    Part.getQualityName(Part.QUALITY_F, reverse)
+                    PartQuality.QUALITY_A.toName(reverse),
+                    PartQuality.QUALITY_B.toName(reverse),
+                    PartQuality.QUALITY_C.toName(reverse),
+                    PartQuality.QUALITY_D.toName(reverse),
+                    PartQuality.QUALITY_E.toName(reverse),
+                    PartQuality.QUALITY_F.toName(reverse)
             };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
-                    Part.getQualityName(Part.QUALITY_D, reverse));
-            for (int i = 0; i < possibilities.length; i++) {
-                if (possibilities[i].equals(quality)) {
-                    q = i;
-                    break;
-                }
-            }
-            if (q != -1) {
-                for (Unit unit : units) {
-                    if (unit != null) {
-                        unit.setQuality(q);
-                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                    }
+                    PartQuality.QUALITY_D.toName(reverse));
+            
+            PartQuality q = PartQuality.fromName(quality, reverse);
+            for (Unit unit : units) {
+                if (null != unit) {
+                    unit.setQuality(q);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
@@ -332,29 +325,40 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.contains(COMMAND_HIRE_FULL)) {
             boolean isGM = command.contains("GM");
+
             HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(isGM);
+
             for (Unit unit : units) {
+                List<Person> preExistingCrew = unit.getCrew();
+
                 hireAction.execute(gui.getCampaign(), unit);
 
-                if (command.contains("RANDOM")) {
-                    continue;
-                }
+                boolean fixSkillLevels = false;
 
                 SkillLevel skillLevel = SkillLevel.REGULAR;
                 if (command.contains("ELITE")) {
                     skillLevel = SkillLevel.ELITE;
+                    fixSkillLevels = true;
                 } else if (command.contains("VETERAN")) {
                     skillLevel = SkillLevel.VETERAN;
-                } else if (command.contains("GREEN")) {
-                    skillLevel = SkillLevel.GREEN;
+                    fixSkillLevels = true;
                 } else if (command.contains("ULTRA_GREEN")) {
                     skillLevel = SkillLevel.ULTRA_GREEN;
+                    fixSkillLevels = true;
+                } else if (command.contains("GREEN")) {
+                    skillLevel = SkillLevel.GREEN;
+                    fixSkillLevels = true;
                 }
 
-                for (Person person : unit.getCrew()) {
-                    overrideSkills(gui.getCampaign(), person, person.getPrimaryRole(), skillLevel.ordinal());
-                }
+                if (fixSkillLevels) {
+                    for (Person person : unit.getCrew()) {
+                        if (preExistingCrew.contains(person)) {
+                            continue;
+                        }
 
+                        overrideSkills(gui.getCampaign(), person, person.getPrimaryRole(), skillLevel.ordinal());
+                    }
+                }
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
@@ -1008,7 +1012,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     JMenu menuMinimumComplement = new JMenu(resources.getString("addMinimumComplement.text"));
 
                     menuItem = new JMenuItem(resources.getString("addMinimumComplementRandom.text"));
-                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_RANDOM);
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 
@@ -1096,10 +1100,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             Entity entity = unit.getEntity();
             String unitName = entity.getShortNameRaw();
             String fileExtension = entity instanceof Mek ? ".mtf" : ".blk";
-            String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator 
+            String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
                     + unitName + fileExtension;
             String fileNameCampaign = sCustomsDirCampaign + File.separator + unitName + fileExtension;
-            
+
             // if this file already exists then don't overwrite it or we will end up with a bunch of copies
             if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                 JOptionPane.showMessageDialog(null,
@@ -1107,7 +1111,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         "File Already Exists", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             if (entity instanceof Mek) {
                 try (OutputStream os = new FileOutputStream(fileNameCampaign);
                         PrintStream p = new PrintStream(os)) {

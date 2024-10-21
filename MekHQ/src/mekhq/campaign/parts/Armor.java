@@ -45,6 +45,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -122,39 +123,34 @@ public class Armor extends Part implements IAcquisitionWork {
         if (isSalvaging()) {
             return super.getDesc();
         }
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = '+' + bonus;
-        }
-        String toReturn = "<html><font";
-
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
-        toReturn += ">";
-        toReturn += "<b>Replace " + getName();
-
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>Replace ")
+            .append(getName());
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-            toReturn += " - <b><span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        } else {
-            toReturn += "</b><br/>";
+            toReturn.append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
+        toReturn.append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += getDetails() + "<br/>";
-        if (getAmountAvailable() > 0) {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += " <b>TN:</b> " + bonus;
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
+            if (getMode() != WorkTime.NORMAL) {
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
+            }
         }
-        if (getMode() != WorkTime.NORMAL) {
-            toReturn += " <i>" + getCurrentModeName() + "</i>";
-        }
-        toReturn += "</font></html>";
-        return toReturn;
-
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override
@@ -164,35 +160,58 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
+        StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            String rearMount = "";
-            if (rear) {
-                rearMount = " (R)";
-            }
-            if (!isSalvaging()) {
-                String availability;
+            if (isSalvaging()) {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                .append(rear ? " (Rear)" : "")
+                .append(", ")
+                .append(amount)
+                .append(amount == 1 ? " point" : " points");
+            } else {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                    .append(rear ? " (Rear)" : "")
+                    .append(", ")
+                    .append(amountNeeded)
+                    .append(amountNeeded == 1 ? " point" : " points")
+                    .append("<br/>");
+
                 int amountAvailable = getAmountAvailable();
-                PartInventory inventories = campaign.getPartInventory(getNewPart());
-
-                String orderTransitString = getOrderTransitStringForDetails(inventories);
-
-                if (amountAvailable == 0) {
-                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>No armor " + orderTransitString + "</font>";
+                if(amountAvailable == 0) {
+                    toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
                 } else if (amountAvailable < amountNeeded) {
-                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+                        .append("Only ")
+                        .append(amountAvailable)
+                        .append(" in stock")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
                 } else {
-                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + amountAvailable + " available " + orderTransitString + "</font>";
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorPositiveHexColor()))
+                        .append(amountAvailable)
+                        .append(" in stock")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
                 }
-
-                return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points"
-                        + availability;
+    
+                PartInventory inventories = campaign.getPartInventory(getNewPart());
+                String orderTransitString = inventories.getTransitOrderedDetails();
+                if (!orderTransitString.isEmpty()) {
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorWarningHexColor()))
+                        .append(" (")
+                        .append(orderTransitString)
+                        .append(")")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                }
             }
-            return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
+        
+        } else {
+            toReturn.append(amount)
+                .append(" points");
         }
-        return amount + " points";
+        return toReturn.toString();
     }
 
     public int getType() {

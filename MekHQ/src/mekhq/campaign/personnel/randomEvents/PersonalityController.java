@@ -19,24 +19,15 @@
 
 package mekhq.campaign.personnel.randomEvents;
 
-import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.PersonalityQuirk;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
+
+import java.util.*;
+
+import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
 
 public class PersonalityController {
     public static void generatePersonality(Person person) {
@@ -97,10 +88,10 @@ public class PersonalityController {
         }
 
         switch (tableRoll) {
-            case 0 -> person.setAggression(Aggression.parseFromInt(traitRoll));
-            case 1 -> person.setAmbition(Ambition.parseFromInt(traitRoll));
-            case 2 -> person.setGreed(Greed.parseFromInt(traitRoll));
-            case 3 -> person.setSocial(Social.parseFromInt(traitRoll));
+            case 0 -> person.setAggression(Aggression.fromOrdinal(traitRoll));
+            case 1 -> person.setAmbition(Ambition.fromOrdinal(traitRoll));
+            case 2 -> person.setGreed(Greed.fromOrdinal(traitRoll));
+            case 3 -> person.setSocial(Social.fromOrdinal(traitRoll));
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/setPersonalityTrait: "
                             + tableRoll);

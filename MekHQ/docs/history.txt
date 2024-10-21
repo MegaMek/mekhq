@@ -104,6 +104,11 @@ MEKHQ VERSION HISTORY:
 + PR #5034: New row highlights for Personnel Table: Gone, Absent, Fatigued
 + FIX #5028: Random Camo Allocation Fixes
 + PR #5036: Corrected Scenario Modifiers for HouseOfficer units
++ PR #5052: Convert the Part Quality concept into an enum
++ PR #5053: Colorise Skill Levels
++ PR #5054: Implement CamOps Contract Negotiation
++ PR #5055: Parts In Use - Filter Mothballed and Spare Part Quality
++ PR #5064: Bug fix and improvements for calculateContractDifficulty()
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
@@ -298,6 +303,9 @@ MEKHQ VERSION HISTORY:
 + PR #4758: MHQ side of fix for MHQ 4755: NPE when opfor has no faction code
 + FIX #4697: Refactor salary editing logic and prevent NPE
 + PR #4690: Corrected Experience Generation Logic and Refined Campaign Options GUI
++ PR #5052: Convert the Part Quality concept into an enum
++ PR #5053: Colorise Skill Levels
++ PR #5054: Implement CamOps Contract Negotiation
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update

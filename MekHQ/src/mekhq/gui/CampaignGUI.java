@@ -51,6 +51,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -1220,13 +1221,11 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
-                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
-        rdd.setLocation(rdd.getLocation().x, 0);
-        rdd.setVisible(true);
+        boolean doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
+        RetirementDefectionDialog dialog = new RetirementDefectionDialog(this, null, doRetirement);
 
-        if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+        if (!dialog.wasAborted()) {
+            getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
             return true;
         } else {
             return false;
@@ -1612,10 +1611,21 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                name = tech.getFullName() + ", " + tech.getSkillLevel(getCampaign(), false) + ' '
-                        + tech.getPrimaryRoleDesc() + " ("
-                        + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
-                        + tech.getMinutesLeft() + '/' + tech.getDailyAvailableTechTime() + " minutes";
+                StringBuilder nameBuilder = new StringBuilder(128);
+                nameBuilder.append("<html>")
+                    .append(tech.getFullName())
+                    .append(", <b>") 
+                    .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
+                    .append("</b> ")
+                    .append(tech.getPrimaryRoleDesc())
+                    .append(" (")
+                    .append(getCampaign().getTargetFor(r, tech).getValueAsString())
+                    .append("+), ")
+                    .append(tech.getMinutesLeft())
+                    .append('/')
+                    .append(tech.getDailyAvailableTechTime())
+                    .append(" minutes</html>");
+                name = nameBuilder.toString();
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -1914,7 +1924,7 @@ public class CampaignGUI extends JPanel {
     protected void loadListFile(final boolean allowNewPilots) {
         final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
 
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
@@ -2407,7 +2417,7 @@ public class CampaignGUI extends JPanel {
                         continue;
                     }
                     scenario.addForces(sub.getId());
-                    sub.setScenarioId(scenario.getId());
+                    sub.setScenarioId(scenario.getId(), getCampaign());
                 }
                 prevId = parent.getId();
             }

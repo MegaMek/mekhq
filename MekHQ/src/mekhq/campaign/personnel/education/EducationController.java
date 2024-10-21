@@ -32,7 +32,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 import mekhq.utilities.ReportingUtilities;
 
 import java.time.DayOfWeek;
@@ -673,8 +672,11 @@ public class EducationController {
         }
 
         // does person want to drop out?
-        if (checkForDropout(campaign, academy, person, resources)) {
-            return;
+        // We don't process the dropout events for very young children.
+        if (person.getAge(campaign.getLocalDate()) > 6) {
+            if (checkForDropout(campaign, academy, person, resources)) {
+                return;
+            }
         }
 
         // was there a training accident?
@@ -1357,7 +1359,12 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
+            graduationRoll += person.getIntelligence().ordinal() - 12;
+        }
+
+        // We don't process the granularity of graduation events for very young children.
+        if (person.getAge(campaign.getLocalDate()) <= 6) {
+            graduationRoll = 30;
         }
 
         if (graduationRoll < 30) {
