@@ -1752,8 +1752,8 @@ public class Campaign implements ITechManager {
             recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 currentSpouse.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceSpouse.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
@@ -1799,8 +1799,8 @@ public class Campaign implements ITechManager {
             recruitPerson(child, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 child.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceChild.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
