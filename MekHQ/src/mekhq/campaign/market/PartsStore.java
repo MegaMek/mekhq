@@ -88,8 +88,6 @@ public class PartsStore {
         stockProtomekComponents(c);
         stockBattleArmorSuits(c);
 
-        Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s");
-        Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)");
         StringBuilder sb = new StringBuilder();
         for (Part p : parts) {
             p.setBrandNew(true);
@@ -97,7 +95,6 @@ public class PartsStore {
             sb.append(p.getName());
             if (!(p instanceof Armor)) { // ProtoMekArmor and BaArmor are derived from Armor
                 String details = p.getDetails();
-                details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst("");
                 if (!details.isEmpty()) {
                     sb.append(" (").append(details).append(")");
                 }
