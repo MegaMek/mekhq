@@ -20,24 +20,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -47,6 +29,20 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialTerm;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -627,11 +623,11 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
     @Override
     public void stateChanged(ChangeEvent e) {
         if (campaign.getCampaignOptions().isUseLoanLimits()) {
-            if (e.getSource() == sldInterest) {
+            if (Objects.equals(e.getSource(), sldInterest)) {
                 sldCollateral.removeChangeListener(this);
                 sldCollateral.setValue(Loan.recalculateCollateralFromInterest(rating, sldInterest.getValue()));
                 sldCollateral.addChangeListener(this);
-            } else if (e.getSource() == sldCollateral) {
+            } else if (Objects.equals(e.getSource(), sldCollateral)) {
                 sldInterest.removeChangeListener(this);
                 sldInterest.setValue(Loan.recalculateInterestFromCollateral(rating, sldCollateral.getValue()));
                 sldInterest.addChangeListener(this);
