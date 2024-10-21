@@ -6953,10 +6953,7 @@ public class Campaign implements ITechManager {
         if (unitRatingMethod.isFMMR()) {
             return getUnitRating().getUnitRating();
         } else if (unitRatingMethod.isCampaignOperations()) {
-            int reputationRating = reputation.getReputationRating();
-            int unitRatingMod = getAtBUnitRatingMod();
-
-            return String.format("%d (%+d)", reputationRating, unitRatingMod);
+            return String.valueOf(reputation.getReputationRating());
         } else {
             return "N/A";
         }
