@@ -232,6 +232,8 @@ public class PartsStore {
                             epart = new EquipmentPart(0, et, -1, 1.0, true, c);
                             epart.setEquipTonnage(ton);
                             parts.add(epart);
+                            epart = new EquipmentPart(0, et, -1, 1.0, true, c);
+                            epart.setEquipTonnage(ton);
                             parts.add(new OmniPod(epart, c));
                         }
                         // TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
@@ -241,7 +243,7 @@ public class PartsStore {
                     parts.add(p);
                     if (poddable) {
                         parts.add(new EquipmentPart(0, et, -1, 1.0, true, c));
-                        parts.add(new OmniPod(p, c));
+                        parts.add(new OmniPod(new EquipmentPart(0, et, -1, 1.0, false, c), c));
                     }
                 }
             }
