@@ -18,48 +18,26 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
@@ -67,6 +45,21 @@ import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.*;
+
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
  * @author Neoancient
@@ -130,9 +123,17 @@ public class RetirementDefectionDialog extends JDialog {
         rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
         if (doRetirement) {
             targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
+
+            if (targetRolls.isEmpty()) {
+                aborted = false;
+                setVisible(false);
+
+                nobodyEligibleDialog(gui, gui.getCampaign());
+                return;
+            }
         }
         currentPanel = doRetirement ? PAN_OVERVIEW : PAN_RESULTS;
-        setSize(new Dimension(800, 600));
+        setSize(UIUtil.scaleForGUI(800, 600));
         initComponents(doRetirement);
         if (!doRetirement) {
             initResults();
@@ -141,6 +142,8 @@ public class RetirementDefectionDialog extends JDialog {
 
         setLocationRelativeTo(gui.getFrame());
         setUserPreferences(doRetirement);
+        setAlwaysOnTop(true);
+        setVisible(true);
     }
 
     private void initComponents(boolean doRetirement) {
@@ -762,6 +765,17 @@ public class RetirementDefectionDialog extends JDialog {
         return unitAssignments;
     }
 
+    /**
+     * Returns a {@link Map} containing the {@link TargetRoll} objects associated with the {@link UUID} keys.
+     * <p>
+     * If this returns empty, it means nobody is eligible for retirement/resignation
+     *
+     * @return a {@link Map} of {@link UUID} keys mapped to {@link TargetRoll} values
+     */
+    public Map<UUID, TargetRoll> getTargetRolls() {
+        return targetRolls;
+    }
+
     public boolean wasAborted() {
         return aborted;
     }
@@ -895,6 +909,49 @@ public class RetirementDefectionDialog extends JDialog {
             }
             filterUnits();
         }
+    }
+
+    /**
+     * Creates and displays a dialog showing that no members of the campaign have a turnover target
+     * number greater than 2. The dialog includes a scaled faction logo, a message, and an 'OK'
+     * button to close the dialog.
+     *
+     * @param gui       the {@link CampaignGUI} object providing context for the dialog.
+     * @param campaign  the current {@link Campaign}.
+     */
+    private void nobodyEligibleDialog(CampaignGUI gui, Campaign campaign) {
+        // Main frame for the test
+        JFrame frame = gui.getFrame();
+
+        // Creating an instance of JDialog
+        JDialog dialog = new JDialog(frame, resourceMap.getString("nobodyEligibleDialog.title"), true);
+
+        // Setting the layout
+        dialog.setLayout(new BorderLayout());
+
+        // Creating and scaling the image label
+        ImageIcon originalIcon = Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(),
+            true);
+        ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage().getScaledInstance(
+            originalIcon.getIconWidth()/2, originalIcon.getIconHeight()/2, Image.SCALE_FAST));
+        JLabel imageLabel = new JLabel(scaledIcon);
+
+        dialog.add(imageLabel, BorderLayout.NORTH);
+
+        // Dialog body
+        JLabel text = new JLabel(resourceMap.getString("nobodyEligibleDialog.text"), JLabel.CENTER);
+        dialog.add(text, BorderLayout.CENTER);
+
+        // Options
+        JButton okButton = new JButton(resourceMap.getString("btnDone.text"));
+        okButton.addActionListener(e -> dialog.dispose());
+        dialog.add(okButton, BorderLayout.SOUTH);
+
+        // Formating
+        dialog.setSize(UIUtil.scaleForGUI(400, 200));
+        dialog.setLocationRelativeTo(gui.getFrame());
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
     }
 }
 

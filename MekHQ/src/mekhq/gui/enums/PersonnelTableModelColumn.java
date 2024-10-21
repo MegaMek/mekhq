@@ -490,7 +490,8 @@ public enum PersonnelTableModelColumn {
             case GENDER:
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillLevel(campaign, false).toString();
+                return "<html>" + SkillType.getColoredExperienceLevelName(
+                    person.getSkillLevel(campaign, false)) + "</html>";
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
@@ -669,7 +670,7 @@ public enum PersonnelTableModelColumn {
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
                     return Integer.toString(person.getInjuries().size());
-                } else { 
+                } else {
                     return Integer.toString(person.getHits());
                 }
             case KILLS:
@@ -716,7 +717,7 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case FATIGUE:
-                return Integer.toString(person.getFatigue());
+                return Integer.toString(person.getEffectiveFatigue(campaign));
             case EDGE:
                 return Integer.toString(person.getEdge());
             case SPA_COUNT:

@@ -68,6 +68,18 @@ public class OmniPod extends Part {
         name = "OmniPod";
     }
 
+    /**
+     * @return The tech base of the part the omnipod is meant to contain.
+     */
+    @Override
+    public int getTechBase() {
+        if (null != partType) {
+            return partType.getTechBase();
+        } else {
+            return TechAdvancement.TECH_BASE_ALL;
+        }
+    }
+
     @Override
     public void setCampaign(Campaign c) {
         super.setCampaign(c);

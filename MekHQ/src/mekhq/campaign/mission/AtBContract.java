@@ -63,7 +63,6 @@ import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -74,7 +73,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -174,6 +172,11 @@ public class AtBContract extends Contract {
             "mekhq.resources.AtBContract",
             MekHQ.getMHQOptions().getLocale());
 
+    private int commandRoll;
+    private int salvageRoll;
+    private int supportRoll;
+    private int transportRoll;
+
     protected AtBContract() {
         this(null);
     }
@@ -242,26 +245,30 @@ public class AtBContract extends Contract {
         // Define the root directory and get the faction-specific camouflage directory
         final String ROOT_DIRECTORY = "data/images/camo/";
 
-        String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
-      
+        String camouflageDirectory = "Standard Camouflage";
+
+        if (factionCode != null) {
+            camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+        }
+
         // Gather all files
         List<Path> allPaths = null;
 
         try {
             allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
-                    (path, bfa) -> {return bfa.isRegularFile();})
-                .collect(Collectors.toList());
+                    (path, bfa) -> bfa.isRegularFile())
+                .toList();
         } catch (IOException e) {
             logger.error("Error getting list of camouflages", e);
         }
-        
+
         // Select a random file to set camouflage, if there are files available
         if ((null != allPaths) && (!allPaths.isEmpty())) {
             Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
 
             String fileName = randomPath.getFileName().toString();
             String fileCategory = randomPath.getParent().toString()
-                .replaceAll("\\\\", "/"); // Is this necessary on windows machines?
+                .replaceAll("\\\\", "/"); // This is necessary for windows machines
             fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
@@ -1005,6 +1012,10 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRoll", commandRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageRoll", salvageRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRoll", supportRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportRoll", transportRoll);
 
         if (parentContract != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
@@ -1089,6 +1100,14 @@ public class AtBContract extends Contract {
                     battleTypeMod = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
                     nextWeekBattleTypeMod = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("commandRoll")) {
+                    commandRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageRoll")) {
+                    salvageRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("supportRoll")) {
+                    supportRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportRoll")) {
+                    transportRoll = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
                     specialEventScenarioDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
@@ -1697,14 +1716,14 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * This method returns a {@link JPanel} that represents the difficulty stars for a given mission.
+     * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
      *
-     * @param campaign the campaign for which the difficulty stars are calculated
-     * @return a {@link JPanel} with the difficulty stars displayed
+     * @param campaign the campaign for which the difficulty skulls are calculated
+     * @return a {@link JPanel} with the difficulty skulls displayed
      */
-    public JPanel getContractDifficultyStars(Campaign campaign) {
+    public JPanel getContractDifficultySkulls(Campaign campaign) {
         final int ERROR = -99;
-        int difficulty = Math.min(calculateContractDifficulty(campaign), 8);
+        int difficulty = calculateContractDifficulty(campaign);
 
         // Create a new JFrame
         JFrame frame = new JFrame();
@@ -1713,27 +1732,31 @@ public class AtBContract extends Contract {
         // Create a pane with FlowLayout
         JPanel panel = new JPanel(new FlowLayout());
 
-        // Load and scale the image
-        ImageIcon imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_orange.png");
-        if (difficulty < 1 && difficulty != ERROR) {
-            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_green.png");
-        } else if (difficulty > 0) {
-            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_red.png");
-        }
-
-        Image scaledImage = imageIcon.getImage().getScaledInstance(40, 40, Image.SCALE_FAST);
-        imageIcon = new ImageIcon(scaledImage);
+        // Load and scale the images
+        ImageIcon skullFull = new ImageIcon("data/images/misc/challenge_estimate_full.png");
+        ImageIcon skullHalf = new ImageIcon("data/images/misc/challenge_estimate_half.png");
 
         int iterations = difficulty;
 
         if (difficulty == ERROR) {
-            iterations = 1;
-        } else if (difficulty < 1) {
-            iterations = -difficulty + 1;
+            iterations = 5;
         }
 
-        for (int i = 0; i < iterations; i++) {
-            panel.add(new JLabel(imageIcon));
+        if (iterations % 2 == 1) {
+            iterations--;
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
+
+            panel.add(new JLabel(skullHalf));
+        } else {
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
         }
 
         return panel;
@@ -1751,7 +1774,7 @@ public class AtBContract extends Contract {
         // Estimate the power of the enemy forces
         SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
         double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        int enemyPower = getAverageBattleValue(campaign, enemyCode, enemyQuality);
+        double enemyPower = estimateMekStrength(campaign, enemyCode, enemyQuality);
 
         // If we cannot calculate enemy power, abort.
         if (enemyPower == 0) {
@@ -1761,34 +1784,44 @@ public class AtBContract extends Contract {
         enemyPower = (int) round(enemyPower * enemySkillMultiplier);
 
         // Estimate player power
-        int playerPower = estimatePlayerPower(campaign);
+        double playerPower = estimatePlayerPower(campaign);
 
         // Estimate the power of allied forces
-        int allyPower = 0;
-        if (!getCommandRights().isIndependent()) {
+        // TODO pull these directly from Force Generation instead of using magic numbers
+        // TODO estimate the LIAISON ratio by going through each combat lance and
+        // getting the actual average (G)BV for an allied heavy/assault mek.
+        double allyRatio = switch (getCommandRights()) {
+            case INDEPENDENT    -> 0; // no allies
+            case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
+            case HOUSE          -> 1; // allies with same (G)BV budget
+            case INTEGRATED     -> 2; // allies with twice the player's (G)BV budget
+        };
+
+        if (allyRatio > 0) {
             SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
             double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            allyPower = getAverageBattleValue(campaign, employerCode, allyQuality);
-
+            double allyPower = estimateMekStrength(campaign, employerCode, allyQuality);
+            allyPower = allyPower * allySkillMultiplier;
             // If we cannot calculate ally's power, use player power as a fallback.
             if (allyPower == 0) {
                 allyPower = playerPower;
             }
-
-            allyPower = (int) round(allyPower * allySkillMultiplier);
-        }
-
-        if (allyPower > 0) {
-            playerPower += allyPower;
-            enemyPower *= 2;
+            playerPower += allyRatio * allyPower;
+            enemyPower += allyRatio * enemyPower;
         }
 
         // Calculate difficulty based on the percentage difference between the two forces.
-        // If the enemy force exceeds the player force, this will be a positive percentage, otherwise negative.
         double difference = enemyPower - playerPower;
         double percentDifference = (difference / playerPower) * 100;
 
-        return (int) round(percentDifference / 20);
+        int mappedValue = (int) Math.ceil(Math.abs(percentDifference) / 20);
+        if (percentDifference < 0) {
+            mappedValue = 5 - mappedValue;
+        } else {
+            mappedValue = 5 + mappedValue;
+        }
+
+        return Math.min(Math.max(mappedValue, 1), 10);
     }
 
     /**
@@ -1814,10 +1847,11 @@ public class AtBContract extends Contract {
      * Estimates the power of the player in a campaign based on the battle values of their units.
      *
      * @param campaign the object containing the forces and units of the player
-     * @return the estimated player power in the campaign
+     * @return average battle value per player unit OR total BV2 divided by total GBV
      */
-    private static int estimatePlayerPower(Campaign campaign) {
+    private static double estimatePlayerPower(Campaign campaign) {
         int playerPower = 0;
+        int playerGBV = 0;
         int playerUnitCount = 0;
         for (Force force : campaign.getAllForces()) {
             if (!force.isCombatForce()) {
@@ -1825,13 +1859,18 @@ public class AtBContract extends Contract {
             }
 
             for (UUID unitID : force.getUnits()) {
-                Unit unit = campaign.getUnit(unitID);
-                playerPower += unit.getEntity().calculateBattleValue();
+                Entity entity = campaign.getUnit(unitID).getEntity();
+                playerPower += entity.calculateBattleValue();
+                playerGBV += entity.getGenericBattleValue();
                 playerUnitCount ++;
             }
         }
 
-        return round((float) playerPower / playerUnitCount);
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) playerPower) / playerGBV;
+        } else {
+            return ((double) playerPower) / playerUnitCount;
+        }
     }
 
     /**
@@ -1853,15 +1892,17 @@ public class AtBContract extends Contract {
         };
     }
     /**
-     * Calculates the average battle value for Mek units of a specific faction and quality.
+     * Estimates the relative strength for Mek units of a specific faction and quality.
+     * Excludes salvage.
      *
-     * @param campaign the campaign to calculate the average battle value for
-     * @param factionCode the code of the faction to calculate the average battle value for
-     * @param quality the quality of the units to calculate the average battle value for
-     * @return the average battle value for units of the specified faction and quality
+     * @param campaign the campaign to estimate the average Mek strength for
+     * @param factionCode the code of the faction to estimate the average Mek strength for
+     * @param quality the quality of the Meks to calculate the average strength for
+     * @return the average battle value OR total BV2 divided by total GBV
+     * for Meks of the specified faction and quality OR 0 on error
      */
-    private static int getAverageBattleValue(Campaign campaign, String factionCode, int quality) {
-        final int ERROR = 0;
+    private static double estimateMekStrength(Campaign campaign, String factionCode, int quality) {
+        final double ERROR = 0;
 
         RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
         FactionRecord faction = ratGenerator.getFaction(factionCode);
@@ -1892,16 +1933,109 @@ public class AtBContract extends Contract {
         int entries = unitTable.getNumEntries();
 
         int totalBattleValue = 0;
+        int totalGBV = 0;
         int rollingCount = 0;
 
         for (int i = 0; i < entries; i++) {
-            int weight = unitTable.getEntryWeight(i);
-            int battleValue = unitTable.generateUnit().getBV();
+            int battleValue = unitTable.getBV(i); // 0 for salvage
+            if (0 == battleValue) {
+                // Removing this check will break things, see the other comments.
+                continue;
+            }
+            // TODO implement getGBV(int index) in UnitTable to simplify this?
+            // getMekSummary(int index) is NULL for salvage.
+            int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
+            int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
 
             totalBattleValue += battleValue * weight;
+            totalGBV += genericBattleValue * weight;
             rollingCount += weight;
         }
 
-        return totalBattleValue / rollingCount;
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) totalBattleValue) / totalGBV;
+        } else {
+            return ((double) totalBattleValue) / rollingCount;
+        }
+    }
+
+    /**
+     * Get the command roll that was used to determine command rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getCommandRoll() {
+        return commandRoll;
+    }
+
+    /**
+     * Set the command roll that was used to determine command rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setCommandRoll(int roll) {
+        commandRoll = roll;
+    }
+
+    /**
+     * Get the salvage roll that was used to determine salvage rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getSalvageRoll() {
+        return salvageRoll;
+    }
+
+    /**
+     * Set the salvage roll that was used to determine salvage rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setSalvageRoll(int roll) {
+        salvageRoll = roll;
+    }
+
+    /**
+     * Get the support roll that was used to determine support rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getSupportRoll() {
+        return supportRoll;
+    }
+
+    /**
+     * Set the support roll that was used to determine support rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setSupportRoll(int roll) {
+        supportRoll = roll;
+    }
+
+    /**
+     * Get the transport roll that was used to determine transport rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getTransportRoll() {
+        return transportRoll;
+    }
+
+    /**
+     * Set the transport roll that was used to determine transport rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setTransportRoll(int roll) {
+        transportRoll = roll;
     }
 }

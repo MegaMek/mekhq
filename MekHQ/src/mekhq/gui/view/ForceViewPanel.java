@@ -26,6 +26,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -466,11 +467,11 @@ public class ForceViewPanel extends JScrollablePanel {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("<html><nobr><font size='3'><b>")
             .append(person.getFullTitle())
-            .append("</b><br/>")
-            .append(person.getSkillLevel(campaign, false))
-            .append(' ')
+            .append("</b><br/><b>")
+            .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+            .append("</b> ")
             .append(person.getRoleDesc());
-        
+                    
         toReturn.append("<br>");
 
         boolean isInjured = false;

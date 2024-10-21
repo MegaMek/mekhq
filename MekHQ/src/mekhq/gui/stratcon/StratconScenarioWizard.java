@@ -470,7 +470,7 @@ public class StratconScenarioWizard extends JDialog {
                     }
                 }
 
-                currentScenario.addForce(force, templateID);
+                currentScenario.addForce(force, templateID, campaign);
             }
         }
 

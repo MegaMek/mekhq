@@ -18,9 +18,10 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import java.util.ResourceBundle;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum Ambition {
     // region Enum Declarations
@@ -101,129 +102,8 @@ public enum Ambition {
     // endregion Getters
 
     // region Boolean Comparison Methods
-
     public boolean isNone() {
         return this == NONE;
-    }
-
-    public boolean isAmbitious() {
-        return this == AMBITIOUS;
-    }
-
-    public boolean isArrogant() {
-        return this == ARROGANT;
-    }
-
-    public boolean isAspiring() {
-        return this == ASPIRING;
-    }
-
-    public boolean isCalculating() {
-        return this == CALCULATING;
-    }
-
-    public boolean isConniving() {
-        return this == CONNIVING;
-    }
-
-    public boolean isControlling() {
-        return this == CONTROLLING;
-    }
-
-    public boolean isCutthroat() {
-        return this == CUTTHROAT;
-    }
-
-    public boolean isDishonest() {
-        return this == DISHONEST;
-    }
-
-    public boolean isDiligent() {
-        return this == DILIGENT;
-    }
-
-    public boolean isDriven() {
-        return this == DRIVEN;
-    }
-
-    public boolean isEnergetic() {
-        return this == ENERGETIC;
-    }
-
-    public boolean isExcessive() {
-        return this == EXCESSIVE;
-    }
-
-    public boolean isFocused() {
-        return this == FOCUSED;
-    }
-
-    public boolean isGoalOriented() {
-        return this == GOAL_ORIENTED;
-    }
-
-    public boolean isInnovative() {
-        return this == INNOVATIVE;
-    }
-
-    public boolean isManipulative() {
-        return this == MANIPULATIVE;
-    }
-
-    public boolean isMotivated() {
-        return this == MOTIVATED;
-    }
-
-    public boolean isOpportunistic() {
-        return this == OPPORTUNISTIC;
-    }
-
-    public boolean isOverconfident() {
-        return this == OVERCONFIDENT;
-    }
-
-    public boolean isPersistent() {
-        return this == PERSISTENT;
-    }
-
-    public boolean isProactive() {
-        return this == PROACTIVE;
-    }
-
-    public boolean isResilient() {
-        return this == RESILIENT;
-    }
-
-    public boolean isResourceful() {
-        return this == RESOURCEFUL;
-    }
-
-    public boolean isRuthless() {
-        return this == RUTHLESS;
-    }
-
-    public boolean isSelfish() {
-        return this == SELFISH;
-    }
-
-    public boolean isStrategic() {
-        return this == STRATEGIC;
-    }
-
-    public boolean isTyrannical() {
-        return this == TYRANNICAL;
-    }
-
-    public boolean isUnambitious() {
-        return this == UNAMBITIOUS;
-    }
-
-    public boolean isUnscrupulous() {
-        return this == UNSCRUPULOUS;
-    }
-
-    public boolean isVisionary() {
-        return this == VISIONARY;
     }
     // endregion Boolean Comparison Methods
 
@@ -237,7 +117,7 @@ public enum Ambition {
      * @throws IllegalStateException if the given string does not match any valid
      *                               Ambition
      */
-
+    @Deprecated
     public static Ambition parseFromString(final String ambition) {
         return switch (ambition) {
             case "0", "None" -> NONE;
@@ -281,54 +161,23 @@ public enum Ambition {
     }
 
     /**
-     * Parses an integer value into an Aggression enum.
+     * Returns the {@link Ambition} associated with the given ordinal.
      *
-     * @param ambition the integer value representing the Ambition level
-     * @return the corresponding Ambition enum value
-     * @throws IllegalStateException if the integer value does not correspond to any
-     *                               valid Ambition enum value
+     * @param ordinal the ordinal value of the {@link Ambition}
+     * @return the {@link Ambition} associated with the given ordinal, or default value
+     * {@code NONE} if not found
      */
+    public static Ambition fromOrdinal(int ordinal) {
+        for (Ambition ambition : values()) {
+            if (ambition.ordinal() == ordinal) {
+                return ambition;
+            }
+        }
 
-    public static Ambition parseFromInt(final int ambition) {
-        return switch (ambition) {
-            case 0 -> NONE;
-            // Minor Characteristics
-            case 1 -> AMBITIOUS;
-            case 2 -> ARROGANT;
-            case 3 -> ASPIRING;
-            case 4 -> CALCULATING;
-            case 5 -> CONNIVING;
-            case 6 -> CONTROLLING;
-            case 7 -> CUTTHROAT;
-            case 8 -> DILIGENT;
-            case 9 -> DRIVEN;
-            case 10 -> ENERGETIC;
-            case 11 -> EXCESSIVE;
-            case 12 -> FOCUSED;
-            case 13 -> GOAL_ORIENTED;
-            case 14 -> MOTIVATED;
-            case 15 -> OPPORTUNISTIC;
-            case 16 -> OVERCONFIDENT;
-            case 17 -> PERSISTENT;
-            case 18 -> PROACTIVE;
-            case 19 -> RESILIENT;
-            case 20 -> RUTHLESS;
-            case 21 -> SELFISH;
-            case 22 -> STRATEGIC;
-            case 23 -> UNAMBITIOUS;
-            case 24 -> UNSCRUPULOUS;
-            // Major Characteristics
-            case 25 -> DISHONEST;
-            case 26 -> INNOVATIVE;
-            case 27 -> MANIPULATIVE;
-            case 28 -> RESOURCEFUL;
-            case 29 -> TYRANNICAL;
-            case 30 -> VISIONARY;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromInt: "
-                                + ambition);
-        };
+        final MMLogger logger = MMLogger.create(Ambition.class);
+        logger.error(String.format("Unknown Ambition ordinal: %s - returning NONE.", ordinal));
+
+        return NONE;
     }
 
     @Override

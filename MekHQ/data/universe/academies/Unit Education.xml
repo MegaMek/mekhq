@@ -89,8 +89,7 @@
     </academy>
     <academy>
         <name>Adult Apprenticeship</name>
-        <isMilitary>true</isMilitary>
-        <isPrepSchool>true</isPrepSchool>
+        <isMilitary>false</isMilitary>
         <description>An adult apprenticeship is a hands-on training program where older recruits are integrated into a military or mercenary unit. The apprenticeship focuses heavily on learning in the field, with recruits shadowing seasoned veterans.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>

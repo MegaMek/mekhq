@@ -242,15 +242,22 @@ public class TankLocation extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
+        StringBuilder toReturn = new StringBuilder();
+
+        toReturn.append(super.getDetails(includeRepairDetails));
+
         if (includeRepairDetails) {
             if (isBreached()) {
-                return "Breached";
-            } else {
-                return damage + " point(s) of damage";
+                toReturn.append(", Breached");
+            } else if (damage > 0) {
+                toReturn.append(", ")
+                    .append(damage)
+                    .append(damage == 1 ? " point" : " points")
+                    .append(" of damage");
             }
-        } else {
-            return super.getDetails(false);
         }
+
+        return toReturn.toString();
     }
 
     @Override

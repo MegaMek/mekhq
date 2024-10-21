@@ -25,6 +25,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
@@ -39,6 +40,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * Contract summary view for ContractMarketDialog
  *
@@ -52,6 +55,7 @@ public class ContractSummaryPanel extends JPanel {
     private int cmdRerolls;
     private int logRerolls;
     private int tranRerolls;
+    private ContractMarketMethod method;
 
     private JPanel mainPanel;
 
@@ -76,16 +80,20 @@ public class ContractSummaryPanel extends JPanel {
         this.contract = contract;
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;
+        this.method = campaign.getCampaignOptions().getContractMarketMethod();
         if (allowRerolls) {
-            Person admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_NEG, SkillType.S_ADMIN);
-            cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
-                    ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_NEG, SkillType.S_ADMIN);
-            logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
-                    ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
-            admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_NEG, SkillType.S_ADMIN);
-            tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)
-                    ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+            if (method == ContractMarketMethod.CAM_OPS) {
+                cmdRerolls = 1;
+                logRerolls = 1;
+                tranRerolls = 1;
+            } else {
+                Person admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_NEG, SkillType.S_ADMIN);
+                cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+                admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_NEG, SkillType.S_ADMIN);
+                logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+                admin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_NEG, SkillType.S_ADMIN);
+                tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null) ? 0 : admin.getSkill(SkillType.S_NEG).getLevel();
+            }
         }
 
         initComponents();
@@ -161,11 +169,13 @@ public class ContractSummaryPanel extends JPanel {
         if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
             if (contract instanceof AtBContract) {
                 JLabel lblChallenge = new JLabel(resourceMap.getString("lblChallenge.text"));
+                lblChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 lblChallenge.setName("lblChallenge");
                 gridBagConstraintsLabels.gridy = ++y;
                 mainPanel.add(lblChallenge, gridBagConstraintsLabels);
 
-                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultyStars(campaign);
+                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultySkulls(campaign);
+                txtChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 txtChallenge.setName("txtChallenge");
                 gridBagConstraintsText.gridy = y;
                 mainPanel.add(txtChallenge, gridBagConstraintsText);
@@ -565,7 +575,13 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private String generateRerollText(int rerolls) {
-        return resourceMap.getString("lblRenegotiate.text") + " (" + rerolls + ')';
+        StringBuilder text = new StringBuilder(resourceMap.getString("lblRenegotiate.text"));
+        if (method != ContractMarketMethod.CAM_OPS) {
+            text.append(" (")
+                .append(rerolls)
+                .append(')');
+        }
+        return text.toString();
     }
 
     public void refreshAmounts() {

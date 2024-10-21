@@ -31,6 +31,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -249,7 +250,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyUnit(mockEntity, transitDays));
 
         // ...and the new unit should be added to the campaign.
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(transitDays), eq(3));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(transitDays), eq(PartQuality.QUALITY_D));
     }
 
     @Test
@@ -274,7 +275,7 @@ public class QuartermasterTest {
         assertFalse(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should NOT be added to the campaign.
-        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(3));
+        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
     }
 
     @Test
@@ -302,7 +303,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(3));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(cost), captor.getValue());
@@ -333,7 +334,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new infantry should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(3));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(cost), captor.getValue());
@@ -369,7 +370,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(3));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(clanMultiplier * cost), captor.getValue());
@@ -405,7 +406,7 @@ public class QuartermasterTest {
         assertTrue(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new clan infantry should be added to the campaign...
-        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(3));
+        verify(mockCampaign, times(1)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(PartQuality.QUALITY_D));
 
         // ...and it should cost the right amount.
         assertEquals(Money.of(clanMultiplier * cost), captor.getValue());

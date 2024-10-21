@@ -2207,27 +2207,27 @@ public class Person {
             }
 
             if (aggression != Aggression.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.ordinal());
             }
 
             if (ambition != Ambition.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.ordinal());
             }
 
             if (greed != Greed.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.ordinal());
             }
 
             if (social != Social.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.ordinal());
             }
 
             if (personalityQuirk != PersonalityQuirk.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.ordinal());
             }
 
             if (intelligence != Intelligence.AVERAGE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligence", intelligence.toString());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligence", intelligence.ordinal());
             }
 
             if (!StringUtility.isNullOrBlank(personalityDescription)) {
@@ -2564,17 +2564,48 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
                     retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
-                    retVal.aggression = Aggression.parseFromString(wn2.getTextContent());
+                    try {
+                        // <50.01 compatibility handler
+                        retVal.aggression = Aggression.parseFromString(wn2.getTextContent());
+                    } catch (Exception e) {
+                        retVal.aggression = Aggression.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
-                    retVal.ambition = Ambition.parseFromString(wn2.getTextContent());
+                    try {
+                        // <50.01 compatibility handler
+                        retVal.ambition = Ambition.parseFromString(wn2.getTextContent());
+                    } catch (Exception e) {
+                        retVal.ambition = Ambition.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
-                    retVal.greed = Greed.parseFromString(wn2.getTextContent());
+                    try {
+                        // <50.01 compatibility handler
+                        retVal.greed = Greed.parseFromString(wn2.getTextContent());
+                    } catch (Exception e) {
+                        retVal.greed = Greed.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
+                    try {
+                        // <50.01 compatibility handler
+                        retVal.social = Social.parseFromString(wn2.getTextContent());
+                    } catch (Exception e) {
+                        retVal.social = Social.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
+                    }
                     retVal.social = Social.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
-                    retVal.personalityQuirk = PersonalityQuirk.parseFromString(wn2.getTextContent());
+                    try {
+                        // <50.01 compatibility handler
+                        retVal.personalityQuirk = PersonalityQuirk.parseFromString(wn2.getTextContent());
+                    } catch (Exception e) {
+                        retVal.personalityQuirk = PersonalityQuirk.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
-                    retVal.intelligence = Intelligence.parseFromString(wn2.getTextContent());
+                    try {
+                        // <50.01 compatibility handler
+                        retVal.intelligence = Intelligence.parseFromString(wn2.getTextContent());
+                    } catch (Exception e) {
+                        retVal.intelligence = Intelligence.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {

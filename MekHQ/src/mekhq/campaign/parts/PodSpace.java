@@ -30,6 +30,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.utilities.ReportingUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class PodSpace implements IPartWork {
     }
 
     public List<Part> getPartList() {
-        return childPartIds.stream().map(id -> campaign.getPart(id))
+        return childPartIds.stream().map(id -> campaign.getWarehouse().getPart(id))
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
@@ -101,7 +102,7 @@ public class PodSpace implements IPartWork {
         shorthandedMod = 0;
         //Iterate through all pod-mounted equipment in space and remove them.
         for (int pid : childPartIds) {
-            final Part part = campaign.getPart(pid);
+            final Part part = campaign.getWarehouse().getPart(pid);
             if (part != null) {
                 part.remove(salvage);
                 MekHQ.triggerEvent(new PartChangedEvent(part));
@@ -114,7 +115,7 @@ public class PodSpace implements IPartWork {
     public void fix() {
         shorthandedMod = 0;
         for (int pid : childPartIds) {
-            final Part part = campaign.getPart(pid);
+            final Part part = campaign.getWarehouse().getPart(pid);
             if (part != null && !(part instanceof MissingPart)
                     && !(part instanceof AmmoBin)
                     && part.needsFixing()
@@ -125,7 +126,7 @@ public class PodSpace implements IPartWork {
         }
         updateConditionFromEntity(false);
         for (int pid : childPartIds) {
-            final Part part = campaign.getPart(pid);
+            final Part part = campaign.getWarehouse().getPart(pid);
             if (part instanceof MissingPart) {
                 part.fix();
                 MekHQ.triggerEvent(new PartChangedEvent(part));
@@ -155,7 +156,7 @@ public class PodSpace implements IPartWork {
             }
             if (repairInPlace) {
                 for (int id : childPartIds) {
-                    final Part p = unit.getCampaign().getPart(id);
+                    final Part p = unit.getCampaign().getWarehouse().getPart(id);
                     if (p instanceof MissingPart) {
                         return null;
                     }
@@ -163,7 +164,7 @@ public class PodSpace implements IPartWork {
                 return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
             } else {
                 for (int id : childPartIds) {
-                    final Part p = unit.getCampaign().getPart(id);
+                    final Part p = unit.getCampaign().getWarehouse().getPart(id);
                     if (p == null || !p.needsFixing()) {
                         continue;
                     }
@@ -187,7 +188,7 @@ public class PodSpace implements IPartWork {
     @Override
     public boolean needsFixing() {
         return childPartIds.stream()
-                .map(id -> campaign.getPart(id)).filter(Objects::nonNull)
+                .map(id -> campaign.getWarehouse().getPart(id)).filter(Objects::nonNull)
                 .anyMatch(p -> !(p instanceof AmmoBin) && p.needsFixing());
     }
 
@@ -233,10 +234,12 @@ public class PodSpace implements IPartWork {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> removed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> removed</b>") + ".";
         } else {
             fix();
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -246,7 +249,7 @@ public class PodSpace implements IPartWork {
         shorthandedMod = 0;
         boolean replacing = false;
         for (int id : childPartIds) {
-            final Part part = campaign.getPart(id);
+            final Part part = campaign.getWarehouse().getPart(id);
             if (part != null && (isSalvaging() ||
                     (!(part instanceof AmmoBin) && part.needsFixing()))) {
                 part.fail(rating);
@@ -254,9 +257,12 @@ public class PodSpace implements IPartWork {
             }
         }
         if (rating >= SkillType.EXP_ELITE && replacing) {
-                return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed and part(s) destroyed.</b></font>";
+                return ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b> failed and part(s) destroyed</b>") + ".";
         } else {
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),"<b> failed</b>") + ".";
         }
     }
 
@@ -279,7 +285,7 @@ public class PodSpace implements IPartWork {
     public int getSkillMin() {
         int minSkill = SkillType.EXP_GREEN;
         for (int id : childPartIds) {
-            final Part part = campaign.getPart(id);
+            final Part part = campaign.getWarehouse().getPart(id);
             if (part != null) {
                 if ((isSalvaging() && !(part instanceof MissingPart))
                         || (!isSalvaging() && (part instanceof MissingPart)
@@ -365,38 +371,28 @@ public class PodSpace implements IPartWork {
 
     @Override
     public String getDesc() {
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = '+' + bonus;
-        }
-        String toReturn = "<html><font";
-        String action = "Replace ";
-        if (isSalvaging()) {
-            action = "Salvage ";
-        }
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>")
+            .append(isSalvaging() ? "Salvage  " : "Replace ")
+            .append(getPartName())
+            .append(" Equipment - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+            .append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += ">";
-        toReturn += "<b>" + action + getPartName() + " Equipment";
-
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
-        } else {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        }
-
-        toReturn += getDetails() + "<br/>";
         if (getSkillMin() <= SkillType.EXP_ELITE) {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += " <b>TN:</b> " + bonus;
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(getTech() != null ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override
@@ -411,7 +407,7 @@ public class PodSpace implements IPartWork {
         int inTransit = 0;
         int onOrder = 0;
         for (int id : childPartIds) {
-            Part part = campaign.getPart(id);
+            Part part = campaign.getWarehouse().getPart(id);
             if (part != null) {
                 if (!isSalvaging() && !(part instanceof AmmoBin) && part.needsFixing()) {
                     allParts++;
@@ -470,7 +466,7 @@ public class PodSpace implements IPartWork {
 
     public boolean hasSalvageableParts() {
         for (int id : childPartIds) {
-            final Part p = campaign.getPart(id);
+            final Part p = campaign.getWarehouse().getPart(id);
             if (p != null && p.isSalvaging()) {
                 return true;
             }
@@ -480,13 +476,13 @@ public class PodSpace implements IPartWork {
 
     @Override
     public void reservePart() {
-        childPartIds.stream().map(id -> campaign.getPart(id))
+        childPartIds.stream().map(id -> campaign.getWarehouse().getPart(id))
             .filter(Objects::nonNull).forEach(Part::reservePart);
     }
 
     @Override
     public void cancelReservation() {
-        childPartIds.stream().map(id -> campaign.getPart(id))
+        childPartIds.stream().map(id -> campaign.getWarehouse().getPart(id))
             .filter(Objects::nonNull).forEach(Part::cancelReservation);
     }
 
@@ -517,6 +513,17 @@ public class PodSpace implements IPartWork {
      */
     @Override
     public Money getActualValue() {
+        return Money.of(0.0);
+    }
+
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * but which ignores damage
+     * (Note: Pod Space, an abstraction, does not have value or price.
+     * @return the part's actual value
+     */
+    @Override
+    public Money getUndamagedValue() {
         return Money.of(0.0);
     }
 

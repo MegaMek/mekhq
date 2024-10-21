@@ -18,24 +18,20 @@
  */
 package mekhq.campaign.stratcon;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -72,7 +68,7 @@ public class StratconContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
+        int numTracks = Math.max(1, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < numTracks; x++) {
@@ -402,12 +398,11 @@ public class StratconContractInitializer {
      * such as pointers from StratCon scenario objects to AtB scenario objects.
      */
     public static void restoreTransientStratconInformation(Mission m, Campaign campaign) {
-        if (m instanceof AtBContract) {
+        if (m instanceof AtBContract atbContract) {
             // Having loaded scenarios and such, we now need to go through any StratCon
             // scenarios for this contract
             // and set their backing scenario pointers to the existing scenarios stored in
             // the campaign for this contract
-            AtBContract atbContract = (AtBContract) m;
             if (atbContract.getStratconCampaignState() != null) {
                 for (StratconTrackState track : atbContract.getStratconCampaignState().getTracks()) {
                     for (StratconScenario scenario : track.getScenarios().values()) {

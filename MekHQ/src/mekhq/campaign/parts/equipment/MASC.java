@@ -81,7 +81,7 @@ public class MASC extends EquipmentPart {
     @Override
     public Money getStickerPrice() {
         if (isSupercharger()) {
-            return Money.of(engineRating * (isOmniPodded() ? 1250 : 10000));
+            return Money.of(engineRating * (isOmniPodded() ? 12500 : 10000));
         } else {
             return Money.of(engineRating * getTonnage() * 1000);
         }
@@ -146,23 +146,30 @@ public class MASC extends EquipmentPart {
     }
 
     @Override
+    public boolean isUnitTonnageMatters() {
+        return !isSupercharger();
+    }
+
+    @Override
     public String getDetails() {
         return getDetails(true);
     }
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        String details = super.getDetails(includeRepairDetails);
-        if (null != unit) {
-            return details;
-        }
+        StringBuilder details = new StringBuilder();
+        details.append(super.getDetails(includeRepairDetails));
         if (!details.isEmpty()) {
-            details += ", ";
+            details.append(", ");
         }
         if (isSupercharger()) {
-            return details + ", " + getEngineRating() + " rating";
+            // Causes extra information but needed so omnipods show all data
+            details.append(equipTonnage)
+                .append(" tons, ");
         }
-        return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
+        details.append(getEngineRating())
+            .append(" rating");
+        return details.toString();
     }
 
     @Override

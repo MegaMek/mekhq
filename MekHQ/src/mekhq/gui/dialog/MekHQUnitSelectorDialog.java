@@ -23,6 +23,7 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 
@@ -124,7 +125,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected void select(boolean isGM) {
         if (getSelectedEntity() != null) {
             if (isGM) {
-                int quality = 3;
+                PartQuality quality = PartQuality.QUALITY_D;
 
                 if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                     quality = UnitOrder.getRandomUnitQuality(0);

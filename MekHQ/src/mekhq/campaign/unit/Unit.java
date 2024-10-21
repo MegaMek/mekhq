@@ -52,6 +52,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -75,8 +76,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static mekhq.campaign.parts.Part.*;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -5227,7 +5226,7 @@ public class Unit implements ITechnology {
         maintenanceMultiplier = value;
     }
 
-    public int getQuality() {
+    public PartQuality getQuality() {
         int nParts = 0;
         int sumQuality = 0;
         for (Part p : getParts()) {
@@ -5236,16 +5235,16 @@ public class Unit implements ITechnology {
                 nParts++;
             } else if (p.needsMaintenance()) {
                 nParts++;
-                sumQuality += p.getQuality();
+                sumQuality += p.getQuality().toNumeric();
             }
         }
         if (nParts == 0) {
-            return QUALITY_D;
+            return PartQuality.QUALITY_D;
         }
-        return (int) Math.round((1.0 * sumQuality) / nParts);
+        return PartQuality.fromNumeric((int) Math.round((1.0 * sumQuality) / nParts));
     }
 
-    public void setQuality(int q) {
+    public void setQuality(PartQuality q) {
         for (Part p : getParts()) {
             if (!(p instanceof MissingPart)) {
                 p.setQuality(q);
@@ -5254,7 +5253,7 @@ public class Unit implements ITechnology {
     }
 
     public String getQualityName() {
-        return Part.getQualityName(getQuality(), getCampaign().getCampaignOptions().isReverseQualityNames());
+        return getQuality().toName(getCampaign().getCampaignOptions().isReverseQualityNames());
     }
 
     public boolean requiresMaintenance() {
@@ -5887,18 +5886,18 @@ public class Unit implements ITechnology {
      * @throws IllegalStateException if an unexpected value is encountered during
      *                               the switch statement
      */
-    public static int getRandomUnitQuality(int modifier) {
+    public static PartQuality getRandomUnitQuality(int modifier) {
         int roll = MathUtility.clamp(
                 (Compute.d6(2) + modifier),
                 2,
                 12);
 
         return switch (roll) {
-            case 2, 3, 4, 5 -> QUALITY_A;
-            case 6, 7, 8 -> QUALITY_B;
-            case 9, 10 -> QUALITY_C;
-            case 11 -> QUALITY_D;
-            case 12 -> QUALITY_F;
+            case 2, 3, 4, 5 -> PartQuality.QUALITY_A;
+            case 6, 7, 8 -> PartQuality.QUALITY_B;
+            case 9, 10 -> PartQuality.QUALITY_C;
+            case 11 -> PartQuality.QUALITY_D;
+            case 12 -> PartQuality.QUALITY_F;
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };

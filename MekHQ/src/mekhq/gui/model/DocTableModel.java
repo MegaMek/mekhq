@@ -54,8 +54,9 @@ public class DocTableModel extends DataTableModel {
 
         Skill skill = doc.getSkill(SkillType.S_DOCTOR);
         if (null != skill) {
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()))
-                    .append(" " + SkillType.S_DOCTOR);
+            toReturn.append("<b>")
+                    .append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()))
+                    .append("</b> " + SkillType.S_DOCTOR);
         }
 
         toReturn.append(String.format(" (%d XP)", doc.getXP()));

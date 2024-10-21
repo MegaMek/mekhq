@@ -120,8 +120,9 @@ public class TechTableModel extends DataTableModel {
                 toReturn.append("; ");
             }
 
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(' ').append(skillName);
+            toReturn.append("<b>")
+                .append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()))
+                .append("</b> ").append(skillName);
             first = false;
         }
 
@@ -139,6 +140,26 @@ public class TechTableModel extends DataTableModel {
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
         }
+
+        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
+            toReturn.append(", <i>Engineer</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_MAINTAINER)) {
+            toReturn.append(", <i>Maintainer</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
+            toReturn.append(", <i>Mr/Ms Fix-it</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)) {
+            toReturn.append(", <i>Armor Specialist</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)) {
+            toReturn.append(", <i>Internal Specialist</i>");
+        }
+        if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)) {
+            toReturn.append(", <i>Weapon Specialist</i>");
+        }
+
         toReturn.append("</font></html>");
         return toReturn.toString();
     }

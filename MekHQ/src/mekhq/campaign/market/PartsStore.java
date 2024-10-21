@@ -88,8 +88,6 @@ public class PartsStore {
         stockProtomekComponents(c);
         stockBattleArmorSuits(c);
 
-        Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s");
-        Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)");
         StringBuilder sb = new StringBuilder();
         for (Part p : parts) {
             p.setBrandNew(true);
@@ -97,7 +95,6 @@ public class PartsStore {
             sb.append(p.getName());
             if (!(p instanceof Armor)) { // ProtoMekArmor and BaArmor are derived from Armor
                 String details = p.getDetails();
-                details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst("");
                 if (!details.isEmpty()) {
                     sb.append(" (").append(details).append(")");
                 }
@@ -232,6 +229,8 @@ public class PartsStore {
                             epart = new EquipmentPart(0, et, -1, 1.0, true, c);
                             epart.setEquipTonnage(ton);
                             parts.add(epart);
+                            epart = new EquipmentPart(0, et, -1, 1.0, true, c);
+                            epart.setEquipTonnage(ton);
                             parts.add(new OmniPod(epart, c));
                         }
                         // TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
@@ -241,7 +240,7 @@ public class PartsStore {
                     parts.add(p);
                     if (poddable) {
                         parts.add(new EquipmentPart(0, et, -1, 1.0, true, c));
-                        parts.add(new OmniPod(p, c));
+                        parts.add(new OmniPod(new EquipmentPart(0, et, -1, 1.0, false, c), c));
                     }
                 }
             }
@@ -429,7 +428,7 @@ public class PartsStore {
         parts.add(new VeeStabilizer(0, -1, c));
         for (int ton = 5; ton <= 100; ton = ton + 5) {
             parts.add(new Rotor(ton, c));
-            parts.add(new Turret(ton, -1, c));
+            parts.add(new Turret(ton, ton, c));
         }
     }
 

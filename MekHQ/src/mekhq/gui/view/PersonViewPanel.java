@@ -88,7 +88,6 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-
         setLayout(new GridBagLayout());
         getAccessibleContext().setAccessibleName("Details for " + person.getFullName());
 
@@ -204,7 +203,7 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(wordWrap(person.getPersonalityDescription(), 200)));
+            txtDesc.setText(person.getPersonalityDescription());
             txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -222,7 +221,7 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(wordWrap(person.getBiography(), 200)));
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")),
                     BorderFactory.createEmptyBorder(0, 2, 2, 2)));
@@ -1449,9 +1448,8 @@ public class PersonViewPanel extends JScrollablePanel {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
                     JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblAbility2.setToolTipText(wordWrap("<html>"
-                        + option.getDescription().replaceAll("\\n", "<br>")
-                        + "</html>"));
+                    lblAbility2.setToolTipText(wordWrap(
+                        option.getDescription().replaceAll("\\n", "<br>")));
                     lblAbility2.setName("lblAbility2");
                     lblAbility2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
@@ -1482,9 +1480,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 if (option.booleanValue()) {
                     JLabel lblImplants2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblImplants2.setToolTipText(wordWrap("<html>"
-                        + option.getDescription().replaceAll("\\n", "<br>")
-                        + "</html>"));
+                    lblImplants2.setToolTipText(wordWrap(
+                        option.getDescription().replaceAll("\\n", "<br>")));
                     lblImplants2.setName("lblImplants2");
                     lblImplants2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));

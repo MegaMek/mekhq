@@ -36,7 +36,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.verifier.Structure;
 import megamek.common.verifier.TestEntity.Ceil;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -46,6 +45,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -68,6 +68,7 @@ public class MekLocation extends Part {
 
     public MekLocation() {
         this(0, 0, 0, false, false, false, false, false, null);
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -109,6 +110,7 @@ public class MekLocation extends Part {
         this.sensors = sensors;
         this.lifeSupport = lifeSupport;
         this.breached = false;
+        this.unitTonnageMatters = true;
         // TODO : need to account for internal structure and myomer types
         // crap, no static report for location names?
         this.name = "Mek Location";
@@ -566,48 +568,50 @@ public class MekLocation extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if (getUnit() != null) {
-            return getDetailsOnUnit(includeRepairDetails);
+        StringBuilder toReturn = new StringBuilder();
+
+        if (null != getUnit()) {
+            toReturn.append(Objects.requireNonNull(getUnit()).getEntity().getLocationName(loc))
+                .append(", ");
         }
 
-        String toReturn = getUnitTonnage() + " tons";
-        if (includeRepairDetails) {
-            toReturn += " (" + Math.round(100 * getPercent()) + "%)";
-        }
-
+        toReturn.append(getUnitTonnage())
+            .append(" tons");
+            
         if (loc == Mek.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
             if (hasSensors()) {
                 components.add("Sensors");
             }
-
             if (hasLifeSupport()) {
                 components.add("Life Support");
             }
-
             if (components.length() > 0) {
-                toReturn += " [" + components + ']';
+                toReturn.append(" [")
+                    .append(components)
+                    .append(']');
             }
         }
 
-        return toReturn;
-    }
-
-    private String getDetailsOnUnit(boolean includeRepairDetails) {
-        String toReturn = Objects.requireNonNull(getUnit()).getEntity().getLocationName(loc);
         if (includeRepairDetails) {
             if (isBlownOff()) {
-                toReturn += " (Blown Off)";
+                toReturn.append(" (Blown Off)");
             } else if (isBreached()) {
-                toReturn += " (Breached)";
+                toReturn.append(" (Breached)");
             } else if (onBadHipOrShoulder()) {
-                toReturn += " (Bad Hip/Shoulder)";
-            } else {
-                toReturn += " (" + Math.round(100 * getPercent()) + "%)";
+                toReturn.append(" (Bad Hip/Shoulder)");
+            } else if (getPercent() < 1.0) {
+                toReturn.append(" (")
+                    .append(Math.round(100 * getPercent()))
+                    .append("%)");
+                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                    toReturn.append(", ")
+                        .append(getUndamagedValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+                }
             }
         }
 
-        return toReturn;
+        return toReturn.toString();
     }
 
     @Override
@@ -861,49 +865,40 @@ public class MekLocation extends Part {
 
     @Override
     public String getDesc() {
-        if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
+        if ((!isBreached() && !isBlownOff())) {
             return super.getDesc();
         }
-        String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>")
+            .append(isBlownOff() ? "Re-attach " : "Seal ")
+            .append(getName())
+            .append(" (")
+            .append(getUnitTonnage())
+            .append(" ton) - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+            .append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += ">";
-        if (isBlownOff()) {
-            toReturn += "<b>Re-attach " + getName();
-
-        } else {
-            toReturn += "<b>Seal " + getName();
-
-        }
-
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                    + "'>Impossible</b></span>";
-        } else {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        }
-
-        toReturn += getDetails() + "<br/>";
         if (getSkillMin() <= SkillType.EXP_ELITE) {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            if (isBlownOff()) {
-                String bonus = getAllMods(null).getValueAsString();
-                if (getAllMods(null).getValue() > -1) {
-                    bonus = '+' + bonus;
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "");
+                if(isBlownOff()) {
+                    toReturn.append(" <b>TN:</b> ")
+                        .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                        .append(getAllMods(null).getValueAsString());
                 }
-                toReturn += " <b>TN:</b> " + bonus;
-                if (getMode() != WorkTime.NORMAL) {
-                    toReturn += " <i>" + getCurrentModeName() + "</i>";
-                }
+            if (getMode() != WorkTime.NORMAL) {
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override

@@ -30,6 +30,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -81,13 +82,6 @@ public abstract class Part implements IPartWork, ITechnology {
     public static final int T_IS = 1;
     public static final int T_CLAN = 2;
 
-    public static final int QUALITY_A = 0;
-    public static final int QUALITY_B = 1;
-    public static final int QUALITY_C = 2;
-    public static final int QUALITY_D = 3;
-    public static final int QUALITY_E = 4;
-    public static final int QUALITY_F = 5;
-
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
     protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TECH_BASE_ALL)
@@ -98,10 +92,16 @@ public abstract class Part implements IPartWork, ITechnology {
     protected String name;
     protected int id;
 
-    // this is the unitTonnage which needs to be tracked for some parts
-    // even when off the unit. actual tonnage is returned via the
-    // getTonnage() method
+    /** 
+     * This is the unitTonnage which needs to be tracked for some parts
+     * even when off the unit. Actual tonnage is returned via the
+     * getTonnage() method
+     */
     protected int unitTonnage;
+    /**
+     * Is this part's unitTonnage something that differentiates it from other parts
+     */
+    protected boolean unitTonnageMatters;
 
     protected boolean omniPodded;
 
@@ -121,7 +121,7 @@ public abstract class Part implements IPartWork, ITechnology {
     // null is valid. It indicates parts that are not attached to units.
     protected Unit unit;
 
-    protected int quality;
+    protected PartQuality quality;
 
     protected boolean brandNew;
 
@@ -185,6 +185,7 @@ public abstract class Part implements IPartWork, ITechnology {
     public Part(int tonnage, boolean omniPodded, Campaign c) {
         this.name = "Unknown";
         this.unitTonnage = tonnage;
+        this.unitTonnageMatters = false;
         this.omniPodded = omniPodded;
         this.hits = 0;
         this.skillMin = SkillType.EXP_GREEN;
@@ -197,50 +198,13 @@ public abstract class Part implements IPartWork, ITechnology {
         this.campaign = c;
         this.brandNew = true;
         this.quantity = 1;
-        this.quality = QUALITY_D;
+        this.quality = PartQuality.QUALITY_D;
         this.childParts = new ArrayList<>();
         this.isTeamSalvaging = false;
     }
 
-    public static String getQualityName(int quality, boolean reverse) {
-        switch (quality) {
-            case QUALITY_A:
-                if (reverse) {
-                    return "F";
-                }
-                return "A";
-            case QUALITY_B:
-                if (reverse) {
-                    return "E";
-                }
-                return "B";
-            case QUALITY_C:
-                if (reverse) {
-                    return "D";
-                }
-                return "C";
-            case QUALITY_D:
-                if (reverse) {
-                    return "C";
-                }
-                return "D";
-            case QUALITY_E:
-                if (reverse) {
-                    return "B";
-                }
-                return "E";
-            case QUALITY_F:
-                if (reverse) {
-                    return "A";
-                }
-                return "F";
-            default:
-                return "?";
-        }
-    }
-
     public String getQualityName() {
-        return getQualityName(getQuality(), campaign.getCampaignOptions().isReverseQualityNames());
+        return quality.toName(campaign.getCampaignOptions().isReverseQualityNames());
     }
 
     public void setId(int id) {
@@ -275,17 +239,33 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
+    public Money getUndamagedValue() {
+        return adjustCostsForCampaignOptions(getStickerPrice(), true);
+    }
+
+    @Override
     public boolean isPriceAdjustedForAmount() {
         return false;
     }
 
     /**
-     * Adjusts the cost of a part based on one's campaign options
+     * Adjusts the cost of a part based on campaign options and the part's condition
      *
      * @param cost the part's base cost
      * @return the part's cost adjusted for campaign options
      */
     public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
+        return adjustCostsForCampaignOptions(cost, false);
+    } 
+
+    /**
+     * Adjusts the cost of a part based on campaign options
+     *
+     * @param cost the part's base cost
+     * @param ignoreDamage do we ignore damaged condition
+     * @return the part's cost adjusted for campaign options
+     */
+    public Money adjustCostsForCampaignOptions(@Nullable Money cost, boolean ignoreDamage) {
         // if the part doesn't cost anything, no amount of multiplication will change it
         if ((cost == null) || cost.isZero()) {
             return Money.zero();
@@ -308,10 +288,11 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!isBrandNew()) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartPriceMultipliers()[getQuality()]);
+            cost = cost.multipliedBy(campaign.getCampaignOptions()
+                    .getUsedPartPriceMultipliers()[getQuality().toNumeric()]);
         }
 
-        if (needsFixing() && !isPriceAdjustedForAmount()) {
+        if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
             cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE)
                     ? campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier()
                     : campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
@@ -353,6 +334,13 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public int getUnitTonnage() {
         return unitTonnage;
+    }
+    
+    /** 
+     * @return Is this an item that exists in multiple forms for units of different tonnages?
+     */
+    public boolean isUnitTonnageMatters() {
+        return unitTonnageMatters;
     }
 
     public abstract double getTonnage();
@@ -423,71 +411,70 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public String getDesc() {
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = '+' + bonus;
-        }
-        String toReturn = "<html><font";
-        String action = "Repair ";
-        if (isSalvaging()) {
-            action = "Salvage ";
-        }
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
-        toReturn += ">";
-        toReturn += "<b>" + action + getName();
-
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>")
+            .append(isSalvaging() ? "Salvage  " : "Repair ")
+            .append(getName());
+            if(isUnitTonnageMatters()) {
+                toReturn.append(" (")
+                    .append(getUnitTonnage())
+                    .append(" ton)");
+            }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-            toReturn += " - <b><span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        } else {
-            toReturn += "</b><br/>";
+            toReturn.append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
+        toReturn.append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += getDetails() + "<br/>";
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
-        } else {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += " <b>TN:</b> " + bonus;
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += " <i>" + getCurrentModeName() + "</i>";
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     public String getRepairDesc() {
-        String toReturn = "";
-        if (needsFixing()) {
-            String scheduled = "";
-            if (getTech() != null) {
-                scheduled = " (scheduled) ";
-            }
-            String bonus = getAllMods(null).getValueAsString();
-            if (getAllMods(null).getValue() > -1) {
-                bonus = '+' + bonus;
-            }
+        StringBuilder toReturn = new StringBuilder();
 
-            toReturn += getTimeLeft() + " minutes" + scheduled;
+        if (needsFixing()) {
+            toReturn.append("<html>")
+                .append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled) " : "");
 
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                        + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                        + ReportingUtilities.CLOSING_SPAN_TAG;
+                toReturn.append(" - <b>")
+                .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    SkillType.getExperienceLevelColor(getSkillMin()),
+                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+                .append("</b>");
             }
 
-            toReturn += ", TN: " + bonus;
+            toReturn.append(", TN: ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += ", " + getCurrentModeName();
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
+            toReturn.append("</html>");
         }
-        return toReturn;
+        return toReturn.toString();
     }
 
     public String getTechBaseName() {
@@ -563,16 +550,18 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public abstract boolean isSamePartType(Part part);
 
-    public boolean isSameStatus(Part part) {
+    public boolean isSameStatus(Part otherPart) {
         // parts that are reserved for refit or being worked on are never the same
         // status
         if (isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement() || hasParentPart()
-                || part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement()
-                || part.hasParentPart()) {
+                || otherPart.isReservedForRefit() || otherPart.isBeingWorkedOn() 
+                || otherPart.isReservedForReplacement() || otherPart.hasParentPart()) {
             return false;
         }
-        return quality == part.getQuality() && hits == part.getHits() && part.getSkillMin() == this.getSkillMin()
-                && this.getDaysToArrival() == part.getDaysToArrival();
+        return getQuality() == otherPart.getQuality()
+                && getHits() == otherPart.getHits()
+                && getSkillMin() == otherPart.getSkillMin() 
+                && getDaysToArrival() == otherPart.getDaysToArrival();
     }
 
     protected boolean isClanTechBase() {
@@ -640,7 +629,7 @@ public abstract class Part implements IPartWork, ITechnology {
         if (reservedBy != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality.toNumeric());
         if (isTeamSalvaging) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
         }
@@ -747,7 +736,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
                     retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
-                    retVal.quality = Integer.parseInt(wn2.getTextContent());
+                    retVal.quality = PartQuality.fromNumeric(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
                     retVal.parentPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
@@ -978,31 +967,9 @@ public abstract class Part implements IPartWork, ITechnology {
      * @return the modified {@link TargetRoll}
      */
     private TargetRoll getQualityMods(TargetRoll mods, Person tech) {
-        int qualityMod = 0;
-        switch (quality) {
-            case QUALITY_A:
-                qualityMod = 3;
-                break;
-            case QUALITY_B:
-                qualityMod = 2;
-                break;
-            case QUALITY_C:
-                qualityMod = 1;
-                break;
-            case QUALITY_D:
-                qualityMod = 0;
-                break;
-            case QUALITY_E:
-                qualityMod = -1;
-                break;
-            case QUALITY_F:
-                qualityMod = -2;
-                break;
-        }
-        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().isReverseQualityNames()));
-        if ((qualityMod > 0) &&
-                (null != tech) &&
-                tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
+        mods.addModifier(getQuality().getRepairModifier(), getQualityName());
+        if ((getQuality().getRepairModifier() > 0)
+                && (null != tech) && tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
             // fixers can ignore the first point of penalty for poor quality
             mods.addModifier(-1, "Mr/Ms Fix-it");
         }
@@ -1080,18 +1047,20 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> failed</b>") + ".";
     }
 
     @Override
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                    + "'><b> salvaged.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> salvaged</b>") + ".";
         } else {
             fix();
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -1129,32 +1098,18 @@ public abstract class Part implements IPartWork, ITechnology {
             sj.add("OmniPod");
         }
 
-        if (includeRepairDetails) {
-            sj.add(hits + " hit(s)");
-            if (campaign.getCampaignOptions().isPayForRepairs() && (hits > 0)) {
+        if (isUnitTonnageMatters())
+        {
+            sj.add(getUnitTonnage() + " tons");
+        }
+
+        if (includeRepairDetails && hits > 0) {            
+            sj.add(hits + (hits == 1 ? " hit" : " hits"));
+            if (campaign.getCampaignOptions().isPayForRepairs()) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
         return sj.toString();
-    }
-
-    /**
-     * Converts the array of strings normally returned by a call to
-     * campaign.getInventory()
-     * to a string that reads like "(x in transit, y on order)"
-     *
-     * @param inventories The inventory array, see campaign.getInventory() for
-     *                    details.
-     * @return Human readable string.
-     */
-    public String getOrderTransitStringForDetails(PartInventory inventories) {
-        String inTransitString = (inventories.getTransit() == 0) ? "" : inventories.transitAsString() + " in transit";
-        String onOrderString = (inventories.getOrdered() == 0) ? "" : inventories.orderedAsString() + " on order";
-        String transitOrderSeparator = !inTransitString.isBlank() && !onOrderString.isBlank() ? ", " : "";
-
-        return (!inTransitString.isBlank() || !onOrderString.isBlank())
-                ? String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString)
-                : "";
     }
 
     @Override
@@ -1409,19 +1364,19 @@ public abstract class Part implements IPartWork, ITechnology {
         updateConditionFromEntity(false);
     }
 
-    public int getQuality() {
+    public PartQuality getQuality() {
         return quality;
     }
 
     public void improveQuality() {
-        quality += 1;
+        quality = quality.improveQuality();
     }
 
-    public void decreaseQuality() {
-        quality -= 1;
+    public void reduceQuality() {
+        quality = quality.reduceQuality();
     }
 
-    public void setQuality(int q) {
+    public void setQuality(PartQuality q) {
         quality = q;
     }
 
