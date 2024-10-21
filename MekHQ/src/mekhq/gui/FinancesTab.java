@@ -35,6 +35,8 @@ import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -125,7 +127,7 @@ public final class FinancesTab extends CampaignGuiTab {
         }
         loanTable.setIntercellSpacing(new Dimension(0, 0));
         loanTable.setShowGrid(false);
-        JScrollPane scrollLoanTable = new JScrollPane(loanTable);
+        JScrollPane scrollLoanTable = new JScrollPaneWithSpeed(loanTable);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -135,7 +137,7 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
-        panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
+        panBalance.add(new JScrollPaneWithSpeed(financeTable), gridBagConstraints);
         panBalance.setMinimumSize(new Dimension(350, 100));
         panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
@@ -189,7 +191,7 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setText(getFormattedFinancialReport());
         areaNetWorth.setEditable(false);
 
-        JScrollPane descriptionScroll = new JScrollPane(areaNetWorth);
+        JScrollPane descriptionScroll = new JScrollPaneWithSpeed(areaNetWorth);
         panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
         areaNetWorth.setCaretPosition(0);
         descriptionScroll.setMinimumSize(new Dimension(300, 200));

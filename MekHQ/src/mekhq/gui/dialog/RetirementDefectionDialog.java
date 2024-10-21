@@ -67,6 +67,7 @@ import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankStringSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Neoancient
@@ -277,7 +278,7 @@ public class RetirementDefectionDialog extends JDialog {
             });
             setBonusAndShareTotals(getTotalBonus());
 
-            JScrollPane scroll = new JScrollPane();
+            JScrollPane scroll = new JScrollPaneWithSpeed();
             scroll.setViewportView(personnelTable);
             scroll.setPreferredSize(new Dimension(500, 500));
             panOverview.add(scroll, BorderLayout.CENTER);
@@ -391,7 +392,7 @@ public class RetirementDefectionDialog extends JDialog {
 
         JPanel panResults = new JPanel();
         panResults.setLayout(new BoxLayout(panResults, BoxLayout.X_AXIS));
-        JScrollPane scroll = new JScrollPane();
+        JScrollPane scroll = new JScrollPaneWithSpeed();
         scroll.setViewportView(retireeTable);
         panResults.add(scroll);
         JPanel panAddRemoveBtns = new JPanel();
@@ -406,7 +407,7 @@ public class RetirementDefectionDialog extends JDialog {
         panAddRemoveBtns.add(btnRemoveUnit);
         panResults.add(panAddRemoveBtns);
 
-        scroll = new JScrollPane();
+        scroll = new JScrollPaneWithSpeed();
         scroll.setViewportView(unitAssignmentTable);
         panResults.add(scroll);
 

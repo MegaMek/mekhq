@@ -205,7 +205,7 @@ public class JSuggestField extends JTextField {
             public void mouseClicked(MouseEvent e) {
             }
         });
-        d.add(new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        d.add(new JScrollPaneWithSpeed(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         d.pack();
         addKeyListener(new KeyListener() {

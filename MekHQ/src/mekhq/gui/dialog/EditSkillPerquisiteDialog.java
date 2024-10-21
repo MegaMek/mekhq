@@ -42,6 +42,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -113,7 +114,7 @@ public class EditSkillPerquisiteDialog extends JDialog {
         setTitle("Select Abilities");
         getContentPane().setLayout(new BorderLayout());
 
-        getContentPane().add(new JScrollPane(panMain), BorderLayout.CENTER);
+        getContentPane().add(new JScrollPaneWithSpeed(panMain), BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.SOUTH);
 
         this.setPreferredSize(new Dimension(400, 700));

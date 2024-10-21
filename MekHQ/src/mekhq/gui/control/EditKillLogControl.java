@@ -24,6 +24,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.dialog.AddOrEditKillEntryDialog;
 import mekhq.gui.model.KillTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -96,7 +97,7 @@ public class EditKillLogControl extends JPanel {
         killTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         killTable.getSelectionModel().addListSelectionListener(this::killTableValueChanged);
 
-        scrollKillTable = new JScrollPane();
+        scrollKillTable = new JScrollPaneWithSpeed();
         scrollKillTable.setName("scrollPartsTable");
         scrollKillTable.setViewportView(killTable);
         this.add(scrollKillTable, BorderLayout.CENTER);

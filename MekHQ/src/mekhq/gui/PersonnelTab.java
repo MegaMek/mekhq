@@ -54,6 +54,7 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -210,13 +211,13 @@ public final class PersonnelTab extends CampaignGuiTab {
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
-        scrollPersonnelView = new JScrollPane();
+        scrollPersonnelView = new JScrollPaneWithSpeed();
         scrollPersonnelView.setMinimumSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
-        JScrollPane scrollPersonnelTable = new JScrollPane(personnelTable);
+        JScrollPane scrollPersonnelTable = new JScrollPaneWithSpeed(personnelTable);
         splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable,
                 scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);

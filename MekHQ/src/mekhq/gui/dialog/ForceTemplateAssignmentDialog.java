@@ -27,6 +27,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,7 +88,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.gridy++;
 
-        JScrollPane itemListPane = new JScrollPane();
+        JScrollPane itemListPane = new JScrollPaneWithSpeed();
         if (individualUnits) {
             itemListPane.setViewportView(unitList);
             refreshUnitList();
@@ -98,7 +99,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         getContentPane().add(itemListPane, gbc);
         gbc.gridx++;
 
-        JScrollPane templateListPane = new JScrollPane();
+        JScrollPane templateListPane = new JScrollPaneWithSpeed();
         templateListPane.setViewportView(templateList);
         itemListPane.setPreferredSize(
                 new Dimension((int) itemListPane.getPreferredSize().getWidth() + (int) templateListPane.getPreferredSize().getWidth(),

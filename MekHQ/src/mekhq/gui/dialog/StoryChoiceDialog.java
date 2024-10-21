@@ -22,6 +22,7 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.panels.StoryChoicePanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -116,7 +117,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        JScrollPane scrollPane = new JScrollPane(rightPanel);
+        JScrollPane scrollPane = new JScrollPaneWithSpeed(rightPanel);
         scrollPane.setMinimumSize(new Dimension(200, 150));
         scrollPane.setPreferredSize(new Dimension(200, 150));
         mainPanel.add(scrollPane, gbc);

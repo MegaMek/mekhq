@@ -55,6 +55,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -187,7 +188,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
 
-        scrollMissionView = new JScrollPane();
+        scrollMissionView = new JScrollPaneWithSpeed();
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
@@ -272,7 +273,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnClearAssignedUnits.setEnabled(false);
         panScenarioButtons.add(btnClearAssignedUnits);
 
-        scrollScenarioView = new JScrollPane();
+        scrollScenarioView = new JScrollPaneWithSpeed();
         scrollScenarioView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -285,7 +286,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         /* ATB */
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
+        JScrollPane paneLanceDeployment = new JScrollPaneWithSpeed(panLanceAssignment);
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
         paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
