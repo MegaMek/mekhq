@@ -25,6 +25,14 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 
 import java.time.LocalDate;
 
+/**
+ * Class representing an "override" for the dynamic hiring hall system. Normally, hiring halls are
+ * generated dynamically based on planetary system factors like tech level and HPG quality, but some
+ * canonical systems should have hiring halls of certain qualities despite what the dynamic formula
+ * says.
+ * Overrides are stored as child elements of planetary systems in systems.xml, with a start date,
+ * optional end date, and quality.
+ */
 @XmlRootElement(name = "hiringHall")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class HiringHallOverride {
@@ -35,14 +43,31 @@ public class HiringHallOverride {
     @XmlElement
     private HiringHallLevel level = HiringHallLevel.NONE;
 
+    /**
+     * Gets the level of the hiring hall for this override
+     *
+     * @return The hiring hall level as an enum
+     */
     public HiringHallLevel getLevel() {
         return level;
     }
 
+    /**
+     * Sets the hiring hall level for this override
+     *
+     * @param level The level of hiring hall
+     */
     public void setLevel(HiringHallLevel level) {
         this.level = level;
     }
 
+    /**
+     * Checks whether the hiring hall is active on a certain date. Returns true if no end date is
+     * specified in the override.
+     *
+     * @param date The date to check whether the hiring hall is active
+     * @return boolean representing whether the hiring hall is active
+     */
     public boolean isActive(LocalDate date) {
         // Hall has no start date, so it's always inactive
         if (start == null) {
