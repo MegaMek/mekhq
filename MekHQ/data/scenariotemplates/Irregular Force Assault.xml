@@ -79,8 +79,8 @@
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>2</minWeightClass>
+                <maxWeightClass>3</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
@@ -107,7 +107,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>2.0</forceMultiplier>
+                <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Infantry</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -138,7 +138,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>2.0</forceMultiplier>
+                <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Irregulars</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>5</generationOrder>
