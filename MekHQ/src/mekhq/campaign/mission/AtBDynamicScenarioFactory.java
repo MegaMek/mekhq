@@ -284,7 +284,9 @@ public class AtBDynamicScenarioFactory {
                 } else {
                     int weightClass = randomForceWeight();
 
-                    logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
+                    if (forceTemplate.isPlayerForce()) {
+                        logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
+                    }
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
@@ -435,12 +437,17 @@ public class AtBDynamicScenarioFactory {
 
         // determine generation parameters
         int forceBV = 0;
+        double forceMultiplier = forceTemplate.getForceMultiplier();
 
-        int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
+        int forceBVBudget = (int) (effectiveBV * forceMultiplier);
 
         if (isScenarioModifier) {
             forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100)
-                * forceTemplate.getForceMultiplier());
+                * forceMultiplier);
+        }
+
+        if (forceTemplate.getForceMultiplier() != 1) {
+            logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
         }
 
         int forceUnitBudget = 0;
@@ -574,10 +581,7 @@ public class AtBDynamicScenarioFactory {
         while (!stopGenerating) {
             List<Entity> generatedLance;
 
-            // Generate a number of tactical formations for this force based on the desired
-            // average weight class.
-            // This may generate higher numbers of lighter formations, or fewer
-            // (minimum of one) of heavier formations.
+            // Generate a tactical formations for this force based on the desired weight class.
             if (currentLanceWeightString.isEmpty()) {
                 currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
             }
@@ -765,8 +769,8 @@ public class AtBDynamicScenarioFactory {
                 // For generation methods other than scaled BV, compare to the overall budget
                 stopGenerating = generatedEntities.size() >= forceUnitBudget;
             }
-
-            currentLanceWeightString = currentLanceWeightString.substring(1);
+            weightClass = randomForceWeight();
+            currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
         }
 
         // If over budget for BV or unit count, pull units until it works
@@ -2710,6 +2714,9 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
+        logger.info(String.format("Total Seed Force %s: %s",
+            generationMethod, bvBudget));
+
         double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
 
         if (bvMultiplier > 0) {
@@ -2718,22 +2725,22 @@ public class AtBDynamicScenarioFactory {
             bvBudget = (int) round(bvBudget * difficultyMultiplier);
         }
 
-        logger.info(String.format("Total Player %s: %s (adjusted for campaign difficulty)", generationMethod, bvBudget));
-
         // allied bot forces that contribute to BV do not get multiplied by the
         // difficulty even if the player is perfect, the AI doesn't get any better
         for (int index = 0; index < scenario.getNumBots(); index++) {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
-            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                bvBudget += botForce.getTotalBV(campaign);
+            if (forceTemplate.isAlliedBotForce()) {
+                if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                    bvBudget += botForce.getTotalBV(campaign);
 
-                logger.info(String.format("%s %s: %s",
-                    botForce.getName(), generationMethod, botForce.getTotalBV(campaign)));
+                    logger.info(String.format("%s %s: %s", botForce.getName(), generationMethod, botForce.getTotalBV(campaign)));
+                }
             }
         }
 
-        logger.info(String.format("Total Base %s Budget: %s", generationMethod, bvBudget));
+        logger.info(String.format("Total Base %s Budget: %s (adjusted for campaign difficulty)",
+            generationMethod, bvBudget));
 
         return bvBudget;
     }
