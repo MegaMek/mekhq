@@ -18,37 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.vecmath.Vector2d;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
@@ -58,13 +27,25 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.SocioIndustrialData;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.Systems.HPGLink;
+import mekhq.campaign.universe.enums.HiringHallLevel;
+
+import javax.imageio.ImageIO;
+import javax.swing.Timer;
+import javax.swing.*;
+import javax.vecmath.Vector2d;
+import java.awt.*;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is not functional yet. Just testing things out.
@@ -726,18 +707,28 @@ public class InterstellarMapPanel extends JPanel {
                                 int i = 0;
                                 for (Faction faction : factions) {
                                     if (capitals.get(faction).equals(system.getId())) {
-                                        g2.setPaint(new Color(255, 228, 181));
+                                        g2.setPaint(faction.getColor());
+                                        arc.setArcByCenter(x, y, size + 5, 0,
+                                            360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                        g2.fill(arc);
+                                        g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
                                         arc.setArcByCenter(x, y, size + 3, 0,
-                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
+                                            360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                         g2.fill(arc);
+                                    } else {
+                                        if (campaign.getCampaignOptions().isUseAtB()
+                                            && (system.getHiringHallLevel(campaign.getLocalDate()) == HiringHallLevel.GREAT)) {
+                                            g2.setPaint(new Color(176, 196, 222));
+                                            arc.setArcByCenter(x, y, size + 5, 0,
+                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                            g2.fill(arc);
+                                            g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
+                                            arc.setArcByCenter(x, y, size + 3, 0,
+                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                            g2.fill(arc);
+                                        }
                                     }
-                                    if (campaign.getCampaignOptions().isUseAtB()
-                                            && system.isHiringHall(campaign.getLocalDate())) {
-                                        g2.setPaint(new Color(176, 196, 222));
-                                        arc.setArcByCenter(x, y, size + 4, 0,
-                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
-                                        g2.fill(arc);
-                                    }
+
                                     g2.setPaint(faction.getColor());
                                     arc.setArcByCenter(x, y, size, 0, 360.0 * (1 - ((double) i) / factions.size()),
                                             Arc2D.PIE);
