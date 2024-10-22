@@ -18,23 +18,22 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class AutoAwardsTableModel extends AbstractTableModel {
     private static final MMLogger logger = MMLogger.create(AutoAwardsTableModel.class);
@@ -85,28 +84,19 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int column) {
-        switch (column) {
-            case COL_PERSON:
-            case COL_NAME:
-                return 75;
-            case COL_SET:
-                return 40;
-            case COL_DESCRIPTION:
-                return 400;
-            case COL_AWARD:
-            default:
-                return 30;
-        }
+        return switch (column) {
+            case COL_PERSON, COL_NAME -> 75;
+            case COL_SET -> 40;
+            case COL_DESCRIPTION -> 400;
+            default -> 30;
+        };
     }
 
     public int getAlignment(int column) {
-        switch (column) {
-            case COL_PERSON:
-            case COL_DESCRIPTION:
-                return SwingConstants.LEFT;
-            default:
-                return SwingConstants.CENTER;
-        }
+        return switch (column) {
+            case COL_PERSON, COL_DESCRIPTION -> SwingConstants.LEFT;
+            default -> SwingConstants.CENTER;
+        };
     }
 
     @Override
@@ -142,20 +132,39 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         Person person = campaign.getPerson(personUUID);
         Award award = (Award) rowData.get(1);
 
-        switch (columnIndex) {
-            case COL_PERSON:
-                return person.makeHTMLRank();
-            case COL_NAME:
-                return award.getName();
-            case COL_SET:
-                return award.getSet();
-            case COL_AWARD:
-                return rowData.get(2);
-            case COL_DESCRIPTION:
-                return award.getDescription();
-            default:
-                return "?";
+        return switch (columnIndex) {
+            case COL_PERSON -> person.makeHTMLRank();
+            case COL_NAME -> award.getName();
+            case COL_SET -> award.getSet();
+            case COL_AWARD -> rowData.get(2);
+            case COL_DESCRIPTION -> {
+                String awards = getDescriptionString(award);
+
+                yield award.getDescription() + awards;
+            }
+            default -> "?";
+        };
+    }
+
+    /**
+     * Retrieves a description for the given award based on the campaign's award bonus style.
+     *
+     * @param award The {@link Award} object for which the description string is generated.
+     * @return A {@link String} containing the awards based on the style, including XP and Edge rewards if applicable.
+     */
+    private String getDescriptionString(Award award) {
+        AwardBonus style = campaign.getCampaignOptions().getAwardBonusStyle();
+        int xpAward = award.getXPReward();
+        int edgeAward = award.getEdgeReward();
+
+        String awards = "";
+        if (style.isBoth() || style.isXP()) {
+            awards += (xpAward > 0) ? " (" + xpAward + "XP)" : "";
         }
+        if (style.isBoth() || style.isEdge()) {
+            awards += (edgeAward > 0) ? " (" + edgeAward + " Edge)" : "";
+        }
+        return awards;
     }
 
     @Override

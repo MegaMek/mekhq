@@ -37,6 +37,7 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.generators.companyGenerators.AbstractCompanyGenerator;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panels.CompanyGenerationOptionsPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -94,7 +95,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     protected Container createCenterPane() {
         setCompanyGenerationOptionsPanel(new CompanyGenerationOptionsPanel(getFrame(), getCampaign(),
                 getCompanyGenerationOptions()));
-        return new JScrollPane(getCompanyGenerationOptionsPanel());
+        return new JScrollPaneWithSpeed(getCompanyGenerationOptionsPanel());
     }
 
     @Override

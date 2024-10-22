@@ -46,6 +46,7 @@ import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -865,9 +866,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         rightPanel.add(topPanel, BorderLayout.PAGE_START);
 
-        JScrollPane scrOptions = new JScrollPane();
+        JScrollPane scrOptions = new JScrollPaneWithSpeed();
         panOptions = new JPanel();
-        JScrollPane scrSkills = new JScrollPane();
+        JScrollPane scrSkills = new JScrollPaneWithSpeed();
         panSkills = new JPanel();
 
         JTabbedPane tabStats = new JTabbedPane();

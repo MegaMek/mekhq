@@ -896,7 +896,7 @@ public class Campaign implements ITechManager {
         int id = lastForceId + 1;
         force.setId(id);
         superForce.addSubForce(force, true);
-        force.setScenarioId(superForce.getScenarioId());
+        force.setScenarioId(superForce.getScenarioId(), this);
         forceIds.put(id, force);
         lastForceId = id;
 
@@ -917,15 +917,7 @@ public class Campaign implements ITechManager {
         }
 
         superForce.addSubForce(force, true);
-        force.setScenarioId(superForce.getScenarioId());
-
-        for (Object o : force.getAllChildren(this)) {
-            if (o instanceof Unit) {
-                ((Unit) o).setScenarioId(superForce.getScenarioId());
-            } else if (o instanceof Force) {
-                ((Force) o).setScenarioId(superForce.getScenarioId());
-            }
-        }
+        force.setScenarioId(superForce.getScenarioId(), this);
 
         // repopulate formation levels across the TO&E
         Force.populateFormationLevelsFromOrigin(this);
@@ -1757,8 +1749,8 @@ public class Campaign implements ITechManager {
             recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 currentSpouse.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceSpouse.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
@@ -1804,8 +1796,8 @@ public class Campaign implements ITechManager {
             recruitPerson(child, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                person.getHyperlinkedFullTitle(),
                 child.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
                 resources.getString("relativeJoinsForceChild.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
@@ -3510,7 +3502,7 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().isPayForRepairs()
                     && action.equals(" fix ")
                     && !(partWork instanceof Armor)) {
-                Money cost = partWork.getActualValue().multipliedBy(0.2);
+                Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
                 report += "<br>Repairs cost " +
                         cost.toAmountAndSymbolString() +
                         " worth of parts.";
@@ -3700,14 +3692,8 @@ public class Campaign implements ITechManager {
                         }
 
                         if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(s.getId());
+                            forceIds.get(forceId).setScenarioId(s.getId(), this);
                             s.addForces(forceId);
-                            for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
-                                Unit u = getHangar().getUnit(uid);
-                                if (u != null) {
-                                    u.setScenarioId(s.getId());
-                                }
-                            }
 
                             addReport(MessageFormat.format(
                                     resources.getString("atbScenarioTodayWithForce.format"),
@@ -3773,7 +3759,8 @@ public class Campaign implements ITechManager {
 
                 AtBMoraleLevel morale = contract.getMoraleLevel();
 
-                String report = "<html>Current enemy condition is '" + morale + "' on contract " + contract.getName() + "<br><br>" + morale.getToolTipText() + "</html>";
+                String report = "Current enemy condition is <b>" + morale + "</b> on contract "
+                    + contract.getName() + "<br><br>" + morale.getToolTipText();
 
                 addReport(report);
             }
@@ -4225,8 +4212,7 @@ public class Campaign implements ITechManager {
         setLocalDate(getLocalDate().plusDays(1));
 
         // Determine if we have an active contract or not, as this can get used
-        // elsewhere before
-        // we actually hit the AtB new day (e.g., personnel market)
+        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
         if (getCampaignOptions().isUseAtB()) {
             setHasActiveContract();
         }
@@ -4236,6 +4222,8 @@ public class Campaign implements ITechManager {
         setCurrentReportHTML("");
         newReports.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
+
+        MekHQ.triggerEvent(new NewDayEvent(this));
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
@@ -4300,7 +4288,10 @@ public class Campaign implements ITechManager {
             processPersonnelRemoval();
         }
 
-        MekHQ.triggerEvent(new NewDayEvent(this));
+        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(this, false);
+        }
 
         // this duplicates any turnover information so that it is still available on the
         // new day.
@@ -6953,10 +6944,7 @@ public class Campaign implements ITechManager {
         if (unitRatingMethod.isFMMR()) {
             return getUnitRating().getUnitRating();
         } else if (unitRatingMethod.isCampaignOperations()) {
-            int reputationRating = reputation.getReputationRating();
-            int unitRatingMod = getAtBUnitRatingMod();
-
-            return String.format("%d (%+d)", reputationRating, unitRatingMod);
+            return String.valueOf(reputation.getReputationRating());
         } else {
             return "N/A";
         }
@@ -7692,7 +7680,7 @@ public class Campaign implements ITechManager {
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
             if (onOrder instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
-                nOrdered += ((Armor) onOrder).getAmount();
+                nOrdered += ((Armor) onOrder).getAmount() * ((Armor) onOrder).getQuantity();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
             } else {

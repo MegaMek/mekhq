@@ -60,6 +60,7 @@ public class ProtoMekJumpJet extends Part {
     public ProtoMekJumpJet(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "ProtoMek Jump Jet";
+        this.unitTonnageMatters = true;
     }
 
     @Override

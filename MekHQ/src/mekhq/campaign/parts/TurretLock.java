@@ -35,6 +35,11 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TurretLock extends Part {
+    public TurretLock() {
+        // Needed for loading from save
+        this(null);
+    }
+
     public TurretLock(Campaign c) {
         super(0, c);
         this.name = "Turret Lock";
@@ -73,14 +78,15 @@ public class TurretLock extends Part {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        // TODO Auto-generated method stub
-
+    public void writeToXML(final PrintWriter pw, int indent) {
+        // Just use Part's writer
+        indent = writeToXMLBegin(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        // TODO Auto-generated method stub
+    protected void loadFieldsFromXmlNode(Node wn) {
+        // Since we're not adding any bits above Part, think this can be empty
     }
 
     @Override

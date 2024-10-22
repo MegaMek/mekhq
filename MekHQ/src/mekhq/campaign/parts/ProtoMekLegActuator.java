@@ -54,6 +54,7 @@ public class ProtoMekLegActuator extends Part {
     public ProtoMekLegActuator(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "ProtoMek Leg Actuator";
+        this.unitTonnageMatters = true;
     }
 
     @Override

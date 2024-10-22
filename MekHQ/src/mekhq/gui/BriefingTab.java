@@ -55,6 +55,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -187,7 +188,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
         panMissionButtons.add(btnGMGenerateScenarios);
 
-        scrollMissionView = new JScrollPane();
+        scrollMissionView = new JScrollPaneWithSpeed();
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
@@ -272,7 +273,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnClearAssignedUnits.setEnabled(false);
         panScenarioButtons.add(btnClearAssignedUnits);
 
-        scrollScenarioView = new JScrollPane();
+        scrollScenarioView = new JScrollPaneWithSpeed();
         scrollScenarioView.setViewportView(null);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -285,7 +286,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         /* ATB */
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
+        JScrollPane paneLanceDeployment = new JScrollPaneWithSpeed(panLanceAssignment);
         paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
         paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
         paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
@@ -439,8 +440,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if ((getCampaign().getCampaignOptions().isUseRandomRetirement())
                 && (getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement())) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
-            rdd.setLocation(rdd.getLocation().x, 0);
-            rdd.setVisible(true);
 
             if (rdd.wasAborted()) {
                 /*
@@ -725,13 +724,11 @@ public final class BriefingTab extends CampaignGuiTab {
         resolveDialog.setVisible(true);
 
         if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
+            RetirementDefectionDialog dialog = new RetirementDefectionDialog(getCampaignGui(),
                     getCampaign().getMission(scenario.getMissionId()), false);
-            rdd.setLocation(rdd.getLocation().x, 0);
-            rdd.setVisible(true);
 
-            if (!rdd.wasAborted()) {
-                getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            if (!dialog.wasAborted()) {
+                getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
             }
         }
 
@@ -1146,10 +1143,13 @@ public final class BriefingTab extends CampaignGuiTab {
             chosen.clear();
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
             file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployer());
+
+            int genericBattleValue = calculateGenericBattleValue(chosen);
+
             if (file != null) {
                 try {
                     // Save the player's allied entities to the file.
-                    EntityListFile.saveTo(file, chosen);
+                    EntityListFile.saveTo(file, chosen, genericBattleValue);
                 } catch (Exception ex) {
                     logger.error("", ex);
                 }
@@ -1164,15 +1164,36 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
             file = determineMULFilePath(scenario, botForce.getName());
+
+            int genericBattleValue = calculateGenericBattleValue(chosen);
+
             if (file != null) {
                 try {
                     // Save the bot force's entities to the file.
-                    EntityListFile.saveTo(file, chosen);
+                    EntityListFile.saveTo(file, chosen, genericBattleValue);
                 } catch (Exception ex) {
                     logger.error("", ex);
                 }
             }
         }
+    }
+
+    /**
+     * Calculates the total generic battle value of the entities chosen.
+     * If the use of generic battle value option is enabled in the campaign options, the generic battle
+     * value of each entity in the list is summed up and returned as the total generic battle value.
+     * If the said option is disabled, the method returns 0.
+     *
+     * @param chosen the list of entities for which the generic battle value is to be calculated.
+     * @return the total generic battle value or 0 if the generic battle value usage is turned off in
+     * campaign options.
+     */
+    private int calculateGenericBattleValue(ArrayList<Entity> chosen) {
+        int genericBattleValue = 0;
+        if (getCampaign().getCampaignOptions().isUseGenericBattleValue()) {
+            genericBattleValue = chosen.stream().mapToInt(Entity::getGenericBattleValue).sum();
+        }
+        return genericBattleValue;
     }
 
     private @Nullable File determineMULFilePath(final Scenario scenario, final String name) {

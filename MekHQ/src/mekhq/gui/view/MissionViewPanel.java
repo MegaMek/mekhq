@@ -26,6 +26,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -49,6 +50,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /* Basic Mission Parameters */
     private JLabel lblStatus;
+    private JPanel lblChallenge;
     private JLabel lblLocation;
     private JLabel txtLocation;
     private JLabel lblType;
@@ -127,7 +129,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
+        JScrollPane scrollScenarioTable = new JScrollPaneWithSpeed(scenarioTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -562,6 +564,7 @@ public class MissionViewPanel extends JScrollablePanel {
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = {"F", "D", "C", "B", "A"};
         lblStatus = new JLabel();
+        lblChallenge = new JPanel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         lblEmployer = new JLabel();
@@ -612,6 +615,17 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus, gridBagConstraints);
 
+        lblChallenge = contract.getContractDifficultySkulls(campaign);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblChallenge, gridBagConstraints);
 
         lblLocation.setName("lblLocation");
         lblLocation.setText(resourceMap.getString("lblLocation.text"));

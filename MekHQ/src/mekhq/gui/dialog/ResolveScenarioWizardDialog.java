@@ -47,6 +47,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -790,12 +791,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
          */
         pnlPreview = new JPanel();
         choiceStatus = new JComboBox<>();
-        JScrollPane scrRecoveredUnits = new JScrollPane();
-        JScrollPane scrRecoveredPilots = new JScrollPane();
-        JScrollPane scrMissingUnits = new JScrollPane();
-        JScrollPane scrMissingPilots = new JScrollPane();
-        JScrollPane scrDeadPilots = new JScrollPane();
-        JScrollPane scrSalvage = new JScrollPane();
+        JScrollPane scrRecoveredUnits = new JScrollPaneWithSpeed();
+        JScrollPane scrRecoveredPilots = new JScrollPaneWithSpeed();
+        JScrollPane scrMissingUnits = new JScrollPaneWithSpeed();
+        JScrollPane scrMissingPilots = new JScrollPaneWithSpeed();
+        JScrollPane scrDeadPilots = new JScrollPaneWithSpeed();
+        JScrollPane scrSalvage = new JScrollPaneWithSpeed();
         txtInstructions = new JTextArea();
         txtReport = new MarkdownEditorPanel("After-Action Report");
         txtRecoveredUnits = new JTextArea();
@@ -852,7 +853,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(new JScrollPane(txtRewards), gridBagConstraints);
+        pnlPreview.add(new JScrollPaneWithSpeed(txtRewards), gridBagConstraints);
 
         txtReport.setText("");
         txtReport.setPreferredSize(new Dimension(500, 300));
@@ -990,7 +991,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlMain.add(pnlPreview, PREVIEWPANEL);
 
 
-        scrMain = new JScrollPane(pnlMain);
+        scrMain = new JScrollPaneWithSpeed(pnlMain);
         scrMain.setMinimumSize(new Dimension(600, 500));
         scrMain.setPreferredSize(new Dimension(600, 500));
         getContentPane().add(scrMain, BorderLayout.CENTER);
@@ -1754,7 +1755,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
 
         //scroll panel
-        JScrollPane scrollPersonnelView = new JScrollPane();
+        JScrollPane scrollPersonnelView = new JScrollPaneWithSpeed();
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(personViewPanel);
         dialog.getContentPane().add(scrollPersonnelView, gridBagConstraints);

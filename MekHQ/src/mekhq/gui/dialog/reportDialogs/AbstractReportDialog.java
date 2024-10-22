@@ -19,6 +19,7 @@
 package mekhq.gui.dialog.reportDialogs;
 
 import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -39,7 +40,7 @@ public abstract class AbstractReportDialog extends AbstractMHQDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        final JScrollPane scrollPane = new JScrollPane(createTxtReport());
+        final JScrollPane scrollPane = new JScrollPaneWithSpeed(createTxtReport());
         scrollPane.setBorder(new EmptyBorder(2, 10, 2, 2));
         scrollPane.setName("reportPane");
 

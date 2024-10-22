@@ -60,6 +60,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class CustomizeBotForceDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(CustomizeBotForceDialog.class);
@@ -256,7 +257,7 @@ public class CustomizeBotForceDialog extends JDialog {
 
         panFixedUnits = new DefaultMHQScrollablePanel(frame, "panFixedEntity", new GridBagLayout());
         refreshFixedEntityPanel();
-        JScrollPane scrollFixedUnits = new JScrollPane(panFixedUnits);
+        JScrollPane scrollFixedUnits = new JScrollPaneWithSpeed(panFixedUnits);
         scrollFixedUnits.setMinimumSize(new Dimension(400, 200));
         scrollFixedUnits.setPreferredSize(new Dimension(400, 200));
         scrollFixedUnits.setBorder(BorderFactory.createCompoundBorder(

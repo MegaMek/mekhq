@@ -40,6 +40,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -183,7 +184,7 @@ public class LootDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrUnits = new JScrollPane(listUnits);
+        scrUnits = new JScrollPaneWithSpeed(listUnits);
         listUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listUnits.getSelectionModel().addListSelectionListener(evt -> listUnitsValueChanged());
         refreshUnitList();
@@ -226,7 +227,7 @@ public class LootDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrParts = new JScrollPane(listParts);
+        scrParts = new JScrollPaneWithSpeed(listParts);
         listParts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listParts.getSelectionModel().addListSelectionListener(evt -> listPartsValueChanged());
         refreshPartList();

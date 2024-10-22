@@ -73,7 +73,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -246,15 +245,19 @@ public class AtBContract extends Contract {
         // Define the root directory and get the faction-specific camouflage directory
         final String ROOT_DIRECTORY = "data/images/camo/";
 
-        String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+        String camouflageDirectory = "Standard Camouflage";
+
+        if (factionCode != null) {
+            camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+        }
 
         // Gather all files
         List<Path> allPaths = null;
 
         try {
             allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
-                    (path, bfa) -> {return bfa.isRegularFile();})
-                .collect(Collectors.toList());
+                    (path, bfa) -> bfa.isRegularFile())
+                .toList();
         } catch (IOException e) {
             logger.error("Error getting list of camouflages", e);
         }
@@ -265,7 +268,7 @@ public class AtBContract extends Contract {
 
             String fileName = randomPath.getFileName().toString();
             String fileCategory = randomPath.getParent().toString()
-                .replaceAll("\\\\", "/"); // Is this necessary on windows machines?
+                .replaceAll("\\\\", "/"); // This is necessary for windows machines
             fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
@@ -1713,14 +1716,14 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * This method returns a {@link JPanel} that represents the difficulty stars for a given mission.
+     * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
      *
-     * @param campaign the campaign for which the difficulty stars are calculated
-     * @return a {@link JPanel} with the difficulty stars displayed
+     * @param campaign the campaign for which the difficulty skulls are calculated
+     * @return a {@link JPanel} with the difficulty skulls displayed
      */
-    public JPanel getContractDifficultyStars(Campaign campaign) {
+    public JPanel getContractDifficultySkulls(Campaign campaign) {
         final int ERROR = -99;
-        int difficulty = Math.min(calculateContractDifficulty(campaign), 8);
+        int difficulty = calculateContractDifficulty(campaign);
 
         // Create a new JFrame
         JFrame frame = new JFrame();
@@ -1729,27 +1732,31 @@ public class AtBContract extends Contract {
         // Create a pane with FlowLayout
         JPanel panel = new JPanel(new FlowLayout());
 
-        // Load and scale the image
-        ImageIcon imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_orange.png");
-        if (difficulty < 1 && difficulty != ERROR) {
-            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_green.png");
-        } else if (difficulty > 0) {
-            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_red.png");
-        }
-
-        Image scaledImage = imageIcon.getImage().getScaledInstance(40, 40, Image.SCALE_FAST);
-        imageIcon = new ImageIcon(scaledImage);
+        // Load and scale the images
+        ImageIcon skullFull = new ImageIcon("data/images/misc/challenge_estimate_full.png");
+        ImageIcon skullHalf = new ImageIcon("data/images/misc/challenge_estimate_half.png");
 
         int iterations = difficulty;
 
         if (difficulty == ERROR) {
-            iterations = 1;
-        } else if (difficulty < 1) {
-            iterations = -difficulty + 1;
+            iterations = 5;
         }
 
-        for (int i = 0; i < iterations; i++) {
-            panel.add(new JLabel(imageIcon));
+        if (iterations % 2 == 1) {
+            iterations--;
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
+
+            panel.add(new JLabel(skullHalf));
+        } else {
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
         }
 
         return panel;
@@ -1788,8 +1795,8 @@ public class AtBContract extends Contract {
             case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
             case HOUSE          -> 1; // allies with same (G)BV budget
             case INTEGRATED     -> 2; // allies with twice the player's (G)BV budget
-            default -> 0;
         };
+
         if (allyRatio > 0) {
             SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
             double allySkillMultiplier = getSkillMultiplier(alliedSkill);
@@ -1804,11 +1811,17 @@ public class AtBContract extends Contract {
         }
 
         // Calculate difficulty based on the percentage difference between the two forces.
-        // If the enemy force exceeds the player force, this will be a positive percentage, otherwise negative.
         double difference = enemyPower - playerPower;
         double percentDifference = (difference / playerPower) * 100;
 
-        return (int) round(percentDifference / 20);
+        int mappedValue = (int) Math.ceil(Math.abs(percentDifference) / 20);
+        if (percentDifference < 0) {
+            mappedValue = 5 - mappedValue;
+        } else {
+            mappedValue = 5 + mappedValue;
+        }
+
+        return Math.min(Math.max(mappedValue, 1), 10);
     }
 
     /**

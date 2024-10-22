@@ -26,6 +26,7 @@ import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.stratcon.CampaignManagementDialog;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.Dialog.ModalityType;
@@ -105,7 +106,7 @@ public class StratconTab extends CampaignGuiTab {
         initializeInfoPanel();
         cmd = new CampaignManagementDialog(this);
 
-        JScrollPane infoScrollPane = new JScrollPane(infoPanel);
+        JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
         this.add(infoScrollPane);
 
         MekHQ.registerHandler(this);
@@ -127,7 +128,7 @@ public class StratconTab extends CampaignGuiTab {
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
         infoPanel.add(btnManageCampaignState);
 
-        expandedObjectivePanel = new JScrollPane(objectiveStatusText);
+        expandedObjectivePanel = new JScrollPaneWithSpeed(objectiveStatusText);
         expandedObjectivePanel.setMaximumSize(new Dimension(400, 300));
         expandedObjectivePanel.setAlignmentX(LEFT_ALIGNMENT);
         infoPanel.add(expandedObjectivePanel);

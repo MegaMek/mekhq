@@ -44,6 +44,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -103,7 +104,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                 true, typeMax);
 
         // Set up the display of this dialog.
-        JScrollPane scroller = new JScrollPane(bombPanel);
+        JScrollPane scroller = new JScrollPaneWithSpeed(bombPanel);
         scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);

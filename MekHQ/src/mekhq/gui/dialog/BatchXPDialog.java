@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public final class BatchXPDialog extends JDialog {
@@ -184,7 +185,7 @@ public final class BatchXPDialog extends JDialog {
         personnelSorter.setRowFilter(personnelFilter);
         personnelTable.setRowSorter(personnelSorter);
 
-        final JScrollPane pane = new JScrollPane(personnelTable);
+        final JScrollPane pane = new JScrollPaneWithSpeed(personnelTable);
         pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         return pane;
     }

@@ -17,6 +17,7 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -91,10 +92,10 @@ public class StratconScenario implements IStratconDisplayable {
      * Add a force to the backing scenario, trying to associate it with the given template.
      * Does some scenario and force house-keeping, fires a deployment changed event.
      */
-    public void addForce(Force force, String templateID) {
+    public void addForce(Force force, String templateID, Campaign campaign) {
         if (!getBackingScenario().getForceIDs().contains(force.getId())) {
             backingScenario.addForce(force.getId(), templateID);
-            force.setScenarioId(getBackingScenarioID());
+            force.setScenarioId(getBackingScenarioID(), campaign);
             MekHQ.triggerEvent(new DeploymentChangedEvent(force, getBackingScenario()));
         }
     }

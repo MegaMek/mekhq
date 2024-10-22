@@ -31,6 +31,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.sorter.PersonTitleSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,7 +85,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer());
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);
-        JScrollPane scrollDocTable = new JScrollPane(docTable);
+        JScrollPane scrollDocTable = new JScrollPaneWithSpeed(docTable);
         scrollDocTable.setMinimumSize(new Dimension(300, 300));
         scrollDocTable.setPreferredSize(new Dimension(300, 300));
         scrollDocTable.setOpaque(false);
@@ -125,7 +126,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listAssignedPatient.setVisibleRowCount(-1);
         listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
         listAssignedPatient.setOpaque(false);
-        JScrollPane scrollAssignedPatient = new JScrollPane(listAssignedPatient);
+        JScrollPane scrollAssignedPatient = new JScrollPaneWithSpeed(listAssignedPatient);
         scrollAssignedPatient.setMinimumSize(new Dimension(300, 360));
         scrollAssignedPatient.setPreferredSize(new Dimension(300, 360));
         scrollAssignedPatient.setOpaque(false);
@@ -137,7 +138,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient.setVisibleRowCount(-1);
         listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
         listUnassignedPatient.setOpaque(false);
-        JScrollPane scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
+        JScrollPane scrollUnassignedPatient = new JScrollPaneWithSpeed(listUnassignedPatient);
         scrollUnassignedPatient.setMinimumSize(new Dimension(300, 200));
         scrollUnassignedPatient.setPreferredSize(new Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);

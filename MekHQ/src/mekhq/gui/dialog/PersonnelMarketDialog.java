@@ -70,6 +70,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -131,8 +132,8 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void initComponents() {
-        scrollTablePersonnel = new JScrollPane();
-        scrollPersonnelView = new JScrollPane();
+        scrollTablePersonnel = new JScrollPaneWithSpeed();
+        scrollPersonnelView = new JScrollPaneWithSpeed();
         tablePersonnel = new JTable();
         panelMain = new JPanel();
         panelFilterBtns = new JPanel();

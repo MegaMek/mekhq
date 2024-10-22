@@ -95,13 +95,7 @@ public class ScenarioStoryPoint extends StoryPoint {
                 Force force = getCampaign().getForce(deployedForceId);
                 if (null != force) {
                     scenario.addForces(force.getId());
-                    force.setScenarioId(scenario.getId());
-                    for (UUID uid : force.getAllUnits(true)) {
-                        Unit u = getCampaign().getUnit(uid);
-                        if (null != u) {
-                            u.setScenarioId(scenario.getId());
-                        }
-                    }
+                    force.setScenarioId(scenario.getId(), getCampaign());
                 }
             }
         }

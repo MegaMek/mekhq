@@ -32,6 +32,7 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -270,7 +271,7 @@ public class StratconScenarioWizard extends JDialog {
      */
     private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
             ScenarioForceTemplate forceTemplate) {
-        JScrollPane forceListContainer = new JScrollPane();
+        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel;
 
@@ -332,7 +333,7 @@ public class StratconScenarioWizard extends JDialog {
         availableUnits.addListSelectionListener(
                 e -> availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize));
 
-        JScrollPane infantryContainer = new JScrollPane();
+        JScrollPane infantryContainer = new JScrollPaneWithSpeed();
         infantryContainer.setViewportView(availableUnits);
         localGridBagConstraints.gridy++;
         unitPanel.add(infantryContainer, localGridBagConstraints);
@@ -470,7 +471,7 @@ public class StratconScenarioWizard extends JDialog {
                     }
                 }
 
-                currentScenario.addForce(force, templateID);
+                currentScenario.addForce(force, templateID, campaign);
             }
         }
 

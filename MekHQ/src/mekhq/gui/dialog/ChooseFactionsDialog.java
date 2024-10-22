@@ -47,6 +47,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class ChooseFactionsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseFactionsDialog.class);
@@ -92,7 +93,7 @@ public class ChooseFactionsDialog extends JDialog {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        JScrollPane scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPaneWithSpeed();
         factionList = new JList<>(new FactionListModel(date));
         factionList.setCellRenderer(new DefaultListCellRenderer() {
             @Override

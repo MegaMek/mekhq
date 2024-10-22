@@ -60,6 +60,7 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSConfiguredOptions;
 import mekhq.service.mrms.MRMSOption;
@@ -298,7 +299,7 @@ public class MRMSDialog extends JDialog {
 
         pnlMain.add(createOptionsPanel(), createBaseConstraints(2));
 
-        content.add(new JScrollPane(pnlMain), BorderLayout.CENTER);
+        content.add(new JScrollPaneWithSpeed(pnlMain), BorderLayout.CENTER);
         content.add(createActionButtons(), BorderLayout.SOUTH);
 
         pack();
@@ -356,7 +357,7 @@ public class MRMSDialog extends JDialog {
         unitTable.setIntercellSpacing(new Dimension(0, 0));
         unitTable.setShowGrid(false);
 
-        scrollUnitList = new JScrollPane(unitTable);
+        scrollUnitList = new JScrollPaneWithSpeed(unitTable);
         scrollUnitList.setMinimumSize(new Dimension(350, 200));
         scrollUnitList.setPreferredSize(new Dimension(350, 200));
 
@@ -405,7 +406,7 @@ public class MRMSDialog extends JDialog {
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
 
-        scrollPartsTable = new JScrollPane(partsTable);
+        scrollPartsTable = new JScrollPaneWithSpeed(partsTable);
         scrollPartsTable.setMinimumSize(new Dimension(350, 200));
         scrollPartsTable.setPreferredSize(new Dimension(350, 200));
 

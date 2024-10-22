@@ -54,6 +54,7 @@ import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
     private static final MMLogger logger = MMLogger.create(UnitMarketPane.class);
@@ -347,7 +348,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 !getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
         getMarketTable().getSelectionModel().addListSelectionListener(evt -> updateDisplay());
 
-        final JScrollPane marketTableScrollPane = new JScrollPane(getMarketTable(),
+        final JScrollPane marketTableScrollPane = new JScrollPaneWithSpeed(getMarketTable(),
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         marketTableScrollPane.setName("marketTableScrollPane");
         marketTableScrollPane.setMinimumSize(new Dimension(500, 400));

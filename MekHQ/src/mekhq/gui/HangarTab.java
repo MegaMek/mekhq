@@ -38,6 +38,7 @@ import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.*;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.UnitViewPanel;
 
 import javax.swing.*;
@@ -187,9 +188,9 @@ public final class HangarTab extends CampaignGuiTab {
         changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
-        JScrollPane scrollUnitTable = new JScrollPane(unitTable);
+        JScrollPane scrollUnitTable = new JScrollPaneWithSpeed(unitTable);
 
-        scrollUnitView = new JScrollPane();
+        scrollUnitView = new JScrollPaneWithSpeed();
         scrollUnitView.setMinimumSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setPreferredSize(new Dimension(UNIT_VIEW_WIDTH, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
