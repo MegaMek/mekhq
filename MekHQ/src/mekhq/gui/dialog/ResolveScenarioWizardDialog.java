@@ -243,8 +243,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setMinimumSize(new Dimension(590,120));
-        txtInstructions.setPreferredSize(new Dimension(590,120));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
 
         /*
@@ -993,7 +991,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         scrMain = new JScrollPaneWithSpeed(pnlMain);
         scrMain.setMinimumSize(new Dimension(600, 500));
-        scrMain.setPreferredSize(new Dimension(600, 500));
+        scrMain.setPreferredSize(new Dimension(900, 500));
         getContentPane().add(scrMain, BorderLayout.CENTER);
 
 
@@ -1169,34 +1167,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         cardLayout.show(pnlMain, currentPanel);
         switchInstructions();
 
-        switch (name) {
-            case PILOTPANEL:
-                pnlMain.setPreferredSize(pnlPilotStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case UNITSPANEL:
-                pnlMain.setPreferredSize(pnlUnitStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case SALVAGEPANEL:
-                pnlMain.setPreferredSize(pnlSalvage.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case KILLPANEL:
-                pnlMain.setPreferredSize(pnlKills.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case REWARDPANEL:
-                pnlMain.setPreferredSize(pnlRewards.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case PREVIEWPANEL:
-                pnlMain.setPreferredSize(pnlPreview.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case OBJECTIVEPANEL:
-                pnlMain.setPreferredSize(pnlObjectiveStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case PRISONERPANEL:
-                pnlMain.setPreferredSize(pnlPrisonerStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-        }
-
-
         SwingUtilities.invokeLater(() -> scrMain.getVerticalScrollBar().setValue(0));
         pack();
     }
@@ -1237,8 +1207,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructions.setMinimumSize(new Dimension(590, 150));
-        txtInstructions.setPreferredSize(new Dimension(590, 150));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
     }
 
@@ -1769,8 +1737,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         dialog.getContentPane().add(btn, gridBagConstraints);
 
-        dialog.setMinimumSize(new Dimension(600, 300));
-        dialog.setPreferredSize(new Dimension(600, 300));
+        dialog.setMinimumSize(new Dimension(450, 700));
+        dialog.setPreferredSize(new Dimension(450, 700));
         dialog.validate();
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
