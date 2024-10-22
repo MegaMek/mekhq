@@ -747,8 +747,8 @@ public class InterstellarMapPanel extends JPanel {
                                     ++i;
                                 }
                             } else {
-                                // Just a black circle then
-                                g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
+                                // Just a dark grey circle then
+                                g2.setPaint(Color.DARK_GRAY);
                                 arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
                                 g2.fill(arc);
                             }
