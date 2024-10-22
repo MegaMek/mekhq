@@ -478,7 +478,7 @@ public class InterstellarMapPanel extends JPanel {
                     int minY = (int) Math.floor(scr2mapY(getHeight()) / HEX_SIZE);
                     int maxY = (int) Math.ceil(scr2mapY(0.0) / HEX_SIZE);
 
-                    Faction independentFaction = Factions.getInstance().getFaction("IND");
+                    Faction indFaction = Factions.getInstance().getFaction("IND");
 
                     for (int x = minX; x <= maxX; ++x) {
                         for (int y = minY; y <= maxY; ++y) {
@@ -495,7 +495,7 @@ public class InterstellarMapPanel extends JPanel {
                             for (PlanetarySystem system : nearbySystems) {
                                 if (!isSystemEmpty(system) && path.contains(system.getX(), system.getY())) {
                                     Set<Faction> factions = system.getFactionSet(now);
-                                    factions.remove(independentFaction);
+                                    factions.remove(indFaction);
                                     hexFactions.addAll(factions);
                                 }
                             }
@@ -510,7 +510,7 @@ public class InterstellarMapPanel extends JPanel {
                             }
 
                             if (hexFactions.size() > 1) {
-                                hexFactions.remove(independentFaction);
+                                hexFactions.remove(indFaction);
                             }
 
                             path.transform(transform);
