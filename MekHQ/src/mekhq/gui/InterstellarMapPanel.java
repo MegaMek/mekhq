@@ -404,6 +404,8 @@ public class InterstellarMapPanel extends JPanel {
                 final Stroke thin = new BasicStroke(1.2f);
                 final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
                         new float[] { 3 }, 0);
+                final Stroke dashedThick = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+                        new float[] { 3 }, 0);
                 final Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
                         new float[] { 2, 5 }, 0);
                 final Color darkCyan = new Color(0, 100, 50);
@@ -424,11 +426,12 @@ public class InterstellarMapPanel extends JPanel {
                     if (!campaign.getCampaignOptions().getContractMarketMethod().isNone()
                             && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
                         final double z = map2scrX(selectedSystem.getX()
-                                + campaign.getCampaignOptions().getContractSearchRadius());
+                            + campaign.getCampaignOptions().getContractSearchRadius());
                         final double contractSearchRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
+                        g2.setStroke(dashedThick);
                         arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
-                        g2.fill(arc);
+                        g2.draw(arc);
                     }
 
                     // Acquisition Search Radius Aura
@@ -439,10 +442,11 @@ public class InterstellarMapPanel extends JPanel {
                         final double z = map2scrX(selectedSystem.getX()
                                 + (MHQConstants.MAX_JUMP_RADIUS
                                         * campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()));
-                        final double contractSearchRadius = z - x;
+                        final double acquisitionRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
-                        arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
-                        g2.fill(arc);
+                        g2.setStroke(dashedThick);
+                        arc.setArcByCenter(x, y, acquisitionRadius, 0, 360, Arc2D.OPEN);
+                        g2.draw(arc);
                     }
 
                     // Jump Radius Aura
@@ -451,8 +455,9 @@ public class InterstellarMapPanel extends JPanel {
                         final double z = map2scrX(selectedSystem.getX() + MHQConstants.MAX_JUMP_RADIUS);
                         final double jumpRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapJumpRadiusColour());
+                        g2.setStroke(dashedThick);
                         arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
-                        g2.fill(arc);
+                        g2.draw(arc);
                     }
 
                     // Don't override HPG Network drawing
