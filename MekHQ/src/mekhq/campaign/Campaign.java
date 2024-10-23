@@ -3248,34 +3248,40 @@ public class Campaign implements ITechManager {
         addReport(report);
     }
 
-    public void refit(Refit r) {
-        Person tech = (r.getUnit().getEngineer() == null) ? r.getTech() : r.getUnit().getEngineer();
+    public void refit(Refit theRefit) {
+        Person tech = (theRefit.getUnit().getEngineer() == null) ? theRefit.getTech() : theRefit.getUnit().getEngineer();
         if (tech == null) {
-            addReport("No tech is assigned to refit " + r.getOriginalEntity().getShortName() + ". Refit cancelled.");
-            r.cancel();
+            addReport("No tech is assigned to refit " + theRefit.getOriginalEntity().getShortName() + ". Refit cancelled.");
+            theRefit.cancel();
             return;
         }
-        TargetRoll target = getTargetFor(r, tech);
+        TargetRoll target = getTargetFor(theRefit, tech);
         // check that all parts have arrived
-        if (!r.acquireParts()) {
+        if (!theRefit.acquireParts()) {
             return;
         }
-        String report = tech.getHyperlinkedFullTitle() + " works on " + r.getPartName();
-        int minutes = r.getTimeLeft();
+        String report = tech.getHyperlinkedFullTitle() + " works on " + theRefit.getPartName();
+        int minutes = theRefit.getTimeLeft();
         // FIXME: Overtime?
         if (minutes > tech.getMinutesLeft()) {
-            r.addTimeSpent(tech.getMinutesLeft());
+            theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
-            report = report + ", " + r.getTimeLeft() + " minutes left.";
+            report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
+            int daysLeft = (int) Math.ceil(theRefit.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+            if (daysLeft == 1) {
+                report += " tomorrow.</b>";
+            } else {
+                report += " in " + daysLeft + " days.</b>";
+            }
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
-            r.addTimeSpent(minutes);
-            if (r.hasFailedCheck()) {
-                report = report + ", " + r.succeed();
+            theRefit.addTimeSpent(minutes);
+            if (theRefit.hasFailedCheck()) {
+                report = report + ", " + theRefit.succeed();
             } else {
                 int roll;
                 String wrongType = "";
-                if (tech.isRightTechTypeFor(r)) {
+                if (tech.isRightTechTypeFor(theRefit)) {
                     roll = Compute.d6(2);
                 } else {
                     roll = Utilities.roll3d6();
@@ -3286,7 +3292,7 @@ public class Campaign implements ITechManager {
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
                         && (tech.getCurrentEdge() > 0)) {
                     tech.changeCurrentEdge(-1);
-                    roll = tech.isRightTechTypeFor(r) ? Compute.d6(2) : Utilities.roll3d6();
+                    roll = tech.isRightTechTypeFor(theRefit) ? Compute.d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
                         tech.setEdgeUsed(tech.getEdgeUsed() - 1);
@@ -3295,18 +3301,25 @@ public class Campaign implements ITechManager {
                 }
 
                 if (roll >= target.getValue()) {
-                    report += r.succeed();
+                    report += theRefit.succeed();
                 } else {
-                    report += r.fail(SkillType.EXP_GREEN);
+                    report += theRefit.fail(SkillType.EXP_GREEN);
                     // try to refit again in case the tech has any time left
-                    if (!r.isBeingRefurbished()) {
-                        refit(r);
+                    if (!theRefit.isBeingRefurbished()) {
+                        refit(theRefit);
+                        report += " Completion ";
+                        int daysLeft = (int) Math.ceil(theRefit.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+                        if (daysLeft == 1) {
+                            report += " tomorrow.</b>";
+                        } else {
+                        report += " in " + daysLeft + " days.</b>";
+                        }
                     }
                 }
                 report += wrongType;
             }
         }
-        MekHQ.triggerEvent(new PartWorkEvent(tech, r));
+        MekHQ.triggerEvent(new PartWorkEvent(tech, theRefit));
         addReport(report);
     }
 
@@ -3432,12 +3445,17 @@ public class Campaign implements ITechManager {
                 }
                 partWork.setTech(tech);
                 partWork.reservePart();
-                report += " - <b>Not enough time, the remainder of the task";
-                if (null != partWork.getUnit()) {
-                    report += " on " + partWork.getUnit().getName();
-                }
-                if (minutesUsed > 0) {
-                    report += " will be finished tomorrow.</b>";
+                report += " - <b>";
+                report += partWork.getTimeLeft();
+                report += " minutes left. Work";
+                if ((minutesUsed > 0) && (tech.getDailyAvailableTechTime() > 0)) {
+                    report += " will be finished ";
+                    int daysLeft = (int) Math.ceil(partWork.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+                    if (daysLeft == 1) {
+                        report += " tomorrow.</b>";
+                    } else {
+                        report += " in " + daysLeft + " days.</b>";
+                    }
                 } else {
                     report += " cannot be finished because there was no time left after maintenance tasks.</b>";
                     partWork.resetTimeSpent();
