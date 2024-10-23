@@ -25,7 +25,6 @@ import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -37,7 +36,7 @@ import java.util.ResourceBundle;
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class UnitViewPanel extends JScrollablePanel {
+public class UnitViewPanel extends JPanel {
     private Unit unit;
     private Entity entity;
     private Campaign campaign;
