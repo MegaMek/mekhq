@@ -66,8 +66,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and
-                unit(s):</description>
+            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
