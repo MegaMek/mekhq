@@ -512,17 +512,18 @@ public class ContractMarketDialog extends JDialog {
         ImageIcon icon = getFactionLogo(campaign, ((AtBContract) selectedContract).getEmployerCode(),
             true);
 
-        // Define resource keys for each difficulty level
-        Map<Integer, String> difficultyMessages = Map.of(
-            -99, "messageChallengeUnknown.text",
-            1, "messageChallengeVeryEasy.text",
-            2, "messageChallengeEasy.text",
-            9, "messageChallengeHard.text",
-            10, "messageChallengeVeryHard.text"
-        );
+        // Get the resource string
+        String resourceKey = "";
 
-        // Extract the resource mapping and get the resource string
-        String resourceKey = difficultyMessages.getOrDefault(difficulty, "");
+        if (difficulty == -99) {
+            resourceKey = "messageChallengeUnknown.text";
+        } else if (difficulty <= 2) {
+            resourceKey = "messageChallengeVeryEasy.text";
+        } else if (difficulty > 8) {
+            resourceKey = "messageChallengeVeryHard.text";
+        } else if (difficulty > 6) {
+            resourceKey = "messageChallengeHard.text";
+        }
 
         // If resourceKey is not found, just return true, acting as if the player had accepted the mission
         if (resourceKey.isEmpty()) {
