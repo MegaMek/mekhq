@@ -42,9 +42,9 @@
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>100</percentage>
-            <timeLimit>30</timeLimit>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitType>Fixed</timeLimitType>
+            <timeLimitScaleFactor>1</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
