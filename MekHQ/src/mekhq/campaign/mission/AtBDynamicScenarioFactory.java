@@ -787,7 +787,7 @@ public class AtBDynamicScenarioFactory {
             logger.info(String.format("%s generated a force with %s / %s %s BV",
                 forceTemplate.getForceName(), forceBV, forceBVBudget, balancingType));
 
-            int adjustedBvBudget = (int) (forceBVBudget * 1.1);
+            int adjustedBvBudget = (int) (forceBVBudget * 1.25);
 
             while ((forceBV > adjustedBvBudget) && (generatedEntities.size() > 1)) {
                 int targetUnit = Compute.randomInt(generatedEntities.size());
@@ -807,8 +807,8 @@ public class AtBDynamicScenarioFactory {
                 generatedEntities.remove(targetUnit);
             }
 
-            logger.info(String.format("Final force %s / %s %s BV (adjusted for bounds)",
-                    forceBV, adjustedBvBudget, balancingType));
+            logger.info(String.format("Final force %s / %s %s BV (may exceed by *1.25)",
+                    forceBV, forceBVBudget, balancingType));
         }
 
         // Units with infantry bays get conventional infantry or battle armor added
