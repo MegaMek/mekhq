@@ -127,6 +127,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Prisoner status panel components
      */
+    private JButton prisonerRansomAllButton;
     private final List<JCheckBox> prisonerCapturedBtns = new ArrayList<>();
     private final List<JCheckBox> prisonerRansomedBtns = new ArrayList<>();
     private final List<JCheckBox> prisonerKiaBtns = new ArrayList<>();
@@ -418,6 +419,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPrisonerStatus.setLayout(new GridBagLayout());
 
         gridx = 1;
+
+        prisonerRansomAllButton = new JButton(resourceMap.getString("prisonerRansomAllButton.text"));
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx=2;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        pnlPrisonerStatus.add(prisonerRansomAllButton, gridBagConstraints);
+
+        prisonerRansomAllButton.addActionListener(evt -> prisonerRansomAll());
+
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx++;
@@ -1052,6 +1066,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         pack();
     }
+
+    private void prisonerRansomAll() {
+        Iterator<JCheckBox> capturedBoxes = prisonerCapturedBtns.iterator();
+        Iterator<JCheckBox> ransomedBoxes = prisonerRansomedBtns.iterator();
+        while (capturedBoxes.hasNext() && ransomedBoxes.hasNext()) {
+            JCheckBox capturedBox = capturedBoxes.next();
+            JCheckBox ransomedBox = ransomedBoxes.next();
+            if (capturedBox.isSelected()) {
+                ransomedBox.setSelected(true);
+            }
+        }
+    }
+
 
     /**
      * Rolls the dice to determine if the opposition personnel is captured.
