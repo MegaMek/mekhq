@@ -18,37 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.vecmath.Vector2d;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
@@ -58,13 +27,24 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.SocioIndustrialData;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.Systems.HPGLink;
+import mekhq.campaign.universe.enums.HiringHallLevel;
+
+import javax.imageio.ImageIO;
+import javax.swing.Timer;
+import javax.swing.*;
+import javax.vecmath.Vector2d;
+import java.awt.*;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
 
 /**
  * This is not functional yet. Just testing things out.
@@ -104,7 +84,7 @@ public class InterstellarMapPanel extends JPanel {
 
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
-    private JCheckBox optISWAreas;
+    private JCheckBox optTerritory;
 
     private Timer optionPanelTimer;
     private boolean optionPanelHidden;
@@ -424,6 +404,8 @@ public class InterstellarMapPanel extends JPanel {
                 final Stroke thin = new BasicStroke(1.2f);
                 final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
                         new float[] { 3 }, 0);
+                final Stroke dashedThick = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
+                        new float[] { 3 }, 0);
                 final Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
                         new float[] { 2, 5 }, 0);
                 final Color darkCyan = new Color(0, 100, 50);
@@ -444,11 +426,12 @@ public class InterstellarMapPanel extends JPanel {
                     if (!campaign.getCampaignOptions().getContractMarketMethod().isNone()
                             && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
                         final double z = map2scrX(selectedSystem.getX()
-                                + campaign.getCampaignOptions().getContractSearchRadius());
+                            + campaign.getCampaignOptions().getContractSearchRadius());
                         final double contractSearchRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
+                        g2.setStroke(dashedThick);
                         arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
-                        g2.fill(arc);
+                        g2.draw(arc);
                     }
 
                     // Acquisition Search Radius Aura
@@ -459,10 +442,11 @@ public class InterstellarMapPanel extends JPanel {
                         final double z = map2scrX(selectedSystem.getX()
                                 + (MHQConstants.MAX_JUMP_RADIUS
                                         * campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()));
-                        final double contractSearchRadius = z - x;
+                        final double acquisitionRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
-                        arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
-                        g2.fill(arc);
+                        g2.setStroke(dashedThick);
+                        arc.setArcByCenter(x, y, acquisitionRadius, 0, 360, Arc2D.OPEN);
+                        g2.draw(arc);
                     }
 
                     // Jump Radius Aura
@@ -471,8 +455,9 @@ public class InterstellarMapPanel extends JPanel {
                         final double z = map2scrX(selectedSystem.getX() + MHQConstants.MAX_JUMP_RADIUS);
                         final double jumpRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapJumpRadiusColour());
+                        g2.setStroke(dashedThick);
                         arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
-                        g2.fill(arc);
+                        g2.draw(arc);
                     }
 
                     // Don't override HPG Network drawing
@@ -486,30 +471,52 @@ public class InterstellarMapPanel extends JPanel {
                     }
                 }
 
-                if ((conf.scale > 1.0) && optISWAreas.isSelected()) {
-                    // IDEA: Allow for different hex sizes later on.
-                    final double HEX_SIZE = 30.0;
+                if ((conf.scale > 1.0) && optTerritory.isSelected()) {
+                    final double HEX_SIZE = 30;
                     final double SPACING_X = HEX_SIZE * Math.sqrt(3) / 2.0;
+
                     AffineTransform transform = getMap2ScrTransform();
+                    Paint defaultFactionPaint = new Color(0.0f, 0.0f, 0.0f, 0.25f);
+
                     int minX = (int) Math.floor(scr2mapX(0.0) / SPACING_X);
                     int maxX = (int) Math.ceil(scr2mapX(getWidth()) / SPACING_X);
                     int minY = (int) Math.floor(scr2mapY(getHeight()) / HEX_SIZE);
                     int maxY = (int) Math.ceil(scr2mapY(0.0) / HEX_SIZE);
-                    GeneralPath path = new GeneralPath();
+
+                    Faction indFaction = Factions.getInstance().getFaction("IND");
+
                     for (int x = minX; x <= maxX; ++x) {
                         for (int y = minY; y <= maxY; ++y) {
                             double coordX = x * SPACING_X;
                             double coordY = y * HEX_SIZE + (x % 2) * HEX_SIZE / 2.0;
+                            GeneralPath path = new GeneralPath();
                             setupHexPath(path, coordX, coordY, HEX_SIZE / 2.0);
 
-                            Paint factionPaint = new Color(0.0f, 0.0f, 0.0f, 0.25f);
-                            Paint linePaint = new Color(1.0f, 1.0f, 1.0f, 0.25f);
-                            Set<Faction> hexFactions = Systems.getInstance()
-                                    .getNearbySystems(coordX, coordY, (int) Math.round(HEX_SIZE * 1.3)).stream()
-                                    .filter(system -> !isSystemEmpty(system)
-                                            && path.contains(system.getX(), system.getY()))
-                                    .flatMap(system -> system.getFactionSet(now).stream())
-                                    .collect(Collectors.toSet());
+                            Paint factionPaint = defaultFactionPaint;
+                            Set<Faction> hexFactions = new HashSet<>();
+
+                            List<PlanetarySystem> nearbySystems = Systems.getInstance().getNearbySystems(coordX, coordY, (int) Math.round(HEX_SIZE * 1.3));
+
+                            for (PlanetarySystem system : nearbySystems) {
+                                if (!isSystemEmpty(system) && path.contains(system.getX(), system.getY())) {
+                                    Set<Faction> factions = system.getFactionSet(now);
+                                    factions.remove(indFaction);
+                                    hexFactions.addAll(factions);
+                                }
+                            }
+
+                            if (hexFactions.isEmpty()) {
+                                for (PlanetarySystem system : nearbySystems) {
+                                    if (!isSystemEmpty(system)) {
+                                        Set<Faction> factions = system.getFactionSet(now);
+                                        hexFactions.addAll(factions);
+                                    }
+                                }
+                            }
+
+                            if (hexFactions.size() > 1) {
+                                hexFactions.remove(indFaction);
+                            }
 
                             path.transform(transform);
 
@@ -519,11 +526,7 @@ public class InterstellarMapPanel extends JPanel {
                                 float[] colorComponents = new float[4];
                                 factionColor.getComponents(colorComponents);
                                 factionPaint = new Color(colorComponents[0], colorComponents[1], colorComponents[2],
-                                        0.25f);
-                                Color lineColor = factionColor.brighter();
-                                lineColor.getComponents(colorComponents);
-                                linePaint = new Color(colorComponents[0], colorComponents[1], colorComponents[2],
-                                        0.25f);
+                                    0.25f);
                             } else if (hexFactions.size() > 1) {
                                 // Create the painted stripes data
                                 int factionSize = hexFactions.size();
@@ -537,7 +540,7 @@ public class InterstellarMapPanel extends JPanel {
                                     Color factionColor = factionIterator.next().getColor();
                                     factionColor.getComponents(colorComponents);
                                     factionColor = new Color(colorComponents[0], colorComponents[1], colorComponents[2],
-                                            0.25f);
+                                        0.25f);
                                     paintColors[i * 2] = factionColor;
                                     paintColors[i * 2 + 1] = factionColor;
                                 }
@@ -546,21 +549,15 @@ public class InterstellarMapPanel extends JPanel {
                                 // Determine where to anchor the stripes
                                 Point2D firstPoint = new Point2D.Double(map2scrX(coordX), map2scrY(coordY));
                                 Point2D secondPoint = new Point2D.Double(
-                                        firstPoint.getX() + 6 * conf.scale,
-                                        firstPoint.getY() + 6 * conf.scale);
+                                    firstPoint.getX() + 6 * conf.scale,
+                                    firstPoint.getY() + 6 * conf.scale);
                                 factionPaint = new LinearGradientPaint(
-                                        firstPoint, secondPoint, paintFractions, paintColors,
-                                        CycleMethod.REPEAT);
-                                linePaint = new Color(1.0f, 0.2f, 0.0f, 0.5f);
+                                    firstPoint, secondPoint, paintFractions, paintColors,
+                                    CycleMethod.REPEAT);
                             }
+
                             g2.setPaint(factionPaint);
                             g2.fill(path);
-                            g2.setPaint(linePaint);
-                            Shape clip = g2.getClip();
-                            g2.clip(path);
-                            g2.setStroke(new BasicStroke(4.0f));
-                            g2.draw(path);
-                            g2.setClip(clip);
                         }
                     }
                 }
@@ -726,18 +723,28 @@ public class InterstellarMapPanel extends JPanel {
                                 int i = 0;
                                 for (Faction faction : factions) {
                                     if (capitals.get(faction).equals(system.getId())) {
-                                        g2.setPaint(new Color(255, 228, 181));
+                                        g2.setPaint(faction.getColor());
+                                        arc.setArcByCenter(x, y, size + 5, 0,
+                                            360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                        g2.fill(arc);
+                                        g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
                                         arc.setArcByCenter(x, y, size + 3, 0,
-                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
+                                            360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                         g2.fill(arc);
+                                    } else {
+                                        if (campaign.getCampaignOptions().isUseAtB()
+                                            && (system.getHiringHallLevel(campaign.getLocalDate()) == HiringHallLevel.GREAT)) {
+                                            g2.setPaint(new Color(176, 196, 222));
+                                            arc.setArcByCenter(x, y, size + 5, 0,
+                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                            g2.fill(arc);
+                                            g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
+                                            arc.setArcByCenter(x, y, size + 3, 0,
+                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
+                                            g2.fill(arc);
+                                        }
                                     }
-                                    if (campaign.getCampaignOptions().isUseAtB()
-                                            && system.isHiringHall(campaign.getLocalDate())) {
-                                        g2.setPaint(new Color(176, 196, 222));
-                                        arc.setArcByCenter(x, y, size + 4, 0,
-                                                360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
-                                        g2.fill(arc);
-                                    }
+
                                     g2.setPaint(faction.getColor());
                                     arc.setArcByCenter(x, y, size, 0, 360.0 * (1 - ((double) i) / factions.size()),
                                             Arc2D.PIE);
@@ -745,8 +752,8 @@ public class InterstellarMapPanel extends JPanel {
                                     ++i;
                                 }
                             } else {
-                                // Just a black circle then
-                                g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
+                                // Just a dark grey circle then
+                                g2.setPaint(Color.DARK_GRAY);
                                 arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
                                 g2.fill(arc);
                             }
@@ -838,8 +845,9 @@ public class InterstellarMapPanel extends JPanel {
         optEmptySystems = createOptionCheckBox("Empty systems", checkboxIcon, checkboxSelectedIcon);
         optEmptySystems.setSelected(true);
         optionPanel.add(optEmptySystems);
-        optISWAreas = createOptionCheckBox("ISW Areas", checkboxIcon, checkboxSelectedIcon);
-        optionPanel.add(optISWAreas);
+        optTerritory = createOptionCheckBox("Territory", checkboxIcon, checkboxSelectedIcon);
+        optTerritory.setSelected(true);
+        optionPanel.add(optTerritory);
         optHPGNetwork = createOptionCheckBox("HPG Network", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optHPGNetwork);
 
