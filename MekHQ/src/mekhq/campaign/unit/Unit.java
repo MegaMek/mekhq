@@ -77,6 +77,8 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.parts.enums.PartQuality.*;
+
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
  * it
@@ -5239,7 +5241,7 @@ public class Unit implements ITechnology {
             }
         }
         if (nParts == 0) {
-            return PartQuality.QUALITY_D;
+            return QUALITY_D;
         }
         return PartQuality.fromNumeric((int) Math.round((1.0 * sumQuality) / nParts));
     }
@@ -5878,26 +5880,21 @@ public class Unit implements ITechnology {
 
     /**
      * Generates a random unit quality based on a 2d6 roll and a modifier.
-     * This table is based on the AtB Mek Quality table, but is still useful outside
-     * of that ruleset
      *
      * @param modifier the modifier to be applied to the 2d6 roll
      * @return an integer representing the generated unit quality
-     * @throws IllegalStateException if an unexpected value is encountered during
-     *                               the switch statement
+     * @throws IllegalStateException if an unexpected value is encountered during the switch statement
      */
     public static PartQuality getRandomUnitQuality(int modifier) {
-        int roll = MathUtility.clamp(
-                (Compute.d6(2) + modifier),
-                2,
-                12);
+        int roll = MathUtility.clamp((Compute.d6(2) + modifier), 2, 12);
 
         return switch (roll) {
-            case 2, 3, 4, 5 -> PartQuality.QUALITY_A;
-            case 6, 7, 8 -> PartQuality.QUALITY_B;
-            case 9, 10 -> PartQuality.QUALITY_C;
-            case 11 -> PartQuality.QUALITY_D;
-            case 12 -> PartQuality.QUALITY_F;
+            case 2, 3 -> QUALITY_A;
+            case 4, 5 -> QUALITY_B;
+            case 6, 7 -> QUALITY_C;
+            case 8, 9 -> QUALITY_D;
+            case 10, 11 -> QUALITY_E;
+            case 12 -> QUALITY_F;
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };
