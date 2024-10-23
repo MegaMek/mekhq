@@ -22,7 +22,6 @@ import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.common.Entity;
 import megamek.common.MekView;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -184,7 +183,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.setLayout(new GridBagLayout());
 
         lblType.setName("lblType");
-        lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
+        lblType.setText("<html><i>" + unit.getTypeDisplayableNameWithOmni() + "</i></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
