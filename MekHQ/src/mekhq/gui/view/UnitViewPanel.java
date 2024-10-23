@@ -22,11 +22,9 @@ import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.common.Entity;
 import megamek.common.MekView;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.ImgLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -38,7 +36,7 @@ import java.util.ResourceBundle;
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class UnitViewPanel extends JScrollablePanel {
+public class UnitViewPanel extends JPanel {
     private Unit unit;
     private Entity entity;
     private Campaign campaign;
@@ -184,7 +182,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.setLayout(new GridBagLayout());
 
         lblType.setName("lblType");
-        lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
+        lblType.setText("<html><i>" + unit.getTypeDisplayableNameWithOmni() + "</i></html>");
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

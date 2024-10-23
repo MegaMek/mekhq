@@ -29,18 +29,47 @@ import megamek.common.UnitType;
  */
 public class UnitTypeSorter implements Comparator<String> {
     @Override
-    public int compare(String s0, String s1) {
+    public int compare(String compare0, String compare1) {
         // lets find the weight class integer for each name
-        int l0 = 0;
-        int l1 = 0;
+        int sort0 = 0;
+        int sort1 = 0;
+
+        // We ONLY get the strings so sorting Omni units (in this case to be after the same
+        // unit type but otherwise in the same order as this) is going to be a little silly
+
+        boolean omni0 = false;
+        boolean omni1 = false;
+
+        if (compare0.startsWith("Omni ")) {
+            omni0 = true;
+            compare0 = compare0.substring(5);
+        } else if (compare0.startsWith("Omni")) {
+            omni0 = true;
+            compare0 = compare0.substring(4);
+        }
+
+        if (compare1.startsWith("Omni ")) {
+            omni1 = true;
+            compare1 = compare1.substring(5);
+        } else if (compare1.startsWith("Omni")) {
+            omni1 = true;
+            compare1 = compare1.substring(4);
+        }
+
         for (int i = 0; i <= UnitType.SPACE_STATION; i++) {
-            if (UnitType.getTypeDisplayableName(i).equals(s0)) {
-                l0 = i;
+            if (UnitType.getTypeDisplayableName(i).equals(compare0)) {
+                sort0 = i * 2;
+                if (omni0) {
+                    sort0++;
+                }
             }
-            if (UnitType.getTypeDisplayableName(i).equals(s1)) {
-                l1 = i;
+            if (UnitType.getTypeDisplayableName(i).equals(compare1)) {
+                sort1 = i * 2;
+                if (omni1) {
+                    sort1++;
+                }
             }
         }
-        return ((Comparable<Integer>) l1).compareTo(l0);
+        return ((Comparable<Integer>) sort1).compareTo(sort0);
     }
 }

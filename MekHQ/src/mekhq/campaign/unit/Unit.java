@@ -274,6 +274,25 @@ public class Unit implements ITechnology {
         }
     }
 
+    /**
+     * Like UnitType.getTypeDisplayableName but prepends "Omni" to omni units
+     * @return String displayable name with possible "Omni"
+     */
+    public String getTypeDisplayableNameWithOmni() {
+        Entity ourEntity = getEntity();
+        int type = ourEntity.getUnitType();
+        if (!ourEntity.isOmni()) {
+            return UnitType.getTypeDisplayableName(type);
+        }
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("Omni");
+        if (!(type == UnitType.TANK || type == UnitType.MEK)) {
+            toReturn.append(" ");
+        }
+        toReturn.append(UnitType.getTypeDisplayableName(type));
+        return toReturn.toString();
+    }
+
     public void reCalc() {
         // Do Nothing
     }

@@ -227,37 +227,37 @@ public class UnitTableModel extends DataTableModel {
             return "";
         }
 
-        Unit u = getUnit(row);
-        Entity e = u.getEntity();
-        if (e == null) {
+        Unit unit = getUnit(row);
+        Entity entity = unit.getEntity();
+        if (entity == null) {
             return "?";
         }
 
         return switch (col) {
-            case COL_NAME -> u.getName();
-            case COL_TYPE -> UnitType.getTypeDisplayableName(e.getUnitType());
-            case COL_WCLASS -> e.getWeightClassName();
-            case COL_TECH -> TechConstants.getLevelDisplayableName(e.getTechLevel());
-            case COL_WEIGHT -> e.getWeight();
-            case COL_COST -> u.getSellValue().toAmountAndSymbolString();
-            case COL_STATUS -> u.getStatus();
-            case COL_CONDITION -> u.getCondition();
-            case COL_CREW_STATE -> u.getCrewState();
-            case COL_QUALITY -> u.getQualityName();
-            case COL_PILOT -> (u.getCommander() != null) ? u.getCommander().getHTMLTitle() : "-";
+            case COL_NAME -> unit.getName();
+            case COL_TYPE -> unit.getTypeDisplayableNameWithOmni();
+            case COL_WCLASS -> entity.getWeightClassName();
+            case COL_TECH -> TechConstants.getLevelDisplayableName(entity.getTechLevel());
+            case COL_WEIGHT -> entity.getWeight();
+            case COL_COST -> unit.getSellValue().toAmountAndSymbolString();
+            case COL_STATUS -> unit.getStatus();
+            case COL_CONDITION -> unit.getCondition();
+            case COL_CREW_STATE -> unit.getCrewState();
+            case COL_QUALITY -> unit.getQualityName();
+            case COL_PILOT -> (unit.getCommander() != null) ? unit.getCommander().getHTMLTitle() : "-";
             case COL_FORCE -> {
-                Force force = u.getCampaign().getForce(u.getForceId());
+                Force force = unit.getCampaign().getForce(unit.getForceId());
                 yield (force != null) ? force.getFullName() : "-";
             }
-            case COL_CREW -> u.getActiveCrew().size() + "/" + u.getFullCrewSize();
-            case COL_TECH_CRW -> (u.getTech() != null) ? u.getTech().getHTMLTitle() : "-";
-            case COL_MAINTAIN -> u.getMaintenanceCost().toAmountAndSymbolString();
-            case COL_BV -> e.calculateBattleValue(true, u.getEntity().getCrew() == null);
-            case COL_REPAIR -> u.getPartsNeedingFixing().size();
-            case COL_PARTS -> u.getPartsNeeded().size();
-            case COL_SITE -> Unit.getSiteName(u.getSite());
-            case COL_QUIRKS -> e.countQuirks();
-            case COL_RSTATUS -> u.isSalvage() ? "Strip" : "Repair";
+            case COL_CREW -> unit.getActiveCrew().size() + "/" + unit.getFullCrewSize();
+            case COL_TECH_CRW -> (unit.getTech() != null) ? unit.getTech().getHTMLTitle() : "-";
+            case COL_MAINTAIN -> unit.getMaintenanceCost().toAmountAndSymbolString();
+            case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
+            case COL_REPAIR -> unit.getPartsNeedingFixing().size();
+            case COL_PARTS -> unit.getPartsNeeded().size();
+            case COL_SITE -> Unit.getSiteName(unit.getSite());
+            case COL_QUIRKS -> entity.countQuirks();
+            case COL_RSTATUS -> unit.isSalvage() ? "Strip" : "Repair";
             default -> "?";
         };
     }
