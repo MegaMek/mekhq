@@ -664,7 +664,7 @@ public class AtBContract extends Contract {
                     campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
-                        Person p = campaign.newDependent(false, Gender.RANDOMIZE);
+                        Person p = campaign.newDependent(Gender.RANDOMIZE);
                         campaign.recruitPerson(p);
                     }
                 }

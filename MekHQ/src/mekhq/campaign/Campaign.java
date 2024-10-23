@@ -1440,27 +1440,32 @@ public class Campaign implements ITechManager {
     // region Personnel
     // region Person Creation
     /**
-     * Creates a new {@link Person} instance who is a dependent.
-     * If {@code baby} is false and the random dependent origin option is enabled,
-     * the new person will have a random origin.
+     * Creates a new dependent with given gender. The origin faction and planet are set to null.
      *
-     * @param baby          a boolean indicating if the person is a baby or not
-     * @param gender        the Gender enum for the person (should normally be Gender.RANDOMIZE)
-     * @return a new {@link Person} instance who is a dependent
+     * @param gender The {@link Gender} of the new dependent.
+     * @return Return a {@link Person} object representing the new dependent.
      */
-    public Person newDependent(boolean baby, Gender gender) {
-        Person person;
+    public Person newDependent(Gender gender) {
+        return newDependent(gender, null, null);
+    }
 
-        if ((!baby) && (getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin())) {
-            person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
-                    new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
-                    new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
-                gender);
-        } else {
-            person = newPerson(PersonnelRole.DEPENDENT);
-        }
-
-        return person;
+    /**
+     * Creates a new dependent with given gender, origin faction and origin planet.
+     *
+     * @param gender The {@link Gender} of the new dependent.
+     * @param originFaction The {@link Faction} that represents the origin faction for the new dependent.
+     *                      This can be null, suggesting the faction will be chosen based on campaign options.
+     * @param originPlanet The {@link Planet} that represents the origin planet for the new dependent.
+     *                     This can be null, suggesting the planet will be chosen based on campaign options.
+     * @return Return a {@link Person} object representing the new dependent.
+     */
+    public Person newDependent(Gender gender, @Nullable Faction originFaction,
+                               @Nullable Planet originPlanet) {
+        return newPerson(PersonnelRole.DEPENDENT,
+            PersonnelRole.NONE,
+            new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), originFaction),
+            new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions(), originPlanet),
+            gender);
     }
 
     /**
@@ -4451,7 +4456,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (roll <= (getAtBUnitRatingMod() * 2)) {
-                    final Person dependent = newDependent(false, Gender.RANDOMIZE);
+                    final Person dependent = newDependent(Gender.RANDOMIZE);
 
                     recruitPerson(dependent, PrisonerStatus.FREE, true, false);
 

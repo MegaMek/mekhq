@@ -36,6 +36,8 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -337,7 +339,8 @@ public abstract class AbstractProcreation {
         // Create Babies
         for (int i = 0; i < size; i++) {
             // Create a baby
-            final Person baby = campaign.newDependent(true, Gender.RANDOMIZE);
+            final Person baby = campaign.newDependent(
+                Gender.RANDOMIZE, mother.getOriginFaction(), campaign.getLocation().getPlanet());
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
             baby.setDateOfBirth(today);
@@ -436,7 +439,15 @@ public abstract class AbstractProcreation {
         // Create Babies
         for (int i = 0; i < size; i++) {
             // Create the babies
-            final Person baby = campaign.newDependent(true, Gender.RANDOMIZE);
+            Faction originFaction = mother.getOriginFaction();
+            Planet originPlanet = mother.getOriginPlanet();
+
+            if (father != null && Compute.randomInt(1) == 0) {
+                originFaction = father.getOriginFaction();
+                originPlanet = father.getOriginPlanet();
+            }
+
+            final Person baby = campaign.newDependent(Gender.RANDOMIZE, originFaction, originPlanet);
 
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
