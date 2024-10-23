@@ -2730,12 +2730,10 @@ public class AtBDynamicScenarioFactory {
         for (int index = 0; index < scenario.getNumBots(); index++) {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
-            if (forceTemplate.isAlliedBotForce()) {
-                if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                    bvBudget += botForce.getTotalBV(campaign);
+            if (forceTemplate != null && forceTemplate.getContributesToBV()) {
+                bvBudget += botForce.getTotalBV(campaign);
 
-                    logger.info(String.format("%s %s: %s", botForce.getName(), generationMethod, botForce.getTotalBV(campaign)));
-                }
+                logger.info(String.format("%s %s: %s", botForce.getName(), generationMethod, botForce.getTotalBV(campaign)));
             }
         }
 
