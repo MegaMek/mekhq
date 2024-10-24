@@ -2,16 +2,16 @@ package mekhq.campaign.mission.atb;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
+import megamek.common.Entity;
 import megamek.common.ITechnology;
 import megamek.common.Mek;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
@@ -29,31 +29,31 @@ import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
-public class SupplyDrop {
-    private final static MMLogger logger = MMLogger.create(SupplyDrop.class);
-    private Campaign campaign;
-    private Faction employerFaction;
+public class SupplyDrops {
+    final private Campaign campaign;
+    final private Faction employerFaction;
+    final boolean isLosTechCache;
     private Map<Part, Integer> potentialParts;
     private List<Part> partsPool;
     private Random random;
-
 
     private final int YEAR;
     private final int EMPLOYER_TECH_CODE;
     private final boolean EMPLOYER_IS_CLAN;
     private final Money TARGET_VALUE = Money.of(500000);
-    private final int LOSTECH_CHANCE;
 
-    public SupplyDrop(Campaign campaign, Faction employerFaction, int LosTechModifier) {
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.SupplyDrops");
+    private final static MMLogger logger = MMLogger.create(SupplyDrops.class);
+
+    public SupplyDrops(Campaign campaign, Faction employerFaction, boolean isLosTechCache) {
         // Constants
         YEAR = campaign.getGameYear();
         EMPLOYER_IS_CLAN = employerFaction.isClan();
         EMPLOYER_TECH_CODE = getTechFaction(employerFaction);
-        LOSTECH_CHANCE = Math.max(1, 50 - LosTechModifier);
-
 
         this.campaign = campaign;
         this.employerFaction = employerFaction;
+        this.isLosTechCache = isLosTechCache;
         initialize();
     }
 
@@ -70,9 +70,35 @@ public class SupplyDrop {
         try {
             Collection<Unit> units = campaign.getUnits();
             for (Unit unit : units) {
+                Entity entity = unit.getEntity();
+
+                if (entity.isLargeCraft() || entity.isSuperHeavy()) {
+                    continue;
+                }
+
                 if (!unit.isSalvage() && unit.isAvailable()) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
+                        if (part instanceof MekLocation) {
+                            if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
+                                continue;
+                            }
+                        }
+
+                        if (part instanceof TankLocation) {
+                            continue;
+                        }
+
+                        if (part.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE)) {
+                            if (!isLosTechCache) {
+                                continue;
+                            }
+                        } else {
+                            if (isLosTechCache) {
+                                continue;
+                            }
+                        }
+
                         Pair<Unit, Part> pair = new Pair<>(unit, part);
                         int weight = getWeight(pair.getKey(), pair.getValue());
                         potentialParts.merge(part, weight, Integer::sum);
@@ -110,6 +136,12 @@ public class SupplyDrop {
         Part sourcePart = partsPool.get(random.nextInt(partsPool.size()));
         Part clonedPart = sourcePart.clone();
 
+        if (clonedPart == null) {
+            logger.error(String.format("Failed to clone part: %s", sourcePart));
+            logger.error(String.format(sourcePart.getName()));
+            return null;
+        }
+
         try {
             clonedPart.fix();
         } catch (Exception e) {
@@ -126,7 +158,7 @@ public class SupplyDrop {
         return clonedPart;
     }
 
-    public void getSupplyDrops(int dropCount) {
+    public void getSupplyDrops(int dropCount, @Nullable AtBMoraleLevel morale, boolean isLoot) {
         List<Part> droppedItems = new ArrayList<>();
         Money cashReward = Money.zero();
 
@@ -134,30 +166,24 @@ public class SupplyDrop {
             Money runningTotal = Money.zero();
 
             while (runningTotal.isLessThan(TARGET_VALUE)) {
-                Part potentialPart = getPart();
-                runningTotal = runningTotal.plus(potentialPart.getActualValue());
-
-                if (potentialPart instanceof MekLocation) {
-                    if (((MekLocation) potentialPart).getLoc() == Mek.LOC_CT) {
-                        cashReward = cashReward.plus(potentialPart.getActualValue());
-                        continue;
-                    }
-                }
-
-                if (potentialPart.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE)) {
-                    if (Compute.randomInt(LOSTECH_CHANCE) == 0) {
-                        droppedItems.add(potentialPart);
-                    } else {
-                        cashReward = cashReward.plus(potentialPart.getActualValue());
-                    }
+                if (partsPool.isEmpty()) {
+                    cashReward = cashReward.plus(TARGET_VALUE);
+                    runningTotal = cashReward.plus(TARGET_VALUE);
                     continue;
                 }
 
+                Part potentialPart = getPart();
+
+                if (potentialPart == null) {
+                    continue;
+                }
+
+                runningTotal = runningTotal.plus(potentialPart.getActualValue());
                 droppedItems.add(potentialPart);
             }
         }
 
-        supplyDropDialog(droppedItems, cashReward);
+        supplyDropDialog(droppedItems, cashReward, morale, isLoot);
     }
 
     public Map<String, Integer> createPartsReport(List<Part> droppedItems) {
@@ -198,7 +224,7 @@ public class SupplyDrop {
     public JDialog createSupplyDropDialog(ImageIcon icon, String description, List<Part> droppedItems, Money cashReward) {
         final int DIALOG_WIDTH = 900;
         final int DIALOG_HEIGHT = 500;
-        final String title = "++ INCOMING TRANSMISSION ++";
+        final String title = resources.getString("dialog.title");
 
         JDialog dialog = new JDialog();
         dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
@@ -228,7 +254,7 @@ public class SupplyDrop {
 
         dialog.add(scrollPane, BorderLayout.CENTER);
 
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton(resources.getString("confirmReceipt.text"));
         dialog.add(okButton, BorderLayout.SOUTH);
         okButton.addActionListener(e -> {
             deliveryDrop(droppedItems, cashReward);
@@ -238,11 +264,11 @@ public class SupplyDrop {
         return dialog;
     }
 
-
-    private void supplyDropDialog(List<Part> droppedItems, Money cashReward) {
+    private void supplyDropDialog(List<Part> droppedItems, Money cashReward,
+                                  @Nullable AtBMoraleLevel morale, boolean isLoot) {
         ImageIcon icon = getFactionLogo(campaign, employerFaction.getShortName(), true);
 
-        StringBuilder description = new StringBuilder("Our employer has arranged for the following items to be delivered to our encampment:<br>");
+        StringBuilder description = new StringBuilder(getMessageReferenceNormal(morale, isLoot));
 
         Map<String, Integer> partsReport = createPartsReport(droppedItems);
         List<Entry<String, Integer>> entries = new ArrayList<>(partsReport.entrySet());
@@ -260,6 +286,8 @@ public class SupplyDrop {
             .append("</tr></table>");
 
         JDialog dialog = createSupplyDropDialog(icon, description.toString(), droppedItems, cashReward);
+        dialog.setModal(true);
+        dialog.pack();
         dialog.setVisible(true);
     }
 
@@ -277,7 +305,8 @@ public class SupplyDrop {
         }
 
         if (!cashReward.isZero()) {
-            campaign.getFinances().credit(BONUS_EXCHANGE, campaign.getLocalDate(), cashReward, "Supply Drop");
+            campaign.getFinances().credit(BONUS_EXCHANGE, campaign.getLocalDate(), cashReward,
+                resources.getString("transactionReason.text"));
         }
     }
     private static PartQuality getRandomPartQuality(int modifier) {
@@ -309,5 +338,31 @@ public class SupplyDrop {
 
         logger.error("Fallback failed. Using 0 (IS)");
         return 0;
+    }
+
+    private String getMessageReferenceNormal(@Nullable AtBMoraleLevel morale, boolean isLoot) {
+        int bodyRoll = Compute.randomInt(10);
+
+        if (isLoot) {
+            return resources.getString("routed" + bodyRoll + ".text");
+        }
+
+        String moraleName = "adhocSupplies";
+
+        if (morale != null) {
+            moraleName = morale.toString().toLowerCase();
+        }
+
+        if ((morale == null) || (!morale.isOverwhelming())) {
+            return resources.getString(moraleName + bodyRoll + ".text");
+        } else {
+            StringBuilder body = new StringBuilder(resources.getString(moraleName + bodyRoll + ".text"));
+            body.append("<br><br>").append(resources.getString("overwhelmingConnector.text"));
+
+            int goodbyeRoll = Compute.randomInt(30);
+            body.append("<br><br><i>").append(resources.getString("overwhelmingGoodbye" + goodbyeRoll + ".text")).append("</i>");
+
+            return body.toString();
+        }
     }
 }
