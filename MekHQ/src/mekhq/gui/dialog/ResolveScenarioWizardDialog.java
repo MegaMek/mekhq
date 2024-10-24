@@ -80,6 +80,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             OBJECTIVEPANEL, PREVIEWPANEL
     };
 
+    private Campaign campaign;
     private final JFrame frame;
 
     private final ResolveScenarioTracker tracker;
@@ -181,8 +182,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
-    public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveScenarioWizardDialog(Campaign campaign, JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
+        this.campaign = campaign;
         this.frame = parent;
         this.tracker = t;
         objectiveProcessor = new ScenarioObjectiveProcessor();
@@ -1422,7 +1424,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     override = objectiveOverrideCheckboxes.get(objective).isSelected();
                 }
 
-                objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
+                objectiveProcessor.processObjective(campaign, objective, qualifyingUnitCount, override, tracker, false);
             }
         }
 
@@ -1630,7 +1632,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     override = objectiveOverrideCheckboxes.get(objective).isSelected();
                 }
 
-                sb.append(objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, true));
+                sb.append(objectiveProcessor.processObjective(campaign, objective, qualifyingUnitCount, override, tracker, true));
                 sb.append('\n');
             }
 

@@ -21,10 +21,12 @@ package mekhq.campaign.mission;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.atb.SupplyDrops;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
@@ -313,7 +315,7 @@ public class ScenarioObjectiveProcessor {
      * @param tracker The tracker from which to draw unit data
      * @param dryRun Whether we're actually applying the objectives or just generating a report.
      */
-    public String processObjective(ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
+    public String processObjective(Campaign campaign, ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
             ResolveScenarioTracker tracker, boolean dryRun) {
         // if we've overridden the objective completion flag, great, otherwise, calculate it here
         boolean objectiveMet = completionOverride == null ? objectiveMet(objective, qualifyingUnitCount) : completionOverride;
@@ -331,7 +333,7 @@ public class ScenarioObjectiveProcessor {
         }
 
         for (ObjectiveEffect effect : objectiveEffects) {
-            sb.append(processObjectiveEffect(effect,
+            sb.append(processObjectiveEffect(campaign, effect,
                     effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : qualifyingUnitCount,
                     tracker, dryRun));
             sb.append("\n\t");
@@ -346,7 +348,7 @@ public class ScenarioObjectiveProcessor {
      * @param scaleFactor If it's scaled, how much to scale it by
      * @param tracker
      */
-    private String processObjectiveEffect(ObjectiveEffect effect, int scaleFactor,
+    private String processObjectiveEffect(Campaign campaign, ObjectiveEffect effect, int scaleFactor,
                                           ResolveScenarioTracker tracker, boolean dryRun) {
         switch (effect.effectType) {
             case ScenarioVictory:
@@ -361,9 +363,7 @@ public class ScenarioObjectiveProcessor {
                 break;
             case ContractScoreUpdate:
                 // if atb contract, update contract score by how many units met criterion * scaling
-                if (tracker.getMission() instanceof AtBContract) {
-                    AtBContract contract = (AtBContract) tracker.getMission();
-
+                if (tracker.getMission() instanceof AtBContract contract) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int scoreEffect = effect.howMuch * effectMultiplier;
 
@@ -375,9 +375,7 @@ public class ScenarioObjectiveProcessor {
                 }
                 break;
             case SupportPointUpdate:
-                if (tracker.getMission() instanceof AtBContract) {
-                    AtBContract contract = (AtBContract) tracker.getMission();
-
+                if (tracker.getMission() instanceof AtBContract contract) {
                     if (contract.getStratconCampaignState() != null) {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;
@@ -410,16 +408,24 @@ public class ScenarioObjectiveProcessor {
             case BVBudgetUpdate:
                 break;
             case AtBBonus:
-                if (tracker.getMission() instanceof AtBContract) {
-                    AtBContract contract = (AtBContract) tracker.getMission();
-
+                if (tracker.getMission() instanceof AtBContract contract) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int numBonuses = effect.howMuch * effectMultiplier;
                     if (dryRun) {
                         return String.format("%d AtB bonus rolls", numBonuses);
                     } else {
+                        int dropSize = 0;
                         for (int x = 0; x < numBonuses; x++) {
-                            contract.doBonusRoll(tracker.getCampaign());
+                            if (contract.doBonusRoll(tracker.getCampaign())) {
+                                dropSize++;
+                            }
+                        }
+
+                        if (dropSize > 0) {
+                            campaign.addReport("Bonus: Captured Supplies");
+                            SupplyDrops supplyDrops = new SupplyDrops(campaign,
+                                contract.getEmployerFaction(), false);
+                            supplyDrops.getSupplyDrops(1, true);
                         }
                     }
                 }

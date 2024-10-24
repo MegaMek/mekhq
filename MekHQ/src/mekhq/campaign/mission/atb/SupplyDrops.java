@@ -40,7 +40,7 @@ public class SupplyDrops {
     private final int YEAR;
     private final int EMPLOYER_TECH_CODE;
     private final boolean EMPLOYER_IS_CLAN;
-    private final Money TARGET_VALUE = Money.of(500000);
+    private final Money TARGET_VALUE = Money.of(250000);
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.SupplyDrops");
     private final static MMLogger logger = MMLogger.create(SupplyDrops.class);
@@ -156,6 +156,14 @@ public class SupplyDrops {
         clonedPart.setOmniPodded(false);
 
         return clonedPart;
+    }
+
+    public void getSupplyDrops(int dropCount) {
+        getSupplyDrops(dropCount, null, false);
+    }
+
+    public void getSupplyDrops(int dropCount, boolean isLoot) {
+        getSupplyDrops(dropCount, null, isLoot);
     }
 
     public void getSupplyDrops(int dropCount, @Nullable AtBMoraleLevel morale, boolean isLoot) {
