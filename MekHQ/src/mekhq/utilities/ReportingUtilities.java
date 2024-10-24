@@ -66,4 +66,20 @@ public class ReportingUtilities {
     public static String messageSurroundedBySpanWithColor(String colorToUse, String message) {
         return String.format("%s%s%s", spanOpeningWithCustomColor(colorToUse), message, CLOSING_SPAN_TAG);
     }
+
+    /**
+     * Wraps the center argument with the start and end arguments if the center argument is 
+     * not blank or null. For your optional parentheticals and such.
+     * @param start String to begin with
+     * @param main String to contain, if it exists
+     * @param end String to end with
+     * @return String start + main + end if main else ""
+     */
+    public static String surroundIf(String start, String main, String end)
+    {
+        if (null == main || main.isEmpty()) {
+            return "";
+        }
+        return String.format("%s%s%s", start, main, end);
+    }
 }
