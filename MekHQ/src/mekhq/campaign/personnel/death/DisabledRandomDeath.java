@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.death;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDeathMethod;
 
 public class DisabledRandomDeath extends AbstractDeath {
