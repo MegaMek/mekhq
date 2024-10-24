@@ -21,6 +21,7 @@ package mekhq.gui.stratcon;
 
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.atb.SupplyDrops;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
@@ -123,9 +124,10 @@ public class CampaignManagementDialog extends JDialog {
         if (currentCampaignState.getSupportPoints() > 1) {
             supplyDropDialog();
         } else {
-            SupplyDrops supplyDrops = new SupplyDrops(campaign,
-                currentCampaignState.getContract().getEmployerFaction(), false);
-            supplyDrops.getSupplyDrops(1);
+            AtBContract contract = currentCampaignState.getContract();
+            SupplyDrops supplyDrops = new SupplyDrops(campaign, contract.getEmployerFaction(),
+                contract.getEnemy(), false);
+            supplyDrops.getSupplyDropParts(1);
 
             currentCampaignState.useSupportPoint();
         }
@@ -167,9 +169,10 @@ public class CampaignManagementDialog extends JDialog {
         JButton btnConfirm = new JButton("Confirm");
         btnConfirm.addActionListener( e-> {
             dialog.dispose();
-            SupplyDrops supplyDrops = new SupplyDrops(campaign,
-                currentCampaignState.getContract().getEmployerFaction(), false);
-            supplyDrops.getSupplyDrops((int) numberModel.getValue());
+            AtBContract contract = currentCampaignState.getContract();
+            SupplyDrops supplyDrops = new SupplyDrops(campaign, contract.getEmployerFaction(),
+                contract.getEnemy(), false);
+            supplyDrops.getSupplyDropParts((int) numberModel.getValue());
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });
 
