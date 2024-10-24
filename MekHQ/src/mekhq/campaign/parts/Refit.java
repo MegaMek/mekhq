@@ -100,6 +100,7 @@ public class Refit extends Part implements IAcquisitionWork {
     private boolean isSavingFile;
     private boolean kitFound;
     private boolean replacingLocations;
+    private boolean isOmniRefit;
     private String fixableString;
 
     private List<Part> oldUnitParts;
@@ -277,14 +278,21 @@ public class Refit extends Part implements IAcquisitionWork {
         return time;
     }
 
+    public boolean isOmniRefit() {
+        return isOmniRefit;
+    }
+
     public void calculate() {
         Unit newUnit = new Unit(newEntity, getCampaign());
         newUnit.initializeParts(false);
         refitClass = NO_CHANGE;
-        boolean isOmniRefit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
-        if (isOmniRefit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity)) {
-            fixableString = "A unit loses omni capabilities if any fixed equipment is modified.";
-            return;
+        isOmniRefit = false;
+        if(oldUnit.getEntity().isOmni() && newEntity.isOmni()) {
+            if (Utilities.isOmniVariant(oldUnit.getEntity(), newEntity)) {
+                isOmniRefit = true;
+            } else {
+                refitClass = CLASS_F;
+            }
         }
         time = 0;
         sameArmorType = newEntity.getArmorType(newEntity.firstArmorIndex()) == oldUnit.getEntity()

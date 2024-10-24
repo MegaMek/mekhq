@@ -416,19 +416,23 @@ public class ChooseRefitDialog extends JDialog {
                 Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
                     Refit kitRefit = new Refit(unit, refitEn, false, false, false);
-                    if (null == kitRefit.checkFixable()
-                            && (!campaign.getCampaignOptions().isAllowCanonRefitOnly() 
-                            || kitRefit.getNewEntity().isCanon())) {
-                        if (refitEn.isOmni()) {
-                            omniRefits.add(kitRefit);
-                        } else {
+                    boolean valid = null == kitRefit.checkFixable();
+                    boolean canonok = !campaign.getCampaignOptions().isAllowCanonRefitOnly() 
+                            || kitRefit.getNewEntity().isCanon();
+                    boolean omni = kitRefit.isOmniRefit();
+                    if (valid && canonok && !omni) {
                             kitRefits.add(kitRefit);
-                        }
-                        // TODO: Proper List of Omni Stuff When Refit is Updated
                     }
+                    
                     Refit customRefit = new Refit(unit, refitEn, true, false, false);
-                    if (null == customRefit.checkFixable() && !refitEn.isOmni()) {
-                        customRefits.add(customRefit);
+                    valid = null == customRefit.checkFixable();
+                    omni = customRefit.isOmniRefit();
+                    if (valid) {
+                        if (omni) {
+                            omniRefits.add(customRefit);
+                        } else {
+                            customRefits.add(customRefit);
+                        }
                     }
                 }
             } catch (EntityLoadingException ex) {
