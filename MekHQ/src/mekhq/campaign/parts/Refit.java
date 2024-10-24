@@ -236,6 +236,7 @@ public class Refit extends Part implements IAcquisitionWork {
         return shoppingList;
     }
 
+    @Deprecated
     public String[] getShoppingListDescription() {
         Hashtable<String, Integer> tally = new Hashtable<>();
         Hashtable<String, String> desc = new Hashtable<>();
