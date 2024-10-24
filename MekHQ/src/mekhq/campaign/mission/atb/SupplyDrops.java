@@ -27,7 +27,6 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -118,7 +117,7 @@ public class SupplyDrops {
                         }
 
                         Pair<Unit, Part> pair = new Pair<>(unit, part);
-                        int weight = getWeight(pair.getKey(), pair.getValue());
+                        int weight = getWeight(pair.getValue());
                         potentialParts.merge(part, weight, Integer::sum);
                     }
                 }
@@ -128,15 +127,11 @@ public class SupplyDrops {
         }
     }
 
-    private int getWeight(Unit unit, Part part) {
+    private int getWeight(Part part) {
         int weight = 1;
 
-        if (unit.getForceId() != Force.FORCE_NONE) {
-            weight = 2;
-        }
-
         if (part instanceof MissingPart) {
-            return weight * 2;
+            return weight * 5;
         } else {
             return weight;
         }
