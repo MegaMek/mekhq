@@ -41,6 +41,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.atb.SupplyDrops;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -468,6 +469,21 @@ public final class BriefingTab extends CampaignGuiTab {
                     return;
                 }
             }
+        }
+
+        // exchange remaining support points to Supply Drops
+        if (getCampaign().getCampaignOptions().isUseStratCon() && (mission instanceof AtBContract)) {
+            int remainingSupportPoints = ((AtBContract) mission).getStratconCampaignState().getSupportPoints();
+
+            if (remainingSupportPoints > 0) {
+                SupplyDrops supplyDrops = new SupplyDrops(getCampaign(),
+                    ((AtBContract) mission).getEmployerFaction(), false);
+                supplyDrops.getSupplyDrops(remainingSupportPoints, true);
+            }
+        }
+
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
+            getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
         }
 
         // prompt autoAwards ceremony
