@@ -375,7 +375,7 @@ public class ChooseRefitDialog extends JDialog {
     private void refitTableValueChanged() {
         Refit refit = getSelectedRefit();
         if (null == refit) {
-            shoppingTable.setModel(new RefitShoppingListTableModel());
+            shoppingModel.setData(new ArrayList<Part>());
             txtNewUnit.setText("");
             return;
         }
@@ -394,7 +394,7 @@ public class ChooseRefitDialog extends JDialog {
                 shoppingList.put(newPart.getName() + " " + newPart.getDetails(), newPart);
             }
         }
-
+        
         shoppingModel.setData(new ArrayList<Part>(shoppingList.values()));
 
         MekView mv = new MekView(refit.getNewEntity(), false, true);
