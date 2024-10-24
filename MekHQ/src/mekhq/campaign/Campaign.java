@@ -66,6 +66,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.atb.SupplyDrops;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -3781,6 +3782,11 @@ public class Campaign implements ITechManager {
                     + contract.getName() + "<br><br>" + morale.getToolTipText();
 
                 addReport(report);
+
+                // Supply Drops
+                SupplyDrops supplyDrops = new SupplyDrops(this, contract.getEmployerFaction(), false);
+                int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+                supplyDrops.getSupplyDrops(dropCount, contract.getMoraleLevel(), false);
             }
         }
 
@@ -4320,6 +4326,8 @@ public class Campaign implements ITechManager {
             }
         }
 
+        // This must be the last step before returning true
+        MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
 
