@@ -37,6 +37,7 @@ import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
@@ -83,6 +84,7 @@ public class SupplyDrops {
 
     private void collectParts() {
         potentialParts = new HashMap<>();
+        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
         try {
             Collection<Unit> units = campaign.getUnits();
@@ -113,6 +115,16 @@ public class SupplyDrops {
                         } else {
                             if (isLosTechCache) {
                                 continue;
+                            }
+                        }
+
+                        // Prior to the Battle of Tukayyid IS factions are unlikely to be willing to
+                        // share Clan Tech
+                        if (part.isClan() || part.isMixedTech()) {
+                            if (!employerFaction.isClan()) {
+                                if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)) {
+                                    continue;
+                                }
                             }
                         }
 
@@ -199,7 +211,7 @@ public class SupplyDrops {
                     continue;
                 }
 
-                runningTotal = runningTotal.plus(potentialPart.getActualValue());
+                runningTotal = runningTotal.plus(potentialPart.getUndamagedValue());
                 droppedItems.add(potentialPart);
             }
         }
@@ -213,6 +225,8 @@ public class SupplyDrops {
                 part -> {
                     if (part instanceof AmmoBin) {
                         return ((AmmoBin) part).getType().getName();
+                    } else if (part instanceof MekLocation) {
+                        return part.getName() + " (" + part.getUnitTonnage() + ')';
                     } else {
                         return part.getName();
                     }
@@ -221,7 +235,7 @@ public class SupplyDrops {
                     if (part instanceof AmmoBin) {
                         return ((AmmoBin) part).getFullShots();
                     } else if (part instanceof Armor) {
-                        return (int) Math.floor(((Armor) part).getArmorPointsPerTon());
+                        return (int) Math.floor(((Armor) part).getArmorPointsPerTon() * 5);
                     } else {
                         return 1;
                     }
@@ -317,7 +331,7 @@ public class SupplyDrops {
             if (part instanceof AmmoBin) {
                 campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(), ((AmmoBin) part).getFullShots());
             } else if (part instanceof Armor) {
-                int quantity = (int) Math.floor(((Armor) part).getArmorPointsPerTon());
+                int quantity = (int) Math.floor(((Armor) part).getArmorPointsPerTon() * 5);
                 ((Armor) part).setAmount(quantity);
                 campaign.getWarehouse().addPart(part);
             } else {
