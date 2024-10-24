@@ -18,28 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
@@ -59,6 +37,12 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Kipsta
  */
@@ -72,13 +56,9 @@ public class AcquisitionsDialog extends JDialog {
     private JLabel lblSummary;
     private JButton btnSummary;
 
-    private int numBonusParts = 0;
-
     public AcquisitionsDialog(JFrame parent, boolean modal, CampaignGUI campaignGUI) {
         super(parent, modal);
         this.campaignGUI = campaignGUI;
-
-        calculateBonusParts();
 
         initComponents();
 
@@ -173,12 +153,7 @@ public class AcquisitionsDialog extends JDialog {
             }
         });
         btnSummary.addPropertyChangeListener("missingCount", evt -> {
-            boolean visible = false;
-
-            if ((PartsAcquisitionService.getMissingCount() > 0)
-                    && (PartsAcquisitionService.getMissingCount() > PartsAcquisitionService.getUnavailableCount())) {
-                visible = true;
-            }
+            boolean visible = (PartsAcquisitionService.getMissingCount() > 0) && (PartsAcquisitionService.getMissingCount() > PartsAcquisitionService.getUnavailableCount());
 
             btnSummary.setVisible(visible);
         });
@@ -251,16 +226,6 @@ public class AcquisitionsDialog extends JDialog {
         }
     }
 
-    private void calculateBonusParts() {
-        numBonusParts = campaignGUI.getCampaign().totalBonusParts();
-
-        if (partPanelMap != null) {
-            for (AcquisitionPanel pnl : partPanelMap.values()) {
-                pnl.refresh();
-            }
-        }
-    }
-
     public class AcquisitionPanel extends JPanel {
         private List<IAcquisitionWork> awList;
         private int idx;
@@ -270,7 +235,6 @@ public class AcquisitionsDialog extends JDialog {
         private PartCountInfo partCountInfo = new PartCountInfo();
 
         private JButton btnOrderAll;
-        private JButton btnUseBonus;
         private JButton btnDepod;
         private JLabel lblText;
 
@@ -296,18 +260,6 @@ public class AcquisitionsDialog extends JDialog {
             }
         }
 
-        private void useBonusPart() {
-            if (targetWork instanceof AmmoBin) {
-                targetWork = ((AmmoBin) targetWork).getAcquisitionWork();
-            }
-
-            campaignGUI.getCampaign().spendBonusPart(targetWork);
-
-            refresh();
-
-            calculateBonusParts();
-        }
-
         private void refresh() {
             pnlSummary.firePropertyChange("counts", -1, 0);
 
@@ -330,9 +282,6 @@ public class AcquisitionsDialog extends JDialog {
                 }
 
                 btnDepod.setVisible(partCountInfo.getOmniPodCount() != 0);
-
-                btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts));
-                btnUseBonus.setVisible(numBonusParts > 0);
             }
         }
 
@@ -363,7 +312,7 @@ public class AcquisitionsDialog extends JDialog {
                 String countModifier = partCountInfo.getCountModifier();
 
                 if (!StringUtility.isNullOrBlank(countModifier)) {
-                    countModifier = " " + countModifier;
+                    countModifier = ' ' + countModifier;
                 }
 
                 String inventoryInfo = "Inventory: " + partCountInfo.getInTransitCount() + countModifier
@@ -459,7 +408,7 @@ public class AcquisitionsDialog extends JDialog {
 
             JPanel pnlUnits = new JPanel();
             pnlUnits.setLayout(new GridBagLayout());
-            pnlUnits.setBorder(BorderFactory.createTitledBorder("Units requiring this part (" + unitMap.size() + ")"));
+            pnlUnits.setBorder(BorderFactory.createTitledBorder("Units requiring this part (" + unitMap.size() + ')'));
 
             GridBagConstraints cUnits = new GridBagConstraints();
             cUnits.gridx = 0;
@@ -501,14 +450,6 @@ public class AcquisitionsDialog extends JDialog {
             gbcActions.insets = new Insets(10, 0, 5, 0);
             gbcActions.fill = GridBagConstraints.NONE;
             gbcActions.anchor = GridBagConstraints.NORTHEAST;
-
-            btnUseBonus = new JButton(String.format("Use Bonus Part (%s)", numBonusParts));
-            btnUseBonus.setToolTipText("Use a bonus part to acquire this item");
-            btnUseBonus.setName("btnUseBonus");
-            btnUseBonus.setVisible(numBonusParts > 0);
-            btnUseBonus.addActionListener(ev -> useBonusPart());
-            actionButtons.add(btnUseBonus, gbcActions);
-            gbcActions.gridy++;
             JButton btnOrderOne;
             JButton btnOrderInBulk;
             if (partCountInfo.isCanBeAcquired()) {
@@ -546,7 +487,7 @@ public class AcquisitionsDialog extends JDialog {
             actionButtons.add(btnOrderInBulk, gbcActions);
             gbcActions.gridy++;
 
-            btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
+            btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ')');
             btnOrderAll.setToolTipText("Order all missing");
             btnOrderAll.setName("btnOrderAll");
             btnOrderAll.setVisible(partCountInfo.getMissingCount() > 1);

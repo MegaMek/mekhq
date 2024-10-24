@@ -470,12 +470,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // resolve bonus parts exchange
-        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
-            getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
-            bonusPartExchange((AtBContract) mission);
-        }
-
         // prompt autoAwards ceremony
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
@@ -611,37 +605,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
             case ACTIVE -> 0;
         };
-    }
-
-    /**
-     * Credits the campaign finances with additional funds based on campaign
-     * settings and remaining Bonus Parts.
-     *
-     * @param mission the mission just concluded
-     */
-    private void bonusPartExchange(AtBContract mission) {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale());
-
-        double bonusPartExchangeValue = getCampaign().getCampaignOptions().getBonusPartExchangeValue();
-
-        if (bonusPartExchangeValue != 0.0) {
-            int bonusPartMaxExchangeCount = getCampaign().getCampaignOptions().getBonusPartMaxExchangeCount();
-
-            int spareBonusParts = mission.getNumBonusParts();
-
-            if (bonusPartMaxExchangeCount != 0) {
-                spareBonusParts = Math.min(bonusPartMaxExchangeCount, spareBonusParts);
-            }
-
-            bonusPartExchangeValue *= spareBonusParts;
-
-            getCampaign().getFinances().credit(
-                    TransactionType.BONUS_EXCHANGE,
-                    getCampaign().getLocalDate(),
-                    Money.of(bonusPartExchangeValue),
-                    resourceMap.getString("spareBonusPartExchange.text"));
-        }
     }
 
     private void deleteMission() {

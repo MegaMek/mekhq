@@ -14,6 +14,9 @@
 
 package mekhq.gui.stratcon;
 
+import megamek.client.ui.swing.util.UIUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.atb.SupplyDrops;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -28,10 +31,11 @@ import java.awt.event.ActionEvent;
  * @author NickAragua
  */
 public class CampaignManagementDialog extends JDialog {
+    private Campaign campaign;
     private StratconCampaignState currentCampaignState;
     private StratconTab parent;
     private JButton btnConvertVPToSP;
-    private JButton btnConvertSPtoBonusPart;
+    private JButton btnRequestSupplyDrop;
     private JButton btnGMAddVP;
     private JButton btnGMAddSP;
     private JLabel lblTrackScenarioOdds;
@@ -45,19 +49,23 @@ public class CampaignManagementDialog extends JDialog {
     /**
      * Show the dialog for a given campaign state, and whether GM mode is on or not
      */
-    public void display(StratconCampaignState campaignState, StratconTrackState currentTrack, boolean gmMode) {
+    public void display(Campaign campaign, StratconCampaignState campaignState,
+                        StratconTrackState currentTrack, boolean gmMode) {
         currentCampaignState = campaignState;
 
         btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
         btnGMAddVP.setEnabled(gmMode);
         btnGMAddSP.setEnabled(gmMode);
 
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
             lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%",
-                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(), false)));
+                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
+                        false)));
         }
+
+        this.campaign = campaign;
     }
 
     /**
@@ -78,10 +86,10 @@ public class CampaignManagementDialog extends JDialog {
         btnConvertVPToSP.addActionListener(this::convertVPtoSPHandler);
         getContentPane().add(btnConvertVPToSP);
 
-        btnConvertSPtoBonusPart = new JButton();
-        btnConvertSPtoBonusPart.setText("Convert SP to bonus part");
-        btnConvertSPtoBonusPart.addActionListener(this::convertSPtoBonusPartHandler);
-        getContentPane().add(btnConvertSPtoBonusPart);
+        btnRequestSupplyDrop = new JButton();
+        btnRequestSupplyDrop.setText("Request Supply Drop");
+        btnRequestSupplyDrop.addActionListener(this::requestSupplyDrop);
+        getContentPane().add(btnRequestSupplyDrop);
 
         btnGMAddVP = new JButton();
         btnGMAddVP.setText("Add CVP (GM)");
@@ -102,15 +110,69 @@ public class CampaignManagementDialog extends JDialog {
     private void convertVPtoSPHandler(ActionEvent e) {
         currentCampaignState.convertVictoryToSupportPoint();
         btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }
 
-    private void convertSPtoBonusPartHandler(ActionEvent e) {
-        currentCampaignState.useSupportPoint();
-        currentCampaignState.getContract().addBonusParts(1);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+    private void requestSupplyDrop(ActionEvent e) {
+        if (currentCampaignState.getSupportPoints() > 1) {
+            supplyDropDialog();
+        } else {
+            SupplyDrops supplyDrops = new SupplyDrops(campaign,
+                currentCampaignState.getContract().getEmployerFaction(), false);
+            supplyDrops.getSupplyDrops(1);
+
+            currentCampaignState.useSupportPoint();
+        }
+
+        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
+    }
+
+    public void supplyDropDialog() {
+        final JDialog dialog = new JDialog();
+        dialog.setLayout(new GridBagLayout());
+        dialog.setTitle("Requesting Supply Drop");
+        dialog.setSize(400, 200);
+        dialog.setLocationRelativeTo(null);
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                UIUtil.scaleForGUI(500), "How many Support Points would you like to spend?" +
+                    "<br><br>Each SP point increases the value of the Supply Drop by roughly 250,000 C-Bills"));
+        description.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dialog.add(description, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        SpinnerNumberModel numberModel = new SpinnerNumberModel(1, 1,
+            currentCampaignState.getSupportPoints(), 1);
+        JSpinner spinner = new JSpinner(numberModel);
+        dialog.add(spinner, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.SOUTH;
+        JButton btnConfirm = new JButton("Confirm");
+        btnConfirm.addActionListener( e-> {
+            dialog.dispose();
+            SupplyDrops supplyDrops = new SupplyDrops(campaign,
+                currentCampaignState.getContract().getEmployerFaction(), false);
+            supplyDrops.getSupplyDrops((int) numberModel.getValue());
+            currentCampaignState.useSupportPoints((int) numberModel.getValue());
+        });
+
+        dialog.add(btnConfirm, constraints);
+
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setVisible(true);
     }
 
     private void gmAddVPHandler(ActionEvent e) {
@@ -121,7 +183,7 @@ public class CampaignManagementDialog extends JDialog {
 
     private void gmAddSPHandler(ActionEvent e) {
         currentCampaignState.addSupportPoints(1);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }
 }

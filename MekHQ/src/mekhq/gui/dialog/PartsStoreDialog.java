@@ -21,24 +21,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -59,6 +41,18 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -96,7 +90,6 @@ public class PartsStoreDialog extends JDialog {
     private JTextField txtFilter;
     private JComboBox<String> choiceParts;
     private JCheckBox hideImpossible;
-    private JButton btnUseBonusPart;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
             MekHQ.getMHQOptions().getLocale());
@@ -246,13 +239,13 @@ public class PartsStoreDialog extends JDialog {
                         PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
                         int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                                true, "How Many " + partProxy.getName() + "?", quantity,
+                                true, "How Many " + partProxy.getName() + '?', quantity,
                                 1, CampaignGUI.MAX_QUANTITY_SPINNER);
                         pcd.setVisible(true);
                         quantity = pcd.getValue();
 
                         if (quantity > 0) {
-                            addPart(true, false, partProxy.getPart(), quantity);
+                            addPart(true, partProxy.getPart(), quantity);
                             partProxy.updateTargetAndInventories();
                             partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
                                     PartsTableModel.COL_TARGET);
@@ -268,38 +261,6 @@ public class PartsStoreDialog extends JDialog {
             });
             panButtons.add(btnBuyBulk, new GridBagConstraints());
             // endregion Buy Bulk
-
-            // region Bonus Part
-            if (campaign.getCampaignOptions().isUseAtB() && campaign.hasActiveContract()) {
-                btnUseBonusPart = new JButton(
-                        resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
-                btnUseBonusPart.addActionListener(evt -> {
-                    if (partsTable.getSelectedRowCount() > 0) {
-                        int[] selectedRow = partsTable.getSelectedRows();
-                        for (int i : selectedRow) {
-                            PartProxy partProxy = partsModel.getPartProxyAt(partsTable.convertRowIndexToModel(i));
-                            addPart(true, campaign.totalBonusParts() > 0, partProxy.getPart(), 1);
-                            partProxy.updateTargetAndInventories();
-                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
-                                    PartsTableModel.COL_TARGET);
-                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
-                                    PartsTableModel.COL_TRANSIT);
-                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
-                                    PartsTableModel.COL_SUPPLY);
-                            partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(i),
-                                    PartsTableModel.COL_QUEUE);
-
-                            btnUseBonusPart.setText(resourceMap.getString("useBonusPart.text") + " ("
-                                    + campaign.totalBonusParts() + ")");
-                            btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
-                        }
-                    }
-                });
-                btnUseBonusPart.setVisible(campaign.totalBonusParts() > 0);
-
-                panButtons.add(btnUseBonusPart, new GridBagConstraints());
-            }
-            // endregion Bonus Part
 
             // region Add
             btnAdd = new JButton(resourceMap.getString("btnGMAdd.text"));
@@ -336,7 +297,7 @@ public class PartsStoreDialog extends JDialog {
 
                         int quantity = 1;
                         PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                                true, "How Many " + partProxy.getName() + "?", quantity,
+                                true, "How Many " + partProxy.getName() + '?', quantity,
                                 1, CampaignGUI.MAX_QUANTITY_SPINNER);
                         pcd.setVisible(true);
                         quantity = pcd.getValue();
@@ -493,15 +454,8 @@ public class PartsStoreDialog extends JDialog {
         };
         partsSorter.setRowFilter(partsTypeFilter);
     }
-
     private void addPart(boolean purchase, Part part, int quantity) {
-        addPart(purchase, false, part, quantity);
-    }
-
-    private void addPart(boolean purchase, boolean bonus, Part part, int quantity) {
-        if (bonus) {
-            campaign.spendBonusPart(part.getAcquisitionWork());
-        } else if (purchase) {
+        if (purchase) {
             campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
         } else {
             while (quantity > 0) {
@@ -1050,8 +1004,8 @@ public class PartsStoreDialog extends JDialog {
             return null;
         }
 
-        public PartsTableModel.Renderer getRenderer() {
-            return new PartsTableModel.Renderer();
+        public Renderer getRenderer() {
+            return new Renderer();
         }
 
         public class Renderer extends DefaultTableCellRenderer {

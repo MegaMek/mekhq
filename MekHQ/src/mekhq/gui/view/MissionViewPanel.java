@@ -89,8 +89,6 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtMorale;
     private JLabel lblScore;
     private JLabel txtScore;
-    private JLabel lblBonusParts;
-    private JLabel txtBonusParts;
     private JLabel lblSharePct;
     private JLabel txtSharePct;
 
@@ -593,8 +591,6 @@ public class MissionViewPanel extends JScrollablePanel {
         txtSharePct = new JLabel();
         lblScore = new JLabel();
         txtScore = new JLabel();
-        lblBonusParts = new JLabel();
-        txtBonusParts = new JLabel();
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -1007,26 +1003,6 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtScore, gridBagConstraints);
         }
-
-        lblBonusParts.setName("lblBonusParts");
-        lblBonusParts.setText(resourceMap.getString("lblBonusParts.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblBonusParts, gridBagConstraints);
-
-        txtBonusParts.setName("txtBonusParts");
-        txtBonusParts.setText(Integer.toString(contract.getNumBonusParts()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtBonusParts, gridBagConstraints);
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);
