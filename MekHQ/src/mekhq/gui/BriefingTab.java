@@ -683,7 +683,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
+        ResolveScenarioWizardDialog resolveDialog =
+            new ResolveScenarioWizardDialog(getCampaign(), getFrame(), true, tracker);
         resolveDialog.setVisible(true);
 
         if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
