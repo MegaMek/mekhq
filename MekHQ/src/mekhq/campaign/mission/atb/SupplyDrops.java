@@ -24,10 +24,14 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -35,6 +39,8 @@ import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -45,6 +51,7 @@ import static megamek.common.UnitType.AEROSPACEFIGHTER;
 import static megamek.common.UnitType.MEK;
 import static megamek.common.UnitType.TANK;
 import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
+import static mekhq.campaign.personnel.enums.Profession.getProfessionFromPersonnelRole;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
@@ -58,11 +65,14 @@ public class SupplyDrops {
 
     private List<Unit> potentialUnits;
     private Random random;
+    private boolean propositionRefused = false;
 
     private final int YEAR;
     private final int EMPLOYER_TECH_CODE;
     private final boolean EMPLOYER_IS_CLAN;
     private final Money TARGET_VALUE = Money.of(250000);
+    private final LocalDate OPERATION_EXODUS = LocalDate.of(2784, 11, 5);
+    private final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.SupplyDrops");
     private final static MMLogger logger = MMLogger.create(SupplyDrops.class);
@@ -104,7 +114,6 @@ public class SupplyDrops {
 
     private void collectParts(Collection<Unit> units) {
         potentialParts = new HashMap<>();
-        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
         try {
             for (Unit unit : units) {
@@ -254,6 +263,240 @@ public class SupplyDrops {
         }
 
         supplyDropDialog(droppedUnits);
+    }
+
+    public void getLosTechCache(AtBContract contract) {
+        // first we roll to see whether the cache rumor came up worthwhile.
+        final int SUCCESSFUL_SEARCH_DIE_SIZE = 3;
+
+        double distance = campaign.getLocation().getCurrentSystem().getDistanceTo(campaign.getSystemById("Terra"));
+
+        if (Compute.randomInt(SUCCESSFUL_SEARCH_DIE_SIZE) != 0) {
+            dudDialog(distance);
+            return;
+        }
+
+        // Is ComStar interested?
+        if (campaign.getLocalDate().isAfter(OPERATION_EXODUS) && distance <= 800) {
+            if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)) {
+                Money offerValue = getOfferValue(contract);
+                saleDialog(offerValue);
+
+                if (propositionRefused) {
+                    int currentInterest = campaign.getComStarInterest();
+                    campaign.setComStarInterest(currentInterest + contract.getRequiredLances());
+                } else {
+                    campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
+                        offerValue, resources.getString("transaction.text"));
+                    return;
+                }
+            }
+        }
+
+        int roll = Compute.randomInt(20);
+
+        switch (roll) {
+            case 0 -> // Combat Cache (intact units)
+            case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 -> // Supply Cache (parts)
+            case 11, 12, 13, 14, 15, 16 -> // General Supplies (LosTech Staplers)
+            case 17, 18, 19 -> // Memory Core
+        }
+
+//      Combat Cache: Contains mostly BattleMechs, vehicles, and weapons.
+//
+//      Supply Cache: Focuses on spare parts, ammunition, and repair facilities.
+//
+//      Technology Cache: Houses advanced technology, blueprints, or data (like a mini-Helm Memory Core).
+//
+//      This is more of an RPG one...Medical Cache: Contains advanced medical equipment, personnel, and supplies.
+    }
+
+    private static Money getOfferValue(AtBContract contract) {
+        // Get the total contract pay.
+        // We're using 'getTotalAmount' as we deliberately want the offer to be generous.
+        long totalAmount = contract.getTotalAmount().getAmount().longValue();
+
+        // calculate the remainder when dividing by 1,000,000
+        long remainder = totalAmount % 1_000_000;
+
+        // if there is a remainder, increase totalAmount so that it rounds up to the nearest million
+        if (remainder != 0) {
+            totalAmount = totalAmount - remainder + 1_000_000;
+        }
+
+        return Money.of(totalAmount);
+    }
+
+    private void saleDialog(Money offerValue) {
+        final int DIALOG_WIDTH = 500;
+        final int DIALOG_HEIGHT = 300;
+
+        // Create a dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Set description
+        Person commander = campaign.getFlaggedCommander();
+
+        String name = "Commander";
+        if (commander != null) {
+            Rank rank = commander.getRank();
+
+            if (rank != null) {
+                name = rank.getName(getProfessionFromPersonnelRole(commander.getPrimaryRole())) + ' ';
+            }
+
+            String surname = commander.getSurname();
+
+            if (surname != null) {
+                name = name + surname;
+            } else {
+                name = name + commander.getFirstName();
+            }
+        }
+
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s%s</div></html>",
+                UIUtil.scaleForGUI(DIALOG_WIDTH), name, getProposition(offerValue)));
+        description.setHorizontalAlignment(JLabel.CENTER);
+        description.setVerticalAlignment(JLabel.TOP);
+        dialog.add(description, BorderLayout.CENTER);
+
+        // Set image
+        JLabel imageLabel = new JLabel();
+        ImageIcon icon = new ImageIcon("data/images/universe/factions/logo_mercenaries.png");
+        imageLabel.setIcon(icon);
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        dialog.add(imageLabel, BorderLayout.NORTH);
+
+        // Set Confirm button
+        JButton confirmButton = new JButton(resources.getString("propositionAccept.text"));
+        confirmButton.addActionListener(e -> {
+            dialog.dispose();
+        });
+
+        // Set Refuse button
+        JButton refuseButton = new JButton(resources.getString("propositionRefuse.text"));
+        refuseButton.addActionListener(e -> {
+            dialog.dispose();
+            showConfirmationDialog();
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(confirmButton);
+        buttonPanel.add(refuseButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add a window listener
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dialog.dispose();
+            }
+        });
+
+        // Display the dialog
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setVisible(true);
+    }
+
+    private String getProposition(Money offerValue) {
+        int roll = Compute.randomInt(100);
+
+        String proposition = resources.getString("proposition" + roll + ".text") + "<br><br>" + String.format(resources.getString("propositionValue.text"), offerValue.toAmountAndSymbolString());
+
+        return proposition;
+    }
+
+    public void showConfirmationDialog() {
+        int option = JOptionPane.showConfirmDialog(null,
+            resources.getString("warning.text"),
+            resources.getString("dialog.title"),
+            JOptionPane.YES_NO_OPTION);
+
+        propositionRefused = option == JOptionPane.YES_OPTION;
+    }
+
+    private void dudDialog(double distance) {
+        final int DIALOG_WIDTH = 500;
+        final int DIALOG_HEIGHT = 300;
+
+        // Create a dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Set description
+        Person commander = campaign.getFlaggedCommander();
+
+        String name = "Commander";
+        if (commander != null) {
+            Rank rank = commander.getRank();
+
+            if (rank != null) {
+                name = rank.getName(getProfessionFromPersonnelRole(commander.getPrimaryRole())) + ' ';
+            }
+
+            String surname = commander.getSurname();
+
+            if (surname != null) {
+                name = name + surname;
+            } else {
+                name = name + commander.getFirstName();
+            }
+        }
+
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:justified;'>%s%s</div></html>",
+                UIUtil.scaleForGUI(DIALOG_WIDTH), name, getCacheDescriptionDud(distance)));
+        description.setHorizontalAlignment(JLabel.CENTER);
+        description.setVerticalAlignment(JLabel.TOP);
+        dialog.add(description, BorderLayout.CENTER);
+
+        // Set image
+        JLabel imageLabel = new JLabel();
+        ImageIcon icon = getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
+        imageLabel.setIcon(icon);
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        dialog.add(imageLabel, BorderLayout.NORTH);
+
+        // Set Confirm button
+        JButton confirmButton = new JButton(resources.getString("confirmDud.text"));
+        confirmButton.addActionListener(e -> {
+            dialog.dispose();
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(confirmButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Display the dialog
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setVisible(true);
+    }
+
+    private String getCacheDescriptionDud(double distance) {
+        int roll = Compute.randomInt(100);
+        if (campaign.getLocalDate().isBefore(OPERATION_EXODUS) || (distance > 800)) {
+            return String.format(resources.getString("dudGeneric" + roll + ".text"),
+                enemyFaction.getFullName(campaign.getGameYear()));
+        } else {
+            if (Compute.randomInt(2) == 0) {
+                return String.format(resources.getString("dudGeneric" + roll + ".text"),
+                    Factions.getInstance().getFaction("SL").getFullName(campaign.getGameYear()));
+            } else {
+                return resources.getString("dudStarLeague" + roll + ".text");
+            }
+        }
     }
 
     public Map<String, Integer> createPartsReport(@Nullable List<Part> droppedItems) {
@@ -488,8 +731,6 @@ public class SupplyDrops {
     }
 
     private void getPotentialUnits() {
-        final LocalDate OPERATION_EXODUS = LocalDate.of(2784, 11, 5);
-
         String faction = enemyFaction.getShortName();
         int year = campaign.getGameYear();
 
