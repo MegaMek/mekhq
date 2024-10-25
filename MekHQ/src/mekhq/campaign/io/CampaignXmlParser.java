@@ -734,8 +734,6 @@ public class CampaignXmlParser {
                     retVal.setMedicPool(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("id")) {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("comStarInterest")) {
-                    retVal.setComStarInterest(Integer.parseInt(wn.getTextContent()));
                 }
             } catch (Exception e) {
                 logger.error("", e);
