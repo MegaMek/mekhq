@@ -157,6 +157,10 @@ MEKHQ VERSION HISTORY:
 + Fix #5109: Corrected DropShip Scenario Modifier Generation Method
 + PR #5111: Better multi-day repair and refit reports.
 + PR #5112: TechTabelModel - Show Daily Available Time for Techs
++ Fix #5118 && #5117: FG3 Scenario Improvements
++ PR #5121: Label OmniUnits as Omni in the MekHQ UI
++ Fix #5119 && #5108 && #4297 Fixed Position of NewDayEvent Trigger in processNewDay
++ PR #5126: Rebalanced Random Unit Quality
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
