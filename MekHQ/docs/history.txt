@@ -47,7 +47,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4771 & #4781: Fixed ConcurrentModificationException in Personnel Removal Process
 + Fix #4736: Regenerate Personality Descriptions for NPCs
 + Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
-+ Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects #4863
++ Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects
 + PR #4463: Decoupled Dependents from AtB, Reworked Dependents, Reworked New Personnel Ages, Added Documentation
 + PR #4644: Initial work on CamOps RAW Contract Market
 + PR #4859: Reworked AtB Morale, Rebranding it as MekHQ Morale
@@ -141,7 +141,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4980: Fixed outsourcing of babies
 + Fix #4972: Corrected parameter order in simulated relationship history reports
 + PR #5097: Simplified reputation display
-+ PR #5098: More FG3 scenario adjustments
++ PR #5098, #5113: More FG3 scenario adjustments
 + PR #5099: Added award bonuses to award ceremony dialog
 + Fix #5100: PartsStore - Fixed equipment parts and OmniPods (fixes hatchets and maces at least)
 + Fix #4955: Prevented dropout and some graduation events occurring for very young children
@@ -150,7 +150,17 @@ MEKHQ VERSION HISTORY:
 + Fix #4975: Prevent Early Clan Units in Non-Clan Campaigns
 + PR #5103: Globally fix slow mouse wheeling issues, with scaling
 + PR #5104: Fixed Preset Picker Date Issues
-
++ Fix #4980: Fixed Outsourcing of Babies
++ PR #5105: ResolveScenarioWizardDialog - Some UX Improvements
++ PR #5106: ResolveScenarioWizardDialog - Ransom All Button
++ PR #5107: Updated Interstellar Map View Defaults & Optimized 'ISW' view
++ Fix #5109: Corrected DropShip Scenario Modifier Generation Method
++ PR #5111: Better multi-day repair and refit reports.
++ PR #5112: TechTabelModel - Show Daily Available Time for Techs
++ Fix #5118 && #5117: FG3 Scenario Improvements
++ PR #5121: Label OmniUnits as Omni in the MekHQ UI
++ Fix #5119 && #5108 && #4297 Fixed Position of NewDayEvent Trigger in processNewDay
++ PR #5126: Rebalanced Random Unit Quality
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
