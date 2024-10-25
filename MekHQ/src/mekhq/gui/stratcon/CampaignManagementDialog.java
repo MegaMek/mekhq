@@ -22,7 +22,7 @@ package mekhq.gui.stratcon;
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.atb.SupplyDrops;
+import mekhq.campaign.mission.atb.supplyDrops.SupplyDrops;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.mission.atb;
+package mekhq.campaign.mission.atb.supplyDrops;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.*;
@@ -277,10 +277,11 @@ public class SupplyDrops {
         }
 
         // Is ComStar interested?
+        Money offerValue = getOfferValue(contract);
+        saleDialog(offerValue);
+
         if (campaign.getLocalDate().isAfter(OPERATION_EXODUS) && distance <= 800) {
             if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)) {
-                Money offerValue = getOfferValue(contract);
-                saleDialog(offerValue);
 
                 if (propositionRefused) {
                     int currentInterest = campaign.getComStarInterest();
@@ -298,8 +299,8 @@ public class SupplyDrops {
         switch (roll) {
             case 0 -> // Combat Cache (intact units)
             case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 -> // Supply Cache (parts)
-            case 11, 12, 13, 14, 15, 16 -> // General Supplies (LosTech Staplers)
-            case 17, 18, 19 -> // Memory Core
+            case 11, 12, 13, 14, 15, 16 -> // General Supplies (LosTech Staplers) (0.1 of offerValue)
+            case 17, 18, 19 -> // Memory Core (offerValue)
         }
 
 //      Combat Cache: Contains mostly BattleMechs, vehicles, and weapons.
