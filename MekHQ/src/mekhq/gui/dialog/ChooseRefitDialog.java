@@ -377,9 +377,9 @@ public class ChooseRefitDialog extends JDialog {
         if (null == refit) {
             shoppingModel.setData(new ArrayList<Part>());
             txtNewUnit.setText("");
+            btnGo.setEnabled(false);
             return;
         }
-
 
         Map<String,Part> shoppingList = new HashMap<String,Part>();
         for( Part newPart : refit.getShoppingList()) { 
@@ -400,6 +400,7 @@ public class ChooseRefitDialog extends JDialog {
         MekView mv = new MekView(refit.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
+        btnGo.setEnabled(true);
     }
 
     private void populateRefits() {
