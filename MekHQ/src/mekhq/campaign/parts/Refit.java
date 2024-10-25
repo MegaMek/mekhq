@@ -412,7 +412,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         // Not the same armor
                         continue;
                     }
-                    if ((oldPart instanceof VeeStabilizer) // FIXME: WeaverThree - I think something is missing here
+                    if ((oldPart instanceof VeeStabilizer) && (newPart instanceof VeeStabilizer)
                             && (oldPart.getLocation() != newPart.getLocation())) {
                         continue;
                     }
@@ -471,7 +471,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         continue;
                     }
 
-                    if ((oldPart instanceof VeeStabilizer) // FIXME: WeaverThree - I think something is missing here
+                    if ((oldPart instanceof VeeStabilizer) && (newPart instanceof VeeStabilizer)
                             && (oldPart.getLocation() != newPart.getLocation())) {
                         continue;
                     }
@@ -636,8 +636,10 @@ public class Refit extends Part implements IAcquisitionWork {
                         || oldEngine.getEngineType() != newEngine.getEngineType()) {
                     updateRefitClass(customJob ? CLASS_E : CLASS_D);
                 }
-                if (((MissingEnginePart) newPart).getEngine().getSideTorsoCriticalSlots().length > 0) {
-                    // FIXME: WeaverThree - It won't be new stuff if the engine is the same class...
+
+                if (newEngine.getSideTorsoCriticalSlots().length > oldEngine.getSideTorsoCriticalSlots().length) {
+                    // WeaverThree - This still dosen't account for downgrading engine removing from the parts
+                    // That can wait for rework
                     locationHasNewStuff[Mek.LOC_LT] = true;
                     locationHasNewStuff[Mek.LOC_RT] = true;
                 }
@@ -717,6 +719,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
                         if ((crits == oldCrits) && (oldType != null)
                                 // FIXME: WeaverThree - CamOps doesn't specifiy anything about weapon types
+                                // -- Not sure how best to resolve this quickly
                                 && (type.hasFlag(WeaponType.F_LASER) == oldType.hasFlag(WeaponType.F_LASER))
                                 && (type.hasFlag(WeaponType.F_MISSILE) == oldType.hasFlag(WeaponType.F_MISSILE))
                                 && (type.hasFlag(WeaponType.F_BALLISTIC) == oldType.hasFlag(WeaponType.F_BALLISTIC))
@@ -728,7 +731,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
                         } else if (crits <= oldCrits) {
                             // FIXME: WeaverThree - Class B is "Stuff added where something was removed, other than thing removed"
-                            // This is the wrong logic
+                            // This is the wrong logic - not sure how to fix it quickly
                             thisPartRefitClass = CLASS_B;
                             matchFound = true;
                             matchIndex = index;
@@ -1037,7 +1040,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     nloc++;
                 }
             }
-            // FIXME: WeaverThree - This is not how we do customizations anymore
+            // WeaverThree - Actually this is the correct time multiplier for omni swaps...
             time = 30 * nloc;
         }
 
@@ -1056,6 +1059,7 @@ public class Refit extends Part implements IAcquisitionWork {
             for (int loc = 0; loc < newEntity.locations(); loc++) {
                 if (locationHasNewStuff[loc] && oldUnit.isLocationDestroyed(loc)) {
                     // FIXME: WeaverThree - Why would this be a thing? Surely we'd replace the location during the refit...
+                    // I don't think we do but maybe we should?
                     errorStrings.add("Can't add new equipment to a missing " + newEntity.getLocationAbbr(loc));
                 }
             }
@@ -1086,7 +1090,7 @@ public class Refit extends Part implements IAcquisitionWork {
         } else if (newEntity instanceof BattleArmor || newEntity instanceof Tank || newEntity instanceof ProtoMek) {
             time = WORKWEEK; 
         } else {
-            time = 1111; // FIXME: WeaverThree - I'm sorry, what!
+            time = WORKWEEK * 2; // Default to same as Mek
             logger.error("Unit " + newEntity.getModel() + " did not set its time correctly.");
         }
 
@@ -1183,7 +1187,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     AmmoBin ammoBin = (AmmoBin) part;
                     ammoBin.setShotsNeeded(ammoBin.getFullShots());
                     part.setRefitUnit(oldUnit);
-                    // FIXME: WeaverThree - the following function ignores ammo bins...
+                    // WeaverThree - the following function ignores ammo bins... only if they don't have a unit
                     getCampaign().getQuartermaster().addPart(part, 0);
                     newUnitParts.add(part);
 
@@ -1599,7 +1603,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         oldUnit.setParts(newParts);
 
-        // TODO: WeaverThree - What does this do??
+        // WeaverThree - Watford's tool
         final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(oldUnit);
         final EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
@@ -1793,19 +1797,19 @@ public class Refit extends Part implements IAcquisitionWork {
     /**
      * @return time multiplier for this refit's current class
      */
-    private int getTimeMultiplier() {
+    private float getTimeMultiplier() {
         int mult = switch(refitClass) {
-            // FIXME: WeaverThree - This isn't accurate to Camops 211
             case NO_CHANGE -> 0;
-            case CLASS_A, CLASS_B -> 1;
-            case CLASS_C -> 2;
-            case CLASS_D -> 3;
-            case CLASS_E -> 4;
-            case CLASS_F -> 5;
+            case CLASS_A -> 2;
+            case CLASS_B -> 3;
+            case CLASS_C -> 5;
+            case CLASS_D -> 8;
+            case CLASS_E -> 9;
+            case CLASS_F -> 10;
             default -> 1;
         };
-        if (customJob) {
-            mult *= 2;
+        if (!customJob) {
+            mult *= 0.5;
         }
         return mult;
     }
@@ -1853,15 +1857,15 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public int getDifficulty() {
         return switch (refitClass) {
-            // FIXME: WeaverThree - This isn't accurate to Camops 211
             case NO_CHANGE -> 0;
-            case CLASS_A, CLASS_B -> 1;
-            case CLASS_C, CLASS_D -> 2;
-            case CLASS_E -> 3;
-            case CLASS_F -> 4;
+            case CLASS_A -> 2;
+            case CLASS_B, CLASS_C -> 3;
+            case CLASS_D, CLASS_E -> 4;
+            case CLASS_F -> 5;
             case CLASS_OMNI -> -2;
             default -> 1;
         };
+        // Refit kit bonus added below in getAllMods
     }
 
     
@@ -1879,8 +1883,8 @@ public class Refit extends Part implements IAcquisitionWork {
             mods.addModifier(1, "difficult to maintain");
         }
 
-        if (customJob) {
-            mods.addModifier(2, "custom job");
+        if (!customJob) {
+            mods.addModifier(-2, "refit kit used");
         }
 
         if ((null != tech) && tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
@@ -2828,13 +2832,12 @@ public class Refit extends Part implements IAcquisitionWork {
      * @param entity Either the starting or the ending unit of the refit.
      * @return The number of heat sinks the unit mounts that are not tracked as parts.
      */
-    private int untrackedHeatSinkCount(Entity entity) {
+    private static int untrackedHeatSinkCount(Entity entity) {
         if (entity instanceof Mek) {
             return Math.min(((Mek) entity).heatSinks(),
                     entity.getEngine().integralHeatSinkCapacity(((Mek) entity).hasCompactHeatSinks()));
 
-        } else if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
-            // FIXME: shouldn't this be entity and not newEntity? This method should be static?
+        } else if (entity.getClass() == Aero.class) { // Aero but not subclasses
             return entity.getEngine().getWeightFreeEngineHeatSinks();
 
         } else {
