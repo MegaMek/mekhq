@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.death;
 
 import megamek.Version;
+import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import static java.time.DayOfWeek.MONDAY;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 public abstract class AbstractDeath {
@@ -159,7 +161,24 @@ public abstract class AbstractDeath {
             return false;
         }
 
-        if (randomlyDies(age, person.getGender())) {
+        boolean suspiciousDeath = false;
+        int interest = campaign.getComStarInterest();
+
+        if (interest > 0) {
+            if (campaign.getLocalDate().getDayOfWeek() == MONDAY) {
+                if (interest >= 999) {
+                    suspiciousDeath = true;
+                } else if (Compute.randomInt(1000 - interest) == 0) {
+                    suspiciousDeath = true;
+                }
+            }
+        }
+
+        if (suspiciousDeath) {
+            logger.info("A suspicious death has occurred");
+        }
+
+        if (randomlyDies(age, person.getGender()) || suspiciousDeath) {
             // We double-report here, to make sure the user definitely notices that a random death has occurred.
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
