@@ -41,7 +41,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.supplyDrops.SupplyDrops;
+import mekhq.campaign.mission.atb.supplyDrops.SupplyDrop;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Bloodname;
@@ -796,9 +796,7 @@ public class AtBContract extends Contract {
                     campaign.addReport("<b>Special Event:</b> ");
                     if (doBonusRoll(campaign)) {
                         campaign.addReport("Bonus: Captured Supplies");
-                        SupplyDrops supplyDrops = new SupplyDrops(campaign,
-                            parentContract.getEmployerFaction(), parentContract.getEnemy(),
-                            false);
+                        SupplyDrop supplyDrops = new SupplyDrop(campaign, parentContract, false, false);
                         supplyDrops.getSupplyDropParts(1, true);
                     }
 

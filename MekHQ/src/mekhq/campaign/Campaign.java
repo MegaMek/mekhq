@@ -66,7 +66,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.supplyDrops.SupplyDrops;
+import mekhq.campaign.mission.atb.supplyDrops.SupplyDrop;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -3784,11 +3784,9 @@ public class Campaign implements ITechManager {
                 addReport(report);
 
                 // Supply Drops
-                SupplyDrops supplyDrops = new SupplyDrops(this, contract.getEmployerFaction(),
-                    contract.getEnemy(), false);
+                SupplyDrop supplyDrops = new SupplyDrop(this, contract, false, false);
                 int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-                supplyDrops.getSupplyDropParts(dropCount, contract.getMoraleLevel(), false);
-                supplyDrops.getLosTechCache(contract);
+                supplyDrops.getSupplyDropParts(dropCount);
             }
         }
 
@@ -4330,7 +4328,7 @@ public class Campaign implements ITechManager {
 
         // Supply Drops
         // TODO REMOVE THIS BEFORE MERGING!!!
-//        SupplyDrops supplyDrops = new SupplyDrops(this, faction,
+//        SupplyDrop supplyDrops = new SupplyDrop(this, faction,
 //            faction, true);
 //        supplyDrops.getLosTechCache();
 

@@ -26,7 +26,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.atb.supplyDrops.SupplyDrops;
+import mekhq.campaign.mission.atb.supplyDrops.SupplyDrop;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
 
@@ -423,8 +423,7 @@ public class ScenarioObjectiveProcessor {
 
                         if (dropSize > 0) {
                             campaign.addReport("Bonus: Captured Supplies");
-                            SupplyDrops supplyDrops = new SupplyDrops(campaign,
-                                contract.getEmployerFaction(), contract.getEnemy(), false);
+                            SupplyDrop supplyDrops = new SupplyDrop(campaign, contract, false, false);
                             supplyDrops.getSupplyDropParts(1, true);
                         }
                     }
