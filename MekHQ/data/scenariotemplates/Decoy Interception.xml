@@ -110,7 +110,7 @@
             <objectiveCriterion>Custom</objectiveCriterion>
             <percentage>1</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitScaleFactor>1</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>

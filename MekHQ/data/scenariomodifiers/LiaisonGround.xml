@@ -9,7 +9,7 @@
     <forceDefinition>
         <actualDeploymentZone>-1</actualDeploymentZone>
         <allowAeroBombs>false</allowAeroBombs>
-        <allowedUnitType>9</allowedUnitType>
+        <allowedUnitType>0</allowedUnitType>
         <arrivalTurn>0</arrivalTurn>
         <canReinforceLinked>false</canReinforceLinked>
         <contributesToBV>true</contributesToBV>
