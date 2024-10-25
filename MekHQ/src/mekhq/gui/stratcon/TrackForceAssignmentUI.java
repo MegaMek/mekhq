@@ -21,6 +21,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.gui.StratconPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,7 +70,7 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
         getContentPane().add(forceAssignmentInstructions, gbc);
         gbc.gridy++;
 
-        JScrollPane forceListContainer = new JScrollPane();
+        JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
         ScenarioWizardLanceModel lanceModel;
 

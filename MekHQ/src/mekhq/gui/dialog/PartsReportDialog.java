@@ -57,6 +57,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
@@ -260,7 +261,7 @@ public class PartsReportDialog extends JDialog {
                 PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
 
 
-        JScrollPane tableScroll = new JScrollPane(overviewPartsInUseTable);
+        JScrollPane tableScroll = new JScrollPaneWithSpeed(overviewPartsInUseTable);
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());

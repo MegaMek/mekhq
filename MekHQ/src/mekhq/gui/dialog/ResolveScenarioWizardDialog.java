@@ -26,6 +26,7 @@ import megamek.client.ui.dialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.GunEmplacement;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -47,6 +48,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -125,6 +127,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Prisoner status panel components
      */
+    private JButton prisonerRansomAllButton;
     private final List<JCheckBox> prisonerCapturedBtns = new ArrayList<>();
     private final List<JCheckBox> prisonerRansomedBtns = new ArrayList<>();
     private final List<JCheckBox> prisonerKiaBtns = new ArrayList<>();
@@ -242,8 +245,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setMinimumSize(new Dimension(590,120));
-        txtInstructions.setPreferredSize(new Dimension(590,120));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
 
         /*
@@ -418,6 +419,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPrisonerStatus.setLayout(new GridBagLayout());
 
         gridx = 1;
+
+        prisonerRansomAllButton = new JButton(resourceMap.getString("prisonerRansomAllButton.text"));
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx=2;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.gridwidth=3;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        pnlPrisonerStatus.add(prisonerRansomAllButton, gridBagConstraints);
+
+        prisonerRansomAllButton.addActionListener(evt -> prisonerRansomAll());
+
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx++;
@@ -790,12 +804,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
          */
         pnlPreview = new JPanel();
         choiceStatus = new JComboBox<>();
-        JScrollPane scrRecoveredUnits = new JScrollPane();
-        JScrollPane scrRecoveredPilots = new JScrollPane();
-        JScrollPane scrMissingUnits = new JScrollPane();
-        JScrollPane scrMissingPilots = new JScrollPane();
-        JScrollPane scrDeadPilots = new JScrollPane();
-        JScrollPane scrSalvage = new JScrollPane();
+        JScrollPane scrRecoveredUnits = new JScrollPaneWithSpeed();
+        JScrollPane scrRecoveredPilots = new JScrollPaneWithSpeed();
+        JScrollPane scrMissingUnits = new JScrollPaneWithSpeed();
+        JScrollPane scrMissingPilots = new JScrollPaneWithSpeed();
+        JScrollPane scrDeadPilots = new JScrollPaneWithSpeed();
+        JScrollPane scrSalvage = new JScrollPaneWithSpeed();
         txtInstructions = new JTextArea();
         txtReport = new MarkdownEditorPanel("After-Action Report");
         txtRecoveredUnits = new JTextArea();
@@ -852,11 +866,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(new JScrollPane(txtRewards), gridBagConstraints);
+        pnlPreview.add(new JScrollPaneWithSpeed(txtRewards), gridBagConstraints);
 
         txtReport.setText("");
-        txtReport.setPreferredSize(new Dimension(500, 300));
-        txtReport.setMinimumSize(new Dimension(500, 300));
+        txtReport.setPreferredSize(UIUtil.scaleForGUI(500, 300));
+        txtReport.setMinimumSize(UIUtil.scaleForGUI(500, 300));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -990,9 +1004,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlMain.add(pnlPreview, PREVIEWPANEL);
 
 
-        scrMain = new JScrollPane(pnlMain);
-        scrMain.setMinimumSize(new Dimension(600, 500));
-        scrMain.setPreferredSize(new Dimension(600, 500));
+        scrMain = new JScrollPaneWithSpeed(pnlMain);
+        scrMain.setMinimumSize(UIUtil.scaleForGUI(600, 500));
+        scrMain.setPreferredSize(UIUtil.scaleForGUI(900, 500));
         getContentPane().add(scrMain, BorderLayout.CENTER);
 
 
@@ -1052,6 +1066,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         pack();
     }
+
+    private void prisonerRansomAll() {
+        Iterator<JCheckBox> capturedBoxes = prisonerCapturedBtns.iterator();
+        Iterator<JCheckBox> ransomedBoxes = prisonerRansomedBtns.iterator();
+        while (capturedBoxes.hasNext() && ransomedBoxes.hasNext()) {
+            JCheckBox capturedBox = capturedBoxes.next();
+            JCheckBox ransomedBox = ransomedBoxes.next();
+            if (capturedBox.isSelected()) {
+                ransomedBox.setSelected(true);
+            }
+        }
+    }
+
 
     /**
      * Rolls the dice to determine if the opposition personnel is captured.
@@ -1168,34 +1195,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         cardLayout.show(pnlMain, currentPanel);
         switchInstructions();
 
-        switch (name) {
-            case PILOTPANEL:
-                pnlMain.setPreferredSize(pnlPilotStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case UNITSPANEL:
-                pnlMain.setPreferredSize(pnlUnitStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case SALVAGEPANEL:
-                pnlMain.setPreferredSize(pnlSalvage.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case KILLPANEL:
-                pnlMain.setPreferredSize(pnlKills.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case REWARDPANEL:
-                pnlMain.setPreferredSize(pnlRewards.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case PREVIEWPANEL:
-                pnlMain.setPreferredSize(pnlPreview.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case OBJECTIVEPANEL:
-                pnlMain.setPreferredSize(pnlObjectiveStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-            case PRISONERPANEL:
-                pnlMain.setPreferredSize(pnlPrisonerStatus.getLayout().preferredLayoutSize(pnlMain));
-                break;
-        }
-
-
         SwingUtilities.invokeLater(() -> scrMain.getVerticalScrollBar().setValue(0));
         pack();
     }
@@ -1236,8 +1235,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructions.setMinimumSize(new Dimension(590, 150));
-        txtInstructions.setPreferredSize(new Dimension(590, 150));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
     }
 
@@ -1754,7 +1751,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
 
         //scroll panel
-        JScrollPane scrollPersonnelView = new JScrollPane();
+        JScrollPane scrollPersonnelView = new JScrollPaneWithSpeed();
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(personViewPanel);
         dialog.getContentPane().add(scrollPersonnelView, gridBagConstraints);
@@ -1768,8 +1765,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         dialog.getContentPane().add(btn, gridBagConstraints);
 
-        dialog.setMinimumSize(new Dimension(600, 300));
-        dialog.setPreferredSize(new Dimension(600, 300));
+        dialog.setMinimumSize(UIUtil.scaleForGUI(450, 700));
+        dialog.setPreferredSize(UIUtil.scaleForGUI(450, 700));
         dialog.validate();
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);

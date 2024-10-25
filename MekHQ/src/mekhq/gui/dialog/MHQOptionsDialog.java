@@ -36,6 +36,7 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -222,16 +223,22 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         protected Container createCenterPane() {
                 JTabbedPane optionsTabbedPane = new JTabbedPane();
                 optionsTabbedPane.setName("optionsTabbedPane");
-                optionsTabbedPane.add(resources.getString("displayTab.title"), new JScrollPane(createDisplayTab()));
-                optionsTabbedPane.add(resources.getString("coloursTab.title"), new JScrollPane(createColoursTab()));
-                optionsTabbedPane.add(resources.getString("fontsTab.title"), new JScrollPane(createFontsTab()));
-                optionsTabbedPane.add(resources.getString("autosaveTab.title"), new JScrollPane(createAutosaveTab()));
-                optionsTabbedPane.add(resources.getString("newDayTab.title"), new JScrollPane(createNewDayTab()));
+                optionsTabbedPane.add(resources.getString("displayTab.title"),
+                                new JScrollPaneWithSpeed(createDisplayTab()));
+                optionsTabbedPane.add(resources.getString("coloursTab.title"),
+                                new JScrollPaneWithSpeed(createColoursTab()));
+                optionsTabbedPane.add(resources.getString("fontsTab.title"),
+                                new JScrollPaneWithSpeed(createFontsTab()));
+                optionsTabbedPane.add(resources.getString("autosaveTab.title"),
+                                new JScrollPaneWithSpeed(createAutosaveTab()));
+                optionsTabbedPane.add(resources.getString("newDayTab.title"),
+                                new JScrollPaneWithSpeed(createNewDayTab()));
                 optionsTabbedPane.add(resources.getString("campaignXMLSaveTab.title"),
-                                new JScrollPane(createCampaignXMLSaveTab()));
-                optionsTabbedPane.add(resources.getString("nagTab.title"), new JScrollPane(createNagTab()));
+                                new JScrollPaneWithSpeed(createCampaignXMLSaveTab()));
+                optionsTabbedPane.add(resources.getString("nagTab.title"),
+                                new JScrollPaneWithSpeed(createNagTab()));
                 optionsTabbedPane.add(resources.getString("miscellaneousTab.title"),
-                                new JScrollPane(createMiscellaneousTab()));
+                                new JScrollPaneWithSpeed(createMiscellaneousTab()));
                 return optionsTabbedPane;
         }
 

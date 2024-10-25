@@ -47,7 +47,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4771 & #4781: Fixed ConcurrentModificationException in Personnel Removal Process
 + Fix #4736: Regenerate Personality Descriptions for NPCs
 + Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
-+ Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects #4863
++ Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects
 + PR #4463: Decoupled Dependents from AtB, Reworked Dependents, Reworked New Personnel Ages, Added Documentation
 + PR #4644: Initial work on CamOps RAW Contract Market
 + PR #4859: Reworked AtB Morale, Rebranding it as MekHQ Morale
@@ -109,6 +109,59 @@ MEKHQ VERSION HISTORY:
 + PR #5054: Implement CamOps Contract Negotiation
 + PR #5055: Parts In Use - Filter Mothballed and Spare Part Quality
 + PR #5064: Bug fix and improvements for calculateContractDifficulty()
++ Fix #5061: Fixed TurretLock Part not saving
++ Fix #4725: Added duplicate kill checking for multi-crewed units
++ Fix #5058: Fixed `isMilitary` and `isPrepSchool` flags; corrected typo
++ Fix #4973: Fixed `isMilitary` and `isPrepSchool` flags; corrected typo
++ Fix #5065: Showed actual amount of armor on order in repair info
++ PR #5066: Parts improvements - minor refactoring and better information
++ PR #5067: Changed "Clear All Items" to "Remove Selected Items" on CC Tab list
++ Fix #5059: Added "No Eligible Personnel" dialog to turnover & retention checks
++ PR #5069: Implemented hiring hall overrides
++ Fix #5045: Added TotalGenericBattleValue tag to MUL export
++ Fix #5037: Fixed hire minimum complement commands
++ Fix #4725: Added duplicate kill checking for multi-crewed units
++ PR #5073: Refactored contract difficulty display and added tooltips
++ PR #5074: Updated primary allies scenario modifiers
++ Fix #5003: Fixed wrapping of personality description
++ Fix #4999: Updated fatigue column of personnel table to use effective fatigue value
++ Fix #4998: Fixed new day reporting
++ Fix #4991: Re-added compatibility handlers for SPA skill prerequisites
++ Fix #5019: ForceRenderer - Bolded unit commanders
++ Fix #5083: StratCon vs normal deployment status of units
++ PR #5085: Improved Force Gen unit substitution
++ Fix #5079: Refined PartQualityReportDialog layout handling and exclusions
++ Fix #4995: Fixed SPA tooltip HTML wrapping in PersonViewPanel
++ Fix #5020: Fixed SPA tooltip HTML wrapping in PersonViewPanel
++ PR #5088: Added 100+ new quirks, refactored personality traits & quirk classes
++ Fix #4988: Added empty jump path check to UnableToAffordJumpNagDialog
++ Fix #4987: Fixed camouflage directory assignment for null faction codes
++ PR #5091: Added minimum number of tracks (1) to StratCon initialization
++ PR #5092: Fixed objective criteria for intercept engagement
++ Fix #4980: Fixed outsourcing of babies
++ Fix #4972: Corrected parameter order in simulated relationship history reports
++ PR #5097: Simplified reputation display
++ PR #5098, #5113: More FG3 scenario adjustments
++ PR #5099: Added award bonuses to award ceremony dialog
++ Fix #5100: PartsStore - Fixed equipment parts and OmniPods (fixes hatchets and maces at least)
++ Fix #4955: Prevented dropout and some graduation events occurring for very young children
++ Fix #5102: Fixed portrait folder names
++ Fix #5023: Fixed Divide by Zero Error in Loans Dialog
++ Fix #4975: Prevent Early Clan Units in Non-Clan Campaigns
++ PR #5103: Globally fix slow mouse wheeling issues, with scaling
++ PR #5104: Fixed Preset Picker Date Issues
++ Fix #4980: Fixed Outsourcing of Babies
++ PR #5105: ResolveScenarioWizardDialog - Some UX Improvements
++ PR #5106: ResolveScenarioWizardDialog - Ransom All Button
++ PR #5107: Updated Interstellar Map View Defaults & Optimized 'ISW' view
++ Fix #5109: Corrected DropShip Scenario Modifier Generation Method
++ PR #5111: Better multi-day repair and refit reports.
++ PR #5112: TechTabelModel - Show Daily Available Time for Techs
++ Fix #5118 && #5117: FG3 Scenario Improvements
++ PR #5121: Label OmniUnits as Omni in the MekHQ UI
++ Fix #5119 && #5108 && #4297 Fixed Position of NewDayEvent Trigger in processNewDay
++ PR #5126: Rebalanced Random Unit Quality
+
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing

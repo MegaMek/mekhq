@@ -376,7 +376,7 @@ public abstract class AbstractMarriage {
      * @return the created external spouse
      */
     Person createExternalSpouse(final Campaign campaign, final LocalDate today, final Person person, Gender gender) {
-        Person externalSpouse = campaign.newDependent(false, gender);
+        Person externalSpouse = campaign.newDependent(gender);
 
 
         // Calculate person's age and the maximum and minimum allowable spouse ages

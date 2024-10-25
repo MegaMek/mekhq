@@ -54,6 +54,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -120,7 +121,7 @@ public class ChooseRefitDialog extends JDialog {
         refitSorter.setComparator(RefitTableModel.COL_CLASS, new ClassSorter());
         refitSorter.setComparator(RefitTableModel.COL_COST, new FormattedNumberSorter());
         refitTable.setRowSorter(refitSorter);
-        scrRefitTable = new JScrollPane();
+        scrRefitTable = new JScrollPaneWithSpeed();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -133,7 +134,7 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(scrRefitTable, gridBagConstraints);
 
-        scrShoppingList = new JScrollPane();
+        scrShoppingList = new JScrollPaneWithSpeed();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -157,7 +158,7 @@ public class ChooseRefitDialog extends JDialog {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
-        scrOldUnit = new JScrollPane(txtOldUnit);
+        scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
@@ -178,7 +179,7 @@ public class ChooseRefitDialog extends JDialog {
         txtNewUnit.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrNewUnit = new JScrollPane(txtNewUnit);
+        scrNewUnit = new JScrollPaneWithSpeed(txtNewUnit);
         scrNewUnit.setMinimumSize(new Dimension(300, 400));
         scrNewUnit.setPreferredSize(new Dimension(300, 400));
         gridBagConstraints.gridx = 2;

@@ -26,6 +26,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -128,7 +129,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
-        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
+        JScrollPane scrollScenarioTable = new JScrollPaneWithSpeed(scenarioTable);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

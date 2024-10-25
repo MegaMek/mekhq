@@ -18,15 +18,6 @@
  */
 package mekhq.campaign.market.unitMarket;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
@@ -40,6 +31,15 @@ import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public abstract class AbstractUnitMarket {
     private static final MMLogger logger = MMLogger.create(AbstractUnitMarket.class);
@@ -78,7 +78,7 @@ public abstract class AbstractUnitMarket {
      * This is the primary method for processing the Unit Market. It is executed as
      * part of
      * {@link Campaign#newDay()}
-     * 
+     *
      * @param campaign the campaign to process the Unit Market new day using
      */
     public abstract void processNewDay(final Campaign campaign);
@@ -88,14 +88,14 @@ public abstract class AbstractUnitMarket {
      * This is the primary Unit Market generation method, which is how the market
      * specified
      * generates unit offers
-     * 
+     *
      * @param campaign the campaign to generate the unit offers for
      */
     public abstract void generateUnitOffers(final Campaign campaign);
 
     /**
      * This adds a number of unit offers
-     * 
+     *
      * @param campaign    the campaign to add the offers based on
      * @param number      the number of units to generate
      * @param market      the unit market type the unit is part of
@@ -191,8 +191,20 @@ public abstract class AbstractUnitMarket {
     public String addSingleUnit(final Campaign campaign, final UnitMarketType market,
             final int unitType, final MekSummary mekSummary,
             final int percent) {
+        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate currentDate = campaign.getLocalDate();
+
+        if (!campaignFaction.isClan()) {
+            if (mekSummary.isClan() && currentDate.isBefore(BATTLE_OF_TUKAYYID)) {
+                return null;
+            }
+        }
+
         getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent,
                 generateTransitDuration(campaign)));
+
         return mekSummary.getName();
     }
 
@@ -229,7 +241,7 @@ public abstract class AbstractUnitMarket {
      * This is the primary Unit Market removal method, which is how the market
      * specified
      * removes unit offers
-     * 
+     *
      * @param campaign the campaign to use in determining the offers to remove
      */
     protected abstract void removeUnitOffers(final Campaign campaign);
@@ -239,7 +251,7 @@ public abstract class AbstractUnitMarket {
     // region File I/O
     /**
      * This writes the Unit Market to XML
-     * 
+     *
      * @param pw     the PrintWriter to write to
      * @param indent the base indent level to write at
      */
@@ -253,7 +265,7 @@ public abstract class AbstractUnitMarket {
      * This is meant to be overridden so that a market can have additional elements
      * added to it,
      * albeit with this called by super.writeBodyToXML(pw, indent) first.
-     * 
+     *
      * @param pw     the PrintWriter to write to
      * @param indent the base indent level to write at
      */
@@ -267,7 +279,7 @@ public abstract class AbstractUnitMarket {
      * This method fills the market based on the supplied XML node. The market is
      * initialized as
      * empty before this is called.
-     * 
+     *
      * @param wn       the node to fill the market from
      * @param campaign the campaign the market is being parsed as part of
      * @param version  the version of the market being parsed
@@ -291,7 +303,7 @@ public abstract class AbstractUnitMarket {
      * This is meant to be overridden so that a market can have additional elements
      * added to it,
      * albeit with this called by super.parseXMLNode(wn) first.
-     * 
+     *
      * @param wn       the node to parse from XML
      * @param campaign the campaign the market is being parsed as part of
      * @param version  the version of the market being parsed

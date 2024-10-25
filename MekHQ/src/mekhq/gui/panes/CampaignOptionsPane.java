@@ -73,6 +73,7 @@ import mekhq.gui.dialog.SelectUnusedAbilityDialog;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.RandomOriginOptionsPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -888,7 +889,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panGeneral.add(btnIcon, gridBagConstraints);
 
-        return new JScrollPane(panGeneral);
+        return new JScrollPaneWithSpeed(panGeneral);
     }
 
     private JScrollPane createRepairAndMaintenanceTab() {
@@ -1170,7 +1171,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
-        return new JScrollPane(panRepair);
+        return new JScrollPaneWithSpeed(panRepair);
     }
 
     private JScrollPane createSuppliesAndAcquisitionsTab() {
@@ -1542,7 +1543,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panSocioIndustrialBonus, gridBagConstraints);
 
-        return new JScrollPane(panSupplies);
+        return new JScrollPaneWithSpeed(panSupplies);
     }
 
     private JScrollPane createTechLimitsTab() {
@@ -1675,7 +1676,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panTech.add(useAmmoByTypeBox, gridBagConstraints);
 
-        return new JScrollPane(panTech);
+        return new JScrollPaneWithSpeed(panTech);
     }
 
     private JScrollPane createFinancesTab(boolean reverseQualities) {
@@ -1905,7 +1906,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridheight = 20;
         panFinances.add(createSharesPanel(), gridBagConstraints);
 
-        return new JScrollPane(panFinances);
+        return new JScrollPaneWithSpeed(panFinances);
     }
 
     private JScrollPane createMercenaryTab() {
@@ -2036,7 +2037,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         groupContract.add(btnContractEquipment);
         groupContract.add(btnContractPersonnel);
 
-        return new JScrollPane(panMercenary);
+        return new JScrollPaneWithSpeed(panMercenary);
     }
 
     private JScrollPane createExperienceTab() {
@@ -2395,7 +2396,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         tableXP.setColumnSelectionAllowed(false);
         tableXP.setCellSelectionEnabled(true);
         tableXP.setShowGrid(true);
-        final JScrollPane scrXP = new JScrollPane(tableXP);
+        final JScrollPane scrXP = new JScrollPaneWithSpeed(tableXP);
         scrXP.setMinimumSize(new Dimension(500, ((tableXP.getRowCount() * 25) + 50)));
         scrXP.setPreferredSize(new Dimension(500, ((tableXP.getRowCount() * 25) + 50)));
         JTable rowTable = new RowNamesTable(tableXP);
@@ -2415,7 +2416,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(scrXP, gridBagConstraints);
 
-        return new JScrollPane(panXP);
+        return new JScrollPaneWithSpeed(panXP);
     }
 
     private JScrollPane createSkillsTab() {
@@ -2498,7 +2499,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             gridBagConstraints.gridy++;
         }
 
-        final JScrollPane scrSkill = new JScrollPane(panSkill);
+        final JScrollPane scrSkill = new JScrollPaneWithSpeed(panSkill);
         scrSkill.setPreferredSize(new Dimension(500, 400));
         return scrSkill;
     }
@@ -2521,7 +2522,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         recreateSPAPanel(!getUnusedSPA().isEmpty());
 
-        JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
+        JScrollPane scrSPA = new JScrollPaneWithSpeed(panSpecialAbilities);
         scrSPA.setPreferredSize(new Dimension(500, 400));
         return scrSPA;
     }
@@ -2791,7 +2792,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panRandomSkill.add(panOtherBonuses, gridBagConstraints);
 
-        JScrollPane scrRandomSkill = new JScrollPane(panRandomSkill);
+        JScrollPane scrRandomSkill = new JScrollPaneWithSpeed(panRandomSkill);
         scrRandomSkill.setPreferredSize(new Dimension(500, 400));
         return scrRandomSkill;
     }
@@ -2940,7 +2941,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
 
-        return new JScrollPane(panNameGen);
+        return new JScrollPaneWithSpeed(panNameGen);
     }
 
     private JScrollPane createAgainstTheBotTab() {
@@ -3470,7 +3471,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
 
-        JScrollPane scrAtB = new JScrollPane(panAtB);
+        JScrollPane scrAtB = new JScrollPaneWithSpeed(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
         return scrAtB;
     }
@@ -3534,7 +3535,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridwidth = 2;
         personnelPanel.add(createSalaryPanel(), gbc);
 
-        final JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
+        final JScrollPane scrollPersonnel = new JScrollPaneWithSpeed(personnelPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
 
         return scrollPersonnel;
@@ -3570,7 +3571,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx++;
         turnoverAndRetentionPanel.add(createTurnoverAndRetentionUnitCohesionPanel(), gbc);
 
-        final JScrollPane scrollPersonnel = new JScrollPane(turnoverAndRetentionPanel);
+        final JScrollPane scrollPersonnel = new JScrollPaneWithSpeed(turnoverAndRetentionPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
 
         return scrollPersonnel;
@@ -3627,7 +3628,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridwidth = 2;
         lifePathsPanel.add(createDeathPanel(), gbc);
 
-        final JScrollPane scrollLifePaths = new JScrollPane(lifePathsPanel);
+        final JScrollPane scrollLifePaths = new JScrollPaneWithSpeed(lifePathsPanel);
         scrollLifePaths.setPreferredSize(new Dimension(400, 400));
 
         return scrollLifePaths;
@@ -4039,7 +4040,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         txtAwardSetFilterList.setName("txtAwardSetFilterList");
         txtAwardSetFilterList.setText("");
 
-        JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
+        JScrollPane scrollAwardSetFilterList = new JScrollPaneWithSpeed(txtAwardSetFilterList);
         scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -7734,7 +7735,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridy++;
         marketsPanel.add(createUnitMarketPanel(), gbc);
 
-        JScrollPane scrollMarkets = new JScrollPane(marketsPanel);
+        JScrollPane scrollMarkets = new JScrollPaneWithSpeed(marketsPanel);
         scrollMarkets.setPreferredSize(new Dimension(500, 400));
 
         return scrollMarkets;
@@ -8161,7 +8162,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         btnUseStaticRATs.setSelected(true);
         btnUseStaticRATs.doClick();
 
-        return new JScrollPane(panel);
+        return new JScrollPaneWithSpeed(panel);
     }
 
     private void createTraditionalRATPanel(final JDisableablePanel panel) {

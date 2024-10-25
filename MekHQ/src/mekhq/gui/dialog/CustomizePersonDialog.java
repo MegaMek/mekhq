@@ -52,6 +52,7 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
 import mekhq.gui.control.EditScenarioLogControl;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 
 import javax.swing.*;
@@ -187,8 +188,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
-        JScrollPane scrOptions = new JScrollPane();
-        JScrollPane scrSkills = new JScrollPane();
+        JScrollPane scrOptions = new JScrollPaneWithSpeed();
+        JScrollPane scrSkills = new JScrollPaneWithSpeed();
         JPanel panButtons = new JPanel();
         JButton btnOk = new JButton();
 

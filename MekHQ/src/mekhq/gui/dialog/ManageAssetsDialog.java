@@ -51,6 +51,7 @@ import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.gui.model.DataTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * @author Taharqa
@@ -117,7 +118,7 @@ public class ManageAssetsDialog extends JDialog {
         assetTable.setShowGrid(false);
         assetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         assetTable.getSelectionModel().addListSelectionListener(this::assetTableValueChanged);
-        scrollAssetTable = new JScrollPane(assetTable);
+        scrollAssetTable = new JScrollPaneWithSpeed(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));

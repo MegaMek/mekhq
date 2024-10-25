@@ -49,6 +49,7 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredForceIconCreationPanel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -558,7 +559,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                         .addComponent(dicePanel)
                         .addComponent(ratPanel));
 
-        return new JScrollPane(panel);
+        return new JScrollPaneWithSpeed(panel);
     }
 
     private JPanel createDicePanel() {
@@ -788,7 +789,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                         .addComponent(companyNamePanel)
                         .addComponent(bloodnamePanel));
 
-        return new JScrollPane(namesPanel);
+        return new JScrollPaneWithSpeed(namesPanel);
     }
 
     private JPanel createNamePanel() {
@@ -1270,7 +1271,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(procreationPanel));
 
-        return new JScrollPane(personnelModulePanel);
+        return new JScrollPaneWithSpeed(personnelModulePanel);
     }
 
     private JPanel createProcreationPanel() {

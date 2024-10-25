@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard.
@@ -137,7 +138,7 @@ public class CampaignExportWizard extends JDialog {
 
         gbc.gridy++;
 
-        JScrollPane scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPaneWithSpeed();
         switch (state) {
             case ForceSelection:
                 lblInstructions.setText(resourceMap.getString("lblInstructions.ForceSelection.text"));

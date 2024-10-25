@@ -21,18 +21,17 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.Objects;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
@@ -197,9 +196,13 @@ public class Loan {
         final double periodicRate = (getRate() / 100.0) / paymentsPerYear;
 
         setRemainingPayments(numberOfPayments);
-        setPaymentAmount(getPrincipal()
+        if (periodicRate > 0) {
+            setPaymentAmount(getPrincipal()
                 .multipliedBy(periodicRate * Math.pow(1 + periodicRate, numberOfPayments))
                 .dividedBy(Math.pow(1 + periodicRate, numberOfPayments) - 1));
+        } else {
+            setPaymentAmount(getPrincipal().dividedBy(numberOfPayments));
+        }
     }
 
     public void paidLoan() {
@@ -388,8 +391,7 @@ public class Loan {
             return false;
         } else if (this == other) {
             return true;
-        } else if (other instanceof Loan) {
-            final Loan loan = (Loan) other;
+        } else if (other instanceof Loan loan) {
             return getInstitution().equals(loan.getInstitution())
                     && getReferenceNumber().equals(loan.getReferenceNumber())
                     && getPrincipal().equals(loan.getPrincipal())

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Heavy Recon Evasion</name>
-    <shortBriefing>Evade patrols while scanning enemy heavies.</shortBriefing>
-    <detailedBriefing>Enemy patrols are active, and your mission is to scan the enemy’s heavy units. Survive for the duration of the scan without being detected. Preserve at least 50% of your forces until the turn limit is reached to ensure mission success.</detailedBriefing>
-    <isHostileFacility>false</isHostileFacility>
-    <isAlliedFacility>false</isAlliedFacility>
+    <name>Engagement</name>
+    <shortBriefing>Engage and destroy enemy at the front.</shortBriefing>
+    <detailedBriefing>Enemy forces are advancing towards a key landmark. The objective is to either destroy or force them to retreat. At least 50% of the enemy must be neutralized, while maintaining 50% of friendly forces to hold the line and secure the frontline position.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -50,7 +48,6 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -78,9 +75,8 @@
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>2</minWeightClass>
-                <objectiveLinkedForces />
-                <retreatThreshold>25</retreatThreshold>
+                <minWeightClass>0</minWeightClass>
+                <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
@@ -89,6 +85,33 @@
         </entry>
     </scenarioForces>
     <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>OpFor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>Player</associatedForceName>
@@ -113,9 +136,8 @@
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
-            <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>1</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>

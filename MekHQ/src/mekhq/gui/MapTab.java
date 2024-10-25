@@ -27,6 +27,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -136,7 +137,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         mapView.setMinimumSize(new Dimension(600,600));
         mapView.setView(panMapView);
 
-        scrollPlanetView = new JScrollPane();
+        scrollPlanetView = new JScrollPaneWithSpeed();
         scrollPlanetView.setMinimumSize(new Dimension(400, 600));
         scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

@@ -28,6 +28,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.AutoAwardsTableModel;
 import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -165,7 +166,7 @@ public class AutoAwardsDialog extends JDialog {
         JCheckBox cbxAward = (JCheckBox) cellEditor.getComponent();
         cbxAward.addMouseListener(checkboxListener);
 
-        JScrollPane scrollPane = new JScrollPane();
+        JScrollPane scrollPane = new JScrollPaneWithSpeed();
         scrollPane.setViewportView(personnelTable);
         scrollPane.setPreferredSize(new Dimension(500, 500));
         autoAwardsPanel.add(scrollPane, BorderLayout.CENTER);

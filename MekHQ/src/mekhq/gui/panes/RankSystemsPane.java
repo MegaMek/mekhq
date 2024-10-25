@@ -37,6 +37,7 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.CustomRankSystemCreationDialog;
 import mekhq.gui.model.RankTableModel;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -311,7 +312,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         }
 
         // Create the Scroll Pane
-        final JScrollPane pane = new JScrollPane(getRanksTable());
+        final JScrollPane pane = new JScrollPaneWithSpeed(getRanksTable());
         pane.setName("ranksTableScrollPane");
         pane.setMinimumSize(new Dimension(1200, 400));
         pane.setPreferredSize(new Dimension(1200, 500));

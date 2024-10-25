@@ -180,5 +180,9 @@
             <key>44</key>
             <value>VIP Defense.xml</value>
         </entry>
+        <entry>
+            <key>45</key>
+            <value>Engagement.xml</value>
+        </entry>
     </scenarioFileNames>
 </scenarioManifest>

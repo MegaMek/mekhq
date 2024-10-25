@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -82,7 +83,7 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void initComponents() {
-        scrollView = new JScrollPane();
+        scrollView = new JScrollPaneWithSpeed();
         choiceRanks = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
