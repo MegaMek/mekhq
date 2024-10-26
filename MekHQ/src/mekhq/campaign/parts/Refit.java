@@ -825,7 +825,7 @@ public class Refit extends Part implements IAcquisitionWork {
             } else {
                 doorsRemoved = Math.max(0, doorsRemoved + deltaDoors);
             }
-            time += (doorsAdded + doorsRemoved) * 600;
+            time += (doorsAdded + doorsRemoved) * WORKHOUR;
         }
 
         // Step 4: loop through remaining equipment on oldunit parts and add time for
