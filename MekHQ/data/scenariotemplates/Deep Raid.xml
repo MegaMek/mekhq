@@ -155,9 +155,9 @@
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>100</percentage>
-            <timeLimit>30</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>Fixed</timeLimitType>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>

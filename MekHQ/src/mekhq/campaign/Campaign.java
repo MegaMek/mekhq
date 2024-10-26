@@ -4241,8 +4241,6 @@ public class Campaign implements ITechManager {
         newReports.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
-        MekHQ.triggerEvent(new NewDayEvent(this));
-
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
             // News is reloaded
@@ -4320,6 +4318,8 @@ public class Campaign implements ITechManager {
             }
         }
 
+        // This must be the last step before returning true
+        MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
 
