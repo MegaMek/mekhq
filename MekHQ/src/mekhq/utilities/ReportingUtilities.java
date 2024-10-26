@@ -82,4 +82,29 @@ public class ReportingUtilities {
         }
         return String.format("%s%s%s", start, main, end);
     }
+
+    /**
+     * Connects the first string with the second using separator, if both strings are non-null and
+     * non-empty. If only one string is valid, return that string. If neither string is valid,
+     * return "". For when using a StringJoiner is just overkill.
+     * @param first String to begin with
+     * @param separator String to separate with
+     * @param second String to end with
+     * @return String first + separator + second or first or second or ""
+     */
+    public static String separateIf(String first, String separator, String second)
+    {
+        boolean isFirst = (null != first) && (!first.isEmpty());
+        boolean isSecond = (null != second) && (!second.isEmpty());
+
+        if (isFirst && isSecond) {
+            return String.format("%s%s%s", first, separator, second);
+        } else if (isFirst) {
+            return first;
+        } else if (isSecond) {
+            return second;
+        } else {
+            return "";
+        }
+    }
 }
