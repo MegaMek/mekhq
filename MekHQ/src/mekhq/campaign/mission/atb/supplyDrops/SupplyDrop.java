@@ -257,7 +257,7 @@ public class SupplyDrop {
 
         if (Compute.randomInt(10) < interceptionChance) {
             message = resources.getString("suppliesIntercepted" +
-                Compute.randomInt(50) + STATUS_AFTERWARD);
+                Compute.randomInt(25) + STATUS_AFTERWARD);
             isDestroyed = true;
         } else {
             if (Compute.d6() == 1) {
