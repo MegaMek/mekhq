@@ -23,6 +23,10 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 
+/**
+ * Represents the class of a refit, and provides lookup functions for the difficulty and time
+ * multipliers implied by that class. Based on Campaign Operations.
+ */
 public enum RefitClass {
     NO_CHANGE(0,"RefitClass.NO_CHANGE.text"),
     OMNI_RECONFIG(1,"RefitClass.NO_CHANGE.text"),
@@ -46,7 +50,7 @@ public enum RefitClass {
     /**
      * @return the translation's name for the refit class
      */
-    public String getName() {
+    public String toName() {
         return name;
     }
 

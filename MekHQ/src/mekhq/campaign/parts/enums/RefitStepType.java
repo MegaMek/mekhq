@@ -23,12 +23,16 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 
+/**
+ * Represents the type of one step of a refit operation, so that some refit operation classes can
+ * cover more than one possible step each more easily.
+ */
 public enum RefitStepType {
     LEAVE("RefitStepType.LEAVE.text", "LEAVE"),
     REMOVE("RefitStepType.REMOVE.text", "REMOVE"),
     CHANGE_FACING("RefitStepType.CHANGE_FACING.text", "CHANGE_FACING"),
-    REMOVE_ENGINE_SINKS("RefitStepType.REMOVE_ENGINE_SINKS", "REMOVE_ENGINE_SINKS"),
-    ADD_ENGINE_SINKS("RefitStepType.ADD_ENGINE_SINKS", "ADD_ENGINE_SINKS"),
+    REMOVE_ENGINE_SINKS("RefitStepType.REMOVE_ENGINE_SINKS.text", "REMOVE_ENGINE_SINKS"),
+    ADD_ENGINE_SINKS("RefitStepType.ADD_ENGINE_SINKS.text", "ADD_ENGINE_SINKS"),
     ADD("RefitStepType.ADD.text", "ADD"),
     MOVE("RefitStepType.MOVE.text", "MOVE"),
     UNLOAD("RefitStepType.UNLOAD.text", "UNLOAD"),
@@ -36,10 +40,12 @@ public enum RefitStepType {
     REMOVE_ARMOR("RefitStepType.REMOVE_ARMOR.text", "REMOVE_ARMOR"),
     ADD_ARMOR("RefitStepType.ADD_ARMOR.text", "ADD_ARMOR"),
     CHANGE_ARMOR_TYPE("RefitStepType.CHANGE_ARMOR_TYPE.text", "CHANGE_ARMOR_TYPE"),
-    REMOVE_CASE("RefitStepType.REMOVE_CASE", "REMOVE_CASE"),
-    ADD_CASE("RefitStepType.ADD_CASE", "ADD_CASE"),
-    CHANGE_STRUCTURE_TYPE("RefitStepType.CHANGE_STRUCTURE_TYPE.text", "CHANGE_STRUCTURE_TYPE");
+    REMOVE_CASE("RefitStepType.REMOVE_CASE.text", "REMOVE_CASE"),
+    ADD_CASE("RefitStepType.ADD_CASE.text", "ADD_CASE"),
+    CHANGE_STRUCTURE_TYPE("RefitStepType.CHANGE_STRUCTURE_TYPE.text", "CHANGE_STRUCTURE_TYPE"),
     // Myomer Type and Structure Type live together
+    DETACH_OMNIPOD("RefitStepType.DETATCH_OMNIPOD.text", "DETACH_OMNIPOD"),
+    ATTACH_OMNIPOD("RefitStepType.ATTATCH_OMNIPOD.text", "ATTACH_OMNIPOD");
     
     private final String name;
     private final String xmlName;
@@ -52,16 +58,24 @@ public enum RefitStepType {
     }
     
     /**
-     * @return the translation's name for the refit class
+     * @return the translation's name for the refit step
      */
-    public String getName() {
+    public String toName() {
         return name;
     }
     
-    public String getXmlName() {
+    /**
+     * @return a name sutable for encoding this step in XML
+     */
+    public String toXmlName() {
         return xmlName;
     }
 
+    /**
+     * @param xmlName - the encoded name of a step
+     * @return the corresponding RefitStepType
+     * @throws IllegalArgumentException
+     */
     public static RefitStepType fromXmlName(String xmlName) throws IllegalArgumentException {
         return switch (xmlName) {
             case "LEAVE" -> LEAVE;
@@ -79,6 +93,8 @@ public enum RefitStepType {
             case "REMOVE_CASE" -> REMOVE_CASE;
             case "ADD_CASE" -> ADD_CASE;
             case "CHANGE_STRUCTURE_TYPE" -> CHANGE_STRUCTURE_TYPE;
+            case "DETACH_OMNIPOD" -> DETACH_OMNIPOD;
+            case "ATTACH_OMNIPOD" -> ATTACH_OMNIPOD;
             default -> throw new IllegalArgumentException("Invalid RefitStepType");
         };
     }
