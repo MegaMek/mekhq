@@ -2087,7 +2087,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
     /**
      * We don't do this
-     * @param checkForDestriction - ignored
+     * @param checkForDestruction - ignored
      */
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
