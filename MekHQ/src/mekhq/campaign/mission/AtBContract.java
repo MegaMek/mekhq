@@ -795,6 +795,7 @@ public class AtBContract extends Contract {
                 case EVT_BONUSROLL:
                     campaign.addReport("<b>Special Event:</b> ");
                     if (doBonusRoll(campaign)) {
+                        logger.info("AtBContract.java 1");
                         campaign.addReport("Bonus: Captured Supplies");
                         SupplyDrop supplyDrops = new SupplyDrop(campaign, parentContract, false, false);
                         supplyDrops.getSupplyDropParts(1, true);

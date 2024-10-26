@@ -3783,10 +3783,7 @@ public class Campaign implements ITechManager {
 
                 addReport(report);
 
-                // Supply Drops
-                SupplyDrop supplyDrops = new SupplyDrop(this, contract, false, false);
-                int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-                supplyDrops.getSupplyDropParts(dropCount);
+
             }
         }
 
@@ -3801,6 +3798,12 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
+
+            // Supply Drops
+            logger.info("Campaign.java");
+            SupplyDrop supplyDrops = new SupplyDrop(this, contract, false, false);
+            int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+            supplyDrops.getSupplyDropParts(dropCount);
         }
     }
 

@@ -25,20 +25,25 @@ import megamek.common.ITechnology;
 import megamek.common.Mek;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -48,6 +53,8 @@ import java.util.stream.Collectors;
 import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 public class SupplyDrop {
     final private Campaign campaign;
@@ -84,8 +91,8 @@ public class SupplyDrop {
     public SupplyDrop(Campaign campaign, AtBContract contract, boolean skipParts, boolean skipUnits) {
         this.campaign = campaign;
         this.contract = contract;
-        this.employerFaction = this.contract.getEmployerFaction();
-        this.enemyFaction = this.contract.getEnemy();
+        this.employerFaction = contract.getEmployerFaction();
+        this.enemyFaction = contract.getEnemy();
 
         YEAR = campaign.getGameYear();
         EMPLOYER_IS_CLAN = enemyFaction.isClan();
@@ -186,9 +193,22 @@ public class SupplyDrop {
         dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
         dialog.setLocationRelativeTo(null);
         dialog.setTitle(title);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.pack();
+        dialog.setModal(true);
         dialog.setLayout(new BorderLayout());
+
+        ActionListener dialogActionListener = e -> {
+            dialog.dispose();
+            processConvoy(droppedItems, droppedUnits, cashReward);
+        };
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                dialogActionListener.actionPerformed(null);
+            }
+        });
 
         JLabel labelIcon = new JLabel("", SwingConstants.CENTER);
         labelIcon.setIcon(icon);
@@ -197,7 +217,6 @@ public class SupplyDrop {
         JPanel panel = new JPanel();
         BoxLayout boxlayout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(boxlayout);
-
         panel.add(labelIcon);
 
         JLabel label = new JLabel(
@@ -206,18 +225,193 @@ public class SupplyDrop {
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(label);
 
-        JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+        JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         dialog.add(scrollPane, BorderLayout.CENTER);
 
         JButton okButton = new JButton(resources.getString("confirmReceipt.text"));
         dialog.add(okButton, BorderLayout.SOUTH);
-        okButton.addActionListener(e -> {
-            deliveryDrop(droppedItems, droppedUnits, cashReward);
-            dialog.dispose();
-        });
+        okButton.addActionListener(dialogActionListener);
 
         return dialog;
+    }
+
+    private void processConvoy(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
+                               Money cashReward) {
+        final String STATUS_FORWARD = "statusUpdate";
+        final String STATUS_AFTERWARD = ".text";
+        AtBMoraleLevel morale = contract.getMoraleLevel();
+
+        int interceptionChance = switch (morale) {
+            case ROUTED -> 0;
+            case CRITICAL -> 1;
+            case WEAKENED -> 2;
+            case STALEMATE -> 3;
+            case ADVANCING -> 4;
+            case DOMINATING -> 5;
+            case OVERWHELMING -> 6;
+        };
+
+        boolean isDestroyed = false;
+        String message = "";
+
+        if (Compute.randomInt(10) < interceptionChance) {
+            message = resources.getString("suppliesIntercepted" +
+                Compute.randomInt(50) + STATUS_AFTERWARD);
+            isDestroyed = true;
+        } else {
+            if (Compute.d6() == 1) {
+                if (Compute.randomInt(10) < interceptionChance) {
+                    message = resources.getString(STATUS_FORWARD + "Enemy" + morale
+                        + Compute.randomInt(50) + STATUS_AFTERWARD);
+                } else {
+                    switch (Compute.randomInt(4)) {
+                        case 0 -> message = resources.getString(STATUS_FORWARD + "Allies"
+                            + Compute.randomInt(50) + STATUS_AFTERWARD);
+                        case 1 -> message = resources.getString(STATUS_FORWARD + "Civilians"
+                            + Compute.randomInt(50) + STATUS_AFTERWARD);
+                        default -> message = resources.getString(STATUS_FORWARD + "General"
+                            + Compute.randomInt(100) + STATUS_AFTERWARD);
+                    }
+                }
+            }
+        }
+
+        if (!message.isEmpty()) {
+            createConvoyMessage(droppedItems, droppedUnits, cashReward, message, isDestroyed,
+                true);
+        } else {
+            campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                CLOSING_SPAN_TAG));
+            deliverDrop(droppedItems, droppedUnits, cashReward);
+        }
+    }
+
+    public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
+                                       Money cashReward, String convoyStatusMessage, boolean isDestroyed,
+                                    boolean isIntroduction) {
+        // Dialog dimensions and representative
+        final int DIALOG_WIDTH = 400;
+        final int DIALOG_HEIGHT = 200;
+
+        // Creates and sets up the dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Defines the action when the dialog is being dismissed
+        ActionListener dialogDismissActionListener = e -> {
+            dialog.dispose();
+            if (isIntroduction) {
+                createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage,
+                    isDestroyed, false);
+            } else {
+                if (isDestroyed) {
+                    campaign.addReport(String.format(resources.getString("convoyDestroyed.text"),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                        CLOSING_SPAN_TAG));
+                } else {
+                    campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        CLOSING_SPAN_TAG));
+                    deliverDrop(droppedItems, droppedUnits, cashReward);
+                }
+            }
+        };
+
+        // Associates the dismiss action to the dialog window close event
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                dialogDismissActionListener.actionPerformed(null);
+            }
+        });
+
+        // Prepares and adds the icon of the representative as a label
+        JLabel iconLabel = new JLabel();
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        Person logisticsOfficer = pickLogisticsRepresentative();
+        if (isIntroduction) {
+            if (logisticsOfficer == null) {
+                iconLabel.setIcon(Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(),
+                    true));
+            } else {
+                iconLabel.setIcon(logisticsOfficer.getPortrait().getImageIcon());
+            }
+        } else {
+            iconLabel.setIcon(Factions.getFactionLogo(campaign, employerFaction.getShortName(),
+                true));
+        }
+        dialog.add(iconLabel, BorderLayout.NORTH);
+
+        // Prepares and adds the description
+        String message = convoyStatusMessage;
+        String speaker = "";
+        if (isIntroduction) {
+            message = resources.getString("logisticsMessage.text") + "<br>";
+
+            if (logisticsOfficer != null) {
+                speaker = "<b>" + logisticsOfficer.getFullTitle() + "</b><br><br>";
+            }
+        }
+
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s%s%s</div></html>",
+            UIUtil.scaleForGUI(DIALOG_WIDTH), speaker, getCommanderTitle(false), message));
+        description.setHorizontalAlignment(JLabel.CENTER);
+        dialog.add(description, BorderLayout.CENTER);
+
+        // Prepares and adds the confirm button
+        JButton confirmButton = new JButton(resources.getString("logisticsPatch.text"));
+        if (!isIntroduction) {
+            if (isDestroyed) {
+                confirmButton.setText(resources.getString("logisticsDestroyed.text"));
+            } else {
+                confirmButton.setText(resources.getString("logisticsReceived.text"));
+            }
+        }
+        confirmButton.addActionListener(dialogDismissActionListener);
+        dialog.add(confirmButton,  BorderLayout.SOUTH);
+
+        // Pack, position and display the dialog
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    private Person pickLogisticsRepresentative() {
+        Person highestRankedCharacter = null;
+
+        for (Person person : campaign.getLogisticsPersonnel()) {
+            if (highestRankedCharacter == null) {
+                highestRankedCharacter = person;
+                continue;
+            }
+
+            if (person.outRanksUsingSkillTiebreaker(campaign, highestRankedCharacter)) {
+                highestRankedCharacter = person;
+            }
+        }
+
+        return highestRankedCharacter;
+    }
+
+    private String getCommanderTitle(boolean includeSurname) {
+        String placeholder = resources.getString("commander.text");
+        Person commander = campaign.getFlaggedCommander();
+
+        if (commander == null) {
+            return placeholder;
+        }
+
+        String rank = commander.getRankName();
+        String title = (rank == null || rank.contains("None")) ? "" : rank;
+
+        return (includeSurname) ? title + ' ' + commander.getSurname() : title;
     }
 
     /**
@@ -230,8 +424,8 @@ public class SupplyDrop {
      *                    dropped.
      * @param cashReward   The cash reward to be added to the finance ledger.
      */
-    private void deliveryDrop(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                              Money cashReward) {
+    private void deliverDrop(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
+                             Money cashReward) {
         if (droppedItems != null) {
             for (Part part : droppedItems) {
                 if (part instanceof AmmoBin) {
@@ -585,18 +779,12 @@ public class SupplyDrop {
         }
 
         AtBMoraleLevel morale = contract.getMoraleLevel();
-        AtBContractType contractType = contract.getContractType();
-        if (morale.isRouted() && contractType.isGarrisonType()) {
-            return resources.getString("routed" + Compute.randomInt(100) + "Garrison.text");
-        }
 
-        String append = "";
-        if (contractType.isGuerrillaWarfare()) {
-            append = "Smuggler";
+        if (morale.isRouted()) {
+            return resources.getString("adhocSupplies" + Compute.randomInt(20) + ".text");
+        } else {
+            return resources.getString(morale.toString().toLowerCase() + Compute.randomInt(10) + ".text");
         }
-        String moraleText = morale.toString().toLowerCase();
-
-        return resources.getString(moraleText + Compute.randomInt(50) + append + ".text");
     }
 
     /**

@@ -27,6 +27,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.StratconTab;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -124,6 +125,7 @@ public class CampaignManagementDialog extends JDialog {
         if (currentCampaignState.getSupportPoints() > 1) {
             supplyDropDialog();
         } else {
+            LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
             SupplyDrop supplyDrops = new SupplyDrop(campaign, contract, false, false);
             supplyDrops.getSupplyDropParts(1);
@@ -168,6 +170,8 @@ public class CampaignManagementDialog extends JDialog {
         JButton btnConfirm = new JButton("Confirm");
         btnConfirm.addActionListener( e-> {
             dialog.dispose();
+
+            LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
             SupplyDrop supplyDrops = new SupplyDrop(campaign, contract, false, false);
             supplyDrops.getSupplyDropParts((int) numberModel.getValue());
