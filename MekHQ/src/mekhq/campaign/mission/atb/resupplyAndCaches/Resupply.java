@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.mission.atb.supplyDrops;
+package mekhq.campaign.mission.atb.resupplyAndCaches;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
@@ -56,7 +56,7 @@ import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
-public class SupplyDrop {
+public class Resupply {
     final private Campaign campaign;
     final private AtBContract contract;
     final private Faction employerFaction;
@@ -73,11 +73,11 @@ public class SupplyDrop {
     private final Money TARGET_VALUE = Money.of(250000);
     private final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.SupplyDrop");
-    private final static MMLogger logger = MMLogger.create(SupplyDrop.class);
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private final static MMLogger logger = MMLogger.create(Resupply.class);
 
     /**
-     * SupplyDrop constructor, initializing the supply drop with a provided campaign and contract.
+     * Resupply constructor, initializing the supply drop with a provided campaign and contract.
      * It also sets up this instance with default values, and collects potential parts for the supply
      * drop.
      *
@@ -88,7 +88,7 @@ public class SupplyDrop {
      * @param skipUnits Whether to skip generating parts, if {@code true} this call must be followed
      *                 by {@code setPotentialUnits}
      */
-    public SupplyDrop(Campaign campaign, AtBContract contract, boolean skipParts, boolean skipUnits) {
+    public Resupply(Campaign campaign, AtBContract contract, boolean skipParts, boolean skipUnits) {
         this.campaign = campaign;
         this.contract = contract;
         this.employerFaction = contract.getEmployerFaction();
@@ -164,7 +164,7 @@ public class SupplyDrop {
             .append("<td>").append(columns[2]).append("</td>")
             .append("</tr></table>");
 
-        JDialog dialog = createSupplyDropDialog(icon, description.toString(), droppedItems, droppedUnits,
+        JDialog dialog = createResupplyDialog(icon, description.toString(), droppedItems, droppedUnits,
             cashReward);
 
         dialog.setModal(true);
@@ -183,7 +183,7 @@ public class SupplyDrop {
      * @param cashReward   The cash reward for the supply drop.
      * @return             An instance of JDialog ready to be made visible.
      */
-    public JDialog createSupplyDropDialog(ImageIcon icon, String description, @Nullable List<Part> droppedItems,
+    public JDialog createResupplyDialog(ImageIcon icon, String description, @Nullable List<Part> droppedItems,
                                           @Nullable List<Unit> droppedUnits, Money cashReward) {
         final int DIALOG_WIDTH = 900;
         final int DIALOG_HEIGHT = 500;
@@ -602,8 +602,8 @@ public class SupplyDrop {
      *
      * @param dropCount Number of times the part-generation loop must run.
      */
-    public void getSupplyDropParts(int dropCount) {
-        getSupplyDropParts(dropCount, false, false);
+    public void getResupplyParts(int dropCount) {
+        getResupplyParts(dropCount, false, false);
     }
 
     /**
@@ -613,8 +613,8 @@ public class SupplyDrop {
      * @param dropCount Number of times the part-generation loop must run.
      * @param isLoot    Boolean that flags whether drops are classified as loot.
      */
-    public void getSupplyDropParts(int dropCount, boolean isLoot) {
-        getSupplyDropParts(dropCount, isLoot, false);
+    public void getResupplyParts(int dropCount, boolean isLoot) {
+        getResupplyParts(dropCount, isLoot, false);
     }
 
     /**
@@ -626,7 +626,7 @@ public class SupplyDrop {
      * {@code false} if this is being generated at the end of a contract.
      * @param isContractEnd Boolean that flags whether drops are at the end of a contract.
      */
-    public void getSupplyDropParts(int dropCount, boolean isLoot, boolean isContractEnd) {
+    public void getResupplyParts(int dropCount, boolean isLoot, boolean isContractEnd) {
         List<Part> droppedItems = new ArrayList<>();
         Money cashReward = Money.zero();
 

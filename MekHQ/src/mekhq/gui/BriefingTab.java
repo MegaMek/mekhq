@@ -41,7 +41,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.supplyDrops.SupplyDrop;
+import mekhq.campaign.mission.atb.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -471,14 +471,14 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // exchange remaining support points to Supply Drops
+        // exchange remaining support points to Resupplys
         if (getCampaign().getCampaignOptions().isUseStratCon() && (mission instanceof AtBContract)) {
             int remainingSupportPoints = ((AtBContract) mission).getStratconCampaignState().getSupportPoints();
 
             if (remainingSupportPoints > 0) {
                 logger.info("BriefingTab.java");
-                SupplyDrop supplyDrops = new SupplyDrop(getCampaign(), ((AtBContract) mission), false, false);
-                supplyDrops.getSupplyDropParts(remainingSupportPoints, true);
+                Resupply supplyDrops = new Resupply(getCampaign(), ((AtBContract) mission), false, false);
+                supplyDrops.getResupplyParts(remainingSupportPoints, true);
             }
         }
 

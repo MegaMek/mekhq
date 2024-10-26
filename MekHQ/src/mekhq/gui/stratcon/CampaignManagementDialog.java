@@ -22,7 +22,7 @@ package mekhq.gui.stratcon;
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.atb.supplyDrops.SupplyDrop;
+import mekhq.campaign.mission.atb.resupplyAndCaches.Resupply;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -42,7 +42,7 @@ public class CampaignManagementDialog extends JDialog {
     private StratconCampaignState currentCampaignState;
     private StratconTab parent;
     private JButton btnConvertVPToSP;
-    private JButton btnRequestSupplyDrop;
+    private JButton btnRequestResupply;
     private JButton btnGMAddVP;
     private JButton btnGMAddSP;
     private JLabel lblTrackScenarioOdds;
@@ -61,7 +61,7 @@ public class CampaignManagementDialog extends JDialog {
         currentCampaignState = campaignState;
 
         btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         btnGMAddVP.setEnabled(gmMode);
         btnGMAddSP.setEnabled(gmMode);
 
@@ -93,10 +93,10 @@ public class CampaignManagementDialog extends JDialog {
         btnConvertVPToSP.addActionListener(this::convertVPtoSPHandler);
         getContentPane().add(btnConvertVPToSP);
 
-        btnRequestSupplyDrop = new JButton();
-        btnRequestSupplyDrop.setText("Request Supply Drop");
-        btnRequestSupplyDrop.addActionListener(this::requestSupplyDrop);
-        getContentPane().add(btnRequestSupplyDrop);
+        btnRequestResupply = new JButton();
+        btnRequestResupply.setText("Request Resupply");
+        btnRequestResupply.addActionListener(this::requestResupply);
+        getContentPane().add(btnRequestResupply);
 
         btnGMAddVP = new JButton();
         btnGMAddVP.setText("Add CVP (GM)");
@@ -117,30 +117,30 @@ public class CampaignManagementDialog extends JDialog {
     private void convertVPtoSPHandler(ActionEvent e) {
         currentCampaignState.convertVictoryToSupportPoint();
         btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }
 
-    private void requestSupplyDrop(ActionEvent e) {
+    private void requestResupply(ActionEvent e) {
         if (currentCampaignState.getSupportPoints() > 1) {
             supplyDropDialog();
         } else {
             LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
-            SupplyDrop supplyDrops = new SupplyDrop(campaign, contract, false, false);
-            supplyDrops.getSupplyDropParts(1);
+            Resupply supplyDrops = new Resupply(campaign, contract, false, false);
+            supplyDrops.getResupplyParts(1);
 
             currentCampaignState.useSupportPoint();
         }
 
-        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }
 
     public void supplyDropDialog() {
         final JDialog dialog = new JDialog();
         dialog.setLayout(new GridBagLayout());
-        dialog.setTitle("Requesting Supply Drop");
+        dialog.setTitle("Requesting Resupply");
         dialog.setSize(400, 200);
         dialog.setLocationRelativeTo(null);
 
@@ -152,7 +152,7 @@ public class CampaignManagementDialog extends JDialog {
         JLabel description = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 UIUtil.scaleForGUI(500), "How many Support Points would you like to spend?" +
-                    "<br><br>Each SP point increases the value of the Supply Drop by roughly 250,000 C-Bills"));
+                    "<br><br>Each SP point increases the value of the Resupply by roughly 250,000 C-Bills"));
         description.setAlignmentX(Component.CENTER_ALIGNMENT);
         dialog.add(description, constraints);
 
@@ -173,8 +173,8 @@ public class CampaignManagementDialog extends JDialog {
 
             LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
-            SupplyDrop supplyDrops = new SupplyDrop(campaign, contract, false, false);
-            supplyDrops.getSupplyDropParts((int) numberModel.getValue());
+            Resupply supplyDrops = new Resupply(campaign, contract, false, false);
+            supplyDrops.getResupplyParts((int) numberModel.getValue());
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });
 
@@ -193,7 +193,7 @@ public class CampaignManagementDialog extends JDialog {
 
     private void gmAddSPHandler(ActionEvent e) {
         currentCampaignState.addSupportPoints(1);
-        btnRequestSupplyDrop.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }
 }
