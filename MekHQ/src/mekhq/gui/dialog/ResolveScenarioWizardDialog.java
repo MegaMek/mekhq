@@ -19,7 +19,78 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+// switch (currentPanel) {
+//     case UNITSPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.missingunits"));
+//         break;
+//     case PILOTPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.personnel"));
+//         break;
+//     case SALVAGEPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.salvage"));
+//         break;
+//     case KILLPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.kills"));
+//         break;
+//     case PRISONERPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.prisoners"));
+//         break;
+//     case PREVIEWPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.preview"));
+//         break;
+//     case REWARDPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.reward"));
+//         break;
+//     case OBJECTIVEPANEL:
+//         txtInstructions.setText(resourceMap.getString("txtInstructions.text.objectives"));
+//         break;
+//     default:
+//         txtInstructions.setText("");
+//         break;
+// }
+
+ package mekhq.gui.dialog;
+
+import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
+
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.EntityReadoutDialog;
@@ -52,14 +123,6 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.*;
-
-import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
-
 /**
  * @author Taharqa
  */
@@ -88,13 +151,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JButton btnNext;
     private JButton btnFinish;
     private JButton btnBack;
-    private JTextArea txtInstructions;
 
-    private CardLayout cardLayout;
     private String currentPanel;
+    private JTabbedPane tabMain;
 
-    private JScrollPane scrMain;
-    private JPanel pnlMain;
     private JPanel pnlUnitStatus;
     private JPanel pnlObjectiveStatus;
     private JPanel pnlPilotStatus;
@@ -212,14 +272,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * B, C, F, N, ESCAPE
      */
     private void initComponents() {
-        // Initialize Local Variables
         GridBagConstraints gridBagConstraints;
-        int gridy;
-        int gridx;
-        int i = 2;
-        int j = 0;
-
-        cardLayout = new CardLayout();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -230,36 +283,128 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         setName("Form");
 
-        getContentPane().setLayout(new BorderLayout());
+        getContentPane().setLayout(new GridBagLayout());
 
         setTitle(resourceMap.getString("title"));
 
-        /*
-         * Instructions at the top
-         */
-        txtInstructions = new JTextArea();
-        txtInstructions.setText("");
-        txtInstructions.setEditable(false);
-        txtInstructions.setLineWrap(true);
-        txtInstructions.setWrapStyleWord(true);
-        txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-        getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
+        tabMain = new JTabbedPane();
 
-        /*
-         * Set up main panel with cards
-         */
-        pnlMain = new JPanel(cardLayout);
+        //region Make Panels
+        pnlUnitStatus = makeUnitStatusPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlUnitStatus), UNITSPANEL);
 
-        //region Unit Status Panel
-        pnlUnitStatus = new JPanel();
+
+        pnlPilotStatus = makePilotStatusPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlPilotStatus), PILOTPANEL);
+
+
+        pnlSalvage = makeSalvagePanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlSalvage), SALVAGEPANEL);
+
+
+        pnlPrisonerStatus = makePrisonerStatusPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlPrisonerStatus), PRISONERPANEL);
+
+
+        pnlKills = makeKillsPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlKills), KILLPANEL);
+
+
+        pnlRewards = makeRewardsPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlRewards), REWARDPANEL);
+
+
+        pnlObjectiveStatus = makeObjectiveStatusPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlObjectiveStatus), OBJECTIVEPANEL);
+        
+
+        pnlPreview = makePreviewPanel();
+        tabMain.add(new JScrollPaneWithSpeed(pnlPreview), PREVIEWPANEL);
+
+
+        //scrMain = new JScrollPaneWithSpeed(pnlMain);
+        //scrMain.setMinimumSize(UIUtil.scaleForGUI(600, 500));
+        //scrMain.setPreferredSize(UIUtil.scaleForGUI(900, 500));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx=0;
+        gridBagConstraints.gridy=0;
+        gridBagConstraints.weighty=1.0;
+        gridBagConstraints.anchor=GridBagConstraints.NORTHWEST;
+        getContentPane().add(tabMain, gridBagConstraints);
+
+
+        // region Button Panel
+        JPanel panButtons = new JPanel();
+        panButtons.setName("panButtons");
+        panButtons.setLayout(new GridBagLayout());
+
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnClose");
+        btnCancel.setMnemonic(KeyEvent.VK_C);
+        btnCancel.addActionListener(evt -> cancel());
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panButtons.add(btnCancel, gridBagConstraints);
+
+        btnBack = new JButton(resourceMap.getString("btnBack.text"));
+        btnBack.setName("btnBack");
+        btnBack.setMnemonic(KeyEvent.VK_B);
+        btnBack.addActionListener(evt -> back());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 0.0;
+        panButtons.add(btnBack, gridBagConstraints);
+
+        btnNext = new JButton(resourceMap.getString("btnNext.text"));
+        btnNext.setName("btnNext");
+        btnNext.setMnemonic(KeyEvent.VK_N);
+        btnNext.addActionListener(evt -> next());
+        gridBagConstraints.gridx = 2;
+        panButtons.add(btnNext, gridBagConstraints);
+
+        btnFinish = new JButton(resourceMap.getString("btnFinish.text"));
+        btnFinish.setName("btnFinish");
+        btnFinish.setMnemonic(KeyEvent.VK_F);
+        btnFinish.addActionListener(evt -> finish());
+        gridBagConstraints.gridx = 3;
+        panButtons.add(btnFinish, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx=0;
+        gridBagConstraints.gridy=1;
+
+        getContentPane().add(panButtons, gridBagConstraints);
+
+        switchPanel(currentPanel);
+        if (!usePanel(currentPanel)) {
+            next();
+        }
+
+        tabMain.setEnabled(false);
+        btnNext.setEnabled(true);
+        btnBack.setEnabled(false);
+        btnFinish.setEnabled(false);
+
+        pack();
+    }
+
+
+    private JPanel makeUnitStatusPanel() {
+        GridBagConstraints gridBagConstraints;
+        int replaceme_i = 2;
+        int replaceme_j = 0;
+
+        JPanel pnlUnitStatus = new JPanel();
 
         pnlUnitStatus.setLayout(new GridBagLayout());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlUnitStatus.add(new JLabel(resourceMap.getString("totaled")), gridBagConstraints);
@@ -284,7 +429,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             chkTotaled.setName("chkTotaled");
             chkTotaled.getAccessibleContext().setAccessibleName(resourceMap.getString("totaled"));
             chkTotaled.setSelected(status.isTotalLoss());
-            chkTotaled.setName(Integer.toString(j));
+            chkTotaled.setName(Integer.toString(replaceme_j));
             chkTotaled.setActionCommand(unit.getId().toString());
             chkTotaled.addItemListener(new CheckTotalListener());
             chksTotaled.add(chkTotaled);
@@ -296,18 +441,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnEditUnit = new JButton("Edit Unit");
             btnEditUnit.setEnabled(!status.isTotalLoss());
             btnEditUnit.setActionCommand(unit.getId().toString());
-            btnEditUnit.setName(Integer.toString(j));
+            btnEditUnit.setName(Integer.toString(replaceme_j));
             btnEditUnit.addActionListener(new EditUnitListener());
             btnsEditUnit.add(btnEditUnit);
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
-            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridy = replaceme_i;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if (++j == tracker.getUnits().size()) {
+            if (++replaceme_j == tracker.getUnits().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlUnitStatus.add(nameLbl, gridBagConstraints);
@@ -318,21 +462,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 3;
             gridBagConstraints.weightx = 1.0;
             pnlUnitStatus.add(btnEditUnit, gridBagConstraints);
-            i++;
+            replaceme_i++;
         }
-        pnlMain.add(pnlUnitStatus, UNITSPANEL);
-        //endregion Unit Status Panel
+        return pnlUnitStatus;
+    }
 
-        //region Objective Status Panel
-        generateObjectiveStatusPanel();
-        pnlMain.add(pnlObjectiveStatus, OBJECTIVEPANEL);
-        //endregion Objective Status Panel
 
-        //region Pilot Status Panel
-        pnlPilotStatus = new JPanel();
+    private JPanel makePilotStatusPanel() {
+        JPanel pnlPilotStatus = new JPanel();
         pnlPilotStatus.setLayout(new GridBagLayout());
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
@@ -347,8 +487,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridx = 3;
         pnlPilotStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
 
-        j = 0;
-        gridy = 2;
+        int replaceme_j = 0;
+        int replaceme_gridy = 2;
 
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         labelTable.put(0, new JLabel("0") );
@@ -361,31 +501,31 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (PersonStatus status : tracker.getSortedPeople()) {
             pstatuses.add(status);
 
-            gridx = 0;
+            int replaceme_gridx = 0;
 
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.gridy = gridy++;
+            gridBagConstraints.gridx = replaceme_gridx++;
+            gridBagConstraints.gridy = replaceme_gridy++;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if (++j == tracker.getPeopleStatus().keySet().size()) {
+            if (++replaceme_j == tracker.getPeopleStatus().keySet().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
 
-            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
+            JLabel nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             pnlPilotStatus.add(nameLbl, gridBagConstraints);
 
             JSlider hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(), 5));
-            hitSlider.setName(Integer.toString(j - 1));
+            hitSlider.setName(Integer.toString(replaceme_j - 1));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
             hitSlider.setPaintLabels(true);
             hitSlider.setSnapToTicks(true);
             hitSliders.add(hitSlider);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
 
             JCheckBox miaCheck = new JCheckBox("");
@@ -393,7 +533,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             miaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("mia"));
             miaCheck.setSelected(status.isMissing());
             miaBtns.add(miaCheck);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
 
             JCheckBox kiaCheck = new JCheckBox("");
@@ -402,27 +542,193 @@ public class ResolveScenarioWizardDialog extends JDialog {
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck));
             kiaCheck.setSelected(status.isDead());
             kiaBtns.add(kiaCheck);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPilotStatus.add(kiaCheck, gridBagConstraints);
 
             JButton btnViewPilot = new JButton("View Personnel");
             btnViewPilot.addActionListener(evt -> showPerson(status, false));
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(btnViewPilot, gridBagConstraints);
         }
-        pnlMain.add(pnlPilotStatus, PILOTPANEL);
-        //endregion Pilot Status Panel
 
-        //region Prisoner Status Panel
-        pnlPrisonerStatus = new JPanel();
+        return pnlPilotStatus;
+    }
+
+
+    private JPanel makeSalvagePanel() {
+        // Create the panel
+        JPanel pnlSalvage = new JPanel();
+        pnlSalvage.setLayout(new GridBagLayout());
+        JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
+
+        int replaceme_gridx = 0;
+        int replaceme_gridy = 0;
+        GridBagConstraints gridBagConstraints;
+        if ((tracker.getMission() instanceof Contract) && !tracker.usesSalvageExchange()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+
+            JLabel lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
+            gridBagConstraints.gridx = replaceme_gridx++;
+            gridBagConstraints.gridy = replaceme_gridy++;
+            gridBagConstraints.weightx = 0.0;
+            pnlSalvageValue.add(lblSalvageValueUnit1, gridBagConstraints);
+
+            lblSalvageValueUnit2 = new JLabel(salvageUnit.toAmountAndSymbolString());
+            gridBagConstraints.gridx = replaceme_gridx--;
+            gridBagConstraints.weightx = 1.0;
+            pnlSalvageValue.add(lblSalvageValueUnit2, gridBagConstraints);
+
+            JLabel lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));
+            gridBagConstraints.gridx = replaceme_gridx++;
+            gridBagConstraints.gridy = replaceme_gridy++;
+            gridBagConstraints.weightx = 0.0;
+            pnlSalvageValue.add(lblSalvageValueEmployer1, gridBagConstraints);
+
+            lblSalvageValueEmployer2 = new JLabel(salvageEmployer.toAmountAndSymbolString());
+            gridBagConstraints.gridx = replaceme_gridx--;
+            gridBagConstraints.weightx = 1.0;
+            pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
+
+            JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
+            gridBagConstraints.gridx = replaceme_gridx++;
+            gridBagConstraints.gridy = replaceme_gridy++;
+            gridBagConstraints.weightx = 0.0;
+            pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
+
+            String lead = "<html>" + ((currentSalvagePct > maxSalvagePct) ? "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" : "<font>");
+            lblSalvagePct2 = new JLabel(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
+            gridBagConstraints.gridx = replaceme_gridx--;
+            gridBagConstraints.weightx = 1.0;
+            pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.gridwidth = 4;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 0, 20, 0);
+            pnlSalvage.add(pnlSalvageValue, gridBagConstraints);
+        }
+
+        // Update any indexing variables
+        int replaceme_j = 0;
+        replaceme_gridx = 1;
+
+        // Create the Title Line
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridy = replaceme_gridy++;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+
+        gridBagConstraints.gridx = replaceme_gridx++;
+        pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvage.text")), gridBagConstraints);
+
+        gridBagConstraints.gridx = replaceme_gridx++;
+        pnlSalvage.add(new JLabel(resourceMap.getString("lblSell.text")), gridBagConstraints);
+
+        gridBagConstraints.gridx = replaceme_gridx++;
+        pnlSalvage.add(new JLabel(resourceMap.getString("lblEscaped.text")), gridBagConstraints);
+
+        // Initialize the tracking ArrayLists
+        salvageUnitLabel = new ArrayList<>();
+        salvageBoxes = new ArrayList<>();
+        soldUnitBoxes = new ArrayList<>();
+        escapeBoxes = new ArrayList<>();
+        btnsSalvageEditUnit = new ArrayList<>();
+
+        // Create the GridBagConstraint to use for the buttons
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+
+        for (TestUnit u : tracker.getPotentialSalvage()) {
+            // Initial variable work
+            replaceme_gridx = 0;
+            salvageables.add(u);
+            UnitStatus status = tracker.getSalvageStatus().get(u.getId());
+
+            // Initial update to the GridBagConstraints
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.gridy = replaceme_gridy++;
+            gridBagConstraints.weightx = 0.0;
+            if ((replaceme_j + 1) == tracker.getPotentialSalvage().size()) { // we only want the weight change on the last one
+                gridBagConstraints.weighty = 1.0;
+            }
+
+            // Now, we start creating the boxes
+            JLabel salvageUnit = new JLabel(status.getDesc(true));
+            salvageUnitLabel.add(salvageUnit);
+            gridBagConstraints.gridx = replaceme_gridx++;
+            pnlSalvage.add(salvageUnit, gridBagConstraints);
+
+            JCheckBox salvaged = new JCheckBox("");
+            salvaged.setName("salvaged");
+            salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
+            salvaged.setEnabled(!tracker.usesSalvageExchange());
+            salvaged.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
+            salvaged.addItemListener(evt -> checkSalvageRights());
+            salvageBoxes.add(salvaged);
+            gridBagConstraints.anchor = GridBagConstraints.NORTH;
+            gridBagConstraints.gridx = replaceme_gridx++;
+            pnlSalvage.add(salvaged, gridBagConstraints);
+
+            JCheckBox sold = new JCheckBox("");
+            sold.setName("sold");
+            sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
+            sold.setEnabled(!tracker.usesSalvageExchange()  && tracker.getCampaign().getCampaignOptions().isSellUnits());
+            sold.addItemListener(evt -> checkSalvageRights());
+            soldUnitBoxes.add(sold);
+            gridBagConstraints.gridx = replaceme_gridx++;
+            pnlSalvage.add(sold, gridBagConstraints);
+
+            JCheckBox escaped = new JCheckBox("");
+            escaped.setName("escaped");
+            escaped.getAccessibleContext().setAccessibleName(resourceMap.getString("lblEscaped.text"));
+            escaped.setEnabled(!(u.getEntity().isDestroyed() || u.getEntity().isDoomed()));
+            escaped.setSelected(!status.isLikelyCaptured());
+            escaped.addItemListener(evt -> checkSalvageRights());
+            escaped.setActionCommand(u.getEntity().getExternalIdAsString());
+            escapeBoxes.add(escaped);
+            gridBagConstraints.gridx = replaceme_gridx++;
+            pnlSalvage.add(escaped, gridBagConstraints);
+
+            JButton btnSalvageViewUnit = new JButton("View Unit");
+            btnSalvageViewUnit.setActionCommand(u.getId().toString());
+            btnSalvageViewUnit.addActionListener(new ViewUnitListener(true));
+            gridBagConstraints.gridx = replaceme_gridx++;
+            pnlSalvage.add(btnSalvageViewUnit, gridBagConstraints);
+
+            JButton btnSalvageEditUnit = new JButton("Edit Unit");
+            btnSalvageEditUnit.setName(Integer.toString(replaceme_j++));
+            btnSalvageEditUnit.setActionCommand(u.getId().toString());
+            btnSalvageEditUnit.addActionListener(new EditUnitListener(true));
+            btnsSalvageEditUnit.add(btnSalvageEditUnit);
+            gridBagConstraints.gridx = replaceme_gridx++;
+            gridBagConstraints.weightx = 1.0;
+            pnlSalvage.add(btnSalvageEditUnit, gridBagConstraints);
+        }
+
+        checkSalvageRights();
+        return pnlSalvage;
+    }
+
+
+
+    private JPanel makePrisonerStatusPanel() {
+        JPanel pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.setLayout(new GridBagLayout());
 
-        gridx = 1;
+        int replaceme_gridx = 1;
 
         prisonerRansomAllButton = new JButton(resourceMap.getString("prisonerRansomAllButton.text"));
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx=2;
         gridBagConstraints.gridy=0;
         gridBagConstraints.gridwidth=3;
@@ -432,48 +738,55 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         prisonerRansomAllButton.addActionListener(evt -> prisonerRansomAll());
 
-
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridx = replaceme_gridx++;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("hits")), gridBagConstraints);
 
-        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridx = replaceme_gridx++;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
 
-        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridx = replaceme_gridx++;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerRansomed.text")), gridBagConstraints);
 
-        gridBagConstraints.gridx = gridx++;
+        gridBagConstraints.gridx = replaceme_gridx++;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
 
-        j = 0;
-        gridy = 2;
+        int replaceme_j = 0;
+        int replaceme_gridy = 2;
+
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+        labelTable.put(0, new JLabel("0") );
+        labelTable.put(1, new JLabel("1") );
+        labelTable.put(2, new JLabel("2") );
+        labelTable.put(3, new JLabel("3") );
+        labelTable.put(4, new JLabel("4") );
+        labelTable.put(5, new JLabel("5") );
 
         for (OppositionPersonnelStatus status : tracker.getSortedPrisoners()) {
             prstatuses.add(status);
 
-            gridx = 0;
+            replaceme_gridx = 0;
 
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.gridy = gridy++;
+            gridBagConstraints.gridx = replaceme_gridx++;
+            gridBagConstraints.gridy = replaceme_gridy++;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if (++j == tracker.getOppositionPersonnel().keySet().size()) {
+            if (++replaceme_j == tracker.getOppositionPersonnel().keySet().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
 
-            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
+            JLabel nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             pnlPrisonerStatus.add(nameLbl, gridBagConstraints);
 
             JSlider hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(), 5));
-            hitSlider.setName(Integer.toString(j - 1));
+            hitSlider.setName(Integer.toString(replaceme_j - 1));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
@@ -481,7 +794,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             hitSlider.setSnapToTicks(true);
             pr_hitSliders.add(hitSlider);
             gridBagConstraints.anchor = GridBagConstraints.NORTH;
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPrisonerStatus.add(hitSlider, gridBagConstraints);
 
             JCheckBox prisonerCapturedCheck = new JCheckBox("");
@@ -490,7 +803,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prisonerCapturedCheck.setSelected(status.isCaptured());
             prisonerCapturedCheck.addItemListener(evt -> checkPrisonerStatus());
             prisonerCapturedBtns.add(prisonerCapturedCheck);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPrisonerStatus.add(prisonerCapturedCheck, gridBagConstraints);
 
             JCheckBox prisonerRansomedCheck = new JCheckBox("");
@@ -499,7 +812,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prisonerRansomedCheck.setEnabled(!status.isCaptured());
             prisonerRansomedCheck.addItemListener(evt -> checkPrisonerStatus());
             prisonerRansomedBtns.add(prisonerRansomedCheck);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPrisonerStatus.add(prisonerRansomedCheck, gridBagConstraints);
 
             JCheckBox kiaCheck = new JCheckBox("");
@@ -507,12 +820,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
             kiaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("kia"));
             kiaCheck.addItemListener(evt -> checkPrisonerStatus());
             prisonerKiaBtns.add(kiaCheck);
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
 
             JButton btnViewPrisoner = new JButton("View Personnel");
             btnViewPrisoner.addActionListener(evt -> showPerson(status, true));
-            gridBagConstraints.gridx = gridx++;
+            gridBagConstraints.gridx = replaceme_gridx++;
             gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
 
@@ -538,178 +851,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
             // as this is the earliest point in which that description is visible to the user
             writeDescription(status.getPerson());
         }
-        pnlMain.add(pnlPrisonerStatus, PRISONERPANEL);
-        //endregion Prisoner Status Panel
+        
+        return pnlPrisonerStatus;
+    }
 
-        //region Salvage Panel
-        // Create the panel
-        pnlSalvage = new JPanel();
-        pnlSalvage.setLayout(new GridBagLayout());
-        JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
 
-        gridx = 0;
-        gridy = 0;
-        if ((tracker.getMission() instanceof Contract) && !tracker.usesSalvageExchange()) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-
-            JLabel lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
-            gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.gridy = gridy++;
-            gridBagConstraints.weightx = 0.0;
-            pnlSalvageValue.add(lblSalvageValueUnit1, gridBagConstraints);
-
-            lblSalvageValueUnit2 = new JLabel(salvageUnit.toAmountAndSymbolString());
-            gridBagConstraints.gridx = gridx--;
-            gridBagConstraints.weightx = 1.0;
-            pnlSalvageValue.add(lblSalvageValueUnit2, gridBagConstraints);
-
-            JLabel lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));
-            gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.gridy = gridy++;
-            gridBagConstraints.weightx = 0.0;
-            pnlSalvageValue.add(lblSalvageValueEmployer1, gridBagConstraints);
-
-            lblSalvageValueEmployer2 = new JLabel(salvageEmployer.toAmountAndSymbolString());
-            gridBagConstraints.gridx = gridx--;
-            gridBagConstraints.weightx = 1.0;
-            pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
-
-            JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
-            gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.gridy = gridy++;
-            gridBagConstraints.weightx = 0.0;
-            pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
-
-            String lead = "<html>" + ((currentSalvagePct > maxSalvagePct) ? "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" : "<font>");
-            lblSalvagePct2 = new JLabel(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
-            gridBagConstraints.gridx = gridx--;
-            gridBagConstraints.weightx = 1.0;
-            pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.gridwidth = 4;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(0, 0, 20, 0);
-            pnlSalvage.add(pnlSalvageValue, gridBagConstraints);
-        }
-
-        // Update any indexing variables
-        j = 0;
-        gridx = 1;
-
-        // Create the Title Line
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridy = gridy++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-
-        gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblSalvage.text")), gridBagConstraints);
-
-        gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblSell.text")), gridBagConstraints);
-
-        gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblEscaped.text")), gridBagConstraints);
-
-        // Initialize the tracking ArrayLists
-        salvageUnitLabel = new ArrayList<>();
-        salvageBoxes = new ArrayList<>();
-        soldUnitBoxes = new ArrayList<>();
-        escapeBoxes = new ArrayList<>();
-        btnsSalvageEditUnit = new ArrayList<>();
-
-        // Create the GridBagConstraint to use for the buttons
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-
-        for (TestUnit u : tracker.getPotentialSalvage()) {
-            // Initial variable work
-            gridx = 0;
-            salvageables.add(u);
-            UnitStatus status = tracker.getSalvageStatus().get(u.getId());
-
-            // Initial update to the GridBagConstraints
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.gridy = gridy++;
-            gridBagConstraints.weightx = 0.0;
-            if ((j + 1) == tracker.getPotentialSalvage().size()) { // we only want the weight change on the last one
-                gridBagConstraints.weighty = 1.0;
-            }
-
-            // Now, we start creating the boxes
-            JLabel salvageUnit = new JLabel(status.getDesc(true));
-            salvageUnitLabel.add(salvageUnit);
-            gridBagConstraints.gridx = gridx++;
-            pnlSalvage.add(salvageUnit, gridBagConstraints);
-
-            JCheckBox salvaged = new JCheckBox("");
-            salvaged.setName("salvaged");
-            salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
-            salvaged.setEnabled(!tracker.usesSalvageExchange());
-            salvaged.setSelected(!tracker.usesSalvageExchange() && (maxSalvagePct >= 100));
-            salvaged.addItemListener(evt -> checkSalvageRights());
-            salvageBoxes.add(salvaged);
-            gridBagConstraints.anchor = GridBagConstraints.NORTH;
-            gridBagConstraints.gridx = gridx++;
-            pnlSalvage.add(salvaged, gridBagConstraints);
-
-            JCheckBox sold = new JCheckBox("");
-            sold.setName("sold");
-            sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
-            sold.setEnabled(!tracker.usesSalvageExchange()  && tracker.getCampaign().getCampaignOptions().isSellUnits());
-            sold.addItemListener(evt -> checkSalvageRights());
-            soldUnitBoxes.add(sold);
-            gridBagConstraints.gridx = gridx++;
-            pnlSalvage.add(sold, gridBagConstraints);
-
-            JCheckBox escaped = new JCheckBox("");
-            escaped.setName("escaped");
-            escaped.getAccessibleContext().setAccessibleName(resourceMap.getString("lblEscaped.text"));
-            escaped.setEnabled(!(u.getEntity().isDestroyed() || u.getEntity().isDoomed()));
-            escaped.setSelected(!status.isLikelyCaptured());
-            escaped.addItemListener(evt -> checkSalvageRights());
-            escaped.setActionCommand(u.getEntity().getExternalIdAsString());
-            escapeBoxes.add(escaped);
-            gridBagConstraints.gridx = gridx++;
-            pnlSalvage.add(escaped, gridBagConstraints);
-
-            JButton btnSalvageViewUnit = new JButton("View Unit");
-            btnSalvageViewUnit.setActionCommand(u.getId().toString());
-            btnSalvageViewUnit.addActionListener(new ViewUnitListener(true));
-            gridBagConstraints.gridx = gridx++;
-            pnlSalvage.add(btnSalvageViewUnit, gridBagConstraints);
-
-            JButton btnSalvageEditUnit = new JButton("Edit Unit");
-            btnSalvageEditUnit.setName(Integer.toString(j++));
-            btnSalvageEditUnit.setActionCommand(u.getId().toString());
-            btnSalvageEditUnit.addActionListener(new EditUnitListener(true));
-            btnsSalvageEditUnit.add(btnSalvageEditUnit);
-            gridBagConstraints.gridx = gridx++;
-            gridBagConstraints.weightx = 1.0;
-            pnlSalvage.add(btnSalvageEditUnit, gridBagConstraints);
-        }
-
-        checkSalvageRights();
-        pnlMain.add(pnlSalvage, SALVAGEPANEL);
-        //endregion Salvage Panel
-
-        /*
-         * Assign Kills panel
-         */
-        pnlKills = new JPanel();
+    private JPanel makeKillsPanel() {
+        JPanel pnlKills = new JPanel();
         killChoices = new Hashtable<>();
         pnlKills.setLayout(new GridBagLayout());
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
@@ -725,13 +877,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         pnlKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
 
-        i = 2;
+        int replaceme_i = 2;
         JComboBox<String> comboAssign;
         DefaultComboBoxModel<String> assignModel;
-        j = 0;
+        int replaceme_j = 0;
         for (String killName : tracker.getKillCredits().keySet()) {
-            j++;
-            nameLbl = new JLabel(killName);
+            replaceme_j++;
+            JLabel nameLbl = new JLabel(killName);
             assignModel = new DefaultComboBoxModel<>();
             assignModel.addElement(resourceMap.getString("none"));
             int idx = 0;
@@ -755,54 +907,56 @@ public class ResolveScenarioWizardDialog extends JDialog {
             comboAssign.setSelectedIndex(selected);
             killChoices.put(killName, comboAssign);
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridy = replaceme_i;
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if (j == tracker.getKillCredits().keySet().size()) {
+            if (replaceme_j == tracker.getKillCredits().keySet().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlKills.add(nameLbl, gridBagConstraints);
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.gridx = 1;
             pnlKills.add(comboAssign, gridBagConstraints);
-            i++;
+            replaceme_i++;
         }
-        pnlMain.add(pnlKills, KILLPANEL);
+        return pnlKills;
+    }
 
-        /*
-         * Collect Rewards Panel
-         */
-        pnlRewards = new JPanel();
+    
+    private JPanel makeRewardsPanel() {
+        JPanel pnlRewards = new JPanel();
         pnlRewards.setLayout(new GridBagLayout());
         lootBoxes = new ArrayList<>();
-        i = 0;
-        j = 0;
+        int replaceme_i = 0;
+        int replaceme_j = 0;
+        GridBagConstraints gridBagConstraints;
         for (Loot loot : loots) {
-            j++;
+            replaceme_j++;
             JCheckBox box = new JCheckBox(loot.getShortDescription());
             box.setSelected(false);
             lootBoxes.add(box);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridy = replaceme_i;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if (j == (loots.size())) {
+            if (replaceme_j == (loots.size())) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlRewards.add(box, gridBagConstraints);
-            i++;
+            replaceme_i++;
         }
-        pnlMain.add(pnlRewards, REWARDPANEL);
+        return pnlRewards;
+    }
 
-        /*
-         * Preview Panel
-         */
-        pnlPreview = new JPanel();
+
+    private JPanel makePreviewPanel() {
+
+        JPanel pnlPreview = new JPanel();
         choiceStatus = new JComboBox<>();
         JScrollPane scrRecoveredUnits = new JScrollPaneWithSpeed();
         JScrollPane scrRecoveredPilots = new JScrollPaneWithSpeed();
@@ -810,7 +964,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JScrollPane scrMissingPilots = new JScrollPaneWithSpeed();
         JScrollPane scrDeadPilots = new JScrollPaneWithSpeed();
         JScrollPane scrSalvage = new JScrollPaneWithSpeed();
-        txtInstructions = new JTextArea();
         txtReport = new MarkdownEditorPanel("After-Action Report");
         txtRecoveredUnits = new JTextArea();
         txtRecoveredPilots = new JTextArea();
@@ -839,7 +992,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlStatus.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
         pnlStatus.add(lblStatus);
         pnlStatus.add(choiceStatus);
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 3;
@@ -1001,72 +1154,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPreview.add(scrDeadPilots, gridBagConstraints);
-        pnlMain.add(pnlPreview, PREVIEWPANEL);
 
-
-        scrMain = new JScrollPaneWithSpeed(pnlMain);
-        scrMain.setMinimumSize(UIUtil.scaleForGUI(600, 500));
-        scrMain.setPreferredSize(UIUtil.scaleForGUI(900, 500));
-        getContentPane().add(scrMain, BorderLayout.CENTER);
-
-
-        /*
-         * Set up button panel
-         */
-        JPanel panButtons = new JPanel();
-        panButtons.setName("panButtons");
-        panButtons.setLayout(new GridBagLayout());
-
-        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
-        btnCancel.setName("btnClose");
-        btnCancel.setMnemonic(KeyEvent.VK_C);
-        btnCancel.addActionListener(evt -> cancel());
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panButtons.add(btnCancel, gridBagConstraints);
-
-        btnBack = new JButton(resourceMap.getString("btnBack.text"));
-        btnBack.setName("btnBack");
-        btnBack.setMnemonic(KeyEvent.VK_B);
-        btnBack.addActionListener(evt -> back());
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.weightx = 0.0;
-        panButtons.add(btnBack, gridBagConstraints);
-
-        btnNext = new JButton(resourceMap.getString("btnNext.text"));
-        btnNext.setName("btnNext");
-        btnNext.setMnemonic(KeyEvent.VK_N);
-        btnNext.addActionListener(evt -> next());
-        gridBagConstraints.gridx = 2;
-        panButtons.add(btnNext, gridBagConstraints);
-
-        btnFinish = new JButton(resourceMap.getString("btnFinish.text"));
-        btnFinish.setName("btnFinish");
-        btnFinish.setMnemonic(KeyEvent.VK_F);
-        btnFinish.addActionListener(evt -> finish());
-        gridBagConstraints.gridx = 3;
-        panButtons.add(btnFinish, gridBagConstraints);
-
-        getContentPane().add(panButtons, BorderLayout.PAGE_END);
-
-        switchPanel(currentPanel);
-        if (!usePanel(currentPanel)) {
-            next();
-        }
-
-        btnNext.setEnabled(true);
-        btnBack.setEnabled(false);
-        btnFinish.setEnabled(false);
-
-        pack();
+        return pnlPreview;
     }
 
+    
+
+
+    
     private void prisonerRansomAll() {
         Iterator<JCheckBox> capturedBoxes = prisonerCapturedBtns.iterator();
         Iterator<JCheckBox> ransomedBoxes = prisonerRansomedBtns.iterator();
@@ -1078,6 +1173,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
     }
+
+
+
+
+
 
 
     /**
@@ -1102,14 +1202,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
         return false;
     }
 
-    private void generateObjectiveStatusPanel() {
-        pnlObjectiveStatus = new JPanel();
+    private JPanel makeObjectiveStatusPanel() {
+        JPanel pnlObjectiveStatus = new JPanel();
         if (usePanel(OBJECTIVEPANEL)) {
             pnlObjectiveStatus.setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
-            gbc.gridy = 1;
-            gbc.gridwidth = 1;
+            gbc.gridy = 0;
             gbc.anchor = GridBagConstraints.NORTHWEST;
             gbc.insets = new Insets(5, 5, 0, 0);
             pnlObjectiveStatus.add(new JLabel("Objectives:"), gbc);
@@ -1173,6 +1272,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 updateObjectiveDisplay(objective, lblObjective);
             }
         }
+        return pnlObjectiveStatus;
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
@@ -1192,50 +1292,22 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         currentPanel = name;
         setTitle(currentPanel);
-        cardLayout.show(pnlMain, currentPanel);
-        switchInstructions();
 
-        SwingUtilities.invokeLater(() -> scrMain.getVerticalScrollBar().setValue(0));
+        // SwingUtilities.invokeLater(() -> scrMain.getVerticalScrollBar().setValue(0));
         pack();
     }
 
-    private void switchInstructions() {
-        switch (currentPanel) {
-            case UNITSPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.missingunits"));
-                break;
-            case PILOTPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.personnel"));
-                break;
-            case SALVAGEPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.salvage"));
-                break;
-            case KILLPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.kills"));
-                break;
-            case PRISONERPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.prisoners"));
-                break;
-            case PREVIEWPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.preview"));
-                break;
-            case REWARDPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.reward"));
-                break;
-            case OBJECTIVEPANEL:
-                txtInstructions.setText(resourceMap.getString("txtInstructions.text.objectives"));
-                break;
-            default:
-                txtInstructions.setText("");
-                break;
-        }
-        txtInstructions.setEditable(false);
-        txtInstructions.setLineWrap(true);
-        txtInstructions.setWrapStyleWord(true);
-        txtInstructions.setBorder(BorderFactory.createCompoundBorder(
+    
+    private JTextArea makeInstructions(String instructionText) {
+        JTextArea toReturn = new JTextArea();
+        toReturn.setText(instructionText);
+        toReturn.setEditable(false);
+        toReturn.setLineWrap(true);
+        toReturn.setWrapStyleWord(true);
+        toReturn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
+        return toReturn;
     }
 
     private void next() {
