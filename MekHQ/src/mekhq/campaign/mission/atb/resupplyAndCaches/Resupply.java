@@ -51,6 +51,9 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -256,23 +259,23 @@ public class Resupply {
         String message = "";
 
         if (Compute.randomInt(10) < interceptionChance) {
-            message = resources.getString("suppliesIntercepted" +
-                Compute.randomInt(25) + STATUS_AFTERWARD);
+            message = resources.getString(STATUS_FORWARD + "Intercepted" +
+                Compute.randomInt(20) + STATUS_AFTERWARD);
             isDestroyed = true;
         } else {
-            if (Compute.d6() == 1) {
-                if (Compute.randomInt(10) < interceptionChance) {
+            if (Compute.randomInt(10) < interceptionChance) {
+                if (Compute.d6() == 1) {
+                    message = resources.getString(STATUS_FORWARD + Compute.randomInt(100)
+                        + STATUS_AFTERWARD);
+                } else {
+                    int roll = Compute.randomInt(2);
+
+                    if (morale.isAdvancing() || morale.isWeakened()) {
+                        morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
+                    }
+
                     message = resources.getString(STATUS_FORWARD + "Enemy" + morale
                         + Compute.randomInt(50) + STATUS_AFTERWARD);
-                } else {
-                    switch (Compute.randomInt(4)) {
-                        case 0 -> message = resources.getString(STATUS_FORWARD + "Allies"
-                            + Compute.randomInt(50) + STATUS_AFTERWARD);
-                        case 1 -> message = resources.getString(STATUS_FORWARD + "Civilians"
-                            + Compute.randomInt(50) + STATUS_AFTERWARD);
-                        default -> message = resources.getString(STATUS_FORWARD + "General"
-                            + Compute.randomInt(100) + STATUS_AFTERWARD);
-                    }
                 }
             }
         }
@@ -352,16 +355,19 @@ public class Resupply {
         String message = convoyStatusMessage;
         String speaker = "";
         if (isIntroduction) {
-            message = resources.getString("logisticsMessage.text") + "<br>";
+            message = String.format(resources.getString("logisticsMessage.text"),
+                getCommanderTitle(false)) + "<br>";
 
             if (logisticsOfficer != null) {
                 speaker = "<b>" + logisticsOfficer.getFullTitle() + "</b><br><br>";
             }
+        } else {
+            message = String.format(message, getCommanderTitle(false));
         }
 
         JLabel description = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s%s%s</div></html>",
-            UIUtil.scaleForGUI(DIALOG_WIDTH), speaker, getCommanderTitle(false), message));
+            String.format("<html><div style='width: %s; text-align:center;'>%s%s</div></html>",
+            UIUtil.scaleForGUI(DIALOG_WIDTH), speaker, message));
         description.setHorizontalAlignment(JLabel.CENTER);
         dialog.add(description, BorderLayout.CENTER);
 
