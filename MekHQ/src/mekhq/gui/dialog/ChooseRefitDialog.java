@@ -59,6 +59,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitStep;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
@@ -70,11 +71,13 @@ public class ChooseRefitDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
     private ResourceBundle resourceMap;
 
-    // region Variable Declarations
+    // region Variables
     private Campaign campaign;
     private Unit unit;
     private RefitTableModel refitModel;
-    private RefitShoppingListTableModel shoppingModel;
+    private RefitNeededListTableModel neededModel;
+    private RefitReturnsListTableModel returnsModel;
+    private RefitStepsListTableModel stepsModel;
 
     private List<Refit> kitRefits;
     private List<Refit> customRefits;
@@ -86,10 +89,16 @@ public class ChooseRefitDialog extends JDialog {
     private JRadioButton radRefit;
     private JRadioButton radCustomize;
     private JRadioButton radOmni;
+    
     private JTable refitTable;
     private JScrollPane scrRefitTable;
-    private JTable shoppingTable;
-    private JScrollPane scrShoppingList;
+    private JTable neededTable;
+    private JScrollPane scrNeededTable;
+    private JTable returnsTable;
+    private JScrollPane scrReturnsTable;
+    private JTable stepsTable;
+    private JScrollPane scrStepsTable;
+
     private JTextPane txtOldUnit;
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
@@ -121,6 +130,8 @@ public class ChooseRefitDialog extends JDialog {
         setTitle(resourceMap.getString("title.text") + " " + unit.getName());
 
         getContentPane().setLayout(new GridBagLayout());
+
+        // region Radio Button Panel
 
         JPanel radioPanel = new JPanel();
 
@@ -167,6 +178,9 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(radioPanel, gridBagConstraints);
 
+
+        // region Left Side Lists
+        
         refitModel = new RefitTableModel();
         refitTable = new JTable(refitModel);
         TableColumn column;
@@ -209,17 +223,17 @@ public class ChooseRefitDialog extends JDialog {
         noRefitsLbl.setVisible(false);
 
 
-        shoppingModel = new RefitShoppingListTableModel();
-        shoppingTable = new JTable(shoppingModel);
-        for (int i = 0; i < RefitShoppingListTableModel.N_COL; i++) {
-            column = shoppingTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(shoppingModel.getColumnWidth(i));
+        stepsModel = new RefitStepsListTableModel();
+        stepsTable = new JTable(stepsModel);
+        for (int i = 0; i < RefitStepsListTableModel.N_COL; i++) {
+            column = stepsTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(stepsModel.getColumnWidth(i));
         }
-        shoppingTable.setIntercellSpacing(new Dimension(0, 0));
-        shoppingTable.setShowGrid(false);
+        stepsTable.setIntercellSpacing(new Dimension(0, 0));
+        stepsTable.setShowGrid(false);
 
-        scrShoppingList = new JScrollPaneWithSpeed(shoppingTable);
-        scrShoppingList.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
+        scrStepsTable = new JScrollPaneWithSpeed(stepsTable);
+        scrStepsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -228,9 +242,14 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrShoppingList.setMinimumSize(UIUtil.scaleForGUI(300, 200));
-        scrShoppingList.setPreferredSize(UIUtil.scaleForGUI(300, 200));
-        getContentPane().add(scrShoppingList, gridBagConstraints);
+        scrStepsTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
+        scrStepsTable.setPreferredSize(UIUtil.scaleForGUI(300, 300));
+        getContentPane().add(scrStepsTable, gridBagConstraints);
+
+
+        // region Right Side Tab Panel
+        
+        JPanel textPanel = new JPanel(new GridBagLayout());
 
 
 
@@ -249,15 +268,14 @@ public class ChooseRefitDialog extends JDialog {
         scrOldUnit.setPreferredSize(UIUtil.scaleForGUI(300, 400));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(scrOldUnit, gridBagConstraints);
+        textPanel.add(scrOldUnit, gridBagConstraints);
 
         txtNewUnit = new JTextPane();
         txtNewUnit.setEditable(false);
@@ -268,10 +286,77 @@ public class ChooseRefitDialog extends JDialog {
         scrNewUnit = new JScrollPaneWithSpeed(txtNewUnit);
         scrNewUnit.setMinimumSize(UIUtil.scaleForGUI(300, 400));
         scrNewUnit.setPreferredSize(UIUtil.scaleForGUI(300, 400));
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        textPanel.add(scrNewUnit, gridBagConstraints);
+
+        
+        JPanel listPanel = new JPanel(new GridBagLayout());
+
+        neededModel = new RefitNeededListTableModel();
+        neededTable = new JTable(neededModel);
+        for (int i = 0; i < RefitNeededListTableModel.N_COL; i++) {
+            column = neededTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(neededModel.getColumnWidth(i));
+        }
+        neededTable.setIntercellSpacing(new Dimension(0, 0));
+        neededTable.setShowGrid(false);
+
+        scrNeededTable = new JScrollPaneWithSpeed(neededTable);
+        scrNeededTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        scrNeededTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
+        scrNeededTable.setPreferredSize(UIUtil.scaleForGUI(300, 200));
+        listPanel.add(scrNeededTable, gridBagConstraints);
+
+        returnsModel = new RefitReturnsListTableModel();
+        returnsTable = new JTable(returnsModel);
+        for (int i = 0; i < RefitReturnsListTableModel.N_COL; i++) {
+            column = returnsTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(returnsModel.getColumnWidth(i));
+        }
+        returnsTable.setIntercellSpacing(new Dimension(0, 0));
+        returnsTable.setShowGrid(false);
+
+        scrReturnsTable = new JScrollPaneWithSpeed(returnsTable);
+        scrReturnsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        scrReturnsTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
+        scrReturnsTable.setPreferredSize(UIUtil.scaleForGUI(300, 200));
+        listPanel.add(scrReturnsTable, gridBagConstraints);
+
+
+        JTabbedPane tabPane = new JTabbedPane();
+        tabPane.add("Test 1", textPanel);
+        tabPane.add("Test 2", listPanel);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 3;
-        getContentPane().add(scrNewUnit, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(tabPane, gridBagConstraints);
+
+
+        // region Bottom Buttons
+
 
         JPanel panBtn = new JPanel(new GridBagLayout());
 
@@ -375,7 +460,7 @@ public class ChooseRefitDialog extends JDialog {
     private void refitTableValueChanged() {
         Refit refit = getSelectedRefit();
         if (null == refit) {
-            shoppingModel.setData(new ArrayList<Part>());
+            neededModel.setData(new ArrayList<Part>());
             txtNewUnit.setText("");
             btnGo.setEnabled(false);
             return;
@@ -395,9 +480,11 @@ public class ChooseRefitDialog extends JDialog {
             }
         }
         
-        shoppingModel.setData(new ArrayList<Part>(shoppingList.values()));
+        neededModel.setData(new ArrayList<Part>(shoppingList.values()));
 
-        MekView mv = new MekView(refit.getNewEntity(), false, true);
+        lstShopping = new JList<>(r.getShoppingListDescription());
+        scrShoppingList.setViewportView(lstShopping);
+        MekView mv = new MekView(r.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
         btnGo.setEnabled(true);
@@ -555,11 +642,11 @@ public class ChooseRefitDialog extends JDialog {
         }
 
         public String getTooltip(int row, int col) {
-            Refit r;
+            //Refit r;
             if (data.isEmpty()) {
                 return "";
             } else {
-                r = data.get(row);
+             //   r = data.get(row);
             }
             switch (col) {
                 // case COL_TARGET:
@@ -595,7 +682,7 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
-    public class RefitShoppingListTableModel extends AbstractTableModel {
+    public class RefitNeededListTableModel extends AbstractTableModel {
         public final static int COL_NAME = 0;
         public final static int COL_TECH_BASE = 1;
         public final static int COL_STOCK = 2;
@@ -609,11 +696,11 @@ public class ChooseRefitDialog extends JDialog {
 
         private List<Part> data;
 
-        public RefitShoppingListTableModel() {
+        public RefitNeededListTableModel() {
             data = new ArrayList<Part>();
         }
 
-        public RefitShoppingListTableModel(List<Part> parts) {
+        public RefitNeededListTableModel(List<Part> parts) {
             data = parts;
         }
 
@@ -703,6 +790,185 @@ public class ChooseRefitDialog extends JDialog {
             };
         }
     }
+
+    public class RefitReturnsListTableModel extends AbstractTableModel {
+        public final static int COL_NAME = 0;
+        public final static int COL_TECH_BASE = 1;
+        public final static int COL_STOCK = 2;
+        public final static int COL_RECEIVING = 3;
+        public final static int N_COL = 4;
+
+        private List<Part> data;
+
+        public RefitReturnsListTableModel() {
+            data = new ArrayList<Part>();
+        }
+
+        public RefitReturnsListTableModel(List<Part> parts) {
+            data = parts;
+        }
+
+        public void setData(List<Part> parts) {
+            data = parts;
+            fireTableDataChanged();
+        }
+
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return switch (column) {
+                case COL_NAME -> "Name";
+                case COL_TECH_BASE -> "Tech";
+                case COL_STOCK -> "Stock";
+                case COL_RECEIVING -> "Getting Back";
+                default -> "?";
+            };
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            Part part;
+            if (data.isEmpty()) {
+                return "";
+            } else {
+                part = (Part) data.get(row);
+            }
+
+            return switch(col) {
+                case COL_NAME -> "<html><nobr>"
+                        + part.getName() + ReportingUtilities.surroundIf(" (", part.getDetails(), ")")
+                        + "</nobr></html>";
+                case COL_TECH_BASE -> part.getTechBaseName();
+                case COL_STOCK -> campaign.getPartInventory(part).getSupply();
+                case COL_RECEIVING -> part.getQuantity();
+                default -> "?";
+            };
+        }
+
+        public Part getPartAt(int row) {
+            return ((Part) data.get(row));
+        }
+
+        public int getColumnWidth(int c) {
+            return switch (c) {
+                case COL_NAME -> 180;
+                case COL_TECH_BASE -> 26;
+                case COL_STOCK, COL_RECEIVING -> 20;
+                default -> 3;
+            };
+        }
+
+        public int getAlignment(int col) {
+            return switch (col) {
+                case COL_TECH_BASE, COL_STOCK, COL_RECEIVING -> SwingConstants.CENTER;
+                default -> SwingConstants.LEFT;
+            };
+        }
+    }
+
+    public class RefitStepsListTableModel extends AbstractTableModel {
+        public final static int COL_NAME = 0;
+        public final static int COL_REFITSTEP_TYPE = 1;
+        public final static int COL_OLD_LOC = 2;
+        public final static int COL_NEW_LOC = 3;
+        public final static int COL_BASETIME = 4;
+        public final static int COL_REFIT_CLASS = 5;
+        public final static int N_COL = 6;
+
+        private List<RefitStep> data;
+
+        public RefitStepsListTableModel() {
+            data = new ArrayList<RefitStep>();
+        }
+
+        public RefitStepsListTableModel(List<RefitStep> parts) {
+            data = parts;
+        }
+
+        public void setData(List<RefitStep> parts) {
+            data = parts;
+            fireTableDataChanged();
+        }
+
+        @Override
+        public int getRowCount() {
+            return data.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return switch (column) {
+                case COL_NAME -> "Item";
+                case COL_REFITSTEP_TYPE -> "Step Type";
+                case COL_OLD_LOC -> "Old Location";
+                case COL_NEW_LOC -> "New Location";
+                case COL_BASETIME -> "Base Time";
+                case COL_REFIT_CLASS -> "Refit Class";
+                default -> "?";
+            };
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            RefitStep refitStep;
+            if (data.isEmpty()) {
+                return "";
+            } else {
+                refitStep = (RefitStep) data.get(row);
+            }
+
+            return switch(col) {
+                case COL_NAME -> "<html><nobr>"
+                        + refitStep.getPart().getName() 
+                        + ReportingUtilities.surroundIf(" (", refitStep.getPart().getDetails(), ")")
+                        + "</nobr></html>";
+                case COL_REFIT_CLASS -> refitStep.getRefitClass().toName();
+                case COL_BASETIME -> refitStep.getBaseTime();
+                case COL_OLD_LOC -> refitStep.getOldLocName();
+                case COL_NEW_LOC -> refitStep.getNewLocName();
+                case COL_REFITSTEP_TYPE -> refitStep.getType().toName();
+                default -> "?";
+            };
+        }
+
+        /*
+        public Part getPartAt(int row) {
+            return ((Part) data.get(row));
+        }
+        */
+
+        public int getColumnWidth(int c) {
+            return switch (c) {
+                case COL_NAME -> 180;
+                case COL_REFITSTEP_TYPE, COL_REFIT_CLASS -> 60;
+                case COL_BASETIME -> 20;
+                case COL_OLD_LOC, COL_NEW_LOC -> 60;
+                default -> 3;
+            };
+        }
+
+        public int getAlignment(int col) {
+            return switch (col) {
+                case COL_BASETIME -> SwingConstants.CENTER;
+                default -> SwingConstants.LEFT;
+            };
+        }
+    }
+
 
     /**
      * A comparator for numbers that have been formatted with DecimalFormat

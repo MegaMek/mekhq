@@ -413,7 +413,9 @@ public class Armor extends Part implements IAcquisitionWork {
             else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
                 return 15;
             }
+            // TODO: Needs to have 2 hour return for capital-scale armor.
         }
+        // Meks, protomeks, battle armor, and normal aerospace
         return 5;
     }
 
