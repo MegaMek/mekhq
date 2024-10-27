@@ -66,4 +66,45 @@ public class ReportingUtilities {
     public static String messageSurroundedBySpanWithColor(String colorToUse, String message) {
         return String.format("%s%s%s", spanOpeningWithCustomColor(colorToUse), message, CLOSING_SPAN_TAG);
     }
+
+    /**
+     * Wraps the center argument with the start and end arguments if the center argument is 
+     * not blank or null. For your optional parentheticals and such.
+     * @param start String to begin with
+     * @param main String to contain, if it exists
+     * @param end String to end with
+     * @return String start + main + end if main else ""
+     */
+    public static String surroundIf(String start, String main, String end)
+    {
+        if (null == main || main.isEmpty()) {
+            return "";
+        }
+        return String.format("%s%s%s", start, main, end);
+    }
+
+    /**
+     * Connects the first string with the second using separator, if both strings are non-null and
+     * non-empty. If only one string is valid, return that string. If neither string is valid,
+     * return "". For when using a StringJoiner is just overkill.
+     * @param first String to begin with
+     * @param separator String to separate with
+     * @param second String to end with
+     * @return String first + separator + second or first or second or ""
+     */
+    public static String separateIf(String first, String separator, String second)
+    {
+        boolean isFirst = (null != first) && (!first.isEmpty());
+        boolean isSecond = (null != second) && (!second.isEmpty());
+
+        if (isFirst && isSecond) {
+            return String.format("%s%s%s", first, separator, second);
+        } else if (isFirst) {
+            return first;
+        } else if (isSecond) {
+            return second;
+        } else {
+            return "";
+        }
+    }
 }
