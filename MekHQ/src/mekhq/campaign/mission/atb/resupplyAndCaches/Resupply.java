@@ -259,36 +259,39 @@ public class Resupply {
         String message = "";
 
         if (Compute.randomInt(10) < interceptionChance) {
+            if (Compute.d6() == 1) {
+                message = resources.getString(STATUS_FORWARD + Compute.randomInt(100)
+                    + STATUS_AFTERWARD);
+            } else {
+                int roll = Compute.randomInt(2);
+
+                if (morale.isAdvancing() || morale.isWeakened()) {
+                    morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
+                }
+
+                message = resources.getString(STATUS_FORWARD + "Enemy" + morale
+                    + Compute.randomInt(50) + STATUS_AFTERWARD);
+            }
+        } else if (Compute.randomInt(10) < interceptionChance) {
             message = resources.getString(STATUS_FORWARD + "Intercepted" +
                 Compute.randomInt(20) + STATUS_AFTERWARD);
             isDestroyed = true;
-        } else {
-            if (Compute.randomInt(10) < interceptionChance) {
-                if (Compute.d6() == 1) {
-                    message = resources.getString(STATUS_FORWARD + Compute.randomInt(100)
-                        + STATUS_AFTERWARD);
-                } else {
-                    int roll = Compute.randomInt(2);
-
-                    if (morale.isAdvancing() || morale.isWeakened()) {
-                        morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
-                    }
-
-                    message = resources.getString(STATUS_FORWARD + "Enemy" + morale
-                        + Compute.randomInt(50) + STATUS_AFTERWARD);
-                }
-            }
         }
 
         if (!message.isEmpty()) {
-            createConvoyMessage(droppedItems, droppedUnits, cashReward, message, isDestroyed,
-                true);
+            createConvoyMessage(droppedItems, droppedUnits, cashReward, message, isDestroyed);
         } else {
             campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG));
             deliverDrop(droppedItems, droppedUnits, cashReward);
         }
+    }
+
+    public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
+                                    Money cashReward, String convoyStatusMessage, boolean isDestroyed) {
+        createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage, isDestroyed,
+            true);
     }
 
     public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
