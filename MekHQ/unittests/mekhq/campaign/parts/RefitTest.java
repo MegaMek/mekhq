@@ -181,8 +181,8 @@ public class RefitTest {
                 // + 3 removals @ 120 mins ea
                 // + 1 move @ 120 mins ea
                 // + 3 adds @ 120 mins ea
-                // x 3 (Class D)
-                assertEquals((120.0 * 7.0) * 3.0, refit.getActualTime(), 0.1);
+                // x 8*.5=4 (Class D) (CamOps)
+                assertEquals((120.0 * 7.0) * 4.0, refit.getActualTime(), 0.1);
 
                 // Cost?
                 // + 1 Medium Laser @ 40,000 ea
@@ -577,8 +577,8 @@ public class RefitTest {
                 // + 1 facing change @ 120 mins ea
                 // + 5 adds @ 120 mins ea
                 // + 16 armor changes @ 5 mins ea
-                // x 3 (Class D)
-                assertEquals(((120.0 * 9.0) + (5.0 * 16.0)) * 3.0, refit.getActualTime(), 0.1);
+                // x 8*0.5 = 4 (Class D with kit, camops)
+                assertEquals(((120.0 * 9.0) + (5.0 * 16.0)) * 4.0, refit.getActualTime(), 0.1);
 
                 // Cost?
                 // + 2 Medium Lasers @ 40,000 ea
