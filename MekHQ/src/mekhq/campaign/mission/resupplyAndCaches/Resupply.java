@@ -29,14 +29,15 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -59,7 +60,7 @@ import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.stratcon.StratconRulesManager.testMethod;
+import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -351,22 +352,44 @@ public class Resupply {
                     isIntercepted, false);
             } else {
                 if (isIntercepted) {
+                    // Announce the situation to the player and then, if the player is using
+                    // StratCon generate a scenario
                     if (campaign.getCampaignOptions().isUseStratCon()) {
-                        StratconCampaignState campaignState = contract.getStratconCampaignState();
+                        StratconScenario scenario = generateExternalScenario(campaign, contract, null, null);
 
-                        // Pick a random track
-                        List<StratconTrackState> tracks = campaignState.getTracks();
-                        StratconTrackState track = tracks.get(random.nextInt(tracks.size()));
+                        // If we successfully generated a scenario, we need to make a couple of final
+                        // adjustments so that the player can still get their items (if they succeed)
+                        if (scenario != null) {
+                            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+                            backingScenario.setDate(campaign.getLocalDate());
+                            Loot loot = new Loot();
 
-                        // Announce the situation to the player
-                        campaign.addReport(String.format(resources.getString("convoyInterceptedStratCon.text"),
-                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            CLOSING_SPAN_TAG, track.getDisplayableName()));
+                            for (Part part : droppedItems) {
+                                loot.addPart(part);
+                            }
 
-                        // Select a set of unoccupied coordinates and generate the scenario
-                        testMethod(campaign, contract, track);
+                            for (Unit unit : droppedUnits) {
+                                loot.addUnit(unit.getEntity());
+                            }
 
-                        campaign.addReport("THIS ONE /\\");
+                            if (!cashReward.isZero()) {
+                                loot.setCash(cashReward);
+                            }
+
+                            backingScenario.addLoot(loot);
+
+                            // Announce the situation to the player
+                            campaign.addReport(String.format(resources.getString("convoyInterceptedStratCon.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                                CLOSING_SPAN_TAG));
+                        } else {
+                            // If we failed to generate a scenario, for whatever reason, we don't
+                            // want the player confused why there isn't a scenario, so we offer
+                            // this fluffy response.
+                            campaign.addReport(String.format(resources.getString("convoyDestroyed.text.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                                CLOSING_SPAN_TAG));
+                        }
                     } else {
                         campaign.addReport(String.format(resources.getString("convoyInterceptedAtB.text"),
                             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),

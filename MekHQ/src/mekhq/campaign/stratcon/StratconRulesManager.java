@@ -196,15 +196,16 @@ public class StratconRulesManager {
      * This method is based on {@code generateScenariosForTrack()}, designed to simplify the
      * process by which external classes can add new StratCon scenarios.
      *
-     * @param campaign        The campaign object encapsulating the current campaign state.
-     * @param contract        The contract associated with the current scenario.
-     * @param track           The {@link StratconTrackState} the scenario should be assigned to, or
-     *                        {@code null} to select a random track.
-     * @param template        A specific {@link ScenarioTemplate} to use for scenario generation,
-     *                        or {@code null} to select scenario template randomly.
+     * @param campaign The campaign object encapsulating the current campaign state.
+     * @param contract The contract associated with the current scenario.
+     * @param track    The {@link StratconTrackState} the scenario should be assigned to, or
+     *                 {@code null} to select a random track.
+     * @param template A specific {@link ScenarioTemplate} to use for scenario generation,
+     *                 or {@code null} to select scenario template randomly.
+     * @return
      */
-     public static void generateExternalScenario(Campaign campaign, AtBContract contract,
-                         @Nullable StratconTrackState track, @Nullable ScenarioTemplate template) {
+     public static StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract,
+                                    @Nullable StratconTrackState track, @Nullable ScenarioTemplate template) {
          // If we're not generating for a specific track, randomly pick one.
          if (track == null) {
              List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
@@ -214,7 +215,7 @@ public class StratconRulesManager {
                  track = tracks.get(rand.nextInt(tracks.size()));
              } else {
                  logger.error("No tracks available. Aborting scenario generation.");
-                 return;
+                 return null;
              }
          }
 
@@ -230,7 +231,7 @@ public class StratconRulesManager {
 
          if (scenarioCoords == null) {
              logger.warn("Target track is full, aborting scenario generation");
-             return;
+             return null;
          }
 
          // If forces are already assigned to the target coordinates, use those instead of randomly
@@ -274,6 +275,9 @@ public class StratconRulesManager {
 
          // We end by finalizing the scenario
          finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+
+         // We return the scenario in case we want to make specific changes.
+         return scenario;
      }
 
     /**
