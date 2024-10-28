@@ -289,6 +289,13 @@ public class StratconContractInitializer {
 
             StratconCoords coords = getUnoccupiedCoords(trackState);
 
+            if (coords == null) {
+                logger.warn(String.format("Unable to place facility on track %s," +
+                        " as all coords were occupied. Aborting.",
+                    trackState.getDisplayableName()));
+                return;
+            }
+
             trackState.addFacility(coords, sf);
 
             if (strategicObjective) {
@@ -336,6 +343,13 @@ public class StratconContractInitializer {
 
             StratconCoords coords = getUnoccupiedCoords(trackState);
 
+            if (coords == null) {
+                logger.error(String.format("Unable to place objective scenario on track %s," +
+                        " as all coords were occupied. Aborting.",
+                    trackState.getDisplayableName()));
+                return;
+            }
+
             // facility
             if (template.isFacilityScenario()) {
                 StratconFacility facility = template.isHostileFacility()
@@ -376,18 +390,24 @@ public class StratconContractInitializer {
      * Utility function that, given a track state, picks a random set of unoccupied
      * coordinates.
      */
-    private static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
-        // plonk
+    public static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
+        // Maximum number of attempts
+        int maxAttempts = trackState.getWidth() * trackState.getHeight();
+        int attempts = 0;
+
         int x = Compute.randomInt(trackState.getWidth());
         int y = Compute.randomInt(trackState.getHeight());
         StratconCoords coords = new StratconCoords(x, y);
 
-        // make sure we don't put the facility down on top of anything else
-        while ((trackState.getFacility(coords) != null) ||
-                (trackState.getScenario(coords) != null)) {
+        while ((trackState.getFacility(coords) != null || trackState.getScenario(coords) != null) && attempts < maxAttempts) {
             x = Compute.randomInt(trackState.getWidth());
             y = Compute.randomInt(trackState.getHeight());
             coords = new StratconCoords(x, y);
+            attempts++;
+        }
+
+        if (attempts == maxAttempts) {
+            return null;
         }
 
         return coords;
