@@ -61,6 +61,7 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
+import javax.swing.SwingUtilities;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.EntityReadoutDialog;
@@ -93,6 +94,7 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Taharqa
@@ -193,6 +195,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private final List<Loot> loots;
 
     //region Preview Panel components
+    private JScrollPane scrPreviewPanel;
     private JComboBox<ScenarioStatus> choiceStatus;
     private MarkdownEditorPanel txtReport;
     private JTextArea txtRecoveredUnits;
@@ -206,8 +209,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     private static final MMLogger logger = MMLogger.create(ResolveScenarioWizardDialog.class);
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog",
-            MekHQ.getMHQOptions().getLocale());
+    private final transient ResourceBundle resourceMap =
+            ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
@@ -259,37 +262,38 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         //region Make Tab Panels
         pnlUnitStatus = makeUnitStatusPanel();
-        tabMain.add(wrapWithInstructions(pnlUnitStatus,
+        tabMain.add(wrapWithInstructions(pnlUnitStatus, null,
                 resourceMap.getString("txtInstructions.text.missingunits")), UNITSPANEL);
 
 
         pnlPilotStatus = makePilotStatusPanel();
-        tabMain.add(wrapWithInstructions(pnlPilotStatus,
+        tabMain.add(wrapWithInstructions(pnlPilotStatus, null,
                 resourceMap.getString("txtInstructions.text.personnel")), PILOTPANEL);
 
 
         pnlSalvage = makeSalvagePanel();
-        tabMain.add(wrapWithInstructions(pnlSalvage,
+        tabMain.add(wrapWithInstructions(pnlSalvage, null,
                 resourceMap.getString("txtInstructions.text.salvage")), SALVAGEPANEL);
 
         pnlPrisonerStatus = makePrisonerStatusPanel();
-        tabMain.add(wrapWithInstructions(pnlPrisonerStatus,
+        tabMain.add(wrapWithInstructions(pnlPrisonerStatus, null,
                 resourceMap.getString("txtInstructions.text.prisoners")), PRISONERPANEL);
 
         pnlKills = makeKillsPanel();
-        tabMain.add(wrapWithInstructions(pnlKills,
+        tabMain.add(wrapWithInstructions(pnlKills, null,
                 resourceMap.getString("txtInstructions.text.kills")), KILLSPANEL);
 
         pnlRewards = makeRewardsPanel();
-        tabMain.add(wrapWithInstructions(pnlRewards,
+        tabMain.add(wrapWithInstructions(pnlRewards, null,
                 resourceMap.getString("txtInstructions.text.reward")), REWARDPANEL);
 
         pnlObjectiveStatus = makeObjectiveStatusPanel();
-        tabMain.add(wrapWithInstructions(pnlObjectiveStatus,
+        tabMain.add(wrapWithInstructions(pnlObjectiveStatus, null,
                 resourceMap.getString("txtInstructions.text.objectives")), OBJECTIVEPANEL);
 
         pnlPreview = makePreviewPanel();
-        tabMain.add(wrapWithInstructions(pnlPreview,
+        scrPreviewPanel = new JScrollPaneWithSpeed();
+        tabMain.add(wrapWithInstructions(pnlPreview, scrPreviewPanel,
                 resourceMap.getString("txtInstructions.text.preview")), PREVIEWPANEL);
 
 
@@ -366,6 +370,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     //region Make Unit Status
+    /**
+     * Sub-function of initComponents. Makes the Unit Status Panel.
+     * @return the Unit Status Panel.
+     */
     private JPanel makeUnitStatusPanel() {
         GridBagConstraints gridBagConstraints;
         
@@ -439,6 +447,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     // region Make Pilot Status
+    /**
+     * Sub-function of initComponents. Makes the Pilot Panel.
+     * @return the Pilot Panel
+     */
     private JPanel makePilotStatusPanel() {
         JPanel pnlPilotStatus = new JPanel();
         pnlPilotStatus.setLayout(new GridBagLayout());
@@ -527,6 +539,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     // region Make Salvage
+    /**
+     * Sub-function of initComponents. Makes the Salvage Panel.
+     * @return the Salvage Panel
+     */
     private JPanel makeSalvagePanel() {
         // Create the panel
         JPanel pnlSalvage = new JPanel();
@@ -565,8 +581,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridy = gridy++;
             pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
 
-            String lead = "<html>" + ((currentSalvagePct > maxSalvagePct) ? "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" : "<font>");
-            lblSalvagePct2 = new JLabel(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
+            StringBuilder salvageUsed = new StringBuilder();
+            salvageUsed.append("<html>")
+                .append((currentSalvagePct <= maxSalvagePct) ? "" : 
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+                .append(currentSalvagePct).append("%")
+                .append((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG)
+                .append("<span>(max ").append(maxSalvagePct).append("%)</span></html>");
+            lblSalvagePct2 = new JLabel(salvageUsed.toString());
             gridBagConstraints.gridx = gridx--;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
 
@@ -682,6 +704,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
     // region Make Prisoner
+    /**
+     * Sub-function of initComponents. Makes the Prisoner Panel.
+     * @return the Prisoner Panel
+     */
     private JPanel makePrisonerStatusPanel() {
         JPanel pnlPrisonerStatus = new JPanel();
         pnlPrisonerStatus.setLayout(new GridBagLayout());
@@ -858,6 +884,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
     // region Make Kills
+    /**
+     * Sub-function of initComponents. Makes the Kills Panel.
+     * @return the Kills Panel
+     */
     private JPanel makeKillsPanel() {
         JPanel pnlKills = new JPanel();
         killChoices = new Hashtable<>();
@@ -926,6 +956,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     
     // region Make Rewards
+    /**
+     * Sub-function of initComponents. Makes the Rewards Panel.
+     * @return the Rewards Panel
+     */
     private JPanel makeRewardsPanel() {
         JPanel pnlRewards = new JPanel();
         pnlRewards.setLayout(new GridBagLayout());
@@ -956,6 +990,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
     // region Make Objective
+    /**
+     * Sub-function of initComponents. Makes the Objective Status panel.
+     * @return the Objective Status panel
+     */
     private JPanel makeObjectiveStatusPanel() {
         JPanel pnlObjectiveStatus = new JPanel();
         pnlObjectiveStatus.setLayout(new GridBagLayout());
@@ -1033,8 +1071,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
     // region Make Preview
+    /**
+     * Sub-function of initComponents. Makes the final panel.
+     * @return the preview panel
+     */
     private JPanel makePreviewPanel() {
-
         JPanel pnlPreview = new DefaultMHQScrollablePanel(frame, "Test");
         choiceStatus = new JComboBox<>();
         txtReport = new MarkdownEditorPanel("After-Action Report");
@@ -1240,10 +1281,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     /**
      * @param toWrap - A JPanel to work with
+     * @param scrPane - JScrollPane to use, or null and we'll make a new one
      * @param instructionText - The text for the instruction box
      * @return A new JPanel containing the instruction text box above toWrap
      */
-    private JPanel wrapWithInstructions(JPanel toWrap, String instructionText) {
+    private JPanel wrapWithInstructions(JPanel toWrap, JScrollPane scrPane, String instructionText) {
         JTextArea instructions = new JTextArea();
         instructions.setText(instructionText);
         instructions.setEditable(false);
@@ -1263,6 +1305,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTH;
         container.add(instructions, gridBagConstraints);
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -1270,7 +1313,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTH;
-        container.add(new JScrollPaneWithSpeed(toWrap), gridBagConstraints);
+
+        scrPane = null != scrPane ? scrPane : new JScrollPaneWithSpeed();
+        scrPane.setViewportView(toWrap);
+        container.add(scrPane, gridBagConstraints);
 
         return container;
     }
@@ -1287,7 +1333,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id),
                     false, box.isSelected(), !tracker.playerHasBattlefieldControl());
         }
-        //recheckObjectives();
     }
 
 
@@ -1300,7 +1345,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             objectiveProcessor.updateObjectiveEntityState(tracker.getAllInvolvedUnits().get(id),
                     box.isSelected(), false, tracker.playerHasBattlefieldControl());
         }
-        //recheckObjectives();
     }
 
 
@@ -1316,9 +1360,102 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
-    // region Tab Movement
     /**
-     * Go to next tab, if there is one
+     * Updates the final panel with information taken from the other ones. 
+     */
+    private void updatePreviewPanel() {
+        // set victory/defeat status based on scenario objectives
+        ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
+                getObjectiveOverridesStatus(), getObjectiveUnitCounts());
+        choiceStatus.setSelectedItem(scenarioStatus);
+
+        // do a "dry run" of the scenario objectives to output a report
+        StringBuilder reportText = new StringBuilder();
+
+        if (tracker.getScenario().hasObjectives()) {
+            for (ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
+                int qualifyingUnitCount = 0;
+
+                if (objectiveCheckboxes.containsKey(objective)) {
+                    for (JCheckBox box : objectiveCheckboxes.get(objective)) {
+                        if (box.isSelected()) {
+                            qualifyingUnitCount++;
+                        }
+                    }
+                }
+
+                Boolean override = null;
+                if (objectiveOverrideCheckboxes.containsKey(objective)) {
+                    override = objectiveOverrideCheckboxes.get(objective).isSelected();
+                }
+
+                reportText.append(objectiveProcessor.processObjective(
+                        objective, qualifyingUnitCount, override, tracker, true));
+                reportText.append('\n');
+            }
+
+            txtReport.setText(reportText.toString());
+        }
+
+        //pilots first
+        StringBuilder missingNames = new StringBuilder();
+        StringBuilder kiaNames = new StringBuilder();
+        StringBuilder recoverNames = new StringBuilder();
+        for (int i = 0; i < pstatuses.size(); i++) {
+            PersonStatus status = pstatuses.get(i);
+            if (hitSliders.get(i).getValue() >= 6 || kiaBtns.get(i).isSelected()) {
+                kiaNames.append(status.getName()).append('\n');
+            } else if (miaBtns.get(i).isSelected()) {
+                missingNames.append(status.getName()).append('\n');
+            } else {
+                recoverNames.append(status.getName()).append('\n');
+            }
+        }
+        txtRecoveredPilots.setText(recoverNames.toString());
+        txtMissingPilots.setText(missingNames.toString());
+        txtDeadPilots.setText(kiaNames.toString());
+
+        //now units
+        StringBuilder recoverUnits = new StringBuilder();
+        StringBuilder missUnits = new StringBuilder();
+        for (int i = 0; i < chksTotaled.size(); i++) {
+            String name = ustatuses.get(i).getName();
+            if (chksTotaled.get(i).isSelected()) {
+                missUnits.append(name).append('\n');
+            } else {
+                recoverUnits.append(name).append('\n');
+            }
+        }
+        txtRecoveredUnits.setText(recoverUnits.toString());
+        txtMissingUnits.setText(missUnits.toString());
+
+        //now salvage
+        StringBuilder salvageUnits = new StringBuilder();
+        for (int i = 0; i < salvageBoxes.size(); i++) {
+            JCheckBox box = salvageBoxes.get(i);
+            if (box.isSelected()) {
+                salvageUnits.append(salvageables.get(i).getName()).append('\n');
+            }
+        }
+        txtSalvage.setText(salvageUnits.toString());
+
+        //now rewards
+        StringBuilder claimed = new StringBuilder();
+        for (int i = 0; i < lootBoxes.size(); i++) {
+            JCheckBox box = lootBoxes.get(i);
+            if (box.isSelected()) {
+                claimed.append(loots.get(i).getShortDescription()).append('\n');
+            }
+        }
+        txtRewards.setText(claimed.toString());
+        SwingUtilities.invokeLater(() -> scrPreviewPanel.getVerticalScrollBar().setValue(0));
+    }
+
+
+    // region Tab Movement
+
+    /**
+     * Go to next tab, if there is one. Button listener.
      */
     private void next() {
         for (int i = tabMain.getSelectedIndex() + 1; i < tabMain.getTabCount(); i++) {
@@ -1330,7 +1467,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     /**
-     * Go to previous tab, if there is one
+     * Go to previous tab, if there is one. Button listener.
      */
     private void back() {
         for (int i = tabMain.getSelectedIndex() - 1; i >= 0; i--) {
@@ -1342,7 +1479,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     /**
-     * Update buttons and status because the tab changed
+     * Update buttons and status because the tab changed. Event Listener.
      */
     private void tabChanged() {
         int current = tabMain.getSelectedIndex();
@@ -1371,15 +1508,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
         } else {
             btnFinish.setEnabled(false);
         }
-        // Let's just call these all on tab change for safty for now
+        // Let's just call these all on tab change for safety for now
         updateFromUnitsTab();
         updateFromSalvageTab();
-        recheckObjectives();
+        // TODO: WeaverThree - This wipes out user selecitons on the objective panel, so we can't use it right now.
+        // recheckObjectives(); 
         updatePreviewPanel();
     }
 
 
     // region Finish
+
+    /**
+     * End the wizard and update everything in the game that results from it.
+     */
     private void finish() {
         //unit status
         for (JCheckBox box : chksTotaled) {
@@ -1493,6 +1635,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         setVisible(false);
     }
 
+
+    // region Misc II
+
     /**
      * Figuires out which tabs should be enabled. Needs to be called after all tabs are generated.
      */
@@ -1516,7 +1661,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
 
-    // region Misc II
     /**
      * Count up the selected objective checkboxes
      * @return the count of selected objective checkboxes
@@ -1561,6 +1705,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         return objectiveOverrides;
     }
 
+
+    /**
+     * Event listener for changes to prisoner status.
+     */
     private void checkPrisonerStatus() {
         for (int i = 0; i < prisonerCapturedBtns.size(); i++) {
             JCheckBox captured = prisonerCapturedBtns.get(i);
@@ -1591,6 +1739,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
+
+    /**
+     * Updates the salvage percentages used and such. Event listener for slavage changes.
+     */
     private void checkSalvageRights() {
         // Perform a little magic to make sure we aren't trying to do more than one of these things
         for (int i = 0; i < escapeBoxes.size(); i++) {
@@ -1666,100 +1818,27 @@ public class ResolveScenarioWizardDialog extends JDialog {
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
 
-        String lead = (currentSalvagePct <= maxSalvagePct) ? "<html><font>" : "<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>";
+        StringBuilder salvageUsed = new StringBuilder();
 
-        lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
+        salvageUsed.append("<html>")
+            .append((currentSalvagePct <= maxSalvagePct) ? "" : 
+                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+            .append(currentSalvagePct).append("%")
+            .append((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG)
+            .append("<span>(max ").append(maxSalvagePct).append("%)</span></html>");
+        
+        lblSalvagePct2.setText(salvageUsed.toString());
     }
 
-    private void updatePreviewPanel() {
-        // set victory/defeat status based on scenario objectives
-        ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
-                getObjectiveOverridesStatus(), getObjectiveUnitCounts());
-        choiceStatus.setSelectedItem(scenarioStatus);
 
-        // do a "dry run" of the scenario objectives to output a report
-        StringBuilder sb = new StringBuilder();
-
-        if (tracker.getScenario().hasObjectives()) {
-            for (ScenarioObjective objective : tracker.getScenario().getScenarioObjectives()) {
-                int qualifyingUnitCount = 0;
-
-                if (objectiveCheckboxes.containsKey(objective)) {
-                    for (JCheckBox box : objectiveCheckboxes.get(objective)) {
-                        if (box.isSelected()) {
-                            qualifyingUnitCount++;
-                        }
-                    }
-                }
-
-                Boolean override = null;
-                if (objectiveOverrideCheckboxes.containsKey(objective)) {
-                    override = objectiveOverrideCheckboxes.get(objective).isSelected();
-                }
-
-                sb.append(objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, true));
-                sb.append('\n');
-            }
-
-            txtReport.setText(sb.toString());
-        }
-
-        //pilots first
-        StringBuilder missingNames = new StringBuilder();
-        StringBuilder kiaNames = new StringBuilder();
-        StringBuilder recoverNames = new StringBuilder();
-        for (int i = 0; i < pstatuses.size(); i++) {
-            PersonStatus status = pstatuses.get(i);
-            if (hitSliders.get(i).getValue() >= 6 || kiaBtns.get(i).isSelected()) {
-                kiaNames.append(status.getName()).append('\n');
-            } else if (miaBtns.get(i).isSelected()) {
-                missingNames.append(status.getName()).append('\n');
-            } else {
-                recoverNames.append(status.getName()).append('\n');
-            }
-        }
-        txtRecoveredPilots.setText(recoverNames.toString());
-        txtMissingPilots.setText(missingNames.toString());
-        txtDeadPilots.setText(kiaNames.toString());
-
-        //now units
-        StringBuilder recoverUnits = new StringBuilder();
-        StringBuilder missUnits = new StringBuilder();
-        for (int i = 0; i < chksTotaled.size(); i++) {
-            String name = ustatuses.get(i).getName();
-            if (chksTotaled.get(i).isSelected()) {
-                missUnits.append(name).append('\n');
-            } else {
-                recoverUnits.append(name).append('\n');
-            }
-        }
-        txtRecoveredUnits.setText(recoverUnits.toString());
-        txtMissingUnits.setText(missUnits.toString());
-
-        //now salvage
-        StringBuilder salvageUnits = new StringBuilder();
-        for (int i = 0; i < salvageBoxes.size(); i++) {
-            JCheckBox box = salvageBoxes.get(i);
-            if (box.isSelected()) {
-                salvageUnits.append(salvageables.get(i).getName()).append('\n');
-            }
-        }
-        txtSalvage.setText(salvageUnits.toString());
-
-        //now rewards
-        StringBuilder claimed = new StringBuilder();
-        for (int i = 0; i < lootBoxes.size(); i++) {
-            JCheckBox box = lootBoxes.get(i);
-            if (box.isSelected()) {
-                claimed.append(loots.get(i).getShortDescription()).append('\n');
-            }
-        }
-        txtRewards.setText(claimed.toString());
-    }
-
-    private void showUnit(UUID id, boolean salvage) {
+    /**
+     * Shows the info for the given unit in a dialog.
+     * @param id - UUID of the unit to show
+     * @param isSalvage - is this from the salvage page?
+     */
+    private void showUnit(UUID id, boolean isSalvage) {
         UnitStatus ustatus;
-        if (salvage) {
+        if (isSalvage) {
             ustatus = tracker.getSalvageStatus().get(id);
         } else {
             ustatus = tracker.getUnitsStatus().get(id);
@@ -1771,8 +1850,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
         new EntityReadoutDialog(frame, true, ustatus.getEntity()).setVisible(true);
     }
     
-    private void editUnit(UUID id, int idx, boolean salvage) {
-        UnitStatus ustatus = (salvage ? tracker.getSalvageStatus() : tracker.getUnitsStatus()).get(id);
+
+    /**
+     * Opens the unit dmaage editor for a given unit from the units or salvage panel
+     * @param id - UUID of the unit to show
+     * @param unitIndex - index into the unit UI elements lists
+     * @param isSalvage - is this from the salvage page?
+     */
+    private void editUnit(UUID id, int unitIndex, boolean isSalvage) {
+        UnitStatus ustatus = (isSalvage ? tracker.getSalvageStatus() : tracker.getUnitsStatus()).get(id);
         if ((ustatus == null) || (ustatus.getEntity() == null)) {
             return;
         }
@@ -1781,14 +1867,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
         med.setVisible(true);
         ustatus.getUnit().runDiagnostic(false);
 
-        if (salvage) {
-            salvageUnitLabel.get(idx).setText(ustatus.getDesc(true));
+        if (isSalvage) {
+            salvageUnitLabel.get(unitIndex).setText(ustatus.getDesc(true));
             checkSalvageRights();
         } else {
-            lblsUnitName.get(idx).setText(ustatus.getDesc());
+            lblsUnitName.get(unitIndex).setText(ustatus.getDesc());
         }
     }
 
+    
+    /**
+     * Shows a person from the pilot or prisoner list in a dialog
+     * @param status - the record to show
+     * @param isPrisoner - are they a prisoner?
+     */
     private void showPerson(PersonStatus status, boolean isPrisoner) {
         if (status == null) {
             return;
