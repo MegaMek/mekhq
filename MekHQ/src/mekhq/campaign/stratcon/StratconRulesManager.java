@@ -210,10 +210,11 @@ public class StratconRulesManager {
              List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
              Random rand = new Random();
 
-             if (tracks.size() > 0) {
+             if (!tracks.isEmpty()) {
                  track = tracks.get(rand.nextInt(tracks.size()));
              } else {
                  logger.error("No tracks available. Aborting scenario generation.");
+                 return;
              }
          }
 
