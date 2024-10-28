@@ -4325,15 +4325,6 @@ public class Campaign implements ITechManager {
             }
         }
 
-        // Resupplys
-        // TODO REMOVE THIS BEFORE MERGING!!!
-        //        Resupply supplyDrops = new Resupply(this, faction,
-        //            faction, true);
-        //        supplyDrops.getLosTechCache();
-
-        // This must be the last step before returning true
-        MekHQ.triggerEvent(new NewDayEvent(this));
-
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
