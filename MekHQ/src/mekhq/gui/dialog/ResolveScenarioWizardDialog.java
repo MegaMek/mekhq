@@ -1633,7 +1633,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        StratconRulesManager.processScenarioCompletion(tracker);
+        StratconRulesManager.processScenarioCompletion(campaign, tracker);
 
         this.setVisible(false);
     }

@@ -57,6 +57,8 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosp
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -1669,34 +1671,31 @@ public class StratconRulesManager {
      * ResolveScenarioTracker.finish()
      * has been invoked.
      */
-    public static void processScenarioCompletion(ResolveScenarioTracker rst) {
-        if (rst.getMission() instanceof AtBContract) {
-            StratconCampaignState campaignState = ((AtBContract) rst.getMission()).getStratconCampaignState();
+    public static void processScenarioCompletion(Campaign campaign, ResolveScenarioTracker tracker) {
+        if (tracker.getMission() instanceof AtBContract) {
+            StratconCampaignState campaignState = ((AtBContract) tracker.getMission()).getStratconCampaignState();
             if (campaignState == null) {
                 return;
             }
 
+            Scenario backingScenario = tracker.getScenario();
+
+            boolean victory = backingScenario.getStatus().isOverallVictory();
+
             for (StratconTrackState track : campaignState.getTracks()) {
-                if (track.getBackingScenariosMap().containsKey(rst.getScenario().getId())) {
+                if (track.getBackingScenariosMap().containsKey(backingScenario.getId())) {
                     // things that may potentially happen:
                     // scenario is removed from track - implemented
                     // track gets remaining forces added to reinforcement pool
                     // facility gets remaining forces stored in reinforcement pool
                     // process VP and SO
 
-                    StratconScenario scenario = track.getBackingScenariosMap().get(rst.getScenario().getId());
+                    StratconScenario scenario = track.getBackingScenariosMap().get(backingScenario.getId());
 
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
-                    boolean victory = rst.getScenario().getStatus().isOverallVictory();
-                    boolean draw = rst.getScenario().getStatus().isDraw();
-
-                    if (scenario.isRequiredScenario()) {
-                        if (draw) {
-                            // do nothing
-                        } else {
-                            campaignState.updateVictoryPoints(victory ? 1 : -1);
-                        }
+                    if (scenario.isRequiredScenario() && !backingScenario.getStatus().isDraw()) {
+                        campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
 
                     // this must be done before removing the scenario from the track
@@ -1707,10 +1706,26 @@ public class StratconRulesManager {
                         switchFacilityOwner(facility);
                     }
 
-                    processTrackForceReturnDates(track, rst.getCampaign());
+                    processTrackForceReturnDates(track, tracker.getCampaign());
 
                     track.removeScenario(scenario);
                     break;
+                }
+            }
+
+            // I really don't like checking against a String here, but I couldn't find a way to
+            // fetch the scenario's original template
+            if (Objects.equals(backingScenario.getName(), "Emergency Convoy Defense")) {
+                ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+                if (victory) {
+                    campaign.addReport(String.format(resources.getString("convoyRescuedStratCon.text"),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        CLOSING_SPAN_TAG));
+                } else {
+                    campaign.addReport(String.format(resources.getString("convoyDefeatedStratCon.text"),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                        CLOSING_SPAN_TAG));
                 }
             }
         }
