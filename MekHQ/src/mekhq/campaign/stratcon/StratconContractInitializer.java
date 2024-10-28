@@ -68,10 +68,10 @@ public class StratconContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int numTracks = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
-        for (int x = 0; x < numTracks; x++) {
+        for (int x = 0; x < maximumTrackIndex; x++) {
             int scenarioOdds = contractDefinition.getScenarioOdds()
                     .get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
             int deploymentTime = contractDefinition.getDeploymentTimes()
