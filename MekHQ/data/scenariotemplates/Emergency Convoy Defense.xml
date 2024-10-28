@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Emergency Convoy Defense</name>
-    <shortBriefing>Defeat attackers before the convoy is destroyed.</shortBriefing>
-    <detailedBriefing>An allied convoy carrying your resupply has come under attack. Ensure that at least 50% of the convoy reaches its destination. Crippled units only count if the enemy force is routed. Alternatively, destroy 50% of enemy forces while preserving 50% of friendly forces.</detailedBriefing>
+    <shortBriefing>Prevent your resupply falling into the hands of the enemy.</shortBriefing>
+    <detailedBriefing>The convoy carrying your resupply has come under attack. Ensure the supplies do not fall into enemy hands by destroying 50% of enemy forces. Preserving friendly forces is a secondary priority.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -29,9 +29,9 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>0</deploymentZone>
+                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
-                <destinationZone>5</destinationZone>
+                <destinationZone>4</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
@@ -41,7 +41,7 @@
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
-                <retreatThreshold>50</retreatThreshold>
+                <retreatThreshold>0</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>OpFor</syncedForceName>
@@ -61,14 +61,7 @@
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
+                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -101,10 +94,10 @@
                 <deploymentZones>
                     <deploymentZone>10</deploymentZone>
                 </deploymentZones>
-                <destinationZone>6</destinationZone>
+                <destinationZone>9</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
-                <forceMultiplier>0.5</forceMultiplier>
+                <forceMultiplier>1</forceMultiplier>
                 <forceName>Resupply Convoy</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>4</generationOrder>
@@ -123,34 +116,6 @@
         </entry>
     </scenarioForces>
     <scenarioObjectives>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Resupply Convoy</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>50% of the following force(s) must reach the far edge of the map:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>Resupply Convoy</associatedForceName>
@@ -178,14 +143,14 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>3</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>3</howMuch>
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
