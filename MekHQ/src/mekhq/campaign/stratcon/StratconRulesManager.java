@@ -288,16 +288,26 @@ public class StratconRulesManager {
 
                 Collection<Unit> potentialUnits = new HashSet<>();
 
-                // find units in player's campaign (not just forces!)
-                // by default, all units are eligible
-                Force force = campaign.getForce(explicitForceID);
-                for (UUID unitID : force.getUnits()) {
-                    Unit unit = campaign.getUnit(unitID);
-                    if (unit.getTransportShipAssignment() != null) {
-                        potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
+                // find units in player's campaign by default, all units in the TO&E are eligible
+                if (explicitForceID == Force.FORCE_NONE) {
+                    for (UUID unitId : campaign.getForces().getUnits()) {
+                        try {
+                            potentialUnits.add(campaign.getUnit(unitId));
+                        } catch (Exception exception) {
+                            logger.error(String.format("Error retrieving unit (%s): %s",
+                                unitId, exception.getMessage()));
+                        }
+                    }
+                // if we're using a seed force, then units transporting this force are eligible
+                } else {
+                    Force force = campaign.getForce(explicitForceID);
+                    for (UUID unitID : force.getUnits()) {
+                        Unit unit = campaign.getUnit(unitID);
+                        if (unit.getTransportShipAssignment() != null) {
+                            potentialUnits.add(unit.getTransportShipAssignment().getTransportShip());
+                        }
                     }
                 }
-
                 for (Unit unit : potentialUnits) {
                     if ((sft.getAllowedUnitType() == 11) && (!campaign.getCampaignOptions().isUseDropShips())) {
                         continue;
