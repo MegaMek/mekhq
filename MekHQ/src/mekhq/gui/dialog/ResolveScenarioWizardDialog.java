@@ -40,6 +40,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
@@ -322,7 +323,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(5, 0, 5, 5);
         panButtons.add(btnCancel, gridBagConstraints);
 
         btnBack = new JButton(resourceMap.getString("btnBack.text"));
@@ -969,7 +970,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
         for (Loot loot : loots) {
             JCheckBox box = new JCheckBox(loot.getShortDescription());
-            box.setSelected(false);
+            box.setSelected(true);
             lootBoxes.add(box);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -1594,10 +1595,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tracker.assignKills();
 
         //now get loot
-        for (int i = 0; i < lootBoxes.size(); i++) {
-            JCheckBox box = lootBoxes.get(i);
-            if (box.isSelected()) {
-                tracker.addLoot(loots.get(i));
+        if (((ScenarioStatus) Objects.requireNonNull(choiceStatus.getSelectedItem())).isOverallVictory()) {
+            for (int i = 0; i < lootBoxes.size(); i++) {
+                JCheckBox box = lootBoxes.get(i);
+                if (box.isSelected()) {
+                    tracker.addLoot(loots.get(i));
+                }
             }
         }
 
