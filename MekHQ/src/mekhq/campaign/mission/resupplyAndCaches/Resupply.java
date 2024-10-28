@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.mission.atb.resupplyAndCaches;
+package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
@@ -34,6 +34,7 @@ import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -123,7 +124,7 @@ public class Resupply {
      * @param isContractEnd A flag indicating whether the drop is related to the contract end.
      */
     private void supplyDropDialog(List<Part> droppedItems, Money cashReward, boolean isLoot, boolean isContractEnd) {
-        supplyDropDialog(droppedItems, null, cashReward, false, false);
+        supplyDropDialog(droppedItems, null, cashReward, isLoot, isContractEnd);
     }
 
     /**
@@ -151,8 +152,40 @@ public class Resupply {
             unitsReport = createUnitsReport(droppedUnits, campaign.getGameYear(), enemyFaction);
         }
 
-        List<Entry<String, Integer>> entries = new ArrayList<>();
-        entries.addAll(partsReport.entrySet());
+        List<Entry<String, Integer>> entries = new ArrayList<>(partsReport.entrySet());
+
+        if (!partsReport.isEmpty()) {
+            if (!isLoot && !isContractEnd) {
+                int rationPacks = 0;
+                int medicalSupplies = 0;
+
+                for (Person person : campaign.getActivePersonnel()) {
+                    PersonnelRole primaryRole = person.getPrimaryRole();
+                    PersonnelRole secondaryRole = person.getSecondaryRole();
+
+                    if (primaryRole.isCombat() || secondaryRole.isCombat()) {
+                        rationPacks++;
+                    }
+
+                    if (primaryRole.isDoctor() || secondaryRole.isDoctor()) {
+                        medicalSupplies++;
+                    }
+                }
+
+                rationPacks *= (int) Math.ceil((double) campaign.getLocalDate().lengthOfMonth() / 4);
+
+                if (rationPacks > 0) {
+                    entries.add(Map.entry(resources.getString("resourcesRations.text"),
+                        rationPacks));
+                }
+
+                if (medicalSupplies > 0) {
+                    entries.add(Map.entry(resources.getString("resourcesMedical.text"),
+                        medicalSupplies));
+                }
+            }
+        }
+
         entries.addAll(unitsReport.entrySet());
 
         String[] columns = formatColumnData(entries);
@@ -168,26 +201,16 @@ public class Resupply {
             .append("</tr></table>");
 
         JDialog dialog = createResupplyDialog(icon, description.toString(), droppedItems, droppedUnits,
-            cashReward);
+            cashReward, isLoot || isContractEnd);
 
         dialog.setModal(true);
         dialog.pack();
         dialog.setVisible(true);
     }
 
-    /**
-     * This method constructs a dialog box UI element for displaying a supply drop. It returns an
-     * instance of {@link JDialog} ready to be made visible.
-     *
-     * @param icon         The faction icon to be displayed.
-     * @param description  The description of the supply drop.
-     * @param droppedItems A list of items to be dropped.
-     * @param droppedUnits A list of units to be dropped.
-     * @param cashReward   The cash reward for the supply drop.
-     * @return             An instance of JDialog ready to be made visible.
-     */
     public JDialog createResupplyDialog(ImageIcon icon, String description, @Nullable List<Part> droppedItems,
-                                          @Nullable List<Unit> droppedUnits, Money cashReward) {
+                                        @Nullable List<Unit> droppedUnits, Money cashReward,
+                                        boolean isLootOrContractEnd) {
         final int DIALOG_WIDTH = 900;
         final int DIALOG_HEIGHT = 500;
         final String title = resources.getString("dialog.title");
@@ -203,7 +226,12 @@ public class Resupply {
 
         ActionListener dialogActionListener = e -> {
             dialog.dispose();
-            processConvoy(droppedItems, droppedUnits, cashReward);
+
+            if (isLootOrContractEnd) {
+                deliverDrop(droppedItems, droppedUnits, cashReward);
+            } else {
+                processConvoy(droppedItems, droppedUnits, cashReward);
+            }
         };
 
         dialog.addWindowListener(new WindowAdapter() {
@@ -243,6 +271,7 @@ public class Resupply {
                                Money cashReward) {
         final String STATUS_FORWARD = "statusUpdate";
         final String STATUS_AFTERWARD = ".text";
+
         AtBMoraleLevel morale = contract.getMoraleLevel();
 
         int interceptionChance = switch (morale) {
@@ -388,6 +417,7 @@ public class Resupply {
 
         // Pack, position and display the dialog
         dialog.pack();
+        dialog.setModal(true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
@@ -780,11 +810,11 @@ public class Resupply {
      */
     private String getDescription(boolean isLoot, boolean isContractEnd) {
         if (isLoot) {
-            return resources.getString("salvaged" + Compute.randomInt(50) + ".text");
+            return resources.getString("salvaged" + Compute.randomInt(10) + ".text");
         }
 
         if (isContractEnd) {
-            return resources.getString("looted" + Compute.randomInt(50) + ".text");
+            return resources.getString("looted" + Compute.randomInt(10) + ".text");
         }
 
         AtBMoraleLevel morale = contract.getMoraleLevel();

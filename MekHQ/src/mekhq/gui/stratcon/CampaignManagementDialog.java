@@ -22,7 +22,7 @@ package mekhq.gui.stratcon;
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.atb.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -123,12 +123,12 @@ public class CampaignManagementDialog extends JDialog {
 
     private void requestResupply(ActionEvent e) {
         if (currentCampaignState.getSupportPoints() > 1) {
-            supplyDropDialog();
+            resupplyDialog();
         } else {
             LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
-            Resupply supplyDrops = new Resupply(campaign, contract, false, false);
-            supplyDrops.getResupplyParts(1);
+            Resupply resupplies = new Resupply(campaign, contract, false, false);
+            resupplies.getResupplyParts(1);
 
             currentCampaignState.useSupportPoint();
         }
@@ -137,7 +137,7 @@ public class CampaignManagementDialog extends JDialog {
         parent.updateCampaignState();
     }
 
-    public void supplyDropDialog() {
+    public void resupplyDialog() {
         final JDialog dialog = new JDialog();
         dialog.setLayout(new GridBagLayout());
         dialog.setTitle("Requesting Resupply");
@@ -173,8 +173,8 @@ public class CampaignManagementDialog extends JDialog {
 
             LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
-            Resupply supplyDrops = new Resupply(campaign, contract, false, false);
-            supplyDrops.getResupplyParts((int) numberModel.getValue());
+            Resupply resupplies = new Resupply(campaign, contract, false, false);
+            resupplies.getResupplyParts((int) numberModel.getValue());
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });
 
