@@ -376,7 +376,7 @@ public class StratconContractInitializer {
      * Utility function that, given a track state, picks a random set of unoccupied
      * coordinates.
      */
-    private static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
+    static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
         // plonk
         int x = Compute.randomInt(trackState.getWidth());
         int y = Compute.randomInt(trackState.getHeight());
