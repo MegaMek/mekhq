@@ -362,12 +362,12 @@ public class CampaignSummary {
 
         if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
             personnelCount = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> !person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone())
+                .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
                 .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
                 .count();
         } else {
             personnelCount = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> !person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone())
+                .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
                 .count();
         }
 

@@ -4602,12 +4602,12 @@ public class Campaign implements ITechManager {
 
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
                 personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone())
+                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
                     .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
                     .count();
             } else {
                 personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone())
+                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
                     .count();
             }
             fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
