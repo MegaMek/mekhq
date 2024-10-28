@@ -89,6 +89,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
@@ -1034,14 +1035,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     // region Make Preview
     private JPanel makePreviewPanel() {
 
-        JPanel pnlPreview = new JPanel();
+        JPanel pnlPreview = new DefaultMHQScrollablePanel(frame, "Test");
         choiceStatus = new JComboBox<>();
-        JScrollPane scrRecoveredUnits = new JScrollPaneWithSpeed();
-        JScrollPane scrRecoveredPilots = new JScrollPaneWithSpeed();
-        JScrollPane scrMissingUnits = new JScrollPaneWithSpeed();
-        JScrollPane scrMissingPilots = new JScrollPaneWithSpeed();
-        JScrollPane scrDeadPilots = new JScrollPaneWithSpeed();
-        JScrollPane scrSalvage = new JScrollPaneWithSpeed();
         txtReport = new MarkdownEditorPanel("After-Action Report");
         txtRecoveredUnits = new JTextArea();
         txtRecoveredPilots = new JTextArea();
@@ -1097,7 +1092,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(new JScrollPaneWithSpeed(txtRewards), gridBagConstraints);
+        pnlPreview.add(txtRewards, gridBagConstraints);
 
         txtReport.setText("");
         txtReport.setPreferredSize(UIUtil.scaleForGUI(500, 300));
@@ -1121,7 +1116,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRecoveredUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtRecoveredUnits.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrRecoveredUnits.setViewportView(txtRecoveredUnits);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -1131,7 +1125,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrRecoveredUnits, gridBagConstraints);
+        pnlPreview.add(txtRecoveredUnits, gridBagConstraints);
 
         txtRecoveredPilots.setName("txtRecoveredPilots");
         txtRecoveredPilots.setText(resourceMap.getString("none"));
@@ -1141,7 +1135,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRecoveredPilots.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtRecoveredPilots.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrRecoveredPilots.setViewportView(txtRecoveredPilots);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -1151,7 +1144,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrRecoveredPilots, gridBagConstraints);
+        pnlPreview.add(txtRecoveredPilots, gridBagConstraints);
 
         txtMissingUnits.setName("txtMissingUnits");
         txtMissingUnits.setText(resourceMap.getString("none"));
@@ -1161,7 +1154,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtMissingUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtMissingUnits.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrMissingUnits.setViewportView(txtMissingUnits);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -1171,7 +1163,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrMissingUnits, gridBagConstraints);
+        pnlPreview.add(txtMissingUnits, gridBagConstraints);
 
         txtMissingPilots.setName("txtMissingPilots");
         txtMissingPilots.setText(resourceMap.getString("none"));
@@ -1181,7 +1173,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtMissingPilots.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtMissingPilots.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrMissingPilots.setViewportView(txtMissingPilots);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -1191,7 +1182,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrMissingPilots, gridBagConstraints);
+        pnlPreview.add(txtMissingPilots, gridBagConstraints);
 
         txtSalvage.setName("txtSalvage");
         txtSalvage.setText("None");
@@ -1201,7 +1192,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtSalvage.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtSalvagedUnits.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        scrSalvage.setViewportView(txtSalvage);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
@@ -1211,7 +1201,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrSalvage, gridBagConstraints);
+        pnlPreview.add(txtSalvage, gridBagConstraints);
 
         txtDeadPilots.setName("txtDeadPilots");
         txtDeadPilots.setText(resourceMap.getString("none"));
@@ -1221,7 +1211,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtDeadPilots.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtDeadPilots.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrDeadPilots.setViewportView(txtDeadPilots);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -1231,7 +1220,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPreview.add(scrDeadPilots, gridBagConstraints);
+        pnlPreview.add(txtDeadPilots, gridBagConstraints);
 
         return pnlPreview;
     }
