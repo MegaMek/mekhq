@@ -99,7 +99,7 @@
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>0.5</forceMultiplier>
                 <forceName>Convoy</forceName>
-                <generationMethod>2</generationMethod>
+                <generationMethod>1</generationMethod>
                 <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
