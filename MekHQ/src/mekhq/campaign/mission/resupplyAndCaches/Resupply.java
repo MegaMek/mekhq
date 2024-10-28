@@ -35,6 +35,9 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -55,6 +58,7 @@ import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -284,7 +288,7 @@ public class Resupply {
             case OVERWHELMING -> 6;
         };
 
-        boolean isDestroyed = false;
+        boolean isIntercepted = false;
         String message = "";
 
         if (Compute.randomInt(10) < interceptionChance) {
@@ -304,11 +308,11 @@ public class Resupply {
         } else if (Compute.randomInt(10) < interceptionChance) {
             message = resources.getString(STATUS_FORWARD + "Intercepted" +
                 Compute.randomInt(20) + STATUS_AFTERWARD);
-            isDestroyed = true;
+            isIntercepted = true;
         }
 
         if (!message.isEmpty()) {
-            createConvoyMessage(droppedItems, droppedUnits, cashReward, message, isDestroyed);
+            createConvoyMessage(droppedItems, droppedUnits, cashReward, message, isIntercepted);
         } else {
             campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -318,13 +322,13 @@ public class Resupply {
     }
 
     public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                                    Money cashReward, String convoyStatusMessage, boolean isDestroyed) {
-        createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage, isDestroyed,
+                                    Money cashReward, String convoyStatusMessage, boolean isIntercepted) {
+        createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage, isIntercepted,
             true);
     }
 
     public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                                       Money cashReward, String convoyStatusMessage, boolean isDestroyed,
+                                       Money cashReward, String convoyStatusMessage, boolean isIntercepted,
                                     boolean isIntroduction) {
         // Dialog dimensions and representative
         final int DIALOG_WIDTH = 400;
@@ -342,12 +346,29 @@ public class Resupply {
             dialog.dispose();
             if (isIntroduction) {
                 createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage,
-                    isDestroyed, false);
+                    isIntercepted, false);
             } else {
-                if (isDestroyed) {
-                    campaign.addReport(String.format(resources.getString("convoyDestroyed.text"),
-                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                        CLOSING_SPAN_TAG));
+                if (isIntercepted) {
+                    if (campaign.getCampaignOptions().isUseStratCon()) {
+                        StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+                        // Pick a random track
+                        List<StratconTrackState> track = campaignState.getTracks();
+                        StratconTrackState randomTrack = track.get(random.nextInt(track.size()));
+
+                        // Select a set of unoccupied coordinates
+                        StratconCoords coords = getUnoccupiedCoords(randomTrack);
+
+
+
+                        campaign.addReport(String.format(resources.getString("convoyInterceptedStratCon.text"),
+                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            CLOSING_SPAN_TAG, randomTrack.getDisplayableName()));
+                    } else {
+                        campaign.addReport(String.format(resources.getString("convoyInterceptedAtB.text"),
+                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            CLOSING_SPAN_TAG));
+                    }
                 } else {
                     campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                         spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -406,7 +427,7 @@ public class Resupply {
         // Prepares and adds the confirm button
         JButton confirmButton = new JButton(resources.getString("logisticsPatch.text"));
         if (!isIntroduction) {
-            if (isDestroyed) {
+            if (isIntercepted) {
                 confirmButton.setText(resources.getString("logisticsDestroyed.text"));
             } else {
                 confirmButton.setText(resources.getString("logisticsReceived.text"));
