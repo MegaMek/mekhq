@@ -1396,10 +1396,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tracker.assignKills();
 
         //now get loot
-        for (int i = 0; i < lootBoxes.size(); i++) {
-            JCheckBox box = lootBoxes.get(i);
-            if (box.isSelected()) {
-                tracker.addLoot(loots.get(i));
+        if (((ScenarioStatus) Objects.requireNonNull(choiceStatus.getSelectedItem())).isOverallVictory()) {
+            for (int i = 0; i < lootBoxes.size(); i++) {
+                JCheckBox box = lootBoxes.get(i);
+                if (box.isSelected()) {
+                    tracker.addLoot(loots.get(i));
+                }
             }
         }
 
@@ -1428,7 +1430,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        StratconRulesManager.processScenarioCompletion(tracker);
+        StratconRulesManager.processScenarioCompletion(campaign, tracker);
 
         this.setVisible(false);
     }

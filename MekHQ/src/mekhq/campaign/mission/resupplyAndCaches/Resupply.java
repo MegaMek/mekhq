@@ -43,8 +43,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.apache.commons.math3.util.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -68,7 +66,6 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 public class Resupply {
-    private static final Logger log = LogManager.getLogger(Resupply.class);
     final private Campaign campaign;
     final private AtBContract contract;
     final private Faction employerFaction;
@@ -296,6 +293,10 @@ public class Resupply {
         String message = "";
 
         if (Compute.randomInt(10) < interceptionChance) {
+            message = resources.getString(STATUS_FORWARD + "Intercepted" +
+                Compute.randomInt(20) + STATUS_AFTERWARD);
+            isIntercepted = true;
+        } else if (Compute.randomInt(10) < interceptionChance) {
             if (Compute.d6() == 1) {
                 message = resources.getString(STATUS_FORWARD + Compute.randomInt(100)
                     + STATUS_AFTERWARD);
@@ -309,10 +310,6 @@ public class Resupply {
                 message = resources.getString(STATUS_FORWARD + "Enemy" + morale
                     + Compute.randomInt(50) + STATUS_AFTERWARD);
             }
-        } else if (Compute.randomInt(10) < interceptionChance) {
-            message = resources.getString(STATUS_FORWARD + "Intercepted" +
-                Compute.randomInt(20) + STATUS_AFTERWARD);
-            isIntercepted = true;
         }
 
         if (!message.isEmpty()) {
@@ -356,7 +353,8 @@ public class Resupply {
                     // Announce the situation to the player and then, if the player is using
                     // StratCon generate a scenario
                     if (campaign.getCampaignOptions().isUseStratCon()) {
-                        ScenarioTemplate template = ScenarioTemplate.Deserialize("data/scenariotemplates/Emergency Convoy Defense.xml");
+                        ScenarioTemplate template = ScenarioTemplate.Deserialize(
+                            "data/scenariotemplates/Emergency Convoy Defense.xml");
                         StratconScenario scenario = generateExternalScenario(campaign, contract,
                             null, template);
 
@@ -393,7 +391,7 @@ public class Resupply {
                             // If we failed to generate a scenario, for whatever reason, we don't
                             // want the player confused why there isn't a scenario, so we offer
                             // this fluffy response.
-                            campaign.addReport(String.format(resources.getString("convoyDestroyed.text.text"),
+                            campaign.addReport(String.format(resources.getString("convoyDestroyed.text"),
                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                                 CLOSING_SPAN_TAG));
                         }
@@ -442,13 +440,13 @@ public class Resupply {
         String speaker = "";
         if (isIntroduction) {
             message = String.format(resources.getString("logisticsMessage.text"),
-                getCommanderTitle(false)) + "<br>";
+                getCommanderTitle(campaign, false)) + "<br>";
 
             if (logisticsOfficer != null) {
                 speaker = "<b>" + logisticsOfficer.getFullTitle() + "</b><br><br>";
             }
         } else {
-            message = String.format(message, getCommanderTitle(false));
+            message = String.format(message, getCommanderTitle(campaign, false));
         }
 
         JLabel description = new JLabel(
@@ -476,6 +474,51 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
+    public static void convoyFinalMessageDialog(Campaign campaign, Faction employerFaction) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+        // Dialog dimensions and representative
+        final int DIALOG_WIDTH = 400;
+        final int DIALOG_HEIGHT = 200;
+
+        // Creates and sets up the dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Prepares and adds the icon of the representative as a label
+        JLabel iconLabel = new JLabel();
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+        iconLabel.setIcon(Factions.getFactionLogo(campaign, employerFaction.getShortName(),
+            true));
+        dialog.add(iconLabel, BorderLayout.NORTH);
+
+        // Prepares and adds the description
+        String convoyStatusMessage = resources.getString("statusUpdateAbandoned"
+            + Compute.randomInt(20) + ".text");
+        String message = String.format(convoyStatusMessage, getCommanderTitle(campaign, false));
+
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+            UIUtil.scaleForGUI(DIALOG_WIDTH), message));
+        description.setHorizontalAlignment(JLabel.CENTER);
+        dialog.add(description, BorderLayout.CENTER);
+
+        // Prepares and adds the confirm button
+        JButton confirmButton = new JButton(resources.getString("logisticsPatch.text"));
+        confirmButton.setText(resources.getString("logisticsDestroyed.text"));
+        confirmButton.addActionListener(e -> dialog.dispose());
+        dialog.add(confirmButton,  BorderLayout.SOUTH);
+
+        // Pack, position and display the dialog
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
     private Person pickLogisticsRepresentative() {
         Person highestRankedCharacter = null;
 
@@ -493,7 +536,8 @@ public class Resupply {
         return highestRankedCharacter;
     }
 
-    private String getCommanderTitle(boolean includeSurname) {
+    private static String getCommanderTitle(Campaign campaign, boolean includeSurname) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
         String placeholder = resources.getString("commander.text");
         Person commander = campaign.getFlaggedCommander();
 
