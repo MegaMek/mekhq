@@ -52,6 +52,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
+import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
+import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
+import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
+
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
  *
@@ -120,10 +126,12 @@ public class StratconRulesManager {
             // generate a scenario
             if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
                 // pick random coordinates and force to drive the scenario
-                int x = Compute.randomInt(track.getWidth());
-                int y = Compute.randomInt(track.getHeight());
+                StratconCoords scenarioCoords = getUnoccupiedCoords(track);
 
-                StratconCoords scenarioCoords = new StratconCoords(x, y);
+                if (scenarioCoords == null) {
+                    logger.warn("Target track is full, skipping scenario generation");
+                    continue;
+                }
 
                 // if forces are already assigned to these coordinates, use those instead
                 // of randomly-selected ones
@@ -143,9 +151,9 @@ public class StratconRulesManager {
                 availableForceIDs.remove(randomForceIndex);
 
                 // we want to remove the actual int with the value, not the value at the index
-                sortedAvailableForceIDs.get(MapLocation.AllGroundTerrain).remove((Integer) randomForceID);
-                sortedAvailableForceIDs.get(MapLocation.LowAtmosphere).remove((Integer) randomForceID);
-                sortedAvailableForceIDs.get(MapLocation.Space).remove((Integer) randomForceID);
+                sortedAvailableForceIDs.get(AllGroundTerrain).remove((Integer) randomForceID);
+                sortedAvailableForceIDs.get(LowAtmosphere).remove((Integer) randomForceID);
+                sortedAvailableForceIDs.get(Space).remove((Integer) randomForceID);
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
@@ -177,24 +185,125 @@ public class StratconRulesManager {
         // and generate the opfors / events / etc
         // if not auto-assigning lances, we then back out the lance assignments.
         for (StratconScenario scenario : generatedScenarios) {
-            AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
-            setScenarioParametersFromBiome(track, scenario);
-            swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
+            finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+        }
+    }
 
-            if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
-                for (int forceID : scenario.getPlayerTemplateForceIDs()) {
-                    scenario.getBackingScenario().removeForce(forceID);
-                }
+    /**
+     * Creates a new StratCon scenario, placing it in an unoccupied location on the specified track.
+     * If no track is specified, a random one will be chosen.
+     * An optional scenario template can be applied.
+     * This method is based on {@code generateScenariosForTrack()}, designed to simplify the
+     * process by which external classes can add new StratCon scenarios.
+     *
+     * @param campaign        The campaign object encapsulating the current campaign state.
+     * @param contract        The contract associated with the current scenario.
+     * @param track           The {@link StratconTrackState} the scenario should be assigned to, or
+     *                        {@code null} to select a random track.
+     * @param template        A specific {@link ScenarioTemplate} to use for scenario generation,
+     *                        or {@code null} to select scenario template randomly.
+     */
+     public static void generateExternalScenario(Campaign campaign, AtBContract contract,
+                         @Nullable StratconTrackState track, @Nullable ScenarioTemplate template) {
+         // If we're not generating for a specific track, randomly pick one.
+         if (track == null) {
+             List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
+             Random rand = new Random();
 
-                scenario.setCurrentState(ScenarioState.UNRESOLVED);
-                track.addScenario(scenario);
-            } else {
-                commitPrimaryForces(campaign, scenario, track);
-                // if we're auto-assigning lances, deploy all assigned forces to the track as
-                // well
-                for (int forceID : scenario.getPrimaryForceIDs()) {
-                    processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
-                }
+             if (tracks.size() > 0) {
+                 track = tracks.get(rand.nextInt(tracks.size()));
+             } else {
+                 logger.error("No tracks available. Aborting scenario generation.");
+             }
+         }
+
+         // Are we automatically assigning lances?
+         boolean autoAssignLances = contract.getCommandRights().isIntegrated();
+
+         // Grab the available lances and sort them by map type
+         List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+
+         // Select the target coords.
+         StratconCoords scenarioCoords = getUnoccupiedCoords(track);
+
+         if (scenarioCoords == null) {
+             logger.warn("Target track is full, aborting scenario generation");
+             return;
+         }
+
+         // If forces are already assigned to the target coordinates, use those instead of randomly
+         // selected a new force
+         StratconScenario scenario = null;
+         if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
+             scenario = generateScenarioForExistingForces(scenarioCoords,
+                 track.getAssignedCoordForces().get(scenarioCoords), contract, campaign, track,
+                 template);
+         }
+
+         // Otherwise, pick a random force from those available
+         // If a template has been specified, remove forces that aren't appropriate for the
+         // template.
+         if (template != null) {
+             MapLocation location = template.mapParameters.getMapLocation();
+
+             switch (location) {
+                 case AllGroundTerrain, SpecificGroundTerrain -> {
+                     sortedAvailableForceIDs.get(LowAtmosphere).clear();
+                     sortedAvailableForceIDs.get(Space).clear();
+                 }
+                 case LowAtmosphere -> {
+                     sortedAvailableForceIDs.get(AllGroundTerrain).clear();
+                     sortedAvailableForceIDs.get(Space).clear();
+                 }
+                 case Space -> {
+                     sortedAvailableForceIDs.get(AllGroundTerrain).clear();
+                     sortedAvailableForceIDs.get(LowAtmosphere).clear();
+                 }
+             }
+         }
+
+         // If we haven't generated a scenario yet, it's because we need to pick a random force.
+         if (scenario == null) {
+             int randomForceIndex = Compute.randomInt(availableForceIDs.size());
+             int randomForceID = availableForceIDs.get(randomForceIndex);
+
+             scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track, template);
+         }
+
+         // We end by finalizing the scenario
+         finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+     }
+
+    /**
+     * Finalizes the backing scenario, setting up the OpFor, scenario parameters, and other
+     * necessary steps.
+     *
+     * @param campaign        The current campaign.
+     * @param contract        The contract associated with the scenario.
+     * @param track           The relevant {@link StratconTrackState}.
+     * @param autoAssignLances  Flag indicating whether lances are to be auto-assigned.
+     * @param scenario        The {@link StratconScenario} scenario to be finalized.
+     */
+    private static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
+                        @Nullable StratconTrackState track, boolean autoAssignLances,
+                        StratconScenario scenario) {
+        AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+        setScenarioParametersFromBiome(track, scenario);
+        swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
+
+        if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
+            for (int forceID : scenario.getPlayerTemplateForceIDs()) {
+                scenario.getBackingScenario().removeForce(forceID);
+            }
+
+            scenario.setCurrentState(ScenarioState.UNRESOLVED);
+            track.addScenario(scenario);
+        } else {
+            commitPrimaryForces(campaign, scenario, track);
+            // if we're auto-assigning lances, deploy all assigned forces to the track as well
+            for (int forceID : scenario.getPrimaryForceIDs()) {
+                processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
             }
         }
     }
@@ -332,18 +441,47 @@ public class StratconRulesManager {
     }
 
     /**
-     * Given a set of force IDs and coordinates, generate a scenario Useful for when
-     * we want to generate
-     * scenarios for forces already deployed to a track
+     * Generates a StratCon scenario for forces already existing at the given coordinates on the
+     * provided track.
+     *
+     * @param scenarioCoords    The coordinates where the scenario will be placed on the track.
+     * @param forceIDs          The set of force IDs (ideally for the forces already at the
+     *                          specified location).
+     * @param contract          The contract associated with the current scenario.
+     * @param campaign          The current campaign.
+     * @param track             The relevant StratCon track.
+     * @return The newly generated {@link StratconScenario}.
      */
     public static StratconScenario generateScenarioForExistingForces(StratconCoords scenarioCoords,
-            Set<Integer> forceIDs, AtBContract contract, Campaign campaign, StratconTrackState track) {
+                                    Set<Integer> forceIDs, AtBContract contract, Campaign campaign,
+                                    StratconTrackState track) {
+        return generateScenarioForExistingForces(scenarioCoords, forceIDs, contract, campaign,
+            track, null);
+    }
+
+    /**
+     * Generates a StratCon scenario for forces already existing at the given coordinates on the
+     * provided track. This method allows us to specify a specific scenario template.
+     *
+     * @param scenarioCoords    The coordinates where the scenario will be placed on the track.
+     * @param forceIDs          The set of force IDs (ideally for the forces already at the
+     *                          specified location).
+     * @param contract          The contract associated with the current scenario.
+     * @param campaign          The current campaign.
+     * @param track             The relevant StratCon track.
+     * @param template          A specific {@link ScenarioTemplate} to use, or {@code null} to
+     *                          select a random template.
+     * @return The newly generated {@link StratconScenario}.
+     */
+    public static StratconScenario generateScenarioForExistingForces(StratconCoords scenarioCoords,
+                                    Set<Integer> forceIDs, AtBContract contract, Campaign campaign,
+                                    StratconTrackState track, @Nullable ScenarioTemplate template) {
         boolean firstForce = true;
         StratconScenario scenario = null;
 
         for (int forceID : forceIDs) {
             if (firstForce) {
-                scenario = setupScenario(scenarioCoords, forceID, campaign, contract, track);
+                scenario = setupScenario(scenarioCoords, forceID, campaign, contract, track, template);
                 firstForce = false;
             } else {
                 scenario.incrementRequiredPlayerLances();
@@ -411,20 +549,54 @@ public class StratconRulesManager {
     }
 
     /**
-     * Logic to set up a scenario
+     * Sets up a StratCon scenario with the given parameters.
+     *
+     * @param coords    The coordinates where the scenario is to be placed on the track.
+     * @param forceID   The ID of the forces involved in the scenario.
+     * @param campaign  The current campaign.
+     * @param contract  The contract associated with the current scenario.
+     * @param track     The relevant StratCon track.
+     * @return The newly set up {@link StratconScenario}.
      */
     private static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
-            AtBContract contract, StratconTrackState track) {
-        StratconScenario scenario = null;
+                                                  AtBContract contract, StratconTrackState track) {
+        return setupScenario(coords, forceID, campaign, contract, track, null);
+    }
+
+    /**
+     * Sets up a Stratcon scenario with the given parameters optionally allowing use a specific scenario template.
+     * <p>
+     * If a facility is already present at the provided coordinates, the scenario will be setup for that facility.
+     * If there is no facility, a new scenario will be generated; if the ScenarioTemplate argument provided was non-null,
+     * it will be used, else a randomly selected scenario will be generated.
+     * In case the generated scenario turns out to be a facility scenario, a new facility will be added to the track at
+     * the provided coordinates and setup for that facility.
+     *
+     * @param coords    The coordinates where the scenario is to be placed on the track.
+     * @param forceID   The ID of the forces involved in the scenario.
+     * @param campaign  The current campaign.
+     * @param contract  The contract associated with the current scenario.
+     * @param track     The relevant StratCon track.
+     * @param template  A specific {@link ScenarioTemplate} to use for scenario setup, or
+     *                  {@code null} to select the scenario template randomly.
+     * @return The newly set up {@link StratconScenario}.
+     */
+    private static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
+            AtBContract contract, StratconTrackState track, @Nullable ScenarioTemplate template) {
+        StratconScenario scenario;
 
         if (track.getFacilities().containsKey(coords)) {
             StratconFacility facility = track.getFacility(coords);
             boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
-            ScenarioTemplate template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
+            template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
             scenario = generateScenario(campaign, contract, track, forceID, coords, template);
             setupFacilityScenario(scenario, facility);
         } else {
-            scenario = generateScenario(campaign, contract, track, forceID, coords);
+            if (template != null) {
+                scenario = generateScenario(campaign, contract, track, forceID, coords, template);
+            } else {
+                scenario = generateScenario(campaign, contract, track, forceID, coords);
+            }
 
             // we may generate a facility scenario randomly - if so, do the facility-related
             // stuff and add a new facility to the track
@@ -666,17 +838,17 @@ public class StratconRulesManager {
         // and ground units/conventional fighters to space battle
 
         List<MapLocation> mapLocations = new ArrayList<>();
-        mapLocations.add(MapLocation.Space); // can always add ASFs
+        mapLocations.add(Space); // can always add ASFs
 
         MapLocation scenarioMapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
 
-        if (scenarioMapLocation == MapLocation.LowAtmosphere) {
-            mapLocations.add(MapLocation.LowAtmosphere); // can add conventional fighters to ground or low atmo battles
+        if (scenarioMapLocation == LowAtmosphere) {
+            mapLocations.add(LowAtmosphere); // can add conventional fighters to ground or low atmo battles
         }
 
-        if ((scenarioMapLocation == MapLocation.AllGroundTerrain)
-                || (scenarioMapLocation == MapLocation.SpecificGroundTerrain)) {
-            mapLocations.add(MapLocation.AllGroundTerrain); // can only add ground units to ground battles
+        if ((scenarioMapLocation == AllGroundTerrain)
+                || (scenarioMapLocation == SpecificGroundTerrain)) {
+            mapLocations.add(AllGroundTerrain); // can only add ground units to ground battles
         }
 
         MapLocation selectedLocation = mapLocations.get(Compute.randomInt(mapLocations.size()));
@@ -753,9 +925,9 @@ public class StratconRulesManager {
     private static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
         Map<MapLocation, List<Integer>> retVal = new HashMap<>();
 
-        retVal.put(MapLocation.AllGroundTerrain, new ArrayList<>());
-        retVal.put(MapLocation.LowAtmosphere, new ArrayList<>());
-        retVal.put(MapLocation.Space, new ArrayList<>());
+        retVal.put(AllGroundTerrain, new ArrayList<>());
+        retVal.put(LowAtmosphere, new ArrayList<>());
+        retVal.put(Space, new ArrayList<>());
 
         for (int forceID : forceIDs) {
             switch (campaign.getForce(forceID).getPrimaryUnitType(campaign)) {
@@ -765,13 +937,13 @@ public class StratconRulesManager {
                 case UnitType.TANK:
                 case UnitType.PROTOMEK:
                 case UnitType.VTOL:
-                    retVal.get(MapLocation.AllGroundTerrain).add(forceID);
+                    retVal.get(AllGroundTerrain).add(forceID);
                     break;
                 case UnitType.AEROSPACEFIGHTER:
-                    retVal.get(MapLocation.Space).add(forceID);
+                    retVal.get(Space).add(forceID);
                     // intentional fallthrough here, ASFs can go to atmospheric maps too
                 case UnitType.CONV_FIGHTER:
-                    retVal.get(MapLocation.LowAtmosphere).add(forceID);
+                    retVal.get(LowAtmosphere).add(forceID);
                     break;
             }
         }
@@ -933,8 +1105,8 @@ public class StratconRulesManager {
         // if an allied unit is present, then we want to make sure that
         // it's ground units for ground battles
         if (Compute.randomInt(100) <= alliedUnitOdds) {
-            if ((backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere)
-                    || (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space)) {
+            if ((backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere)
+                    || (backingScenario.getTemplate().mapParameters.getMapLocation() == Space)) {
                 backingScenario.addScenarioModifier(
                         AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
             } else {
@@ -953,8 +1125,8 @@ public class StratconRulesManager {
      */
     public static void setAttachedUnitsModifier(StratconScenario scenario, AtBContract contract) {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-        boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.LowAtmosphere)
-                || (backingScenario.getTemplate().mapParameters.getMapLocation() == MapLocation.Space);
+        boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere)
+                || (backingScenario.getTemplate().mapParameters.getMapLocation() == Space);
 
         // if we're on cadre duty, we're getting three trainees, period
         if (contract.getContractType().isCadreDuty()) {
