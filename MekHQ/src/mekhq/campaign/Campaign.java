@@ -66,11 +66,11 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -3785,9 +3785,9 @@ public class Campaign implements ITechManager {
 
                 // Resupply
                 logger.info("Campaign.java");
-                Resupply supplyDrops = new Resupply(this, contract, false, false);
+                Resupply resupplies = new Resupply(this, contract, false, false);
                 int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-                supplyDrops.getResupplyParts(dropCount);
+                resupplies.getResupplyParts(dropCount);
             }
         }
 

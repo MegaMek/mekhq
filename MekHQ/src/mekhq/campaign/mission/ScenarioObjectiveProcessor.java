@@ -26,8 +26,8 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.atb.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import org.apache.logging.log4j.LogManager;
 

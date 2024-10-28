@@ -41,8 +41,8 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.atb.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -478,7 +478,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (remainingSupportPoints > 0) {
                 logger.info("BriefingTab.java");
                 Resupply supplyDrops = new Resupply(getCampaign(), ((AtBContract) mission), false, false);
-                supplyDrops.getResupplyParts(remainingSupportPoints, true);
+                supplyDrops.getResupplyParts(remainingSupportPoints, false, true);
             }
         }
 
