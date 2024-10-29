@@ -784,7 +784,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (Loot loot : loots) {
             j++;
             JCheckBox box = new JCheckBox(loot.getShortDescription());
-            box.setSelected(false);
+            box.setSelected(true);
             lootBoxes.add(box);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;

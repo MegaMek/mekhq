@@ -4689,16 +4689,19 @@ public class Campaign implements ITechManager {
         // otherwise we would need to check it once for each active person in the
         // campaign
         if (campaignOptions.isUseFatigue()) {
-            long validPersonnel;
+            int personnelCount;
 
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                validPersonnel = getActivePersonnel().stream()
-                        .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
-                        .count();
+                personnelCount = (int) getActivePersonnel().stream()
+                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
+                    .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
+                    .count();
             } else {
-                validPersonnel = getActivePersonnel().size();
+                personnelCount = (int) getActivePersonnel().stream()
+                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
+                    .count();
             }
-            fieldKitchenWithinCapacity = validPersonnel <= Fatigue.checkFieldKitchenCapacity(this);
+            fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;
         }
