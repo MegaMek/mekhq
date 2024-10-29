@@ -18,24 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
@@ -67,6 +49,11 @@ import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.*;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
@@ -136,6 +123,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String CHANGE_NAME = "CHANGE_NAME";
     private static final String CHANGE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS";
     private static final String CHANGE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES";
+    private static final String CHANGE_CONVOY_STATUS = "CHANGE_CONVOY_STATUS";
 
     private static final String COMMAND_CHANGE_FORCE_CAMO = "CHANGE_CAMO|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_DESC = "CHANGE_DESC|FORCE|empty|";
@@ -146,6 +134,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_CONVOY_STATUS = "CHANGE_CONVOY_STATUS|FORCE|empty|";
 
     private static final String COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL = "OVERRIDE_FORMATION_LEVEL|FORCE|FORMATION_LEVEL|";
 
@@ -440,8 +429,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             final boolean subforces = command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUSES);
             for (final Force force : forces) {
                 force.setCombatForce(combatForce, subforces);
+                force.setConvoyForce(!combatForce, subforces);
             }
-            gui.undeployForces(forces);
+            gui.getTOETab().refreshForceView();
+        } else if (command.contains(TOEMouseAdapter.CHANGE_CONVOY_STATUS)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            final boolean convoyForce = !singleForce.isConvoyForce();
+            for (final Force force : forces) {
+                force.setConvoyForce(convoyForce, true);
+            }
             gui.getTOETab().refreshForceView();
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Force force : forces) {
@@ -1028,6 +1027,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(force.isCombatForce() ? "Make Force and Subforces Non-Combat Forces"
                     : "Make Force and Subforces Combat Forces");
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
+            menuItem.addActionListener(this);
+            popup.add(menuItem);
+
+            menuItem = new JMenuItem(!force.isConvoyForce() ? "Make Force and Subforces Resupply Convoys"
+                : "Remove Resupply Convoy Status from Force and Subforces");
+            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CONVOY_STATUS + forceIds);
             menuItem.addActionListener(this);
             popup.add(menuItem);
 

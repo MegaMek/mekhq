@@ -73,6 +73,7 @@ public class Force {
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
+    private boolean convoyForce;
     private FormationLevel formationLevel;
     private FormationLevel overrideFormationLevel;
     private Force parentForce;
@@ -94,6 +95,7 @@ public class Force {
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
+        this.convoyForce = false;
         this.formationLevel = FormationLevel.NONE;
         this.overrideFormationLevel = FormationLevel.NONE;
         this.parentForce = null;
@@ -151,7 +153,7 @@ public class Force {
     }
 
     public boolean isCombatForce() {
-        return combatForce;
+        return combatForce && !convoyForce;
     }
 
     public void setCombatForce(boolean combatForce, boolean setForSubForces) {
@@ -159,6 +161,19 @@ public class Force {
         if (setForSubForces) {
             for (Force force : subForces) {
                 force.setCombatForce(combatForce, true);
+            }
+        }
+    }
+
+    public boolean isConvoyForce() {
+        return convoyForce;
+    }
+
+    public void setConvoyForce(boolean convoyForce, boolean setForSubForces) {
+        this.convoyForce = convoyForce;
+        if (setForSubForces) {
+            for (Force force : subForces) {
+                force.setConvoyForce(convoyForce, true);
             }
         }
     }
@@ -320,8 +335,8 @@ public class Force {
             allUnits = new Vector<>(units);
         }
 
-        for (Force f : subForces) {
-            allUnits.addAll(f.getAllUnits(combatForcesOnly));
+        for (Force force : subForces) {
+            allUnits.addAll(force.getAllUnits(combatForcesOnly));
         }
         return allUnits;
     }
@@ -608,6 +623,7 @@ public class Force {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "convoyForce", convoyForce);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
@@ -655,6 +671,8 @@ public class Force {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
+                    retVal.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
                     retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {

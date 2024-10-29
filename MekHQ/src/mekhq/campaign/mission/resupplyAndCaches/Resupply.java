@@ -81,6 +81,7 @@ public class Resupply {
     private final boolean EMPLOYER_IS_CLAN;
     private final Money TARGET_VALUE = Money.of(250000);
     private final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
+    public final static double RESUPPLY_LOAD_SIZE = 5;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
     private final static MMLogger logger = MMLogger.create(Resupply.class);
@@ -936,5 +937,60 @@ public class Resupply {
      */
     private static PartQuality getRandomPartQuality(int modifier) {
         return getRandomUnitQuality(modifier);
+    }
+
+
+    public static void triggerConvoyDialog(Campaign campaign, AtBContract contract) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+        // Retrieves the title from the resources
+        String title = resources.getString("incomingTransmission.title");
+
+        // An ImageIcon to hold the faction icon
+        ImageIcon icon = getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
+
+        // Format the HTML message
+        int maximumResupplySize = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+
+        String message = String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
+            UIUtil.scaleForGUI(500),
+            String.format(resources.getString("convoyMessage.text"),
+                getCommanderTitle(campaign, false),
+                maximumResupplySize * RESUPPLY_LOAD_SIZE, maximumResupplySize));
+
+        // Create a text pane to display the message
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html");
+        textPane.setText(message);
+        textPane.setEditable(false);
+
+        // Create a panel to display the icon and the message
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel imageLabel = new JLabel(icon);
+        panel.add(imageLabel, BorderLayout.CENTER);
+        panel.add(textPane, BorderLayout.SOUTH);
+
+        // Create a custom dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);
+        dialog.setLayout(new BorderLayout());
+
+        // Create an accept button and add its action listener.
+        // When clicked, it will set the result to true and close the dialog
+        JButton acceptButton = new JButton(resources.getString("convoyConfirm.text"));
+        acceptButton.addActionListener(e -> dialog.dispose());
+
+        // Create a panel for buttons and add buttons to it
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+
+        // Add the original panel and button panel to the dialog
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setModal(true);
+        dialog.setVisible(true);
     }
 }

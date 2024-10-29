@@ -48,6 +48,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.triggerConvoyDialog;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 /**
@@ -477,6 +478,12 @@ public class ContractMarketDialog extends JDialog {
             if (selectedContract instanceof AtBContract) {
                 if (!triggerConfirmationDialog()) {
                     return;
+                }
+
+                if (selectedContract.getCommandRights().isIndependent()) {
+                    if (selectedContract instanceof AtBContract) {
+                        triggerConvoyDialog(campaign, (AtBContract) selectedContract);
+                    }
                 }
             }
 
