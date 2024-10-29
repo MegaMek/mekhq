@@ -272,6 +272,7 @@ public class AtBDynamicScenarioFactory {
         // how close to the allowances do we want to get?
         int targetPercentage = 100 + ((Compute.randomInt(8) - 3) * 5);
         logger.info(String.format("Target Percentage: %s", targetPercentage));
+        logger.info(String.format("Difficulty Multiplier: %s", getDifficultyMultiplier(campaign)));
 
         for (int generationOrder : generationOrders) {
             List<ScenarioForceTemplate> currentForceTemplates = orderedForceTemplates.get(generationOrder);
@@ -283,10 +284,8 @@ public class AtBDynamicScenarioFactory {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     int weightClass = randomForceWeight();
+                    logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
 
-                    if (forceTemplate.isPlayerForce()) {
-                        logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
-                    }
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
@@ -390,11 +389,15 @@ public class AtBDynamicScenarioFactory {
                 break;
             case Opposing:
                 factionCode = contract.getEnemyCode();
+
+                // We only want the difficulty multipliers applying to enemy forces
+                double difficultyMultiplier = getDifficultyMultiplier(campaign);
+                effectiveBV = (int) round(effectiveBV * difficultyMultiplier);
+                effectiveUnitCount = (int) round(effectiveUnitCount  * difficultyMultiplier);
+
                 // Intentional fall-through: opposing third parties are either the contracted
-                // enemy or
-                // "Unidentified Hostiles" which are considered pirates or bandit caste with
-                // random
-                // quality and skill
+                // enemy or "Unidentified Hostiles" which are considered pirates or bandit caste
+                // with random quality and skill
             case Third:
                 skill = scenario.getEffectiveOpforSkill();
                 quality = scenario.getEffectiveOpforQuality();
@@ -2689,7 +2692,6 @@ public class AtBDynamicScenarioFactory {
         // for each deployed player and bot force that's marked as contributing to the
         // BV budget
         int bvBudget = 0;
-        double difficultyMultiplier = getDifficultyMultiplier(campaign);
 
         String generationMethod = campaign.getCampaignOptions().isUseGenericBattleValue() ?
             "Generic BV" : "BV2";
@@ -2720,9 +2722,7 @@ public class AtBDynamicScenarioFactory {
         double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
 
         if (bvMultiplier > 0) {
-            bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier() * difficultyMultiplier);
-        } else {
-            bvBudget = (int) round(bvBudget * difficultyMultiplier);
+            bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
         }
 
         // allied bot forces that contribute to BV do not get multiplied by the
@@ -2756,7 +2756,6 @@ public class AtBDynamicScenarioFactory {
         // for each deployed player and bot force that's marked as contributing to the
         // unit count budget
         int unitCount = 0;
-        double difficultyMultiplier = getDifficultyMultiplier(campaign);
 
         // deployed player forces:
         for (int forceID : scenario.getForceIDs()) {
@@ -2775,9 +2774,6 @@ public class AtBDynamicScenarioFactory {
                 unitCount++;
             }
         }
-
-        // the player unit count is now multiplied by the difficulty multiplier
-        unitCount = (int) Math.floor((double) unitCount * difficultyMultiplier);
 
         // allied bot forces that contribute to BV do not get multiplied by the
         // difficulty even if the player is good, the AI doesn't get any better
