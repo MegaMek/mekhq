@@ -233,7 +233,7 @@ public class ChooseRefitDialog extends JDialog {
         stepsTable.setShowGrid(false);
 
         scrStepsTable = new JScrollPaneWithSpeed(stepsTable);
-        scrStepsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
+        scrStepsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("stepsTable.title")));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -250,10 +250,6 @@ public class ChooseRefitDialog extends JDialog {
         // region Right Side Tab Panel
         
         JPanel textPanel = new JPanel(new GridBagLayout());
-
-
-
-        
 
         txtOldUnit = new JTextPane();
         txtOldUnit.setEditable(false);
@@ -303,7 +299,7 @@ public class ChooseRefitDialog extends JDialog {
         neededTable.setShowGrid(false);
 
         scrNeededTable = new JScrollPaneWithSpeed(neededTable);
-        scrNeededTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
+        scrNeededTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("neededTable.title")));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -326,7 +322,7 @@ public class ChooseRefitDialog extends JDialog {
         returnsTable.setShowGrid(false);
 
         scrReturnsTable = new JScrollPaneWithSpeed(returnsTable);
-        scrReturnsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")));
+        scrReturnsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("returnsTable.title")));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -414,8 +410,9 @@ public class ChooseRefitDialog extends JDialog {
             logger.error("Failed to set user preferences", ex);
         }
     }
-    // endregion Initialization
 
+    
+    // region Acitons
     private void confirm() {
         confirmed = getSelectedRefit() != null;
         customize = radCustomize.isSelected();
@@ -457,39 +454,31 @@ public class ChooseRefitDialog extends JDialog {
         return refitModel.getRefitAt(refitTable.convertRowIndexToModel(selectedRow));
     }
 
+    
+    // region Refit Table Changed
     private void refitTableValueChanged() {
         Refit refit = getSelectedRefit();
         if (null == refit) {
             neededModel.setData(new ArrayList<Part>());
+            returnsModel.setData(new ArrayList<Part>());
+            stepsModel.setData(new ArrayList<RefitStep>());
             txtNewUnit.setText("");
             btnGo.setEnabled(false);
             return;
         }
-
-        Map<String,Part> shoppingList = new HashMap<String,Part>();
-        for( Part newPart : refit.getShoppingList()) { 
-            newPart.setUnit(null);
-            if(newPart instanceof MissingPart) {
-                newPart = ((MissingPart) newPart).getNewPart();
-            }
-            if (shoppingList.containsKey(newPart.getName() + " " + newPart.getDetails())) {
-                Part oldPart = shoppingList.get(newPart.getName() + " " + newPart.getDetails());
-                oldPart.setQuantity(oldPart.getQuantity() + newPart.getQuantity());
-            } else {
-                shoppingList.put(newPart.getName() + " " + newPart.getDetails(), newPart);
-            }
-        }
         
-        neededModel.setData(new ArrayList<Part>(shoppingList.values()));
+        neededModel.setData(refit.getNeededList());
+        returnsModel.setData(refit.getReturnsList());
+        stepsModel.setData(refit.getStepsList());
 
-        lstShopping = new JList<>(r.getShoppingListDescription());
-        scrShoppingList.setViewportView(lstShopping);
-        MekView mv = new MekView(r.getNewEntity(), false, true);
+        MekView mv = new MekView(refit.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
         btnGo.setEnabled(true);
     }
 
+
+    // region Populate Refits
     private void populateRefits() {
         kitRefits = new ArrayList<Refit>();
         customRefits = new ArrayList<Refit>();
@@ -529,6 +518,7 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
+    // region RefitTableModel
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but
      * not exactly
@@ -681,6 +671,9 @@ public class ChooseRefitDialog extends JDialog {
             }
         }
     }
+
+
+    // region RefitNeededListTableModel
 
     public class RefitNeededListTableModel extends AbstractTableModel {
         public final static int COL_NAME = 0;
@@ -875,14 +868,19 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
+
+
+    // region RefitStepsListTableModel
+
     public class RefitStepsListTableModel extends AbstractTableModel {
-        public final static int COL_NAME = 0;
-        public final static int COL_REFITSTEP_TYPE = 1;
-        public final static int COL_OLD_LOC = 2;
+        public final static int COL_OLD_NAME = 0;
+        public final static int COL_OLD_LOC = 1;
+        public final static int COL_REFITSTEP_TYPE = 2;
         public final static int COL_NEW_LOC = 3;
-        public final static int COL_BASETIME = 4;
-        public final static int COL_REFIT_CLASS = 5;
-        public final static int N_COL = 6;
+        public final static int COL_NEW_NAME = 4;
+        public final static int COL_BASETIME = 5;
+        public final static int COL_REFIT_CLASS = 6;
+        public final static int N_COL = 7;
 
         private List<RefitStep> data;
 
@@ -912,7 +910,8 @@ public class ChooseRefitDialog extends JDialog {
         @Override
         public String getColumnName(int column) {
             return switch (column) {
-                case COL_NAME -> "Item";
+                case COL_OLD_NAME -> "Old Item";
+                case COL_NEW_NAME -> "New Item";
                 case COL_REFITSTEP_TYPE -> "Step Type";
                 case COL_OLD_LOC -> "Old Location";
                 case COL_NEW_LOC -> "New Location";
@@ -932,10 +931,8 @@ public class ChooseRefitDialog extends JDialog {
             }
 
             return switch(col) {
-                case COL_NAME -> "<html><nobr>"
-                        + refitStep.getPart().getName() 
-                        + ReportingUtilities.surroundIf(" (", refitStep.getPart().getDetails(), ")")
-                        + "</nobr></html>";
+                case COL_OLD_NAME -> "<html><nobr>" + refitStep.getOldPartName() + "</nobr></html>";
+                case COL_NEW_NAME -> "<html><nobr>" + refitStep.getNewPartName() + "</nobr></html>";
                 case COL_REFIT_CLASS -> refitStep.getRefitClass().toName();
                 case COL_BASETIME -> refitStep.getBaseTime();
                 case COL_OLD_LOC -> refitStep.getOldLocName();
@@ -953,7 +950,7 @@ public class ChooseRefitDialog extends JDialog {
 
         public int getColumnWidth(int c) {
             return switch (c) {
-                case COL_NAME -> 180;
+                case COL_OLD_NAME, COL_NEW_NAME -> 180;
                 case COL_REFITSTEP_TYPE, COL_REFIT_CLASS -> 60;
                 case COL_BASETIME -> 20;
                 case COL_OLD_LOC, COL_NEW_LOC -> 60;
@@ -969,7 +966,8 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
-
+    
+    // region Comparators
     /**
      * A comparator for numbers that have been formatted with DecimalFormat
      * 

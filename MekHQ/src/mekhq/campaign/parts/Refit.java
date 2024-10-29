@@ -110,10 +110,13 @@ public class Refit extends Part implements IAcquisitionWork {
 
     private List<Part> oldUnitParts;
     private List<Part> newUnitParts;
-    private List<Part> shoppingList;
+    private List<Part> neededList;
+    private List<Part> returnsList;
     private List<Part> oldIntegratedHeatSinks;
     private List<Part> newIntegratedHeatSinks;
     private Set<Part> largeCraftBinsToChange;
+
+    private List<RefitStep> stepsList;
 
     private int armorNeeded;
     private Armor newArmorSupplies;
@@ -129,9 +132,11 @@ public class Refit extends Part implements IAcquisitionWork {
      * Blank refit constructor. Probably should not be used.
      */
     public Refit() {
-        oldUnitParts = new ArrayList<>();
-        newUnitParts = new ArrayList<>();
-        shoppingList = new ArrayList<>();
+        oldUnitParts = new ArrayList<Part>();
+        newUnitParts = new ArrayList<Part>();
+        neededList = new ArrayList<Part>();
+        returnsList = new ArrayList<Part>();
+        stepsList = new ArrayList<RefitStep>();
         oldIntegratedHeatSinks = new ArrayList<>();
         newIntegratedHeatSinks = new ArrayList<>();
         largeCraftBinsToChange = new HashSet<>();
@@ -169,6 +174,7 @@ public class Refit extends Part implements IAcquisitionWork {
         replacingLocations = false;
         campaign = oldUnit.getCampaign();
         calculate();
+        optimizeShoppingLists();
         if (customJob) {
             suggestNewName();
         }
@@ -235,77 +241,24 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Returns a mutable list of parts for the old unit in the refit. This is intended to be mutated
-     * only be {@link mekhq.campaign.Campaign Campaign} when merging parts.
-     *
-     * This is only used by RefitTest.java
-     * 
-     * @return A mutable {@link List} of old parts in the refit.
-     */
-    @Deprecated
-    public List<Part> getOldUnitParts() {
-        return oldUnitParts;
-    }
-
-    /**
-     * Returns a mutable list of parts for the new unit in the refit. This is intended to be mutated
-     * only be {@link mekhq.campaign.Campaign Campaign} when merging parts.
-     *
-     * This is only used by RefitTest.java
-     * 
-     * @return A mutable {@link List} of new part IDs in the refit.
-     */
-    @Deprecated
-    public List<Part> getNewUnitParts() {
-        return newUnitParts;
-    }
-
-
-    /**
      * @return A list of parts required to make this refit happen
      */
-    public List<Part> getShoppingList() {
-        return shoppingList;
+    public List<Part> getNeededList() {
+        return neededList;
     }
 
     /**
-     * @return Printable list of shopping items for display
+     * @return A list of parts that will be reclaimed by doing this refit
      */
-    @Deprecated
-    public String[] getShoppingListDescription() {
-        Hashtable<String, Integer> tally = new Hashtable<>();
-        Hashtable<String, String> desc = new Hashtable<>();
-        for (Part part : shoppingList) {
-            if (part instanceof Armor) {
-                continue;
-            }
-            if (null != tally.get(part.getName())) {
-                tally.put(part.getName(), tally.get(part.getName()) + 1);
-                desc.put(part.getName(), part.getQuantityName(tally.get(part.getName())));
-            } else {
-                tally.put(part.getName(), 1);
-                desc.put(part.getName(), part.getQuantityName(1));
-            }
-        }
-        if (null != newArmorSupplies) {
-            int actualAmountNeeded = armorNeeded;
-            Armor existingSupplies = getExistingArmorSupplies();
-            if (null != existingSupplies) {
-                actualAmountNeeded -= existingSupplies.getAmount();
-            }
-            if (actualAmountNeeded > 0) {
-                Armor armor = (Armor) newArmorSupplies.getNewPart();
-                armor.setAmount(actualAmountNeeded);
-                desc.put(armor.getName(), armor.getQuantityName(1));
-            }
-        }
-        String[] descs = new String[desc.keySet().size()];
-        int index = 0;
-        for (String name : desc.keySet()) {
-            descs[index] = desc.get(name);
-            index++;
-        }
-        return descs;
+    public List<Part> getReturnsList() {
+        return returnsList;
+    }
+
+    /**
+     * @return A list of steps required to carry out this refit
+     */
+    public List<RefitStep> getStepsList() {
+        return stepsList;
     }
 
     /**
@@ -321,9 +274,79 @@ public class Refit extends Part implements IAcquisitionWork {
 
     /**
      * Do all the grunt work to determine what parts are being added, removed, moved, and what other
-     * manipulations are happening in this refit.
+     * manipulations are happening in this refit. We locate the items and then pass off to RefitStep
+     * set up the fine details of the exchange and determine things like time and class.
      */
     public void calculate() {
+        Unit newUnit = new Unit(newEntity, getCampaign());
+        newUnit.initializeParts(false);
+
+        // List of parts to go through. The goal is to remove everything from both lists.
+        List<Part> oldParts = new ArrayList<Part>(oldUnit.getParts());
+        List<Part> newParts = new ArrayList<Part>(newUnit.getParts());
+
+        // Let's look for armor first
+
+        Iterator<Part> oldIterator = oldParts.iterator();
+        while (oldIterator.hasNext()) {
+            Part oldPart = oldIterator.next();
+            if (oldPart instanceof Armor) {
+                Armor oldArmor = (Armor) oldPart;
+        
+                boolean matchFound = false;
+                Iterator<Part> newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+                    if (newPart instanceof Armor) {
+
+                        Armor newArmor = (Armor) newPart;
+                        
+                        if ((oldArmor.getLocation() == newArmor.getLocation())
+                                && (oldArmor.isRearMounted() == newArmor.isRearMounted())) {
+                            matchFound = true;
+                            stepsList.add(new RefitStep(oldUnit, oldArmor, newArmor));
+                            break;
+                        }
+
+                    }
+                }
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching armor locations!");
+                }
+            }
+        }
+
+        // Sanity check that we found all the armor on both units
+        for (Part part : newParts) {
+            if (part instanceof Armor) {
+                logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching armor locations!");
+            }
+        }
+
+
+
+    }
+
+    /**
+     * When this is finished, it wil collapse needed and returned parts into single items of varying
+     * quantity, and account for the reuse of parts in add/remove steps if needed.
+     */
+    public void optimizeShoppingLists() {
+        for (RefitStep step : stepsList) {
+            if (null != step.getNeededPart()) {
+                neededList.add(step.getNeededPart());
+            }
+            if (null != step.getReturnsPart()) {
+                returnsList.add(step.getReturnsPart());
+            }
+        }
+    }
+
+
+    public void oldCalculate() {
         Unit newUnit = new Unit(newEntity, getCampaign());
         newUnit.initializeParts(false);
         refitClass = NO_CHANGE;
@@ -353,7 +376,7 @@ public class Refit extends Part implements IAcquisitionWork {
         HashMap<AmmoType, Integer> ammoRemoved = new HashMap<>();
         ArrayList<Part> newPartList = new ArrayList<>();
 
-
+        
         // Step 1: put all of the parts from the current unit into a new arraylist so
         // they can be removed when we find a match.
 
@@ -587,7 +610,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     // set entity for variable cost items
                     replacement.setUnit(newUnit);
                     cost = cost.plus(replacement.getActualValue());
-                    shoppingList.add(newPart);
+                    neededList.add(newPart);
                 }
 
             } else if (newPart instanceof Armor) {
@@ -604,7 +627,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 AmmoType type = ammoBin.getType();
 
                 ammoNeeded.merge(type, ammoBin.getFullShots(), Integer::sum);
-                shoppingList.add(newPart);
+                neededList.add(newPart);
 
                 if (newPart instanceof LargeCraftAmmoBin) {
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per
@@ -631,7 +654,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
                 time += (WORKHOUR * (sinksToReplace / 50));
                 while (sinksToReplace > 0) {
-                    shoppingList.add(replacement);
+                    neededList.add(replacement);
                     sinksToReplace--;
                 }
             }
@@ -1002,7 +1025,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     plannedReplacementParts.add(replacement);
                 }
             } else {
-                shoppingList.add(newHeatSinkPart);
+                neededList.add(newHeatSinkPart);
             }
         }
 
@@ -1134,7 +1157,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        for (Iterator<Part> iter = shoppingList.iterator(); iter.hasNext();) {
+        for (Iterator<Part> iter = neededList.iterator(); iter.hasNext();) {
             final Part part = iter.next();
             if (part instanceof AmmoBin) {
                 part.setRefitUnit(oldUnit);
@@ -1171,7 +1194,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 int tons = (int) Math.ceil((double) shotsToBuy / atype.getShots());
                 AmmoStorage ammo = new AmmoStorage(0, atype, tons * atype.getShots(), campaign);
                 newUnitParts.add(ammo);
-                shoppingList.add(ammo);
+                neededList.add(ammo);
             }
         }
 
@@ -1179,7 +1202,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (customJob) {
             // add the stuff on the shopping list to the master shopping list
             ArrayList<Part> newShoppingList = new ArrayList<>();
-            for (Part part : shoppingList) {
+            for (Part part : neededList) {
                 part.setUnit(null);
                 if (part instanceof Armor) {
                     /* Taharqa: WE shouldn't be here anymore, given that I am no longer adding
@@ -1210,7 +1233,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     newShoppingList.add(part);
                 }
             }
-            shoppingList = newShoppingList;
+            neededList = newShoppingList;
             if (null != newArmorSupplies) {
                 // add enough armor to the shopping list
                 int armorSupplied = 0;
@@ -1226,12 +1249,12 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             }
         } else {
-            for (Part part : shoppingList) {
+            for (Part part : neededList) {
                 part.setUnit(null);
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
             orderArmorSupplies();
-            if (shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
+            if (neededList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
                 kitFound = true;
             } else {
                 getCampaign().getShoppingList().addShoppingItem(this, 1, getCampaign());
@@ -1304,7 +1327,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         ArrayList<Part> newShoppingList = new ArrayList<>();
-        for (Part part : shoppingList) {
+        for (Part part : neededList) {
             if (part instanceof AmmoStorage) {
                 continue;
             }
@@ -1334,14 +1357,14 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         orderArmorSupplies();
-        shoppingList = newShoppingList;
+        neededList = newShoppingList;
 
         // Also, check to make sure that they're not still in transit! - ralgith 2013/07/09
         if (partsInTransit()) {
             return false;
         }
 
-        return shoppingList.isEmpty()
+        return neededList.isEmpty()
                 && ((null == newArmorSupplies) || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
     }
 
@@ -2245,9 +2268,9 @@ public class Refit extends Part implements IAcquisitionWork {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lcBinsToChange");
         }
 
-        if (!shoppingList.isEmpty()) {
+        if (!neededList.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "shoppingList");
-            for (final Part part : shoppingList) {
+            for (final Part part : neededList) {
                 part.writeToXML(pw, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");
@@ -2371,7 +2394,7 @@ public class Refit extends Part implements IAcquisitionWork {
             Part p = Part.generateInstanceFromXML(wn2, version);
             if (p != null) {
                 p.setUnit(u);
-                retVal.shoppingList.add(p);
+                retVal.neededList.add(p);
             } else {
                 logger.error((u != null)
                         ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId())
@@ -2409,7 +2432,7 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     public void reCalc() {
         setCampaign(oldUnit.getCampaign());
-        for (Part p : shoppingList) {
+        for (Part p : neededList) {
             p.setCampaign(oldUnit.getCampaign());
         }
 
@@ -2496,7 +2519,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @param transitDays - How long will it take to acquire kit
      */
     public void addRefitKitParts(int transitDays) {
-        for (Part part : shoppingList) {
+        for (Part part : neededList) {
             if (part instanceof AmmoBin) {
                 part.setRefitUnit(oldUnit);
                 getCampaign().getQuartermaster().addPart(part, 0);
@@ -2530,7 +2553,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             orderArmorSupplies();
         }
-        shoppingList = new ArrayList<>();
+        neededList = new ArrayList<>();
         kitFound = true;
     }
 
@@ -2572,7 +2595,7 @@ public class Refit extends Part implements IAcquisitionWork {
         TargetRoll roll = new TargetRoll();
         int avail = EquipmentType.RATING_A;
         int techBaseMod = 0;
-        for (Part part : shoppingList) {
+        for (Part part : neededList) {
             if (getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
                 techBaseMod = campaign.getCampaignOptions().getClanAcquisitionPenalty();
             } else if (getTechBase() == T_IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > techBaseMod) {

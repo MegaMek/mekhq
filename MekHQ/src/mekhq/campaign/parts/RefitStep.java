@@ -29,54 +29,105 @@ import mekhq.campaign.unit.Unit;
  * Campaign Operations.
  */
 public class RefitStep {
-    private Part part;
+    private Part neededPart;
+    private Part returnsPart;
     private int oldLoc;
     private int newLoc;
     private String oldLocName;
     private String newLocName;
+    private String oldPartName;
+    private String newPartName;
     private RefitStepType type;
     private String notes;
-    private RefitClass rClass;
+    private RefitClass refitClass;
     private int baseTime;
+    private boolean isFixedEquipmentChange;
 
     public RefitStep() {
         baseTime = 0;
-        rClass = RefitClass.NO_CHANGE;
+        refitClass = RefitClass.NO_CHANGE;
+        neededPart = null;
+        returnsPart = null;
     }
 
-    RefitStep(Part part, int newLoc, Unit oldUnit) {
+    RefitStep(Unit oldUnit, Part oldPart, Part newPart) throws IllegalArgumentException {
         this();
-        oldLoc = part.getLocation();
-        oldLocName = part.getLocationName();
-        this.newLoc = newLoc;
-        newLocName = oldUnit.getEntity().getLocationName(newLoc);
 
-        if (newLoc == oldLoc) {
-            type = RefitStepType.LEAVE;
-            return;
+        if (null == oldPart && null == newPart) {
+            throw new IllegalArgumentException("oldPart and newPart must not both be null");
         }
 
-        if (part instanceof Armor) {
-            rClass = RefitClass.CLASS_A;
-            if (oldLoc == -1) {
-                type = RefitStepType.ADD_ARMOR;
-            } else if (newLoc == -1) {
-                type = RefitStepType.REMOVE_ARMOR;
-            } else {
+        // We don't actually keep the parts around or even any parts in some cases, so keep the
+        // values required to report what's going on
+
+        oldLoc = null == oldPart ? -1 : oldPart.getLocation();
+        oldLocName = null == oldPart ? "" : oldPart.getLocationName();
+        oldPartName = null == oldPart ? "" : oldPart.getName();
+        newLoc = null == newPart ? -1 : newPart.getLocation();
+        newLocName = null == newPart ? "" : newPart.getLocationName();
+        newPartName = null == newPart ? "" : newPart.getName();
+
+        if (oldPart instanceof Armor) {
+            // Refit code should have found us armors from the same location
+            Armor oldArmor = (Armor) oldPart;
+            Armor newArmor = (Armor) newPart;
+            if ((oldLoc != newLoc) || (oldArmor.isRearMounted() != newArmor.isRearMounted())) {
                 throw new IllegalArgumentException("Moving armor between locations directly is not supported.");
             }
-        
-            baseTime = ((Armor) part).getBaseTimeFor(oldUnit.getEntity()) * part.getQuantity();
+            
+            // This covers every armor change except no change
+            refitClass = RefitClass.CLASS_A;
+            isFixedEquipmentChange = true;
+
+            if (oldArmor.getType() == newArmor.getType()) {
+                if(oldArmor.getAmount() == newArmor.getAmount()) {
+                    refitClass = RefitClass.NO_CHANGE;
+                    type = RefitStepType.LEAVE;
+                    isFixedEquipmentChange = false;
+                    return;
+                } else {
+                    int oldAmount = oldArmor.getAmount();
+                    int newAmount = newArmor.getAmount();
+                    Armor deltaArmor = oldArmor.clone();
+                    int delta = 0;
+                    if (oldAmount > newAmount) {
+                        delta = oldAmount - newAmount;
+                        deltaArmor.setAmount(delta);
+                        type = RefitStepType.REMOVE_ARMOR;
+                        returnsPart = deltaArmor;
+                    } else {
+                        delta = newAmount - oldAmount;
+                        deltaArmor.setAmount(delta);
+                        type = RefitStepType.ADD_ARMOR;
+                        neededPart = deltaArmor;
+                    }
+                    baseTime = deltaArmor.getBaseTimeFor(oldUnit.getEntity()) * delta;
+                }
+            } else {
+                // Armor types differ, remove old and add new
+                type = RefitStepType.CHANGE_ARMOR_TYPE;
+                returnsPart = oldArmor.clone();
+                neededPart = newArmor.clone();
+
+                baseTime = oldArmor.getBaseTimeFor(oldUnit.getEntity()) * oldArmor.getAmount();
+                baseTime += newArmor.getBaseTimeFor(oldUnit.getEntity()) * newArmor.getAmount();
+            }
+            
+
+        } else if (newLoc == oldLoc) {
+            type = RefitStepType.LEAVE;
+            isFixedEquipmentChange = false;
+            return;
         }
     }
 
 
-    public Part getPart() {
-        return part;
+    public Part getNeededPart() {
+        return neededPart;
     }
 
-    public int getQuantity() {
-        return part.getQuantity();
+    public Part getReturnsPart() {
+        return returnsPart;
     }
 
     public int getOldLoc() {
@@ -95,6 +146,14 @@ public class RefitStep {
         return newLocName;
     }
 
+    public String getOldPartName() {
+        return oldPartName;
+    }
+
+    public String getNewPartName() {
+        return newPartName;
+    }
+
     public RefitStepType getType() {
         return type;
     }
@@ -104,15 +163,15 @@ public class RefitStep {
     }
 
     public RefitClass getRefitClass() {
-        return rClass;
+        return refitClass;
     }
 
-    public void setRefitClass(RefitClass rClass) {
-        this.rClass = rClass;
+    public void setRefitClass(RefitClass refitClass) {
+        this.refitClass = refitClass;
     }
 
-    public void setRefitClassToHarder(RefitClass rClass) {
-        this.rClass = this.rClass.keepHardest(rClass);
+    public void setRefitClassToHarder(RefitClass refitClass) {
+        this.refitClass = this.refitClass.keepHardest(refitClass);
     }
 
     public int getBaseTime() {

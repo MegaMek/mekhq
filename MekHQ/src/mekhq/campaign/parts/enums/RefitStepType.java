@@ -37,6 +37,7 @@ public enum RefitStepType {
     MOVE("RefitStepType.MOVE.text", "MOVE"),
     UNLOAD("RefitStepType.UNLOAD.text", "UNLOAD"),
     LOAD("RefitStepType.LOAD.text", "LOAD"),
+    MOVE_AMMO("RefitStepType.MOVE_AMMO", "MOVE_AMMO"),
     REMOVE_ARMOR("RefitStepType.REMOVE_ARMOR.text", "REMOVE_ARMOR"),
     ADD_ARMOR("RefitStepType.ADD_ARMOR.text", "ADD_ARMOR"),
     CHANGE_ARMOR_TYPE("RefitStepType.CHANGE_ARMOR_TYPE.text", "CHANGE_ARMOR_TYPE"),
@@ -44,8 +45,9 @@ public enum RefitStepType {
     ADD_CASE("RefitStepType.ADD_CASE.text", "ADD_CASE"),
     CHANGE_STRUCTURE_TYPE("RefitStepType.CHANGE_STRUCTURE_TYPE.text", "CHANGE_STRUCTURE_TYPE"),
     // Myomer Type and Structure Type live together
-    DETACH_OMNIPOD("RefitStepType.DETATCH_OMNIPOD.text", "DETACH_OMNIPOD"),
-    ATTACH_OMNIPOD("RefitStepType.ATTATCH_OMNIPOD.text", "ATTACH_OMNIPOD");
+    DETACH_OMNIPOD("RefitStepType.DETACH_OMNIPOD.text", "DETACH_OMNIPOD"),
+    ATTACH_OMNIPOD("RefitStepType.ATTACH_OMNIPOD.text", "ATTACH_OMNIPOD"),
+    MOVE_OMNIPOD("RefitStepType.MOVE_OMNIPOD.text", "MOVE_OMNIPOD");
     
     private final String name;
     private final String xmlName;
@@ -87,6 +89,7 @@ public enum RefitStepType {
             case "MOVE" -> MOVE;
             case "UNLOAD" -> UNLOAD;
             case "LOAD" -> LOAD;
+            case "MOVE_AMMO" -> MOVE_AMMO;
             case "REMOVE_ARMOR" -> REMOVE_ARMOR;
             case "ADD_ARMOR" -> ADD_ARMOR;
             case "CHANGE_ARMOR_TYPE" -> CHANGE_ARMOR_TYPE;
@@ -95,6 +98,7 @@ public enum RefitStepType {
             case "CHANGE_STRUCTURE_TYPE" -> CHANGE_STRUCTURE_TYPE;
             case "DETACH_OMNIPOD" -> DETACH_OMNIPOD;
             case "ATTACH_OMNIPOD" -> ATTACH_OMNIPOD;
+            case "MOVE_OMNIPOD" -> MOVE_OMNIPOD;
             default -> throw new IllegalArgumentException("Invalid RefitStepType");
         };
     }
