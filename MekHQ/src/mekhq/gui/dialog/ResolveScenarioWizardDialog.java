@@ -782,7 +782,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (Loot loot : loots) {
             j++;
             JCheckBox box = new JCheckBox(loot.getShortDescription());
-            box.setSelected(false);
+            box.setSelected(true);
             lootBoxes.add(box);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -1394,10 +1394,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         tracker.assignKills();
 
         //now get loot
-        for (int i = 0; i < lootBoxes.size(); i++) {
-            JCheckBox box = lootBoxes.get(i);
-            if (box.isSelected()) {
-                tracker.addLoot(loots.get(i));
+        if (((ScenarioStatus) Objects.requireNonNull(choiceStatus.getSelectedItem())).isOverallVictory()) {
+            for (int i = 0; i < lootBoxes.size(); i++) {
+                JCheckBox box = lootBoxes.get(i);
+                if (box.isSelected()) {
+                    tracker.addLoot(loots.get(i));
+                }
             }
         }
 
