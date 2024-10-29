@@ -622,9 +622,16 @@ public class Academy implements Comparable<Academy> {
                 return null;
             }
 
-            if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate())
+            // For reeducation camps we only care about whether the campaign faction is at war
+            if (isReeducationCamp) {
+                if (!hints.isAtWarWith(campaignFaction, faction, campaign.getLocalDate())) {
+                    return faction.getShortName();
+                }
+            } else {
+                if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate())
                     || !hints.isAtWarWith(campaignFaction, faction, campaign.getLocalDate())) {
-                return faction.getShortName();
+                    return faction.getShortName();
+                }
             }
         }
 
@@ -697,6 +704,12 @@ public class Academy implements Comparable<Academy> {
      * @return true if there is a faction conflict, false otherwise.
      */
     public Boolean isFactionConflict(Campaign campaign, Person person) {
+        // Reeducation camps only care if they're at war with the campaign faction
+        if (isReeducationCamp) {
+            return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
+                Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());
+        }
+
         // is there a conflict between academy faction & person's faction?
         if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
                 Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
