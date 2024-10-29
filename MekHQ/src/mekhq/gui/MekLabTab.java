@@ -385,14 +385,14 @@ public class MekLabTab extends CampaignGuiTab {
         }
         shoppingPanel.removeAll();
         JLabel lblItem;
-        for (String name : refit.getShoppingListDescription()) {
-            lblItem = new JLabel(name);
-            shoppingPanel.add(lblItem);
-        }
-        if (refit.getShoppingListDescription().length == 0) {
-            lblItem = new JLabel("None");
-            shoppingPanel.add(lblItem);
-        }
+        // for (String name : refit.getShoppingListDescription()) {
+        //     lblItem = new JLabel(name);
+        //     shoppingPanel.add(lblItem);
+        // }
+        // if (refit.getShoppingListDescription().length == 0) {
+        lblItem = new JLabel("None");
+        shoppingPanel.add(lblItem);
+        // }
     }
 
     public double calculateTotalHeat() {
