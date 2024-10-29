@@ -72,6 +72,8 @@ import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * This class handles the creation and substantive manipulation of
@@ -361,6 +363,10 @@ public class AtBDynamicScenarioFactory {
         // don't generate forces flagged as player-supplied
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
             return 0;
+        }
+
+        if (contract.getCommandRights().isIndependent() && forceTemplate.getForceName().contains("Resupply Convoy")) {
+            return getPlayerConvoy(scenario, contract, campaign, forceTemplate);
         }
 
         String factionCode = "";
@@ -934,6 +940,77 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Chooses a random, undeployed player-managed convoy and generates a corresponding {@link BotForce}.
+     * The BotForce is then added to the given scenario. Error reports are made if no valid convoys exist
+     * and if problems are encountered while generating entities for the {@link BotForce}.
+     *
+     * @param scenario       The {@link AtBDynamicScenario} to which the generated {@link BotForce} is added.
+     * @param contract       The {@link AtBContract} associated with the scenario.
+     * @param campaign       The {@link Campaign} object, used to fetch forces and units.
+     * @param forceTemplate  The {@link ScenarioForceTemplate} which provides directions on how to
+     *                      compose the {@link BotForce}.
+     *
+     * @return Returns 1 if convoy deployment is successful, else 0.
+     */
+    private static int getPlayerConvoy(AtBDynamicScenario scenario, AtBContract contract,
+                                       Campaign campaign, ScenarioForceTemplate forceTemplate) {
+        ResourceBundle convoyResources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+        List<Force> validConvoys = new ArrayList<>();
+
+        for (Force force : campaign.getAllForces()) {
+            if (!force.isDeployed() && force.getSubForces().isEmpty()
+                && force.isConvoyForce() && !force.getUnits().isEmpty()) {
+                validConvoys.add(force);
+            }
+        }
+
+        Force randomConvoy = null;
+
+        if (!validConvoys.isEmpty()) {
+            Random random = new Random();
+            randomConvoy = validConvoys.get(random.nextInt(validConvoys.size()));
+        } else {
+            campaign.addReport(String.format(convoyResources.getString("convoyErrorPlayerConvoy.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+        }
+
+        if (randomConvoy == null) {
+            return 0;
+        }
+
+        randomConvoy.setScenarioId(scenario.getId(), campaign);
+
+        List<Entity> generatedEntities = new ArrayList<>();
+        for (UUID playerUnitId : randomConvoy.getUnits()) {
+            Unit unit = campaign.getUnit(playerUnitId);
+
+            if (unit != null) {
+                Entity entity = unit.getEntity();
+
+                if (entity != null) {
+                    generatedEntities.add(entity);
+                } else {
+                    logger.warn(String.format("Failed to fetch entity for unit: %s",
+                        unit.getName()));
+                }
+            } else {
+                logger.warn(String.format("Failed to fetch unit for id: %s",
+                    playerUnitId));
+            }
+        }
+
+        BotForce generatedForce = new BotForce();
+        generatedForce.setFixedEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, ForceAlignment.Allied, contract);
+        generatedForce.setName(randomConvoy.getFullName());
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
+
+        return 1;
     }
 
     /**

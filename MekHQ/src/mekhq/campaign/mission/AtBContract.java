@@ -797,7 +797,7 @@ public class AtBContract extends Contract {
                     if (doBonusRoll(campaign)) {
                         logger.info("AtBContract.java 1");
                         campaign.addReport("Bonus: Captured Supplies");
-                        Resupply supplyDrops = new Resupply(campaign, parentContract, false, false);
+                        Resupply supplyDrops = new Resupply(campaign, this, false, false);
                         supplyDrops.getResupplyParts(1, true);
                     }
 
