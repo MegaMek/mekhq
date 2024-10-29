@@ -141,12 +141,15 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.round;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_LOAD_SIZE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.convoyFinalMessageDialog;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -3793,9 +3796,7 @@ public class Campaign implements ITechManager {
                 // Resupply
                 logger.info("Campaign.java");
                 if (getLocation().isOnPlanet() && getLocation().getCurrentSystem().equals(contract.getSystem())) {
-                    Resupply resupplies = new Resupply(this, contract, false, false);
-                    int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-                    resupplies.getResupplyParts(dropCount);
+                    processResupply(contract);
                 }
             }
         }
@@ -3817,6 +3818,73 @@ public class Campaign implements ITechManager {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
+            }
+        }
+    }
+
+    private void processResupply(AtBContract contract) {
+        final ResourceBundle resupplyResources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+        int maximumResupplySize = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+        Resupply resupplies = new Resupply(this, contract, false, false);
+        int requiredTonnage = (int) round(maximumResupplySize * RESUPPLY_LOAD_SIZE);
+
+        if (!contract.getCommandRights().isIndependent()) {
+            resupplies.getResupplyParts(maximumResupplySize);
+        } else {
+            int supplyRuns = 0;
+            double totalCargoCapacity = 0;
+            boolean hasConvoyForce = false;
+
+            for (Force force : getAllForces()) {
+                if (force.isConvoyForce()) {
+                    hasConvoyForce = true;
+                    boolean hasCargo = false;
+                    for (UUID unitId : force.getUnits()) {
+                        Unit unit = getUnit(unitId);
+
+                        if (unit != null) {
+                            if (!unit.isFullyCrewed()) {
+                                continue;
+                            }
+
+                            double individualCargo = unit.getCargoCapacity();
+
+                            if (!hasCargo && individualCargo > 0) {
+                                hasCargo = true;
+                            }
+
+                            totalCargoCapacity += individualCargo;
+                        }
+                    }
+
+                    if (hasCargo) {
+                        supplyRuns++;
+                    }
+                }
+            }
+            if (!hasConvoyForce) {
+                return;
+            }
+
+            if (totalCargoCapacity < requiredTonnage) {
+                addReport(String.format(resupplyResources.getString("convoyTooSmall.text"),
+                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                    CLOSING_SPAN_TAG), maximumResupplySize, totalCargoCapacity, requiredTonnage);
+
+                maximumResupplySize = (int) Math.floor(totalCargoCapacity / RESUPPLY_LOAD_SIZE);
+            }
+
+            supplyRuns = Math.min(supplyRuns, maximumResupplySize);
+            int suppliesPerRun = (int) Math.ceil((double) maximumResupplySize / supplyRuns);
+
+            int remainingSupplies = maximumResupplySize;
+
+            for (int i = 0; i < supplyRuns; i++) {
+                int runSize = Math.min(suppliesPerRun, remainingSupplies);
+                remainingSupplies = remainingSupplies - suppliesPerRun;
+
+                resupplies.getResupplyParts(runSize);
             }
         }
     }
