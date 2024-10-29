@@ -162,6 +162,10 @@ public class RefitStep {
         return notes;
     }
 
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     public RefitClass getRefitClass() {
         return refitClass;
     }

@@ -298,7 +298,6 @@ public class Refit extends Part implements IAcquisitionWork {
                 while (newIterator.hasNext()) {
                     Part newPart = newIterator.next();
                     if (newPart instanceof Armor) {
-
                         Armor newArmor = (Armor) newPart;
                         
                         if ((oldArmor.getLocation() == newArmor.getLocation())
@@ -307,7 +306,6 @@ public class Refit extends Part implements IAcquisitionWork {
                             stepsList.add(new RefitStep(oldUnit, oldArmor, newArmor));
                             break;
                         }
-
                     }
                 }
                 if (matchFound) {
@@ -326,9 +324,71 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
+        // Let's check the engine next. There's always an engine.
+
+        // Part oldEngine = findOnly(EnginePart.class, MissingEnginePart.class, oldParts, oldUnit);
+        }
 
 
+
+    /**
+     * Find the only Part of a given kind in a unit's Part list, remove it (so use a copied list)
+     * and return it. If there's none or more than one, complain loudly.
+     * @param partType - the .class of the Part type to look for
+     * @param missingPartType - the .class of the MissingPart type to look for, if relevant. can null
+     * @param searchList - the list to search in. will be mutated!
+     * @param unit - unit for error reporting
+     * @return the found Part or null
+     * @throws IllegalStateException
+     */
+    @SuppressWarnings("rawtypes")
+    private static Part findOnly(Class partType, Class missingPartType, List<Part> searchList, Unit unit) 
+            throws IllegalStateException {
+
+        boolean found = false;
+        Part toReturn = null;
+
+        Iterator<Part> searchIter = searchList.iterator();
+        
+        while (searchIter.hasNext()) {
+            Part part = searchIter.next();
+
+            if (partType.isInstance(part)) {
+                if (found) {
+                    String errorString = unit + " has more than one " + partType.getName();
+                    if (null != missingPartType) {
+                        errorString += " or " + missingPartType.getName();
+                    }
+                    logger.error(errorString);
+                } else {
+                    toReturn = part;
+                    searchIter.remove();
+                    found = true;
+                }
+            } else if ((null != missingPartType) && (missingPartType.isInstance(part))) {
+                if (found) {
+                    logger.error(unit + " has more than one " + partType.getName() + " or " + missingPartType.getName());
+                } else {
+                    toReturn = part;
+                    searchIter.remove();
+                    found = true;
+                }
+            }
+        }
+
+        if (!found) {
+            String errorString = unit + " has no " + partType.getName();
+            if (null != missingPartType) {
+                errorString += " or " + missingPartType.getName();
+            }
+            // Better than allowing a NPE?
+            throw new IllegalStateException(errorString);
+        }
+
+
+        return toReturn;
     }
+
 
     /**
      * When this is finished, it wil collapse needed and returned parts into single items of varying
