@@ -39,6 +39,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -60,6 +61,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
+import static mekhq.campaign.stratcon.StratconRulesManager.getRandomTrack;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -354,10 +356,29 @@ public class Resupply {
                     // Announce the situation to the player and then, if the player is using
                     // StratCon generate a scenario
                     if (campaign.getCampaignOptions().isUseStratCon()) {
-                        ScenarioTemplate template = ScenarioTemplate.Deserialize(
-                            "data/scenariotemplates/Emergency Convoy Defense.xml");
+                        String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
+                        ScenarioTemplate template = ScenarioTemplate.Deserialize(templateAddress);
+
+                        if (template == null) {
+                            campaign.addReport(String.format(resources.getString("convoyErrorTemplate.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                                templateAddress, CLOSING_SPAN_TAG));
+                            deliverDrop(droppedItems, droppedUnits, cashReward);
+                            return;
+                        }
+
+                        StratconTrackState track = getRandomTrack(contract);
+
+                        if (track == null) {
+                            campaign.addReport(String.format(resources.getString("convoyErrorTracks.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                                templateAddress, CLOSING_SPAN_TAG));
+                            deliverDrop(droppedItems, droppedUnits, cashReward);
+                            return;
+                        }
+
                         StratconScenario scenario = generateExternalScenario(campaign, contract,
-                            null, template);
+                            track, template);
 
                         // If we successfully generated a scenario, we need to make a couple of final
                         // adjustments so that the player can still get their items (if they succeed)
@@ -944,7 +965,7 @@ public class Resupply {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
         // Retrieves the title from the resources
-        String title = resources.getString("incomingTransmission.title");
+        String title = resources.getString("dialog.title");
 
         // An ImageIcon to hold the faction icon
         ImageIcon icon = getFactionLogo(campaign, campaign.getFaction().getShortName(), true);

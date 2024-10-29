@@ -329,7 +329,7 @@ public class Force {
      */
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
         Vector<UUID> allUnits;
-        if (combatForcesOnly && !isCombatForce()) {
+        if (combatForcesOnly && !isCombatForce() && !isConvoyForce()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
