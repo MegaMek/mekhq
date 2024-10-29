@@ -18,16 +18,6 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
@@ -40,6 +30,15 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting,
@@ -220,7 +219,7 @@ public class CampaignSummary {
     /**
      * A report that gives numbers of combat and support personnel as well as
      * injuries
-     * 
+     *
      * @return a <code>String</code> of the report
      */
     public String getPersonnelReport() {
@@ -230,7 +229,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives the number of units in different damage states
-     * 
+     *
      * @return a <code>String</code> of the report
      */
     public String getForceRepairReport() {
@@ -243,7 +242,7 @@ public class CampaignSummary {
     /**
      * A report that gives the percentage composition of the force in mek, armor,
      * infantry, and aero units.
-     * 
+     *
      * @return a <code>String</code> of the report
      */
     public String getForceCompositionReport() {
@@ -265,7 +264,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives the percentage of successful missions
-     * 
+     *
      * @return a <code>String</code> of the report
      */
     public String getMissionSuccessReport() {
@@ -276,7 +275,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives capacity and existing tonnage of all cargo
-     * 
+     *
      * @return a <code>String</code> of the report
      */
     public StringBuilder getCargoCapacityReport() {
@@ -310,7 +309,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives information about the transportation capacity
-     * 
+     *
      * @return a <code>String</code> of the report
      */
     public String getTransportCapacity() {
@@ -358,24 +357,36 @@ public class CampaignSummary {
      * @return A summary of fatigue related facilities.
      */
     public String getFacilityReport() {
-        int personnelCount = campaign.getActivePersonnel().size();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int personnelCount;
+
+        if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
+            personnelCount = (int) campaign.getActivePersonnel().stream()
+                .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
+                .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
+                .count();
+        } else {
+            personnelCount = (int) campaign.getActivePersonnel().stream()
+                .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
+                .count();
+        }
 
         StringBuilder report = new StringBuilder();
 
-        if (campaign.getCampaignOptions().isUseFatigue()) {
+        if (campaignOptions.isUseFatigue()) {
             report.append(String.format("Kitchens (%s/%s)  ",
                     personnelCount,
                     Fatigue.checkFieldKitchenCapacity(campaign)));
         }
 
-        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+        if (campaignOptions.isUseAdvancedMedical()) {
             int patients = (int) campaign.getPatients().stream()
                     .filter(patient -> patient.getDoctorId() != null)
                     .count();
 
             int doctorCapacity = campaign.getActivePersonnel().stream()
                     .filter(person -> (person.getPrimaryRole().isDoctor()) || (person.getSecondaryRole().isDoctor()))
-                    .mapToInt(person -> campaign.getCampaignOptions().getMaximumPatients())
+                    .mapToInt(person -> campaignOptions.getMaximumPatients())
                     .sum();
 
             report.append(String.format("Hospital Beds (%s/%s)",
