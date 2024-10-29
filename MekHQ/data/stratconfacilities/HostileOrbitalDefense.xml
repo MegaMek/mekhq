@@ -5,7 +5,6 @@
     <owner>Opposing</owner>
     <preventAerospace>true</preventAerospace>
     <sharedModifiers>EnemyOfficerMek.xml</sharedModifiers>
-    <userDescription>Prevents allied aerospace unit operation on this track and supplies an
-        additional hostile Mek to ground scenarios.</userDescription>
+    <userDescription>Prevents allied aerospace unit operation on this track and supplies an additional hostile Mek to ground scenarios.</userDescription>
     <visible>false</visible>
 </StratconFacility>

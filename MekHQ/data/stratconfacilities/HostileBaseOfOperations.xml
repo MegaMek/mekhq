@@ -7,7 +7,6 @@
     <localModifiers>GoodEquipment.xml</localModifiers>
     <localModifiers>EnemyTurrets.xml</localModifiers>
     <sharedModifiers>EnemyCommanderMek.xml</sharedModifiers>
-    <userDescription>This base is defended by well-equipped veteran troops, turrets and a commander
-        in a Mek.</userDescription>
+    <userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a Mek.</userDescription>
     <visible>false</visible>
 </StratconFacility>

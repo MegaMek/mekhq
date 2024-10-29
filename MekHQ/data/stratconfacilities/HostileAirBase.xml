@@ -5,7 +5,6 @@
     <localModifiers>EnemyAirGarrison.xml</localModifiers>
     <owner>Opposing</owner>
     <sharedModifiers>EnemyAirSupport.xml</sharedModifiers>
-    <userDescription>Hostile aircraft will participate in scenarios on this track and defend this
-        facility.</userDescription>
+    <userDescription>Hostile aircraft will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>false</visible>
 </StratconFacility>
