@@ -435,18 +435,31 @@ public class Refit extends Part implements IAcquisitionWork {
         // Engine
 
         Part oldEngine = findOnly(EnginePart.class, MissingEnginePart.class, oldParts, oldUnit);
-        Part newEngine = findOnly(EnginePart.class, null, newParts, newUnit);
-        
-        logger.info(oldEngine + " --- " + newEngine);
+        if (null != oldEngine) {
+            Part newEngine = findOnly(EnginePart.class, null, newParts, newUnit);
 
-
-        RefitStep engineStep = new RefitStep(oldUnit, oldEngine, newEngine);
-        if ((engineStep.getRefitClass() == RefitClass.CLASS_E) && (!customJob)) {
-            engineStep.setRefitClass(RefitClass.CLASS_D);
+            RefitStep engineStep = new RefitStep(oldUnit, oldEngine, newEngine);
+            if ((engineStep.getRefitClass() == RefitClass.CLASS_E) && (!customJob)) {
+                engineStep.setRefitClass(RefitClass.CLASS_D);
+            }
+            stepsList.add(engineStep);
         }
-        stepsList.add(engineStep);
 
-        
+        // Gyro
+
+        Part oldGyro = findOnly(MekGyro.class, MissingMekGyro.class, oldParts, oldUnit);
+        if (null != oldGyro) {
+            Part newGyro = findOnly(MekGyro.class, null, newParts, newUnit);
+            stepsList.add(new RefitStep(oldUnit, oldGyro, newGyro));
+        }
+
+        // Cockpit
+
+        Part oldCockpit = findOnly(MekCockpit.class, MissingMekCockpit.class, oldParts, oldUnit);
+        if (null != oldCockpit) {
+            Part newCockpit = findOnly(MekCockpit.class, null, newParts, newUnit);
+            stepsList.add(new RefitStep(oldUnit, oldCockpit, newCockpit));
+        }
 
 
 
@@ -515,16 +528,6 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             }
         }
-
-        if (!found) {
-            String errorString = unit + " has no " + partType.getName();
-            if (null != missingPartType) {
-                errorString += " or " + missingPartType.getName();
-            }
-            // Better than allowing a NPE?
-            throw new IllegalStateException(errorString);
-        }
-
 
         return toReturn;
     }

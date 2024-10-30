@@ -226,6 +226,80 @@ public class RefitStep {
                 neededPart = newPart.clone();
                 return;
             }
+
+
+        } else if (((oldPart instanceof MekGyro) || (oldPart instanceof MissingMekGyro))
+                && (newPart instanceof MekGyro)) {
+            
+            boolean equal;
+            if (oldPart instanceof MekGyro) {
+                equal = oldPart.isSamePartType(newPart);
+            } else {
+                equal = ((MissingMekGyro) oldPart).isAcceptableReplacement(newPart, true);
+            }
+
+            if (equal) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                baseTime = 0;
+                return;
+            } else {
+                refitClass = RefitClass.CLASS_D;
+                type = RefitStepType.CHANGE;
+                baseTime = 360;
+                returnsPart = (oldPart instanceof MekGyro) ? oldPart.clone() : null;
+                neededPart = newPart.clone();
+                return;
+            }
+
+      } else if (((oldPart instanceof MekGyro) || (oldPart instanceof MissingMekGyro))
+                && (newPart instanceof MekGyro)) {
+            
+            boolean equal;
+            if (oldPart instanceof MekGyro) {
+                equal = oldPart.isSamePartType(newPart);
+            } else {
+                equal = ((MissingMekGyro) oldPart).isAcceptableReplacement(newPart, true);
+            }
+
+            if (equal) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                baseTime = 0;
+                return;
+            } else {
+                refitClass = RefitClass.CLASS_D;
+                type = RefitStepType.CHANGE;
+                baseTime = 200;
+                returnsPart = (oldPart instanceof MekGyro) ? oldPart.clone() : null;
+                neededPart = newPart.clone();
+                return;
+            }
+
+
+        } else if (((oldPart instanceof MekCockpit) || (oldPart instanceof MissingMekCockpit))
+                && (newPart instanceof MekCockpit)) {
+            
+            boolean equal;
+            if (oldPart instanceof MekCockpit) {
+                equal = oldPart.isSamePartType(newPart);
+            } else {
+                equal = ((MissingMekCockpit) oldPart).isAcceptableReplacement(newPart, true);
+            }
+
+            if (equal) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                baseTime = 0;
+                return;
+            } else {
+                refitClass = RefitClass.CLASS_D;
+                type = RefitStepType.CHANGE;
+                baseTime = 300; // FIXME: WeaverThree - From MissingMekCockpit - not in CamOps
+                returnsPart = (oldPart instanceof MekCockpit) ? oldPart.clone() : null;
+                neededPart = newPart.clone();
+                return;
+            }
         }
 
 
