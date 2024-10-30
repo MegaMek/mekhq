@@ -481,9 +481,7 @@ public class ContractMarketDialog extends JDialog {
                 }
 
                 if (selectedContract.getCommandRights().isIndependent()) {
-                    if (selectedContract instanceof AtBContract) {
-                        triggerConvoyDialog(campaign, (AtBContract) selectedContract);
-                    }
+                    triggerConvoyDialog(campaign, (AtBContract) selectedContract);
                 }
             }
 

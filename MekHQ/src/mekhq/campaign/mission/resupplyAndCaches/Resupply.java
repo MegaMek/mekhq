@@ -220,6 +220,18 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
+    /**
+     * Creates a resupply dialog window with the specified parameters.
+     *
+     * @param icon            The icon to be displayed in the dialog.
+     * @param message         The message to be displayed in the dialog.
+     * @param droppedItems    List of items to be dropped. Can be null.
+     * @param droppedUnits    List of units to be dropped. Can be null.
+     * @param cashReward      The value of the cash reward.
+     * @param isLootOrContractEnd {@link Boolean} value representing if the dialog is being created
+     *                        as the result of either loot or contract end.
+     * @return A {@link JDialog} instance containing the resupply information.
+     */
     public JDialog createResupplyDialog(ImageIcon icon, String message, @Nullable List<Part> droppedItems,
                                         @Nullable List<Unit> droppedUnits, Money cashReward,
                                         boolean isLootOrContractEnd) {
@@ -279,6 +291,14 @@ public class Resupply {
         return dialog;
     }
 
+    /**
+     * Processes a convoy by determining interception chances based on morale level and performs
+     * actions accordingly.
+     *
+     * @param droppedItems    List of items dropped by the convoy. Can be {@code null}.
+     * @param droppedUnits    List of units dropped by the convoy. Can be {@code null}.
+     * @param cashReward      The amount of cash reward.
+     */
     private void processConvoy(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
                                Money cashReward) {
         final String STATUS_FORWARD = "statusUpdate";
@@ -329,12 +349,33 @@ public class Resupply {
         }
     }
 
+    /**
+     * Creates a convoy with provided parameters and a status message to display.
+     *
+     * @param droppedItems         List of items dropped by the convoy. Can be {@code null}.
+     * @param droppedUnits         List of units dropped by the convoy. Can be {@code null}.
+     * @param cashReward           The amount of cash reward.
+     * @param convoyStatusMessage  The status message to be displayed for the convoy.
+     * @param isIntercepted        {@link Boolean} indicating if the convoy has been intercepted.
+     */
     public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
                                     Money cashReward, String convoyStatusMessage, boolean isIntercepted) {
         createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage, isIntercepted,
             true);
     }
 
+    /**
+     * Creates a convoy with provided parameters, status message to display and introduction option.
+     *
+     * @param droppedItems         List of items dropped by the convoy. Can be {@code null}.
+     * @param droppedUnits         List of units dropped by the convoy. Can be {@code null}.
+     * @param cashReward           The amount of cash reward.
+     * @param convoyStatusMessage  The status message to be displayed for the convoy.
+     * @param isIntercepted        {@link Boolean} indicating if the convoy has been intercepted.
+     * @param isIntroduction       {@link Boolean} if this dialog is an introduction (i.e., the player
+     *                             being informed that they have a message), or whether it's the
+     *                             message that follows - informing the player of the message's nature.
+     */
     public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
                                        Money cashReward, String convoyStatusMessage, boolean isIntercepted,
                                     boolean isIntroduction) {
@@ -449,7 +490,7 @@ public class Resupply {
 
             if (contract.getCommandRights().isIndependent()) {
                 if (targetConvoy != null) {
-                    speaker = getConvoySpeaker(targetConvoy, speaker);
+                    speaker = getConvoySpeaker(targetConvoy);
                 }
 
                 if (speaker == null) {
@@ -493,6 +534,13 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
+    /**
+     * Scales an {@link ImageIcon} to the specified width while maintaining its aspect ratio.
+     *
+     * @param icon  The {@link ImageIcon} to be scaled.
+     * @param width The desired width.
+     * @return The scaled {@link ImageIcon}.
+     */
     private static ImageIcon scaleImageIconToWidth(ImageIcon icon, int width) {
         int height = (int) Math.ceil((double) width * icon.getIconHeight() / icon.getIconWidth());
         Image image = icon.getImage();
@@ -500,8 +548,16 @@ public class Resupply {
         return new ImageIcon(scaledImage);
     }
 
-    private String getConvoySpeaker(Integer targetConvoy, String speaker) {
+    /**
+     * Retrieves the speaker of the convoy.
+     *
+     * @param targetConvoy    The relevant convoy.
+     * @return The speaker of the convoy.
+     */
+    private String getConvoySpeaker(Integer targetConvoy) {
         Force convoy = campaign.getForce(targetConvoy);
+
+        String speaker = null;
 
         if (convoy != null) {
             UUID convoyCommanderId = convoy.getForceCommanderID();
@@ -524,6 +580,13 @@ public class Resupply {
         return speaker;
     }
 
+    /**
+     * Retrieves the icon of the convoy. This should only be used when the contract has Independent
+     * command level (i.e., if the convoy is player owned).
+     *
+     * @param targetConvoy The convoy target.
+     * @return The {@link ImageIcon} of the convoy.
+     */
     @Nullable
     private ImageIcon getIndependentIconLabel(Integer targetConvoy) {
         if (targetConvoy != null) {
@@ -544,6 +607,16 @@ public class Resupply {
         return null;
     }
 
+    /**
+     * Processes the interception of a convoy.
+     *
+     * @param droppedItems         List of items dropped by the convoy. Can be {@link null}.
+     * @param droppedUnits         List of units dropped by the convoy. Can be {@link null}.
+     * @param cashReward           The amount of cash reward.
+     * @param isIndependent        Boolean indicating if contract command level is independent.
+     * @param targetConvoy         The target convoy.
+     * @param convoyGridReference  The grid reference for the convoy's location.
+     */
     private void processConvoyInterception(List<Part> droppedItems, List<Unit> droppedUnits,
                                            Money cashReward, boolean isIndependent, Integer targetConvoy,
                                            StratconCoords convoyGridReference) {
@@ -626,6 +699,11 @@ public class Resupply {
         }
     }
 
+    /**
+     * Picks a random convoy from available ones.
+     *
+     * @return The ID of the randomly selected convoy.
+     */
     @Nullable
     private Integer getRandomConvoy() {
         // First, we gather a set of all forces that are already deployed to a track, so we can
@@ -657,6 +735,12 @@ public class Resupply {
         }
     }
 
+    /**
+     * Creates the final message dialog for the convoy.
+     *
+     * @param campaign        The current campaign.
+     * @param employerFaction The employing faction.
+     */
     public static void convoyFinalMessageDialog(Campaign campaign, Faction employerFaction) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
@@ -702,6 +786,12 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
+    /**
+     * Picks a logistics representative from available personnel.
+     *
+     * @return The chosen logistics representative.
+     */
+    @Nullable
     private Person pickLogisticsRepresentative() {
         Person highestRankedCharacter = null;
 
@@ -719,6 +809,13 @@ public class Resupply {
         return highestRankedCharacter;
     }
 
+    /**
+     * Retrieves the commander's title.
+     *
+     * @param campaign       The current campaign.
+     * @param includeSurname {@link Boolean} indicating if the surname is to be included.
+     * @return The title of the commander.
+     */
     private static String getCommanderTitle(Campaign campaign, boolean includeSurname) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
         String placeholder = resources.getString("commander.text");
@@ -1121,7 +1218,13 @@ public class Resupply {
         return getRandomUnitQuality(modifier);
     }
 
-
+    /**
+     * Triggers a dialog window providing convoy related information meant to be triggered at the
+     * beginning of an Independent contract.
+     *
+     * @param campaign The current campaign.
+     * @param contract The relevant contract.
+     */
     public static void triggerConvoyDialog(Campaign campaign, AtBContract contract) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 

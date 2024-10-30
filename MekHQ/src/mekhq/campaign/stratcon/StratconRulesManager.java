@@ -328,7 +328,7 @@ public class StratconRulesManager {
      * @param autoAssignLances  Flag indicating whether lances are to be auto-assigned.
      * @param scenario        The {@link StratconScenario} scenario to be finalized.
      */
-    public static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
+    private static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
                         @Nullable StratconTrackState track, boolean autoAssignLances,
                         StratconScenario scenario) {
         AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
@@ -628,7 +628,9 @@ public class StratconRulesManager {
      *                  {@code null} to select the scenario template randomly.
      * @return The newly set up {@link StratconScenario}.
      */
-    public static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track, @Nullable ScenarioTemplate template) {
+    private static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
+                                                  AtBContract contract, StratconTrackState track,
+                                                  @Nullable ScenarioTemplate template) {
         StratconScenario scenario;
 
         if (track.getFacilities().containsKey(coords)) {
@@ -975,7 +977,7 @@ public class StratconRulesManager {
      * @param forceIDs List of force IDs to check
      * @return Sorted hash map
      */
-    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
+    private static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
         Map<MapLocation, List<Integer>> retVal = new HashMap<>();
 
         retVal.put(AllGroundTerrain, new ArrayList<>());

@@ -3742,6 +3742,16 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Processes an abandoned convoy. The player is presented with a defeat dialog,
+     * and if they have independent command rights, it checks each player template force in the scenario
+     * for being a convoy force. If it is a convoy force, the fence units are treated as abandoned units.
+     * Each crew member of these units is set as either KIA or POW based on a die roll.
+     * It finally removes each unit from the campaign.
+     *
+     * @param contract The current {@link AtBContract}.
+     * @param scenario The relevant {@link AtBDynamicScenario}.
+     */
     private void processAbandonedConvoy(AtBContract contract, AtBDynamicScenario scenario) {
         convoyFinalMessageDialog(this, contract.getEmployerFaction());
 

@@ -154,6 +154,11 @@ public class StratconCampaignState {
         supportPoints--;
     }
 
+    /**
+     * Decreases the number of support points by the specified increment.
+     *
+     * @param increment The number of support points to use/decrease.
+     */
     public void useSupportPoints(int increment) {
         supportPoints -= increment;
     }

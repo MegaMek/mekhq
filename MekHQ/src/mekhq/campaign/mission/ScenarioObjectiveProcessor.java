@@ -344,10 +344,19 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Processes an individual objective effect.
-     * @param effect
-     * @param scaleFactor If it's scaled, how much to scale it by
-     * @param tracker
+     * This method processes individual objective effects based on their type.
+     *
+     * @param campaign The current campaign.
+     * @param effect The objective effect that needs to be processed.
+     * @param scaleFactor If the effect is not fixed, the scale factor for how much the effect will
+     *                   influence the outcome.
+     * @param tracker The {@link ResolveScenarioTracker} instance that tracks the resolution of the
+     *               scenario in the current campaign.
+     * @param dryRun If {@code true}, the function will not perform the actual updates on the
+     *              campaign and contract, but will return a {@link String} containing a description
+     *              of what will happen instead.
+     * @return A text description of what actions would be performed if it is a dry run. Empty string
+     * otherwise.
      */
     private String processObjectiveEffect(Campaign campaign, ObjectiveEffect effect, int scaleFactor,
                                           ResolveScenarioTracker tracker, boolean dryRun) {

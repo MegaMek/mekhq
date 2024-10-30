@@ -27,7 +27,6 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.StratconTab;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -121,11 +120,19 @@ public class CampaignManagementDialog extends JDialog {
         parent.updateCampaignState();
     }
 
-    private void requestResupply(ActionEvent e) {
+    /**
+     * Requests resupply. If there are more than one available support points, it triggers a dialog
+     * to specify how many points to use for the resupply.
+     * If there is exactly one support point, it automatically uses this one point to resupply.
+     * It also updates the button state based on the remaining support points and updates the parent
+     * campaign state.
+     *
+     * @param event The triggering ActionEvent (not used in this method).
+     */
+    private void requestResupply(ActionEvent event) {
         if (currentCampaignState.getSupportPoints() > 1) {
             supplyDropDialog();
         } else {
-            LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
             Resupply supplyDrops = new Resupply(campaign, contract, false, false);
             supplyDrops.getResupplyParts(1);
@@ -171,7 +178,6 @@ public class CampaignManagementDialog extends JDialog {
         btnConfirm.addActionListener( e-> {
             dialog.dispose();
 
-            LogManager.getLogger().info("CampaignManagementDialog.java 1");
             AtBContract contract = currentCampaignState.getContract();
             Resupply supplyDrops = new Resupply(campaign, contract, false, false);
             supplyDrops.getResupplyParts((int) numberModel.getValue());
