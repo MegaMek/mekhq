@@ -476,7 +476,20 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return Is this armor on a location of an Aero unit that shouldn't have armor?
      */
     private boolean isInvalidAeroArmor(Unit unit, Armor armor) {
-        if (unit.getEntity() instanceof Aero) {
+        if (unit.getEntity() instanceof Warship) {
+            if ((armor.getLocation() == Warship.LOC_LBS) || (armor.getLocation() == Warship.LOC_RBS)
+                    || (armor.getLocation() == Warship.LOC_HULL)) {
+                        return true;
+            }
+        } else if (unit.getEntity() instanceof Jumpship) {
+            if (armor.getLocation() == Jumpship.LOC_HULL) {
+                return true;
+            }
+        } else if (unit.getEntity() instanceof SmallCraft) { // Covers Dropships
+            if (armor.getLocation() == SmallCraft.LOC_HULL) {
+                return true;
+            }
+        } else if (unit.getEntity() instanceof Aero) {
             if ((armor.getLocation() == Aero.LOC_WINGS) || (armor.getLocation() == Aero.LOC_FUSELAGE)) {
                 return true;
             }

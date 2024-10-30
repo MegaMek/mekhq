@@ -27,6 +27,7 @@ import java.util.Objects;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
@@ -408,12 +409,11 @@ public class Armor extends Part implements IAcquisitionWork {
         if (null != entity) {
             if (entity instanceof Tank) {
                 return 3;
-            }
-            // December 2017 errata, only large craft should return 15m/point.
-            else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            } else if (entity instanceof Dropship) {
                 return 15;
-            }
-            // TODO: Needs to have 2 hour return for capital-scale armor.
+            } else if (entity.isCapitalScale()) {
+                return 120;
+            }   
         }
         // Meks, protomeks, battle armor, and normal aerospace
         return 5;

@@ -19,7 +19,6 @@
 
 package mekhq.campaign.parts;
 
-import megamek.common.Engine;
 import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.parts.enums.RefitStepType;
 import mekhq.campaign.unit.Unit;
@@ -84,6 +83,8 @@ public class RefitStep {
             // This covers every armor change except no change
             refitClass = RefitClass.CLASS_A;
             isFixedEquipmentChange = true;
+            // Capital scale armor is 10 points per point allocated
+            int armorMultipler = oldUnit.getEntity().isCapitalScale() ? 10 : 1;
 
             if (oldArmor.getType() == newArmor.getType()) {
                 if(oldArmor.getAmount() == newArmor.getAmount()) {
@@ -98,12 +99,12 @@ public class RefitStep {
                     int delta = 0;
                     if (oldAmount > newAmount) {
                         delta = oldAmount - newAmount;
-                        deltaArmor.setAmount(delta);
+                        deltaArmor.setAmount(delta * armorMultipler);
                         type = RefitStepType.REMOVE_ARMOR;
                         returnsPart = deltaArmor;
                     } else {
                         delta = newAmount - oldAmount;
-                        deltaArmor.setAmount(delta);
+                        deltaArmor.setAmount(delta * armorMultipler);
                         type = RefitStepType.ADD_ARMOR;
                         neededPart = deltaArmor;
                     }
@@ -115,6 +116,9 @@ public class RefitStep {
                 type = RefitStepType.CHANGE_ARMOR_TYPE;
                 returnsPart = oldArmor.clone();
                 neededPart = newArmor.clone();
+
+                ((Armor) returnsPart).setAmount(((Armor) returnsPart).getAmount() * armorMultipler);
+                ((Armor) neededPart).setAmount(((Armor) neededPart).getAmount() * armorMultipler);
 
                 baseTime = oldArmor.getBaseTimeFor(oldUnit.getEntity()) * oldArmor.getAmount();
                 baseTime += newArmor.getBaseTimeFor(oldUnit.getEntity()) * newArmor.getAmount();
@@ -134,6 +138,7 @@ public class RefitStep {
             neededPart = newPart.clone();
             return;
         
+
         // region Locations
 
         } else if (((oldPart instanceof MekLocation) || (oldPart instanceof MissingMekLocation))
@@ -179,8 +184,8 @@ public class RefitStep {
             return;
 
         } else if (((oldPart instanceof Turret) || (oldPart instanceof MissingTurret)) && null == newPart) {
-            // FIXME: WeaverThree - Adding a turret is F, should removing it be? Unclear.
-            refitClass = RefitClass.CLASS_F;
+            // FIXME: WeaverThree - Removing a Turret is changing the weight of the turret...
+            refitClass = RefitClass.CLASS_D;
             type = RefitStepType.REMOVE_TURRET;
             isFixedEquipmentChange = true;
             returnsPart = oldPart instanceof Turret ? oldPart.clone() : null;
@@ -201,12 +206,12 @@ public class RefitStep {
             baseTime = 0;
             return;
         
+
         // region Core Equipment
         } else if (((oldPart instanceof EnginePart) || (oldPart instanceof MissingEnginePart))
                 && (newPart instanceof EnginePart)) {
             
             boolean equal;
-
             if (oldPart instanceof EnginePart) {
                 equal = oldPart.isSamePartType(newPart);
             } else {
