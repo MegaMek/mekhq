@@ -224,6 +224,7 @@ public class RefitStep {
                 baseTime = 360;
                 returnsPart = (oldPart instanceof EnginePart) ? oldPart.clone() : null;
                 neededPart = newPart.clone();
+                return;
             }
         }
 
