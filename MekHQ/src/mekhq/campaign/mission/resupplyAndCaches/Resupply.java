@@ -343,8 +343,14 @@ public class Resupply {
         if (contract.getCommandRights().isIndependent()) {
             targetConvoy = getRandomConvoy();
 
+            int fatigueGain = morale.ordinal();
+
+            if (!message.isEmpty()) {
+                fatigueGain++;
+            }
+
             if (campaign.getCampaignOptions().isUseFatigue()) {
-                increaseFatigue(message.isEmpty() ? 1 : 2);
+                increaseFatigue(fatigueGain);
             }
         }
 
