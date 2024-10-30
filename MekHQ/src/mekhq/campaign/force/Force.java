@@ -165,10 +165,22 @@ public class Force {
         }
     }
 
+    /**
+     * @return {@code true} if this is a convoy force, {@code false} otherwise.
+     */
     public boolean isConvoyForce() {
         return convoyForce;
     }
 
+    /**
+     * Sets the status of the force as a convoy force. If requested, propagate this status to all
+     * sub-forces recursively.
+     *
+     * @param convoyForce {@code true} to mark force as a convoy force, {@code false} to mark force
+     *                     as non-convoy.
+     * @param setForSubForces {@code true} to recursively apply convoyForce status to all subforces,
+     *                         {@code false} to only set for this force.
+     */
     public void setConvoyForce(boolean convoyForce, boolean setForSubForces) {
         this.convoyForce = convoyForce;
         if (setForSubForces) {
