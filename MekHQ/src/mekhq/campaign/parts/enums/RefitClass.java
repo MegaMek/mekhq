@@ -62,6 +62,13 @@ public enum RefitClass {
     }
 
     /**
+     * @return numeric class for XML
+     */
+    public int toNumeric() {
+        return severity;
+    }
+
+    /**
      * @param other - another RefitClass to compare to
      * @return the more difficult RefitClass of the two
      */
@@ -109,6 +116,24 @@ public enum RefitClass {
             case CLASS_B, CLASS_C -> 3;
             case CLASS_D, CLASS_E -> 4;
             case CLASS_F -> 5;
+        };
+    }
+
+    /**
+     * @param numeric value for returning from XML
+     */
+    public static RefitClass fromNumeric(int numeric) {
+        return switch(numeric) {
+            case 0 -> NO_CHANGE;
+            case 1 -> OMNI_RECONFIG;
+            case 2 -> CLASS_A;
+            case 3 -> CLASS_B;
+            case 4 -> CLASS_C;
+            case 5 -> CLASS_D;
+            case 6 -> CLASS_E;
+            case 7 -> CLASS_F;
+            case 8 -> PLEASE_REPAIR;
+            default -> throw new IllegalArgumentException("RefitClass.fromNumeric must be 0-8");
         };
     }
 

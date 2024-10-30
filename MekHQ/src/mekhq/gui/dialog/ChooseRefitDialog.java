@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -47,7 +45,6 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
 import megamek.common.MekView;
 import megamek.common.ViewFormatting;
 import megamek.common.loaders.EntityLoadingException;
@@ -57,7 +54,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitStep;
 import mekhq.campaign.unit.Unit;
@@ -1005,40 +1001,41 @@ public class ChooseRefitDialog extends JDialog {
     public static class ClassSorter implements Comparator<String> {
         @Override
         public int compare(String s0, String s1) {
-            int r0 = Refit.NO_CHANGE;
-            int r1 = Refit.NO_CHANGE;
-            if (s0.contains("Omni")) {
-                r0 = Refit.CLASS_OMNI;
-            } else if (s0.contains("Class A")) {
-                r0 = Refit.CLASS_A;
-            } else if (s0.contains("Class B")) {
-                r0 = Refit.CLASS_B;
-            } else if (s0.contains("Class C")) {
-                r0 = Refit.CLASS_C;
-            } else if (s0.contains("Class D")) {
-                r0 = Refit.CLASS_D;
-            } else if (s0.contains("Class E")) {
-                r0 = Refit.CLASS_E;
-            } else if (s0.contains("Class F")) {
-                r0 = Refit.CLASS_F;
-            }
+        //     int r0 = Refit.NO_CHANGE;
+        //     int r1 = Refit.NO_CHANGE;
+        //     if (s0.contains("Omni")) {
+        //         r0 = Refit.CLASS_OMNI;
+        //     } else if (s0.contains("Class A")) {
+        //         r0 = Refit.CLASS_A;
+        //     } else if (s0.contains("Class B")) {
+        //         r0 = Refit.CLASS_B;
+        //     } else if (s0.contains("Class C")) {
+        //         r0 = Refit.CLASS_C;
+        //     } else if (s0.contains("Class D")) {
+        //         r0 = Refit.CLASS_D;
+        //     } else if (s0.contains("Class E")) {
+        //         r0 = Refit.CLASS_E;
+        //     } else if (s0.contains("Class F")) {
+        //         r0 = Refit.CLASS_F;
+        //     }
 
-            if (s1.contains("Omni")) {
-                r1 = Refit.CLASS_OMNI;
-            } else if (s1.contains("Class A")) {
-                r1 = Refit.CLASS_A;
-            } else if (s1.contains("Class B")) {
-                r1 = Refit.CLASS_B;
-            } else if (s1.contains("Class C")) {
-                r1 = Refit.CLASS_C;
-            } else if (s1.contains("Class D")) {
-                r1 = Refit.CLASS_D;
-            } else if (s1.contains("Class E")) {
-                r1 = Refit.CLASS_E;
-            } else if (s1.contains("Class F")) {
-                r1 = Refit.CLASS_F;
-            }
-            return ((Comparable<Integer>) r0).compareTo(r1);
+        //     if (s1.contains("Omni")) {
+        //         r1 = Refit.CLASS_OMNI;
+        //     } else if (s1.contains("Class A")) {
+        //         r1 = Refit.CLASS_A;
+        //     } else if (s1.contains("Class B")) {
+        //         r1 = Refit.CLASS_B;
+        //     } else if (s1.contains("Class C")) {
+        //         r1 = Refit.CLASS_C;
+        //     } else if (s1.contains("Class D")) {
+        //         r1 = Refit.CLASS_D;
+        //     } else if (s1.contains("Class E")) {
+        //         r1 = Refit.CLASS_E;
+        //     } else if (s1.contains("Class F")) {
+        //         r1 = Refit.CLASS_F;
+        //     }
+        //     return ((Comparable<Integer>) r0).compareTo(r1);
+            return 0;
         }
     }
 }
