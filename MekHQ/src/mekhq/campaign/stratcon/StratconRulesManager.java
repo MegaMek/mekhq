@@ -312,12 +312,6 @@ public class StratconRulesManager {
           }
      }
 
-    public static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
-                                               @Nullable StratconTrackState track, boolean autoAssignLances,
-                                               StratconScenario scenario) {
-        finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario, false);
-    }
-
     /**
      * Finalizes the backing scenario, setting up the OpFor, scenario parameters, and other
      * necessary steps.
@@ -330,7 +324,7 @@ public class StratconRulesManager {
      */
     public static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
                         @Nullable StratconTrackState track, boolean autoAssignLances,
-                        StratconScenario scenario, boolean isConvoy) {
+                        StratconScenario scenario) {
         AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         setScenarioParametersFromBiome(track, scenario);
         swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
@@ -628,8 +622,7 @@ public class StratconRulesManager {
      *                  {@code null} to select the scenario template randomly.
      * @return The newly set up {@link StratconScenario}.
      */
-    private static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
-            AtBContract contract, StratconTrackState track, @Nullable ScenarioTemplate template) {
+    public static StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract, StratconTrackState track, @Nullable ScenarioTemplate template) {
         StratconScenario scenario;
 
         if (track.getFacilities().containsKey(coords)) {
@@ -976,7 +969,7 @@ public class StratconRulesManager {
      * @param forceIDs List of force IDs to check
      * @return Sorted hash map
      */
-    private static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
+    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
         Map<MapLocation, List<Integer>> retVal = new HashMap<>();
 
         retVal.put(AllGroundTerrain, new ArrayList<>());
@@ -1301,7 +1294,6 @@ public class StratconRulesManager {
      * @return List of available force IDs.
      */
     public static List<Integer> getAvailableForceIDs(Campaign campaign) {
-
         // first, we gather a set of all forces that are already deployed to a track so
         // we eliminate those later
         Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()

@@ -28,6 +28,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
@@ -83,7 +84,7 @@ public class Resupply {
     private final boolean EMPLOYER_IS_CLAN;
     private final Money TARGET_VALUE = Money.of(250000);
     private final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
-    public final static double RESUPPLY_LOAD_SIZE = 5;
+    public final static double RESUPPLY_LOAD_SIZE = 25;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
     private final static MMLogger logger = MMLogger.create(Resupply.class);
@@ -353,10 +354,14 @@ public class Resupply {
                     isIntercepted, false);
             } else {
                 if (isIntercepted) {
-                    // Announce the situation to the player and then, if the player is using
-                    // StratCon generate a scenario
+                    boolean isIndependent = contract.getCommandRights().isIndependent();
+
                     if (campaign.getCampaignOptions().isUseStratCon()) {
                         String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
+
+                        if (isIndependent) {
+                            templateAddress = "data/scenariotemplates/Emergency Convoy Defense - Independent.xml";
+                        }
                         ScenarioTemplate template = ScenarioTemplate.Deserialize(templateAddress);
 
                         if (template == null) {
@@ -376,15 +381,23 @@ public class Resupply {
                             deliverDrop(droppedItems, droppedUnits, cashReward);
                             return;
                         }
-
-                        StratconScenario scenario = generateExternalScenario(campaign, contract,
-                            track, template);
+                        StratconScenario scenario = generateExternalScenario(campaign, contract, track, template);
 
                         // If we successfully generated a scenario, we need to make a couple of final
                         // adjustments so that the player can still get their items (if they succeed)
                         if (scenario != null) {
                             AtBDynamicScenario backingScenario = scenario.getBackingScenario();
                             backingScenario.setDate(campaign.getLocalDate());
+
+                            for (int id : backingScenario.getPlayerTemplateForceIDs()) {
+                                //backingScenario.removeForce(id);
+                            }
+
+                            int randomConvoyId = getRandomConvoy();
+                            backingScenario.addForce(randomConvoyId, "Player");
+                            campaign.getForce(randomConvoyId).setScenarioId(backingScenario.getId(), campaign);
+                            scenario.commitPrimaryForces();
+
                             Loot loot = new Loot();
 
                             if (droppedItems != null) {
@@ -494,6 +507,37 @@ public class Resupply {
         dialog.setModal(true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    @Nullable
+    private Integer getRandomConvoy() {
+        // First, we gather a set of all forces that are already deployed to a track, so we can
+        // eliminate them later in the next step
+        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
+            .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
+            .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
+            .collect(Collectors.toSet());
+
+        // Then, we build a list of all valid convoys.
+        List<Integer> validConvoys = new ArrayList<>();
+        for (Integer key : campaign.getLances().keySet()) {
+            Force force = campaign.getForce(key);
+            if (force != null
+                && !force.isDeployed()
+                && force.isConvoyForce()
+                && !forcesInTracks.contains(force.getId())
+                && force.getSubForces().isEmpty()) {
+                validConvoys.add(force.getId());
+            }
+        }
+
+        // Then we return the chosen Force ID
+        if (validConvoys.isEmpty()) {
+            return null;
+        } else {
+            int randomIndex = random.nextInt(validConvoys.size());
+            return validConvoys.get(randomIndex);
+        }
     }
 
     public static void convoyFinalMessageDialog(Campaign campaign, Faction employerFaction) {
