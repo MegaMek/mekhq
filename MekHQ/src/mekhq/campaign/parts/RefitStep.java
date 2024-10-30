@@ -135,7 +135,8 @@ public class RefitStep {
         
         // region Locations
 
-        } else if ((oldPart instanceof MekLocation) || (oldPart instanceof MissingMekLocation)) {
+        } else if (((oldPart instanceof MekLocation) || (oldPart instanceof MissingMekLocation))
+                && (newPart instanceof MekLocation)) {
             boolean oldTsm;
             int oldStructure;
             if (oldPart instanceof MekLocation) {

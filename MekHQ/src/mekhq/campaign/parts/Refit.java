@@ -369,18 +369,62 @@ public class Refit extends Part implements IAcquisitionWork {
                     oldIterator.remove();
                     newIterator.remove();
                 } else {
-                    // Meks can't have locations added or removed
-                    logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching locations!");
+                    // This should create an error state in the UI
+                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
                 }
 
-            } else if ((oldPart instanceof TankLocation) 
-                    || (oldPart instanceof MissingRotor) || (oldPart instanceof MissingTurret)) {
+            } else if ((oldPart instanceof Rotor) || (oldPart instanceof MissingRotor)) {
 
                 boolean matchFound = false;
                 newIterator = newParts.iterator();
                 while (newIterator.hasNext()) {
                     Part newPart = newIterator.next();
-                    if (newPart instanceof TankLocation) { // New unit better not have missing locations
+                    if (newPart instanceof Rotor) { 
+                        
+                        // MissingRotors don't have locations so we'll have to take the match on faith
+                        matchFound = true;
+                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                        break;
+                    
+                    }
+                }
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    // This should create an error state in the UI
+                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                    newIterator.remove();
+                }
+            } else if ((oldPart instanceof Turret) || (oldPart instanceof MissingTurret)) {
+
+                boolean matchFound = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+                    if (newPart instanceof Turret) { 
+
+                        // MissingTurrets don't have locations so we'll have to take the match on faith
+                        matchFound = true;
+                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                        break;
+                    }
+                }
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    // This should create an error state in the UI
+                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                    newIterator.remove();
+                }
+            } else if (oldPart instanceof TankLocation) {
+
+                boolean matchFound = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+                    if (newPart instanceof TankLocation) {
                         if (oldPart.getLocation() == newPart.getLocation()) {
                             matchFound = true;
                             stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
@@ -392,11 +436,12 @@ public class Refit extends Part implements IAcquisitionWork {
                     oldIterator.remove();
                     newIterator.remove();
                 } else {
-                    // Probably a turret change
+                    // This should create an error state in the UI
                     stepsList.add(new RefitStep(oldUnit, oldPart, null));
-                    oldIterator.remove();
+                    newIterator.remove();
                 }
             }
+            
         }
 
         // Sanity check that we found all the locations on both units
@@ -404,10 +449,16 @@ public class Refit extends Part implements IAcquisitionWork {
         while (newIterator.hasNext()) {
             Part newPart = newIterator.next();
             if (newPart instanceof MekLocation) {
-                logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching locaitons!");
-            } else if (newPart instanceof TankLocation) {
-                // Probably a turret change
+                stepsList.add(new RefitStep(oldUnit, null, newPart)); // Error state
+                newIterator.remove();
+            } else if (newPart instanceof Rotor) {
+                stepsList.add(new RefitStep(oldUnit, null, newPart)); // Error state
+                newIterator.remove();
+            } else if (newPart instanceof Turret) {
                 stepsList.add(new RefitStep(oldUnit, null, newPart));
+                newIterator.remove();
+            } else if (newPart instanceof TankLocation) {
+                stepsList.add(new RefitStep(oldUnit, null, newPart)); // Error state
                 newIterator.remove();
             }
         }
