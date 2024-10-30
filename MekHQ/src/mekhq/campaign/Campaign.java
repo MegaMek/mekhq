@@ -3750,23 +3750,18 @@ public class Campaign implements ITechManager {
                 Force force = getForce(forceId);
 
                 if (force != null && force.isConvoyForce()) {
-                    for (UUID unitID : force.getUnits()) {
+                    for (UUID unitID : new ArrayList<>(force.getUnits())) {
                         Unit unit = getUnit(unitID);
-
                         if (unit != null) {
-                            List<Person> crew = unit.getCrew();
-
+                            List<Person> crew = new ArrayList<>(unit.getCrew());
                             for (Person crewMember : crew) {
-                                int roll = Compute.d6(2);
-
                                 PersonnelStatus status = KIA;
-                                if (roll < 5) {
+                                if (Compute.d6(2) < 5) {
                                     status = PersonnelStatus.POW;
                                 }
                                 crewMember.changeStatus(this, currentDay, status);
                             }
                         }
-
                         removeUnit(unitID);
                     }
                 }
