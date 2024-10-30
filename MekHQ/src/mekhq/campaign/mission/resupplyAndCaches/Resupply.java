@@ -381,14 +381,15 @@ public class Resupply {
                                     boolean isIntroduction) {
         boolean isIndependent = contract.getCommandRights().isIndependent();
         Integer targetConvoy;
-        StratconTrackState convoySector = getRandomTrack(contract);
+        StratconTrackState track = getRandomTrack(contract);
 
         StratconCoords convoyGridReference;
-        if (convoySector != null) {
-            convoyGridReference = getUnoccupiedCoords(convoySector);
+        if (track != null) {
+            convoyGridReference = getUnoccupiedCoords(track);
         } else {
             convoyGridReference = null;
         }
+
 
         if (isIndependent) {
             targetConvoy = getRandomConvoy();
@@ -417,7 +418,7 @@ public class Resupply {
                 if (isIntercepted) {
                     if (campaign.getCampaignOptions().isUseStratCon()) {
                         processConvoyInterception(droppedItems, droppedUnits, cashReward,
-                            isIndependent, targetConvoy, convoyGridReference);
+                            isIndependent, targetConvoy, track, convoyGridReference);
                     } else {
                         campaign.addReport(String.format(resources.getString("convoyInterceptedAtB.text"),
                             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
@@ -486,7 +487,22 @@ public class Resupply {
                     campaign.getName());
             }
         } else {
-            message = String.format(message, getCommanderTitle(campaign, false));
+            if (isIntercepted) {
+                String coords = resources.getString("static.text");
+                if (convoyGridReference != null) {
+                    coords = convoyGridReference.toBTString();
+                }
+
+                String sector = resources.getString("hiss.text");
+                if (track != null) {
+                    sector = track.getDisplayableName();
+                }
+
+                message = String.format(message, getCommanderTitle(campaign, false),
+                    sector, coords);
+            } else {
+                message = String.format(message, getCommanderTitle(campaign, false));
+            }
 
             if (contract.getCommandRights().isIndependent()) {
                 if (targetConvoy != null) {
@@ -615,11 +631,12 @@ public class Resupply {
      * @param cashReward           The amount of cash reward.
      * @param isIndependent        Boolean indicating if contract command level is independent.
      * @param targetConvoy         The target convoy.
+     * @param track                The track reference for the convoy's location.
      * @param convoyGridReference  The grid reference for the convoy's location.
      */
     private void processConvoyInterception(List<Part> droppedItems, List<Unit> droppedUnits,
                                            Money cashReward, boolean isIndependent, Integer targetConvoy,
-                                           StratconCoords convoyGridReference) {
+                                           StratconTrackState track, StratconCoords convoyGridReference) {
         String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
 
         if (isIndependent) {
@@ -634,8 +651,6 @@ public class Resupply {
             deliverDrop(droppedItems, droppedUnits, cashReward);
             return;
         }
-
-        StratconTrackState track = getRandomTrack(contract);
 
         if (track == null) {
             campaign.addReport(String.format(resources.getString("convoyErrorTracks.text"),
@@ -1196,12 +1211,8 @@ public class Resupply {
         }
 
         AtBMoraleLevel morale = contract.getMoraleLevel();
-
-        if (morale.isRouted()) {
-            return resources.getString("adhocSupplies" + Compute.randomInt(20) + ".text");
-        } else {
-            return resources.getString(morale.toString().toLowerCase() + Compute.randomInt(10) + ".text");
-        }
+        return resources.getString(morale.toString().toLowerCase() + "Supplies"
+                + Compute.randomInt(20) + ".text");
     }
 
     /**
