@@ -39,6 +39,7 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
@@ -61,6 +62,7 @@ import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.campaign.stratcon.StratconRulesManager.getRandomTrack;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
@@ -337,11 +339,20 @@ public class Resupply {
                                        Money cashReward, String convoyStatusMessage, boolean isIntercepted,
                                     boolean isIntroduction) {
         boolean isIndependent = contract.getCommandRights().isIndependent();
+        Integer targetConvoy;
+        StratconTrackState convoySector = getRandomTrack(contract);
 
-        Integer targetConvoy = null;
+        StratconCoords convoyGridReference;
+        if (convoySector != null) {
+            convoyGridReference = getUnoccupiedCoords(convoySector);
+        } else {
+            convoyGridReference = null;
+        }
 
         if (isIndependent) {
             targetConvoy = getRandomConvoy();
+        } else {
+            targetConvoy = null;
         }
 
         // Dialog dimensions and representative
@@ -364,7 +375,8 @@ public class Resupply {
             } else {
                 if (isIntercepted) {
                     if (campaign.getCampaignOptions().isUseStratCon()) {
-                        processIndependentConvoyInterception(droppedItems, droppedUnits, cashReward, isIndependent);
+                        processConvoyInterception(droppedItems, droppedUnits, cashReward,
+                            isIndependent, targetConvoy, convoyGridReference);
                     } else {
                         campaign.addReport(String.format(resources.getString("convoyInterceptedAtB.text"),
                             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
@@ -395,7 +407,7 @@ public class Resupply {
         ImageIcon speakerIcon = null;
         if (isIntroduction) {
             if (logisticsOfficer == null) {
-                speakerIcon = Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(),
+                speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
                     true);
             } else {
                 speakerIcon = logisticsOfficer.getPortrait().getImageIcon();
@@ -407,10 +419,10 @@ public class Resupply {
 
             if (speakerIcon == null) {
                 if (contract.getCommandRights().isIndependent()) {
-                    speakerIcon = Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(),
+                    speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
                         true);
                 } else {
-                    speakerIcon = Factions.getFactionLogo(campaign, employerFaction.getShortName(),
+                    speakerIcon = getFactionLogo(campaign, employerFaction.getShortName(),
                         true);
                 }
             }
@@ -532,7 +544,9 @@ public class Resupply {
         return null;
     }
 
-    private void processIndependentConvoyInterception(List<Part> droppedItems, List<Unit> droppedUnits, Money cashReward, boolean isIndependent) {
+    private void processConvoyInterception(List<Part> droppedItems, List<Unit> droppedUnits,
+                                           Money cashReward, boolean isIndependent, Integer targetConvoy,
+                                           StratconCoords convoyGridReference) {
         String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
 
         if (isIndependent) {
@@ -557,7 +571,7 @@ public class Resupply {
             deliverDrop(droppedItems, droppedUnits, cashReward);
             return;
         }
-        StratconScenario scenario = generateExternalScenario(campaign, contract, track, template);
+        StratconScenario scenario = generateExternalScenario(campaign, contract, track, convoyGridReference, template);
 
         // If we successfully generated a scenario, we need to make a couple of final
         // adjustments, including assigning the Resupply contents as loot and
@@ -566,9 +580,7 @@ public class Resupply {
             AtBDynamicScenario backingScenario = scenario.getBackingScenario();
             backingScenario.setDate(campaign.getLocalDate());
 
-            Integer randomConvoyId = getRandomConvoy();
-
-            if (randomConvoyId == null) {
+            if (targetConvoy == null) {
                 campaign.addReport(String.format(resources.getString("convoyErrorPlayerConvoy.text"),
                     spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                     templateAddress, CLOSING_SPAN_TAG));
@@ -576,8 +588,8 @@ public class Resupply {
                 return;
             }
 
-            backingScenario.addForce(randomConvoyId, "Player");
-            campaign.getForce(randomConvoyId).setScenarioId(backingScenario.getId(), campaign);
+            backingScenario.addForce(targetConvoy, "Player");
+            campaign.getForce(targetConvoy).setScenarioId(backingScenario.getId(), campaign);
             scenario.commitPrimaryForces();
 
             Loot loot = new Loot();

@@ -202,7 +202,7 @@ public class StratconRulesManager {
      */
     @Nullable
     public static StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract) {
-        return generateExternalScenario(campaign, contract, null, null);
+        return generateExternalScenario(campaign, contract, null, null, null);
     }
 
     /**
@@ -214,13 +214,17 @@ public class StratconRulesManager {
      * @param contract The contract associated with the scenario.
      * @param track    The {@link StratconTrackState} the scenario should be assigned to, or
      *                 {@code null} to select a random track.
+     * @param scenarioCoords   The {@link StratconCoords} where in the track to place the scenario, or
+     *                 {@code null} to select a random hex. If populated, {@code track} cannot be
+     *                 {@code null}
      * @param template A specific {@link ScenarioTemplate} to use for scenario generation,
      *                 or {@code null} to select scenario template randomly.
      * @return A newly generated {@link StratconScenario}, or {@code null} if scenario creation fails.
      */
      @Nullable
      public static StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract,
-                                    @Nullable StratconTrackState track, @Nullable ScenarioTemplate template) {
+                                    @Nullable StratconTrackState track, @Nullable StratconCoords scenarioCoords,
+                                    @Nullable ScenarioTemplate template) {
          // If we're not generating for a specific track, randomly pick one.
          if (track == null) {
              track = getRandomTrack(contract);
@@ -239,7 +243,9 @@ public class StratconRulesManager {
          Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
          // Select the target coords.
-         StratconCoords scenarioCoords = getUnoccupiedCoords(track);
+         if (scenarioCoords == null) {
+             scenarioCoords = getUnoccupiedCoords(track);
+         }
 
          if (scenarioCoords == null) {
              logger.warn("Target track is full, aborting scenario generation.");
