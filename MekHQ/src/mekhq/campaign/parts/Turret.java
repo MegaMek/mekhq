@@ -154,7 +154,7 @@ public class Turret extends TankLocation {
         if (isSalvaging()) {
             return 160;
         }
-        return 60;
+        return 60; // FIXME: The only value given in CamOps is 160 minutes for replacing turrets.
     }
 
     @Override

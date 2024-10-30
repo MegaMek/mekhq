@@ -43,11 +43,15 @@ public enum RefitStepType {
     CHANGE_ARMOR_TYPE("RefitStepType.CHANGE_ARMOR_TYPE.text", "CHANGE_ARMOR_TYPE"),
     REMOVE_CASE("RefitStepType.REMOVE_CASE.text", "REMOVE_CASE"),
     ADD_CASE("RefitStepType.ADD_CASE.text", "ADD_CASE"),
+    REMOVE_TURRET("RefitStepType.REMOVE_TURRET.text", "REMOVE_TURRET"),
+    ADD_TURRET("RefitStepType.ADD_TURRET.text", "ADD_TURRET"),
     CHANGE_STRUCTURE_TYPE("RefitStepType.CHANGE_STRUCTURE_TYPE.text", "CHANGE_STRUCTURE_TYPE"),
     // Myomer Type and Structure Type live together
     DETACH_OMNIPOD("RefitStepType.DETACH_OMNIPOD.text", "DETACH_OMNIPOD"),
     ATTACH_OMNIPOD("RefitStepType.ATTACH_OMNIPOD.text", "ATTACH_OMNIPOD"),
-    MOVE_OMNIPOD("RefitStepType.MOVE_OMNIPOD.text", "MOVE_OMNIPOD");
+    MOVE_OMNIPOD("RefitStepType.MOVE_OMNIPOD.text", "MOVE_OMNIPOD"),
+    META("RefitStepType.META.text", "META"),
+    ERROR("RefitStepType.ERROR.text", "ERROR");
     
     private final String name;
     private final String xmlName;
@@ -95,10 +99,14 @@ public enum RefitStepType {
             case "CHANGE_ARMOR_TYPE" -> CHANGE_ARMOR_TYPE;
             case "REMOVE_CASE" -> REMOVE_CASE;
             case "ADD_CASE" -> ADD_CASE;
+            case "REMOVE_TURRET" -> REMOVE_TURRET;
+            case "ADD_TURRET" -> ADD_TURRET;
             case "CHANGE_STRUCTURE_TYPE" -> CHANGE_STRUCTURE_TYPE;
             case "DETACH_OMNIPOD" -> DETACH_OMNIPOD;
             case "ATTACH_OMNIPOD" -> ATTACH_OMNIPOD;
             case "MOVE_OMNIPOD" -> MOVE_OMNIPOD;
+            case "META" -> META;
+            case "ERROR" -> ERROR;
             default -> throw new IllegalArgumentException("Invalid RefitStepType");
         };
     }

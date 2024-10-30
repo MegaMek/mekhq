@@ -281,20 +281,28 @@ public class Refit extends Part implements IAcquisitionWork {
         Unit newUnit = new Unit(newEntity, getCampaign());
         newUnit.initializeParts(false);
 
-        // List of parts to go through. The goal is to remove everything from both lists.
+        // Lists of parts to go through. The goal is to remove everything from both lists.
         List<Part> oldParts = new ArrayList<Part>(oldUnit.getParts());
         List<Part> newParts = new ArrayList<Part>(newUnit.getParts());
+        Iterator<Part> oldIterator;
+        Iterator<Part> newIterator;
 
         // Let's look for armor first
 
-        Iterator<Part> oldIterator = oldParts.iterator();
+        oldIterator = oldParts.iterator();
         while (oldIterator.hasNext()) {
             Part oldPart = oldIterator.next();
             if (oldPart instanceof Armor) {
                 Armor oldArmor = (Armor) oldPart;
         
+                if (isInvalidAeroArmor(oldUnit, oldArmor)) {
+                    // Ignore this one
+                    oldIterator.remove();
+                    continue;
+                }
+
                 boolean matchFound = false;
-                Iterator<Part> newIterator = newParts.iterator();
+                newIterator = newParts.iterator();
                 while (newIterator.hasNext()) {
                     Part newPart = newIterator.next();
                     if (newPart instanceof Armor) {
@@ -312,24 +320,113 @@ public class Refit extends Part implements IAcquisitionWork {
                     oldIterator.remove();
                     newIterator.remove();
                 } else {
-                    logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching armor locations!");
+                    // There's probably a turret being removed or something
+                    stepsList.add(new RefitStep(oldUnit, oldArmor, null));
+                    oldIterator.remove();
                 }
             }
         }
 
         // Sanity check that we found all the armor on both units
-        for (Part part : newParts) {
-            if (part instanceof Armor) {
-                logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching armor locations!");
+        newIterator = newParts.iterator();
+        while (newIterator.hasNext()) {
+            Part newPart = newIterator.next();
+            if (newPart instanceof Armor) {
+
+                if (isInvalidAeroArmor(newUnit, (Armor) newPart)) {
+                    // Ignore this one
+                    newIterator.remove();
+                    continue;
+                }
+
+                // There's probably a turret being added or something
+                stepsList.add(new RefitStep(oldUnit, null, newPart));
+                newIterator.remove();
             }
         }
 
-        // Let's check the engine next. There's always an engine.
 
-        // Part oldEngine = findOnly(EnginePart.class, MissingEnginePart.class, oldParts, oldUnit);
+        // Let's do locations next
+
+        oldIterator = oldParts.iterator();
+        while (oldIterator.hasNext()) {
+            Part oldPart = oldIterator.next();
+            if ((oldPart instanceof MekLocation) || (oldPart instanceof MissingMekLocation)) {
+        
+                boolean matchFound = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+                    if (newPart instanceof MekLocation) { // New unit better not have missing locations
+                        if (oldPart.getLocation() == newPart.getLocation()) {
+                            matchFound = true;
+                            stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                            break;
+                        }
+                    }
+                }
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    // Meks can't have locations added or removed
+                    logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching locations!");
+                }
+
+            } else if ((oldPart instanceof TankLocation) 
+                    || (oldPart instanceof MissingRotor) || (oldPart instanceof MissingTurret)) {
+
+                boolean matchFound = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+                    if (newPart instanceof TankLocation) { // New unit better not have missing locations
+                        if (oldPart.getLocation() == newPart.getLocation()) {
+                            matchFound = true;
+                            stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                            break;
+                        }
+                    }
+                }
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    // Probably a turret change
+                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                    oldIterator.remove();
+                }
+            }
         }
 
+        // Sanity check that we found all the locations on both units
+        newIterator = newParts.iterator();
+        while (newIterator.hasNext()) {
+            Part newPart = newIterator.next();
+            if (newPart instanceof MekLocation) {
+                logger.error("Units " + oldUnit + " and " + newUnit + " do not have matching locaitons!");
+            } else if (newPart instanceof TankLocation) {
+                // Probably a turret change
+                stepsList.add(new RefitStep(oldUnit, null, newPart));
+                newIterator.remove();
+            }
+        }
 
+    }
+
+    /**
+     * @param unit - the unit to check against
+     * @param armor - the armor piece to check
+     * @return Is this armor on a location of an Aero unit that shouldn't have armor?
+     */
+    private boolean isInvalidAeroArmor(Unit unit, Armor armor) {
+        if (unit.getEntity() instanceof Aero) {
+            if ((armor.getLocation() == Aero.LOC_WINGS) || (armor.getLocation() == Aero.LOC_FUSELAGE)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Find the only Part of a given kind in a unit's Part list, remove it (so use a copied list)

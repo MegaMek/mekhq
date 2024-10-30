@@ -242,8 +242,8 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrStepsTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
-        scrStepsTable.setPreferredSize(UIUtil.scaleForGUI(300, 300));
+        //scrStepsTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
+        //scrStepsTable.setPreferredSize(UIUtil.scaleForGUI(300, 300));
         getContentPane().add(scrStepsTable, gridBagConstraints);
 
 
@@ -260,8 +260,8 @@ public class ChooseRefitDialog extends JDialog {
         MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
-        scrOldUnit.setMinimumSize(UIUtil.scaleForGUI(300, 400));
-        scrOldUnit.setPreferredSize(UIUtil.scaleForGUI(300, 400));
+        //txtOldUnit.setMinimumSize(UIUtil.scaleForGUI(420, 500));
+        //txtOldUnit.setPreferredSize(UIUtil.scaleForGUI(420, 500));
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -280,8 +280,8 @@ public class ChooseRefitDialog extends JDialog {
                 BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrNewUnit = new JScrollPaneWithSpeed(txtNewUnit);
-        scrNewUnit.setMinimumSize(UIUtil.scaleForGUI(300, 400));
-        scrNewUnit.setPreferredSize(UIUtil.scaleForGUI(300, 400));
+        //txtNewUnit.setMinimumSize(UIUtil.scaleForGUI(420, 500));
+        //txtNewUnit.setPreferredSize(UIUtil.scaleForGUI(420, 500));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         textPanel.add(scrNewUnit, gridBagConstraints);
@@ -308,8 +308,8 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrNeededTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
-        scrNeededTable.setPreferredSize(UIUtil.scaleForGUI(300, 200));
+        //scrNeededTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
+        //scrNeededTable.setPreferredSize(UIUtil.scaleForGUI(300, 200));
         listPanel.add(scrNeededTable, gridBagConstraints);
 
         returnsModel = new RefitReturnsListTableModel();
@@ -331,14 +331,16 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        scrReturnsTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
-        scrReturnsTable.setPreferredSize(UIUtil.scaleForGUI(300, 200));
+        //scrReturnsTable.setMinimumSize(UIUtil.scaleForGUI(420, 500));
+        //scrReturnsTable.setPreferredSize(UIUtil.scaleForGUI(420, 500));
         listPanel.add(scrReturnsTable, gridBagConstraints);
 
 
         JTabbedPane tabPane = new JTabbedPane();
-        tabPane.add("Test 1", textPanel);
-        tabPane.add("Test 2", listPanel);
+        tabPane.add(resourceMap.getString("tabUnitView.title"), textPanel);
+        tabPane.add(resourceMap.getString("tabListView.title"), listPanel);
+        tabPane.setMinimumSize(UIUtil.scaleForGUI(450,500));
+        tabPane.setPreferredSize(UIUtil.scaleForGUI(450,500));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -933,7 +935,7 @@ public class ChooseRefitDialog extends JDialog {
             return switch(col) {
                 case COL_OLD_NAME -> "<html><nobr>" + refitStep.getOldPartName() + "</nobr></html>";
                 case COL_NEW_NAME -> "<html><nobr>" + refitStep.getNewPartName() + "</nobr></html>";
-                case COL_REFIT_CLASS -> refitStep.getRefitClass().toName();
+                case COL_REFIT_CLASS -> refitStep.getRefitClass().toShortName();
                 case COL_BASETIME -> refitStep.getBaseTime();
                 case COL_OLD_LOC -> refitStep.getOldLocName();
                 case COL_NEW_LOC -> refitStep.getNewLocName();
@@ -951,8 +953,8 @@ public class ChooseRefitDialog extends JDialog {
         public int getColumnWidth(int c) {
             return switch (c) {
                 case COL_OLD_NAME, COL_NEW_NAME -> 180;
-                case COL_REFITSTEP_TYPE, COL_REFIT_CLASS -> 60;
-                case COL_BASETIME -> 20;
+                case COL_REFITSTEP_TYPE -> 60;
+                case COL_BASETIME, COL_REFIT_CLASS -> 20;
                 case COL_OLD_LOC, COL_NEW_LOC -> 60;
                 default -> 3;
             };
@@ -960,7 +962,8 @@ public class ChooseRefitDialog extends JDialog {
 
         public int getAlignment(int col) {
             return switch (col) {
-                case COL_BASETIME -> SwingConstants.CENTER;
+                case COL_BASETIME -> SwingConstants.RIGHT;
+                case COL_REFIT_CLASS -> SwingConstants.CENTER;
                 default -> SwingConstants.LEFT;
             };
         }

@@ -28,23 +28,26 @@ import mekhq.MekHQ;
  * multipliers implied by that class. Based on Campaign Operations.
  */
 public enum RefitClass {
-    NO_CHANGE(0,"RefitClass.NO_CHANGE.text"),
-    OMNI_RECONFIG(1,"RefitClass.NO_CHANGE.text"),
-    CLASS_A(2,"RefitClass.CLASS_A.text"),
-    CLASS_B(3,"RefitClass.CLASS_B.text"),
-    CLASS_C(4,"RefitClass.CLASS_C.text"),
-    CLASS_D(5,"RefitClass.CLASS_D.text"),
-    CLASS_E(6,"RefitClass.CLASS_E.text"),
-    CLASS_F(7,"RefitClass.CLASS_F.text");
+    NO_CHANGE(0, "RefitClass.NO_CHANGE.text", "RefitClass.NO_CHANGE.shortText"),
+    OMNI_RECONFIG(1, "RefitClass.OMNI_RECONFIG.text", "RefitClass.OMNI_RECONFIG.shortText"),
+    CLASS_A(2, "RefitClass.CLASS_A.text", "RefitClass.CLASS_A.shortText"),
+    CLASS_B(3, "RefitClass.CLASS_B.text", "RefitClass.CLASS_B.shortText"),
+    CLASS_C(4, "RefitClass.CLASS_C.text", "RefitClass.CLASS_C.shortText"),
+    CLASS_D(5, "RefitClass.CLASS_D.text", "RefitClass.CLASS_D.shortText"),
+    CLASS_E(6, "RefitClass.CLASS_E.text", "RefitClass.CLASS_E.shortText"),
+    CLASS_F(7, "RefitClass.CLASS_F.text", "RefitClass.CLASS_F.shortText"),
+    PLEASE_REPAIR(8, "RefitClass.PLEASE_REPAIR.text", "RefitClass.PLEASE_REPAIR.shortText");
 
     private final int severity;
     private final String name;
+    private final String shortName;
 
-    RefitClass(final int severity, final String name) {
+    RefitClass(final int severity, final String name, final String shortName) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
                 MekHQ.getMHQOptions().getLocale());
         this.severity = severity;
         this.name = resources.getString(name);
+        this.shortName = resources.getString(shortName);
     }
 
     /**
@@ -52,6 +55,10 @@ public enum RefitClass {
      */
     public String toName() {
         return name;
+    }
+
+    public String toShortName() {
+        return shortName;
     }
 
     /**
@@ -81,6 +88,7 @@ public enum RefitClass {
             case CLASS_D -> 8;
             case CLASS_E -> 9;
             case CLASS_F -> 10;
+            case PLEASE_REPAIR -> 0;
         };
         if (usingRefitKit) {
             mult *= 0.5;
@@ -95,7 +103,7 @@ public enum RefitClass {
      */
     public int getDifficultyModifier() {
         return switch (this) {
-            case NO_CHANGE -> 0;
+            case NO_CHANGE, PLEASE_REPAIR -> 0;
             case OMNI_RECONFIG -> -2; // Omni reconfiguartion has a skill of -2 per CamOps 205.
             case CLASS_A -> 2;
             case CLASS_B, CLASS_C -> 3;

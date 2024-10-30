@@ -29,6 +29,7 @@ import mekhq.campaign.unit.Unit;
  * Campaign Operations.
  */
 public class RefitStep {
+    // region Instance Variables
     private Part neededPart;
     private Part returnsPart;
     private int oldLoc;
@@ -43,7 +44,8 @@ public class RefitStep {
     private int baseTime;
     private boolean isFixedEquipmentChange;
 
-    public RefitStep() {
+    // region Initialization
+    private RefitStep() {
         baseTime = 0;
         refitClass = RefitClass.NO_CHANGE;
         neededPart = null;
@@ -67,12 +69,15 @@ public class RefitStep {
         newLocName = null == newPart ? "" : newPart.getLocationName();
         newPartName = null == newPart ? "" : newPart.getName();
 
-        if (oldPart instanceof Armor) {
+        // region Armor
+
+        if ((oldPart instanceof Armor && newPart instanceof Armor)) {
             // Refit code should have found us armors from the same location
             Armor oldArmor = (Armor) oldPart;
             Armor newArmor = (Armor) newPart;
             if ((oldLoc != newLoc) || (oldArmor.isRearMounted() != newArmor.isRearMounted())) {
-                throw new IllegalArgumentException("Moving armor between locations directly is not supported.");
+                throw new IllegalArgumentException(
+                        "Moving armor between locations directly is not supported. " + oldUnit);
             }
             
             // This covers every armor change except no change
@@ -102,6 +107,7 @@ public class RefitStep {
                         neededPart = deltaArmor;
                     }
                     baseTime = deltaArmor.getBaseTimeFor(oldUnit.getEntity()) * delta;
+                    return;
                 }
             } else {
                 // Armor types differ, remove old and add new
@@ -111,16 +117,99 @@ public class RefitStep {
 
                 baseTime = oldArmor.getBaseTimeFor(oldUnit.getEntity()) * oldArmor.getAmount();
                 baseTime += newArmor.getBaseTimeFor(oldUnit.getEntity()) * newArmor.getAmount();
+                return;
             }
-            
+        
+        } else if (oldPart instanceof Armor) {
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE_ARMOR;
+            isFixedEquipmentChange = true;
+            returnsPart = oldPart.clone();
+            return;
+        } else if (newPart instanceof Armor) {
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.ADD_ARMOR;
+            isFixedEquipmentChange = true;
+            neededPart = newPart.clone();
+            return;
+        
+        // region Locations
 
-        } else if (newLoc == oldLoc) {
+        } else if ((oldPart instanceof MekLocation) || (oldPart instanceof MissingMekLocation)) {
+            boolean oldTsm;
+            int oldStructure;
+            if (oldPart instanceof MekLocation) {
+                oldTsm = ((MekLocation) oldPart).isTsm();
+                oldStructure = ((MekLocation) oldPart).getStructureType();
+            } else {
+                oldTsm = ((MissingMekLocation) oldPart).isTsm();
+                oldStructure = ((MissingMekLocation) oldPart).getStructureType();
+            }
+
+            MekLocation newMekLocation = (MekLocation) newPart;
+
+            if (oldTsm == newMekLocation.isTsm() && oldStructure == newMekLocation.getStructureType()) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                return;
+            } else {
+                refitClass = RefitClass.CLASS_F;
+                type = RefitStepType.CHANGE_STRUCTURE_TYPE;
+                baseTime = 0;
+                if (oldTsm != newMekLocation.isTsm()) {
+                    baseTime += 360;
+                }
+                if (oldStructure != newMekLocation.getStructureType()) {
+                    baseTime += 360;
+                }
+                neededPart = newPart.clone();
+                returnsPart = oldPart instanceof MekLocation ? oldPart.clone() : null; // No returning Missing Parts
+                return;
+            }
+        
+
+        } else if (((oldPart instanceof MissingRotor) || (oldPart instanceof MissingTurret))
+                    && null != newPart) {
+            // We'll just leave the broken parts on
+            refitClass = RefitClass.NO_CHANGE;
             type = RefitStepType.LEAVE;
-            isFixedEquipmentChange = false;
+            baseTime = 0;
+            return;
+
+        } else if (((oldPart instanceof Turret) || (oldPart instanceof MissingTurret)) && null == newPart) {
+            // FIXME: WeaverThree - Adding a turret is F, should removing it be? Unclear.
+            refitClass = RefitClass.CLASS_F;
+            type = RefitStepType.REMOVE_TURRET;
+            isFixedEquipmentChange = true;
+            returnsPart = oldPart.clone();
+            baseTime = 160;
+            return;
+        } else if ((null == oldPart) && (newPart instanceof Turret)) {
+            refitClass = RefitClass.CLASS_F;
+            type = RefitStepType.ADD_TURRET;
+            isFixedEquipmentChange = true;
+            neededPart = newPart.clone();
+            baseTime = 160;
+            return;
+
+        } else if ((oldPart instanceof TankLocation) && (newPart instanceof TankLocation)) {
+            // There's nothing else you can change about a tank location
+            refitClass = RefitClass.NO_CHANGE;
+            type = RefitStepType.LEAVE;
+            baseTime = 0;
             return;
         }
+
+        // If we reach this point, something has gone wrong
+
+        type = RefitStepType.ERROR;
+        refitClass = RefitClass.PLEASE_REPAIR;
+        baseTime = 0;
+        
     }
 
+
+    // region Getter/Setters
 
     public Part getNeededPart() {
         return neededPart;
@@ -180,6 +269,10 @@ public class RefitStep {
 
     public int getBaseTime() {
         return baseTime;
+    }
+
+    public boolean isFixedEquipmentChange() {
+        return isFixedEquipmentChange;
     }
 
 
