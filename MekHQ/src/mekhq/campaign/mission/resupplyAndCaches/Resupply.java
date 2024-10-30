@@ -58,6 +58,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
@@ -306,15 +307,7 @@ public class Resupply {
 
         AtBMoraleLevel morale = contract.getMoraleLevel();
 
-        int interceptionChance = switch (morale) {
-            case ROUTED -> 0;
-            case CRITICAL -> 1;
-            case WEAKENED -> 2;
-            case STALEMATE -> 3;
-            case ADVANCING -> 4;
-            case DOMINATING -> 5;
-            case OVERWHELMING -> 6;
-        };
+        int interceptionChance = morale.ordinal();
 
         boolean isIntercepted = false;
         String message = "";
@@ -343,14 +336,12 @@ public class Resupply {
         if (contract.getCommandRights().isIndependent()) {
             targetConvoy = getRandomConvoy();
 
-            int fatigueGain = morale.ordinal();
-
-            if (!message.isEmpty()) {
-                fatigueGain++;
+            if (message.isEmpty()) {
+                interceptionChance = (int) round((double) interceptionChance / 2);
             }
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
-                increaseFatigue(fatigueGain);
+                increaseFatigue(interceptionChance);
             }
         }
 
