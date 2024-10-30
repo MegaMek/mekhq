@@ -3674,14 +3674,14 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
+                            scenario.convertToStub(this, ScenarioStatus.DEFEAT);
+                            addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
+
                             // I really don't like checking against a String here, but I couldn't find a way to
                             // fetch the scenario's original template
                             if (Objects.equals(scenario.getName(), "Emergency Convoy Defense")) {
                                 processAbandonedConvoy(contract, (AtBDynamicScenario) scenario);
                             }
-
-                            scenario.convertToStub(this, ScenarioStatus.DEFEAT);
-                            addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
