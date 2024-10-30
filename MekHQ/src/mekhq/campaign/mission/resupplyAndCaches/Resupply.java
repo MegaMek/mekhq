@@ -339,8 +339,18 @@ public class Resupply {
             }
         }
 
+        Integer targetConvoy = null;
+        if (contract.getCommandRights().isIndependent()) {
+            targetConvoy = getRandomConvoy();
+
+            if (campaign.getCampaignOptions().isUseFatigue()) {
+                increaseFatigue(message.isEmpty() ? 1 : 2);
+            }
+        }
+
         if (!message.isEmpty()) {
-            createConvoyMessage(droppedItems, droppedUnits, cashReward, message, isIntercepted);
+            createConvoyMessage(targetConvoy, droppedItems, droppedUnits, cashReward, message,
+                isIntercepted);
         } else {
             campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -358,10 +368,11 @@ public class Resupply {
      * @param convoyStatusMessage  The status message to be displayed for the convoy.
      * @param isIntercepted        {@link Boolean} indicating if the convoy has been intercepted.
      */
-    public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                                    Money cashReward, String convoyStatusMessage, boolean isIntercepted) {
-        createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage, isIntercepted,
-            true);
+    public void createConvoyMessage(@Nullable Integer targetConvoy, @Nullable List<Part> droppedItems,
+                                    @Nullable List<Unit> droppedUnits, Money cashReward,
+                                    String convoyStatusMessage, boolean isIntercepted) {
+        createConvoyMessage(targetConvoy, droppedItems, droppedUnits, cashReward, convoyStatusMessage,
+            isIntercepted, true);
     }
 
     /**
@@ -376,11 +387,10 @@ public class Resupply {
      *                             being informed that they have a message), or whether it's the
      *                             message that follows - informing the player of the message's nature.
      */
-    public void createConvoyMessage(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
+    public void createConvoyMessage(@Nullable Integer targetConvoy, @Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
                                        Money cashReward, String convoyStatusMessage, boolean isIntercepted,
                                     boolean isIntroduction) {
         boolean isIndependent = contract.getCommandRights().isIndependent();
-        Integer targetConvoy;
         StratconTrackState track = getRandomTrack(contract);
 
         StratconCoords convoyGridReference;
@@ -388,13 +398,6 @@ public class Resupply {
             convoyGridReference = getUnoccupiedCoords(track);
         } else {
             convoyGridReference = null;
-        }
-
-
-        if (isIndependent) {
-            targetConvoy = getRandomConvoy();
-        } else {
-            targetConvoy = null;
         }
 
         // Dialog dimensions and representative
@@ -412,8 +415,8 @@ public class Resupply {
         ActionListener dialogDismissActionListener = e -> {
             dialog.dispose();
             if (isIntroduction) {
-                createConvoyMessage(droppedItems, droppedUnits, cashReward, convoyStatusMessage,
-                    isIntercepted, false);
+                createConvoyMessage(targetConvoy, droppedItems, droppedUnits, cashReward,
+                    convoyStatusMessage, isIntercepted, false);
             } else {
                 if (isIntercepted) {
                     if (campaign.getCampaignOptions().isUseStratCon()) {
@@ -548,6 +551,29 @@ public class Resupply {
         dialog.setModal(true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    /**
+     * Increases the fatigue convoy crews.
+     *
+     * @param targetConvoy The id of the convoy whose crew's fatigue should be increased.
+     */
+    private void increaseFatigue(Integer targetConvoy) {
+        if (targetConvoy != null) {
+            Force convoy = campaign.getForce(targetConvoy);
+
+            if (convoy != null) {
+                for (UUID unitId : convoy.getUnits()) {
+                    Unit unit = campaign.getUnit(unitId);
+
+                    if (unit != null) {
+                        for (Person crewMember : unit.getCrew()) {
+                            crewMember.increaseFatigue(1);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
