@@ -19,6 +19,7 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.Engine;
 import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.parts.enums.RefitStepType;
 import mekhq.campaign.unit.Unit;
@@ -164,7 +165,7 @@ public class RefitStep {
                     baseTime += 360;
                 }
                 neededPart = newPart.clone();
-                returnsPart = oldPart instanceof MekLocation ? oldPart.clone() : null; // No returning Missing Parts
+                returnsPart = (oldPart instanceof MekLocation) ? oldPart.clone() : null; // No returning Missing Parts
                 return;
             }
         
@@ -182,7 +183,7 @@ public class RefitStep {
             refitClass = RefitClass.CLASS_F;
             type = RefitStepType.REMOVE_TURRET;
             isFixedEquipmentChange = true;
-            returnsPart = oldPart.clone();
+            returnsPart = oldPart instanceof Turret ? oldPart.clone() : null;
             baseTime = 160;
             return;
         } else if ((null == oldPart) && (newPart instanceof Turret)) {
@@ -199,7 +200,33 @@ public class RefitStep {
             type = RefitStepType.LEAVE;
             baseTime = 0;
             return;
+        
+        // region Core Equipment
+        } else if (((oldPart instanceof EnginePart) || (oldPart instanceof MissingEnginePart))
+                && (newPart instanceof EnginePart)) {
+            
+            boolean equal;
+
+            if (oldPart instanceof EnginePart) {
+                equal = oldPart.isSamePartType(newPart);
+            } else {
+                equal = ((MissingEnginePart) oldPart).isAcceptableReplacement(newPart, true);
+            }
+
+            if (equal) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                baseTime = 0;
+                return;
+            } else {
+                refitClass = RefitClass.CLASS_E; // Refit code responsible for downgrading for kit
+                type = RefitStepType.CHANGE;
+                baseTime = 360;
+                returnsPart = (oldPart instanceof EnginePart) ? oldPart.clone() : null;
+                neededPart = newPart.clone();
+            }
         }
+
 
         // If we reach this point, something has gone wrong
 

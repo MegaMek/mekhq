@@ -35,6 +35,7 @@ public enum RefitStepType {
     ADD_ENGINE_SINKS("RefitStepType.ADD_ENGINE_SINKS.text", "ADD_ENGINE_SINKS"),
     ADD("RefitStepType.ADD.text", "ADD"),
     MOVE("RefitStepType.MOVE.text", "MOVE"),
+    CHANGE("RefitSTepType.CHANGE.text", "CHANGE"),
     UNLOAD("RefitStepType.UNLOAD.text", "UNLOAD"),
     LOAD("RefitStepType.LOAD.text", "LOAD"),
     MOVE_AMMO("RefitStepType.MOVE_AMMO", "MOVE_AMMO"),
@@ -91,6 +92,7 @@ public enum RefitStepType {
             case "ADD_ENGINE_SINKS" -> ADD_ENGINE_SINKS;
             case "ADD" -> ADD;
             case "MOVE" -> MOVE;
+            case "CHANGE" -> CHANGE;
             case "UNLOAD" -> UNLOAD;
             case "LOAD" -> LOAD;
             case "MOVE_AMMO" -> MOVE_AMMO;

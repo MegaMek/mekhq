@@ -463,6 +463,32 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
+        
+        // region Core Equipment
+
+        // Engine
+
+        Part oldEngine = findOnly(EnginePart.class, MissingEnginePart.class, oldParts, oldUnit);
+        Part newEngine = findOnly(EnginePart.class, null, newParts, newUnit);
+        
+        logger.info(oldEngine + " --- " + newEngine);
+
+
+        RefitStep engineStep = new RefitStep(oldUnit, oldEngine, newEngine);
+        if ((engineStep.getRefitClass() == RefitClass.CLASS_E) && (!customJob)) {
+            engineStep.setRefitClass(RefitClass.CLASS_D);
+        }
+        stepsList.add(engineStep);
+
+        
+
+
+
+
+
+
+
+
     }
 
     /**
