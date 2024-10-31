@@ -95,6 +95,8 @@ public class StarLeagueCache {
             intactUnitCount += Compute.randomInt(3) + Compute.randomInt(3);
         }
 
+        intactUnitCount = Math.min(intactUnitCount, intactUnits.size());
+
         int ruinedChance = campaign.getGameYear() - FALL_OF_STAR_LEAGUE.getYear();
 
         for (int individualUnit = 0; individualUnit < ruinedChance; individualUnit++) {
@@ -167,8 +169,7 @@ public class StarLeagueCache {
     }
 
     private List<Unit> getCacheContents() {
-        final int COMPANY_COUNT = 3;
-        Map<Integer, List<Integer>> unitsPresent = buildUnitWeightMap(COMPANY_COUNT);
+        Map<Integer, List<Integer>> unitsPresent = buildUnitWeightMap();
         List<MekSummary> unitSummaries = getUnitSummaries(unitsPresent);
 
         List<Unit> units = new ArrayList<>();
@@ -224,7 +225,8 @@ public class StarLeagueCache {
         return unitSummaries;
     }
 
-    private Map<Integer, List<Integer>> buildUnitWeightMap(int COMPANY_COUNT) {
+    private Map<Integer, List<Integer>> buildUnitWeightMap() {
+        final int COMPANY_COUNT = 3;
         Map<Integer, List<Integer>> unitsPresent = new HashMap<>();
 
         for (int company = 0; company < COMPANY_COUNT; company++) {
