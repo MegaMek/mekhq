@@ -421,9 +421,7 @@ public class Resupply {
         int swindleChance = morale.ordinal();
 
         if (Compute.randomInt(10) < swindleChance) {
-            String message = resources.getString("guerrillaSwindled" +
-                Compute.randomInt(25) + ".text");
-
+            String message = getSmugglerDescription(null, true);
             createSwindledMessage(message);
         } else {
             campaign.addReport(String.format(resources.getString("convoySuccessfulSmuggler.text"),
