@@ -3745,7 +3745,7 @@ public class Campaign implements ITechManager {
     /**
      * Processes an abandoned convoy. The player is presented with a defeat dialog,
      * and if they have independent command rights, it checks each player template force in the scenario
-     * for being a convoy force. If it is a convoy force, the fence units are treated as abandoned units.
+     * for being a convoy force. If it is a convoy force, its units are treated as abandoned units.
      * Each crew member of these units is set as either KIA or POW based on a die roll.
      * It finally removes each unit from the campaign.
      *
@@ -3766,7 +3766,9 @@ public class Campaign implements ITechManager {
                             List<Person> crew = new ArrayList<>(unit.getCrew());
                             for (Person crewMember : crew) {
                                 PersonnelStatus status = KIA;
-                                if (Compute.d6(2) < 5) {
+                                // We're using the CamOps rules for infantry survival here and
+                                // assuming anyone who isn't dead has been captured.
+                                if (Compute.d6(2) > 7) {
                                     status = PersonnelStatus.POW;
                                 }
                                 crewMember.changeStatus(this, currentDay, status);
