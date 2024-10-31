@@ -1467,7 +1467,8 @@ public class Resupply {
             UIUtil.scaleForGUI(500),
             String.format(resources.getString("convoyMessage.text"),
                 getCommanderTitle(campaign, false),
-                maximumResupplySize * RESUPPLY_LOAD_SIZE, maximumResupplySize));
+                maximumResupplySize * RESUPPLY_LOAD_SIZE, maximumResupplySize,
+                maximumResupplySize > 1 ? "s" : ""));
 
         // Create a text pane to display the message
         JTextPane textPane = new JTextPane();
