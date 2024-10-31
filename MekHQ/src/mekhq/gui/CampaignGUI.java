@@ -1019,7 +1019,6 @@ public class CampaignGUI extends JPanel {
             .addActionListener(evt -> {
                 var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
                 autoResolveBehaviorSettingsDialog.setVisible(true);
-                autoResolveBehaviorSettingsDialog.setModal(true);
                 autoResolveBehaviorSettingsDialog.pack();
             });
 

@@ -2,19 +2,30 @@ package mekhq.gui.dialog;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
+import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.gui.dialog.helpDialogs.AutoResolveBehaviorSettingsHelpDialog;
+
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
 public class AutoResolveBehaviorSettingsDialog
     extends BotConfigDialog
 {
     private final static MMLogger logger = MMLogger.create(AutoResolveBehaviorSettingsDialog.class);
 
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AutoResolveBehaviorSettingsDialog",
+        MekHQ.getMHQOptions().getLocale());
+
     private Campaign campaign;
     private final BehaviorSettingsFactory behaviorSettingsFactory = BehaviorSettingsFactory.getInstance();
+    private JButton autoResolveHelpButton;
 
     /**
      * Creates a new instance of AutoResolveBehaviorSettingsDialog.
@@ -32,7 +43,38 @@ public class AutoResolveBehaviorSettingsDialog
         setCampaign(campaign);
     }
 
-    public void setCampaign(final Campaign campaign) {
+    private JButton getAutoResolveHelpButton() {
+        return autoResolveHelpButton;
+    }
+
+    private void setAutoResolveHelpButton(JButton autoResolveHelpButton) {
+        this.autoResolveHelpButton = autoResolveHelpButton;
+    }
+
+    @Override
+    protected Container createCenterPane() {
+        var result = super.createCenterPane();
+        // get last item in the result
+
+        result.add(createAutoResolveHelpButton());
+        return result;
+    }
+
+    protected JPanel createAutoResolveHelpButton() {
+//        var result = new JPanel(new BorderLayout(5, 0));
+        JPanel result = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        result.setAlignmentX(LEFT_ALIGNMENT);
+
+        setAutoResolveHelpButton(new MMButton("btnNewYear",
+            resourceMap.getString("AutoResolveBehaviorSettingsDialog.help"),
+            resourceMap.getString("AutoResolveBehaviorSettingsDialog.helpTooltip"),
+            this::autoResolveHelpActionPerformed));
+
+        result.add(getAutoResolveHelpButton());
+        return result;
+    }
+
+    private void setCampaign(final Campaign campaign) {
         this.campaign = campaign;
     }
 
@@ -53,6 +95,16 @@ public class AutoResolveBehaviorSettingsDialog
         behaviorSettingsFactory.saveBehaviorSettings(false);
 
         campaign.setAutoResolveBehaviorSettings(autoResolveBehaviorSettings);
+    }
+
+    protected void autoResolveHelpActionPerformed(ActionEvent evt) {
+        showAutoResolveHelp();
+    }
+
+    private void showAutoResolveHelp() {
+        var autoResolveHelp = new AutoResolveBehaviorSettingsHelpDialog(getFrame());
+        autoResolveHelp.setVisible(true);
+        autoResolveHelp.setAlwaysOnTop(true);
     }
 
     @Override
