@@ -18,7 +18,10 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -40,12 +43,12 @@ import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
 import static megamek.common.EntityWeightClass.WEIGHT_HEAVY;
 import static megamek.common.EntityWeightClass.WEIGHT_LIGHT;
 import static megamek.common.EntityWeightClass.WEIGHT_MEDIUM;
+import static megamek.common.Mek.LOC_CT;
 import static megamek.common.UnitType.AEROSPACEFIGHTER;
 import static megamek.common.UnitType.INFANTRY;
 import static megamek.common.UnitType.MEK;
 import static megamek.common.UnitType.TANK;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.buildPool;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getDropWeight;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 
@@ -55,31 +58,46 @@ public class StarLeagueCache {
     private final Random random = new Random();
     private Faction originFaction;
     private boolean didGenerationFail = false;
-    private Map<Part, Integer> potentialParts;
-    private List<Part> partsPool;
+    private final int ruinedChance;
+    private Map<Part, Integer> partsPool;
     private List<Unit> intactUnits;
 
     // We use year -1 as otherwise MHQ considers the SL to no longer exist.
     private final LocalDate FALL_OF_STAR_LEAGUE = LocalDate.of(
         Factions.getInstance().getFaction("SL").getEndYear() - 1, 1, 1);
+
+    public enum CacheType {
+        TRASH_CACHE, // The cache contains only trash or roleplay items.
+        CLUE_CACHE, // The cache contains a clue that will lead the player to another cache.
+        DATA_CACHE, // The cache contains a memory core
+        LEGACY_CACHE, // The cache contains a message from the past, improving Loyalty across the campaign
+        TRAP_CACHE, // The cache is a trap
+        COMBAT_CACHE // The cache contains units and parts
+    }
+
     private final static MMLogger logger = MMLogger.create(StarLeagueCache.class);
 
-    public StarLeagueCache(Campaign campaign, AtBContract contract) {
+    public static int getCacheType() {
+        return Compute.randomInt(CacheType.values().length);
+    }
+
+    public StarLeagueCache(Campaign campaign, AtBContract contract, int cacheType) {
         this.campaign = campaign;
         this.contract = contract;
 
+        ruinedChance = campaign.getGameYear() - FALL_OF_STAR_LEAGUE.getYear();
+
         getOriginFaction();
 
-        if (!didGenerationFail) {
-            intactUnits = getCacheContents();
+        if (cacheType == CacheType.COMBAT_CACHE.ordinal()) {
+            if (!didGenerationFail) {
+                intactUnits = getCacheContents();
+                processUnits();
+            }
 
-            potentialParts = new HashMap<>();
-            processUnits();
-            partsPool = buildPool(potentialParts);
-        }
-
-        if (potentialParts.isEmpty() && intactUnits.isEmpty()) {
-            didGenerationFail = true;
+            if (partsPool.isEmpty() && intactUnits.isEmpty()) {
+                didGenerationFail = true;
+            }
         }
     }
 
@@ -96,8 +114,6 @@ public class StarLeagueCache {
         }
 
         intactUnitCount = Math.min(intactUnitCount, intactUnits.size());
-
-        int ruinedChance = campaign.getGameYear() - FALL_OF_STAR_LEAGUE.getYear();
 
         for (int individualUnit = 0; individualUnit < ruinedChance; individualUnit++) {
             if (Compute.randomInt(500) < ruinedChance) {
@@ -120,16 +136,15 @@ public class StarLeagueCache {
     }
 
     private void collectParts() {
-        potentialParts = new HashMap<>();
+        partsPool = new HashMap<>();
 
         try {
             for (Unit unit : intactUnits) {
                 List<Part> parts = unit.getParts();
                 for (Part part : parts) {
                     if (part instanceof MekLocation) {
-                        if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
+                        if (((MekLocation) part).getLoc() == LOC_CT) {
                             continue;
-                            // If the unit itself is extinct, it's impossible to find replacement locations
                         }
                     }
 
@@ -137,9 +152,14 @@ public class StarLeagueCache {
                         continue;
                     }
 
+                    // Is the part too damaged to be salvaged?
+                    if (Compute.randomInt(500) < ruinedChance) {
+                        continue;
+                    }
+
                     Pair<Unit, Part> pair = new Pair<>(unit, part);
                     int weight = getDropWeight(pair.getValue());
-                    potentialParts.merge(part, weight, Integer::sum);
+                    partsPool.merge(part, weight, Integer::sum);
                 }
             }
         } catch (Exception exception) {
