@@ -34,6 +34,10 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestAero;
+import megamek.common.verifier.TestEntity;
+import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -69,6 +73,7 @@ import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.List;
@@ -1249,6 +1254,54 @@ public class Unit implements ITechnology {
     
 
         return toReturn;
+    }
+
+    /**
+     * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and
+     * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For
+     * vehicles and conventional fighters this would be heat sinks required by energy weapons.
+     *
+     * @param entity Either the starting or the ending unit of the refit.
+     * @return The number of heat sinks the unit mounts that are not tracked as parts.
+     */
+    public Part getUntrackedHeatSinks () {
+        Part toReturn = getHeatSinkExample();
+
+        if (getEntity() instanceof Mek) {
+            int count = getEntity().getEngine().integralHeatSinkCapacity(((Mek) getEntity()).hasCompactHeatSinks());
+            if (((EquipmentPart) toReturn).getType().hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
+                // This unit will have SHS as its untracked HS
+                toReturn = new HeatSink(0, MiscType.createHeatSink(), -1, false, campaign);
+            }
+            toReturn.setQuantity(count);
+            return toReturn;
+
+        } else if (getEntity().getClass() == AeroSpaceFighter.class) { 
+            int count = getEntity().getEngine().getWeightFreeEngineHeatSinks();
+            toReturn.setQuantity(count);
+            return toReturn;
+
+
+        } else {
+            EntityVerifier verifier = EntityVerifier.getInstance(new File("data/mekfiles/UnitVerifierOptions.xml"));
+            TestEntity testEntity;
+            
+            if (getEntity() instanceof Tank) {
+                testEntity = new TestTank((Tank) getEntity(), verifier.tankOption, null);
+                int count = testEntity.getCountHeatSinks();
+                toReturn.setQuantity(count);
+                return toReturn;
+            
+            } else if (getEntity() instanceof ConvFighter) {
+                testEntity = new TestAero((Aero) getEntity(), verifier.aeroOption, null);
+                int count = testEntity.getCountHeatSinks();
+                toReturn.setQuantity(count);
+                return toReturn;
+            
+            } else {
+            }
+        }
+        return null;
     }
 
     public Money getSellValue() {
