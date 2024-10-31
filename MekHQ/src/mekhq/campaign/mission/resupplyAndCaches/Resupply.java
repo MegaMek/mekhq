@@ -316,7 +316,13 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
-    private void smugglerOfferDialog(@Nullable List<Part> droppedItems) {
+    /**
+     * Generates and displays a dialog detailing the smuggler's offer.
+     * The dialog features a formatted description of the offer, along with a parts report.
+     *
+     * @param droppedItems The list of items offered by the smuggler.
+     */
+    private void smugglerOfferDialog(List<Part> droppedItems) {
         ImageIcon icon = Factions.getFactionLogo(campaign, "PIR", true);
         icon = scaleImageIconToWidth(icon, 100);
 
@@ -403,6 +409,13 @@ public class Resupply {
         }
     }
 
+    /**
+     * Processes a smuggler's offer, including whether the player has been swindled.
+     * Swindle chance is based on contract morale.
+     * If the player is swindled a follow-up dialog is triggered.
+     *
+     * @param droppedItems The list of items dropped by smuggler.
+     */
     private void processSmuggler(List<Part> droppedItems) {
         AtBMoraleLevel morale = contract.getMoraleLevel();
         int swindleChance = morale.ordinal();
@@ -615,6 +628,11 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
+    /**
+     * Generates and displays the 'swindled' follow-up dialog.
+     *
+     * @param message The text message to be displayed in the dialog detailing the swindle event.
+     */
     public void createSwindledMessage(String message) {
         // Dialog dimensions and representative
         final int DIALOG_WIDTH = 400;
@@ -1397,13 +1415,20 @@ public class Resupply {
         }
     }
 
+    /**
+     * Calculates the smuggler's fee for a list of dropped items.
+     * The fee is 2 times the total actual value of all items.
+     *
+     * @param droppedItems The list of items dropped by smuggler.
+     * @return The calculated smuggler's fee as a {@link Money} object.
+     */
     private static Money getSmugglerFee(List<Part> droppedItems) {
         Money value = Money.zero();
         for (Part part : droppedItems) {
             value = value.plus(part.getActualValue());
         }
 
-        value = value.multipliedBy(1.5);
+        value = value.multipliedBy(2);
         return value;
     }
 
