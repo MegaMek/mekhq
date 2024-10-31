@@ -108,24 +108,23 @@ public class Resupply {
     public Resupply(Campaign campaign, AtBContract contract, boolean skipParts, boolean skipUnits) {
         this.campaign = campaign;
         this.contract = contract;
-        this.employerFaction = contract.getEmployerFaction();
-        this.enemyFaction = contract.getEnemy();
+        employerFaction = contract.getEmployerFaction();
+        enemyFaction = contract.getEnemy();
 
         YEAR = campaign.getGameYear();
         EMPLOYER_IS_CLAN = enemyFaction.isClan();
         EMPLOYER_TECH_CODE = getTechFaction(employerFaction);
 
         if (!skipParts) {
-            this.potentialParts = new HashMap<>();
-            collectParts(campaign.getUnits());
-            buildPool();
+            collectParts();
+            partsPool = buildPool(potentialParts);
         }
 
         if (!skipUnits) {
-            this.potentialUnits = new ArrayList<>();
+            potentialUnits = new ArrayList<>();
         }
 
-        this.random = new Random();
+        random = new Random();
     }
 
     /**
@@ -1060,7 +1059,7 @@ public class Resupply {
      * @param part Part object whose weight is to be determined.
      * @return int representing the weight of the part.
      */
-    private int getDropWeight(Part part) {
+    static int getDropWeight(Part part) {
         int weight = 1;
 
         if (part instanceof MissingPart) {
@@ -1075,10 +1074,9 @@ public class Resupply {
      * parts are filtered based on their salvage status, year of availability, unit type, whether the
      * unit is extinct, and before the battle of Tukayyid Inner Sphere factions are unwilling to share
      * Clan Tech.
-     *
-     * @param  units A collection of {@code Unit} objects from which parts will be extracted.
      */
-    private void collectParts(Collection<Unit> units) {
+    private void collectParts() {
+        final Collection<Unit> units = campaign.getUnits();
         potentialParts = new HashMap<>();
 
         try {
@@ -1136,12 +1134,14 @@ public class Resupply {
      * {@code HashMap}, thus ensuring that the pool remains independent of future changes to the
      * potential parts {@code HashMap}.
      */
-    private void buildPool() {
-        partsPool = new ArrayList<>(potentialParts.keySet());
+    static List<Part> buildPool(Map<Part, Integer> potentialParts) {
+        List<Part> partsPool = new ArrayList<>(potentialParts.keySet());
 
         if (!partsPool.isEmpty()) {
             Collections.shuffle(partsPool);
         }
+
+        return partsPool;
     }
 
     /**
@@ -1440,7 +1440,7 @@ public class Resupply {
      *                 part quality that's returned.
      * @return          A {@link PartQuality} object representing the quality of a part.
      */
-    private static PartQuality getRandomPartQuality(int modifier) {
+    static PartQuality getRandomPartQuality(int modifier) {
         return getRandomUnitQuality(modifier);
     }
 
