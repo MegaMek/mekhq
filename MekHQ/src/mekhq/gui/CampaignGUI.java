@@ -1012,6 +1012,19 @@ public class CampaignGUI extends JPanel {
                 .addActionListener(evt -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         menuManage.add(miCompanyGenerator);
 
+        JMenuItem miAutoResolveBehaviorEditor = new JMenuItem(resourceMap.getString("miAutoResolveBehaviorSettings.text"));
+        miAutoResolveBehaviorEditor.setMnemonic(KeyEvent.VK_T);
+        miAutoResolveBehaviorEditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.ALT_DOWN_MASK));
+        miAutoResolveBehaviorEditor
+            .addActionListener(evt -> {
+                var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
+                autoResolveBehaviorSettingsDialog.setVisible(true);
+                autoResolveBehaviorSettingsDialog.setModal(true);
+                autoResolveBehaviorSettingsDialog.pack();
+            });
+
+        menuManage.add(miAutoResolveBehaviorEditor);
+
         menuBar.add(menuManage);
         // endregion Manage Campaign Menu
 
@@ -1614,7 +1627,7 @@ public class CampaignGUI extends JPanel {
                 StringBuilder nameBuilder = new StringBuilder(128);
                 nameBuilder.append("<html>")
                     .append(tech.getFullName())
-                    .append(", <b>") 
+                    .append(", <b>")
                     .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
                     .append("</b> ")
                     .append(tech.getPrimaryRoleDesc())

@@ -18,46 +18,31 @@
  */
 package mekhq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.swing.JOptionPane;
-
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.Princess;
+import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Infantry;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units
@@ -69,16 +54,23 @@ public class AtBGameThread extends GameThread {
     private static final MMLogger logger = MMLogger.create(AtBGameThread.class);
 
     private final AtBScenario scenario;
+    private final BehaviorSettings autoResolveBehaviorSettings;
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
             AtBScenario scenario) {
-        this(name, password, c, app, units, scenario, true);
+        this(name, password, c, app, units, scenario, null, true);
     }
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
-            AtBScenario scenario, boolean started) {
+                         AtBScenario scenario, BehaviorSettings autoResolveBehaviorSettings) {
+        this(name, password, c, app, units, scenario, autoResolveBehaviorSettings, true);
+    }
+
+    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
+            AtBScenario scenario, BehaviorSettings autoResolveBehaviorSettings, boolean started) {
         super(name, password, c, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
+        this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
     }
 
     // String tokens for dialog boxes used for transport loading
@@ -118,7 +110,7 @@ public class AtBGameThread extends GameThread {
             while (client.getLocalPlayer() == null) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
             }
-
+            var player = client.getLocalPlayer();
             // if game is running, shouldn't do the following, so detect the phase
             for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
                     && client.getGame().getPhase().isUnknown(); i++) {
@@ -185,23 +177,7 @@ public class AtBGameThread extends GameThread {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-                if (campaign.getCampaignOptions().isUseLightConditions()) {
-                    planetaryConditions.setLight(scenario.getLight());
-                }
-                if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-                    planetaryConditions.setWeather(scenario.getWeather());
-                    planetaryConditions.setWind(scenario.getWind());
-                    planetaryConditions.setFog(scenario.getFog());
-                    planetaryConditions.setEMI(scenario.getEMI());
-                    planetaryConditions.setBlowingSand(scenario.getBlowingSand());
-                    planetaryConditions.setTemperature(scenario.getModifiedTemperature());
-                }
-                if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
-                    planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                    planetaryConditions.setGravity(scenario.getGravity());
-                }
-                client.sendPlanetaryConditions(planetaryConditions);
+                client.sendPlanetaryConditions(getPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 // set player deployment
@@ -392,7 +368,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 // All player and bot units have been added to the lobby
-                // Prompt the player to auto load units into transports
+                // Prompt the player to autoload units into transports
                 if (!scenario.getPlayerTransportLinkages().isEmpty()) {
                     for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
                         boolean loadDropShips = false;
@@ -454,6 +430,14 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                 }
+
+
+                // if AtB was loaded with the auto resolve bot behavior settings then it loads a new bot,
+                // set to the players team
+                // and then moves all the player forces under this new bot
+                if (Objects.nonNull(autoResolveBehaviorSettings)) {
+                    setupPlayerBotForAutoResolve(player);
+                }
             }
 
             while (!stop) {
@@ -469,6 +453,77 @@ public class AtBGameThread extends GameThread {
             swingGui = null;
             controller = null;
         }
+    }
+
+    private void setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
+        var botName = player.getName() + ":AI";
+        var autoResolveBot = new BotForce();
+        autoResolveBot.setName(botName);
+
+        Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        var botClient = new Princess(botName, client.getHost(), client.getPort());
+        botClient.setBehaviorSettings(autoResolveBehaviorSettings.getCopy());
+        try {
+            botClient.connect();
+            Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        } catch (Exception e) {
+            Sentry.captureException(e);
+            logger.error(String.format("Could not connect with Bot name %s", botName),
+                e);
+        }
+        swingGui.getLocalBots().put(botName, botClient);
+
+        var retryCount = MekHQ.getMHQOptions().getStartGameBotClientRetryCount();
+        while (botClient.getLocalPlayer() == null) {
+            Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+            retryCount--;
+            if (retryCount <= 0) {
+                break;
+            }
+        }
+        if (retryCount <= 0) {
+            logger.error(String.format("Could not connect with Bot name %s", botName));
+        }
+        botClient.getLocalPlayer().setName(botName);
+        botClient.getLocalPlayer().setStartingPos(player.getStartingPos());
+        botClient.getLocalPlayer().setStartOffset(player.getStartOffset());
+        botClient.getLocalPlayer().setStartWidth(player.getStartWidth());
+        botClient.getLocalPlayer().setStartingAnyNWx(player.getStartingAnyNWx());
+        botClient.getLocalPlayer().setStartingAnyNWy(player.getStartingAnyNWy());
+        botClient.getLocalPlayer().setStartingAnySEx(player.getStartingAnySEx());
+        botClient.getLocalPlayer().setStartingAnySEy(player.getStartingAnySEy());
+        botClient.getLocalPlayer().setCamouflage(player.getCamouflage().clone());
+        botClient.getLocalPlayer().setColour(player.getColour());
+        botClient.getLocalPlayer().setTeam(player.getTeam());
+        botClient.sendPlayerInfo();
+        Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+
+        var ent = client.getEntitiesVector().stream()
+            .filter(entity -> entity.getOwnerId() == player.getId())
+            .collect(Collectors.toList());
+        botClient.sendChangeOwner(ent, botClient.getLocalPlayer().getId());
+        Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+
+    }
+
+    private PlanetaryConditions getPlanetaryConditions() {
+        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+        if (campaign.getCampaignOptions().isUseLightConditions()) {
+            planetaryConditions.setLight(scenario.getLight());
+        }
+        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
+            planetaryConditions.setWeather(scenario.getWeather());
+            planetaryConditions.setWind(scenario.getWind());
+            planetaryConditions.setFog(scenario.getFog());
+            planetaryConditions.setEMI(scenario.getEMI());
+            planetaryConditions.setBlowingSand(scenario.getBlowingSand());
+            planetaryConditions.setTemperature(scenario.getModifiedTemperature());
+        }
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
+            planetaryConditions.setAtmosphere(scenario.getAtmosphere());
+            planetaryConditions.setGravity(scenario.getGravity());
+        }
+        return planetaryConditions;
     }
 
     /**

@@ -26,6 +26,7 @@ import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -374,6 +375,11 @@ public class MekHQ implements GameListener {
     }
 
     public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
+        startHost(scenario, loadSavegame, meks, null);
+    }
+
+    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks, BehaviorSettings autoResolveBehaviorSettings)
+    {
         HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
         hostDialog.setVisible(true);
 
@@ -426,7 +432,7 @@ public class MekHQ implements GameListener {
 
         // Start the game thread
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
