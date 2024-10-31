@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.advancedsearch.MekSearchFilter;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
