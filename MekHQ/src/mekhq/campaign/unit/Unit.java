@@ -1169,6 +1169,88 @@ public class Unit implements ITechnology {
         return heatSinkTypeString;
     }
 
+    /**
+     * Generates a Part representing the type of heat sink used by the Unit. This can be a HeatSink,
+     * an AeroHeatSink, or, in the case of several of the less common heatsink types, an
+     * EquipmentPart. TODO: Investigate the EquipmentPart issue deeper - WeaverThree
+     * @return a HeatSink, AeroHeatSink, or EquipmentPart, typed as a Part. Note that AeroHeatSinks
+     * are not EquipmentParts...
+     */
+    public Part getHeatSinkExample() {
+         Part toReturn = null;
+
+        // Do we have a Part for the heatsink
+
+        // First, check for non-HeatSink HeatSinks
+        for (Part part : getParts()) { 
+            if ((part instanceof EquipmentPart)) {
+                if (((EquipmentPart) part).getType().hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Fake Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+                if (((EquipmentPart) part).getType().hasFlag(MiscType.F_COMPACT_HEAT_SINK)) {
+                    // Only single CHS are to be used in refits
+                    toReturn = new EquipmentPart(0, MiscType.createIS1CompactHeatSink(), -1, 1.0, false, campaign);
+                    // logger.info("Fake Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+                if (((EquipmentPart) part).getType().hasFlag(MiscType.F_LASER_HEAT_SINK)) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Fake Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+            }       
+        }
+
+        // Now check for actual HeatSinks
+        if (toReturn != null) {
+            for (Part part : getParts()) {
+                if (part instanceof HeatSink) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Easy Heatsink Found - " + toReturn); 
+                    return toReturn;
+                } else if (part instanceof AeroHeatSink) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Easy Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+            }
+        }
+
+        // If we get here the unit only has engine/untracked heatsinks.
+        if (getEntity() instanceof Mek) {
+            Mek mek = (Mek) getEntity();
+            if (mek.hasLaserHeatSinks()) {
+                toReturn = new EquipmentPart(0, MiscType.createCLLaserHeatSink(), -1, 1.0, false, campaign);
+            } else if (mek.hasCompactHeatSinks()) {
+                toReturn = new EquipmentPart(0, MiscType.createIS1CompactHeatSink(), -1, 1.0, false, campaign);
+            } else if (mek.hasDoubleHeatSinks()) {
+                if (mek.isClan()) { // Is this accurate?
+                    toReturn = new HeatSink(0, MiscType.createCLDoubleHeatSink(), -1, false, campaign);
+                } else {
+                    toReturn = new HeatSink(0, MiscType.createISDoubleHeatSink(), -1, false, campaign);
+                }
+            } else {
+                toReturn = new HeatSink(0, MiscType.createHeatSink(), -1, false, campaign);
+            }
+        } else if (getEntity().getClass() == AeroSpaceFighter.class) { 
+            Aero aero = (Aero) getEntity();
+            toReturn = new AeroHeatSink(0, aero.getHeatType(), false, campaign);
+        } else {
+            // All other units have SHS
+            toReturn = new HeatSink(0, MiscType.createHeatSink(), -1, false, campaign);
+        }
+        // logger.info("CONFUSED unit with heatsink " + toReturn);
+    
+
+        return toReturn;
+    }
+
     public Money getSellValue() {
         Money partsValue = Money.zero();
 
