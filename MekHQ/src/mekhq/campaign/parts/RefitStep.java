@@ -19,14 +19,18 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.Mek;
+import megamek.common.MiscType;
 import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.parts.enums.RefitStepType;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Holds data on one step of a refit process. It calculates as much as possible from the ingrediants
+ * Holds data on one step of a refit process. It calculates as much as possible from the ingredients
  * given to it, but other things will need to be calculated outside of here. All values are based on
- * Campaign Operations.
+ * Campaign Operations... where possible.
  */
 public class RefitStep {
     // region Instance Variables
@@ -38,26 +42,54 @@ public class RefitStep {
     private String newLocName;
     private String oldPartName;
     private String newPartName;
+    private int oldQuantity;
+    private int newQuantity;
     private RefitStepType type;
     private String notes;
     private RefitClass refitClass;
-    private int baseTime;
     private boolean isFixedEquipmentChange;
+    private int baseTime;
 
     // region Initialization
+    /**
+     * Creates a blank refit step. Might be useful for XML initialization.
+     */
     private RefitStep() {
         baseTime = 0;
         refitClass = RefitClass.NO_CHANGE;
+        type = RefitStepType.ERROR;
         neededPart = null;
         returnsPart = null;
+        notes = "";
     }
 
+    /**
+     * Creates a RefitStep for a Refit operation.
+     * @param oldUnit - the unit being refit FROM. Important to understand what kind of unit is involved.
+     * @param oldPart - the part on the old unit
+     * @param newPart - the part on the new unit
+     * @throws IllegalArgumentException
+     */
     RefitStep(Unit oldUnit, Part oldPart, Part newPart) throws IllegalArgumentException {
+        this(oldUnit, oldPart, newPart, false);
+    }
+
+    /**
+     * Creates a RefitStep for a Refit operation.
+     * @param oldUnit - the unit being refit FROM. Important to understand what kind of unit is involved.
+     * @param oldPart - the part on the old unit
+     * @param newPart - the part on the new unit
+     * @param untracked - is this an untracked part like engine heatsinks
+     * @throws IllegalArgumentException
+     */
+    RefitStep(Unit oldUnit, Part oldPart, Part newPart, boolean untracked) throws IllegalArgumentException {
         this();
 
         if (null == oldPart && null == newPart) {
             throw new IllegalArgumentException("oldPart and newPart must not both be null");
         }
+
+        // region Keeping Data
 
         // We don't actually keep the parts around or even any parts in some cases, so keep the
         // values required to report what's going on
@@ -68,6 +100,126 @@ public class RefitStep {
         newLoc = null == newPart ? -1 : newPart.getLocation();
         newLocName = null == newPart ? "" : newPart.getLocationName();
         newPartName = null == newPart ? "" : newPart.getName();
+
+        if (null != oldPart) {
+            if (oldPart instanceof Armor) {
+                oldQuantity = ((Armor) oldPart).getAmount();
+            } else {
+                oldQuantity = oldPart.getQuantity();
+            }
+        } else {
+            oldQuantity = 0;
+        }
+
+        if (null != newPart) {
+            if (newPart instanceof Armor) {
+                newQuantity = ((Armor) newPart).getAmount();
+            } else {
+                newQuantity = newPart.getQuantity();
+            }
+        } else {
+            newQuantity = 0;
+        }
+
+        // region Untracked Items
+
+        if (untracked) {
+            if ((oldPart instanceof AeroHeatSink) && (newPart instanceof AeroHeatSink)) {
+                AeroHeatSink oldAHS = (AeroHeatSink) oldPart;
+                AeroHeatSink newAHS = (AeroHeatSink) oldPart;
+                refitClass = RefitClass.CLASS_B; // Engine Heat Sinks - treating all untracked HS as this for now
+                isFixedEquipmentChange = true;
+
+                if (oldAHS.getType() == newAHS.getType()) {
+                    if (oldAHS.getQuantity() == newAHS.getQuantity()) {
+                        refitClass = RefitClass.NO_CHANGE;
+                        type = RefitStepType.LEAVE;
+                        isFixedEquipmentChange = false;
+                        return;
+                    } else {
+                        int oldQuantity = oldAHS.getQuantity();
+                        int newQuantity = newAHS.getQuantity();
+                        AeroHeatSink deltaAHS = oldAHS.clone();
+                        int delta = 0;
+                        if (oldQuantity > newQuantity) {
+                            delta = oldQuantity - newQuantity;
+                            deltaAHS.setQuantity(delta);
+                            type = RefitStepType.REMOVE_UNTRACKED_SINKS;
+                            returnsPart = deltaAHS;
+                        } else {
+                            delta = newQuantity - oldQuantity;
+                            deltaAHS.setQuantity(delta);
+                            type = RefitStepType.ADD_UNTRACKED_SINKS;
+                            neededPart = deltaAHS;
+                        }
+                        baseTime = delta * 20; // TODO: Class basetimes are off? - WeaverThree
+                        return;
+                    }
+                } else {
+                    // Changing HS Type
+                    type = RefitStepType.CHANGE_UNTRACKED_SINKS;
+                    returnsPart = oldAHS.clone();
+                    neededPart = newAHS.clone();
+                    baseTime = oldAHS.getQuantity() * 20;
+                    baseTime += newAHS.getQuantity() * 20;
+                    return;
+                }
+            } else if (tempIsHeatSink(oldPart) && tempIsHeatSink(newPart)) {
+                EquipmentPart oldHS = (EquipmentPart) oldPart;
+                EquipmentPart newHS = (EquipmentPart) newPart;
+                refitClass = RefitClass.CLASS_B; // Engine Heat Sinks - treating all untracked HS as this for now
+                isFixedEquipmentChange = true;
+
+                if(oldHS.getType().equals(newHS.getType())) {
+                    if(oldHS.getQuantity() == newHS.getQuantity()) {
+                        refitClass = RefitClass.NO_CHANGE;
+                        type = RefitStepType.LEAVE;
+                        isFixedEquipmentChange = false;
+                        return;
+                    } else {
+                        int oldQuantity = oldHS.getQuantity();
+                        int newQuantity = newHS.getQuantity();
+                        EquipmentPart deltaHS = oldHS.clone();
+                        int delta = 0;
+                        if (oldQuantity > newQuantity) {
+                            delta = oldQuantity - newQuantity;
+                            deltaHS.setQuantity(delta);
+                            type = RefitStepType.REMOVE_UNTRACKED_SINKS;
+                            returnsPart = deltaHS;
+                        } else {
+                            delta = newQuantity - oldQuantity;
+                            deltaHS.setQuantity(delta);
+                            type = RefitStepType.ADD_UNTRACKED_SINKS;
+                            neededPart = deltaHS;
+                        }
+                        if (oldUnit.getEntity() instanceof Mek) {
+                            baseTime = 90; // Meks treat engine sinks as "one location" for time
+                        } else {
+                            baseTime = 20 * delta; // All vehicles?
+                        }
+                    }
+                } else {
+                    // Changing HS Type
+                    type = RefitStepType.CHANGE_UNTRACKED_SINKS;
+                    returnsPart = oldHS.clone();
+                    neededPart = newHS.clone();
+                    if (oldUnit.getEntity() instanceof Mek) {
+                        baseTime = 180; // One operation to remove, one operation to install?
+                    } else {
+                        baseTime = 20 * oldHS.getQuantity(); // All vehicles?
+                        baseTime += 20 * newHS.getQuantity();
+                    }
+                    return;
+                }
+            }
+
+            // If we reach this point for untracked, something has gone wrong
+        
+            type = RefitStepType.ERROR;
+            refitClass = RefitClass.PLEASE_REPAIR;
+            baseTime = 0;
+            return;
+        }
 
         // region Armor
 
@@ -130,12 +282,14 @@ public class RefitStep {
             type = RefitStepType.REMOVE_ARMOR;
             isFixedEquipmentChange = true;
             returnsPart = oldPart.clone();
+            baseTime = ((Armor) oldPart).getBaseTimeFor(oldUnit.getEntity()) * ((Armor) oldPart).getAmount();
             return;
         } else if (newPart instanceof Armor) {
             refitClass = RefitClass.CLASS_A;
             type = RefitStepType.ADD_ARMOR;
             isFixedEquipmentChange = true;
             neededPart = newPart.clone();
+            baseTime = ((Armor) newPart).getBaseTimeFor(oldUnit.getEntity()) * ((Armor) newPart).getAmount();
             return;
         
 
@@ -305,6 +459,13 @@ public class RefitStep {
                 neededPart = newPart.clone();
                 return;
             }
+
+
+
+        //} else if () {
+
+
+
         }
 
 
@@ -315,6 +476,26 @@ public class RefitStep {
         baseTime = 0;
         
     }
+
+    /**
+     * Determine if a Part is a heat sink because not all heat sinks are of class HeatSink right now.
+     * I hope the need for this function goes away in the future.
+     * @param part - the part to check
+     * @return is this part a heat sink
+     */
+    public static boolean tempIsHeatSink(Part part) {
+        if (part instanceof HeatSink) {
+            return true;
+        } else if ((part instanceof EquipmentPart)
+                && (((EquipmentPart) part).getType().hasFlag(MiscType.F_LASER_HEAT_SINK)
+                    || ((EquipmentPart) part).getType().hasFlag(MiscType.F_COMPACT_HEAT_SINK)
+                    || ((EquipmentPart) part).getType().hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE))) { 
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
 
     // region Getter/Setters
@@ -349,6 +530,14 @@ public class RefitStep {
 
     public String getNewPartName() {
         return newPartName;
+    }
+
+    public int getOldQuantity() {
+        return oldQuantity;
+    }
+
+    public int getNewQuantity() {
+        return newQuantity;
     }
 
     public RefitStepType getType() {

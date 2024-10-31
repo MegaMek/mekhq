@@ -31,8 +31,9 @@ public enum RefitStepType {
     LEAVE("RefitStepType.LEAVE.text", "LEAVE"),
     REMOVE("RefitStepType.REMOVE.text", "REMOVE"),
     CHANGE_FACING("RefitStepType.CHANGE_FACING.text", "CHANGE_FACING"),
-    REMOVE_ENGINE_SINKS("RefitStepType.REMOVE_ENGINE_SINKS.text", "REMOVE_ENGINE_SINKS"),
-    ADD_ENGINE_SINKS("RefitStepType.ADD_ENGINE_SINKS.text", "ADD_ENGINE_SINKS"),
+    REMOVE_UNTRACKED_SINKS("RefitStepType.REMOVE_UNTRACKED_SINKS.text", "REMOVE_UNTRACKED_SINKS"),
+    ADD_UNTRACKED_SINKS("RefitStepType.ADD_UNTRACKED_SINKS.text", "ADD_UNTRACKED_SINKS"),
+    CHANGE_UNTRACKED_SINKS("RefitStepType.CHANGE_UNTRACKED_SINKS.text", "CHANGE_UNTRACKED_SINKS"),
     ADD("RefitStepType.ADD.text", "ADD"),
     MOVE("RefitStepType.MOVE.text", "MOVE"),
     CHANGE("RefitSTepType.CHANGE.text", "CHANGE"),
@@ -88,8 +89,9 @@ public enum RefitStepType {
             case "LEAVE" -> LEAVE;
             case "REMOVE" -> REMOVE;
             case "CHANGE_FACING" -> CHANGE_FACING;
-            case "REMOVE_ENGINE_SINKS" -> REMOVE_ENGINE_SINKS;
-            case "ADD_ENGINE_SINKS" -> ADD_ENGINE_SINKS;
+            case "REMOVE_UNTRACKED_SINKS" -> REMOVE_UNTRACKED_SINKS;
+            case "ADD_UNTRACKED_SINKS" -> ADD_UNTRACKED_SINKS;
+            case "CHANGE_UNTRACKED_SINKS" -> CHANGE_UNTRACKED_SINKS;
             case "ADD" -> ADD;
             case "MOVE" -> MOVE;
             case "CHANGE" -> CHANGE;

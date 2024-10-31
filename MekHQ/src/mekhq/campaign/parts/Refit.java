@@ -462,9 +462,21 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
 
+        // Heat Sinks
+
+        stepsList.add(new RefitStep(oldUnit, oldUnit.getUntrackedHeatSinks(), newUnit.getUntrackedHeatSinks(), true));
 
 
 
+        // Dump the rest of the parts in so we can see them
+
+        for (Part p : oldParts) {
+            stepsList.add(new RefitStep(oldUnit, p, null));
+        }
+
+        for (Part p : newParts) {
+            stepsList.add(new RefitStep(oldUnit, null, p));
+        }
 
 
 
@@ -479,7 +491,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (unit.getEntity() instanceof Warship) {
             if ((armor.getLocation() == Warship.LOC_LBS) || (armor.getLocation() == Warship.LOC_RBS)
                     || (armor.getLocation() == Warship.LOC_HULL)) {
-                        return true;
+                return true;
             }
         } else if (unit.getEntity() instanceof Jumpship) {
             if (armor.getLocation() == Jumpship.LOC_HULL) {
@@ -1037,9 +1049,9 @@ public class Refit extends Part implements IAcquisitionWork {
             // Only Aerospace Fighters are expected to have heat sink parts (Meks handled
             // separately) SmallCraft, DropShip, JumpShip, WarShip, and SpaceStation use
             // SpacecraftCoolingSystem instead
-            expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() 
-                    - ((Aero) newEntity).getPodHeatSinks() 
-                    - untrackedHeatSinkCount(newEntity);
+            expectedHeatSinkParts = 0;//FIXME://((Aero) newEntity).getHeatSinks() 
+                   ///- ((Aero) newEntity).getPodHeatSinks() 
+                    //- untrackedHeatSinkCount(newEntity);
         }
         for (Part part : newUnitParts) {
             if ((!replacingLocations) && (part instanceof MekLocation)) {
@@ -1275,26 +1287,6 @@ public class Refit extends Part implements IAcquisitionWork {
 
             throw ex;
         }
-    }
-
-    /**
-     * @return time multiplier for this refit's current class
-     */
-    private float getTimeMultiplier() {
-        int mult = switch(refitClass) {
-            case NO_CHANGE -> 0;
-            case CLASS_A -> 2;
-            case CLASS_B -> 3;
-            case CLASS_C -> 5;
-            case CLASS_D -> 8;
-            case CLASS_E -> 9;
-            case CLASS_F -> 10;
-            default -> 1;
-        };
-        if (!customJob) {
-            mult *= 0.5;
-        }
-        return mult;
     }
 
     /**
@@ -2299,62 +2291,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
-    /**
-     * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and
-     * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For
-     * vehicles and conventional fighters this would be heat sinks required by energy weapons.
-     *
-     * @param entity Either the starting or the ending unit of the refit.
-     * @return The number of heat sinks the unit mounts that are not tracked as parts.
-     */
-    private static int untrackedHeatSinkCount(Entity entity) {
-        if (entity instanceof Mek) {
-            return Math.min(((Mek) entity).heatSinks(),
-                    entity.getEngine().integralHeatSinkCapacity(((Mek) entity).hasCompactHeatSinks()));
 
-        } else if (entity.getClass() == Aero.class) { // Aero but not subclasses
-            return entity.getEngine().getWeightFreeEngineHeatSinks();
-
-        } else {
-            EntityVerifier verifier = EntityVerifier.getInstance(new File(
-                    "data/mekfiles/UnitVerifierOptions.xml"));
-            TestEntity testEntity;
-            if (entity instanceof Tank) {
-                testEntity = new TestTank((Tank) entity, verifier.tankOption, null);
-                return testEntity.getCountHeatSinks();
-            } else if (entity instanceof ConvFighter) {
-                testEntity = new TestAero((Aero) entity, verifier.aeroOption, null);
-                return testEntity.getCountHeatSinks();
-            } else {
-                return 0;
-            }
-        }
-    }
-
-    /**
-     * Creates an independent heat sink part appropriate to the unit that can be used to track
-     * needed and leftover parts for heat sinks that are not actually tracked by the unit.
-     *
-     * @param entity Either the original or the new unit.
-     * @return The part corresponding to the type of heat sink for the unit.
-     */
-    private Part getHeatSinkPart(Entity entity) {
-        if (entity instanceof Aero) {
-            if (((Aero) entity).getHeatType() == Aero.HEAT_DOUBLE && entity.isClan()) {
-                return new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, campaign);
-            }
-            return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
-        } else if (entity instanceof Mek) {
-            Optional<MiscMounted> mount = entity.getMisc().stream()
-                    .filter(m -> m.getType().hasFlag(MiscType.F_HEAT_SINK)
-                            || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))
-                    .findAny();
-            if (mount.isPresent()) {
-                return new HeatSink(0, mount.get().getType(), -1, false, campaign);
-            }
-        }
-        return new HeatSink(0, EquipmentType.get("Heat Sink"), -1, false, campaign);
-    }
 
     /**
      * @param quantity - ignored

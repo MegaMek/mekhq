@@ -224,6 +224,7 @@ public class ChooseRefitDialog extends JDialog {
         for (int i = 0; i < RefitStepsListTableModel.N_COL; i++) {
             column = stepsTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(stepsModel.getColumnWidth(i));
+            column.setCellRenderer(stepsModel.getRenderer());
         }
         stepsTable.setIntercellSpacing(new Dimension(0, 0));
         stepsTable.setShowGrid(false);
@@ -233,6 +234,7 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -290,6 +292,7 @@ public class ChooseRefitDialog extends JDialog {
         for (int i = 0; i < RefitNeededListTableModel.N_COL; i++) {
             column = neededTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(neededModel.getColumnWidth(i));
+            column.setCellRenderer(neededModel.getRenderer());
         }
         neededTable.setIntercellSpacing(new Dimension(0, 0));
         neededTable.setShowGrid(false);
@@ -313,6 +316,7 @@ public class ChooseRefitDialog extends JDialog {
         for (int i = 0; i < RefitReturnsListTableModel.N_COL; i++) {
             column = returnsTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(returnsModel.getColumnWidth(i));
+            column.setCellRenderer(returnsModel.getRenderer());
         }
         returnsTable.setIntercellSpacing(new Dimension(0, 0));
         returnsTable.setShowGrid(false);
@@ -340,7 +344,7 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.gridheight = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -365,7 +369,7 @@ public class ChooseRefitDialog extends JDialog {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -780,6 +784,24 @@ public class ChooseRefitDialog extends JDialog {
                 default -> SwingConstants.LEFT;
             };
         }
+
+        public Renderer getRenderer() {
+            return new Renderer();
+        }
+        public class Renderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setHorizontalAlignment(getAlignment(actualCol));
+                //setToolTipText(getTooltip(actualRow, actualCol));
+
+                return this;
+            }
+        }
     }
 
     public class RefitReturnsListTableModel extends AbstractTableModel {
@@ -864,6 +886,24 @@ public class ChooseRefitDialog extends JDialog {
                 default -> SwingConstants.LEFT;
             };
         }
+        
+        public Renderer getRenderer() {
+            return new Renderer();
+        }
+        public class Renderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setHorizontalAlignment(getAlignment(actualCol));
+                //setToolTipText(getTooltip(actualRow, actualCol));
+
+                return this;
+            }
+        }
     }
 
 
@@ -873,12 +913,14 @@ public class ChooseRefitDialog extends JDialog {
     public class RefitStepsListTableModel extends AbstractTableModel {
         public final static int COL_OLD_NAME = 0;
         public final static int COL_OLD_LOC = 1;
-        public final static int COL_REFITSTEP_TYPE = 2;
-        public final static int COL_NEW_LOC = 3;
-        public final static int COL_NEW_NAME = 4;
-        public final static int COL_BASETIME = 5;
-        public final static int COL_REFIT_CLASS = 6;
-        public final static int N_COL = 7;
+        public final static int COL_OLD_QUANTITY = 2;
+        public final static int COL_REFITSTEP_TYPE = 3;
+        public final static int COL_NEW_QUANTITY = 4;
+        public final static int COL_NEW_LOC = 5;
+        public final static int COL_NEW_NAME = 6;
+        public final static int COL_BASETIME = 7;
+        public final static int COL_REFIT_CLASS = 8;
+        public final static int N_COL = 9;
 
         private List<RefitStep> data;
 
@@ -913,6 +955,8 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_REFITSTEP_TYPE -> "Step Type";
                 case COL_OLD_LOC -> "Old Location";
                 case COL_NEW_LOC -> "New Location";
+                case COL_OLD_QUANTITY -> "Old #";
+                case COL_NEW_QUANTITY -> "New #";
                 case COL_BASETIME -> "Base Time";
                 case COL_REFIT_CLASS -> "Refit Class";
                 default -> "?";
@@ -932,9 +976,21 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_OLD_NAME -> "<html><nobr>" + refitStep.getOldPartName() + "</nobr></html>";
                 case COL_NEW_NAME -> "<html><nobr>" + refitStep.getNewPartName() + "</nobr></html>";
                 case COL_REFIT_CLASS -> refitStep.getRefitClass().toShortName();
-                case COL_BASETIME -> refitStep.getBaseTime();
                 case COL_OLD_LOC -> refitStep.getOldLocName();
                 case COL_NEW_LOC -> refitStep.getNewLocName();
+                case COL_OLD_QUANTITY -> {
+                        if(!refitStep.getOldPartName().isEmpty()) {
+                            yield refitStep.getOldQuantity() != 1 ? refitStep.getOldQuantity() : "";
+                        } else {
+                            yield "";
+                        }}
+                case COL_NEW_QUANTITY -> {
+                        if(!refitStep.getNewPartName().isEmpty()) {
+                            yield refitStep.getNewQuantity() != 1 ? refitStep.getNewQuantity() : "";
+                        } else {
+                            yield "";
+                        }}
+                case COL_BASETIME -> refitStep.getBaseTime();
                 case COL_REFITSTEP_TYPE -> refitStep.getType().toName();
                 default -> "?";
             };
@@ -950,8 +1006,9 @@ public class ChooseRefitDialog extends JDialog {
             return switch (c) {
                 case COL_OLD_NAME, COL_NEW_NAME -> 180;
                 case COL_REFITSTEP_TYPE -> 60;
-                case COL_BASETIME, COL_REFIT_CLASS -> 20;
                 case COL_OLD_LOC, COL_NEW_LOC -> 60;
+                case COL_OLD_QUANTITY, COL_NEW_QUANTITY -> 20;
+                case COL_BASETIME, COL_REFIT_CLASS -> 20;
                 default -> 3;
             };
         }
@@ -959,9 +1016,27 @@ public class ChooseRefitDialog extends JDialog {
         public int getAlignment(int col) {
             return switch (col) {
                 case COL_BASETIME -> SwingConstants.RIGHT;
-                case COL_REFIT_CLASS -> SwingConstants.CENTER;
+                case COL_REFIT_CLASS, COL_OLD_QUANTITY, COL_NEW_QUANTITY -> SwingConstants.CENTER;
                 default -> SwingConstants.LEFT;
             };
+        }
+        public Renderer getRenderer() {
+            return new Renderer();
+        }
+
+        public class Renderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setHorizontalAlignment(getAlignment(actualCol));
+                //setToolTipText(getTooltip(actualRow, actualCol));
+
+                return this;
+            }
         }
     }
 
