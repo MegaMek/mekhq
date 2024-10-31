@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,14 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
-import javax.xml.transform.Source;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
@@ -34,9 +26,16 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.utilities.MHQXMLUtility;
 
+import javax.xml.transform.Source;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+
 /**
  * This represents a facility in the StratCon context
- * 
+ *
  * @author NickAragua
  */
 @XmlRootElement(name = "StratconFacility")
@@ -68,7 +67,7 @@ public class StratconFacility implements Cloneable {
     private String capturedDefinition;
     private boolean revealTrack;
     private int scenarioOddsModifier;
-    private int weeklySPModifier;
+    private int monthlySPModifier;
     private boolean preventAerospace;
     // TODO: post-MVP
     // private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
@@ -96,7 +95,7 @@ public class StratconFacility implements Cloneable {
         clone.setCapturedDefinition(capturedDefinition);
         clone.revealTrack = revealTrack;
         clone.scenarioOddsModifier = scenarioOddsModifier;
-        clone.weeklySPModifier = weeklySPModifier;
+        clone.monthlySPModifier = monthlySPModifier;
         clone.preventAerospace = preventAerospace;
         clone.userDescription = userDescription;
         clone.biomes = new ArrayList<>(biomes);
@@ -115,7 +114,7 @@ public class StratconFacility implements Cloneable {
         setOwner(facility.getOwner());
         setRevealTrack(facility.getRevealTrack());
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
-        setWeeklySPModifier(facility.getWeeklySPModifier());
+        setMonthlySPModifier(facility.getMonthlySPModifier());
         setPreventAerospace(facility.preventAerospace());
         setBiomes(new ArrayList<>(facility.getBiomes()));
         setUserDescription(facility.getUserDescription());
@@ -254,12 +253,20 @@ public class StratconFacility implements Cloneable {
         this.scenarioOddsModifier = scenarioOddsModifier;
     }
 
-    public int getWeeklySPModifier() {
-        return weeklySPModifier;
+    /**
+     * @return The facility's monthly SP (Support Points) modifier as an integer.
+     */
+    public int getMonthlySPModifier() {
+        return monthlySPModifier;
     }
 
-    public void setWeeklySPModifier(int weeklySPModifier) {
-        this.weeklySPModifier = weeklySPModifier;
+    /**
+     * Sets a new value for the monthly SP (Support Points) modifier.
+     *
+     * @param monthlySPModifier The new monthly SP modifier value.
+     */
+    public void setMonthlySPModifier(int monthlySPModifier) {
+        this.monthlySPModifier = monthlySPModifier;
     }
 
     /**
@@ -273,7 +280,7 @@ public class StratconFacility implements Cloneable {
     /**
      * Attempt to deserialize an instance of a StratconFacility from the passed-in
      * file name
-     * 
+     *
      * @return Possibly an instance of a StratconFacility
      */
     public static StratconFacility deserialize(String fileName) {
