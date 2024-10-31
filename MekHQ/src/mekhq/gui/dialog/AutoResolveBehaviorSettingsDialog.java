@@ -54,14 +54,11 @@ public class AutoResolveBehaviorSettingsDialog
     @Override
     protected Container createCenterPane() {
         var result = super.createCenterPane();
-        // get last item in the result
-
         result.add(createAutoResolveHelpButton());
         return result;
     }
 
     protected JPanel createAutoResolveHelpButton() {
-//        var result = new JPanel(new BorderLayout(5, 0));
         JPanel result = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         result.setAlignmentX(LEFT_ALIGNMENT);
 

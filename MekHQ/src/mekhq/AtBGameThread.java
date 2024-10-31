@@ -67,20 +67,20 @@ public class AtBGameThread extends GameThread {
      *
      * @param name                        The name of the player
      * @param password                    The password for the game
-     * @param c                           The client
+     * @param client                      The client
      * @param app                         The MekHQ application
      * @param units                       The list of units to import into the game
      * @param scenario                    The scenario to use for this game
      * @param autoResolveBehaviorSettings The behavior settings for the auto resolve bot
      */
-    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
+    public AtBGameThread(String name, String password, Client client, MekHQ app, List<Unit> units,
                          AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings) {
-        this(name, password, c, app, units, scenario, autoResolveBehaviorSettings, true);
+        this(name, password, client, app, units, scenario, autoResolveBehaviorSettings, true);
     }
 
-    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
+    public AtBGameThread(String name, String password, Client client, MekHQ app, List<Unit> units,
             AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings, boolean started) {
-        super(name, password, c, app, units, scenario, started);
+        super(name, password, client, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
         this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
     }

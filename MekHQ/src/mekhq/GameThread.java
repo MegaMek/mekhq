@@ -68,25 +68,68 @@ class GameThread extends Thread implements CloseClientListener {
     // endregion Variable Declarations
 
     // region Constructors
-    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, Scenario s) {
-        this(name, password, c, app, units, s, true);
+
+    /**
+     * GameThread
+     * <p>
+     *     Initializes a new thread for a game.
+     * </p>
+     *
+     * @param name          The player name
+     * @param password      The game password
+     * @param client        The client
+     * @param app           The MekHQ instance
+     * @param units         The list of units you intend to play with in your side
+     * @param scenario      The scenario that is going to be initialized for the game
+     */
+    public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario) {
+        this(name, password, client, app, units, scenario, true);
     }
 
-    public GameThread(String name, Client c, MekHQ app, List<Unit> units, Scenario s, boolean started) {
-        this(name, "", c, app, units, s, started);
+
+    /**
+     * GameThread
+     * <p>
+     *     Initializes a new thread for a game.
+     * </p>
+     *
+     * @param name          The player name
+     * @param client        The client
+     * @param app           The MekHQ instance
+     * @param units         The list of units you intend to play with in your side
+     * @param scenario      The scenario that is going to be initialized for the game
+     * @param started       Whether the game has already started
+     */
+    public GameThread(String name, Client client, MekHQ app, List<Unit> units, Scenario scenario, boolean started) {
+        this(name, "", client, app, units, scenario, started);
     }
 
-    public GameThread(String name, String password, Client c, MekHQ app, List<Unit> units, Scenario s,
+
+    /**
+     * GameThread
+     * <p>
+     *     Initializes a new thread for a game.
+     * </p>
+     *
+     * @param name          The player name
+     * @param password      The game password
+     * @param client        The client
+     * @param app           The MekHQ instance
+     * @param units         The list of units you intend to play with in your side
+     * @param scenario      The scenario that is going to be initialized for the game
+     * @param started       Whether the game has already started
+     */
+    public GameThread(String name, String password, Client client, MekHQ app, List<Unit> units, Scenario scenario,
             boolean started) {
         super(name);
         myname = name.trim();
         this.password = password;
-        this.client = c;
+        this.client = client;
         this.app = app;
         this.units = Objects.requireNonNull(units);
         this.started = started;
         this.campaign = app.getCampaign();
-        this.scenario = Objects.requireNonNull(s);
+        this.scenario = Objects.requireNonNull(scenario);
     }
     // endregion Constructors
 
