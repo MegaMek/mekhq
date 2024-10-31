@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Resolve</title>
+</head>
+<body>
+    <div>
+        <h1 id="auto-resolve-behavior-settings">Auto Resolve Behavior Settings</h1>
+        <h2 id="introduction">Introduction</h2>
+        <p>The Auto Resolve feature is a way to let the PrincessBot control your units so she can quickly play out the battles
+            for you, its pretty straight forward to setup and use if you want to focus on your company management or just dont
+            want to play every single lengthy battle.</p>
+        <h2 id="how-to-use">How to Use</h2>
+        <p>Auto Resolve is available as a new option in the Scenario panel, the button &quot;Auto Resolve&quot; will setup the game scenario
+            on MegaMek as normal, and then it adds a Princess bot with the name following the format <YourCompany>:AI, it is setup
+                as the player is setup, same starting position, color, camouflage and team, and then all the players units change owner
+                to it.</p>
+        <p>To make the game faster, you can change configuration to not show the reports between phases, and select the skip
+            action if no available unit, with those options selected the game will not request you to press Done between those
+            phases.</p>
+        <h2 id="configuring-the-auto-resolve-behavior">Configuring the Auto Resolve Behavior</h2>
+        <p>The configuration is accessible in the <strong>Manage Campaign</strong> menu, in the MekHQ toolbar, there is the entry
+            <strong>Auto Resolve Behavior Settings</strong>, it will open the <strong>Configure Princess Bot</strong> window, where you can define the
+            behavior for the auto resolve preset.</p>
+        <p>By default, every campaign now have an auto-resolve default preset, that is named <YourCompany>:AI, you can change the
+            configuration as you like and select whatever preset you want.</p>
+        <p>Whenever you hit the &quot;OK&quot; button the current configuration being shown overwrites the auto resolve preset
+            for your company, so if you want to experiment with different behaviors, I suggest that you create new presets and then
+            just select the one you want before hitting &quot;OK&quot; to close the configuration.</p>
+        <h2 id="qa">Q&amp;A</h2>
+        <p><strong>Q: Can I change the configuration during the game?</strong></p>
+        <p>Sure, its a Princess Bot, so all chat commands to change behavior apply</p>
+        <p><strong>Q: Can I change the configuration for a specific scenario?</strong></p>
+        <p>Also yes, you can create many presets, like for example one for a scape scenario, another for a defend scenario, etc.
+            Just remember to change the selected preset behavior before entering the game with auto resolve. And remember to change
+            it back later to your &quot;default&quot; preset.</p>
+        <p><strong>Q: Can I change the configuration for a specific unit?</strong></p>
+        <p>No, you can&#39;t, you can emulate that by manually creating many bots with different configurations and then assigning
+            individual units or lances to them, but that is outside the current scope of the Auto Resolve.</p>
+        <p><strong>Q: I deleted my company preset! Is everything lost?</strong></p>
+        <p>You lost the configuration, sure, but MekHQ won&#39;t make any fuss about it, if you delete it by mistake inside MegaMek,
+            once you open the <strong>Auto Resolve Behavior Settings</strong> again, the default preset will be recreated for you. And if it is
+            missing before you enter an auto resolve game, it will use the default behavior for the Princess Bot instead.</p>
+        <p><strong>Q: I want to share my preset with my friends, how can I do that?</strong></p>
+        <p>It&#39;s just a preset, so you can use the same way you used to share it with your friends before.</p>
+        <p><strong>Q: The preset is written to the campaign save?</strong></p>
+        <p>No, the preset is saved in the MekHQ configuration folder, so it&#39;s available for all your campaigns, not just the one
+            that created it. So... if you create two different campaigns with the same name they would use the same preset.
+            Also means that if you change the preset in one save file, the preset is the same in your other campaign. Remember, it
+            is a preset that you are telling MekHQ to use, not a campaign specific configuration.</p>
+    </div>
+</body>
+</html>

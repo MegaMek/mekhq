@@ -28,6 +28,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
@@ -56,18 +57,29 @@ public class AtBGameThread extends GameThread {
     private final AtBScenario scenario;
     private final BehaviorSettings autoResolveBehaviorSettings;
 
+    /**
+     * Constructor for AtBGameThread
+     *
+     * <p>
+     *     This constructor creates a new AtBGameThread with the given name, password, client, MekHQ application, list of
+     *     units, scenario, and auto resolve behavior settings. The game thread is started by default.
+     * </p>
+     *
+     * @param name                        The name of the player
+     * @param password                    The password for the game
+     * @param c                           The client
+     * @param app                         The MekHQ application
+     * @param units                       The list of units to import into the game
+     * @param scenario                    The scenario to use for this game
+     * @param autoResolveBehaviorSettings The behavior settings for the auto resolve bot
+     */
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
-            AtBScenario scenario) {
-        this(name, password, c, app, units, scenario, null, true);
-    }
-
-    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
-                         AtBScenario scenario, BehaviorSettings autoResolveBehaviorSettings) {
+                         AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings) {
         this(name, password, c, app, units, scenario, autoResolveBehaviorSettings, true);
     }
 
     public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
-            AtBScenario scenario, BehaviorSettings autoResolveBehaviorSettings, boolean started) {
+            AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings, boolean started) {
         super(name, password, c, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
         this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
@@ -498,12 +510,11 @@ public class AtBGameThread extends GameThread {
         botClient.sendPlayerInfo();
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
 
-        var ent = client.getEntitiesVector().stream()
+        var playerEntities = client.getEntitiesVector().stream()
             .filter(entity -> entity.getOwnerId() == player.getId())
             .collect(Collectors.toList());
-        botClient.sendChangeOwner(ent, botClient.getLocalPlayer().getId());
+        botClient.sendChangeOwner(playerEntities, botClient.getLocalPlayer().getId());
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-
     }
 
     private PlanetaryConditions getPlanetaryConditions() {

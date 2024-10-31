@@ -78,7 +78,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static mekhq.utilities.MoreObjects.firstNonNull;
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+
 
 public class CampaignXmlParser {
     private final InputStream is;
