@@ -34,12 +34,15 @@ public enum RefitStepType {
     REMOVE_UNTRACKED_SINKS("RefitStepType.REMOVE_UNTRACKED_SINKS.text", "REMOVE_UNTRACKED_SINKS"),
     ADD_UNTRACKED_SINKS("RefitStepType.ADD_UNTRACKED_SINKS.text", "ADD_UNTRACKED_SINKS"),
     CHANGE_UNTRACKED_SINKS("RefitStepType.CHANGE_UNTRACKED_SINKS.text", "CHANGE_UNTRACKED_SINKS"),
+    REMOVE_SCCS_SINKS("RefitStepType.REMOVE_SCCS_SINKS.text", "REMOVE_SCCS_SINKS"),
+    ADD_SCCS_SINKS("RefitStepType.ADD_SCCS_SINKS.text", "ADD_SCCS_SINKS"),
+    CHANGE_SCCS_SINKS("RefitStepType.CHANGE_SCCS_SINKS.text", "CHANGE_SCCS_SINKS"),
     ADD("RefitStepType.ADD.text", "ADD"),
     MOVE("RefitStepType.MOVE.text", "MOVE"),
     CHANGE("RefitSTepType.CHANGE.text", "CHANGE"),
     UNLOAD("RefitStepType.UNLOAD.text", "UNLOAD"),
     LOAD("RefitStepType.LOAD.text", "LOAD"),
-    MOVE_AMMO("RefitStepType.MOVE_AMMO", "MOVE_AMMO"),
+    MOVE_AMMO("RefitStepType.MOVE_AMMO.text", "MOVE_AMMO"),
     REMOVE_ARMOR("RefitStepType.REMOVE_ARMOR.text", "REMOVE_ARMOR"),
     ADD_ARMOR("RefitStepType.ADD_ARMOR.text", "ADD_ARMOR"),
     CHANGE_ARMOR_TYPE("RefitStepType.CHANGE_ARMOR_TYPE.text", "CHANGE_ARMOR_TYPE"),
@@ -92,6 +95,9 @@ public enum RefitStepType {
             case "REMOVE_UNTRACKED_SINKS" -> REMOVE_UNTRACKED_SINKS;
             case "ADD_UNTRACKED_SINKS" -> ADD_UNTRACKED_SINKS;
             case "CHANGE_UNTRACKED_SINKS" -> CHANGE_UNTRACKED_SINKS;
+            case "REMOVE_SCCS_SINKS" -> REMOVE_SCCS_SINKS;
+            case "ADD_SCCS_SINKS" -> ADD_SCCS_SINKS;
+            case "CHANGE_SCCS_SINKS" -> CHANGE_SCCS_SINKS;
             case "ADD" -> ADD;
             case "MOVE" -> MOVE;
             case "CHANGE" -> CHANGE;

@@ -327,7 +327,6 @@ public class RefitStep {
                 returnsPart = (oldPart instanceof MekLocation) ? oldPart.clone() : null; // No returning Missing Parts
                 return;
             }
-        
 
         } else if (((oldPart instanceof MissingRotor) || (oldPart instanceof MissingTurret))
                     && null != newPart) {
@@ -360,6 +359,47 @@ public class RefitStep {
             baseTime = 0;
             return;
         
+
+        // region Actuators
+
+        } else if (((oldPart instanceof MekActuator) || (oldPart instanceof MissingMekActuator))
+                && (newPart instanceof MekActuator)) { 
+            // Some arm actuators can be added/removed but if we have both there's nothing to do
+            refitClass = RefitClass.NO_CHANGE;
+            type = RefitStepType.LEAVE;
+            isFixedEquipmentChange = false;
+            return;
+
+        } else if ((oldPart instanceof MekActuator) || (oldPart instanceof MissingMekActuator)) {
+            returnsPart = oldPart instanceof MekActuator ? oldPart.clone() : null;
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            baseTime = 90;
+
+            int oldType = oldPart instanceof MekActuator ?
+                ((MekActuator) oldPart).getType() : ((MissingMekActuator) oldPart).getType();
+            if ((oldType == Mek.ACTUATOR_HAND) || (oldType == Mek.ACTUATOR_LOWER_ARM)) {
+                isFixedEquipmentChange = false;
+            } else {
+                isFixedEquipmentChange = true;
+            }
+            return;
+
+        } else if (newPart instanceof MekActuator) {
+            neededPart = newPart.clone();
+            refitClass = RefitClass.CLASS_B;
+            type = RefitStepType.ADD;
+            baseTime = 90;
+
+            int newType = ((MekActuator) newPart).getType();
+            if ((newType == Mek.ACTUATOR_HAND) || (newType == Mek.ACTUATOR_LOWER_ARM)) {
+                isFixedEquipmentChange = false;
+            } else {
+                isFixedEquipmentChange = true;
+            }
+            return;
+
+
 
         // region Core Equipment
         } else if (((oldPart instanceof EnginePart) || (oldPart instanceof MissingEnginePart))
@@ -461,11 +501,59 @@ public class RefitStep {
             }
 
 
+        } else if ((oldPart instanceof SpacecraftCoolingSystem) && (newPart instanceof SpacecraftCoolingSystem)) {
+            SpacecraftCoolingSystem oldSCCS = (SpacecraftCoolingSystem) oldPart;
+            SpacecraftCoolingSystem newSCCS = (SpacecraftCoolingSystem) newPart;
 
-        //} else if () {
+            // Override our part names and stuff 
+            oldQuantity = oldSCCS.getTotalSinks();
+            newQuantity = newSCCS.getTotalSinks();
+            
+            AeroHeatSink oldAHS = new AeroHeatSink(0, oldSCCS.getSinkType(), false, oldUnit.getCampaign());
+            AeroHeatSink newAHS = new AeroHeatSink(0, newSCCS.getSinkType(), false, oldUnit.getCampaign());
+            
+            oldAHS.setQuantity(oldQuantity);
+            newAHS.setQuantity(newQuantity);
 
+            oldPartName = oldAHS.getName();
+            newPartName = newAHS.getName();
 
+            refitClass = RefitClass.CLASS_C; // Not going to track location stuff for heatsinks on a big unit.
+            isFixedEquipmentChange = true; // I don't think these can be omni but...
 
+            if (oldAHS.getType() == newAHS.getType()) {
+                if (oldQuantity == newQuantity) {
+                    refitClass = RefitClass.NO_CHANGE;
+                    type = RefitStepType.LEAVE;
+                    isFixedEquipmentChange = false;
+                    return;
+                } else {
+                    int delta = 0;
+                    AeroHeatSink deltaAHS = new AeroHeatSink(0, oldAHS.getType(), false, oldUnit.getCampaign());
+
+                    if (oldQuantity > newQuantity) {
+                        delta = oldQuantity - newQuantity;
+                        deltaAHS.setQuantity(delta);
+                        returnsPart = deltaAHS;
+                        type = RefitStepType.REMOVE_SCCS_SINKS;
+                    } else {
+                        delta = newQuantity - oldQuantity;
+                        deltaAHS.setQuantity(delta);
+                        neededPart = deltaAHS;
+                        type = RefitStepType.ADD_SCCS_SINKS;
+                    }
+                    baseTime = (int) (Math.ceil(delta / 50) * 60); // 50/hour round up.
+                    return;
+                }
+            } else {
+                // Change HS type
+                type = RefitStepType.CHANGE_SCCS_SINKS;
+                returnsPart = oldAHS;
+                neededPart = newAHS;
+                baseTime = (int) (Math.ceil((oldQuantity + newQuantity) / 50) * 60); // 50/hour round up.
+                return;
+            }
+            
         }
 
 

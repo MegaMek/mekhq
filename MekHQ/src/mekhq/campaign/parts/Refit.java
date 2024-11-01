@@ -35,13 +35,8 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.equipment.MiscMounted;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.verifier.EntityVerifier;
-import megamek.common.verifier.TestAero;
-import megamek.common.verifier.TestEntity;
-import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitUtil;
@@ -88,6 +83,7 @@ public class Refit extends Part implements IAcquisitionWork {
     private Entity newEntity;
 
     private RefitClass refitClass;
+    private int unmodifiedTime;
     private int time;
     private int timeSpent;
     private Money cost;
@@ -105,7 +101,6 @@ public class Refit extends Part implements IAcquisitionWork {
     private List<Part> neededList;
     private List<Part> returnsList;
     private List<Part> oldIntegratedHeatSinks;
-    private List<Part> newIntegratedHeatSinks;
     private Set<Part> largeCraftBinsToChange;
 
     private List<RefitStep> stepsList;
@@ -113,10 +108,6 @@ public class Refit extends Part implements IAcquisitionWork {
     private int armorNeeded;
     private Armor newArmorSupplies;
     private boolean sameArmorType;
-
-    private int oldLargeCraftHeatSinks;
-    private int oldLargeCraftSinkType;
-    private int newLargeCraftHeatSinks;
 
     private Person assignedTech;
 
@@ -130,7 +121,6 @@ public class Refit extends Part implements IAcquisitionWork {
         returnsList = new ArrayList<Part>();
         stepsList = new ArrayList<RefitStep>();
         oldIntegratedHeatSinks = new ArrayList<>();
-        newIntegratedHeatSinks = new ArrayList<>();
         largeCraftBinsToChange = new HashSet<>();
         errorStrings = new StringJoiner("\n");
         cost = Money.zero();
@@ -165,8 +155,11 @@ public class Refit extends Part implements IAcquisitionWork {
         kitFound = false;
         replacingLocations = false;
         campaign = oldUnit.getCampaign();
+
         calculate();
         figureRefitClass();
+        figureRefitTime();
+
         optimizeShoppingLists();
         if (customJob) {
             suggestNewName();
@@ -232,6 +225,13 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     public int getTime() {
         return time;
+    }
+
+    /**
+     * @return the time not modified by the refit class. Mainly for UI.
+     */
+    public int getUnmodifiedTime() {
+        return unmodifiedTime;
     }
 
      public boolean isOmniRefit() {
@@ -430,6 +430,52 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         
+        // region Actuators
+
+        oldIterator = oldParts.iterator();
+        while (oldIterator.hasNext()) {
+            Part oldPart = oldIterator.next();
+
+            if ((oldPart instanceof MekActuator) || (oldPart instanceof MissingMekActuator)) {
+                int oldLoc = oldPart.getLocation();
+                int oldType = (oldPart instanceof MekActuator) ? 
+                        ((MekActuator) oldPart).getType() : ((MissingMekActuator) oldPart).getType();
+                
+                boolean matchFound = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+
+                    if ((newPart instanceof MekActuator) 
+                            && (oldLoc == newPart.getLocation()) && (oldType == (((MekActuator) oldPart).getType()))) {
+                        
+                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    oldIterator.remove();
+                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                }
+            }
+        }
+
+        newIterator = newParts.iterator();
+        while (newIterator.hasNext()) {
+            Part newPart = newIterator.next();
+
+            if (newPart instanceof MekActuator) {
+                newIterator.remove();
+                stepsList.add(new RefitStep(oldUnit, null, newPart));
+            }
+        }
+
+
         // region Core Equipment
 
         // Engine
@@ -464,8 +510,16 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // Heat Sinks
 
-        stepsList.add(new RefitStep(oldUnit, oldUnit.getUntrackedHeatSinks(), newUnit.getUntrackedHeatSinks(), true));
-
+        Part oldUHS = oldUnit.getUntrackedHeatSinks();
+        Part newUHS = newUnit.getUntrackedHeatSinks();
+        if ((null != oldUHS) || (null != newUHS)) { 
+            stepsList.add(new RefitStep(oldUnit, oldUHS, newUHS, true));
+        } else {
+            // If we don't have UHS, we probably have a Spacecraft Cooling System
+            Part oldSCCS = findOnly(SpacecraftCoolingSystem.class, null, oldParts, oldUnit);
+            Part newSCCS = findOnly(SpacecraftCoolingSystem.class, null, newParts, newUnit);
+            stepsList.add(new RefitStep(oldUnit, oldSCCS, newSCCS));
+        }
 
 
         // Dump the rest of the parts in so we can see them
@@ -573,6 +627,9 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
+    /**
+     * Determines the refit class as the harest class of all the refit steps
+     */
     public void figureRefitClass() {
         RefitClass rc = RefitClass.NO_CHANGE;
         for (RefitStep step : stepsList) {
@@ -581,6 +638,18 @@ public class Refit extends Part implements IAcquisitionWork {
         refitClass = rc;
     }
 
+    /**
+     * Determines the refit base time as the sum of all the refit steps' times, and then the full
+     * time based on the overall refit class. So figure the refit class first. 
+     */
+    public void figureRefitTime() {
+        unmodifiedTime = 0;
+        for (RefitStep step : stepsList) {
+            unmodifiedTime += step.getBaseTime();
+        }
+        time = (int) (unmodifiedTime * refitClass.getTimeMultiplier(!customJob));
+    }
+    
     private void calculateRefurbishment() {
         // Refurbishment rules (class, time, and cost) are found in SO p189.
         // FIXME: WeaverThree - This should be its own code path rather than an appendix to the other

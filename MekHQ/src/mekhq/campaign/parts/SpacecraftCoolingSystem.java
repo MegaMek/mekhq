@@ -95,6 +95,15 @@ public class SpacecraftCoolingSystem extends Part {
         return totalSinks;
     }
 
+    /**
+     * Sorry, but we're going to have to work around all the add/remove shenanigans to manage this
+     * class from Refit. Probably shouldn't be used by anyone else. - WeaverThree
+     * @param totalSinks - new total heatsink count
+     */
+    public void setTotalSinks(int totalSinks) {
+        this.totalSinks = totalSinks;
+    }
+
     public int getRemoveableSinks() {
         return removeableSinks;
     }

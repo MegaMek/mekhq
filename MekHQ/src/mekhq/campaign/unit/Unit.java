@@ -1259,7 +1259,9 @@ public class Unit implements ITechnology {
     /**
      * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and
      * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For
-     * vehicles and conventional fighters this would be heat sinks required by energy weapons.
+     * vehicles and conventional fighters this would be heat sinks required by energy weapons. Does
+     * not work on small craft and larger because they hide their heatsinks in an available
+     * Spacecraft Cooling System Part.
      *
      * @param entity Either the starting or the ending unit of the refit.
      * @return The number of heat sinks the unit mounts that are not tracked as parts.
@@ -1297,8 +1299,6 @@ public class Unit implements ITechnology {
                 int count = testEntity.getCountHeatSinks();
                 toReturn.setQuantity(count);
                 return toReturn;
-            
-            } else {
             }
         }
         return null;
