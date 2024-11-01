@@ -1285,6 +1285,8 @@ public class Resupply {
             }
         } else if (part instanceof MASC || part instanceof MekGyro || part instanceof EnginePart) {
             multiplier = 0.5;
+        } else if (part instanceof AmmoBin) {
+            multiplier = 4;
         }
 
         return multiplier;
