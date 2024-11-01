@@ -37,6 +37,8 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.stratcon.StratconCoords;
@@ -45,7 +47,6 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,6 +60,8 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
+import static megamek.common.ITechnology.RATING_A;
+import static megamek.common.ITechnology.RATING_C;
 import static mekhq.campaign.finances.enums.TransactionType.BONUS_EXCHANGE;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
@@ -77,10 +80,7 @@ public class Resupply {
     final private AtBContract contract;
     final private Faction employerFaction;
     final private Faction enemyFaction;
-    private Map<Part, Integer> potentialParts;
     private List<Part> partsPool;
-
-    private List<Unit> potentialUnits;
     private Random random;
 
     private final int YEAR;
@@ -100,12 +100,8 @@ public class Resupply {
      *
      * @param campaign  The campaign this supply drop is part of.
      * @param contract  The relevant contract.
-     * @param skipParts Whether to skip generating parts, if {@code true} this call must be followed
-     *                 by {@code setPotentialParts}
-     * @param skipUnits Whether to skip generating parts, if {@code true} this call must be followed
-     *                 by {@code setPotentialUnits}
      */
-    public Resupply(Campaign campaign, AtBContract contract, boolean skipParts, boolean skipUnits) {
+    public Resupply(Campaign campaign, AtBContract contract) {
         this.campaign = campaign;
         this.contract = contract;
         employerFaction = contract.getEmployerFaction();
@@ -115,41 +111,19 @@ public class Resupply {
         EMPLOYER_IS_CLAN = enemyFaction.isClan();
         EMPLOYER_TECH_CODE = getTechFaction(employerFaction);
 
-        if (!skipParts) {
-            collectParts();
-            partsPool = buildPool(potentialParts);
-        }
-
-        if (!skipUnits) {
-            potentialUnits = new ArrayList<>();
-        }
-
+        partsPool = buildPool(collectParts());
         random = new Random();
     }
 
     /**
-     * Method to create a supply drop dialog with the given parameters and display it to the user.
+     * Displays a dialog depicting a resupply of parts and possibly cash.
      *
-     * @param droppedItems A list of items to be dropped.
-     * @param cashReward   The cash reward for the supply drop.
-     * @param isLoot       A flag indicating whether the drop is considered loot.
-     * @param isContractEnd A flag indicating whether the drop is related to the contract end.
+     * @param droppedItems The items being dropped.
+     * @param cashReward The monetary reward from the supply drop.
+     * @param isLoot A boolean indicating if the supply drop is categorized as loot.
+     * @param isContractEnd A boolean indicating if the supply drop is related to the contract's conclusion.
      */
     private void supplyDropDialog(List<Part> droppedItems, Money cashReward, boolean isLoot, boolean isContractEnd) {
-        supplyDropDialog(droppedItems, null, cashReward, isLoot, isContractEnd);
-    }
-
-    /**
-     * Overloaded method to additionally support supply drop dialogs that include units.
-     *
-     * @param droppedItems A list of items to be dropped.
-     * @param droppedUnits A list of units to be dropped.
-     * @param cashReward   The cash reward for the supply drop.
-     * @param isLoot       A flag indicating whether the drop is considered loot.
-     * @param isContractEnd A flag indicating whether the drop is related to the contract end.
-     */
-    private void supplyDropDialog(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                                  Money cashReward, boolean isLoot, boolean isContractEnd) {
         ImageIcon icon = getFactionLogo(campaign, employerFaction.getShortName(), true);
 
         if (isLoot || isContractEnd) {
@@ -159,16 +133,7 @@ public class Resupply {
 
         StringBuilder message = new StringBuilder(getInitialDescription(isLoot, isContractEnd));
 
-        Map<String, Integer> partsReport = new HashMap<>();
-        if (droppedItems != null) {
-            partsReport = createPartsReport(droppedItems);
-        }
-
-        Map<String, Integer> unitsReport = new HashMap<>();
-        if (droppedUnits != null) {
-            unitsReport = createUnitsReport(droppedUnits);
-        }
-
+        Map<String, Integer> partsReport = createPartsReport(droppedItems);
         List<Entry<String, Integer>> entries = new ArrayList<>(partsReport.entrySet());
 
         if (!partsReport.isEmpty()) {
@@ -203,8 +168,6 @@ public class Resupply {
             }
         }
 
-        entries.addAll(unitsReport.entrySet());
-
         String[] columns = formatColumnData(entries);
 
         if (!cashReward.isZero()) {
@@ -217,7 +180,7 @@ public class Resupply {
             .append("<td>").append(columns[2]).append("</td>")
             .append("</tr></table>");
 
-        createResupplyDialog(icon, message.toString(), droppedItems, droppedUnits, cashReward,
+        createResupplyDialog(icon, message.toString(), droppedItems, cashReward,
             isLoot || isContractEnd, false);
     }
 
@@ -227,16 +190,14 @@ public class Resupply {
      * @param icon            The icon to be displayed in the dialog.
      * @param message         The message to be displayed in the dialog.
      * @param droppedItems    List of items to be dropped. Can be null.
-     * @param droppedUnits    List of units to be dropped. Can be null.
      * @param cashReward      The value of the cash reward.
      * @param isLootOrContractEnd {@link Boolean} value representing if the dialog is being created
      *                        as the result of either loot or contract end.
      * @param isSmuggler      {@link Boolean} value representing if the dialog is an offer from a
      *                        smuggler.
      */
-    public void createResupplyDialog(ImageIcon icon, String message, @Nullable List<Part> droppedItems,
-                                        @Nullable List<Unit> droppedUnits, Money cashReward,
-                                        boolean isLootOrContractEnd, boolean isSmuggler) {
+    public void createResupplyDialog(ImageIcon icon, String message, List<Part> droppedItems,
+                                     Money cashReward, boolean isLootOrContractEnd, boolean isSmuggler) {
         final int DIALOG_WIDTH = 700;
         final int DIALOG_HEIGHT = 500;
         final String title = resources.getString("dialog.title");
@@ -251,9 +212,9 @@ public class Resupply {
             dialog.dispose();
 
             if (isLootOrContractEnd) {
-                deliverDrop(droppedItems, droppedUnits, cashReward);
+                deliverDrop(droppedItems, cashReward);
             } else if (!isSmuggler) {
-                processConvoy(droppedItems, droppedUnits, cashReward);
+                processConvoy(droppedItems, cashReward);
             }
         };
 
@@ -341,7 +302,7 @@ public class Resupply {
             .append("<td>").append(columns[2]).append("</td>")
             .append("</tr></table>");
 
-        createResupplyDialog(icon, message.toString(), droppedItems, null, Money.zero(),
+        createResupplyDialog(icon, message.toString(), droppedItems, Money.zero(),
             false, true);
     }
 
@@ -349,12 +310,10 @@ public class Resupply {
      * Processes a convoy by determining interception chances based on morale level and performs
      * actions accordingly.
      *
-     * @param droppedItems    List of items dropped by the convoy. Can be {@code null}.
-     * @param droppedUnits    List of units dropped by the convoy. Can be {@code null}.
+     * @param droppedItems    List of items dropped by the convoy.
      * @param cashReward      The amount of cash reward.
      */
-    private void processConvoy(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                               Money cashReward) {
+    private void processConvoy(List<Part> droppedItems, Money cashReward) {
         final String STATUS_FORWARD = "statusUpdate";
         final String STATUS_AFTERWARD = ".text";
 
@@ -398,13 +357,12 @@ public class Resupply {
         }
 
         if (!message.isEmpty()) {
-            createConvoyMessage(targetConvoy, droppedItems, droppedUnits, cashReward, message,
-                isIntercepted);
+            createConvoyMessage(targetConvoy, droppedItems, cashReward, message, isIntercepted);
         } else {
             campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG));
-            deliverDrop(droppedItems, droppedUnits, cashReward);
+            deliverDrop(droppedItems, cashReward);
         }
     }
 
@@ -426,31 +384,28 @@ public class Resupply {
             campaign.addReport(String.format(resources.getString("convoySuccessfulSmuggler.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG));
-            deliverDrop(droppedItems, null, Money.zero());
+            deliverDrop(droppedItems, Money.zero());
         }
     }
 
     /**
      * Creates a convoy with provided parameters and a status message to display.
      *
-     * @param droppedItems         List of items dropped by the convoy. Can be {@code null}.
-     * @param droppedUnits         List of units dropped by the convoy. Can be {@code null}.
+     * @param droppedItems         List of items dropped by the convoy.
      * @param cashReward           The amount of cash reward.
      * @param convoyStatusMessage  The status message to be displayed for the convoy.
      * @param isIntercepted        {@link Boolean} indicating if the convoy has been intercepted.
      */
-    public void createConvoyMessage(@Nullable Integer targetConvoy, @Nullable List<Part> droppedItems,
-                                    @Nullable List<Unit> droppedUnits, Money cashReward,
-                                    String convoyStatusMessage, boolean isIntercepted) {
-        createConvoyMessage(targetConvoy, droppedItems, droppedUnits, cashReward, convoyStatusMessage,
+    public void createConvoyMessage(@Nullable Integer targetConvoy, List<Part> droppedItems,
+                                    Money cashReward, String convoyStatusMessage, boolean isIntercepted) {
+        createConvoyMessage(targetConvoy, droppedItems, cashReward, convoyStatusMessage,
             isIntercepted, true);
     }
 
     /**
      * Creates a convoy with provided parameters, status message to display and introduction option.
      *
-     * @param droppedItems         List of items dropped by the convoy. Can be {@code null}.
-     * @param droppedUnits         List of units dropped by the convoy. Can be {@code null}.
+     * @param droppedItems         List of items dropped by the convoy.
      * @param cashReward           The amount of cash reward.
      * @param convoyStatusMessage  The status message to be displayed for the convoy.
      * @param isIntercepted        {@link Boolean} indicating if the convoy has been intercepted.
@@ -458,10 +413,9 @@ public class Resupply {
      *                             being informed that they have a message), or whether it's the
      *                             message that follows - informing the player of the message's nature.
      */
-    public void createConvoyMessage(@Nullable Integer targetConvoy, @Nullable List<Part> droppedItems,
-                                    @Nullable List<Unit> droppedUnits, Money cashReward,
-                                    String convoyStatusMessage, boolean isIntercepted,
-                                    boolean isIntroduction) {
+    public void createConvoyMessage(@Nullable Integer targetConvoy, List<Part> droppedItems,
+                                    Money cashReward, String convoyStatusMessage,
+                                    boolean isIntercepted, boolean isIntroduction) {
         boolean isIndependent = contract.getCommandRights().isIndependent();
         StratconTrackState track = getRandomTrack(contract);
 
@@ -487,12 +441,12 @@ public class Resupply {
         ActionListener dialogDismissActionListener = e -> {
             dialog.dispose();
             if (isIntroduction) {
-                createConvoyMessage(targetConvoy, droppedItems, droppedUnits, cashReward,
+                createConvoyMessage(targetConvoy, droppedItems, cashReward,
                     convoyStatusMessage, isIntercepted, false);
             } else {
                 if (isIntercepted) {
                     if (campaign.getCampaignOptions().isUseStratCon()) {
-                        processConvoyInterception(droppedItems, droppedUnits, cashReward,
+                        processConvoyInterception(droppedItems, cashReward,
                             isIndependent, targetConvoy, track, convoyGridReference);
                     } else {
                         campaign.addReport(String.format(resources.getString("convoyInterceptedAtB.text"),
@@ -503,7 +457,7 @@ public class Resupply {
                     campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                         spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                         CLOSING_SPAN_TAG));
-                    deliverDrop(droppedItems, droppedUnits, cashReward);
+                    deliverDrop(droppedItems, cashReward);
                 }
             }
         };
@@ -602,6 +556,22 @@ public class Resupply {
         dialog.setVisible(true);
     }
 
+    /**
+     * Retrieves the speaker's icon for use in message dialogs.
+     *
+     * <p>This method returns a faction logo, convoy commander's icon, or an image of the logistics officer,
+     * depending on whether the communication is an introduction, the command right is independent
+     * and if a logistics officer is present.
+     *
+     * @param targetConvoy      The target convoy in the current context, used to determine the convoy
+     *                         commander's icon. May be {@code null} if a player convoy is not present.
+     * @param isIntroduction    A boolean flag indicating whether the communication is an introduction.
+     * @param logisticsOfficer  The logistics officer involved in the communication, may be
+     *                          {@code null} if not present.
+     *
+     * @return The {@link ImageIcon} representing the speaker. If no specific speaker icon is
+     * available, the method will return {@code null}.
+     */
     @Nullable
     private ImageIcon getSpeakerIcon(Integer targetConvoy, boolean isIntroduction, Person logisticsOfficer) {
         ImageIcon speakerIcon = null;
@@ -779,16 +749,15 @@ public class Resupply {
     /**
      * Processes the interception of a convoy.
      *
-     * @param droppedItems         List of items dropped by the convoy. Can be {@link null}.
-     * @param droppedUnits         List of units dropped by the convoy. Can be {@link null}.
+     * @param droppedItems         List of items dropped by the convoy.
      * @param cashReward           The amount of cash reward.
      * @param isIndependent        Boolean indicating if contract command level is independent.
      * @param targetConvoy         The target convoy.
      * @param track                The track reference for the convoy's location.
      * @param convoyGridReference  The grid reference for the convoy's location.
      */
-    private void processConvoyInterception(List<Part> droppedItems, List<Unit> droppedUnits,
-                                           Money cashReward, boolean isIndependent, Integer targetConvoy,
+    private void processConvoyInterception(List<Part> droppedItems, Money cashReward,
+                                           boolean isIndependent, Integer targetConvoy,
                                            StratconTrackState track, StratconCoords convoyGridReference) {
         String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
 
@@ -801,7 +770,7 @@ public class Resupply {
             campaign.addReport(String.format(resources.getString("convoyErrorTemplate.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 templateAddress, CLOSING_SPAN_TAG));
-            deliverDrop(droppedItems, droppedUnits, cashReward);
+            deliverDrop(droppedItems, cashReward);
             return;
         }
 
@@ -809,7 +778,7 @@ public class Resupply {
             campaign.addReport(String.format(resources.getString("convoyErrorTracks.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 templateAddress, CLOSING_SPAN_TAG));
-            deliverDrop(droppedItems, droppedUnits, cashReward);
+            deliverDrop(droppedItems, cashReward);
             return;
         }
         StratconScenario scenario = generateExternalScenario(campaign, contract, track, convoyGridReference, template);
@@ -825,7 +794,7 @@ public class Resupply {
                 campaign.addReport(String.format(resources.getString("convoyErrorPlayerConvoy.text"),
                     spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                     templateAddress, CLOSING_SPAN_TAG));
-                deliverDrop(droppedItems, droppedUnits, cashReward);
+                deliverDrop(droppedItems, cashReward);
                 return;
             }
 
@@ -838,12 +807,6 @@ public class Resupply {
             if (droppedItems != null) {
                 for (Part part : droppedItems) {
                     loot.addPart(part);
-                }
-            }
-
-            if (droppedUnits != null) {
-                for (Unit unit : droppedUnits) {
-                    loot.addUnit(unit.getEntity());
                 }
             }
 
@@ -1003,31 +966,21 @@ public class Resupply {
      * This method is responsible for delivering the actual supply drop and updating the campaign's
      * inventory and finances.
      *
-     * @param droppedItems A list of items to be dropped. Can be {@code null} if no items are to be
-     *                    dropped.
-     * @param droppedUnits A list of units to be dropped. Can be {@code null} if no units are to be
-     *                    dropped.
+     * @param droppedItems A list of items to be dropped.
      * @param cashReward   The cash reward to be added to the finance ledger.
      */
-    private void deliverDrop(@Nullable List<Part> droppedItems, @Nullable List<Unit> droppedUnits,
-                             Money cashReward) {
+    private void deliverDrop(List<Part> droppedItems, Money cashReward) {
         if (droppedItems != null) {
             for (Part part : droppedItems) {
                 if (part instanceof AmmoBin) {
                     campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(), ((AmmoBin) part).getFullShots());
                 } else if (part instanceof Armor) {
-                    int quantity = (int) Math.floor(((Armor) part).getArmorPointsPerTon() * 5);
+                    int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
                     ((Armor) part).setAmount(quantity);
                     campaign.getWarehouse().addPart(part);
                 } else {
                     campaign.getWarehouse().addPart(part);
                 }
-            }
-        }
-
-        if (droppedUnits != null) {
-            for (Unit unit : droppedUnits) {
-                campaign.addNewUnit(unit.getEntity(), false, 0);
             }
         }
 
@@ -1074,63 +1027,201 @@ public class Resupply {
     }
 
     /**
-     * Populates the 'potentialParts' instance variable with parts obtained from provided units. The
-     * parts are filtered based on their salvage status, year of availability, unit type, whether the
-     * unit is extinct, and before the battle of Tukayyid Inner Sphere factions are unwilling to share
-     * Clan Tech.
+     * Extracts parts from the campaign's units and applies warehouse and industry weight modifiers.
+     * <p>
+     * The method checks each part of each unit in the campaign's units. Only parts from units that
+     * are available and not marked as salvage are considered. Parts are ignored if they meet the
+     * following criteria:
+     * - the part is from a large vessel, super heavy, or conventional infantry unit
+     * - the part relates to a certain locations or is extinct
+     * - the acquisition is taking place before Battle of Tukayyid and is Clan or Mixed tech, while
+     * the employer faction isn't Clan
+     * <p>
+     * For each valid part, we create a "PartDetails" object which includes the part and its adjusted
+     * weight, then add it to a map. If the part is already in the map we increase its weight by the
+     * weight of the new part.
+     *
+     * @return A map of parts and their respective details. If an error occurs during parts collection,
+     * an empty map is returned and the error is logged.
      */
-    private void collectParts() {
+    private Map<String, PartDetails> collectParts() {
         final Collection<Unit> units = campaign.getUnits();
-        potentialParts = new HashMap<>();
+        Map<String, PartDetails> processedParts = new HashMap<>();
 
         try {
             for (Unit unit : units) {
                 Entity entity = unit.getEntity();
 
-                if (entity.isLargeCraft() || entity.isSuperHeavy() || entity.isConventionalInfantry()) {
+                if (isShipOrInfantry(entity)) {
                     continue;
                 }
 
                 if (!unit.isSalvage() && unit.isAvailable()) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
-                        if (part instanceof MekLocation) {
-                            if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
-                                continue;
-                            // If the unit itself is extinct, it's impossible to find replacement locations
-                            } else if (unit.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE)) {
-                                continue;
-                            }
-                        }
-
-                        if (part instanceof TankLocation) {
+                        if (checkMekLocation(part, unit) || checkTankLocation(part) || isExtinct(part)
+                            || isUnavailableBeforeTukayyid(part)) {
                             continue;
                         }
-
-                        // If the individual part is extinct, it's impossible to find
-                        if (part.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE)) {
-                            continue;
-                        }
-
-                        // Prior to the Battle of Tukayyid IS factions are unlikely to be willing to
-                        // share Clan Tech
-                        if (part.isClan() || part.isMixedTech()) {
-                            if (!employerFaction.isClan()) {
-                                if (campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID)) {
-                                    continue;
-                                }
-                            }
-                        }
-
-                        Pair<Unit, Part> pair = new Pair<>(unit, part);
-                        int weight = getDropWeight(pair.getValue());
-                        potentialParts.merge(part, weight, Integer::sum);
+                        int systemIndustry = getSystemIndustry();
+                        PartDetails partDetails = getPartDetails(part, systemIndustry);
+                        processedParts.merge(part.toString(), partDetails, (oldValue, newValue) -> {
+                            oldValue.setWeight(oldValue.getWeight() + newValue.getWeight());
+                            return oldValue;
+                        });
                     }
                 }
             }
+
+            applyWarehouseWeightModifiers(processedParts);
         } catch (Exception exception) {
             logger.error("Aborted parts collection.", exception);
         }
+
+        return processedParts;
+    }
+
+    /**
+     * Adjusts the weights of the parts based on how many are stored in the warehouse.
+     * It takes into consideration both the quantity of part in storage and the multiplier specific
+     * for each part based on its type.
+     *
+     * @param partsList The map of parts and their details to be adjusted.
+     */
+    private void applyWarehouseWeightModifiers(Map<String, PartDetails> partsList) {
+        // Because of how AmmoBins work, we're always considering the campaign to have 0 rounds
+        // of ammo in storage, we could avoid this, but I don't think it's necessary.
+        for (Part part : campaign.getWarehouse().getSpareParts()) {
+            PartDetails targetPart = partsList.get(part.toString());
+            if (targetPart != null) {
+                int spareCount = part.getQuantity();
+                double multiplier = getPartMultiplier(part);
+
+                double targetPartCount = targetPart.getWeight() * multiplier;
+                if ((targetPartCount - spareCount) < 1) {
+                    partsList.remove(part.toString());
+                } else {
+                    targetPart.setWeight(targetPartCount);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if the given entity is a large craft, super heavy, or conventional infantry.
+     *
+     * @param entity The entity to check.
+     * @return Boolean value {@code true} if the entity is large craft, super heavy or conventional
+     * infantry, otherwise {@code false}.
+     */
+    private boolean isShipOrInfantry(Entity entity) {
+        return entity.isLargeCraft() || entity.isSuperHeavy() || entity.isConventionalInfantry();
+    }
+
+    /**
+     * Checks whether a part is a center torso location of a Mek or if the Mek is extinct.
+     *
+     * @param part The part to check.
+     * @param mek  The Mek to which the part belongs.
+     * @return {@code True} if the part is a central torso location or the Mek is extinct.
+     * {@code False} otherwise.
+     */
+    private boolean checkMekLocation(Part part, Unit mek) {
+        return part instanceof MekLocation &&
+            (((MekLocation) part).getLoc() == Mek.LOC_CT
+                || mek.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE));
+    }
+
+    /**
+     * Checks if the given part is a location on a Tank but not a Rotor or Turret.
+     *
+     * @param part The part to check.
+     * @return {@code True} if the part is a location on a Tank but not a Rotor or Turret.
+     * {@code False} otherwise.
+     */
+    private boolean checkTankLocation(Part part) {
+        return part instanceof TankLocation && !(part instanceof Rotor || part instanceof Turret);
+    }
+
+    /**
+     * Checks if the part is extinct.
+     *
+     * @param part The part to check.
+     * @return {@code True} if the part is extinct.
+     * {@code False} otherwise.
+     */
+    private boolean isExtinct(Part part) {
+        return part.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE);
+    }
+
+    /**
+     * Checks if a part is available before the Battle of Tukayyid.
+     *
+     * @param part The part to check.
+     * @return {@code True} if the part is unavailable before Tukayyid.
+     * {@code False} otherwise.
+     */
+    private boolean isUnavailableBeforeTukayyid(Part part) {
+        return (part.isClan() || part.isMixedTech())
+            && !employerFaction.isClan()
+            && campaign.getLocalDate().isBefore(BATTLE_OF_TUKAYYID);
+    }
+
+    /**
+     * Gets the industry value of a system based on the contract type.
+     *
+     * @return The industry rating of the system.
+     */
+    private int getSystemIndustry() {
+        // This default value represents the employer needing to bring in resources from off-planet.
+        int systemIndustry = RATING_C;
+
+        if (contract.getContractType().isGuerrillaWarfare()) {
+            // This value represents the limited resources available to Smugglers
+            systemIndustry = RATING_A;
+        } else if (!contract.getContractType().isRaidType()) {
+            // Otherwise, we use the planet's industry
+            systemIndustry = campaign.getLocation().getPlanet()
+                .getSocioIndustrial(campaign.getLocalDate()).industry;
+        }
+        return systemIndustry;
+    }
+
+    /**
+     * Creates a new {@link PartDetails} instance for a part adjusting its weight based on system
+     * industry and part's tech rating.
+     *
+     * @param part The part for which to create the PartDetails instance.
+     * @param systemIndustry The system industry rating.
+     * @return A new {@link PartDetails} instance with the part and its adjusted weight.
+     */
+    private PartDetails getPartDetails(Part part, double systemIndustry) {
+        // The +1 is to avoid having to divide by 0
+        double adjustedWeight = (systemIndustry + 1) / ((double) part.getTechRating() + 1);
+        return new PartDetails(part, adjustedWeight);
+    }
+
+    /**
+     * Calculates a multiplier for a part's weight based on the part's type.
+     *
+     * @param part The part for which to get the multiplier.
+     * @return The multiplier for the part's weight.
+     */
+    private static double getPartMultiplier(Part part) {
+        double multiplier = 1;
+
+        // This is based on the Mishra Method, found in the Company Generator
+        if (part instanceof HeatSink) {
+            multiplier = 2.5;
+        } else if (part instanceof MekLocation) {
+            if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
+                multiplier = 2;
+            }
+        } else if (part instanceof MASC || part instanceof MekGyro || part instanceof EnginePart) {
+            multiplier = 0.5;
+        }
+
+        return multiplier;
     }
 
     /**
@@ -1138,8 +1229,16 @@ public class Resupply {
      * {@code HashMap}, thus ensuring that the pool remains independent of future changes to the
      * potential parts {@code HashMap}.
      */
-    static List<Part> buildPool(Map<Part, Integer> potentialParts) {
-        List<Part> partsPool = new ArrayList<>(potentialParts.keySet());
+    private List<Part> buildPool(Map<String, PartDetails> potentialParts) {
+        List<Part> partsPool = new ArrayList<>();
+
+        for (PartDetails potentialPart : potentialParts.values()) {
+            // We need to use ceil here, otherwise well-stocked campaigns will end up with very
+            // mediocre Resupplies.
+            for (int entry = 0; entry < Math.ceil(potentialPart.getWeight()); entry++) {
+                partsPool.add(preparePart(potentialPart.getPart()));
+            }
+        }
 
         if (!partsPool.isEmpty()) {
             Collections.shuffle(partsPool);
@@ -1149,20 +1248,20 @@ public class Resupply {
     }
 
     /**
-     * Retrieves a part from the parts pool by picking one at random, creating a clone of it and
-     * adjusting some properties of the cloned part to fit the requirements of a supply drop. The
-     * cloned part is then returned.
+     * Creates a copy of a given part with specific properties adjusted to fit a resupply.
+     * The properties adjusted include fixing any damage on the part, setting its quality to a randomly
+     * determined value (except for AmmoBins), and marking the part as brand new and not OmniPodded.
+     * <p>
+     * If the part fails to clone, an error is logged and the method returns {@code null}.
      *
-     * @return A {@link Part} object representing the selected part from pool. {@code Null} is returned
-     * if cloning fails.
+     * @param originPart The {@link Part} object to clone and modify.
+     * @return A cloned {@link Part} object , or {@code null} if cloning fails.
      */
-    private Part getPart() {
-        Part sourcePart = partsPool.get(random.nextInt(partsPool.size()));
-        Part clonedPart = sourcePart.clone();
+    private Part preparePart(Part originPart) {
+        Part clonedPart = originPart.clone();
 
         if (clonedPart == null) {
-            logger.error(String.format("Failed to clone part: %s", sourcePart));
-            logger.error(String.format(sourcePart.getName()));
+            logger.error(String.format("Failed to clone part: %s", originPart));
             return null;
         }
 
@@ -1182,6 +1281,14 @@ public class Resupply {
         return clonedPart;
     }
 
+    /**
+     * @return A randomly selected {@link Part} from the parts pool with its quality set to a random value.
+     */
+    private Part getRandomPart() {
+        Part randomPart = partsPool.get(random.nextInt(partsPool.size()));
+        randomPart.setQuality(getRandomPartQuality(0));
+        return randomPart;
+    }
     /**
      * This method initiates to generate the supply drop parts and display them on the dialog.
      * The ‘dropCount’ parameter determines the number of times the part generation loop runs.
@@ -1226,13 +1333,9 @@ public class Resupply {
                     continue;
                 }
 
-                Part potentialPart = getPart();
+                Part potentialPart = getRandomPart();
 
-                if (potentialPart == null) {
-                    continue;
-                }
-
-                runningTotal = runningTotal.plus(potentialPart.getUndamagedValue());
+                runningTotal = runningTotal.plus(potentialPart.getActualValue());
                 droppedItems.add(potentialPart);
             }
         }
@@ -1284,37 +1387,11 @@ public class Resupply {
                     if (part instanceof AmmoBin) {
                         return ((AmmoBin) part).getFullShots();
                     } else if (part instanceof Armor) {
-                        return (int) Math.floor(((Armor) part).getArmorPointsPerTon() * 5);
+                        return (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
                     } else {
                         return 1;
                     }
                 },
-                Integer::sum));
-    }
-
-    /**
-     * The unit based counterpart of {@code createPartsReport()} - instead of parts, it makes a
-     * similar report based on unit objects.
-     *
-     * @param droppedUnits List of {@link Unit} objects that were included in the supply drop. Can be
-     * {@code null}.
-     * @return A map containing the dropped units and their quantities.
-     */
-    public Map<String, Integer> createUnitsReport(@Nullable List<Unit> droppedUnits) {
-        int year = campaign.getGameYear();
-        Faction originFaction = campaign.getFaction();
-
-        return droppedUnits.stream()
-            .collect(Collectors.toMap(
-                unit -> {
-                    String append = unit.isClan() ? " (Clan)" : "";
-                    append = unit.isMixedTech() ? " (Mixed)" : append;
-                    append += unit.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
-                        " (<b>Extinct</b>)" : "";
-
-                    return unit.getName() + " (" + unit.getQualityName() + ')' + append;
-                },
-                part -> 1,
                 Integer::sum));
     }
 
@@ -1508,5 +1585,51 @@ public class Resupply {
         dialog.setLocationRelativeTo(null);
         dialog.setModal(true);
         dialog.setVisible(true);
+    }
+}
+
+/**
+ * Class representing details about a part, including the part itself and its drop weight.
+ */
+class PartDetails {
+    private Part part;
+    private double weight;
+
+    /**
+     * Constructs a {@link PartDetails} object with associated part and weight.
+     *
+     * @param part The part to be stored in this object.
+     * @param weight The weight to be associated with the part.
+     */
+    public PartDetails(Part part, double weight) {
+        this.part = part;
+        this.weight = weight;
+    }
+
+    /**
+     * Returns the part associated with this object.
+     *
+     * @return the stored {@link Part} object.
+     */
+    public Part getPart() {
+        return part;
+    }
+
+    /**
+     * Gets the part's drop weight.
+     *
+     * @return The weight associated with the stored part.
+     */
+    public double getWeight() {
+        return weight;
+    }
+
+    /**
+     * Sets the drop weight for the part.
+     *
+     * @param weight The weight to be set.
+     */
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 }
