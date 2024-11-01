@@ -28,8 +28,6 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,7 +44,6 @@ public class StratconContractInitializer {
 
     public static final int NUM_LANCES_PER_TRACK = 3;
     public static final int ZERO_CELSIUS_IN_KELVIN = 273;
-    private static final Logger log = LogManager.getLogger(StratconContractInitializer.class);
 
     /**
      * Initializes the campaign state given a contract, campaign and contract

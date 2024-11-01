@@ -204,22 +204,15 @@ public class ScenarioObjectiveProcessor {
     private boolean entityMeetsObjective(Entity entity, ScenarioObjective objective,
             Set<String> objectiveUnitIDs, boolean opponentHasBattlefieldControl) {
         if (objectiveUnitIDs.contains(entity.getExternalIdAsString())) {
-            switch (objective.getObjectiveCriterion()) {
-                case Destroy:
-                    return entityIsDestroyed(entity, opponentHasBattlefieldControl);
-                case ForceWithdraw:
-                    return entityIsForcedWithdrawal(entity);
-                case Capture:
-                    return entityIsCaptured(entity, !opponentHasBattlefieldControl);
-                case PreventReachMapEdge:
-                    return !entityHasReachedDestinationEdge(entity, objective);
-                case Preserve:
-                    return !entityIsDestroyed(entity, opponentHasBattlefieldControl);
-                case ReachMapEdge:
-                    return entityHasReachedDestinationEdge(entity, objective);
-                default:
-                    return false;
-            }
+            return switch (objective.getObjectiveCriterion()) {
+                case Destroy -> entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                case ForceWithdraw -> entityIsForcedWithdrawal(entity);
+                case Capture -> entityIsCaptured(entity, !opponentHasBattlefieldControl);
+                case PreventReachMapEdge -> !entityHasReachedDestinationEdge(entity, objective);
+                case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                case ReachMapEdge -> entityHasReachedDestinationEdge(entity, objective);
+                default -> false;
+            };
         }
 
         return false;

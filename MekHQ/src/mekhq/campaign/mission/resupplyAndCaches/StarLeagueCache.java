@@ -609,9 +609,9 @@ public class StarLeagueCache {
     private String getProposalText(Money proposal) {
         String commanderTitle = getCommanderTitle(campaign, true);
 
-        String message = String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"), commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"), proposal.toAmountAndSymbolString());
-
-        return message;
+        return String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"),
+            commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"),
+            proposal.toAmountAndSymbolString());
     }
 
     private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
