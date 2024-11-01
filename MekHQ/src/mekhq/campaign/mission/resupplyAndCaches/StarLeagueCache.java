@@ -26,7 +26,7 @@ import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
@@ -38,6 +38,7 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
@@ -58,6 +59,7 @@ import static megamek.common.UnitType.AEROSPACEFIGHTER;
 import static megamek.common.UnitType.INFANTRY;
 import static megamek.common.UnitType.MEK;
 import static megamek.common.UnitType.TANK;
+import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getCommanderTitle;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getDropWeight;
@@ -96,6 +98,10 @@ public class StarLeagueCache {
         return Compute.randomInt(CacheType.values().length);
     }
 
+    public Faction getFaction() {
+        return originFaction;
+    }
+
     public StarLeagueCache(Campaign campaign, AtBContract contract, int cacheType) {
         this.campaign = campaign;
         this.contract = contract;
@@ -103,17 +109,17 @@ public class StarLeagueCache {
 
         ruinedChance = campaign.getGameYear() - FALL_OF_STAR_LEAGUE.getYear();
 
-        getOriginFaction();
+        determineOriginFaction();
+    }
 
-        if (cacheType == CacheType.COMBAT_CACHE.ordinal()) {
-            if (!didGenerationFail) {
-                intactUnits = getCacheContents();
-                processUnits();
-            }
+    private void generateCombatCacheContents() {
+        if (!didGenerationFail) {
+            intactUnits = getCacheContents();
+            processUnits();
+        }
 
-            if (partsPool.isEmpty() && intactUnits.isEmpty()) {
-                didGenerationFail = true;
-            }
+        if (partsPool.isEmpty() && intactUnits.isEmpty()) {
+            didGenerationFail = true;
         }
     }
 
@@ -183,15 +189,15 @@ public class StarLeagueCache {
         }
     }
 
-    private void getOriginFaction() {
+    public void determineOriginFaction() {
         final int sphereOfInfluence = 650;
-        final CurrentLocation location = campaign.getLocation();
-        final double distanceToTerra = location.getCurrentSystem().getDistanceTo(campaign.getSystemById("Terra"));
+        final PlanetarySystem contractSystem = contract.getSystem();
+        final double distanceToTerra = contractSystem.getDistanceTo(campaign.getSystemById("Terra"));
 
         // This is a fallback to better ensure something drops, even if it isn't a SLDF Depot
         // This value was reached by 'eye-balling' the map of the Inner Sphere
         if (distanceToTerra > sphereOfInfluence) {
-            List<String> factions = location.getPlanet().getFactions(FALL_OF_STAR_LEAGUE);
+            List<String> factions = contractSystem.getFactions(FALL_OF_STAR_LEAGUE);
 
             if (factions.isEmpty()) {
                 didGenerationFail = true;
@@ -416,7 +422,7 @@ public class StarLeagueCache {
         JLabel iconLabel = new JLabel();
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        ImageIcon speakerIcon = getSpeakerIcon();
+        ImageIcon speakerIcon = getSpeakerIcon(false);
         speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
@@ -426,7 +432,6 @@ public class StarLeagueCache {
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
         description.setHorizontalAlignment(JLabel.CENTER);
-        dialog.add(description, BorderLayout.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
@@ -444,6 +449,169 @@ public class StarLeagueCache {
         dialog.setModal(true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    public void createProposalDialog() {
+        Money proposal = calculateProposal();
+
+        // Dialog dimensions and representative
+        final int DIALOG_WIDTH = 400;
+        final int DIALOG_HEIGHT = 200;
+
+        // Creates and sets up the dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Defines the action when the dialog is being dismissed
+        ActionListener dialogDismissActionListener = e -> {
+            dialog.dispose();
+            campaign.getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
+                resources.getString("transaction.text"));
+        };
+
+        // Associates the dismiss action to the dialog window close event
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                dialogDismissActionListener.actionPerformed(null);
+            }
+        });
+
+        // Prepares and adds the icon of the representative as a label
+        JLabel iconLabel = new JLabel();
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        ImageIcon speakerIcon = getSpeakerIcon(true);
+        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+        iconLabel.setIcon(speakerIcon);
+        dialog.add(iconLabel, BorderLayout.NORTH);
+
+        // Prepares and adds the description
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                UIUtil.scaleForGUI(DIALOG_WIDTH), getProposalText(proposal)));
+        description.setHorizontalAlignment(JLabel.CENTER);
+
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
+            String.format(resources.getString("dialogBorderTitle.text"),
+                resources.getString("senderUnknown.text"))));
+        descriptionPanel.add(description);
+        dialog.add(descriptionPanel, BorderLayout.CENTER);
+
+        // Prepares and adds the accept button
+        JButton acceptDialog = new JButton(resources.getString("propositionAccept.text"));
+        acceptDialog.addActionListener(dialogDismissActionListener);
+
+        // Prepares and adds the refuse button
+        JButton refuseDialog = new JButton(resources.getString("propositionRefuse.text"));
+        refuseDialog.addActionListener(e -> {
+            dialog.dispose();
+            createProposalRefusalConfirmationDialog(proposal);
+        });
+
+        // Creates a panel to house both buttons
+        JPanel actionsPanel = new JPanel(new FlowLayout());
+        actionsPanel.add(acceptDialog);
+        actionsPanel.add(refuseDialog);
+        dialog.add(actionsPanel, BorderLayout.SOUTH);
+
+        // Pack, position and display the dialog
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    public void createProposalRefusalConfirmationDialog(Money proposal) {
+        // Dialog dimensions and representative
+        final int DIALOG_WIDTH = 300;
+        final int DIALOG_HEIGHT = 200;
+
+        // Creates and sets up the dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Defines the action when the dialog is being dismissed
+        ActionListener dialogDismissActionListener = e -> {
+            dialog.dispose();
+            campaign.getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
+                resources.getString("transaction.text"));
+        };
+
+        // Associates the dismiss action to the dialog window close event
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                dialogDismissActionListener.actionPerformed(null);
+            }
+        });
+
+        // Prepares and adds the icon of the representative as a label
+        JLabel iconLabel = new JLabel();
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        ImageIcon speakerIcon = getSpeakerIcon(true);
+        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+        iconLabel.setIcon(speakerIcon);
+        dialog.add(iconLabel, BorderLayout.NORTH);
+
+        // Prepares and adds the description
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                UIUtil.scaleForGUI(DIALOG_WIDTH), resources.getString("warning.text")));
+        description.setHorizontalAlignment(JLabel.CENTER);
+
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
+            String.format(resources.getString("dialogBorderTitle.text"),
+                resources.getString("senderUnknown.text"))));
+        descriptionPanel.add(description);
+        dialog.add(descriptionPanel, BorderLayout.CENTER);
+
+        // Prepares and adds the accept button
+        JButton acceptDialog = new JButton(resources.getString("propositionAccept.text"));
+        acceptDialog.addActionListener(dialogDismissActionListener);
+
+        // Prepares and adds the refuse button
+        JButton refuseDialog = new JButton(resources.getString("propositionRefuse.text"));
+        refuseDialog.addActionListener(e -> {
+            dialog.dispose();
+            createProposalRefusalConfirmationDialog(proposal);
+        });
+
+        // Creates a panel to house both buttons
+        JPanel actionsPanel = new JPanel(new FlowLayout());
+        actionsPanel.add(acceptDialog);
+        actionsPanel.add(refuseDialog);
+        dialog.add(actionsPanel, BorderLayout.SOUTH);
+
+        // Pack, position and display the dialog
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    private Money calculateProposal() {
+        Money proposal = contract.getTotalAmount();
+        double proposalValue = proposal.getAmount().doubleValue();
+        double roundedValue = Math.ceil(proposalValue / 1_000_000) * 1_000_000;
+        return Money.of(roundedValue);
+    }
+
+    private String getProposalText(Money proposal) {
+        String commanderTitle = getCommanderTitle(campaign, true);
+
+        String message = String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"), commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"), proposal.toAmountAndSymbolString());
+
+        return message;
     }
 
     private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
@@ -465,7 +633,11 @@ public class StarLeagueCache {
     }
 
     @Nullable
-    private ImageIcon getSpeakerIcon() {
-        return getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
+    private ImageIcon getSpeakerIcon(boolean isAnon) {
+        if (isAnon) {
+            return new ImageIcon("data/images/portraits/default.gif");
+        } else {
+            return getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
+        }
     }
 }

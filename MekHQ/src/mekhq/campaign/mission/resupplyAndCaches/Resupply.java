@@ -576,7 +576,6 @@ public class Resupply {
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
             UIUtil.scaleForGUI(DIALOG_WIDTH), message));
         description.setHorizontalAlignment(JLabel.CENTER);
-        dialog.add(description, BorderLayout.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
@@ -662,7 +661,6 @@ public class Resupply {
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
             UIUtil.scaleForGUI(DIALOG_WIDTH), message));
         description.setHorizontalAlignment(JLabel.CENTER);
-        dialog.add(description, BorderLayout.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(

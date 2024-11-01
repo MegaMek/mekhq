@@ -1831,18 +1831,19 @@ public class StratconRulesManager {
                     } else if (Objects.equals(backingScenario.getName(), "Chasing a Rumor")) {
                         if (victory) {
                             int roll = Compute.randomInt(10);
+                            StarLeagueCache cache = new StarLeagueCache(campaign, ((AtBContract) mission),
+                                CacheType.TRASH_CACHE.ordinal());
 
                             // The rumor is a dud
-                            if (roll > 0) {
-                                StarLeagueCache cache = new StarLeagueCache(campaign, ((AtBContract) mission),
-                                    CacheType.TRASH_CACHE.ordinal());
+                            if (false) { // TODO replace placeholder value
                                 cache.createDudDialog(track, scenario);
                             } else {
-                                logger.info("The rumor was legit.");
+                                if (Objects.equals(cache.getFaction().getShortName(), "SL")) {
+                                    cache.createProposalDialog();
+                                }
                             }
                         }
                     }
-
                     break;
                 }
             }
