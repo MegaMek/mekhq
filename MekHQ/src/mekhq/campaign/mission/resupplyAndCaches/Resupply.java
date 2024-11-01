@@ -521,29 +521,7 @@ public class Resupply {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         Person logisticsOfficer = pickLogisticsRepresentative();
-        ImageIcon speakerIcon = null;
-        if (isIntroduction) {
-            if (logisticsOfficer == null) {
-                speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
-                    true);
-            } else {
-                speakerIcon = logisticsOfficer.getPortrait().getImageIcon();
-            }
-        } else {
-            if (contract.getCommandRights().isIndependent()) {
-                speakerIcon = getIndependentIconLabel(targetConvoy);
-            }
-
-            if (speakerIcon == null) {
-                if (contract.getCommandRights().isIndependent()) {
-                    speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
-                        true);
-                } else {
-                    speakerIcon = getFactionLogo(campaign, employerFaction.getShortName(),
-                        true);
-                }
-            }
-        }
+        ImageIcon speakerIcon = getSpeakerIcon(targetConvoy, isIntroduction, logisticsOfficer);
         speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
@@ -623,6 +601,34 @@ public class Resupply {
         dialog.setModal(true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    @Nullable
+    private ImageIcon getSpeakerIcon(Integer targetConvoy, boolean isIntroduction, Person logisticsOfficer) {
+        ImageIcon speakerIcon = null;
+        if (isIntroduction) {
+            if (logisticsOfficer == null) {
+                speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
+                    true);
+            } else {
+                speakerIcon = logisticsOfficer.getPortrait().getImageIcon();
+            }
+        } else {
+            if (contract.getCommandRights().isIndependent()) {
+                speakerIcon = getIndependentIconLabel(targetConvoy);
+            }
+
+            if (speakerIcon == null) {
+                if (contract.getCommandRights().isIndependent()) {
+                    speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
+                        true);
+                } else {
+                    speakerIcon = getFactionLogo(campaign, employerFaction.getShortName(),
+                        true);
+                }
+            }
+        }
+        return speakerIcon;
     }
 
     /**
@@ -706,7 +712,7 @@ public class Resupply {
      * @param width The desired width.
      * @return The scaled {@link ImageIcon}.
      */
-    private static ImageIcon scaleImageIconToWidth(ImageIcon icon, int width) {
+    static ImageIcon scaleImageIconToWidth(ImageIcon icon, int width) {
         int height = (int) Math.ceil((double) width * icon.getIconHeight() / icon.getIconWidth());
         Image image = icon.getImage();
         Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -980,7 +986,7 @@ public class Resupply {
      * @param includeSurname {@link Boolean} indicating if the surname is to be included.
      * @return The title of the commander.
      */
-    private static String getCommanderTitle(Campaign campaign, boolean includeSurname) {
+    static String getCommanderTitle(Campaign campaign, boolean includeSurname) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
         String placeholder = resources.getString("commander.text");
         Person commander = campaign.getFlaggedCommander();

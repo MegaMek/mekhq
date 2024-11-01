@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.mission.resupplyAndCaches;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
@@ -31,12 +32,21 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.stratcon.StratconCoords;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.apache.commons.math3.util.Pair;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.*;
 
 import static megamek.common.EntityWeightClass.WEIGHT_ASSAULT;
@@ -49,12 +59,16 @@ import static megamek.common.UnitType.INFANTRY;
 import static megamek.common.UnitType.MEK;
 import static megamek.common.UnitType.TANK;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getCommanderTitle;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getDropWeight;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.scaleImageIconToWidth;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 public class StarLeagueCache {
     private final Campaign campaign;
     private final AtBContract contract;
+    private final int cacheType;
     private final Random random = new Random();
     private Faction originFaction;
     private boolean didGenerationFail = false;
@@ -63,6 +77,7 @@ public class StarLeagueCache {
     private List<Unit> intactUnits;
 
     // We use year -1 as otherwise MHQ considers the SL to no longer exist.
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
     private final LocalDate FALL_OF_STAR_LEAGUE = LocalDate.of(
         Factions.getInstance().getFaction("SL").getEndYear() - 1, 1, 1);
 
@@ -84,6 +99,7 @@ public class StarLeagueCache {
     public StarLeagueCache(Campaign campaign, AtBContract contract, int cacheType) {
         this.campaign = campaign;
         this.contract = contract;
+        this.cacheType = cacheType;
 
         ruinedChance = campaign.getGameYear() - FALL_OF_STAR_LEAGUE.getYear();
 
@@ -369,5 +385,87 @@ public class StarLeagueCache {
         }
 
         return unitWeights;
+    }
+
+    public void createDudDialog(StratconTrackState track, StratconScenario scenario) {
+        StratconCoords stratconCoords = scenario.getCoords();
+
+        // Dialog dimensions and representative
+        final int DIALOG_WIDTH = 400;
+        final int DIALOG_HEIGHT = 200;
+
+        // Creates and sets up the dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("dialog.title"));
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(UIUtil.scaleForGUI(DIALOG_WIDTH, DIALOG_HEIGHT));
+        dialog.setLocationRelativeTo(null);
+
+        // Defines the action when the dialog is being dismissed
+        ActionListener dialogDismissActionListener = e -> dialog.dispose();
+
+        // Associates the dismiss action to the dialog window close event
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                dialogDismissActionListener.actionPerformed(null);
+            }
+        });
+
+        // Prepares and adds the icon of the representative as a label
+        JLabel iconLabel = new JLabel();
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        ImageIcon speakerIcon = getSpeakerIcon();
+        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+        iconLabel.setIcon(speakerIcon);
+        dialog.add(iconLabel, BorderLayout.NORTH);
+
+        // Prepares and adds the description
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
+        description.setHorizontalAlignment(JLabel.CENTER);
+        dialog.add(description, BorderLayout.CENTER);
+
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
+            String.format(resources.getString("dialogBorderTitle.text"), "PLACEHOLDER")));
+        descriptionPanel.add(description);
+        dialog.add(descriptionPanel, BorderLayout.CENTER);
+
+        // Prepares and adds the confirm button
+        JButton confirmButton = new JButton(resources.getString("confirmDud.text"));
+        confirmButton.addActionListener(dialogDismissActionListener);
+        dialog.add(confirmButton,  BorderLayout.SOUTH);
+
+        // Pack, position and display the dialog
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
+        final String DUD_FORWARD = "dud";
+        final String DUD_AFTERWARD = ".text";
+
+        String commanderTitle = getCommanderTitle(campaign, false);
+        String gridReference = track.toString() + '-' + stratconCoords.toBTString();
+
+        int roll = Compute.d6(1);
+        if ((roll <= 2) || !(Objects.equals(originFaction.getShortName(), "SL"))) {
+            return String.format(resources.getString(DUD_FORWARD + "Generic" +
+                Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference,
+                originFaction.getFullName(campaign.getGameYear()));
+        } else {
+            return String.format(resources.getString(DUD_FORWARD + "StarLeague"
+                + Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference);
+        }
+    }
+
+    @Nullable
+    private ImageIcon getSpeakerIcon() {
+        return getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
     }
 }

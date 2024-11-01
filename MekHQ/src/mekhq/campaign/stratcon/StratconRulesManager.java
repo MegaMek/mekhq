@@ -40,6 +40,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
+import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -297,6 +299,62 @@ public class StratconRulesManager {
          // We return the scenario in case we want to make specific changes.
          return scenario;
      }
+
+    /**
+     * Adds a {@link StratconScenario} to the specified contract. This scenario is cloaked so will
+     * not be visible until the player uncovers it.
+     * If no {@link StratconTrackState} or {@link ScenarioTemplate} is provided, random one will be
+     * picked.
+     *
+     * @param campaign   The current campaign.
+     * @param contract   The {@link AtBContract} associated with the scenario.
+     * @param trackState The {@link StratconTrackState} in which the scenario occurs.
+     *                  If {@code null}, a random trackState is selected.
+     * @param template   The {@link ScenarioTemplate} for the scenario.
+     *                  If {@code null}, the default template is used.
+     *
+     * @return The created {@link StratconScenario} or @code null},
+     * if no {@link ScenarioTemplate} is found or if all coordinates in the provided
+     * {@link StratconTrackState} are occupied (and therefore, scenario placement is not possible).
+     */
+    @Nullable
+    public static StratconScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
+                                                      @Nullable StratconTrackState trackState,
+                                                      @Nullable ScenarioTemplate template) {
+        // If we're not generating for a specific track, randomly pick one.
+        if (trackState == null) {
+            trackState = getRandomTrack(contract);
+
+            if (trackState == null) {
+                logger.error("Failed to generate a random track, aborting scenario generation.");
+                return null;
+            }
+        }
+
+        StratconCoords coords = getUnoccupiedCoords(trackState);
+
+        if (coords == null) {
+            logger.error(String.format("Unable to place objective scenario on track %s," +
+                    " as all coords were occupied. Aborting.",
+                trackState.getDisplayableName()));
+            return null;
+        }
+
+        // create scenario - don't assign a force yet
+        StratconScenario scenario = StratconRulesManager.generateScenario(campaign, contract,
+            trackState, Force.FORCE_NONE, coords, template);
+
+        // clear dates, because we don't want the scenario disappearing on us
+        scenario.setDeploymentDate(null);
+        scenario.setActionDate(null);
+        scenario.setReturnDate(null);
+        scenario.setStrategicObjective(true);
+        scenario.getBackingScenario().setCloaked(true);
+
+        trackState.addScenario(scenario);
+
+        return scenario;
+    }
 
     /**
      * Fetches a random {@link StratconTrackState} from the {@link StratconCampaignState}.
@@ -1714,9 +1772,12 @@ public class StratconRulesManager {
      * ResolveScenarioTracker.finish()
      * has been invoked.
      */
-    public static void processScenarioCompletion(Campaign campaign, ResolveScenarioTracker tracker) {
-        if (tracker.getMission() instanceof AtBContract) {
-            StratconCampaignState campaignState = ((AtBContract) tracker.getMission()).getStratconCampaignState();
+    public static void processScenarioCompletion(ResolveScenarioTracker tracker) {
+        Campaign campaign = tracker.getCampaign();
+        Mission mission = tracker.getMission();
+
+        if (mission instanceof AtBContract) {
+            StratconCampaignState campaignState = ((AtBContract) mission).getStratconCampaignState();
             if (campaignState == null) {
                 return;
             }
@@ -1749,26 +1810,40 @@ public class StratconRulesManager {
                         switchFacilityOwner(facility);
                     }
 
-                    processTrackForceReturnDates(track, tracker.getCampaign());
+                    processTrackForceReturnDates(track, campaign);
 
                     track.removeScenario(scenario);
+
+                    // I really don't like checking against a String here, but I couldn't find a way to
+                    // fetch the scenario's original template
+                    if (Objects.equals(backingScenario.getName(), "Emergency Convoy Defense")) {
+                        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+                        if (victory) {
+                            campaign.addReport(String.format(resources.getString("convoyRescuedStratCon.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                                CLOSING_SPAN_TAG));
+                        } else {
+                            campaign.addReport(String.format(resources.getString("convoyDefeatedStratCon.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                                CLOSING_SPAN_TAG));
+                        }
+                    } else if (Objects.equals(backingScenario.getName(), "Chasing a Rumor")) {
+                        if (victory) {
+                            int roll = Compute.randomInt(10);
+
+                            // The rumor is a dud
+                            if (roll > 0) {
+                                StarLeagueCache cache = new StarLeagueCache(campaign, ((AtBContract) mission),
+                                    CacheType.TRASH_CACHE.ordinal());
+                                cache.createDudDialog(track, scenario);
+                            } else {
+                                logger.info("The rumor was legit.");
+                            }
+                        }
+                    }
+
                     break;
-                }
-            }
-
-            // I really don't like checking against a String here, but I couldn't find a way to
-            // fetch the scenario's original template
-            if (Objects.equals(backingScenario.getName(), "Emergency Convoy Defense")) {
-                ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
-
-                if (victory) {
-                    campaign.addReport(String.format(resources.getString("convoyRescuedStratCon.text"),
-                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        CLOSING_SPAN_TAG));
-                } else {
-                    campaign.addReport(String.format(resources.getString("convoyDefeatedStratCon.text"),
-                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                        CLOSING_SPAN_TAG));
                 }
             }
         }

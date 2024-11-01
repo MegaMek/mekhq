@@ -28,10 +28,15 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -41,6 +46,7 @@ public class StratconContractInitializer {
 
     public static final int NUM_LANCES_PER_TRACK = 3;
     public static final int ZERO_CELSIUS_IN_KELVIN = 273;
+    private static final Logger log = LogManager.getLogger(StratconContractInitializer.class);
 
     /**
      * Initializes the campaign state given a contract, campaign and contract
@@ -192,6 +198,24 @@ public class StratconContractInitializer {
         if (contract.getCommandRights() == ContractCommandRights.INTEGRATED) {
             for (StratconTrackState track : campaignState.getTracks()) {
                 track.getStrategicObjectives().clear();
+            }
+        }
+
+        // Roll to see if a hidden cache is present
+        if (false) { // TODO remove placeholder value
+            ScenarioTemplate template = ScenarioTemplate.Deserialize("data/scenariotemplates/Chasing a Rumor.xml");
+
+            if (template != null) {
+                StratconScenario hiddenCache = addHiddenExternalScenario(campaign, contract,
+                    null, template);
+
+                if (hiddenCache != null) {
+                    hiddenCache.setCurrentState(ScenarioState.UNRESOLVED);
+                    logger.info(String.format("A secret cache has been spawned for contract %s",
+                        contract.getName()));
+                }
+            } else {
+                logger.error("'Chasing a Rumor' scenario failed to deserialize");
             }
         }
 
