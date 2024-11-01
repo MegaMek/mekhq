@@ -796,7 +796,7 @@ public class AtBContract extends Contract {
                     campaign.addReport("<b>Special Event:</b> ");
                     if (doBonusRoll(campaign)) {
                         campaign.addReport("Bonus: Captured Supplies");
-                        Resupply supplyDrops = new Resupply(campaign, this, false, false);
+                        Resupply supplyDrops = new Resupply(campaign, this);
                         supplyDrops.getResupplyParts(1, true);
                     }
 

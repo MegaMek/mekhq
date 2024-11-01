@@ -3865,7 +3865,7 @@ public class Campaign implements ITechManager {
         final ResourceBundle resupplyResources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
         int maximumResupplySize = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-        Resupply resupplies = new Resupply(this, contract, false, false);
+        Resupply resupplies = new Resupply(this, contract);
         int requiredTonnage = (int) round(maximumResupplySize * RESUPPLY_LOAD_SIZE);
 
         if (!contract.getCommandRights().isIndependent()) {
