@@ -22,7 +22,7 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>3</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>

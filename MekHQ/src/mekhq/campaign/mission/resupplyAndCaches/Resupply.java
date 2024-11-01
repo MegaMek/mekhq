@@ -40,6 +40,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
@@ -56,7 +58,6 @@ import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
@@ -83,6 +84,9 @@ public class Resupply {
     private List<Part> partsPool;
     private Random random;
     private boolean usePlayerConvoy;
+    private int convoyCount;
+    private double totalCargoCapacity;
+    private int negotiationModifier;
 
     private final int YEAR;
     private final int EMPLOYER_TECH_CODE;
@@ -115,6 +119,45 @@ public class Resupply {
 
         partsPool = buildPool(collectParts());
         random = new Random();
+
+        calculateNegotiationModifier();
+        calculatePlayerConvoyValues();
+    }
+
+    /**
+     * @return {@code true} if the player's convoy is being used, {@code false} otherwise.
+     */
+    public boolean isUsePlayerConvoy() {
+        return usePlayerConvoy;
+    }
+
+    private void calculateNegotiationModifier() {
+        Person negotiator;
+        negotiationModifier = -4;
+
+        if (contract.getContractType().isGuerrillaWarfare()) {
+            negotiator = campaign.getFlaggedCommander();
+        } else {
+            negotiator = null;
+
+            for (Person admin : campaign.getAdmins()) {
+                if (admin.getPrimaryRole().isAdministratorLogistics()
+                    || admin.getSecondaryRole().isAdministratorLogistics()) {
+                    if (negotiator == null
+                        || (admin.outRanksUsingSkillTiebreaker(campaign, negotiator))) {
+                        negotiator = admin;
+                    }
+                }
+            }
+        }
+
+        if (negotiator != null) {
+            Skill skill = negotiator.getSkill(SkillType.S_NEG);
+
+            if (skill != null) {
+                negotiationModifier = Math.min(3, skill.getFinalSkillValue() - 3);
+            }
+        }
     }
 
     /**
@@ -135,9 +178,7 @@ public class Resupply {
 
         StringBuilder message = new StringBuilder(getInitialDescription(isLoot, isContractEnd));
 
-        Map<String, Integer> partsReport = createPartsReport(droppedItems);
-        List<Entry<String, Integer>> entries = new ArrayList<>(partsReport.entrySet());
-
+        List<String> partsReport = createPartsReport(droppedItems);
         if (!partsReport.isEmpty()) {
             if (!isLoot && !isContractEnd) {
                 int rationPacks = 0;
@@ -159,21 +200,21 @@ public class Resupply {
                 rationPacks *= (int) Math.ceil((double) campaign.getLocalDate().lengthOfMonth() / 4);
 
                 if (rationPacks > 0) {
-                    entries.add(Map.entry(resources.getString("resourcesRations.text"),
-                        rationPacks));
+                    partsReport.add(resources.getString("resourcesRations.text")
+                        + " x" + rationPacks);
                 }
 
                 if (medicalSupplies > 0) {
-                    entries.add(Map.entry(resources.getString("resourcesMedical.text"),
-                        medicalSupplies));
+                    partsReport.add(resources.getString("resourcesMedical.text")
+                        + " x" + medicalSupplies);
                 }
             }
         }
 
-        String[] columns = formatColumnData(entries);
+        String[] columns = formatColumnData(partsReport);
 
         if (!cashReward.isZero()) {
-            columns[entries.size() % 3] += "<br> - " + cashReward.toAmountAndSymbolString();
+            columns[partsReport.size() % 3] += "<br> - " + cashReward.toAmountAndSymbolString();
         }
 
         message.append("<table><tr valign='top'>")
@@ -290,12 +331,12 @@ public class Resupply {
 
         StringBuilder message = new StringBuilder(getSmugglerDescription(droppedItems, false));
 
-        Map<String, Integer> partsReport = new HashMap<>();
+        List<String> partsReport = new ArrayList<>();
         if (droppedItems != null) {
             partsReport = createPartsReport(droppedItems);
         }
 
-        List<Entry<String, Integer>> entries = new ArrayList<>(partsReport.entrySet());
+        List<String> entries = new ArrayList<>(partsReport);
         String[] columns = formatColumnData(entries);
 
         message.append("<table><tr valign='top'>")
@@ -346,7 +387,7 @@ public class Resupply {
         }
 
         Integer targetConvoy = null;
-        if (contract.getCommandRights().isIndependent()) {
+        if (usePlayerConvoy) {
             targetConvoy = getRandomConvoy();
 
             if (message.isEmpty()) {
@@ -418,7 +459,6 @@ public class Resupply {
     public void createConvoyMessage(@Nullable Integer targetConvoy, List<Part> droppedItems,
                                     Money cashReward, String convoyStatusMessage,
                                     boolean isIntercepted, boolean isIntroduction) {
-        boolean isIndependent = contract.getCommandRights().isIndependent();
         StratconTrackState track = getRandomTrack(contract);
 
         StratconCoords convoyGridReference;
@@ -448,8 +488,8 @@ public class Resupply {
             } else {
                 if (isIntercepted) {
                     if (campaign.getCampaignOptions().isUseStratCon()) {
-                        processConvoyInterception(droppedItems, cashReward,
-                            isIndependent, targetConvoy, track, convoyGridReference);
+                        processConvoyInterception(droppedItems, cashReward, targetConvoy, track,
+                            convoyGridReference);
                     } else {
                         campaign.addReport(String.format(resources.getString("convoyInterceptedAtB.text"),
                             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
@@ -513,7 +553,7 @@ public class Resupply {
                 message = String.format(message, getCommanderTitle(campaign, false));
             }
 
-            if (contract.getCommandRights().isIndependent()) {
+            if (usePlayerConvoy) {
                 if (targetConvoy != null) {
                     speaker = getConvoySpeaker(targetConvoy);
                 }
@@ -561,10 +601,6 @@ public class Resupply {
     /**
      * Retrieves the speaker's icon for use in message dialogs.
      *
-     * <p>This method returns a faction logo, convoy commander's icon, or an image of the logistics officer,
-     * depending on whether the communication is an introduction, the command right is independent
-     * and if a logistics officer is present.
-     *
      * @param targetConvoy      The target convoy in the current context, used to determine the convoy
      *                         commander's icon. May be {@code null} if a player convoy is not present.
      * @param isIntroduction    A boolean flag indicating whether the communication is an introduction.
@@ -575,7 +611,8 @@ public class Resupply {
      * available, the method will return {@code null}.
      */
     @Nullable
-    private ImageIcon getSpeakerIcon(Integer targetConvoy, boolean isIntroduction, Person logisticsOfficer) {
+    private ImageIcon getSpeakerIcon(@Nullable Integer targetConvoy, boolean isIntroduction,
+                                     @Nullable Person logisticsOfficer) {
         ImageIcon speakerIcon = null;
         if (isIntroduction) {
             if (logisticsOfficer == null) {
@@ -585,12 +622,12 @@ public class Resupply {
                 speakerIcon = logisticsOfficer.getPortrait().getImageIcon();
             }
         } else {
-            if (contract.getCommandRights().isIndependent()) {
-                speakerIcon = getIndependentIconLabel(targetConvoy);
+            if (usePlayerConvoy) {
+                speakerIcon = getConvoyIcon(targetConvoy);
             }
 
             if (speakerIcon == null) {
-                if (contract.getCommandRights().isIndependent()) {
+                if (usePlayerConvoy) {
                     speakerIcon = getFactionLogo(campaign, campaign.getFaction().getShortName(),
                         true);
                 } else {
@@ -722,14 +759,13 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the icon of the convoy. This should only be used when the contract has Independent
-     * command level (i.e., if the convoy is player owned).
+     * Retrieves the icon of the convoy.
      *
      * @param targetConvoy The convoy target.
      * @return The {@link ImageIcon} of the convoy.
      */
     @Nullable
-    private ImageIcon getIndependentIconLabel(Integer targetConvoy) {
+    private ImageIcon getConvoyIcon(Integer targetConvoy) {
         if (targetConvoy != null) {
             Force convoy = campaign.getForce(targetConvoy);
 
@@ -753,17 +789,15 @@ public class Resupply {
      *
      * @param droppedItems         List of items dropped by the convoy.
      * @param cashReward           The amount of cash reward.
-     * @param isIndependent        Boolean indicating if contract command level is independent.
-     * @param targetConvoy         The target convoy.
+     * @param targetConvoy         The target convoy. Can be {@code null}.
      * @param track                The track reference for the convoy's location.
      * @param convoyGridReference  The grid reference for the convoy's location.
      */
-    private void processConvoyInterception(List<Part> droppedItems, Money cashReward,
-                                           boolean isIndependent, Integer targetConvoy,
+    private void processConvoyInterception(List<Part> droppedItems, Money cashReward, @Nullable Integer targetConvoy,
                                            StratconTrackState track, StratconCoords convoyGridReference) {
         String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
 
-        if (isIndependent) {
+        if (usePlayerConvoy) {
             templateAddress = "data/scenariotemplates/Emergency Convoy Defense - Independent.xml";
         }
         ScenarioTemplate template = ScenarioTemplate.Deserialize(templateAddress);
@@ -792,17 +826,11 @@ public class Resupply {
             AtBDynamicScenario backingScenario = scenario.getBackingScenario();
             backingScenario.setDate(campaign.getLocalDate());
 
-            if (targetConvoy == null) {
-                campaign.addReport(String.format(resources.getString("convoyErrorPlayerConvoy.text"),
-                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    templateAddress, CLOSING_SPAN_TAG));
-                deliverDrop(droppedItems, cashReward);
-                return;
+            if (targetConvoy != null) {
+                backingScenario.addForce(targetConvoy, "Player");
+                campaign.getForce(targetConvoy).setScenarioId(backingScenario.getId(), campaign);
+                scenario.commitPrimaryForces();
             }
-
-            backingScenario.addForce(targetConvoy, "Player");
-            campaign.getForce(targetConvoy).setScenarioId(backingScenario.getId(), campaign);
-            scenario.commitPrimaryForces();
 
             Loot loot = new Loot();
 
@@ -977,7 +1005,7 @@ public class Resupply {
                 if (part instanceof AmmoBin) {
                     campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(), ((AmmoBin) part).getFullShots());
                 } else if (part instanceof Armor) {
-                    int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
+                    int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon());
                     ((Armor) part).setAmount(quantity);
                     campaign.getWarehouse().addPart(part);
                 } else {
@@ -998,13 +1026,13 @@ public class Resupply {
      * @param  partsReport A list of parts.
      * @return An array of strings representing columns for display.
      */
-    public String[] formatColumnData(List<Entry<String, Integer>> partsReport) {
+    public String[] formatColumnData(List<String> partsReport) {
         String[] columns = new String[3];
         Arrays.fill(columns, "");
 
         int i = 0;
-        for (Entry<String, Integer> entry : partsReport) {
-            columns[i % 3] += "<br> - " + entry.getKey() + " x" + entry.getValue();
+        for (String entry : partsReport) {
+            columns[i % 3] += "<br> - " + entry;
             i++;
         }
 
@@ -1022,7 +1050,7 @@ public class Resupply {
         int weight = 1;
 
         if (part instanceof MissingPart) {
-            return weight * 5;
+            return weight * 10;
         } else {
             return weight;
         }
@@ -1061,12 +1089,13 @@ public class Resupply {
                 if (!unit.isSalvage() && unit.isAvailable()) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
-                        if (checkMekLocation(part, unit) || checkTankLocation(part) || isExtinct(part)
-                            || isUnavailableBeforeTukayyid(part)) {
+                        if (isIneligiblePart(part, unit)) {
                             continue;
                         }
+
                         int systemIndustry = getSystemIndustry();
                         PartDetails partDetails = getPartDetails(part, systemIndustry);
+
                         processedParts.merge(part.toString(), partDetails, (oldValue, newValue) -> {
                             oldValue.setWeight(oldValue.getWeight() + newValue.getWeight());
                             return oldValue;
@@ -1121,6 +1150,33 @@ public class Resupply {
     }
 
     /**
+     * Checks if a given part is ineligible for inclusion in a resupply.
+     *
+     * @param part The part to check for eligibility.
+     * @param unit The unit to associate the part with.
+     * @return     {@code true} if the part is ineligible; {@code false} otherwise.
+     */
+    private boolean isIneligiblePart(Part part, Unit unit) {
+        return checkExclusionList(part)
+            || checkMekLocation(part, unit)
+            || checkTankLocation(part)
+            || checkTransporter(part)
+            || isExtinct(part)
+            || isUnavailableBeforeTukayyid(part);
+    }
+
+    /**
+     * Checks if a given part is of a type that is specifically excluded from resupplies.
+     * This method should be expanded as ineligible parts are found.
+     *
+     * @param part The part to check for eligibility.
+     * @return     {@code true} if the part is ineligible; {@code false} otherwise.
+     */
+    private boolean checkExclusionList(Part part) {
+        return false;
+    }
+
+    /**
      * Checks whether a part is a center torso location of a Mek or if the Mek is extinct.
      *
      * @param part The part to check.
@@ -1146,11 +1202,20 @@ public class Resupply {
     }
 
     /**
+     * Checks if the given part is a Transport Bay or door.
+     *
+     * @param part The part to check.
+     * @return {@code True} if the part is a transport bay or door. {@code False} otherwise.
+     */
+    private boolean checkTransporter(Part part) {
+        return part instanceof TransportBayPart;
+    }
+
+    /**
      * Checks if the part is extinct.
      *
      * @param part The part to check.
-     * @return {@code True} if the part is extinct.
-     * {@code False} otherwise.
+     * @return {@code True} if the part is extinct. {@code False} otherwise.
      */
     private boolean isExtinct(Part part) {
         return part.isExtinct(YEAR, EMPLOYER_IS_CLAN, EMPLOYER_TECH_CODE);
@@ -1160,8 +1225,7 @@ public class Resupply {
      * Checks if a part is available before the Battle of Tukayyid.
      *
      * @param part The part to check.
-     * @return {@code True} if the part is unavailable before Tukayyid.
-     * {@code False} otherwise.
+     * @return {@code True} if the part is unavailable before Tukayyid. {@code False} otherwise.
      */
     private boolean isUnavailableBeforeTukayyid(Part part) {
         return (part.isClan() || part.isMixedTech())
@@ -1273,10 +1337,6 @@ public class Resupply {
             clonedPart.setHits(0);
         }
 
-        if (!(clonedPart instanceof AmmoBin)) {
-            clonedPart.setQuality(getRandomPartQuality(0));
-        }
-
         clonedPart.setBrandNew(true);
         clonedPart.setOmniPodded(false);
 
@@ -1284,11 +1344,17 @@ public class Resupply {
     }
 
     /**
-     * @return A randomly selected {@link Part} from the parts pool with its quality set to a random value.
+     * @return A randomly selected {@link Part} from the parts pool.
      */
     private Part getRandomPart() {
         Part randomPart = partsPool.get(random.nextInt(partsPool.size()));
-        randomPart.setQuality(getRandomPartQuality(0));
+
+        // We set quality here as it means we only need to parse quality for those items we're
+        // specifically picking out of the pool.
+        if (!(randomPart instanceof AmmoBin)) {
+            randomPart.setQuality(getRandomPartQuality(negotiationModifier));
+        }
+
         return randomPart;
     }
     /**
@@ -1296,9 +1362,11 @@ public class Resupply {
      * The ‘dropCount’ parameter determines the number of times the part generation loop runs.
      *
      * @param dropCount Number of times the part-generation loop must run.
+     * @param bypassConvoyNeeds If {@code true} an NPC convoy will be provided, even for contracts
+     *                         where this wouldn't normally be possible.
      */
-    public void getResupplyParts(int dropCount) {
-        getResupplyParts(dropCount, false, false);
+    public void getResupply(int dropCount, boolean bypassConvoyNeeds) {
+        getResupply(dropCount, bypassConvoyNeeds, false, false);
     }
 
     /**
@@ -1306,10 +1374,12 @@ public class Resupply {
      * as 'loot'.
      *
      * @param dropCount Number of times the part-generation loop must run.
+     * @param bypassConvoyNeeds If {@code true} an NPC convoy will be provided, even for contracts
+     *                         where this wouldn't normally be possible.
      * @param isLoot    Boolean that flags whether drops are classified as loot.
      */
-    public void getResupplyParts(int dropCount, boolean isLoot) {
-        getResupplyParts(dropCount, isLoot, false);
+    public void getResupply(int dropCount, boolean bypassConvoyNeeds, boolean isLoot) {
+        getResupply(dropCount, isLoot, bypassConvoyNeeds, false);
     }
 
     /**
@@ -1317,39 +1387,75 @@ public class Resupply {
      * of the contract.
      *
      * @param dropCount Number of times the part-generation loop must run.
+     * @param bypassConvoyNeeds If {@code true} an NPC convoy will be provided, even for contracts
+     *                         where this wouldn't normally be possible.
      * @param isLoot    Boolean that flags whether drops are classified as loot. Should be set to
      * {@code false} if this is being generated at the end of a contract.
      * @param isContractEnd Boolean that flags whether drops are at the end of a contract.
      */
-    public void getResupplyParts(int dropCount, boolean isLoot, boolean isContractEnd) {
+    public void getResupply(int dropCount, boolean bypassConvoyNeeds, boolean isLoot,
+                            boolean isContractEnd) {
+        boolean isIndependent = contract.getCommandRights().isIndependent();
+
+        if (!contract.getContractType().isGuerrillaWarfare() && !bypassConvoyNeeds) {
+            createPlayerConvoyOptionalDialog();
+        }
+
+        if (isIndependent && !usePlayerConvoy && !bypassConvoyNeeds) {
+            return;
+        }
+
         List<Part> droppedItems = new ArrayList<>();
         Money cashReward = Money.zero();
+        Money targetValue = TARGET_VALUE;
+
+        if (!isIndependent && usePlayerConvoy) {
+            targetValue = targetValue.multipliedBy(2);
+        }
 
         for (int i = 0; i < dropCount; i++) {
             Money runningTotal = Money.zero();
 
-            while (runningTotal.isLessThan(TARGET_VALUE)) {
+            while (runningTotal.isLessThan(targetValue)) {
                 if (partsPool.isEmpty()) {
-                    cashReward = cashReward.plus(TARGET_VALUE);
-                    runningTotal = cashReward.plus(TARGET_VALUE);
-                    continue;
+                    break;
                 }
 
                 Part potentialPart = getRandomPart();
+                boolean partFetched = false;
 
-                runningTotal = runningTotal.plus(potentialPart.getActualValue());
-                droppedItems.add(potentialPart);
+                // For particularly valuable items, we roll a follow-up die to see if the item
+                // is actually picked, or if the supplier substitutes it with another item.
+                if (potentialPart.getUndamagedValue().isGreaterThan(targetValue)) {
+                    if (Compute.d6(1) == 6) {
+                        partFetched = true;
+                    }
+
+                    // For really expensive items, the player only has one chance per distinct
+                    // part.
+                    partsPool.removeAll(Collections.singleton(potentialPart));
+                } else {
+                    partFetched = true;
+                }
+
+                if (partFetched) {
+                    partsPool.remove(potentialPart);
+                    runningTotal = runningTotal.plus(potentialPart.getActualValue());
+                    droppedItems.add(potentialPart);
+                }
             }
         }
-
-        logger.info(droppedItems.toString());
 
         if (contract.getContractType().isGuerrillaWarfare() && !(isLoot || isContractEnd)) {
             if (!droppedItems.isEmpty()) {
                 smugglerOfferDialog(droppedItems);
+                logger.warn("No resupply possible as no items dropped (Smuggler).");
             }
         } else {
-            supplyDropDialog(droppedItems, cashReward, isLoot, isContractEnd);
+            if (!droppedItems.isEmpty()) {
+                supplyDropDialog(droppedItems, cashReward, isLoot, isContractEnd);
+                logger.warn("No resupply possible as no items dropped (Normal).");
+            }
         }
     }
 
@@ -1363,23 +1469,24 @@ public class Resupply {
      * {@code null}.
      * @return A map containing the dropped parts and their quantities.
      */
-    public Map<String, Integer> createPartsReport(@Nullable List<Part> droppedItems) {
+    public List<String> createPartsReport(@Nullable List<Part> droppedItems) {
         int year = campaign.getGameYear();
         Faction originFaction = campaign.getFaction();
 
-        return droppedItems.stream()
-            .collect(Collectors.toMap(
+        Map<String, Integer> entries = droppedItems.stream().collect(Collectors.toMap(
                 part -> {
                     String name = part.getName();
+                    String quality = part.getQualityName();
 
                     String append = part.isClan() ? " (Clan)" : "";
                     append = part.isMixedTech() ? " (Mixed)" : append;
+                    append += " (" + quality + ')';
                     append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
-                        " (<b>Extinct</b>)" : "";
+                        " (<b>EXTINCT!</b>)" : "";
 
                     if (part instanceof AmmoBin) {
                         return ((AmmoBin) part).getType().getName() + append;
-                    } else if (part instanceof MekLocation) {
+                    } else if (part instanceof MekLocation || part instanceof MekActuator) {
                         return name + " (" + part.getUnitTonnage() + "t)" + append;
                     } else {
                         return name + append;
@@ -1389,12 +1496,17 @@ public class Resupply {
                     if (part instanceof AmmoBin) {
                         return ((AmmoBin) part).getFullShots();
                     } else if (part instanceof Armor) {
-                        return (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
+                        return (int) Math.ceil(((Armor) part).getArmorPointsPerTon());
                     } else {
                         return 1;
                     }
                 },
                 Integer::sum));
+
+        return entries.keySet().stream()
+            .map(item -> item + " x" + entries.get(item))
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1529,12 +1641,12 @@ public class Resupply {
 
     /**
      * Triggers a dialog window providing convoy related information meant to be triggered at the
-     * beginning of an Independent contract.
+     * beginning of a contract.
      *
      * @param campaign The current campaign.
      * @param contract The relevant contract.
      */
-    public static void triggerConvoyDialog(Campaign campaign, AtBContract contract) {
+    public static void triggerContractStartDialog(Campaign campaign, AtBContract contract) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
         // Retrieves the title from the resources
@@ -1562,13 +1674,147 @@ public class Resupply {
         dialog.setLayout(new BorderLayout());
 
         // Create an accept button and add its action listener.
-        // When clicked, it will set the result to true and close the dialog
         JButton acceptButton = new JButton(resources.getString("convoyConfirm.text"));
         acceptButton.addActionListener(e -> dialog.dispose());
 
         // Create a panel for buttons and add buttons to it
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(acceptButton);
+
+        // Add the original panel and button panel to the dialog
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setModal(true);
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Calculates the convoy count and total cargo capacity of the player's convoys.
+     */
+    private void calculatePlayerConvoyValues() {
+        convoyCount = 0;
+        totalCargoCapacity = 0;
+
+        for (Force force : campaign.getAllForces()) {
+            if (force.isConvoyForce()) {
+                boolean hasCargo = false;
+                for (UUID unitId : force.getUnits()) {
+                    Unit unit = campaign.getUnit(unitId);
+
+                    if (unit != null) {
+                        if (!unit.isFullyCrewed()) {
+                            continue;
+                        }
+
+                        double individualCargo = unit.getCargoCapacity();
+
+                        if (!hasCargo && individualCargo > 0) {
+                            hasCargo = true;
+                        }
+
+                        totalCargoCapacity += individualCargo;
+                    }
+                }
+
+                if (hasCargo) {
+                    convoyCount++;
+                }
+            }
+        }
+    }
+
+    public void createPlayerConvoyOptionalDialog() {
+        final int DIALOG_WIDTH = 400;
+
+        // Retrieves the title from the resources
+        String title = resources.getString("dialog.title");
+
+        // Create a custom dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);
+        dialog.setLayout(new BorderLayout());
+
+        // Establish the speaker
+        Person logisticsOfficer = pickLogisticsRepresentative();
+
+        String speaker;
+        if (logisticsOfficer != null) {
+            speaker = logisticsOfficer.getFullTitle();
+        } else {
+            speaker = String.format(resources.getString("dialogBorderCampaignSpeaker.text"),
+                campaign.getName());
+        }
+
+        // An ImageIcon to hold the faction icon
+        ImageIcon speakerIcon = getSpeakerIcon(null, true, logisticsOfficer);
+        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+
+        // Calculate convoy values
+        int convoysNeeded = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+        int tonnageNeeded = (int) round(convoysNeeded * RESUPPLY_LOAD_SIZE);
+
+        // Create and display the message
+        String pluralizerEmployer = convoysNeeded > 1 ? "s" : "";
+        String pluralizerPlayer = convoyCount > 1 || convoyCount == 0 ? "s" : "";
+        String messageResource;
+
+        if (isUsePlayerConvoy()) {
+            messageResource = resources.getString("usePlayerConvoyForced.text");
+        } else {
+            messageResource = resources.getString("usePlayerConvoyOptional.text");
+        }
+
+        String message = String.format(messageResource, getCommanderTitle(campaign, false),
+            pluralizerEmployer, tonnageNeeded, convoysNeeded, pluralizerEmployer, totalCargoCapacity, convoyCount,
+            pluralizerPlayer, pluralizerPlayer);
+
+        // Create a panel to display the icon and the message
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                UIUtil.scaleForGUI(DIALOG_WIDTH), message));
+        description.setHorizontalAlignment(JLabel.CENTER);
+
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
+            String.format(resources.getString("dialogBorderTitle.text"), speaker)));
+        descriptionPanel.add(description);
+        dialog.add(descriptionPanel, BorderLayout.CENTER);
+
+        // Create a panel to display the icon and the message
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel imageLabel = new JLabel(speakerIcon);
+        panel.add(imageLabel, BorderLayout.CENTER);
+        panel.add(descriptionPanel, BorderLayout.SOUTH);
+
+        // Create the buttons and add their action listener.
+        JButton acceptButton = new JButton(resources.getString("confirmAccept.text"));
+        acceptButton.addActionListener(e -> {
+            dialog.dispose();
+            usePlayerConvoy = true;
+        });
+        acceptButton.setEnabled(convoyCount > 0);
+
+        JButton refuseButton = new JButton(resources.getString("confirmRefuse.text"));
+        refuseButton.addActionListener(e -> {
+            dialog.dispose();
+            usePlayerConvoy = false;
+        });
+
+        // Create a panel for buttons and add buttons to it
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(refuseButton);
+
+        // Add a WindowListener to handle the close operation
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                usePlayerConvoy = false;
+            }
+        });
 
         // Add the original panel and button panel to the dialog
         dialog.add(panel, BorderLayout.CENTER);
@@ -1611,20 +1857,24 @@ public class Resupply {
             }
         }
 
-        String convoyMessageTemplate = resources.getString("contractStartMessageGeneric.text");
+        String convoyMessage;
+        String commanderTitle = getCommanderTitle(campaign, false);
 
         if (contract.getContractType().isGuerrillaWarfare()) {
-            convoyMessageTemplate = resources.getString("contractStartMessageGuerrilla.text");
-        } else if (contract.getCommandRights().isIndependent()) {
-            convoyMessageTemplate = resources.getString("contractStartMessageIndependent.text");
+            String convoyMessageTemplate = resources.getString("contractStartMessageGuerrilla.text");
+            convoyMessage = String.format(convoyMessageTemplate, commanderTitle);
+        } else {
+            String convoyMessageTemplate = resources.getString("contractStartMessageGeneric.text");
+            if (contract.getCommandRights().isIndependent()) {
+                convoyMessageTemplate = resources.getString("contractStartMessageIndependent.text");
+            }
+
+            String resupplyLoadSize = String.valueOf(maximumResupplySize * RESUPPLY_LOAD_SIZE);
+            String convoyPluralSuffix = maximumResupplySize > 1 ? "s" : "";
+
+            convoyMessage = String.format(convoyMessageTemplate, commanderTitle,
+                resupplyLoadSize, maximumResupplySize, convoyPluralSuffix, cargoCapacity, convoyCount, convoyPluralSuffix);
         }
-
-        String commanderTitle = getCommanderTitle(campaign, false);
-        String resupplyLoadSize = String.valueOf(maximumResupplySize * RESUPPLY_LOAD_SIZE);
-        String convoyPluralSuffix = maximumResupplySize > 1 ? "s" : "";
-
-        String convoyMessage = String.format(convoyMessageTemplate,
-            commanderTitle, resupplyLoadSize, maximumResupplySize, convoyPluralSuffix, cargoCapacity, convoyCount, convoyPluralSuffix);
 
         int width = UIUtil.scaleForGUI(500);
         return String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",

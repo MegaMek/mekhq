@@ -54,6 +54,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
@@ -287,8 +288,13 @@ public class StratconRulesManager {
 
          // If we haven't generated a scenario yet, it's because we need to pick a random force.
          if (scenario == null) {
-             int randomForceIndex = Compute.randomInt(availableForceIDs.size());
-             int randomForceID = availableForceIDs.get(randomForceIndex);
+             int availableForces = availableForceIDs.size();
+             int randomForceID = FORCE_NONE;
+
+             if (availableForces > 0) {
+                 int randomForceIndex = Compute.randomInt(availableForces);
+                 randomForceID = availableForceIDs.get(randomForceIndex);
+             }
 
              scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track, template);
          }
@@ -342,7 +348,7 @@ public class StratconRulesManager {
 
         // create scenario - don't assign a force yet
         StratconScenario scenario = StratconRulesManager.generateScenario(campaign, contract,
-            trackState, Force.FORCE_NONE, coords, template);
+            trackState, FORCE_NONE, coords, template);
 
         // clear dates, because we don't want the scenario disappearing on us
         scenario.setDeploymentDate(null);
@@ -391,7 +397,7 @@ public class StratconRulesManager {
                         StratconScenario scenario) {
         AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
         setScenarioParametersFromBiome(track, scenario);
-        swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
+        swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
@@ -499,7 +505,7 @@ public class StratconRulesManager {
                 Collection<Unit> potentialUnits = new HashSet<>();
 
                 // find units in player's campaign by default, all units in the TO&E are eligible
-                if (explicitForceID == Force.FORCE_NONE) {
+                if (explicitForceID == FORCE_NONE) {
                     for (UUID unitId : campaign.getForces().getUnits()) {
                         try {
                             potentialUnits.add(campaign.getUnit(unitId));
@@ -1119,10 +1125,10 @@ public class StratconRulesManager {
         // dates, otherwise, the report messages for new scenarios look weird
         // also, suppress the "new scenario" report if not generating a scenario
         // for a specific force, as this indicates a contract initialization
-        campaign.addScenario(backingScenario, contract, forceID == Force.FORCE_NONE);
+        campaign.addScenario(backingScenario, contract, forceID == FORCE_NONE);
         scenario.setBackingScenarioID(backingScenario.getId());
 
-        if (forceID > Force.FORCE_NONE) {
+        if (forceID > FORCE_NONE) {
             scenario.addPrimaryForce(forceID);
         }
 

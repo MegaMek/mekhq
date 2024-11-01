@@ -435,7 +435,7 @@ public class ScenarioObjectiveProcessor {
                             LogManager.getLogger().info("ScenarioObjectiveProcessor.java");
                             campaign.addReport("Bonus: Captured Supplies");
                             Resupply supplyDrops = new Resupply(campaign, contract);
-                            supplyDrops.getResupplyParts(1, true);
+                            supplyDrops.getResupply(1, false, true);
                         }
                     }
                 }
