@@ -1301,7 +1301,8 @@ public class Resupply {
         for (PartDetails potentialPart : potentialParts.values()) {
             // We need to use ceil here, otherwise well-stocked campaigns will end up with very
             // mediocre Resupplies.
-            for (int entry = 0; entry < Math.ceil(potentialPart.getWeight()); entry++) {
+            int weight = (int) Math.ceil(potentialPart.getWeight());
+            for (int entry = 0; entry < weight; entry++) {
                 partsPool.add(preparePart(potentialPart.getPart()));
             }
         }
