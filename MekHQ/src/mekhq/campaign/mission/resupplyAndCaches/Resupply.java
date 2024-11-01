@@ -82,6 +82,7 @@ public class Resupply {
     final private Faction enemyFaction;
     private List<Part> partsPool;
     private Random random;
+    private boolean usePlayerConvoy;
 
     private final int YEAR;
     private final int EMPLOYER_TECH_CODE;
@@ -106,6 +107,7 @@ public class Resupply {
         this.contract = contract;
         employerFaction = contract.getEmployerFaction();
         enemyFaction = contract.getEnemy();
+        usePlayerConvoy = contract.getCommandRights().isIndependent();
 
         YEAR = campaign.getGameYear();
         EMPLOYER_IS_CLAN = enemyFaction.isClan();
@@ -1541,17 +1543,8 @@ public class Resupply {
         // An ImageIcon to hold the faction icon
         ImageIcon icon = getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
 
-        // Format the HTML message
-        int maximumResupplySize = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-
-        String message = String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
-            UIUtil.scaleForGUI(500),
-            String.format(resources.getString("convoyMessage.text"),
-                getCommanderTitle(campaign, false),
-                maximumResupplySize * RESUPPLY_LOAD_SIZE, maximumResupplySize,
-                maximumResupplySize > 1 ? "s" : ""));
-
         // Create a text pane to display the message
+        String message = getContractStartMessage(campaign, contract, resources);
         JTextPane textPane = new JTextPane();
         textPane.setContentType("text/html");
         textPane.setText(message);
@@ -1585,6 +1578,57 @@ public class Resupply {
         dialog.setLocationRelativeTo(null);
         dialog.setModal(true);
         dialog.setVisible(true);
+    }
+
+    /**
+     * Creates a start message for a contract based on its type and resupply details.
+     * The message is formatted using a specific template according to the type of
+     * the contract and whether it involves guerrilla warfare or independent command rights.
+     *
+     * @param campaign          The current campaign.
+     * @param contract          The contract for which the start message is created.
+     * @param resources         The resource bundle to retrieve convoy message templates.
+     * @return A formatted start message for the contract, enclosed within an HTML div with a defined width.
+     */
+    private static String getContractStartMessage(Campaign campaign, AtBContract contract,
+                                                  ResourceBundle resources) {
+        int maximumResupplySize = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+
+        int convoyCount = 0;
+        double cargoCapacity = 0;
+
+        for (Force force : campaign.getAllForces()) {
+            if (force.isConvoyForce() && force.getSubForces().isEmpty() && !force.getUnits().isEmpty()) {
+                convoyCount++;
+
+                for (UUID unitId : force.getUnits()) {
+                    Unit unit = campaign.getUnit(unitId);
+
+                    if (unit != null) {
+                        cargoCapacity += unit.getCargoCapacity();
+                    }
+                }
+            }
+        }
+
+        String convoyMessageTemplate = resources.getString("contractStartMessageGeneric.text");
+
+        if (contract.getContractType().isGuerrillaWarfare()) {
+            convoyMessageTemplate = resources.getString("contractStartMessageGuerrilla.text");
+        } else if (contract.getCommandRights().isIndependent()) {
+            convoyMessageTemplate = resources.getString("contractStartMessageIndependent.text");
+        }
+
+        String commanderTitle = getCommanderTitle(campaign, false);
+        String resupplyLoadSize = String.valueOf(maximumResupplySize * RESUPPLY_LOAD_SIZE);
+        String convoyPluralSuffix = maximumResupplySize > 1 ? "s" : "";
+
+        String convoyMessage = String.format(convoyMessageTemplate,
+            commanderTitle, resupplyLoadSize, maximumResupplySize, convoyPluralSuffix, cargoCapacity, convoyCount, convoyPluralSuffix);
+
+        int width = UIUtil.scaleForGUI(500);
+        return String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
+            width, convoyMessage);
     }
 }
 
