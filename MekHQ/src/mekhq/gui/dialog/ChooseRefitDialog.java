@@ -56,7 +56,12 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitStep;
+import mekhq.campaign.parts.enums.RefitStepType;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.ChooseRefitDialog.ClassSorter;
+import mekhq.gui.dialog.ChooseRefitDialog.RefitReturnsListTableModel;
+import mekhq.gui.dialog.ChooseRefitDialog.RefitStepsListTableModel;
+import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
@@ -95,6 +100,13 @@ public class ChooseRefitDialog extends JDialog {
     private JTable stepsTable;
     private JScrollPane scrStepsTable;
 
+    private JPanel leftSidePanel;
+
+    private JSplitPane horizMainSplitter;
+    private JSplitPane vertLeftListSplitter;
+    private JSplitPane vertRightListSplitter;
+    private JSplitPane horizReadoutSplitter;
+
     private JTextPane txtOldUnit;
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
@@ -129,9 +141,9 @@ public class ChooseRefitDialog extends JDialog {
 
         // region Radio Button Panel
 
-        JPanel radioPanel = new JPanel();
+        leftSidePanel = new JPanel(new GridBagLayout());
 
-        radioPanel.setLayout(new GridBagLayout());
+        JPanel radioPanel = new JPanel(new GridBagLayout());
 
         radRefit = new JRadioButton(resourceMap.getString("radRefit.text"));
         radRefit.addActionListener(evt -> setRefit());
@@ -172,7 +184,8 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(radioPanel, gridBagConstraints);
+
+        leftSidePanel.add(radioPanel, gridBagConstraints);
 
 
         // region Left Side Lists
@@ -196,28 +209,6 @@ public class ChooseRefitDialog extends JDialog {
         scrRefitTable = new JScrollPaneWithSpeed();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(scrRefitTable, gridBagConstraints);
-
-        noRefitsLbl = new JLabel(resourceMap.getString("noRefitsLbl.text"));
-        noRefitsLbl.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(noRefitsLbl, gridBagConstraints);
-        noRefitsLbl.setVisible(false);
-
 
         stepsModel = new RefitStepsListTableModel();
         stepsTable = new JTable(stepsModel);
@@ -231,24 +222,34 @@ public class ChooseRefitDialog extends JDialog {
 
         scrStepsTable = new JScrollPaneWithSpeed(stepsTable);
         scrStepsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("stepsTable.title")));
+
+        vertLeftListSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrRefitTable, scrStepsTable);
+        vertLeftListSplitter.setResizeWeight(0.5);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        //scrStepsTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
-        //scrStepsTable.setPreferredSize(UIUtil.scaleForGUI(300, 300));
-        getContentPane().add(scrStepsTable, gridBagConstraints);
+        leftSidePanel.add(vertLeftListSplitter, gridBagConstraints);
+
+        noRefitsLbl = new JLabel(resourceMap.getString("noRefitsLbl.text"));
+        noRefitsLbl.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        leftSidePanel.add(noRefitsLbl, gridBagConstraints);
+        noRefitsLbl.setVisible(false);
 
 
         // region Right Side Tab Panel
         
-        JPanel textPanel = new JPanel(new GridBagLayout());
-
         txtOldUnit = new JTextPane();
         txtOldUnit.setEditable(false);
         txtOldUnit.setContentType("text/html");
@@ -258,19 +259,9 @@ public class ChooseRefitDialog extends JDialog {
         MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         scrOldUnit = new JScrollPaneWithSpeed(txtOldUnit);
-        //txtOldUnit.setMinimumSize(UIUtil.scaleForGUI(420, 500));
-        //txtOldUnit.setPreferredSize(UIUtil.scaleForGUI(420, 500));
+
         SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        textPanel.add(scrOldUnit, gridBagConstraints);
-
         txtNewUnit = new JTextPane();
         txtNewUnit.setEditable(false);
         txtNewUnit.setContentType("text/html");
@@ -278,14 +269,9 @@ public class ChooseRefitDialog extends JDialog {
                 BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrNewUnit = new JScrollPaneWithSpeed(txtNewUnit);
-        //txtNewUnit.setMinimumSize(UIUtil.scaleForGUI(420, 500));
-        //txtNewUnit.setPreferredSize(UIUtil.scaleForGUI(420, 500));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        textPanel.add(scrNewUnit, gridBagConstraints);
 
-        
-        JPanel listPanel = new JPanel(new GridBagLayout());
+        horizReadoutSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrOldUnit, scrNewUnit);
+        horizReadoutSplitter.setResizeWeight(0.5);
 
         neededModel = new RefitNeededListTableModel();
         neededTable = new JTable(neededModel);
@@ -299,17 +285,7 @@ public class ChooseRefitDialog extends JDialog {
 
         scrNeededTable = new JScrollPaneWithSpeed(neededTable);
         scrNeededTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("neededTable.title")));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        //scrNeededTable.setMinimumSize(UIUtil.scaleForGUI(300, 200));
-        //scrNeededTable.setPreferredSize(UIUtil.scaleForGUI(300, 200));
-        listPanel.add(scrNeededTable, gridBagConstraints);
+   
 
         returnsModel = new RefitReturnsListTableModel();
         returnsTable = new JTable(returnsModel);
@@ -323,34 +299,27 @@ public class ChooseRefitDialog extends JDialog {
 
         scrReturnsTable = new JScrollPaneWithSpeed(returnsTable);
         scrReturnsTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("returnsTable.title")));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        //scrReturnsTable.setMinimumSize(UIUtil.scaleForGUI(420, 500));
-        //scrReturnsTable.setPreferredSize(UIUtil.scaleForGUI(420, 500));
-        listPanel.add(scrReturnsTable, gridBagConstraints);
+      
+        vertRightListSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrNeededTable, scrReturnsTable);
+        vertRightListSplitter.setResizeWeight(0.5);
 
 
         JTabbedPane tabPane = new JTabbedPane();
-        tabPane.add(resourceMap.getString("tabUnitView.title"), textPanel);
-        tabPane.add(resourceMap.getString("tabListView.title"), listPanel);
-        tabPane.setMinimumSize(UIUtil.scaleForGUI(450,500));
-        tabPane.setPreferredSize(UIUtil.scaleForGUI(450,500));
+        tabPane.add(resourceMap.getString("tabUnitView.title"), horizReadoutSplitter);
+        tabPane.add(resourceMap.getString("tabListView.title"), vertRightListSplitter);
+        
+        horizMainSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftSidePanel, tabPane);
+        horizMainSplitter.setResizeWeight(0.5);
+
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(tabPane, gridBagConstraints);
+        getContentPane().add(horizMainSplitter, gridBagConstraints);
 
 
         // region Bottom Buttons
@@ -369,8 +338,7 @@ public class ChooseRefitDialog extends JDialog {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -390,7 +358,7 @@ public class ChooseRefitDialog extends JDialog {
                 setCustomize();
             }
             else {
-                scrRefitTable.setVisible(false);
+                vertLeftListSplitter.setVisible(false);
                 noRefitsLbl.setVisible(true);
             }
         }
@@ -1034,6 +1002,21 @@ public class ChooseRefitDialog extends JDialog {
                 int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
                 //setToolTipText(getTooltip(actualRow, actualCol));
+
+                RefitStep thisStep = (RefitStep) data.get(actualRow);
+
+                if (!isSelected) {
+                    if (thisStep.getType() == RefitStepType.LEAVE) {
+                        setForeground(MekHQ.getMHQOptions().getDeployedForeground());
+                        setBackground(MekHQ.getMHQOptions().getDeployedBackground());
+                    } else if (thisStep.getType() == RefitStepType.ERROR) {
+                        setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
+                        setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
+                    } else {
+                        setBackground(UIManager.getColor("Table.background"));
+                        setForeground(UIManager.getColor("Table.foreground"));
+                    }
+                }
 
                 return this;
             }

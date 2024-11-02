@@ -21,10 +21,13 @@ package mekhq.campaign.parts;
 
 import megamek.common.Mek;
 import megamek.common.MiscType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.parts.enums.RefitStepType;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -88,6 +91,8 @@ public class RefitStep {
         if (null == oldPart && null == newPart) {
             throw new IllegalArgumentException("oldPart and newPart must not both be null");
         }
+
+        Campaign campaign = oldUnit.getCampaign();
 
         // region Keeping Data
 
@@ -218,7 +223,6 @@ public class RefitStep {
         
             type = RefitStepType.ERROR;
             refitClass = RefitClass.PLEASE_REPAIR;
-            baseTime = 0;
             return;
         }
 
@@ -452,30 +456,6 @@ public class RefitStep {
                 return;
             }
 
-      } else if (((oldPart instanceof MekGyro) || (oldPart instanceof MissingMekGyro))
-                && (newPart instanceof MekGyro)) {
-            
-            boolean equal;
-            if (oldPart instanceof MekGyro) {
-                equal = oldPart.isSamePartType(newPart);
-            } else {
-                equal = ((MissingMekGyro) oldPart).isAcceptableReplacement(newPart, true);
-            }
-
-            if (equal) {
-                refitClass = RefitClass.NO_CHANGE;
-                type = RefitStepType.LEAVE;
-                baseTime = 0;
-                return;
-            } else {
-                refitClass = RefitClass.CLASS_D;
-                type = RefitStepType.CHANGE;
-                baseTime = 200;
-                returnsPart = (oldPart instanceof MekGyro) ? oldPart.clone() : null;
-                neededPart = newPart.clone();
-                return;
-            }
-
 
         } else if (((oldPart instanceof MekCockpit) || (oldPart instanceof MissingMekCockpit))
                 && (newPart instanceof MekCockpit)) {
@@ -493,7 +473,7 @@ public class RefitStep {
                 baseTime = 0;
                 return;
             } else {
-                refitClass = RefitClass.CLASS_D;
+                refitClass = RefitClass.CLASS_E;
                 type = RefitStepType.CHANGE;
                 baseTime = 300; // FIXME: WeaverThree - From MissingMekCockpit - not in CamOps
                 returnsPart = (oldPart instanceof MekCockpit) ? oldPart.clone() : null;
@@ -502,6 +482,56 @@ public class RefitStep {
             }
 
 
+        } else if (((oldPart instanceof MekSensor) || (oldPart instanceof MissingMekSensor))
+                && (newPart instanceof MekSensor)) {
+            
+            boolean equal;
+            if (oldPart instanceof MekSensor) {
+                equal = oldPart.isSamePartType(newPart);
+            } else {
+                equal = ((MissingMekSensor) oldPart).isAcceptableReplacement(newPart, true);
+            }
+
+            if (equal) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                baseTime = 0;
+                return;
+            } else {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.ERROR; // FIXME: This shouldn't be a thing, right?
+                baseTime = 260; 
+                returnsPart = (oldPart instanceof MekSensor) ? oldPart.clone() : null;
+                neededPart = newPart.clone();
+                return;
+            }
+
+
+        } else if (((oldPart instanceof MekLifeSupport) || (oldPart instanceof MissingMekLifeSupport))
+                && (newPart instanceof MekLifeSupport)) {
+            
+            boolean equal;
+            if (oldPart instanceof MekLifeSupport) {
+                equal = oldPart.isSamePartType(newPart);
+            } else {
+                equal = ((MissingMekSensor) oldPart).isAcceptableReplacement(newPart, true);
+            }
+
+            if (equal) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                baseTime = 0;
+                return;
+            } else {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.ERROR; // FIXME: This shouldn't be a thing, right?
+                baseTime = 180; 
+                returnsPart = (oldPart instanceof MekLifeSupport) ? oldPart.clone() : null;
+                neededPart = newPart.clone();
+                return;
+            }
+
+            
         } else if ((oldPart instanceof SpacecraftCoolingSystem) && (newPart instanceof SpacecraftCoolingSystem)) {
             SpacecraftCoolingSystem oldSCCS = (SpacecraftCoolingSystem) oldPart;
             SpacecraftCoolingSystem newSCCS = (SpacecraftCoolingSystem) newPart;
@@ -510,8 +540,8 @@ public class RefitStep {
             oldQuantity = oldSCCS.getTotalSinks();
             newQuantity = newSCCS.getTotalSinks();
             
-            AeroHeatSink oldAHS = new AeroHeatSink(0, oldSCCS.getSinkType(), false, oldUnit.getCampaign());
-            AeroHeatSink newAHS = new AeroHeatSink(0, newSCCS.getSinkType(), false, oldUnit.getCampaign());
+            AeroHeatSink oldAHS = new AeroHeatSink(0, oldSCCS.getSinkType(), false, campaign);
+            AeroHeatSink newAHS = new AeroHeatSink(0, newSCCS.getSinkType(), false, campaign);
             
             oldAHS.setQuantity(oldQuantity);
             newAHS.setQuantity(newQuantity);
@@ -530,7 +560,7 @@ public class RefitStep {
                     return;
                 } else {
                     int delta = 0;
-                    AeroHeatSink deltaAHS = new AeroHeatSink(0, oldAHS.getType(), false, oldUnit.getCampaign());
+                    AeroHeatSink deltaAHS = new AeroHeatSink(0, oldAHS.getType(), false, campaign);
 
                     if (oldQuantity > newQuantity) {
                         delta = oldQuantity - newQuantity;
@@ -554,15 +584,60 @@ public class RefitStep {
                 baseTime = (int) (Math.ceil((oldQuantity + newQuantity) / 50) * 60); // 50/hour round up.
                 return;
             }
+         
             
+        // region Ammo Bins :<
+        
+        } else if (((oldPart instanceof AmmoBin) || (oldPart instanceof MissingAmmoBin))
+                && (newPart instanceof AmmoBin)) {
+            
+
+            // Missing bins hold no shots
+            oldQuantity = (oldPart instanceof AmmoBin) ? ((AmmoBin) oldPart).getCurrentShots() : 0;
+            newQuantity = ((AmmoBin) newPart).getCurrentShots();
+
+            if (oldLoc == newLoc) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                isFixedEquipmentChange = false;
+                return;
+            }
+
+            refitClass = RefitClass.CLASS_C;
+            type = RefitStepType.MOVE_AMMO;
+            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            baseTime = 240; // 120 out, 120 in
+            return;
+
+        } else if ((oldPart instanceof AmmoBin) || (oldPart instanceof MissingAmmoBin)) {
+
+            // Missing bins hold no shots
+            oldQuantity = (oldPart instanceof AmmoBin) ? ((AmmoBin) oldPart).getCurrentShots() : 0;
+            returnsPart = new AmmoStorage(0, ((AmmoBin) oldPart).getType(), oldQuantity, campaign);
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.UNLOAD;
+            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            baseTime = 120;
+            return;
+
+        } else if (newPart instanceof AmmoBin) {
+
+            newQuantity = ((AmmoBin) newPart).getCurrentShots();
+            neededPart = new AmmoStorage(0, ((AmmoBin) newPart).getType(), newQuantity, campaign);
+
+            refitClass = RefitClass.CLASS_B;
+            type = RefitStepType.LOAD;
+            isFixedEquipmentChange = !newPart.isOmniPodded();
+            baseTime = 120;
+            return; 
+
+    
         }
-
-
         // If we reach this point, something has gone wrong
 
         type = RefitStepType.ERROR;
         refitClass = RefitClass.PLEASE_REPAIR;
-        baseTime = 0;
         
     }
 

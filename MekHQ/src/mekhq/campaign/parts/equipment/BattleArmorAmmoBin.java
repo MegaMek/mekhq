@@ -88,7 +88,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     @Override
-    protected int getCurrentShots() {
+    public int getCurrentShots() {
         Mounted<?> mounted = getMounted();
         if (mounted != null) {
             // Replace with actual entity values if entity not null because

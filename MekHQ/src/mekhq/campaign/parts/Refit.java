@@ -508,6 +508,22 @@ public class Refit extends Part implements IAcquisitionWork {
             stepsList.add(new RefitStep(oldUnit, oldCockpit, newCockpit));
         }
 
+        // Sensors
+
+        Part oldSensors = findOnly(MekSensor.class, MissingMekSensor.class, oldParts, oldUnit);
+        if (null != oldSensors) {
+            Part newSensors = findOnly(MekSensor.class, null, newParts, newUnit);
+            stepsList.add(new RefitStep(oldUnit, oldSensors, newSensors));
+        }
+
+        // Life Support
+
+        Part oldLS = findOnly(MekLifeSupport.class, MissingMekLifeSupport.class, oldParts, oldUnit);
+        if (null != oldLS) {
+            Part newLS = findOnly(MekLifeSupport.class, null, newParts, newUnit);
+            stepsList.add(new RefitStep(oldUnit, oldLS, newLS));
+        }
+
 
         // Untracked Heat Sinks
 
@@ -541,15 +557,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
                     if ((newPart instanceof AmmoBin) 
                             && (oldLoc == newPart.getLocation()) && 
-                                (oldType.equalsAmmoTypeOnly(((AmmoBin)newPart).getType()))) {
-
-                        logger.info(oldPart);
-                        logger.info(oldType);
-                        logger.info(newPart);
-                        logger.info(((AmmoBin) newPart).getType());
-                        logger.info("------------------------------------------");
-                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                                (oldType.equalsAmmoTypeOnly(((AmmoBin) newPart).getType()))) {
                         matchFound = true;
+                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
                         break;
                     }
                 }
@@ -564,7 +574,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         Part newPart = newIterator.next();
     
                         if ((newPart instanceof AmmoBin) 
-                                && (oldType.equalsAmmoTypeOnly(((AmmoBin)newPart).getType()))) {
+                                && (oldType.equalsAmmoTypeOnly(((AmmoBin) newPart).getType()))) {
                             
                             stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
                             movedMatchFound = true;
@@ -659,17 +669,17 @@ public class Refit extends Part implements IAcquisitionWork {
 
 
 
-        // Dump the rest of the parts in so we can see them
+        // // Dump the rest of the parts in so we can see them
 
-        for (Part p : oldParts) {
-            logger.error(oldUnit + " still has part " + p);
-            stepsList.add(new RefitStep(oldUnit, p, null));
-        }
+        // for (Part p : oldParts) {
+        //     logger.error(oldUnit + " still has part " + p);
+        //     stepsList.add(new RefitStep(oldUnit, p, null));
+        // }
 
-        for (Part p : newParts) {
-            logger.error(newUnit + " still has part " + p);
-            stepsList.add(new RefitStep(oldUnit, null, p));
-        }
+        // for (Part p : newParts) {
+        //     logger.error(newUnit + " still has part " + p);
+        //     stepsList.add(new RefitStep(oldUnit, null, p));
+        // }
 
 
 

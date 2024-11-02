@@ -136,7 +136,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return fullShots;
     }
 
-    protected int getCurrentShots() {
+    /**
+     * @return The number of shots currently in the bin.
+     */
+    public int getCurrentShots() {
         return getFullShots() - shotsNeeded;
     }
 
