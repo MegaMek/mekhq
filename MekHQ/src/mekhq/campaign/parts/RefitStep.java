@@ -21,6 +21,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Mek;
 import megamek.common.MiscType;
+import megamek.common.WeaponType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.parts.enums.RefitStepType;
@@ -28,6 +29,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -605,7 +608,7 @@ public class RefitStep {
 
             refitClass = RefitClass.CLASS_C;
             type = RefitStepType.MOVE_AMMO;
-            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
             baseTime = 240; // 120 out, 120 in
             return;
 
@@ -632,8 +635,86 @@ public class RefitStep {
             baseTime = 120;
             return; 
 
-    
+
+        // region Tracked HeatSinks
+        } else if ((tempIsHeatSink(oldPart) || tempIsMissingHeatSink(oldPart)) && tempIsHeatSink(newPart)) {
+
+            if (oldLoc == newLoc) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                isFixedEquipmentChange = false;
+                return;
+            }
+            
+            refitClass = RefitClass.CLASS_C;
+            type = RefitStepType.MOVE;
+            isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
+            baseTime = (oldUnit.getEntity() instanceof Mek) ? 180 : 40;
+            return;
+
+        } else if (tempIsHeatSink(oldPart) || tempIsMissingHeatSink(oldPart)) {
+
+            returnsPart = (oldPart instanceof MissingPart) ? null : oldPart.clone();
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            baseTime = (oldUnit.getEntity() instanceof Mek) ? 90 : 20; // 20 is all other vehicles
+            return;
+        
+        } else if (tempIsHeatSink(newPart)) {
+
+            neededPart = newPart.clone();
+
+            refitClass = RefitClass.CLASS_B;
+            type = RefitStepType.ADD;
+            isFixedEquipmentChange = !newPart.isOmniPodded();
+            baseTime = (oldUnit.getEntity() instanceof Mek) ? 90 : 20; // 20 is all other vehicles
+            return;
+
+        
+        // region Weapons
+
+        } else if (((oldPart instanceof EquipmentPart) || (oldPart instanceof MissingEquipmentPart))
+                    && (newPart instanceof EquipmentPart)) {
+            
+            if (oldLoc == newLoc) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                isFixedEquipmentChange = false;
+                return;
+            }
+
+            refitClass = RefitClass.CLASS_C;
+            type = RefitStepType.MOVE;
+            isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
+            baseTime = 240; // 120 out, 120 in
+            return;
+            
+        } else if ((oldPart instanceof EquipmentPart) || (oldPart instanceof MissingEquipmentPart)) {
+
+            returnsPart = (oldPart instanceof EquipmentPart) ? oldPart.clone() : null;
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            baseTime = 120;
+            return;
+        
+        } else if (newPart instanceof EquipmentPart) {
+
+            neededPart = newPart.clone();
+
+            refitClass = RefitClass.CLASS_B;
+            type = RefitStepType.ADD;
+            isFixedEquipmentChange = !newPart.isOmniPodded();
+            baseTime = 120;
+            return;
+
         }
+
+
+
         // If we reach this point, something has gone wrong
 
         type = RefitStepType.ERROR;
@@ -660,7 +741,37 @@ public class RefitStep {
         }
     }
 
+    /**
+     * Determine if a Part is a missing heat sink because not all heat sinks are of class HeatSink
+     * right now. I hope the need for this function goes away in the future.
+     * @param part - the part to check
+     * @return is this part a heat sink
+     */
+    public static boolean tempIsMissingHeatSink(Part part) {
+        if (part instanceof MissingHeatSink) {
+            return true;
+        } else if ((part instanceof MissingEquipmentPart)
+                && (((MissingEquipmentPart) part).getType().hasFlag(MiscType.F_LASER_HEAT_SINK)
+                    || ((MissingEquipmentPart) part).getType().hasFlag(MiscType.F_COMPACT_HEAT_SINK)
+                    || ((MissingEquipmentPart) part).getType().hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE))) { 
+            return true;
+        } else {
+            return false;
+        }
+    }
 
+    public static boolean isEquipmentSubtype(Part part, Class targetClass) {
+        return (part instanceof EquipmentPart)
+                && targetClass.isInstance(((EquipmentPart) part).getType());
+    }
+
+    public static boolean isEquipmentOrMissingSubtype(Part part, Class targetClass) {
+        boolean isRegular = (part instanceof EquipmentPart)
+                && targetClass.isInstance(((EquipmentPart) part).getType());
+        boolean isMissing = (part instanceof MissingEquipmentPart)
+                && targetClass.isInstance(((MissingEquipmentPart) part).getType());
+        return isRegular || isMissing;
+    }
 
     // region Getter/Setters
 

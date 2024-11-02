@@ -448,7 +448,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     Part newPart = newIterator.next();
 
                     if ((newPart instanceof MekActuator) 
-                            && (oldLoc == newPart.getLocation()) && (oldType == (((MekActuator) oldPart).getType()))) {
+                            && (oldLoc == newPart.getLocation()) && (oldType == (((MekActuator) newPart).getType()))) {
                         
                         stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
                         matchFound = true;
