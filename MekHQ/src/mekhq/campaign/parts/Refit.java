@@ -51,6 +51,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -253,7 +254,7 @@ public class Refit extends Part implements IAcquisitionWork {
         Iterator<Part> oldIterator;
         Iterator<Part> newIterator;
 
-        // Let's look for armor first
+        // region Armor
 
         oldIterator = oldParts.iterator();
         while (oldIterator.hasNext()) {
@@ -312,7 +313,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
 
-        // Let's do locations next
+        // region Locations
 
         oldIterator = oldParts.iterator();
         while (oldIterator.hasNext()) {
@@ -508,7 +509,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
 
-        // Heat Sinks
+        // Untracked Heat Sinks
 
         Part oldUHS = oldUnit.getUntrackedHeatSinks();
         Part newUHS = newUnit.getUntrackedHeatSinks();
@@ -522,13 +523,151 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
 
+        // region Ammo Bins :<
+
+        oldIterator = oldParts.iterator();
+        while (oldIterator.hasNext()) {
+            Part oldPart = oldIterator.next();
+
+            if ((oldPart instanceof AmmoBin) || (oldPart instanceof MissingAmmoBin)) {
+                int oldLoc = oldPart.getLocation();
+                AmmoType oldType = (oldPart instanceof AmmoBin) ? 
+                        ((AmmoBin) oldPart).getType() : ((MissingAmmoBin) oldPart).getType();
+                
+                boolean matchFound = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+
+                    if ((newPart instanceof AmmoBin) 
+                            && (oldLoc == newPart.getLocation()) && 
+                                (oldType.equalsAmmoTypeOnly(((AmmoBin)newPart).getType()))) {
+
+                        logger.info(oldPart);
+                        logger.info(oldType);
+                        logger.info(newPart);
+                        logger.info(((AmmoBin) newPart).getType());
+                        logger.info("------------------------------------------");
+                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if (matchFound) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    boolean movedMatchFound = false;
+                    newIterator = newParts.iterator();
+                    while (newIterator.hasNext()) {
+                        Part newPart = newIterator.next();
+    
+                        if ((newPart instanceof AmmoBin) 
+                                && (oldType.equalsAmmoTypeOnly(((AmmoBin)newPart).getType()))) {
+                            
+                            stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                            movedMatchFound = true;
+                            break;
+                        }
+                    }
+                    if (movedMatchFound) {
+                        oldIterator.remove();
+                        newIterator.remove();
+                    } else {
+                        oldIterator.remove();
+                        stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                    }
+                }
+            }
+        }
+
+        newIterator = newParts.iterator();
+        while (newIterator.hasNext()) {
+            Part newPart = newIterator.next();
+
+            if (newPart instanceof AmmoBin) {
+                newIterator.remove();
+                stepsList.add(new RefitStep(oldUnit, null, newPart));
+            }
+        }
+
+        // region Normal Equipment
+
+        oldIterator = oldParts.iterator();
+        while (oldIterator.hasNext()) {
+            Part oldPart = oldIterator.next();
+            
+            Part matchPart;
+            if (oldPart instanceof MissingPart) {
+                matchPart = ((MissingPart) oldPart).getNewPart();
+            } else {
+                matchPart = oldPart;
+            }
+
+            int matchLoc = matchPart.getLocation();
+                        
+            boolean matchFoundSameLoc = false;
+            newIterator = newParts.iterator();
+            while (newIterator.hasNext()) {
+                Part newPart = newIterator.next();
+
+                if (matchPart.isSamePartType(newPart) && (matchLoc == newPart.getLocation())) {
+                    
+                    stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                    matchFoundSameLoc = true;
+                    break;
+                }
+            }
+
+            if (matchFoundSameLoc) {
+                oldIterator.remove();
+                newIterator.remove();
+            } else {
+                // We haven't found same location, so check for moves
+                boolean matchFountDiffLoc = false;
+                newIterator = newParts.iterator();
+                while (newIterator.hasNext()) {
+                    Part newPart = newIterator.next();
+    
+                    if (matchPart.isSamePartType(newPart)) {
+                        
+                        stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                        matchFountDiffLoc = true;
+                        break;
+                    }
+                }
+                if (matchFountDiffLoc) {
+                    oldIterator.remove();
+                    newIterator.remove();
+                } else {
+                    oldIterator.remove();
+                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                }
+            }
+        }
+
+        newIterator = newParts.iterator();
+        while (newIterator.hasNext()) {
+            Part newPart = newIterator.next();
+            
+            // Dump final selection of new parts into the mix
+            newIterator.remove();
+            stepsList.add(new RefitStep(oldUnit, null, newPart));
+            
+        }
+
+
+
         // Dump the rest of the parts in so we can see them
 
         for (Part p : oldParts) {
+            logger.error(oldUnit + " still has part " + p);
             stepsList.add(new RefitStep(oldUnit, p, null));
         }
 
         for (Part p : newParts) {
+            logger.error(newUnit + " still has part " + p);
             stepsList.add(new RefitStep(oldUnit, null, p));
         }
 
@@ -650,6 +789,10 @@ public class Refit extends Part implements IAcquisitionWork {
         time = (int) (unmodifiedTime * refitClass.getTimeMultiplier(!customJob));
     }
     
+
+    // -----------------------------------------  =======================================
+    // region OLD STUFF
+
     private void calculateRefurbishment() {
         // Refurbishment rules (class, time, and cost) are found in SO p189.
         // FIXME: WeaverThree - This should be its own code path rather than an appendix to the other

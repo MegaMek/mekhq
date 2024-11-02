@@ -197,6 +197,7 @@ public class RefitStep {
                         } else {
                             baseTime = 20 * delta; // All vehicles?
                         }
+                        return;
                     }
                 } else {
                     // Changing HS Type
