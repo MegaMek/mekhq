@@ -549,12 +549,12 @@ public class Resupply {
         }
 
         if (morale.isRouted()) {
-            // If the enemy has been Routed there is zero chance of Interception.
+            // If the enemy has been Routed, there is zero chance of Interception.
             // Even if there are still enemy forces in the AO, they are more concerned with immediate
             // survival than preventing the player from getting new toys.
             interceptionChance = 0;
         } else {
-            // If the enemy hasn't been Routed there is always a 1in10 chance of Interception,
+            // If the enemy hasn't been Routed, there is always a 1in10 chance of Interception,
             // no matter how stealthy the convoy.
             interceptionChance = Math.max(0, interceptionChance);
         }
