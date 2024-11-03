@@ -588,7 +588,8 @@ public class RefitStep {
                 baseTime = (int) (Math.ceil((oldQuantity + newQuantity) / 50) * 60); // 50/hour round up.
                 return;
             }
-         
+      
+            
             
         // region Ammo Bins :<
         
@@ -598,7 +599,10 @@ public class RefitStep {
 
             // Missing bins hold no shots
             oldQuantity = (oldPart instanceof AmmoBin) ? ((AmmoBin) oldPart).getCurrentShots() : 0;
-            newQuantity = ((AmmoBin) newPart).getCurrentShots();
+            // FIXME: Something's wrong with at least the large craft ammo bin that causes it to
+            // generate on the new unit with negative shots needed on the dummy new unit, so...
+            // different function used here...
+            newQuantity = ((AmmoBin) newPart).getFullShots();
 
             if (oldLoc == newLoc) {
                 refitClass = RefitClass.NO_CHANGE;
@@ -627,7 +631,7 @@ public class RefitStep {
 
         } else if (newPart instanceof AmmoBin) {
 
-            newQuantity = ((AmmoBin) newPart).getCurrentShots();
+            newQuantity = ((AmmoBin) newPart).getFullShots();
             neededPart = new AmmoStorage(0, ((AmmoBin) newPart).getType(), newQuantity, campaign);
 
             refitClass = RefitClass.CLASS_B;
@@ -747,7 +751,7 @@ public class RefitStep {
             baseTime = 480 * 7;
             return;
         
-            
+
         } else if (((oldPart instanceof BayDoor) || (oldPart instanceof MissingBayDoor))
                 && (newPart instanceof BayDoor)) {
 
