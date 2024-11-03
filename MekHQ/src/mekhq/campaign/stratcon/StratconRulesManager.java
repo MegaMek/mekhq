@@ -203,8 +203,7 @@ public class StratconRulesManager {
      * @param contract The contract associated with the scenario.
      * @return A newly generated {@link StratconScenario}, or {@code null} if scenario creation fails.
      */
-    @Nullable
-    public static StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract) {
+    public static @Nullable StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract) {
         return generateExternalScenario(campaign, contract, null, null, null);
     }
 
@@ -224,8 +223,7 @@ public class StratconRulesManager {
      *                 or {@code null} to select scenario template randomly.
      * @return A newly generated {@link StratconScenario}, or {@code null} if scenario creation fails.
      */
-     @Nullable
-     public static StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract,
+     public static @Nullable StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract,
                                     @Nullable StratconTrackState track, @Nullable StratconCoords scenarioCoords,
                                     @Nullable ScenarioTemplate template) {
          // If we're not generating for a specific track, randomly pick one.
@@ -323,8 +321,7 @@ public class StratconRulesManager {
      * if no {@link ScenarioTemplate} is found or if all coordinates in the provided
      * {@link StratconTrackState} are occupied (and therefore, scenario placement is not possible).
      */
-    @Nullable
-    public static StratconScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
+    public static @Nullable StratconScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
                                                       @Nullable StratconTrackState trackState,
                                                       @Nullable ScenarioTemplate template) {
         // If we're not generating for a specific track, randomly pick one.
@@ -369,8 +366,7 @@ public class StratconRulesManager {
      * @param contract The {@link AtBContract} from which the track state will be fetched.
      * @return The randomly chosen {@link StratconTrackState}, or {@code null} if no tracks are available.
      */
-     @Nullable
-     public static StratconTrackState getRandomTrack(AtBContract contract) {
+     public static @Nullable StratconTrackState getRandomTrack(AtBContract contract) {
           List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
           Random rand = new Random();
 

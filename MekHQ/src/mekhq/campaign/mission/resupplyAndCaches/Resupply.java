@@ -781,8 +781,7 @@ public class Resupply {
      * @return The {@link ImageIcon} representing the speaker. If no specific speaker icon is
      * available, the method will return {@code null}.
      */
-    @Nullable
-    private ImageIcon getSpeakerIcon(@Nullable Force targetConvoy, boolean isIntroduction,
+    private @Nullable ImageIcon getSpeakerIcon(@Nullable Force targetConvoy, boolean isIntroduction,
                                      @Nullable Person logisticsOfficer) {
         ImageIcon speakerIcon = null;
         if (isIntroduction) {
@@ -929,8 +928,7 @@ public class Resupply {
      * @param targetConvoy The convoy target.
      * @return The {@link ImageIcon} of the convoy.
      */
-    @Nullable
-    private ImageIcon getConvoyIcon(@Nullable Force targetConvoy) {
+    private @Nullable ImageIcon getConvoyIcon(@Nullable Force targetConvoy) {
         if (targetConvoy == null) {
             return null;
         }
@@ -1690,11 +1688,10 @@ public class Resupply {
      * special note of those parts that are considered 'extinct' according to the year and the origin
      * faction.
      *
-     * @param droppedItems List of {@link Part} objects that were included in the supply drop. Can be
-     * {@code null}.
+     * @param droppedItems List of {@link Part} objects that were included in the supply drop.
      * @return A map containing the dropped parts and their quantities.
      */
-    public List<String> createPartsReport(@Nullable List<Part> droppedItems) {
+    public List<String> createPartsReport(List<Part> droppedItems) {
         int year = campaign.getGameYear();
         Faction originFaction = campaign.getFaction();
 
