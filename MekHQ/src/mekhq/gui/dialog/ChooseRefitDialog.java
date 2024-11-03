@@ -555,7 +555,7 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_BV) {
                 return r.getNewEntity().calculateBattleValue(true, true);
             } else if (col == COL_TIME) {
-                return r.getTime();
+                return makeRefitTimeDisplay(r.getTime());
             } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();
 //            } else if (col == COL_TARGET) {
@@ -966,7 +966,7 @@ public class ChooseRefitDialog extends JDialog {
                         } else {
                             yield "";
                         }}
-                case COL_BASETIME -> refitStep.getBaseTime();
+                case COL_BASETIME -> makeRefitTimeDisplay(refitStep.getBaseTime());
                 case COL_REFITSTEP_TYPE -> refitStep.getType().toName();
                 default -> "?";
             };
@@ -1102,6 +1102,16 @@ public class ChooseRefitDialog extends JDialog {
         //     }
         //     return ((Comparable<Integer>) r0).compareTo(r1);
             return 0;
+        }
+    }
+
+    public static String makeRefitTimeDisplay(int minutes) {
+        if (minutes < 60) {
+            return String.format("%dm", minutes);
+        } else if (minutes < 480) {
+            return String.format("%.2fh", minutes/60.0);
+        } else {
+            return String.format("%.2fd", minutes/480.0);
         }
     }
 }
