@@ -793,10 +793,18 @@ public class RefitStep {
                     && (newPart instanceof EquipmentPart)) {
             
             if (oldLoc == newLoc) {
-                refitClass = RefitClass.NO_CHANGE;
-                type = RefitStepType.LEAVE;
-                isFixedEquipmentChange = false;
-                return;
+                if (((EquipmentPart) oldPart).isRearFacing() == ((EquipmentPart) newPart).isRearFacing()) {    
+                    refitClass = RefitClass.NO_CHANGE;
+                    type = RefitStepType.LEAVE;
+                    isFixedEquipmentChange = false;
+                    return;
+                } else {
+                    refitClass = RefitClass.CLASS_B;
+                    type = RefitStepType.CHANGE_FACING;
+                    isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
+                    baseTime = 240; // 120 out, 120 in
+                    return;
+                }
             }
 
             refitClass = RefitClass.CLASS_C;
@@ -839,8 +847,13 @@ public class RefitStep {
 
             refitClass = RefitClass.CLASS_C;
             type = RefitStepType.MOVE;
+            // The MissingPart basetimes seem to be what we need...
+            if (oldPart instanceof MissingPart) {
+                baseTime = ((MissingPart) oldPart).getBaseTime() * 2;
+            } else {
+                baseTime = oldPart.getMissingPart().getBaseTime() * 2;
+            }
             isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
-            
             return;
         
         } else if ((oldPart instanceof Part) || (newPart instanceof MissingPart)) {
@@ -849,8 +862,12 @@ public class RefitStep {
 
             refitClass = RefitClass.CLASS_A;
             type = RefitStepType.REMOVE;
+            if (oldPart instanceof MissingPart) {
+                baseTime = ((MissingPart) oldPart).getBaseTime();
+            } else {
+                baseTime = oldPart.getMissingPart().getBaseTime();
+            }
             isFixedEquipmentChange = !oldPart.isOmniPodded();
-            
             return;
 
         } else if (newPart instanceof Part) {
@@ -859,8 +876,8 @@ public class RefitStep {
 
             refitClass = RefitClass.CLASS_B;
             type = RefitStepType.ADD;
+            baseTime = newPart.getMissingPart().getBaseTime();
             isFixedEquipmentChange = !newPart.isOmniPodded();
-
             return;
 
         }
@@ -970,6 +987,10 @@ public class RefitStep {
 
     public RefitStepType getType() {
         return type;
+    }
+
+    public void setType(RefitStepType type) {
+        this.type = type;
     }
 
     public String getNotes() {
