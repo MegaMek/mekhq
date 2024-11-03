@@ -21,7 +21,6 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.ITechnology;
 import megamek.common.Mek;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -30,6 +29,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
@@ -61,7 +61,9 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
+import static megamek.common.enums.SkillLevel.NONE;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
+import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -83,17 +85,17 @@ public class Resupply {
     private final int employerTechCode;
     private final boolean employerIsClan;
     private List<Part> ammoBinPool;
+    private double focusAmmo;
     private List<Part> armorPool;
+    private double focusArmor;
     private List<Part> partsPool;
+    private double focusParts;
     private Random random;
     private boolean usePlayerConvoy;
     private Map<Force, Double> playerConvoys;
     private double totalPlayerCargoCapacity;
     private double targetCargoTonnage;
-    private double focusAmmo;
-    private double focusArmor;
-    private double focusParts;
-    private int negotiationModifier;
+    private int negotiatorSkill;
 
     private static final Money HIGH_VALUE_ITEM = Money.of(250000);
     private static final int CARGO_MULTIPLIER = 4;
@@ -126,14 +128,14 @@ public class Resupply {
 
         currentYear = campaign.getGameYear();
         employerIsClan = enemyFaction.isClan();
-        employerTechCode = getTechFaction(employerFaction);
+        employerTechCode = getFactionTechCode(employerFaction);
 
         focusAmmo = 0.25;
         focusArmor = 0.25;
         focusParts = 0.5;
 
         buildPartsPools(collectParts());
-        calculateNegotiationModifier();
+        calculateNegotiationSkill();
         calculatePlayerConvoyValues();
     }
 
@@ -218,9 +220,9 @@ public class Resupply {
      * <p>
      * Resulting negotiationModifier is stored in {@code negotiationModifier} instance variable.
      */
-    private void calculateNegotiationModifier() {
+    private void calculateNegotiationSkill() {
         Person negotiator;
-        negotiationModifier = -4;
+        negotiatorSkill = NONE.ordinal();
 
         if (contract.getContractType().isGuerrillaWarfare()) {
             negotiator = campaign.getFlaggedCommander();
@@ -242,7 +244,8 @@ public class Resupply {
             Skill skill = negotiator.getSkill(SkillType.S_NEG);
 
             if (skill != null) {
-                negotiationModifier = Math.min(3, skill.getFinalSkillValue() - 3);
+                int skillLevel = skill.getFinalSkillValue();
+                negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
             }
         }
     }
@@ -1421,27 +1424,32 @@ public class Resupply {
         for (PartDetails potentialPart : potentialParts.values()) {
             int weight = (int) Math.round(potentialPart.getWeight());
             for (int entry = 0; entry < weight; entry++) {
-                boolean isAcquired = Compute.d6(2) > 7; // TODO: make acquisition roll
-
-                if (isAcquired) {
-                    // This has been ordered in order of items we're most likely to hit first
-                    if (!(potentialPart.getPart() instanceof AmmoBin)) {
-                        partsPool.add(preparePart(potentialPart.getPart()));
-                        continue;
-                    }
-
-                    if (potentialPart.getPart() instanceof Armor) {
-                        armorPool.add(preparePart(potentialPart.getPart()));
-                        continue;
-                    }
-
-                    ammoBinPool.add(preparePart(potentialPart.getPart()));
+                if (potentialPart.getPart() instanceof Armor) {
+                    armorPool.add(preparePart(potentialPart.getPart()));
+                    continue;
                 }
+
+                if (potentialPart.getPart() instanceof AmmoBin) {
+                    ammoBinPool.add(preparePart(potentialPart.getPart()));
+                    continue;
+                }
+
+                partsPool.add(preparePart(potentialPart.getPart()));
             }
         }
 
+        logger.info(armorPool);
+
+        // Make procurement checks for each of the items in the individual pools
+        Procurement procurement = new Procurement(negotiatorSkill, currentYear, employerFaction);
+
+        partsPool = procurement.makeProcurementChecks(partsPool, true, true);
         Collections.shuffle(partsPool);
+
+        armorPool = procurement.makeProcurementChecks(armorPool, true, true);
         Collections.shuffle(armorPool);
+
+        ammoBinPool = procurement.makeProcurementChecks(ammoBinPool, true, true);
         Collections.shuffle(ammoBinPool);
     }
 
@@ -1484,7 +1492,7 @@ public class Resupply {
         }
 
         Part randomPart = partsPool.get(random.nextInt(partsPool.size()));
-        randomPart.setQuality(getRandomPartQuality(negotiationModifier));
+        randomPart.setQuality(getRandomPartQuality(negotiatorSkill));
         return randomPart;
     }
 
@@ -1497,7 +1505,7 @@ public class Resupply {
         }
 
         Part randomArmor = armorPool.get(random.nextInt(armorPool.size()));
-        randomArmor.setQuality(getRandomPartQuality(negotiationModifier));
+        randomArmor.setQuality(getRandomPartQuality(negotiatorSkill));
         return randomArmor;
     }
 
@@ -1582,16 +1590,17 @@ public class Resupply {
             droppedItems.addAll(getDrops(DropType.PARTS));
         }
 
+        if (droppedItems.isEmpty()) {
+            campaign.addReport(String.format(resources.getString("convoyUnsuccessful.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            return;
+        }
+
         if (contract.getContractType().isGuerrillaWarfare() && !(isLoot || isContractEnd)) {
-            if (!droppedItems.isEmpty()) {
-                smugglerOfferDialog(droppedItems);
-                logger.warn("No resupply possible as no items dropped (Smuggler).");
-            }
+            smugglerOfferDialog(droppedItems);
         } else {
-            if (!droppedItems.isEmpty()) {
-                supplyDropDialog(droppedItems, isLoot, isContractEnd);
-                logger.warn("No resupply possible as no items dropped (Normal).");
-            }
+            supplyDropDialog(droppedItems, isLoot, isContractEnd);
         }
     }
 
@@ -1624,6 +1633,10 @@ public class Resupply {
             case AMMO -> targetCargoTonnage * focusAmmo;
         };
 
+        if (targetValue == 0) {
+            return droppedItems;
+        }
+
         while (runningTotal < targetValue) {
             Part potentialPart = switch(dropType) {
                 case PARTS -> getRandomPart();
@@ -1648,13 +1661,22 @@ public class Resupply {
                 }
 
                 // For really expensive items, the player only has one chance per distinct part.
-                partsPool.removeAll(Collections.singleton(potentialPart));
+                switch (dropType) {
+                    case PARTS -> partsPool.removeAll(Collections.singleton(potentialPart));
+                    case ARMOR -> armorPool.removeAll(Collections.singleton(potentialPart));
+                    case AMMO -> ammoBinPool.removeAll(Collections.singleton(potentialPart));
+                }
             } else {
                 partFetched = true;
             }
 
             if (partFetched) {
-                partsPool.remove(potentialPart);
+                switch (dropType) {
+                    case PARTS -> partsPool.remove(potentialPart);
+                    case ARMOR -> armorPool.remove(potentialPart);
+                    case AMMO -> ammoBinPool.remove(potentialPart);
+                }
+
                 runningTotal += potentialPart.getTonnage();
                 droppedItems.add(potentialPart);
             }
@@ -1684,7 +1706,7 @@ public class Resupply {
                     String append = part.isClan() ? " (Clan)" : "";
                     append = part.isMixedTech() ? " (Mixed)" : append;
                     append += " (" + quality + ')';
-                    append += part.isExtinct(year, originFaction.isClan(), getTechFaction(originFaction)) ?
+                    append += part.isExtinct(year, originFaction.isClan(), getFactionTechCode(originFaction)) ?
                         " (<b>EXTINCT!</b>)" : "";
 
                     if (part instanceof AmmoBin) {
@@ -1710,39 +1732,6 @@ public class Resupply {
             .map(item -> item + " x" + entries.get(item))
             .sorted()
             .collect(Collectors.toList());
-    }
-
-    /**
-     * Retrieves the faction-specific tech level.
-     *
-     * @param faction The target {@link Faction} to get the technology level of.
-     * @return An integer representing the faction's technology level.
-     */
-    int getTechFaction(Faction faction) {
-        for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-            if (ITechnology.MM_FACTION_CODES[i].equals(faction.getShortName())) {
-                return i;
-            }
-        }
-
-        logger.warn("Unable to retrieve Tech Faction. Using fallback.");
-
-        if (faction.isClan()) {
-            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (ITechnology.MM_FACTION_CODES[i].equals("CLAN")) {
-                    return i;
-                }
-            }
-        } else if (faction.isInnerSphere()) {
-            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (ITechnology.MM_FACTION_CODES[i].equals("IS")) {
-                    return i;
-                }
-            }
-        }
-
-        logger.error("Fallback failed. Using 0 (IS)");
-        return 0;
     }
 
     /**
@@ -2098,22 +2087,22 @@ public class Resupply {
         });
 
         // The player should not be able to focus on parts for game balance reasons.
-        // If the player could pick parts the optimum choice would be to always pick parts.
+        // If the player could pick parts, the optimum choice would be to always pick parts.
 
         JButton optionArmor = new JButton(resources.getString("optionArmor.text"));
         optionArmor.addActionListener(e -> {
             dialog.dispose();
-            focusAmmo = 0.125;
+            focusAmmo = 0;
             focusArmor = 0.75;
-            focusParts = 0.125;
+            focusParts = 0;
         });
 
         JButton optionAmmo = new JButton(resources.getString("optionAmmo.text"));
         optionAmmo.addActionListener(e -> {
             dialog.dispose();
             focusAmmo = 0.75;
-            focusArmor = 0.125;
-            focusParts = 0.125;
+            focusArmor = 0;
+            focusParts = 0;
         });
 
         // Create a panel for buttons and add buttons to it

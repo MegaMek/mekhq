@@ -1972,6 +1972,10 @@ public class StratconRulesManager {
 
                 track.removeScenario(scenario);
 
+                if (Objects.equals(scenario.getBackingScenario().getName(), "Emergency Convoy Defense")) {
+                    return true;
+                }
+
                 StratconFacility localFacility = track.getFacility(scenario.getCoords());
                 if (localFacility != null) {
                     // if the ignored scenario was on top of an allied facility
