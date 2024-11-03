@@ -157,7 +157,7 @@ public class Refit extends Part implements IAcquisitionWork {
         replacingLocations = false;
         campaign = oldUnit.getCampaign();
 
-        calculate();
+        analyze();
         figureRefitClass();
         figureRefitTime();
 
@@ -244,7 +244,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * manipulations are happening in this refit. We locate the items and then pass off to RefitStep
      * set up the fine details of the exchange and determine things like time and class.
      */
-    public void calculate() {
+    public void analyze() {
         Unit newUnit = new Unit(newEntity, getCampaign());
         newUnit.initializeParts(false);
 
@@ -524,6 +524,28 @@ public class Refit extends Part implements IAcquisitionWork {
             stepsList.add(new RefitStep(oldUnit, oldLS, newLS));
         }
 
+        // Aero / SC Life Support
+
+        Part oldALS = findOnly(AeroLifeSupport.class, MissingAeroLifeSupport.class, oldParts, oldUnit);
+        if (null != oldALS) {
+            Part newALS = findOnly(AeroLifeSupport.class, null, newParts, newUnit);
+            Part matchPart;
+            if (oldALS instanceof MissingPart) {
+                matchPart = ((MissingPart) oldALS).getNewPart();
+            } else {
+                matchPart = oldALS;
+            }
+            // !crewSizeChanged - only change life support if actual crew size changes, not if misc
+            // bay personnel change. Will save a lot of time on some refits...
+            if (!crewSizeChanged() || matchPart.isSamePartType(newALS)) {
+                stepsList.add(new RefitStep(oldUnit, oldALS, newALS));
+            } else {
+                stepsList.add(new RefitStep(oldUnit, oldALS, null));
+                stepsList.add(new RefitStep(oldUnit, null, newALS));
+            }
+
+        }
+
 
         // Untracked Heat Sinks
 
@@ -601,6 +623,134 @@ public class Refit extends Part implements IAcquisitionWork {
                 stepsList.add(new RefitStep(oldUnit, null, newPart));
             }
         }
+
+
+        // region TransportBays
+
+        // These should hall have location none so we don't need to handle moves?
+
+        // Have to avoid concrrent modification errors so we're going to have to use more lists
+
+        List<TransportBayPart> oldTransportBays = oldParts.stream()
+            .filter(part -> (part instanceof TransportBayPart))
+            .map(part -> ((TransportBayPart) part))
+            .collect(Collectors.toList());
+
+        oldParts.removeIf(part -> (part instanceof TransportBayPart));
+
+        List<TransportBayPart> newTransportBays = newParts.stream()
+            .filter(part -> (part instanceof TransportBayPart))
+            .map(part -> ((TransportBayPart) part))
+            .collect(Collectors.toList());
+
+        newParts.removeIf(part -> (part instanceof TransportBayPart));
+
+        Iterator<TransportBayPart> oldTBIter = oldTransportBays.iterator();
+        while (oldTBIter.hasNext()) {
+            TransportBayPart oldTransportBay = oldTBIter.next();
+            Bay oldBay = oldTransportBay.getBay();
+
+            boolean matchFound = false;
+            Iterator<TransportBayPart> newTBIter = newTransportBays.iterator();
+            while (newTBIter.hasNext()) {
+                TransportBayPart newTransportBay = newTBIter.next();
+                Bay newBay = newTransportBay.getBay();
+
+                if (oldBay.getType().equals(newBay.getType())
+                        && (oldBay.getCapacity() == newBay.getCapacity())) {
+                    stepsList.add(new RefitStep(oldUnit, oldTransportBay, newTransportBay));
+
+                    List<Part> oldChildren = getChildPartsOfTypes(oldTransportBay, oldParts,
+                            Cubicle.class, MissingCubicle.class);
+                    List<Part> newChildren = getChildPartsOfTypes(newTransportBay, newParts,
+                            Cubicle.class, MissingCubicle.class);
+
+                    Iterator<Part> oldChildIter = oldChildren.iterator();
+                    Iterator<Part> NewChildIter = newChildren.iterator();
+
+                    while (oldChildIter.hasNext() && NewChildIter.hasNext()) {
+                        Part oldCube = oldChildIter.next();
+                        Part newCube = NewChildIter.next();
+                        stepsList.add(new RefitStep(oldUnit, oldCube, newCube));
+                    }
+                    while (oldChildIter.hasNext()) {
+                        Part oldCubicle = oldChildIter.next();
+                        stepsList.add(new RefitStep(oldUnit, oldCubicle, null));
+                    }
+                    while (NewChildIter.hasNext()) {
+                        Part newCubicle = NewChildIter.next();
+                        stepsList.add(new RefitStep(oldUnit, null, newCubicle));
+                    }
+
+                    oldChildren = getChildPartsOfTypes(oldTransportBay, oldParts,
+                            BayDoor.class, MissingBayDoor.class);
+                    newChildren = getChildPartsOfTypes(newTransportBay, newParts,
+                            BayDoor.class, MissingBayDoor.class);
+
+                    oldChildIter = oldChildren.iterator();
+                    NewChildIter = newChildren.iterator();
+
+                    while (oldChildIter.hasNext() && NewChildIter.hasNext()) {
+                        Part oldCube = oldChildIter.next();
+                        Part newCube = NewChildIter.next();
+                        stepsList.add(new RefitStep(oldUnit, oldCube, newCube));
+                    }
+                    while (oldChildIter.hasNext()) {
+                        Part oldCubicle = oldChildIter.next();
+                        stepsList.add(new RefitStep(oldUnit, oldCubicle, null));
+                    }
+                    while (NewChildIter.hasNext()) {
+                        Part newCubicle = NewChildIter.next();
+                        stepsList.add(new RefitStep(oldUnit, null, newCubicle));
+                    }
+
+
+
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            if (matchFound) {
+                oldTBIter.remove();
+                newTBIter.remove();
+            } else {
+                oldTBIter.remove();
+                stepsList.add(new RefitStep(oldUnit, oldTransportBay, null));
+
+                List<Part> oldChildren = getChildPartsOfTypes(oldTransportBay, oldParts,
+                        Cubicle.class, MissingCubicle.class);
+                for (Part oldChild : oldChildren) {
+                    stepsList.add(new RefitStep(oldUnit, oldChild, null));
+                }
+                oldChildren = getChildPartsOfTypes(oldTransportBay, oldParts,
+                        BayDoor.class, MissingBayDoor.class);
+                for (Part oldChild : oldChildren) {
+                    stepsList.add(new RefitStep(oldUnit, oldChild, null));
+                }
+            }
+            
+        }
+
+        Iterator<TransportBayPart> newTBIter = newTransportBays.iterator();
+        while (newTBIter.hasNext()) {
+            TransportBayPart newTransportBay = newTBIter.next();
+
+            newTBIter.remove();
+            stepsList.add(new RefitStep(oldUnit, null, newTransportBay));
+
+            List<Part> newChildren = getChildPartsOfTypes(newTransportBay, newParts,
+                    Cubicle.class, MissingCubicle.class);
+            for (Part newChild : newChildren) {
+                stepsList.add(new RefitStep(oldUnit, null, newChild));
+            }
+            newChildren = getChildPartsOfTypes(newTransportBay, newParts,
+                    BayDoor.class, MissingBayDoor.class);
+            for (Part newChild : newChildren) {
+                stepsList.add(new RefitStep(oldUnit, null, newChild));
+            }
+        }
+
 
         // region Normal Equipment
 
@@ -685,6 +835,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
     }
 
+
+    // region Analysis Subfunctions
+
     /**
      * @param unit - the unit to check against
      * @param armor - the armor piece to check
@@ -759,6 +912,33 @@ public class Refit extends Part implements IAcquisitionWork {
 
         return toReturn;
     }
+
+    /**
+     * Finds the transport cubicles that are parented to the given transport bay, removes them from
+     * the given list (beware) and returns them in a new list.
+     * @param parentPart - parent part
+     * @param parts - part list to be searched - will be mutated
+     * @return list of Cubicles attached to parent part
+     */
+    private List<Part> getChildPartsOfTypes(Part parentPart, List<Part> parts, Class partClass, Class missingPartClass) {
+        List<Part> toReturn = new ArrayList<Part>();
+
+        Iterator<Part> partsIterator = parts.iterator();
+        while (partsIterator.hasNext()) {
+            Part part = partsIterator.next();
+
+            if (partClass.isInstance(part) || missingPartClass.isInstance(part)) {
+                
+                if (part.getParentPart() == parentPart) {
+                    toReturn.add(part);
+                    partsIterator.remove();
+                    continue;
+                }
+            }
+        }
+        return toReturn;
+    }
+
 
 
     /**

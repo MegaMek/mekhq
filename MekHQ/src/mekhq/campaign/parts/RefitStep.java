@@ -19,6 +19,7 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.CargoBay;
 import megamek.common.Mek;
 import megamek.common.MiscType;
 import megamek.common.WeaponType;
@@ -672,8 +673,117 @@ public class RefitStep {
             baseTime = (oldUnit.getEntity() instanceof Mek) ? 90 : 20; // 20 is all other vehicles
             return;
 
+
+        // region Transport Bay Stuff
+
+        } else if ((oldPart instanceof TransportBayPart) && (newPart instanceof TransportBayPart)) { 
+            
+            oldQuantity = (int) ((TransportBayPart) oldPart).getBay().getCapacity(); 
+            newQuantity = (int) ((TransportBayPart) newPart).getBay().getCapacity();
+
+            if (oldLoc != newLoc) {
+                throw new IllegalArgumentException("Transport Bays shouldn't move location...");
+            }
+
+            refitClass = RefitClass.NO_CHANGE;
+            type = RefitStepType.LEAVE;
+            isFixedEquipmentChange = false;
+            return;
         
-        // region Weapons
+        } else if (oldPart instanceof TransportBayPart) {
+
+            oldQuantity = (int) ((TransportBayPart) oldPart).getBay().getCapacity(); 
+            returnsPart = oldPart.clone();
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            isFixedEquipmentChange = true;
+            // Cargo bays take a month (30 workdays), other bays are managed by cubicle
+            baseTime = (((TransportBayPart) oldPart).getBay() instanceof CargoBay) ? 480 * 30 : 0;
+            return;
+
+        } else if (newPart instanceof TransportBayPart) {
+
+            newQuantity = (int) ((TransportBayPart) newPart).getBay().getCapacity(); 
+            returnsPart = newPart.clone();
+
+            refitClass = RefitClass.CLASS_C; // FIXME: No Location = No Removal Bonus? - WeaverThree
+            type = RefitStepType.ADD;
+            isFixedEquipmentChange = true;
+            // Cargo bays take a month (30 workdays), other bays are managed by cubicle
+            baseTime = (((TransportBayPart) newPart).getBay() instanceof CargoBay) ? 480 * 30 : 0;
+            return;
+
+
+        } else if (((oldPart instanceof Cubicle) || (oldPart instanceof MissingCubicle))
+                && (newPart instanceof Cubicle)) {
+
+            if (oldLoc != newLoc) {
+                throw new IllegalArgumentException("Cubicles shouldn't move location...");
+            }
+
+            refitClass = RefitClass.NO_CHANGE;
+            type = RefitStepType.LEAVE;
+            isFixedEquipmentChange = false;
+            return;
+
+        } else if ((oldPart instanceof Cubicle) || (oldPart instanceof MissingCubicle)) {
+
+            returnsPart = (oldPart instanceof Cubicle) ? oldPart.clone() : null;
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            isFixedEquipmentChange = true;
+            baseTime = 480 * 7;
+            return;
+
+        } else if (newPart instanceof Cubicle) {
+
+            neededPart = newPart.clone();
+
+            refitClass = RefitClass.CLASS_C;
+            type = RefitStepType.ADD;
+            isFixedEquipmentChange = true;
+            baseTime = 480 * 7;
+            return;
+        
+            
+        } else if (((oldPart instanceof BayDoor) || (oldPart instanceof MissingBayDoor))
+                && (newPart instanceof BayDoor)) {
+
+            if (oldLoc != newLoc) {
+                throw new IllegalArgumentException("Cubicles shouldn't move location...");
+            }
+
+            refitClass = RefitClass.NO_CHANGE;
+            type = RefitStepType.LEAVE;
+            isFixedEquipmentChange = false;
+            return;
+
+        } else if ((oldPart instanceof BayDoor) || (oldPart instanceof MissingBayDoor)) {
+
+            returnsPart = (oldPart instanceof BayDoor) ? oldPart.clone() : null;
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            isFixedEquipmentChange = true;
+            baseTime = 60 * 10;
+            return;
+
+        } else if (newPart instanceof BayDoor) {
+
+            neededPart = newPart.clone();
+
+            refitClass = RefitClass.CLASS_C;
+            type = RefitStepType.ADD;
+            isFixedEquipmentChange = true;
+            baseTime = 60 * 10;
+            return;
+        
+
+
+
+        // region Equipment
 
         } else if (((oldPart instanceof EquipmentPart) || (oldPart instanceof MissingEquipmentPart))
                     && (newPart instanceof EquipmentPart)) {
@@ -690,7 +800,7 @@ public class RefitStep {
             isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
             baseTime = 240; // 120 out, 120 in
             return;
-            
+
         } else if ((oldPart instanceof EquipmentPart) || (oldPart instanceof MissingEquipmentPart)) {
 
             returnsPart = (oldPart instanceof EquipmentPart) ? oldPart.clone() : null;
@@ -711,7 +821,46 @@ public class RefitStep {
             baseTime = 120;
             return;
 
+
+        // region Everything Else
+        } else if (((oldPart instanceof Part) || (newPart instanceof MissingPart))
+                && (newPart instanceof Part)) {
+            
+            if (oldLoc == newLoc) {
+                refitClass = RefitClass.NO_CHANGE;
+                type = RefitStepType.LEAVE;
+                isFixedEquipmentChange = false;
+                return;
+            }
+
+            refitClass = RefitClass.CLASS_C;
+            type = RefitStepType.MOVE;
+            isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
+            
+            return;
+        
+        } else if ((oldPart instanceof Part) || (newPart instanceof MissingPart)) {
+    
+            returnsPart = !(oldPart instanceof MissingPart) ? oldPart.clone() : null;
+
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE;
+            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            
+            return;
+
+        } else if (newPart instanceof Part) {
+
+            neededPart = newPart.clone();
+
+            refitClass = RefitClass.CLASS_B;
+            type = RefitStepType.ADD;
+            isFixedEquipmentChange = !newPart.isOmniPodded();
+
+            return;
+
         }
+
 
 
 

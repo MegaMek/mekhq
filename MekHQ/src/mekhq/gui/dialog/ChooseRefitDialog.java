@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
@@ -643,7 +644,7 @@ public class ChooseRefitDialog extends JDialog {
     }
 
 
-    // region RefitNeededListTableModel
+    // region Needed Model
 
     public class RefitNeededListTableModel extends AbstractTableModel {
         public final static int COL_NAME = 0;
@@ -725,7 +726,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_ORDERED -> campaign.getPartInventory(part).getOrdered();
                 case COL_NEEDED -> part.getQuantity();
                 case COL_TOORDER -> "<html><b>" + getToOrder(part) + "</b></html>";
-                case COL_COST -> part.getActualValue().toAmountAndSymbolString();
+                case COL_COST -> part.getActualValue().multipliedBy(getToOrder(part)).toAmountAndSymbolString();
                 default -> "?";
             };
         }
@@ -772,12 +773,15 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
+    // region Returns Model
+
     public class RefitReturnsListTableModel extends AbstractTableModel {
         public final static int COL_NAME = 0;
         public final static int COL_TECH_BASE = 1;
         public final static int COL_STOCK = 2;
         public final static int COL_RECEIVING = 3;
-        public final static int N_COL = 4;
+        public final static int COL_VALUE = 4;
+        public final static int N_COL = 5;
 
         private List<Part> data;
 
@@ -811,6 +815,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_TECH_BASE -> "Tech";
                 case COL_STOCK -> "Stock";
                 case COL_RECEIVING -> "Getting Back";
+                case COL_VALUE -> "Value Returned";
                 default -> "?";
             };
         }
@@ -831,6 +836,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_TECH_BASE -> part.getTechBaseName();
                 case COL_STOCK -> campaign.getPartInventory(part).getSupply();
                 case COL_RECEIVING -> part.getQuantity();
+                case COL_VALUE -> part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
                 default -> "?";
             };
         }
@@ -844,6 +850,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_NAME -> 180;
                 case COL_TECH_BASE -> 26;
                 case COL_STOCK, COL_RECEIVING -> 20;
+                case COL_VALUE -> 50;
                 default -> 3;
             };
         }
@@ -851,6 +858,7 @@ public class ChooseRefitDialog extends JDialog {
         public int getAlignment(int col) {
             return switch (col) {
                 case COL_TECH_BASE, COL_STOCK, COL_RECEIVING -> SwingConstants.CENTER;
+                case COL_VALUE -> SwingConstants.RIGHT;
                 default -> SwingConstants.LEFT;
             };
         }
@@ -876,7 +884,7 @@ public class ChooseRefitDialog extends JDialog {
 
 
 
-    // region RefitStepsListTableModel
+    // region Steps Model
 
     public class RefitStepsListTableModel extends AbstractTableModel {
         public final static int COL_OLD_NAME = 0;
