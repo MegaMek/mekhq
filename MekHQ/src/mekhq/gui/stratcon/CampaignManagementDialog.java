@@ -134,8 +134,8 @@ public class CampaignManagementDialog extends JDialog {
             supplyDropDialog();
         } else {
             AtBContract contract = currentCampaignState.getContract();
-            Resupply supplyDrops = new Resupply(campaign, contract);
-            supplyDrops.getResupply(1, true);
+            Resupply supplyDrops = new Resupply(campaign, contract, true);
+            supplyDrops.getResupply(1, false);
 
             currentCampaignState.useSupportPoint();
         }
@@ -179,8 +179,8 @@ public class CampaignManagementDialog extends JDialog {
             dialog.dispose();
 
             AtBContract contract = currentCampaignState.getContract();
-            Resupply supplyDrops = new Resupply(campaign, contract);
-            supplyDrops.getResupply((int) numberModel.getValue(), true);
+            Resupply supplyDrops = new Resupply(campaign, contract, true);
+            supplyDrops.getResupply((int) numberModel.getValue(), false);
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });
 

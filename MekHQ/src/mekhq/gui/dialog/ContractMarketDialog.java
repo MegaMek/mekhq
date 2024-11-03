@@ -480,9 +480,7 @@ public class ContractMarketDialog extends JDialog {
                     return;
                 }
 
-                if (selectedContract.getCommandRights().isIndependent()) {
-                    triggerContractStartDialog(campaign, (AtBContract) selectedContract);
-                }
+                triggerContractStartDialog(campaign, (AtBContract) selectedContract);
             }
 
             selectedContract.setName(contractView.getContractName());

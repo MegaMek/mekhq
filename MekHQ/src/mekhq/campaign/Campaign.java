@@ -3870,9 +3870,9 @@ public class Campaign implements ITechManager {
      */
     private void processResupply(AtBContract contract) {
         if (!contract.getContractType().isGuerrillaWarfare() || Compute.d6(1) > 4) {
-            int maximumResupplySize = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-            Resupply resupplies = new Resupply(this, contract);
-            resupplies.getResupply(maximumResupplySize, false);
+            int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+            Resupply resupplies = new Resupply(this, contract, false);
+            resupplies.getResupply(dropCount, false);
         }
     }
 
