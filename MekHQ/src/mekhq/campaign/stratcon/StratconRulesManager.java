@@ -1526,7 +1526,7 @@ public class StratconRulesManager {
             return ReinforcementEligibilityType.FightLance;
         }
 
-        // otherwise, the force requires support points / vps to deploy
+        // otherwise, the force requires support points to deploy
         if (campaignState.getSupportPoints() > 0) {
             return ReinforcementEligibilityType.SupportPoint;
         }
