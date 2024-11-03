@@ -594,7 +594,10 @@ public class Resupply {
         }
 
         if (!message.isEmpty()) {
-            createConvoyMessage(playerConvoy, droppedItems, message, isIntercepted);
+            if (isIntercepted
+                || (!forceContainsOnlyVTOLForces(playerConvoy) && !forceContainsOnlyAerialForces(playerConvoy))) {
+                createConvoyMessage(playerConvoy, droppedItems, message, isIntercepted);
+            }
         } else {
             campaign.addReport(String.format(resources.getString("convoySuccessful.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -1045,7 +1048,11 @@ public class Resupply {
      * @return A boolean indicating whether all units in the force are Aerospace or Conventional
      * Fighter units.
      */
-    private boolean forceContainsOnlyAerialForces(Force targetConvoy) {
+    private boolean forceContainsOnlyAerialForces(@Nullable Force targetConvoy) {
+        if (targetConvoy == null) {
+            return false;
+        }
+
         for (UUID unitId : targetConvoy.getUnits()) {
             try {
                 Unit unit = campaign.getUnit(unitId);
@@ -1075,7 +1082,11 @@ public class Resupply {
      * @return A boolean indicating whether the majority of units in the force are of VTOL (or
      * WIGE) types.
      */
-    private boolean forceContainsMajorityVTOLForces(Force targetConvoy) {
+    private boolean forceContainsMajorityVTOLForces(@Nullable Force targetConvoy) {
+        if (targetConvoy == null) {
+            return false;
+        }
+
         int convoySize = 0;
         int vtolCount = 0;
 
@@ -1095,6 +1106,39 @@ public class Resupply {
         }
 
         return vtolCount >= Math.floor((double) convoySize / 3);
+    }
+
+    /**
+     * This method iterates over every unit in the given force and checks if it's a VTOL (or WIGE)
+     * unit. If it encounters a unit that is not a VTOL (or WIGE), it immediately returns {@code false},
+     * indicating that there exist non-VTOL units in the force. Upon checking all units without
+     * finding a non-VTOL (or WIGE) unit, it will return {@code true}.
+     * <p>
+     * If an error occurs while processing a unit (for example, due to a {@code null} reference),
+     * that unit will be ignored and the method proceeds with the next unit.
+     *
+     * @param targetConvoy The force to be verified if all units are of VTOL (or WIGE) types.
+     * @return A boolean indicating whether all units in the force are of VTOL (or WIGE) types or not.
+     */
+    private boolean forceContainsOnlyVTOLForces(@Nullable Force targetConvoy) {
+        if (targetConvoy == null) {
+            return false;
+        }
+
+        for (UUID unitId : targetConvoy.getUnits()) {
+            try {
+                Unit unit = campaign.getUnit(unitId);
+                Entity entity = unit.getEntity();
+
+                if (!entity.isAirborneVTOLorWIGE()) {
+                    return false;
+                }
+            } catch (Exception ignored) {
+                // If we run into issues, we can just skip that unit and check the others.
+            }
+        }
+
+        return true;
     }
 
     /**
