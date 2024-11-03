@@ -958,10 +958,22 @@ public class Resupply {
      */
     private void processConvoyInterception(List<Part> droppedItems, @Nullable Force targetConvoy,
                                            StratconTrackState track, StratconCoords convoyGridReference) {
-        String templateAddress = "data/scenariotemplates/Emergency Convoy Defense.xml";
+        final String DIRECTORY = "data/scenariotemplates/";
+        final String GENERIC = DIRECTORY + "Emergency Convoy Defense.xml";
+        final String PLAYER_AEROSPACE_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - Low-Atmosphere.xml";
+        final String PLAYER_VTOL_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player - VTOL.xml";
+        final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.xml";
 
-        if (usePlayerConvoy) {
-            templateAddress = "data/scenariotemplates/Emergency Convoy Defense - Independent.xml";
+        String templateAddress = GENERIC;
+
+        if (targetConvoy != null) {
+            if (forceContainsOnlyAerialForces(targetConvoy)) {
+                templateAddress = PLAYER_AEROSPACE_CONVOY;
+            } else if (forceContainsMajorityVTOLForces(targetConvoy)) {
+                templateAddress = PLAYER_VTOL_CONVOY;
+            } else {
+                templateAddress = PLAYER_CONVOY;
+            }
         }
         ScenarioTemplate template = ScenarioTemplate.Deserialize(templateAddress);
 
@@ -1017,6 +1029,72 @@ public class Resupply {
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG));
         }
+    }
+
+    /**
+     * This method iterates over all units in the given force and checks if each unit
+     * is an aerospace unit or a conventional fighter. If it finds a unit that isn't
+     * one of these types, it immediately returns {@code false}, indicating that the force
+     * contains non-aerial units. If it successfully goes through all units without
+     * finding a non-aerial unit, it returns {@code true}.
+     * <p>
+     * If a unit cannot be accounted for (for example, due to a {@code null} reference),
+     * it will be ignored and the method will proceed to the next unit.
+     *
+     * @param targetConvoy The force that is being checked for unit types.
+     * @return A boolean indicating whether all units in the force are Aerospace or Conventional
+     * Fighter units.
+     */
+    private boolean forceContainsOnlyAerialForces(Force targetConvoy) {
+        for (UUID unitId : targetConvoy.getUnits()) {
+            try {
+                Unit unit = campaign.getUnit(unitId);
+                Entity entity = unit.getEntity();
+
+                if (!entity.isAerospace() && !entity.isConventionalFighter()) {
+                    return false;
+                }
+            } catch (Exception ignored) {
+                // If we run into issues, we can just skip that unit and check the others.
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * This method iterates over all units in the given force and counts the total number of units
+     * and the number of VTOL (or WIGE) units. If an error occurs while processing a unit (for
+     * example, due to a {@code null} reference), it gets ignored and the method proceeds with the
+     * next unit.
+     * <p>
+     * Once all units are processed, it checks if the number of VTOL (or WIGE) units is more than
+     * or equal to a third the total number of units in the force.
+     *
+     * @param targetConvoy The force that is being checked for unit types.
+     * @return A boolean indicating whether the majority of units in the force are of VTOL (or
+     * WIGE) types.
+     */
+    private boolean forceContainsMajorityVTOLForces(Force targetConvoy) {
+        int convoySize = 0;
+        int vtolCount = 0;
+
+        for (UUID unitId : targetConvoy.getUnits()) {
+            try {
+                Unit unit = campaign.getUnit(unitId);
+                Entity entity = unit.getEntity();
+
+                if (entity.isAirborneVTOLorWIGE()) {
+                    vtolCount++;
+                }
+
+                convoySize++;
+            } catch (Exception ignored) {
+                // If we run into issues, we can just skip that unit and check the others.
+            }
+        }
+
+        return vtolCount >= Math.floor((double) convoySize / 3);
     }
 
     /**

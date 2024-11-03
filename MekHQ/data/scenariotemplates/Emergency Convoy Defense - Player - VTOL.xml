@@ -8,8 +8,8 @@
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
-        <baseHeight>25</baseHeight>
-        <baseWidth>25</baseWidth>
+        <baseHeight>50</baseHeight>
+        <baseWidth>50</baseWidth>
         <heightScalingIncrement>5</heightScalingIncrement>
         <mapLocation>AllGroundTerrain</mapLocation>
         <useStandardAtBSizing>true</useStandardAtBSizing>
@@ -22,14 +22,14 @@
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>3</arrivalTurn>
+                <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>9</deploymentZone>
+                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>4</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -43,6 +43,7 @@
                 <objectiveLinkedForces />
                 <retreatThreshold>0</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -64,7 +65,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>2.0</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -78,27 +79,27 @@
             </value>
         </entry>
         <entry>
-            <key>Resupply Convoy</key>
+            <key>Air Cavalry</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>1</allowedUnitType>
+                <allowedUnitType>5</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>true</contributesToUnitCount>
+                <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
+                    <deploymentZone>0</deploymentZone>
                 </deploymentZones>
-                <destinationZone>9</destinationZone>
+                <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>1</forceAlignment>
-                <forceMultiplier>1</forceMultiplier>
-                <forceName>Resupply Convoy</forceName>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>2.0</forceMultiplier>
+                <forceName>Air Cavalry</forceName>
                 <generationMethod>1</generationMethod>
-                <generationOrder>1</generationOrder>
+                <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
@@ -106,35 +107,14 @@
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
-                <roleChoices>
-                    <forceRole>CARGO</forceRole>
-                    <forceRole>APC</forceRole>
-                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Resupply Convoy</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects />
-            <failureEffects />
-            <additionalDetails>
-                <additionalDetail>Crippled units only count if the opposing force is routed.</additionalDetail>
-            </additionalDetails>
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
                 <associatedForceName>OpFor</associatedForceName>
+                <associatedForceName>Air Cavalry</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
