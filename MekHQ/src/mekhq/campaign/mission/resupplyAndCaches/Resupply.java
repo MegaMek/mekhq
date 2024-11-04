@@ -198,14 +198,10 @@ public class Resupply {
             }
         }
 
-        double averageTonnage = (unitTonnage / unitCount);
+        double averageTonnage = (unitTonnage / unitCount) / 2;
 
         if (adHocResupply) {
             averageTonnage *= Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-        }
-
-        if (!contract.getContractType().isGuerrillaWarfare() && !adHocResupply) {
-            averageTonnage *= (double) contract.getStraightSupport() / 100;
         }
 
         // We're wanting to round down to the nearest 5 tons.
@@ -1965,14 +1961,6 @@ public class Resupply {
      * @param contract The relevant contract.
      */
     public static void triggerContractStartDialog(Campaign campaign, AtBContract contract) {
-        // If the player hasn't negotiated any straight support, they are not due resupplies so
-        // don't need to be told about them.
-        // This is bypassed if they are on a Guerilla contract as smugglers are handling the
-        // resupplies, not the employer.
-        if (contract.getStraightSupport() == 0 && !contract.getContractType().isGuerrillaWarfare()) {
-            return;
-        }
-
         // Retrieves the title from the resources
         String title = resources.getString("dialog.title");
 
