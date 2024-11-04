@@ -59,7 +59,7 @@ public class ScenarioTemplate implements Cloneable {
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 
     public String name;
-    public ScenarioType stratConScenarioType;
+    private ScenarioType stratConScenarioType;
     public String shortBriefing;
     public String detailedBriefing;
 
@@ -79,7 +79,7 @@ public class ScenarioTemplate implements Cloneable {
     public ScenarioTemplate clone() {
         ScenarioTemplate template = new ScenarioTemplate();
         template.name = this.name;
-        template.stratConScenarioType = this.stratConScenarioType;
+        template.stratConScenarioType = getStratConScenarioType();
         template.shortBriefing = this.shortBriefing;
         template.detailedBriefing = this.detailedBriefing;
         template.isHostileFacility = this.isHostileFacility;
@@ -99,6 +99,10 @@ public class ScenarioTemplate implements Cloneable {
         template.mapParameters = mapParameters.clone();
 
         return template;
+    }
+
+    public ScenarioType getStratConScenarioType() {
+        return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
     }
 
     /**
