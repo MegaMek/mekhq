@@ -5,7 +5,6 @@
     <localModifiers>AlliedArtyGarrison.xml</localModifiers>
     <owner>Allied</owner>
     <sharedModifiers>AlliedArtySupport.xml</sharedModifiers>
-    <userDescription>A force of allied artillery will participate in scenarios on this track and
-        defend this facility.</userDescription>
+    <userDescription>A force of allied artillery will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>true</visible>
 </StratconFacility>
