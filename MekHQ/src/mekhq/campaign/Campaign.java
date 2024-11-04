@@ -3676,7 +3676,7 @@ public class Campaign implements ITechManager {
 
                             // I really don't like checking against a String here, but I couldn't find a way to
                             // fetch the scenario's original template
-                            if (Objects.equals(scenario.getName(), "Emergency Convoy Defense")) {
+                            if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(contract, (AtBDynamicScenario) scenario);
                             }
                         } else {

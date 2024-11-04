@@ -200,6 +200,10 @@ public class Resupply {
 
         double averageTonnage = (unitTonnage / unitCount);
 
+        if (adHocResupply) {
+            averageTonnage *= Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+        }
+
         if (!contract.getContractType().isGuerrillaWarfare() && !adHocResupply) {
             averageTonnage *= (double) contract.getStraightSupport() / 100;
         }
@@ -297,6 +301,9 @@ public class Resupply {
                     partsReport.add(resources.getString("resourcesMedical.text")
                         + " x" + medicalSupplies);
                 }
+
+                partsReport.add(resources.getString("resourcesRoleplay" + Compute.randomInt(50)
+                    + ".text") + " x" + (int) Math.ceil((double) rationPacks / 5));
             }
         }
 

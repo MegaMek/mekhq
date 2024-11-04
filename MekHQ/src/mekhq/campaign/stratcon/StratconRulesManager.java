@@ -1818,7 +1818,7 @@ public class StratconRulesManager {
 
                     // I really don't like checking against a String here, but I couldn't find a way to
                     // fetch the scenario's original template
-                    if (Objects.equals(backingScenario.getName(), "Emergency Convoy Defense")) {
+                    if (backingScenario.getStratConScenarioType().isResupply()) {
                         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
                         if (victory) {
@@ -1830,7 +1830,7 @@ public class StratconRulesManager {
                                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                                 CLOSING_SPAN_TAG));
                         }
-                    } else if (Objects.equals(backingScenario.getName(), "Chasing a Rumor")) {
+                    } else if (backingScenario.getStratConScenarioType().isLosTech()) {
                         if (victory) {
                             int roll = Compute.randomInt(10);
                             StarLeagueCache cache = new StarLeagueCache(campaign, ((AtBContract) mission),
@@ -1968,7 +1968,7 @@ public class StratconRulesManager {
 
                 track.removeScenario(scenario);
 
-                if (Objects.equals(scenario.getBackingScenario().getName(), "Emergency Convoy Defense")) {
+                if (scenario.getBackingScenario().getStratConScenarioType().isResupply()) {
                     return true;
                 }
 

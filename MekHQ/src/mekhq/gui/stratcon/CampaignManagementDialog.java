@@ -158,8 +158,7 @@ public class CampaignManagementDialog extends JDialog {
         constraints.gridy = 0;
         JLabel description = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(500), "How many Support Points would you like to spend?" +
-                    "<br><br>Each SP point increases the value of the Resupply by roughly 250,000 C-Bills"));
+                UIUtil.scaleForGUI(500), "How many Support Points would you like to spend?"));
         description.setAlignmentX(Component.CENTER_ALIGNMENT);
         dialog.add(description, constraints);
 
