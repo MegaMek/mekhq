@@ -5,7 +5,6 @@
     <localModifiers>AlliedMekGarrison.xml</localModifiers>
     <owner>Allied</owner>
     <sharedModifiers>AlliedMekReinforcements.xml</sharedModifiers>
-    <userDescription>Allied Meks will participate in scenarios on this track and defend this
-        facility.</userDescription>
+    <userDescription>Allied Meks will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>true</visible>
 </StratconFacility>
