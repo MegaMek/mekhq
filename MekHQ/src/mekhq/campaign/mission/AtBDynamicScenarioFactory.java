@@ -443,15 +443,19 @@ public class AtBDynamicScenarioFactory {
         int forceBV = 0;
         double forceMultiplier = forceTemplate.getForceMultiplier();
 
+        if (forceTemplate.getForceMultiplier() != 1) {
+            logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
+        }
+
         int forceBVBudget = (int) (effectiveBV * forceMultiplier);
 
         if (isScenarioModifier) {
-            forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100)
-                * forceMultiplier);
+            forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100));
         }
 
         if (forceTemplate.getForceMultiplier() != 1) {
-            logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
+            logger.info(String.format("BV Budget was %s, now %s (includes Modifier settings and Multiplier)",
+                effectiveBV, forceBVBudget));
         }
 
         int forceUnitBudget = 0;

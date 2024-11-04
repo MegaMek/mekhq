@@ -4,7 +4,6 @@
 	<facilityType>CommandCenter</facilityType>
 	<owner>Allied</owner>
 	<sharedModifiers>GoodEvent.xml</sharedModifiers>
-	<userDescription>This facility will coordinate additional allied reinforcements to scenarios on
-		this track.</userDescription>
+	<userDescription>This facility will coordinate additional allied reinforcements to scenarios on this track.</userDescription>
 	<visible>true</visible>
 </StratconFacility>

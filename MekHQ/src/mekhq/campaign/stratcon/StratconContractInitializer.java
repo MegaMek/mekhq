@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,7 +82,7 @@ public class StratconContractInitializer {
 
             StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime,
                     planetaryTemperature);
-            track.setDisplayableName(String.format("Track %d", x));
+            track.setDisplayableName(String.format("Sector %d", x));
             campaignState.addTrack(track);
         }
 
@@ -98,7 +98,7 @@ public class StratconContractInitializer {
 
             StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime,
                     planetaryTemperature);
-            track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
+            track.setDisplayableName(String.format("Sector %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
 

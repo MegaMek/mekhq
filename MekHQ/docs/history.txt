@@ -171,6 +171,15 @@ MEKHQ VERSION HISTORY:
 + PR #5145: [FG3] Refactored Difficulty Multiplier Application
 + PR #5146: Adjusted Scenario Loot Box Behavior
 + PR #5147: Refactored JScrollPaneWithSpeed Constructor
++ PR #5148: ResolveScenarioWizardDialog - Rebuild as a tabbed dialog, improve UI
++ PR #5151: Fixed Line Breaks in StratCon Facility Descriptions
++ PR #5152: Update odds add lightning storm and adjust others
++ PR #5154: Renamed Tracks and AtB Campaign State in StratCon
++ PR #5156: Refactor Supply Depot SP Modifiers to be Monthly
++ PR #5157: Fixed StratCon Reinforcement Deployment Check
++ PR #5159: CampaignGUI Tab reordering
++ PR #5161: Changed wording in "Potential Capture Style"
++ PR #5163: Added Force BV Multiplier Logging & Adjusted Calculation in AtBDynamicScenarioFactory
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)

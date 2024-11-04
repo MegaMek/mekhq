@@ -761,10 +761,10 @@ public class StratconRulesManager {
      * Applies time-sensitive facility effects.
      */
     private static void processFacilityEffects(StratconTrackState track,
-            StratconCampaignState campaignState, boolean isMonday) {
+            StratconCampaignState campaignState, boolean isStartOfMonth) {
         for (StratconFacility facility : track.getFacilities().values()) {
-            if (isMonday) {
-                campaignState.addSupportPoints(facility.getWeeklySPModifier());
+            if (isStartOfMonth) {
+                campaignState.addSupportPoints(facility.getMonthlySPModifier());
             }
         }
     }
@@ -1635,9 +1635,8 @@ public class StratconRulesManager {
             return ReinforcementEligibilityType.FightLance;
         }
 
-        // otherwise, the force requires support points / vps to deploy
-        if ((campaignState.getSupportPoints() > 0) ||
-                (campaignState.getVictoryPoints() > 0)) {
+        // otherwise, the force requires support points to deploy
+        if (campaignState.getSupportPoints() > 0) {
             return ReinforcementEligibilityType.SupportPoint;
         }
 
@@ -2047,6 +2046,7 @@ public class StratconRulesManager {
             return;
         }
         boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;
+        boolean isStartOfMonth = ev.getCampaign().getLocalDate().getDayOfMonth() == 1;
 
         // run scenario generation routine for every track attached to an active
         // contract
@@ -2063,7 +2063,7 @@ public class StratconRulesManager {
                     // 0-deployment-length tracks
                     processTrackForceReturnDates(track, ev.getCampaign());
 
-                    processFacilityEffects(track, campaignState, isMonday);
+                    processFacilityEffects(track, campaignState, isStartOfMonth);
 
                     // loop through scenarios - if we haven't deployed in time,
                     // fail it and apply consequences

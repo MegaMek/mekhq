@@ -5,7 +5,6 @@
     <localModifiers>AlliedAirGarrison.xml</localModifiers>
     <owner>Allied</owner>
     <sharedModifiers>AlliedAirSupport.xml</sharedModifiers>
-    <userDescription>Allied aircraft will participate in scenarios on this track and defend this
-        facility.</userDescription>
+    <userDescription>Allied aircraft will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>true</visible>
 </StratconFacility>

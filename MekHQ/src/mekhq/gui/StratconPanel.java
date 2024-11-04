@@ -1,5 +1,5 @@
 /*
-* MegaMek - Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
+* MegaMek - Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
@@ -13,6 +13,19 @@
 */
 package mekhq.gui;
 
+import megamek.common.util.ImageUtil;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.stratcon.*;
+import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
+import mekhq.gui.stratcon.StratconScenarioWizard;
+import mekhq.gui.stratcon.TrackForceAssignmentUI;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,37 +40,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
-import megamek.common.util.ImageUtil;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconCoords;
-import mekhq.campaign.stratcon.StratconFacility;
-import mekhq.campaign.stratcon.StratconFacilityFactory;
-import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.stratcon.StratconScenarioWizard;
-import mekhq.gui.stratcon.TrackForceAssignmentUI;
-
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario
  * track.
- * 
+ *
  * @author NickAragua
  */
 public class StratconPanel extends JPanel implements ActionListener {
@@ -209,7 +195,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             rightClickMenu.addSeparator();
 
             menuItemGMReveal = new JMenuItem();
-            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
+            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector" : "Reveal Sector");
             menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
             menuItemGMReveal.addActionListener(this);
             rightClickMenu.add(menuItemGMReveal);
@@ -329,7 +315,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * The point of it is to draw all the hexes for the board.
      * If it's a "dry run", we don't actually draw the hexes, we just pretend to
      * until we "draw" one that encompasses the clicked point.
-     * 
+     *
      * @param g2D         - graphics object on which to draw
      * @param drawHexType - whether to draw the hex backgrounds, hex outlines or a
      *                    dry run for click detection
@@ -522,7 +508,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         try {
             image = ImageIO.read(biomeImageFile);
         } catch (Exception e) {
-            logger.error("Unable to load image: " + imageName + " with ID '" + imageKey + "'");
+            logger.error("Unable to load image: " + imageName + " with ID '" + imageKey + '\'');
             return null;
         }
 
@@ -742,7 +728,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     /**
      * Returns the translation that we need to make to render the "next downward"
      * hex.
-     * 
+     *
      * @return Two dimensional array with the first element being the x vector and
      *         the second being the y vector
      */
@@ -754,14 +740,14 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Returns the translation that we need to make to move from the bottom of a
      * column to the top of the next
      * column to the right.
-     * 
+     *
      * @param evenColumn Whether the column we're currently in is odd or even
      * @return Two dimensional array with the first element being the x vector and
      *         the second being the y vector
      */
     private int[] getRightAndUpVector(boolean evenColumn) {
-        int yRadius = (int) (HEX_Y_RADIUS);
-        int xRadius = (int) (HEX_X_RADIUS);
+        int yRadius = HEX_Y_RADIUS;
+        int xRadius = HEX_X_RADIUS;
 
         int yTranslation = currentTrack.getHeight() * yRadius * 2;
         if (evenColumn) {
@@ -777,7 +763,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * Go to the origin of the hex board and reset the scaling.
      */
     private void performInitialTransform(Graphics2D g2D) {
-        g2D.translate(0, 0 + HEX_Y_RADIUS);
+        g2D.translate(0, HEX_Y_RADIUS);
         g2D.scale(scale, scale);
     }
 
@@ -789,7 +775,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * for this class.
      *
      * Side effects: the dry run sets the boardState clicked hex coordinates.
-     * 
+     *
      * @return Whether or not the clicked point was found on the hex board
      */
     private boolean detectClickedHex() {
