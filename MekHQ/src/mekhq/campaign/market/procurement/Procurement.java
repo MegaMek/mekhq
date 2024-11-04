@@ -72,7 +72,8 @@ public class Procurement {
      * @return returns corresponding faction code.
      */
     public static int getFactionTechCode(Faction faction) {
-        for (int i = 0; i < MM_FACTION_CODES.length; i++) {
+        int allCodesCount = MM_FACTION_CODES.length;
+        for (int i = 0; i < allCodesCount; i++) {
             if (MM_FACTION_CODES[i].equals(faction.getShortName())) {
                 return i;
             }

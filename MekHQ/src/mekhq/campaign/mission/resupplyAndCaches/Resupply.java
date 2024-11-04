@@ -1156,7 +1156,7 @@ public class Resupply {
     @Nullable
     private Force getRandomConvoy() {
         Force[] keys = playerConvoys.keySet().toArray(new Force[0]);
-        return keys[new Random().nextInt(keys.length)];
+        return keys[random.nextInt(keys.length)];
     }
 
     /**
