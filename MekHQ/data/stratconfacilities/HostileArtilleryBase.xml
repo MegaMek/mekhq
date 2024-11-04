@@ -5,7 +5,6 @@
     <localModifiers>EnemyArtyGarrison.xml</localModifiers>
     <owner>Opposing</owner>
     <sharedModifiers>EnemyArty.xml</sharedModifiers>
-    <userDescription>Hostile artillery will participate in scenarios on this track and defend this
-        facility.</userDescription>
+    <userDescription>Hostile artillery will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>false</visible>
 </StratconFacility>

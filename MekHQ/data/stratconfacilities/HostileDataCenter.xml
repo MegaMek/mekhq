@@ -5,7 +5,6 @@
     <facilityType>DataCenter</facilityType>
     <owner>Opposing</owner>
     <sharedModifiers>EnemyMekPatrol.xml</sharedModifiers>
-    <userDescription>An additional hostile Mek patrol will sweep through scenarios on this
-        track.</userDescription>
+    <userDescription>An additional hostile Mek patrol will sweep through scenarios on this track.</userDescription>
     <visible>false</visible>
 </StratconFacility>
