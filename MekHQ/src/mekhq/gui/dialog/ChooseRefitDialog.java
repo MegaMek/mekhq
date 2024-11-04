@@ -894,9 +894,10 @@ public class ChooseRefitDialog extends JDialog {
         public final static int COL_NEW_QUANTITY = 4;
         public final static int COL_NEW_LOC = 5;
         public final static int COL_NEW_NAME = 6;
-        public final static int COL_BASETIME = 7;
-        public final static int COL_REFIT_CLASS = 8;
-        public final static int N_COL = 9;
+        public final static int COL_NOTES = 7;
+        public final static int COL_BASETIME = 8;
+        public final static int COL_REFIT_CLASS = 9;
+        public final static int N_COL = 10;
 
         private List<RefitStep> data;
 
@@ -933,6 +934,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_NEW_LOC -> "New Location";
                 case COL_OLD_QUANTITY -> "Old #";
                 case COL_NEW_QUANTITY -> "New #";
+                case COL_NOTES -> "Notes";
                 case COL_BASETIME -> "Base Time";
                 case COL_REFIT_CLASS -> "Refit Class";
                 default -> "?";
@@ -968,6 +970,7 @@ public class ChooseRefitDialog extends JDialog {
                         }}
                 case COL_BASETIME -> makeRefitTimeDisplay(refitStep.getBaseTime());
                 case COL_REFITSTEP_TYPE -> refitStep.getType().toName();
+                case COL_NOTES -> (null != refitStep.getNotes() && !refitStep.getNotes().isBlank()) ? "!!!" : "";
                 default -> "?";
             };
         }
@@ -985,6 +988,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_OLD_LOC, COL_NEW_LOC -> 60;
                 case COL_OLD_QUANTITY, COL_NEW_QUANTITY -> 20;
                 case COL_BASETIME, COL_REFIT_CLASS -> 20;
+                case COL_NOTES -> 20;
                 default -> 3;
             };
         }
@@ -992,10 +996,24 @@ public class ChooseRefitDialog extends JDialog {
         public int getAlignment(int col) {
             return switch (col) {
                 case COL_BASETIME -> SwingConstants.RIGHT;
-                case COL_REFIT_CLASS, COL_OLD_QUANTITY, COL_NEW_QUANTITY -> SwingConstants.CENTER;
+                case COL_REFIT_CLASS, COL_OLD_QUANTITY, COL_NEW_QUANTITY, COL_NOTES -> SwingConstants.CENTER;
                 default -> SwingConstants.LEFT;
             };
         }
+
+        public String getTooltip(int row, int col) {
+            RefitStep step;
+            if (data.isEmpty()) {
+                return "";
+            } else {
+                step = data.get(row);
+            }
+            return switch (col) {
+                case COL_NOTES -> step.getNotes();
+                default -> null;
+            };
+        }
+
         public Renderer getRenderer() {
             return new Renderer();
         }
@@ -1009,7 +1027,7 @@ public class ChooseRefitDialog extends JDialog {
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
-                //setToolTipText(getTooltip(actualRow, actualCol));
+                setToolTipText(getTooltip(actualRow, actualCol));
 
                 RefitStep thisStep = (RefitStep) data.get(actualRow);
 
@@ -1025,7 +1043,6 @@ public class ChooseRefitDialog extends JDialog {
                         setForeground(UIManager.getColor("Table.foreground"));
                     }
                 }
-
                 return this;
             }
         }
@@ -1106,7 +1123,9 @@ public class ChooseRefitDialog extends JDialog {
     }
 
     public static String makeRefitTimeDisplay(int minutes) {
-        if (minutes < 60) {
+        if (minutes == 0) {
+            return "";
+        } else if (minutes < 60) {
             return String.format("%dm", minutes);
         } else if (minutes < 480) {
             return String.format("%.2fh", minutes/60.0);

@@ -31,12 +31,6 @@ public enum RefitStepType {
     LEAVE("RefitStepType.LEAVE.text", "LEAVE"),
     REMOVE("RefitStepType.REMOVE.text", "REMOVE"),
     CHANGE_FACING("RefitStepType.CHANGE_FACING.text", "CHANGE_FACING"),
-    REMOVE_UNTRACKED_SINKS("RefitStepType.REMOVE_UNTRACKED_SINKS.text", "REMOVE_UNTRACKED_SINKS"),
-    ADD_UNTRACKED_SINKS("RefitStepType.ADD_UNTRACKED_SINKS.text", "ADD_UNTRACKED_SINKS"),
-    CHANGE_UNTRACKED_SINKS("RefitStepType.CHANGE_UNTRACKED_SINKS.text", "CHANGE_UNTRACKED_SINKS"),
-    REMOVE_SCCS_SINKS("RefitStepType.REMOVE_SCCS_SINKS.text", "REMOVE_SCCS_SINKS"),
-    ADD_SCCS_SINKS("RefitStepType.ADD_SCCS_SINKS.text", "ADD_SCCS_SINKS"),
-    CHANGE_SCCS_SINKS("RefitStepType.CHANGE_SCCS_SINKS.text", "CHANGE_SCCS_SINKS"),
     ADD("RefitStepType.ADD.text", "ADD"),
     MOVE("RefitStepType.MOVE.text", "MOVE"),
     CHANGE("RefitSTepType.CHANGE.text", "CHANGE"),
@@ -46,6 +40,12 @@ public enum RefitStepType {
     REMOVE_ARMOR("RefitStepType.REMOVE_ARMOR.text", "REMOVE_ARMOR"),
     ADD_ARMOR("RefitStepType.ADD_ARMOR.text", "ADD_ARMOR"),
     CHANGE_ARMOR_TYPE("RefitStepType.CHANGE_ARMOR_TYPE.text", "CHANGE_ARMOR_TYPE"),
+    REMOVE_UNTRACKED_SINKS("RefitStepType.REMOVE_UNTRACKED_SINKS.text", "REMOVE_UNTRACKED_SINKS"),
+    ADD_UNTRACKED_SINKS("RefitStepType.ADD_UNTRACKED_SINKS.text", "ADD_UNTRACKED_SINKS"),
+    CHANGE_UNTRACKED_SINKS("RefitStepType.CHANGE_UNTRACKED_SINKS.text", "CHANGE_UNTRACKED_SINKS"),
+    REMOVE_SCCS_SINKS("RefitStepType.REMOVE_SCCS_SINKS.text", "REMOVE_SCCS_SINKS"),
+    ADD_SCCS_SINKS("RefitStepType.ADD_SCCS_SINKS.text", "ADD_SCCS_SINKS"),
+    CHANGE_SCCS_SINKS("RefitStepType.CHANGE_SCCS_SINKS.text", "CHANGE_SCCS_SINKS"),
     REMOVE_CASE("RefitStepType.REMOVE_CASE.text", "REMOVE_CASE"),
     ADD_CASE("RefitStepType.ADD_CASE.text", "ADD_CASE"),
     REMOVE_TURRET("RefitStepType.REMOVE_TURRET.text", "REMOVE_TURRET"),
@@ -83,6 +83,27 @@ public enum RefitStepType {
     }
 
     /**
+     * @return is this an additive operation for purposes of bad location filtering?
+     */
+    public boolean isAdditive() {
+        return switch (this) {
+            case CHANGE_FACING -> true;
+            case ADD -> true;
+            case LOAD -> true;
+            case MOVE -> true;
+            case MOVE_AMMO -> true;
+            case MOVE_OMNIPOD -> true;
+            case ATTACH_OMNIPOD -> true;
+            case ADD_ARMOR -> true;
+            case CHANGE_ARMOR_TYPE -> true;
+            case ADD_CASE -> true;
+
+            default -> false;
+        };
+    }
+
+
+    /**
      * @param xmlName - the encoded name of a step
      * @return the corresponding RefitStepType
      * @throws IllegalArgumentException
@@ -92,12 +113,6 @@ public enum RefitStepType {
             case "LEAVE" -> LEAVE;
             case "REMOVE" -> REMOVE;
             case "CHANGE_FACING" -> CHANGE_FACING;
-            case "REMOVE_UNTRACKED_SINKS" -> REMOVE_UNTRACKED_SINKS;
-            case "ADD_UNTRACKED_SINKS" -> ADD_UNTRACKED_SINKS;
-            case "CHANGE_UNTRACKED_SINKS" -> CHANGE_UNTRACKED_SINKS;
-            case "REMOVE_SCCS_SINKS" -> REMOVE_SCCS_SINKS;
-            case "ADD_SCCS_SINKS" -> ADD_SCCS_SINKS;
-            case "CHANGE_SCCS_SINKS" -> CHANGE_SCCS_SINKS;
             case "ADD" -> ADD;
             case "MOVE" -> MOVE;
             case "CHANGE" -> CHANGE;
@@ -107,6 +122,12 @@ public enum RefitStepType {
             case "REMOVE_ARMOR" -> REMOVE_ARMOR;
             case "ADD_ARMOR" -> ADD_ARMOR;
             case "CHANGE_ARMOR_TYPE" -> CHANGE_ARMOR_TYPE;
+            case "REMOVE_UNTRACKED_SINKS" -> REMOVE_UNTRACKED_SINKS;
+            case "ADD_UNTRACKED_SINKS" -> ADD_UNTRACKED_SINKS;
+            case "CHANGE_UNTRACKED_SINKS" -> CHANGE_UNTRACKED_SINKS;
+            case "REMOVE_SCCS_SINKS" -> REMOVE_SCCS_SINKS;
+            case "ADD_SCCS_SINKS" -> ADD_SCCS_SINKS;
+            case "CHANGE_SCCS_SINKS" -> CHANGE_SCCS_SINKS;
             case "REMOVE_CASE" -> REMOVE_CASE;
             case "ADD_CASE" -> ADD_CASE;
             case "REMOVE_TURRET" -> REMOVE_TURRET;

@@ -47,12 +47,12 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.RefitClass;
+import mekhq.campaign.parts.enums.RefitStepType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -73,6 +73,8 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class Refit extends Part implements IAcquisitionWork {
     private static final MMLogger logger = MMLogger.create(Refit.class);
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            MekHQ.getMHQOptions().getLocale());
 
     // These should live elsewhere eventually
     public static final int WORKHOUR = 60;
@@ -254,6 +256,8 @@ public class Refit extends Part implements IAcquisitionWork {
         Iterator<Part> oldIterator;
         Iterator<Part> newIterator;
 
+        boolean[] brokenLocations = new boolean[oldUnit.getEntity().locations()];
+
         // region Armor
 
         oldIterator = oldParts.iterator();
@@ -321,13 +325,16 @@ public class Refit extends Part implements IAcquisitionWork {
             if ((oldPart instanceof MekLocation) || (oldPart instanceof MissingMekLocation)) {
         
                 boolean matchFound = false;
+                RefitStep refitStep = null;
                 newIterator = newParts.iterator();
                 while (newIterator.hasNext()) {
                     Part newPart = newIterator.next();
                     if (newPart instanceof MekLocation) { // New unit better not have missing locations
                         if (oldPart.getLocation() == newPart.getLocation()) {
                             matchFound = true;
-                            stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
+                            refitStep = new RefitStep(oldUnit, oldPart, newPart);
+                            stepsList.add(refitStep);
+                            
                             break;
                         }
                     }
@@ -337,8 +344,21 @@ public class Refit extends Part implements IAcquisitionWork {
                     newIterator.remove();
                 } else {
                     // This should create an error state in the UI
-                    stepsList.add(new RefitStep(oldUnit, oldPart, null));
+                    refitStep = new RefitStep(oldUnit, oldPart, null);
+                    stepsList.add(refitStep);
                 }
+
+                if ((null != refitStep) && (refitStep.getType() != RefitStepType.CHANGE_STRUCTURE_TYPE)
+                        && ((oldPart instanceof MissingMekLocation)
+                            || ((MekLocation) oldPart).isBlownOff()
+                            || ((MekLocation) oldPart).isBreached()
+                            || ((MekLocation) oldPart).onBadHipOrShoulder())) {
+                    // If we're not getting rid of the location due to a structure swap and the
+                    // location is an invalid location for new parts, mark the location
+                    brokenLocations[oldPart.getLocation()] = true;
+                }
+
+                    
 
             } else if ((oldPart instanceof Rotor) || (oldPart instanceof MissingRotor)) {
 
@@ -430,7 +450,25 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        
+        // region CASE
+
+        for(int loc = 0; loc < oldUnit.getEntity().locations(); loc++) {
+            CASE oldCASE = CASE.getCaseFor(loc, oldUnit, campaign);
+            CASE newCASE = CASE.getCaseFor(loc, newUnit, campaign);
+            
+            if ((null != oldCASE) && (null != newCASE)) {
+                if (oldCASE.isSamePartType(newCASE)) {
+                    stepsList.add(new RefitStep(oldUnit, oldCASE, newCASE));
+                } else {
+                    stepsList.add(new RefitStep(oldUnit, oldCASE, null));
+                    stepsList.add(new RefitStep(oldUnit, null, newCASE));
+                }
+            } else if ((null != oldCASE) || (null != newCASE)) {
+                stepsList.add(new RefitStep(oldUnit, oldCASE, newCASE));
+            }
+        }
+
+
         // region Actuators
 
         oldIterator = oldParts.iterator();
@@ -739,20 +777,18 @@ public class Refit extends Part implements IAcquisitionWork {
             newTBIter.remove();
             stepsList.add(new RefitStep(oldUnit, null, newTransportBay));
 
-            List<Part> newChildren = getChildPartsOfTypes(newTransportBay, newParts,
-                    Cubicle.class, MissingCubicle.class);
+            List<Part> newChildren = getChildPartsOfTypes(newTransportBay, newParts, Cubicle.class, MissingCubicle.class);
             for (Part newChild : newChildren) {
                 stepsList.add(new RefitStep(oldUnit, null, newChild));
             }
-            newChildren = getChildPartsOfTypes(newTransportBay, newParts,
-                    BayDoor.class, MissingBayDoor.class);
+            newChildren = getChildPartsOfTypes(newTransportBay, newParts, BayDoor.class, MissingBayDoor.class);
             for (Part newChild : newChildren) {
                 stepsList.add(new RefitStep(oldUnit, null, newChild));
             }
         }
 
 
-        // region Normal Equipment
+        // region Everything Else
 
         oldIterator = oldParts.iterator();
         while (oldIterator.hasNext()) {
@@ -817,21 +853,19 @@ public class Refit extends Part implements IAcquisitionWork {
             
         }
 
+        // region Post Processing
 
+        
 
-        // // Dump the rest of the parts in so we can see them
+        for (RefitStep step : stepsList) {
+            if (step.getType().isAdditive() && step.getNewLoc() != -1 && brokenLocations[step.getNewLoc()]) {
+                step.setType(RefitStepType.ERROR);
+                step.setRefitClass(RefitClass.PLEASE_REPAIR);
+                step.setNotes(resources.getString("RefitError.BrokenLocation.text"));
+            }
+        }
 
-        // for (Part p : oldParts) {
-        //     logger.error(oldUnit + " still has part " + p);
-        //     stepsList.add(new RefitStep(oldUnit, p, null));
-        // }
-
-        // for (Part p : newParts) {
-        //     logger.error(newUnit + " still has part " + p);
-        //     stepsList.add(new RefitStep(oldUnit, null, p));
-        // }
-
-
+        
 
     }
 
@@ -920,6 +954,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * @param parts - part list to be searched - will be mutated
      * @return list of Cubicles attached to parent part
      */
+    @SuppressWarnings("rawtypes")
     private List<Part> getChildPartsOfTypes(Part parentPart, List<Part> parts, Class partClass, Class missingPartClass) {
         List<Part> toReturn = new ArrayList<Part>();
 

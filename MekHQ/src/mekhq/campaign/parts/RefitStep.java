@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 import megamek.common.CargoBay;
 import megamek.common.Mek;
 import megamek.common.MiscType;
+import megamek.common.Tank;
 import megamek.common.WeaponType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.RefitClass;
@@ -368,6 +369,41 @@ public class RefitStep {
             baseTime = 0;
             return;
         
+        // region CASE
+
+        } else if ((oldPart instanceof CASE) && (newPart instanceof CASE)) {
+            // We only get here if the CASE is the same
+            refitClass = RefitClass.NO_CHANGE;
+            type = RefitStepType.LEAVE;
+            baseTime = 0;
+            return;
+
+        } else if (oldPart instanceof CASE) {
+            refitClass = RefitClass.CLASS_A;
+            type = RefitStepType.REMOVE_CASE;
+            if(oldUnit.getEntity() instanceof Mek) {
+                baseTime = 120;
+            } else if (oldUnit.getEntity() instanceof Tank) {
+                baseTime = 90;
+            } else { // Aero and Large Craft apparently
+                baseTime = 60;
+            }
+            isFixedEquipmentChange = true;
+            return;
+
+        } else if (newPart instanceof CASE) {
+            refitClass = RefitClass.CLASS_D;
+            type = RefitStepType.ADD_CASE;
+            if(oldUnit.getEntity() instanceof Mek) {
+                baseTime = 120;
+            } else if (oldUnit.getEntity() instanceof Tank) {
+                baseTime = 90;
+            } else { // Aero and Large Craft apparently
+                baseTime = 60;
+            }
+            isFixedEquipmentChange = true;
+            return;
+
 
         // region Actuators
 
