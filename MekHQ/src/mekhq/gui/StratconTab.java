@@ -133,7 +133,7 @@ public class StratconTab extends CampaignGuiTab {
         expandedObjectivePanel.setAlignmentX(LEFT_ALIGNMENT);
         infoPanel.add(expandedObjectivePanel);
 
-        JLabel lblCurrentTrack = new JLabel("Current Track:");
+        JLabel lblCurrentTrack = new JLabel("Current Sector:");
         infoPanel.add(lblCurrentTrack);
 
         cboCurrentTrack = new JComboBox<>();
@@ -350,7 +350,7 @@ public class StratconTab extends CampaignGuiTab {
                         sb.append("Engage and defeat hostile forces in ")
                             .append(objective.getCurrentObjectiveCount()).append('/')
                             .append(objective.getDesiredObjectiveCount())
-                            .append(" scenarios on ").append(track.getDisplayableName());
+                            .append(" scenarios in ").append(track.getDisplayableName());
                         break;
                     default:
                         break;
@@ -414,7 +414,7 @@ public class StratconTab extends CampaignGuiTab {
             stratconPanel.selectTrack(selectedTrack.contract.getStratconCampaignState(), currentTDI.track);
             stratconPanel.setVisible(true);
         } else {
-            infoPanelText.setText("No active campaign tracks");
+            infoPanelText.setText("No active sectors");
             stratconPanel.setVisible(false);
         }
     }
