@@ -942,7 +942,6 @@ public class CampaignXmlParser {
     private static List<Unit> processAutomatedMothballNodes(Node workingNode, Campaign campaign) {
         logger.info("Loading Automated Mothball Nodes from XML...");
 
-        // TODO: make SpecialAbility a Campaign instance
         List<Unit> mothballedUnits = new ArrayList<>();
 
         NodeList workingList = workingNode.getChildNodes();
@@ -955,8 +954,6 @@ public class CampaignXmlParser {
             }
 
             if (!childNode.getNodeName().equalsIgnoreCase("mothballedUnit")) {
-                // Error condition of sorts!
-                // Errr, what should we do here?
                 logger.error("Unknown node type not loaded in Automated Mothball nodes: "
                     + childNode.getNodeName());
                 continue;
