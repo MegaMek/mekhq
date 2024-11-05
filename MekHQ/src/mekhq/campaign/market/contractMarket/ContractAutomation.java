@@ -1,14 +1,38 @@
+/*
+ * ContractAutomation.java
+ *
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.market.contractMarket;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.unit.actions.ActivateUnitAction;
+import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.universe.Factions;
 
 import javax.swing.*;
@@ -18,19 +42,23 @@ import java.util.*;
 
 import static megamek.common.icons.AbstractIcon.DEFAULT_ICON_FILENAME;
 
+/**
+ * The ContractAutomation class provides a suite of methods
+ * used in automating actions when a contract starts.
+ * This includes actions like mothballing of units,
+ * transit to mission location and the automated activation of units when arriving in system.
+ */
 public class ContractAutomation {
     private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ContractAutomation");
-    // Ask the user if they want to mothball their stuff.
-    //     Store the units mothballed in this manner, so we can activate them.
-    // Ask the user if they want to chart a course to their destination.
-    //     Make sure the user knows how much the journey will cost.
-    //     Make sure the user knows how to set the journey if they refuse.
-    // Ask the user if they want to start their journey.
-    //     Make sure the user knows how long the journey will take cost.
-    //     Make sure the user knows how to begin the journey if they refuse.
 
-    // When the user enters the target system automatically active the previously mothballed units.
-
+    /**
+     * Main function to initiate a sequence of automated tasks when a contract is started.
+     * The tasks include prompt and execution for unit mothballing, calculating and starting the
+     * journey to the target system.
+     *
+     * @param campaign The current campaign.
+     * @param contract Selected contract.
+     */
     public static void contractStartPrompt(Campaign campaign, Contract contract) {
         // If we're already in the right system there is no need to automate these actions
         if (Objects.equals(campaign.getLocation().getCurrentSystem(), contract.getSystem())) {
@@ -51,14 +79,9 @@ public class ContractAutomation {
             campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
         }
 
-        // Chart Course;
+        // Transit;
         String targetSystem = contract.getSystemName(campaign.getLocalDate());
-
-        Faction employerFaction = Factions.getInstance().getFaction(contract.getEmployer());
-        String employerName = resources.getString("generalEmployerFallback");
-        if (employerFaction != null) {
-            employerName = employerFaction.getFullName(campaign.getGameYear());
-        }
+        String employerName = contract.getEmployer();
 
         JumpPath jumpPath = contract.getJumpPath(campaign);
         int travelDays = contract.getTravelDays(campaign);
@@ -67,25 +90,22 @@ public class ContractAutomation {
                 campaign.getCampaignOptions().isEquipmentContractBase());
         String totalCost = costPerJump.multipliedBy(jumpPath.getJumps()).toAmountAndSymbolString();
 
-        message = String.format(resources.getString("chartCourseDescription.text"),
+        message = String.format(resources.getString("transitDescription.text"),
             targetSystem, employerName, travelDays, totalCost);
         boolean calculateJumpPath = createDialog(speakerName, speakerIcon, message);
 
         if (calculateJumpPath) {
             campaign.getLocation().setJumpPath(jumpPath);
-        } else {
-            return;
-        }
-
-        // Begin Transit
-        message = String.format(resources.getString("beginTransitDescription.text"),
-            commanderAddress);
-        if (createDialog(speakerName, speakerIcon, message)) {
-            campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
+            campaign.getApp().getCampaigngui().refreshAllTabs();
+            campaign.getApp().getCampaigngui().refreshLocation();
         }
     }
 
+    /**
+     * @param campaign The current campaign
+     * @return The highest ranking Admin/Transport character. If none are found, returns {@code null}.
+     */
     private static @Nullable Person getSpeaker(Campaign campaign) {
         List<Person> admins = campaign.getAdmins();
 
@@ -117,6 +137,14 @@ public class ContractAutomation {
         return speaker;
     }
 
+    /**
+     * Gets the name of the individual to be displayed in the dialog.
+     * If the person is {@code null}, it uses the campaign's name.
+     *
+     * @param campaign The current campaign
+     * @param speaker The person who will be speaking, or {@code null}.
+     * @return The name to be displayed.
+     */
     private static String getSpeakerName(Campaign campaign, @Nullable Person speaker) {
         if (speaker == null) {
             return String.format(resources.getString("generalSpeakerNameFallback.text"),
@@ -126,6 +154,15 @@ public class ContractAutomation {
         }
     }
 
+    /**
+     * Gets the icon representing the speaker.
+     * If the speaker is {@code null}, it defaults to displaying the campaign's icon, or the
+     * campaign's faction icon.
+     *
+     * @param campaign The current campaign
+     * @param speaker The person who is speaking, or {@code null}.
+     * @return The icon of the speaker, campaign, or faction.
+     */
     private static ImageIcon getSpeakerIcon(Campaign campaign, @Nullable Person speaker) {
         ImageIcon icon;
 
@@ -135,7 +172,7 @@ public class ContractAutomation {
             if (fallbackIconFilename == null || fallbackIconFilename.equals(DEFAULT_ICON_FILENAME)) {
                 icon = Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
             } else {
-                icon = new ImageIcon(fallbackIconFilename);
+                icon = campaign.getUnitIcon().getImageIcon();
             }
         } else {
             icon = speaker.getPortrait().getImageIcon();
@@ -146,6 +183,13 @@ public class ContractAutomation {
         return new ImageIcon(scaledImage);
     }
 
+    /**
+     * Gets a string to use for addressing the commander.
+     * If no commander is flagged, returns a default address.
+     *
+     * @param campaign The current campaign
+     * @return The title of the commander, or a default string if no commander.
+     */
     private static String getCommanderAddress(Campaign campaign) {
         Person commander = campaign.getFlaggedCommander();
 
@@ -155,14 +199,25 @@ public class ContractAutomation {
 
         String commanderRank = commander.getRankName();
 
-        if (commanderRank.equalsIgnoreCase("None")) {
+        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
             return commander.getFullName();
         }
 
         return commanderRank;
     }
 
+    /**
+     * Displays a dialog for user interaction.
+     * The dialog uses a custom formatted message and includes options for user to confirm or decline.
+     *
+     * @param speakerName The title of the speaker to be displayed.
+     * @param speakerIcon The {@link ImageIcon} of the person speaking.
+     * @param message The message to be displayed in the dialog.
+     * @return {@code true} if the user confirms, {@code false} otherwise.
+     */
     private static boolean createDialog(String speakerName, ImageIcon speakerIcon, String message) {
+        final int WIDTH = UIUtil.scaleForGUI(400);
+
         // Custom button text
         Object[] options = {
             resources.getString("generalConfirm.text"),
@@ -170,26 +225,38 @@ public class ContractAutomation {
         };
 
         // Create a custom message with a border
+        String descriptionTitle = String.format("<html><b>%s</b></html>", speakerName);
+
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.PAGE_AXIS));
-        JLabel description = new JLabel(message);
-        description.setBorder(BorderFactory.createTitledBorder(speakerName));
+        JLabel description = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
+            WIDTH, message));
+        description.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
         descriptionPanel.add(description);
 
         int response = JOptionPane.showOptionDialog(null,
-            descriptionPanel,  // Description
-            resources.getString("generalTitle.text"),  // Title
-            JOptionPane.YES_NO_OPTION,  // Option type
-            JOptionPane.QUESTION_MESSAGE,  // Message type
-            speakerIcon,  // Icon
+            descriptionPanel,
+            resources.getString("generalTitle.text"),
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            speakerIcon,
             options,  // Array of options
             options[0]);  // Default button title
 
         return (response == JOptionPane.YES_OPTION);
     }
 
+    /**
+     * This method identifies all non-mothballed units within a campaign that are currently
+     * assigned to a {@code Force}. Those units are then GM Mothballed.
+     *
+     * @param campaign The current campaign.
+     * @return A list of all newly mothballed units.
+     */
     private static List<Unit> performAutomatedMothballing(Campaign campaign) {
+        List<Unit> mothballTargets = new ArrayList<>();
         List<Unit> mothballedUnits = new ArrayList<>();
+        MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
         for (Force force : campaign.getAllForces()) {
             for (UUID unitId : force.getUnits()) {
@@ -197,13 +264,45 @@ public class ContractAutomation {
 
                 if (unit != null) {
                     if (!unit.isMothballed()) {
-                        unit.completeMothball();
-                        mothballedUnits.add(unit);
+                        mothballTargets.add(unit);
                     }
                 }
             }
         }
 
+        // This needs to be a separate list as the act of mothballing the unit removes it from the
+        // list of units attached to the relevant force, resulting in a ConcurrentModificationException
+        for (Unit unit : mothballTargets) {
+            mothballUnitAction.execute(campaign, unit);
+            MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            mothballedUnits.add(unit);
+        }
+
         return mothballedUnits;
+    }
+
+    /**
+     * Perform automated activation of units.
+     * Identifies all units that were mothballed previously and are now needing activation.
+     * The activation action is executed for each unit, and they are returned to their prior Force
+     * if it still exists.
+     *
+     * @param campaign The current campaign.
+     */
+    public static void performAutomatedActivation(Campaign campaign) {
+        List<Unit> units = campaign.getAutomatedMothballUnits();
+
+        if (units.isEmpty()) {
+            return;
+        }
+
+        ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
+
+        for (Unit unit : units) {
+            if (unit.isMothballed()) {
+                activateUnitAction.execute(campaign, unit);
+                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            }
+        }
     }
 }

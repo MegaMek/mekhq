@@ -289,7 +289,7 @@ public class Unit implements ITechnology {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("Omni");
         if (!(type == UnitType.TANK || type == UnitType.MEK)) {
-            toReturn.append(" ");
+            toReturn.append(' ');
         }
         toReturn.append(UnitType.getTypeDisplayableName(type));
         return toReturn.toString();
@@ -4817,7 +4817,7 @@ public class Unit implements ITechnology {
             getCampaign().mothball(this);
         } else {
             completeMothball();
-            getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
+            getCampaign().addReport(getHyperlinkedName() + " has been mothballed");
         }
     }
 
@@ -4866,7 +4866,7 @@ public class Unit implements ITechnology {
             getCampaign().activate(this);
         } else {
             completeActivation();
-            getCampaign().addReport(getHyperlinkedName() + " has been activated (GM)");
+            getCampaign().addReport(getHyperlinkedName() + " has been activated");
         }
     }
 

@@ -140,6 +140,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
@@ -3660,6 +3661,12 @@ public class Campaign implements ITechManager {
                     contract.addPlayerMinorBreaches(deficit);
                     addReport("Failure to meet " + contract.getName() + " requirements resulted in " + deficit
                             + ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
+                }
+            }
+
+            if (Objects.equals(location.getCurrentSystem(), contract.getSystem())) {
+                if (!automatedMothballUnits.isEmpty()) {
+                    performAutomatedActivation(this);
                 }
             }
 
