@@ -293,7 +293,7 @@ public class ContractAutomation {
                 Unit unit = campaign.getUnit(unitId);
 
                 if (unit != null) {
-                    if (!unit.isMothballed()) {
+                    if (unit.isAvailable(false) && !unit.isUnderRepair()) {
                         mothballTargets.add(unit);
                     }
                 }
