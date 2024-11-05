@@ -268,6 +268,7 @@ public class Campaign implements ITechManager {
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
     private FameAndInfamyController fameAndInfamy;
+    private List<Unit> automatedMothballUnits;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -335,6 +336,7 @@ public class Campaign implements ITechManager {
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
         fameAndInfamy = new FameAndInfamyController();
+        automatedMothballUnits = new ArrayList<>();
     }
 
     /**
@@ -5311,6 +5313,14 @@ public class Campaign implements ITechManager {
 
     public FameAndInfamyController getFameAndInfamy() {
         return fameAndInfamy;
+    }
+
+    public List<Unit> getAutomatedMothballUnits() {
+        return automatedMothballUnits;
+    }
+
+    public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
+        this.automatedMothballUnits = automatedMothballUnits;
     }
 
     public void writeToXML(final PrintWriter pw) {

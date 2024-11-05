@@ -48,6 +48,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 /**
@@ -479,6 +480,8 @@ public class ContractMarketDialog extends JDialog {
                     return;
                 }
             }
+
+            contractStartPrompt(campaign, selectedContract);
 
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
