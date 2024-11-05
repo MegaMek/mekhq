@@ -85,8 +85,8 @@ public enum RefitClass {
      * @param usingRefitKit - are we using a refit kit?
      * @return float time multipler
      */
-    public float getTimeMultiplier(boolean usingRefitKit) {
-        int mult = switch(this) {
+    public double getTimeMultiplier(boolean usingRefitKit) {
+        double mult = switch(this) {
             case NO_CHANGE -> 0;
             case OMNI_RECONFIG -> 1; // Omni reconfig takes base time on CamOps 205.
             case CLASS_A -> 2;

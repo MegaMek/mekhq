@@ -237,7 +237,10 @@ public class Refit extends Part implements IAcquisitionWork {
         return unmodifiedTime;
     }
 
-     public boolean isOmniRefit() {
+    /**
+     * @return has the analysis determined that this is an omni refit?
+     */
+    public boolean isOmniRefit() {
         return isOmniRefit;
     }
 
@@ -856,12 +859,34 @@ public class Refit extends Part implements IAcquisitionWork {
         // region Post Processing
 
         
+        // Can't install new equipment in broken locaitons that aren't themselves being replaced.
 
         for (RefitStep step : stepsList) {
             if (step.getType().isAdditive() && step.getNewLoc() != -1 && brokenLocations[step.getNewLoc()]) {
                 step.setType(RefitStepType.ERROR);
                 step.setRefitClass(RefitClass.PLEASE_REPAIR);
                 step.setNotes(resources.getString("RefitError.BrokenLocation.text"));
+            }
+        }
+
+
+        // Let's see if this is possible as an omni refit.
+
+        if(oldUnit.getEntity().isOmni() && newUnit.getEntity().isOmni()) {
+
+            boolean anyFixedChanges = false;
+            for (RefitStep step : stepsList) {
+                if (step.isFixedEquipmentChange()) {
+                    anyFixedChanges = true;
+                }
+            }
+            if (anyFixedChanges) {
+                stepsList.add(RefitStep.spcialOmniFixedRefit());
+            } else {
+                isOmniRefit = true;
+                for (RefitStep step : stepsList) {
+                    step.omnify();
+                }
             }
         }
 
@@ -1011,12 +1036,19 @@ public class Refit extends Part implements IAcquisitionWork {
         for (RefitStep step : stepsList) {
             unmodifiedTime += step.getBaseTime();
         }
-        time = (int) (unmodifiedTime * refitClass.getTimeMultiplier(!customJob));
+        time = (int) (unmodifiedTime * getRefitMultiplier());
+    }
+
+    /**
+     * @return the multipler for our refit class considering if this is a custom job or not
+     */
+    public double getRefitMultiplier() {
+        return refitClass.getTimeMultiplier(!customJob);
     }
     
 
     // -----------------------------------------  =======================================
-    // region OLD STUFF
+    // region ---- -----OLD STUFF
 
     private void calculateRefurbishment() {
         // Refurbishment rules (class, time, and cost) are found in SO p189.

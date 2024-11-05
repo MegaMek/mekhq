@@ -59,9 +59,6 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitStep;
 import mekhq.campaign.parts.enums.RefitStepType;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.ChooseRefitDialog.ClassSorter;
-import mekhq.gui.dialog.ChooseRefitDialog.RefitReturnsListTableModel;
-import mekhq.gui.dialog.ChooseRefitDialog.RefitStepsListTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
@@ -112,6 +109,9 @@ public class ChooseRefitDialog extends JDialog {
     private JTextPane txtNewUnit;
     private JScrollPane scrOldUnit;
     private JScrollPane scrNewUnit;
+
+    private JPanel totalsPanel;
+    private JTextPane totalsText;
 
     private boolean confirmed = false;
     private boolean customize = false;
@@ -248,6 +248,33 @@ public class ChooseRefitDialog extends JDialog {
         leftSidePanel.add(noRefitsLbl, gridBagConstraints);
         noRefitsLbl.setVisible(false);
 
+        // region Totals Panel
+
+        totalsPanel = new JPanel(new GridBagLayout());
+        totalsPanel.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("totals.title")));
+
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        totalsText = new JTextPane();
+        totalsText.setEditable(false);
+        totalsText.setContentType("text/html");
+
+   
+        
+        totalsPanel.add(totalsText, gridBagConstraints);
+        
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        leftSidePanel.add(totalsPanel, gridBagConstraints);
+        
 
         // region Right Side Tab Panel
         
@@ -434,6 +461,7 @@ public class ChooseRefitDialog extends JDialog {
             returnsModel.setData(new ArrayList<Part>());
             stepsModel.setData(new ArrayList<RefitStep>());
             txtNewUnit.setText("");
+            totalsText.setText(" ");
             btnGo.setEnabled(false);
             return;
         }
@@ -441,6 +469,27 @@ public class ChooseRefitDialog extends JDialog {
         neededModel.setData(refit.getNeededList());
         returnsModel.setData(refit.getReturnsList());
         stepsModel.setData(refit.getStepsList());
+
+        StringBuilder totals = new StringBuilder();
+
+        totals
+            .append("<html><b>").append(resourceMap.getString("totals-baseTime.text")).append("</b>: ")
+            .append(refit.getUnmodifiedTime()).append('m');
+        if (refit.getUnmodifiedTime() >= 480) {
+            totals.append(" (").append(makeRefitTimeDisplay(refit.getUnmodifiedTime())).append(')');
+        }
+        totals
+            .append(" &nbsp;&nbsp;<b>").append(resourceMap.getString("totals-refitClass.text")).append("</b>: ")
+            .append(refit.getRefitClass().toShortName())
+            .append(" &nbsp;&nbsp;<b>").append(resourceMap.getString("totals-multiplier.text")).append("</b>: ")
+            .append(String.format("%.2fx", refit.getRefitMultiplier()))
+            .append(" &nbsp;&nbsp;<b>").append(resourceMap.getString("totals-final.text")).append("</b>: ")
+            .append(refit.getTime()).append('m');
+        if (refit.getTime() >= 480) {
+            totals.append(" (").append(makeRefitTimeDisplay(refit.getTime())).append(')');
+        }
+
+        totalsText.setText(totals.toString());
 
         MekView mv = new MekView(refit.getNewEntity(), false, true);
         txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
@@ -463,25 +512,21 @@ public class ChooseRefitDialog extends JDialog {
                 MekSummary summary = Utilities.retrieveUnit(chassis + model);
                 Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
+
                     Refit kitRefit = new Refit(unit, refitEn, false, false, false);
-                    boolean valid = null == kitRefit.checkFixable();
                     boolean canonok = !campaign.getCampaignOptions().isAllowCanonRefitOnly() 
                             || kitRefit.getNewEntity().isCanon();
-                    boolean omni = kitRefit.isOmniRefit();
-                    if (valid && canonok && !omni) {
-                            kitRefits.add(kitRefit);
+                    if (canonok && !kitRefit.isOmniRefit()) {
+                        kitRefits.add(kitRefit);
                     }
                     
                     Refit customRefit = new Refit(unit, refitEn, true, false, false);
-                    valid = null == customRefit.checkFixable();
-                    omni = customRefit.isOmniRefit();
-                    if (valid) {
-                        if (omni) {
-                            omniRefits.add(customRefit);
-                        } else {
-                            customRefits.add(customRefit);
-                        }
+                    if (customRefit.isOmniRefit()) {
+                        omniRefits.add(customRefit);
+                    } else {
+                        customRefits.add(customRefit);
                     }
+                
                 }
             } catch (EntityLoadingException ex) {
                 logger.error("", ex);
@@ -1125,10 +1170,10 @@ public class ChooseRefitDialog extends JDialog {
     public static String makeRefitTimeDisplay(int minutes) {
         if (minutes == 0) {
             return "";
-        } else if (minutes < 60) {
+        } else if (minutes <= 480) {
             return String.format("%dm", minutes);
-        } else if (minutes < 480) {
-            return String.format("%.2fh", minutes/60.0);
+        // } else if (minutes < 480) {
+        //     return String.format("%.2fh", minutes/60.0);
         } else {
             return String.format("%.2fd", minutes/480.0);
         }

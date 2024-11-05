@@ -19,11 +19,14 @@
 
 package mekhq.campaign.parts;
 
+import java.util.ResourceBundle;
+
 import megamek.common.CargoBay;
 import megamek.common.Mek;
 import megamek.common.MiscType;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.RefitClass;
 import mekhq.campaign.parts.enums.RefitStepType;
@@ -41,6 +44,8 @@ import mekhq.campaign.unit.Unit;
  * Campaign Operations... where possible.
  */
 public class RefitStep {
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
+            MekHQ.getMHQOptions().getLocale());
     // region Instance Variables
     private Part neededPart;
     private Part returnsPart;
@@ -56,6 +61,7 @@ public class RefitStep {
     private String notes;
     private RefitClass refitClass;
     private boolean isFixedEquipmentChange;
+    private boolean isArmorDamageOnly;
     private int baseTime;
 
     // region Initialization
@@ -68,7 +74,23 @@ public class RefitStep {
         type = RefitStepType.ERROR;
         neededPart = null;
         returnsPart = null;
+        isFixedEquipmentChange = false;
+        isArmorDamageOnly = false;
+        oldLocName = "";
+        newLocName = "";
+        oldPartName = "";
+        newPartName = "";
         notes = "";
+    }
+
+    public static RefitStep spcialOmniFixedRefit() {
+        RefitStep step = new RefitStep();
+        step.oldLocName = "Whole Unit";
+        step.newLocName = "Whole Unit";
+        step.type = RefitStepType.META;
+        step.refitClass = RefitClass.CLASS_F;
+        step.notes = resources.getString("RefitStepError.OmniFixedRefit.text");
+        return step;
     }
 
     /**
@@ -269,6 +291,11 @@ public class RefitStep {
                         deltaArmor.setAmount(delta * armorMultipler);
                         type = RefitStepType.ADD_ARMOR;
                         neededPart = deltaArmor;
+
+                        if (oldArmor.getTotalAmount() == newAmount) {
+                            isArmorDamageOnly = true;
+                            isFixedEquipmentChange = false;
+                        }
                     }
                     baseTime = deltaArmor.getBaseTimeFor(oldUnit.getEntity()) * delta;
                     return;
@@ -388,7 +415,7 @@ public class RefitStep {
             } else { // Aero and Large Craft apparently
                 baseTime = 60;
             }
-            isFixedEquipmentChange = true;
+            isFixedEquipmentChange = false; // We're just assuming CASE is pod mounted until the full item is implemented.
             return;
 
         } else if (newPart instanceof CASE) {
@@ -401,7 +428,7 @@ public class RefitStep {
             } else { // Aero and Large Craft apparently
                 baseTime = 60;
             }
-            isFixedEquipmentChange = true;
+            isFixedEquipmentChange = false;
             return;
 
 
@@ -918,15 +945,38 @@ public class RefitStep {
 
         }
 
-
-
-
         // If we reach this point, something has gone wrong
 
         type = RefitStepType.ERROR;
         refitClass = RefitClass.PLEASE_REPAIR;
         
     }
+
+
+    // region Helpers
+
+    
+    public void omnify() {
+        type = type.omnify();
+        if (type.isOmniType()) {
+            refitClass = RefitClass.OMNI_RECONFIG;
+            if (type == RefitStepType.MOVE_AMMOPOD || type == RefitStepType.MOVE_OMNIPOD) {
+                baseTime = 60;
+            } else {
+                baseTime = 30;
+            }
+        } else if (type == RefitStepType.ADD_ARMOR && isArmorDamageOnly) {
+
+            // Want to allow omni refits on units with damaged armor.
+
+            type = RefitStepType.LEAVE;
+            refitClass = RefitClass.NO_CHANGE;
+            baseTime = 0;
+            neededPart = null;
+            
+        }
+    }
+
 
     /**
      * Determine if a Part is a heat sink because not all heat sinks are of class HeatSink right now.

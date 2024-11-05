@@ -70,6 +70,13 @@ public class CASE extends Part {
     }
 
     /**
+     * @return the code for what type of CASE this is
+     */
+    public int getType() {
+        return type;
+    }
+
+    /**
      * Does nothing.
      */
     @Override

@@ -55,6 +55,9 @@ public enum RefitStepType {
     DETACH_OMNIPOD("RefitStepType.DETACH_OMNIPOD.text", "DETACH_OMNIPOD"),
     ATTACH_OMNIPOD("RefitStepType.ATTACH_OMNIPOD.text", "ATTACH_OMNIPOD"),
     MOVE_OMNIPOD("RefitStepType.MOVE_OMNIPOD.text", "MOVE_OMNIPOD"),
+    DETACH_AMMOPOD("RefitStepType.DETACH_AMMOPOD.text", "DETACH_AMMOPOD"),
+    ATTACH_AMMOPOD("RefitStepType.ATTACH_AMMOPOD.text", "ATTACH_AMMOPOD"),
+    MOVE_AMMOPOD("RefitStepType.MOVE_AMMOPOD.text", "MOVE_AMMOPOD"),
     META("RefitStepType.META.text", "META"),
     ERROR("RefitStepType.ERROR.text", "ERROR");
     
@@ -102,6 +105,31 @@ public enum RefitStepType {
         };
     }
 
+    /**
+     * Get the omni equivilant of this action.
+     */
+    public RefitStepType omnify() {
+        return switch (this) {
+            case REMOVE -> DETACH_OMNIPOD;
+            case CHANGE_FACING -> MOVE_OMNIPOD;
+            case MOVE -> MOVE_OMNIPOD;
+            case ADD -> ATTACH_OMNIPOD;
+            case UNLOAD -> DETACH_AMMOPOD;
+            case LOAD -> ATTACH_AMMOPOD;
+            case MOVE_AMMO -> MOVE_AMMOPOD;
+            case ADD_CASE -> ATTACH_OMNIPOD;
+            case REMOVE_CASE -> DETACH_OMNIPOD;
+            default -> this;
+        };
+    }
+
+    public boolean isOmniType() {
+        return switch (this) {
+            case ATTACH_OMNIPOD, DETACH_OMNIPOD, MOVE_OMNIPOD -> true;
+            case ATTACH_AMMOPOD, DETACH_AMMOPOD, MOVE_AMMOPOD -> true;
+            default -> false;
+        };
+    }
 
     /**
      * @param xmlName - the encoded name of a step
@@ -136,6 +164,9 @@ public enum RefitStepType {
             case "DETACH_OMNIPOD" -> DETACH_OMNIPOD;
             case "ATTACH_OMNIPOD" -> ATTACH_OMNIPOD;
             case "MOVE_OMNIPOD" -> MOVE_OMNIPOD;
+            case "DETACH_AMMOPOD" -> DETACH_AMMOPOD;
+            case "ATTACH_AMMOPOD" -> ATTACH_AMMOPOD;
+            case "MOVE_AMMOPOD" -> MOVE_AMMOPOD;
             case "META" -> META;
             case "ERROR" -> ERROR;
             default -> throw new IllegalArgumentException("Invalid RefitStepType");
