@@ -5,7 +5,6 @@
     <localModifiers>EnemyTankGarrison.xml</localModifiers>
     <owner>Opposing</owner>
     <sharedModifiers>EnemyTankReinforcements.xml</sharedModifiers>
-    <userDescription>Hostile vehicles will participate in scenarios on this track and defend
-        this facility.</userDescription>
+    <userDescription>Hostile vehicles will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>false</visible>
 </StratconFacility>

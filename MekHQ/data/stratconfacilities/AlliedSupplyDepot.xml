@@ -4,6 +4,6 @@
 	<facilityType>SupplyDepot</facilityType>
 	<owner>Allied</owner>
 	<weeklySPModifier>1</weeklySPModifier>
-	<userDescription>Provides 1 SP/week of allied logistical support.</userDescription>
+	<userDescription>Provides 1 SP/month of allied logistical support.</userDescription>
 	<visible>true</visible>
 </StratconFacility>
