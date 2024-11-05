@@ -79,9 +79,13 @@ public class ContractAutomation {
             campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
         }
 
-        // Transit;
+        // Transit
         String targetSystem = contract.getSystemName(campaign.getLocalDate());
         String employerName = contract.getEmployer();
+
+        if (!employerName.contains("Clan")) {
+            employerName = String.format(resources.getString("generalNonClan.text"), employerName);
+        }
 
         JumpPath jumpPath = contract.getJumpPath(campaign);
         int travelDays = contract.getTravelDays(campaign);
@@ -92,9 +96,7 @@ public class ContractAutomation {
 
         message = String.format(resources.getString("transitDescription.text"),
             targetSystem, employerName, travelDays, totalCost);
-        boolean calculateJumpPath = createDialog(speakerName, speakerIcon, message);
-
-        if (calculateJumpPath) {
+        if (createDialog(speakerName, speakerIcon, message)) {
             campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
@@ -147,8 +149,7 @@ public class ContractAutomation {
      */
     private static String getSpeakerName(Campaign campaign, @Nullable Person speaker) {
         if (speaker == null) {
-            return String.format(resources.getString("generalSpeakerNameFallback.text"),
-                campaign.getName());
+            return campaign.getName();
         } else {
             return speaker.getFullTitle();
         }
@@ -227,6 +228,11 @@ public class ContractAutomation {
         // Create a custom message with a border
         String descriptionTitle = String.format("<html><b>%s</b></html>", speakerName);
 
+        // Create ImageIcon JLabel
+        JLabel iconLabel = new JLabel(speakerIcon);
+        iconLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        // Create description JPanel
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.PAGE_AXIS));
         JLabel description = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
@@ -234,14 +240,38 @@ public class ContractAutomation {
         description.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
         descriptionPanel.add(description);
 
-        int response = JOptionPane.showOptionDialog(null,
-            descriptionPanel,
-            resources.getString("generalTitle.text"),
+        // Create main JPanel and add icon and description
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(iconLabel, BorderLayout.NORTH);
+        mainPanel.add(descriptionPanel, BorderLayout.CENTER);
+
+        // Create JOptionPane
+        JOptionPane optionPane = new JOptionPane(mainPanel,
+            JOptionPane.PLAIN_MESSAGE,
             JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            speakerIcon,
-            options,  // Array of options
-            options[0]);  // Default button title
+            null,
+            options,
+            options[0]);
+
+        // Create JDialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(resources.getString("generalTitle.text"));
+        dialog.setModal(true);
+        dialog.setContentPane(optionPane);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+
+        optionPane.addPropertyChangeListener(evt -> {
+            if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())) {
+                dialog.dispose();
+            }
+        });
+
+        dialog.setVisible(true);
+
+        int response = (Objects.equals(optionPane.getValue(), options[0]) ?
+            JOptionPane.YES_OPTION : JOptionPane.NO_OPTION);
 
         return (response == JOptionPane.YES_OPTION);
     }

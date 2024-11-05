@@ -37,10 +37,10 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.campaign.market.contractMarket.AbstractContractMarket;
-import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -284,6 +284,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
+                } else if (xn.equalsIgnoreCase("automatedMothballUnits")) {
+                    retVal.setAutomatedMothballUnits(processAutomatedMothballNodes(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     retVal.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
@@ -935,6 +937,42 @@ public class CampaignXmlParser {
     private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
         logger.info("Loading Fame and Infamy Nodes from XML...");
         FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
+    }
+
+    private static List<Unit> processAutomatedMothballNodes(Node workingNode, Campaign campaign) {
+        logger.info("Loading Automated Mothball Nodes from XML...");
+
+        // TODO: make SpecialAbility a Campaign instance
+        List<Unit> mothballedUnits = new ArrayList<>();
+
+        NodeList workingList = workingNode.getChildNodes();
+        for (int x = 0; x < workingList.getLength(); x++) {
+            Node childNode = workingList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!childNode.getNodeName().equalsIgnoreCase("mothballedUnit")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                logger.error("Unknown node type not loaded in Automated Mothball nodes: "
+                    + childNode.getNodeName());
+                continue;
+            }
+
+            Unit unit = campaign.getUnit(UUID.fromString(childNode.getTextContent()));
+
+            if (unit == null) {
+                logger.error("Unknown UUID: " + childNode.getTextContent());
+            }
+
+            mothballedUnits.add(unit);
+        }
+
+        logger.info("Load Automated Mothball Nodes Complete!");
+        return mothballedUnits;
     }
 
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {
