@@ -1835,7 +1835,7 @@ public class AtBDynamicScenarioFactory {
 
         for (Transporter bay : transport.getTransports()) {
             // If unit has an infantry bay
-            if (bay instanceof TroopSpace) {
+            if (bay instanceof InfantryCompartment) {
 
                 double bayCapacity = bay.getUnused();
                 int remainingCount = (int) Math.max(1, Math.floor(bayCapacity / IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT));
