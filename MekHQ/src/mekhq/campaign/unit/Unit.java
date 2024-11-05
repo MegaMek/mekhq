@@ -1,8 +1,8 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2016-2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *

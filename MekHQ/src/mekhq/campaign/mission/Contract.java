@@ -2,6 +2,7 @@
  * Contract.java
  *
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
