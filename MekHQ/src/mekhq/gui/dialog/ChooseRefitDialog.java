@@ -737,7 +737,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_NEEDED -> "Needed";
                 case COL_TARGET -> "TN";
                 case COL_TOORDER -> "To Order";
-                case COL_COST -> "Cost/Unit";
+                case COL_COST -> "Cost for Row";
                 default -> "?";
             };
         }
