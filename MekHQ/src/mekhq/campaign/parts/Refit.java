@@ -1105,22 +1105,65 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
+
+        // Now do this for everything else
+
+        Map<Part,Part> partNeeded = new HashMap<Part,Part>();
+        Map<Part,Part> partReturns = new HashMap<Part,Part>();
+
+        for (Part incomingPart : returnsList) {
+            if (partReturns.containsKey(incomingPart)) {
+                Part existingPart = partReturns.get(incomingPart);
+                existingPart.setQuantity(existingPart.getQuantity() + incomingPart.getQuantity());
+            } else {
+                partReturns.put(incomingPart, incomingPart);
+            }
+        }
+
+        for (Part incomingPart : neededList) {
+            int incomingQuantity = incomingPart.getQuantity();
+            
+            if (partReturns.containsKey(incomingPart)) {
+                Part returnsPart = partReturns.get(incomingPart);
+                int returnsQuantity = returnsPart.getQuantity();
+                
+                if (incomingQuantity == returnsQuantity) {
+                    partReturns.remove(returnsPart);
+                    // and drop incoming
+                    continue;
+                } else if (incomingQuantity > returnsQuantity) {
+                    incomingPart.setQuantity(incomingQuantity - returnsQuantity);
+                    partReturns.remove(returnsPart);
+                } else {
+                    returnsPart.setQuantity(returnsQuantity - incomingQuantity);
+                    // and drop incoming
+                    continue;
+                }
+            }
+
+            if (partNeeded.containsKey(incomingPart)) {
+                Part neededPart = partNeeded.get(incomingPart);
+                neededPart.setQuantity(neededPart.getQuantity() + incomingPart.getQuantity());
+            } else {
+                partNeeded.put(incomingPart,incomingPart);
+            }
+        }
+
         // Now put the lists back together
 
-        for (Armor neededArmor : armorNeeded.values()) {
-            neededList.add(neededArmor);
-        }
-        for (Armor returnsArmor : armorReturns.values()) {
-            returnsList.add(returnsArmor);
-        }
-        for (AmmoStorage neededAmmo : ammoNeeded.values()) {
-            neededList.add(neededAmmo);
-        }
-        for (AmmoStorage returnsAmmo : ammoReturns.values()) {
-            returnsList.add(returnsAmmo);
-        }
+        neededList = new ArrayList<Part>();
+        returnsList = new ArrayList<Part>();
+
+        neededList.addAll(armorNeeded.values());
+        neededList.addAll(ammoNeeded.values());
+        neededList.addAll(partNeeded.values());        
+        returnsList.addAll(armorReturns.values());
+        returnsList.addAll(ammoReturns.values());
+        returnsList.addAll(partReturns.values());
 
     }
+
+
 
     /**
      * Remove all Parts of type type from list and return them in a new list

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -52,14 +53,14 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitStep;
 import mekhq.campaign.parts.enums.RefitStepType;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.ReportingUtilities;
 
@@ -88,6 +89,7 @@ public class ChooseRefitDialog extends JDialog {
     private JRadioButton radRefit;
     private JRadioButton radCustomize;
     private JRadioButton radOmni;
+    private JCheckBox chkHideLeaves;
     
     private JTable refitTable;
     private JScrollPane scrRefitTable;
@@ -355,6 +357,12 @@ public class ChooseRefitDialog extends JDialog {
 
         JPanel panBtn = new JPanel(new GridBagLayout());
 
+        chkHideLeaves = new JCheckBox(resourceMap.getString("chkHideLeaves.text"));
+        chkHideLeaves.setSelected(true);
+        chkHideLeaves.addActionListener(evt -> refitTableValueChanged());
+        
+        panBtn.add(chkHideLeaves, new GridBagConstraints());
+
         btnGo = new JButton(resourceMap.getString("btnGo-Refit.text"));
         btnGo.setEnabled(false);
         btnGo.addActionListener(evt -> confirm());
@@ -468,7 +476,14 @@ public class ChooseRefitDialog extends JDialog {
         
         neededModel.setData(refit.getNeededList());
         returnsModel.setData(refit.getReturnsList());
-        stepsModel.setData(refit.getStepsList());
+
+        if(chkHideLeaves.isSelected()){
+            stepsModel.setData(refit.getStepsList().stream()
+                    .filter(step -> step.getType() != RefitStepType.LEAVE)
+                    .collect(Collectors.toList()));
+        } else {
+            stepsModel.setData(refit.getStepsList());
+        }
 
         StringBuilder totals = new StringBuilder();
 
@@ -534,6 +549,26 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
+
+    
+    public static int getActualQuantity(Part part) {
+        if (part instanceof Armor) {
+            return ((Armor) part).getAmount();
+        } else if (part instanceof AmmoStorage) {
+            return ((AmmoStorage) part).getShots();
+        } else {
+            return part.getQuantity();
+        }
+    }
+
+    public int getToOrder(Part part) {
+        PartInventory inventory = campaign.getPartInventory(part);
+        return Math.max(0, getActualQuantity(part)
+                - inventory.getSupply()
+                - inventory.getTransit()
+                - inventory.getOrdered());
+    }
+
     // region RefitTableModel
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but
@@ -570,20 +605,14 @@ public class ChooseRefitDialog extends JDialog {
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case COL_MODEL:
-                    return "Model";
-                case COL_CLASS:
-                    return "Class";
-                case COL_BV:
-                    return "BV";
-                case COL_TIME:
-                    return "Time";
-                case COL_COST:
-                    return "Cost";
-                default:
-                    return "?";
-            }
+            return switch (column) {
+                case COL_MODEL -> "Model";
+                case COL_CLASS -> "Class";
+                case COL_BV -> "BV";
+                case COL_TIME -> "Time";
+                case COL_COST ->  "Cost";
+                default -> "?";
+            };
         }
 
         @Override
@@ -591,23 +620,16 @@ public class ChooseRefitDialog extends JDialog {
             if (data.isEmpty()) {
                 return "";
             }
-            Refit r = data.get(row);
+            Refit refit = data.get(row);
 
-            if (col == COL_MODEL) {
-                return r.getNewEntity().getModel();
-            } else if (col == COL_CLASS) {
-                return r.getRefitClassName();
-            } else if (col == COL_BV) {
-                return r.getNewEntity().calculateBattleValue(true, true);
-            } else if (col == COL_TIME) {
-                return makeRefitTimeDisplay(r.getTime());
-            } else if (col == COL_COST) {
-                return r.getCost().toAmountAndSymbolString();
-//            } else if (col == COL_TARGET) {
-//                return campaign.getTargetForAcquisition(r).getValueAsString();
-            } else {
-                return "?";
-            }
+            return switch(col) {            
+            case COL_MODEL -> refit.getNewEntity().getModel();
+            case COL_CLASS -> refit.getRefitClassName();
+            case COL_BV -> refit.getNewEntity().calculateBattleValue(true, true);
+            case COL_TIME -> makeRefitTimeDisplay(refit.getTime());
+            case COL_COST -> refit.getCost().toAmountAndSymbolString();
+            default -> "?";
+            };
         }
 
         @Override
@@ -624,42 +646,20 @@ public class ChooseRefitDialog extends JDialog {
             return data.get(row);
         }
 
-        public int getColumnWidth(int c) {
-            switch (c) {
-                case COL_MODEL:
-                    return 75;
-                case COL_CLASS:
-                    return 110;
-                case COL_COST:
-                    return 40;
-                default:
-                    return 10;
-            }
+        public int getColumnWidth(int col) {
+            return switch (col) {
+                case COL_MODEL -> 75;
+                case COL_CLASS -> 110;
+                case COL_COST -> 40;
+                default -> 10;
+            };
         }
 
         public int getAlignment(int col) {
-            switch (col) {
-                case COL_MODEL:
-                case COL_CLASS:
-                    return SwingConstants.LEFT;
-                default:
-                    return SwingConstants.RIGHT;
-            }
-        }
-
-        public String getTooltip(int row, int col) {
-            //Refit r;
-            if (data.isEmpty()) {
-                return "";
-            } else {
-             //   r = data.get(row);
-            }
-            switch (col) {
-                // case COL_TARGET:
-                //     return campaign.getTargetForAcquisition(r).getDesc();
-                default:
-                    return null;
-            }
+            return switch (col) {
+                case COL_MODEL, COL_CLASS -> SwingConstants.LEFT;
+                default -> SwingConstants.RIGHT;
+            };
         }
 
         // fill table with values
@@ -679,9 +679,7 @@ public class ChooseRefitDialog extends JDialog {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
-                int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
-                setToolTipText(getTooltip(actualRow, actualCol));
 
                 return this;
             }
@@ -692,12 +690,12 @@ public class ChooseRefitDialog extends JDialog {
     // region Needed Model
 
     public class RefitNeededListTableModel extends AbstractTableModel {
-        public final static int COL_NAME = 0;
-        public final static int COL_TECH_BASE = 1;
-        public final static int COL_STOCK = 2;
-        public final static int COL_TRANSIT = 3;
-        public final static int COL_ORDERED = 4;
-        public final static int COL_NEEDED = 5;
+        public final static int COL_NEEDED = 0;
+        public final static int COL_NAME = 1;
+        public final static int COL_TECH_BASE = 2;
+        public final static int COL_STOCK = 3;
+        public final static int COL_TRANSIT = 4;
+        public final static int COL_ORDERED = 5;
         public final static int COL_TARGET = 6;
         public final static int COL_TOORDER = 7;
         public final static int COL_COST = 8;
@@ -744,13 +742,7 @@ public class ChooseRefitDialog extends JDialog {
             };
         }
 
-        public int getToOrder(Part part) {
-            PartInventory inventory = campaign.getPartInventory(part);
-            return Math.max(0, part.getQuantity()
-                    - inventory.getSupply()
-                    - inventory.getTransit()
-                    - inventory.getOrdered());
-        }
+
 
         @Override
         public Object getValueAt(int row, int col) {
@@ -769,9 +761,10 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_STOCK -> campaign.getPartInventory(part).getSupply();
                 case COL_TRANSIT -> campaign.getPartInventory(part).getTransit();
                 case COL_ORDERED -> campaign.getPartInventory(part).getOrdered();
-                case COL_NEEDED -> part.getQuantity();
+                case COL_NEEDED -> getActualQuantity(part);
                 case COL_TOORDER -> "<html><b>" + getToOrder(part) + "</b></html>";
                 case COL_COST -> part.getActualValue().multipliedBy(getToOrder(part)).toAmountAndSymbolString();
+                case COL_TARGET -> campaign.getTargetForAcquisition((part.getAcquisitionWork())).getValueAsString();
                 default -> "?";
             };
         }
@@ -799,6 +792,19 @@ public class ChooseRefitDialog extends JDialog {
             };
         }
 
+        public String getTooltip(int row, int col) {
+            Part part;
+            if (data.isEmpty()) {
+                return null;
+            } else {
+                part = data.get(row);
+            }
+            return switch (col) {
+                case COL_TARGET -> campaign.getTargetForAcquisition(part.getAcquisitionWork()).getDesc();
+                default -> null;
+            };
+        }
+
         public Renderer getRenderer() {
             return new Renderer();
         }
@@ -811,7 +817,7 @@ public class ChooseRefitDialog extends JDialog {
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
-                //setToolTipText(getTooltip(actualRow, actualCol));
+                setToolTipText(getTooltip(actualRow, actualCol));
 
                 return this;
             }
@@ -821,10 +827,10 @@ public class ChooseRefitDialog extends JDialog {
     // region Returns Model
 
     public class RefitReturnsListTableModel extends AbstractTableModel {
-        public final static int COL_NAME = 0;
-        public final static int COL_TECH_BASE = 1;
-        public final static int COL_STOCK = 2;
-        public final static int COL_RECEIVING = 3;
+        public final static int COL_RECEIVING = 0;
+        public final static int COL_NAME = 1;
+        public final static int COL_TECH_BASE = 2;
+        public final static int COL_STOCK = 3;
         public final static int COL_VALUE = 4;
         public final static int N_COL = 5;
 
@@ -880,7 +886,7 @@ public class ChooseRefitDialog extends JDialog {
                         + "</nobr></html>";
                 case COL_TECH_BASE -> part.getTechBaseName();
                 case COL_STOCK -> campaign.getPartInventory(part).getSupply();
-                case COL_RECEIVING -> part.getQuantity();
+                case COL_RECEIVING -> getActualQuantity(part);
                 case COL_VALUE -> part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
                 default -> "?";
             };
@@ -918,9 +924,7 @@ public class ChooseRefitDialog extends JDialog {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);
-                int actualRow = table.convertRowIndexToModel(row);
                 setHorizontalAlignment(getAlignment(actualCol));
-                //setToolTipText(getTooltip(actualRow, actualCol));
 
                 return this;
             }

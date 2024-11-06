@@ -1507,6 +1507,33 @@ public abstract class Part implements IPartWork, ITechnology {
         return sb.toString();
     }
 
+    /**
+     * I hate this but I can't think of a better way to do it without changing Part too much.
+     * @return hashcode for hashmaps and such
+     */
+    @Override
+    public int hashCode() {
+        // FIXME: Invasive changes to Part to make this suck less
+        return Objects.hashCode(getName() + ReportingUtilities.surroundIf(" (", getDetails(), ")"));
+    }
+
+    /**
+     * For hashmaps. Urk.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if ((null == obj) || (getClass() != obj.getClass())) {
+            return false;
+        }
+        final Part other = (Part) obj;
+        return Objects.equals(getName() + ReportingUtilities.surroundIf(" (", getDetails(), ")"),
+                other.getName() + ReportingUtilities.surroundIf(" (", other.getDetails(), ")"));
+    }
+
+
     public static String[] findPartImage(IPartWork part) {
         String imgBase = null;
         PartRepairType repairType = IPartWork.findCorrectRepairType(part);
