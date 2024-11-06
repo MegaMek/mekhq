@@ -35,6 +35,7 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.ArmorType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.weapons.InfantryAttack;
@@ -1014,7 +1015,129 @@ public class Refit extends Part implements IAcquisitionWork {
                 returnsList.add(step.getReturnsPart());
             }
         }
+        // Treat armors separately because they use amount instead of quantity -.-
+        Map<Integer,Armor> armorNeeded = new HashMap<Integer,Armor>();
+        Map<Integer,Armor> armorReturns = new HashMap<Integer,Armor>();
+
+        for (Part part : takeAllOfType(Armor.class, returnsList)) {
+            Armor incomingArmor = (Armor) part;
+            if (armorReturns.containsKey(incomingArmor.getType())) {
+                Armor existingArmor = armorReturns.get(incomingArmor.getType());
+                existingArmor.setAmount(existingArmor.getAmount() + incomingArmor.getAmount());
+            } else {
+                armorReturns.put(incomingArmor.getType(), incomingArmor);
+            }
+        }
+
+        for (Part part : takeAllOfType(Armor.class, neededList)) {
+            Armor incomingArmor = (Armor) part;
+            int incomingAmount = incomingArmor.getAmount();
+            // Do we have returned armor to use
+            if (armorReturns.containsKey(incomingArmor.getType())) {
+                Armor returnsArmor = armorReturns.get(incomingArmor.getType());
+                int returnsAmount = returnsArmor.getAmount();
+                if(incomingAmount == returnsAmount) {
+                    armorReturns.remove(returnsArmor.getType());
+                    // And drop the incoming armor
+                    continue;
+                } else if (incomingAmount > returnsAmount) {
+                    incomingArmor.setAmount(incomingAmount - returnsAmount);
+                    armorReturns.remove(returnsArmor.getType());
+                } else {
+                    returnsArmor.setAmount(returnsAmount - incomingAmount);
+                    // and drop the incoming armor
+                    continue;
+                }
+            }
+
+            if (armorNeeded.containsKey(incomingArmor.getType())) {
+                Armor neededArmor = armorNeeded.get(incomingArmor.getType());
+                neededArmor.setAmount(neededArmor.getAmount() + incomingArmor.getAmount());
+            } else {
+                armorNeeded.put(incomingArmor.getType(), incomingArmor);
+            }
+        }
+
+ 
+
+        // Now we have to do the same thing with ammo...
+
+        Map<AmmoType,AmmoStorage> ammoNeeded = new HashMap<AmmoType,AmmoStorage>();
+        Map<AmmoType,AmmoStorage> ammoReturns = new HashMap<AmmoType,AmmoStorage>();
+    
+        for (Part part : takeAllOfType(AmmoStorage.class, returnsList)) {
+            AmmoStorage incomingAmmo = (AmmoStorage) part;
+            if (ammoReturns.containsKey(incomingAmmo.getType())) {
+                AmmoStorage existingAmmo = ammoReturns.get(incomingAmmo.getType());
+                existingAmmo.setShots(existingAmmo.getShots() + incomingAmmo.getShots());
+            } else {
+                ammoReturns.put(incomingAmmo.getType(), incomingAmmo);
+            }
+        }
+
+        for (Part part : takeAllOfType(AmmoStorage.class, neededList)) {
+            AmmoStorage incomingAmmo = (AmmoStorage) part;
+            int incomingShots = incomingAmmo.getShots();
+            // Do we have returned ammo to use
+            if (ammoReturns.containsKey(incomingAmmo.getType())) {
+                AmmoStorage returnsAmmo = ammoReturns.get(incomingAmmo.getType());
+                int returnsShots = returnsAmmo.getShots();
+                if (incomingShots == returnsShots) {
+                    ammoReturns.remove(returnsAmmo.getType());
+                    // and drop the incoming ammo
+                    continue;
+                }
+                else if (incomingShots > returnsShots) {
+                    incomingAmmo.setShots(incomingShots - returnsShots);
+                    ammoReturns.remove(returnsAmmo.getType());
+                } else {
+                    returnsAmmo.setShots(returnsShots - incomingShots);
+                    // and drop the incoming ammo
+                    continue;
+                }
+            }
+
+            if (ammoNeeded.containsKey(incomingAmmo.getType())) {
+                AmmoStorage neededAmmo = ammoNeeded.get(incomingAmmo.getType());
+                neededAmmo.setShots(neededAmmo.getShots() + incomingAmmo.getShots());
+            } else {
+                ammoNeeded.put(incomingAmmo.getType(), incomingAmmo);
+            }
+        }
+
+        // Now put the lists back together
+
+        for (Armor neededArmor : armorNeeded.values()) {
+            neededList.add(neededArmor);
+        }
+        for (Armor returnsArmor : armorReturns.values()) {
+            returnsList.add(returnsArmor);
+        }
+        for (AmmoStorage neededAmmo : ammoNeeded.values()) {
+            neededList.add(neededAmmo);
+        }
+        for (AmmoStorage returnsAmmo : ammoReturns.values()) {
+            returnsList.add(returnsAmmo);
+        }
+
     }
+
+    /**
+     * Remove all Parts of type type from list and return them in a new list
+     */
+    @SuppressWarnings("rawtypes")
+    public static List<Part> takeAllOfType(Class type, List<Part> list) {
+        List<Part> toReturn = new ArrayList<>();
+        for(Iterator<Part> partIter = list.iterator(); partIter.hasNext(); ) {
+            Part part = partIter.next();
+            if (type.isInstance(part)) {
+                partIter.remove();
+                toReturn.add(part);
+            }
+        }
+        return toReturn;
+    }
+
 
     /**
      * Determines the refit class as the harest class of all the refit steps
