@@ -8400,4 +8400,27 @@ public class Campaign implements ITechManager {
     public boolean showExtinct() {
         return !campaignOptions.isDisallowExtinctStuff();
     }
+
+    /**
+     * Gets a string to use for addressing the commander.
+     * If no commander is flagged, returns a default address.
+     *
+     * @return The title of the commander, or a default string if no commander.
+     */
+    public String getCommanderAddress() {
+        Person commander = getFlaggedCommander();
+
+        if (commander == null) {
+            return resources.getString("generalFallbackAddress.text");
+        }
+
+        String commanderRank = commander.getRankName();
+
+        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
+            return commander.getFullName();
+        }
+
+        return commanderRank;
+    }
+
 }

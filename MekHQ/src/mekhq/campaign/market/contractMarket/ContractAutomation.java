@@ -70,7 +70,7 @@ public class ContractAutomation {
         final String speakerName = getSpeakerName(campaign, speaker);
         final ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
 
-        final String commanderAddress = getCommanderAddress(campaign);
+        final String commanderAddress = campaign.getCommanderAddress();
 
         // Mothballing
         String message = String.format(resources.getString("mothballDescription.text"), commanderAddress);
@@ -185,29 +185,6 @@ public class ContractAutomation {
     }
 
     /**
-     * Gets a string to use for addressing the commander.
-     * If no commander is flagged, returns a default address.
-     *
-     * @param campaign The current campaign
-     * @return The title of the commander, or a default string if no commander.
-     */
-    private static String getCommanderAddress(Campaign campaign) {
-        Person commander = campaign.getFlaggedCommander();
-
-        if (commander == null) {
-            return resources.getString("generalFallbackAddress.text");
-        }
-
-        String commanderRank = commander.getRankName();
-
-        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
-            return commander.getFullName();
-        }
-
-        return commanderRank;
-    }
-
-    /**
      * Displays a dialog for user interaction.
      * The dialog uses a custom formatted message and includes options for user to confirm or decline.
      *
@@ -220,10 +197,8 @@ public class ContractAutomation {
         final int WIDTH = UIUtil.scaleForGUI(400);
 
         // Custom button text
-        Object[] options = {
-            resources.getString("generalConfirm.text"),
-            resources.getString("generalDecline.text")
-        };
+        JButton confirmButton = new JButton(resources.getString("generalConfirm.text"));
+        JButton declineButton = new JButton(resources.getString("generalDecline.text"));
 
         // Create a custom message with a border
         String descriptionTitle = String.format("<html><b>%s</b></html>", speakerName);
@@ -235,45 +210,47 @@ public class ContractAutomation {
         // Create description JPanel
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.PAGE_AXIS));
-        JLabel description = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
             WIDTH, message));
         description.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
         descriptionPanel.add(description);
+
+        // Create Buttons Panel
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.add(confirmButton);
+        buttonsPanel.add(declineButton);
 
         // Create main JPanel and add icon and description
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(iconLabel, BorderLayout.NORTH);
         mainPanel.add(descriptionPanel, BorderLayout.CENTER);
-
-        // Create JOptionPane
-        JOptionPane optionPane = new JOptionPane(mainPanel,
-            JOptionPane.PLAIN_MESSAGE,
-            JOptionPane.YES_NO_OPTION,
-            null,
-            options,
-            options[0]);
+        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         // Create JDialog
-        JDialog dialog = new JDialog();
+        final JDialog dialog = new JDialog();
         dialog.setTitle(resources.getString("generalTitle.text"));
         dialog.setModal(true);
-        dialog.setContentPane(optionPane);
+        dialog.setContentPane(mainPanel);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
 
-        optionPane.addPropertyChangeListener(evt -> {
-            if (JOptionPane.VALUE_PROPERTY.equals(evt.getPropertyName())) {
-                dialog.dispose();
-            }
+        boolean[] result = new boolean[1];
+
+        // Add functionality to buttons
+        confirmButton.addActionListener(e -> {
+            result[0] = true;
+            dialog.dispose();
+        });
+        declineButton.addActionListener(e -> {
+            result[0] = false;
+            dialog.dispose();
         });
 
         dialog.setVisible(true);
 
-        int response = (Objects.equals(optionPane.getValue(), options[0]) ?
-            JOptionPane.YES_OPTION : JOptionPane.NO_OPTION);
-
-        return (response == JOptionPane.YES_OPTION);
+        return result[0];
     }
 
     /**
@@ -285,7 +262,6 @@ public class ContractAutomation {
      */
     private static List<Unit> performAutomatedMothballing(Campaign campaign) {
         List<Unit> mothballTargets = new ArrayList<>();
-        List<Unit> mothballedUnits = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
         for (Force force : campaign.getAllForces()) {
@@ -295,6 +271,9 @@ public class ContractAutomation {
                 if (unit != null) {
                     if (unit.isAvailable(false) && !unit.isUnderRepair()) {
                         mothballTargets.add(unit);
+                    } else {
+                        campaign.addReport(String.format(resources.getString("mothballingFailed.text"),
+                            unit.getName()));
                     }
                 }
             }
@@ -305,10 +284,9 @@ public class ContractAutomation {
         for (Unit unit : mothballTargets) {
             mothballUnitAction.execute(campaign, unit);
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
-            mothballedUnits.add(unit);
         }
 
-        return mothballedUnits;
+        return mothballTargets;
     }
 
     /**
@@ -322,17 +300,21 @@ public class ContractAutomation {
     public static void performAutomatedActivation(Campaign campaign) {
         List<Unit> units = campaign.getAutomatedMothballUnits();
 
-        if (units.isEmpty()) {
-            return;
-        }
-
         ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
 
         for (Unit unit : units) {
             if (unit.isMothballed()) {
                 activateUnitAction.execute(campaign, unit);
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
+
+                if (unit.isMothballed()) {
+                    campaign.addReport(String.format(resources.getString("activationFailed.text"),
+                        unit.getName()));
+                }
             }
         }
+
+        // We still want to clear out any units
+        campaign.setAutomatedMothballUnits(new ArrayList<>());
     }
 }
