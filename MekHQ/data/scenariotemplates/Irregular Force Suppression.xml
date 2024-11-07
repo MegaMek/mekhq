@@ -79,7 +79,7 @@
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Infantry</forceName>
-                <generationMethod>1</generationMethod>
+                <generationMethod>2</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>

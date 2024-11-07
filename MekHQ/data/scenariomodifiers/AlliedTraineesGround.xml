@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Three trainees will deploy alongside your lance. Keep them alive.</additionalBriefingText>
+	<additionalBriefingText>A force of trainees will deploy alongside your lance. Keep them alive.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -18,47 +18,20 @@
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones />
 		<destinationZone>5</destinationZone>
-		<fixedUnitCount>3</fixedUnitCount>
+		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>0</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Allied Trainees</forceName>
+		<forceName>Trainees</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>1</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
+        <objectiveLinkedForces>
+            <objectiveLinkedForce>Player</objectiveLinkedForce>
+        </objectiveLinkedForces>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
 		<syncedForceName>Player</syncedForceName>
 		<useArtillery>false</useArtillery>
 	</forceDefinition>
-
-	<objectives>
-		<objective>
-			<associatedForceNames>
-				<associatedForceName>Allied Trainees</associatedForceName>
-			</associatedForceNames>
-			<associatedUnitIDs />
-			<successEffects>
-				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</successEffect>
-			</successEffects>
-			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
-			</failureEffects>
-			<description>Preserve 100% of the following force(s) and unit(s):</description>
-			<destinationEdge>NONE</destinationEdge>
-			<objectiveCriterion>Preserve</objectiveCriterion>
-			<percentage>100</percentage>
-			<timeLimit>0</timeLimit>
-			<timeLimitAtMost>true</timeLimitAtMost>
-			<timeLimitType>None</timeLimitType>
-		</objective>
-	</objectives>
 </AtBScenarioModifier>
