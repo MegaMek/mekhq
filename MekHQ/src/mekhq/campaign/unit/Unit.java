@@ -1,8 +1,8 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2016-2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -289,7 +289,7 @@ public class Unit implements ITechnology {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("Omni");
         if (!(type == UnitType.TANK || type == UnitType.MEK)) {
-            toReturn.append(" ");
+            toReturn.append(' ');
         }
         toReturn.append(UnitType.getTypeDisplayableName(type));
         return toReturn.toString();
@@ -4817,7 +4817,7 @@ public class Unit implements ITechnology {
             getCampaign().mothball(this);
         } else {
             completeMothball();
-            getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
+            getCampaign().addReport(getHyperlinkedName() + " has been mothballed");
         }
     }
 
@@ -4866,7 +4866,7 @@ public class Unit implements ITechnology {
             getCampaign().activate(this);
         } else {
             completeActivation();
-            getCampaign().addReport(getHyperlinkedName() + " has been activated (GM)");
+            getCampaign().addReport(getHyperlinkedName() + " has been activated");
         }
     }
 
