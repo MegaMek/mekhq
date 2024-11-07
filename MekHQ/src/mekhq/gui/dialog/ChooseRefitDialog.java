@@ -561,8 +561,8 @@ public class ChooseRefitDialog extends JDialog {
         }
     }
 
-    public int getToOrder(Part part) {
-        PartInventory inventory = campaign.getPartInventory(part);
+    public static int getToOrder(Part part) {
+        PartInventory inventory = part.getCampaign().getPartInventory(part);
         return Math.max(0, getActualQuantity(part)
                 - inventory.getSupply()
                 - inventory.getTransit()
@@ -689,7 +689,7 @@ public class ChooseRefitDialog extends JDialog {
 
     // region Needed Model
 
-    public class RefitNeededListTableModel extends AbstractTableModel {
+    public static class RefitNeededListTableModel extends AbstractTableModel {
         public final static int COL_NEEDED = 0;
         public final static int COL_NAME = 1;
         public final static int COL_TECH_BASE = 2;
@@ -752,7 +752,7 @@ public class ChooseRefitDialog extends JDialog {
             } else {
                 part = (Part) data.get(row);
             }
-
+            Campaign campaign = part.getCampaign();
             return switch(col) {
                 case COL_NAME -> "<html><nobr>"
                         + part.getName() + ReportingUtilities.surroundIf(" (", part.getDetails(), ")")
@@ -800,7 +800,7 @@ public class ChooseRefitDialog extends JDialog {
                 part = data.get(row);
             }
             return switch (col) {
-                case COL_TARGET -> campaign.getTargetForAcquisition(part.getAcquisitionWork()).getDesc();
+                case COL_TARGET -> part.getCampaign().getTargetForAcquisition(part.getAcquisitionWork()).getDesc();
                 default -> null;
             };
         }
@@ -826,7 +826,7 @@ public class ChooseRefitDialog extends JDialog {
 
     // region Returns Model
 
-    public class RefitReturnsListTableModel extends AbstractTableModel {
+    public static class RefitReturnsListTableModel extends AbstractTableModel {
         public final static int COL_RECEIVING = 0;
         public final static int COL_NAME = 1;
         public final static int COL_TECH_BASE = 2;
@@ -885,7 +885,7 @@ public class ChooseRefitDialog extends JDialog {
                         + part.getName() + ReportingUtilities.surroundIf(" (", part.getDetails(), ")")
                         + "</nobr></html>";
                 case COL_TECH_BASE -> part.getTechBaseName();
-                case COL_STOCK -> campaign.getPartInventory(part).getSupply();
+                case COL_STOCK -> part.getCampaign().getPartInventory(part).getSupply();
                 case COL_RECEIVING -> getActualQuantity(part);
                 case COL_VALUE -> part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
                 default -> "?";
@@ -935,7 +935,7 @@ public class ChooseRefitDialog extends JDialog {
 
     // region Steps Model
 
-    public class RefitStepsListTableModel extends AbstractTableModel {
+    public static class RefitStepsListTableModel extends AbstractTableModel {
         public final static int COL_OLD_NAME = 0;
         public final static int COL_OLD_LOC = 1;
         public final static int COL_OLD_QUANTITY = 2;

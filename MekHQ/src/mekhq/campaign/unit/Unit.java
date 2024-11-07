@@ -1263,7 +1263,6 @@ public class Unit implements ITechnology {
      * not work on small craft and larger because they hide their heatsinks in an available
      * Spacecraft Cooling System Part.
      *
-     * @param entity Either the starting or the ending unit of the refit.
      * @return The number of heat sinks the unit mounts that are not tracked as parts.
      */
     public Part getUntrackedHeatSinks () {
