@@ -169,17 +169,17 @@ public class RefitStep {
                         isFixedEquipmentChange = false;
                         return;
                     } else {
-                        int oldQuantity = oldAHS.getQuantity();
-                        int newQuantity = newAHS.getQuantity();
+                        int oldAHSQuant = oldAHS.getQuantity();
+                        int newAHSQuant = newAHS.getQuantity();
                         AeroHeatSink deltaAHS = oldAHS.clone();
                         int delta = 0;
-                        if (oldQuantity > newQuantity) {
-                            delta = oldQuantity - newQuantity;
+                        if (oldAHSQuant > newAHSQuant) {
+                            delta = oldAHSQuant - newAHSQuant;
                             deltaAHS.setQuantity(delta);
                             type = RefitStepType.REMOVE_UNTRACKED_SINKS;
                             returnsPart = deltaAHS;
                         } else {
-                            delta = newQuantity - oldQuantity;
+                            delta = newAHSQuant - oldAHSQuant;
                             deltaAHS.setQuantity(delta);
                             type = RefitStepType.ADD_UNTRACKED_SINKS;
                             neededPart = deltaAHS;
@@ -209,17 +209,17 @@ public class RefitStep {
                         isFixedEquipmentChange = false;
                         return;
                     } else {
-                        int oldQuantity = oldHS.getQuantity();
-                        int newQuantity = newHS.getQuantity();
+                        int oldHSQuant = oldHS.getQuantity();
+                        int newHSQuant = newHS.getQuantity();
                         EquipmentPart deltaHS = oldHS.clone();
                         int delta = 0;
-                        if (oldQuantity > newQuantity) {
-                            delta = oldQuantity - newQuantity;
+                        if (oldHSQuant > newHSQuant) {
+                            delta = oldHSQuant - newHSQuant;
                             deltaHS.setQuantity(delta);
                             type = RefitStepType.REMOVE_UNTRACKED_SINKS;
                             returnsPart = deltaHS;
                         } else {
-                            delta = newQuantity - oldQuantity;
+                            delta = newHSQuant - oldHSQuant;
                             deltaHS.setQuantity(delta);
                             type = RefitStepType.ADD_UNTRACKED_SINKS;
                             neededPart = deltaHS;
