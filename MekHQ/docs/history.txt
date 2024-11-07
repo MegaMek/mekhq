@@ -180,6 +180,12 @@ MEKHQ VERSION HISTORY:
 + PR #5159: CampaignGUI Tab reordering
 + PR #5161: Changed wording in "Potential Capture Style"
 + PR #5163: Added Force BV Multiplier Logging & Adjusted Calculation in AtBDynamicScenarioFactory
++ FIX #5160, #5162: Updated Infantry Generation Method and Trainee Settings
++ PR #5168: StratCon will No Longer Display GBV when Using FG3
++ PR #5172: Added Contract Automation
++ PR #5174: Updated Faction Loading Log Format
++ PR #5175: Temporarily Disabled Preset Confirm in New Campaign Dialog
++ PR #5176: Temporarily Removed CAM_OPS from Contract Market Method ComboBox
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
