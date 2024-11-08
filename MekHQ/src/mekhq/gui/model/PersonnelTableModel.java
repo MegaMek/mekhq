@@ -166,7 +166,7 @@ public class PersonnelTableModel extends DataTableModel {
             // Colouring
             boolean personIsDamaged = false;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-                personIsDamaged = person.hasInjuries(false);
+                personIsDamaged = person.hasInjuries(true);
             } else {
                 personIsDamaged = person.getHits() > 0;
             }
