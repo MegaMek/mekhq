@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.sorter.*;
+import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -526,13 +527,21 @@ public enum PersonnelTableModelColumn {
 
                     // Check for tech units
                     if (!person.getTechUnits().isEmpty()) {
+                        Unit refitUnit = person.getTechUnits().stream()
+                            .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
+                            .findFirst().orElse(null);
+                        String refitString = null != refitUnit ? 
+                                "<b>Refitting</b> " + refitUnit.getName() : "";
                         if (person.getTechUnits().size() == 1) {
                             unit = person.getTechUnits().get(0);
                             if (unit != null) {
-                                return unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)";
+                                return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
+                                        unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") + "</html>";
                             }
                         } else {
-                            return person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)";
+                            return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
+                                    person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)")
+                                    + "</html>";
                         }
                     }
                 }
