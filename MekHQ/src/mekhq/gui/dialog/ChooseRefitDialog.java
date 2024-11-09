@@ -126,8 +126,8 @@ public class ChooseRefitDialog extends JDialog {
         campaign = c;
         this.unit = unit;
         populateRefits();
-        initComponents();
         setLocationRelativeTo(parent);
+        initComponents();
         setUserPreferences();
     }
     // endregion Constructors
@@ -402,6 +402,9 @@ public class ChooseRefitDialog extends JDialog {
         radRefit.setEnabled(!kitRefits.isEmpty());
         radCustomize.setEnabled(!customRefits.isEmpty());
         radOmni.setEnabled(!omniRefits.isEmpty());
+
+        setPreferredSize(UIUtil.scaleForGUI(1000,800));
+        setMinimumSize(UIUtil.scaleForGUI(600,600));
 
         pack();
     }
