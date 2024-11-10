@@ -1,6 +1,6 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.01-SNAPSHOT
+0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
 + FIX #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
 + PR #4655: Refactored Random Company Name Generator to Use CSV
