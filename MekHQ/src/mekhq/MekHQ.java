@@ -47,6 +47,10 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.autoResolve.AutoResolveEngine;
+import mekhq.campaign.autoResolve.helper.AutoResolveClient;
+import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.AutoResolveConcludedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
@@ -290,6 +294,7 @@ public class MekHQ implements GameListener {
             final String name = t.getClass().getName();
             final String message = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION, name);
             final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
+            System.out.println(message);
             logger.error(t, message, title);
         });
 
@@ -466,6 +471,12 @@ public class MekHQ implements GameListener {
         currentScenario = null;
     }
 
+    // MekHQ only needs to hear a few of the game events
+    // So most are not implemented.
+    // Maybe we could make one interface that contains only a very few of the events
+    // that are required for book keeping the results of a scenario.
+    // then we could clean alot of those up.
+
     @Override
     public void gameBoardChanged(GameBoardChangeEvent e) {
         // Why Empty?
@@ -514,6 +525,74 @@ public class MekHQ implements GameListener {
     @Override
     public void gamePhaseChange(GamePhaseChangeEvent e) {
         // Why Empty?
+    }
+
+    public void autoResolveConcluded(AutoResolveConcludedEvent arce){
+        try {
+            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), arce.controlledScenario());
+            tracker.setClient(new AutoResolveClient(new AutoResolveGame(getCampaign())));
+            tracker.setEvent(arce);
+            tracker.processGame();
+
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(campaignGUI.getCampaign(), campaignGUI.getFrame(),
+                    true, tracker);
+            resolveDialog.setVisible(true);
+
+            if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
+                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
+                    campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
+
+                if (!rdd.wasAborted()) {
+                    getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+                }
+            }
+
+            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+                HashMap<UUID, Integer> personnel = new HashMap<>();
+                HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
+
+                for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                    Person person = getCampaign().getPerson(personId);
+                    PersonStatus status = tracker.getPeopleStatus().get(personId);
+                    int injuryCount = 0;
+
+                    if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                        if (status.getHits() > person.getHitsPrior()) {
+                            injuryCount = status.getHits() - person.getHitsPrior();
+                        }
+                    }
+
+                    personnel.put(personId, injuryCount);
+                    scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
+                }
+
+                boolean isCivilianHelp = false;
+
+                if (tracker.getScenario() instanceof AtBScenario) {
+                    isCivilianHelp = ((AtBScenario) tracker.getScenario())
+                        .getScenarioType() == AtBScenario.CIVILIANHELP;
+                }
+
+                AutoAwardsController autoAwardsController = new AutoAwardsController();
+                autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
+            }
+
+            for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                Person person = getCampaign().getPerson(personId);
+
+                if (person.getStatus() == PersonnelStatus.MIA && !arce.controlledScenario()) {
+                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
+                        PersonnelStatus.POW);
+                }
+            }
+
+            // we need to trigger ScenarioResolvedEvent before stopping the thread or
+            // currentScenario may become null
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+        } catch (Exception ex) {
+            logger.error(ex, "gameVictory()");
+        }
     }
 
     @Override
@@ -704,6 +783,11 @@ public class MekHQ implements GameListener {
     public static void updateGuiScaling() {
         System.setProperty("flatlaf.uiScale", Double.toString(GUIPreferences.getInstance().getGUIScale()));
         setLookAndFeel(GUIPreferences.getInstance().getUITheme());
+    }
+
+    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
+        currentScenario = scenario;
+        new AutoResolveEngine().resolveBattle(this, units, scenario);
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

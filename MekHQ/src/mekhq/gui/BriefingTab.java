@@ -36,6 +36,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.autoResolve.AutoResolveEngine;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -853,26 +854,30 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(null);
     }
 
-    private void autoResolveScenario() {
-        startScenario(getCampaign().getAutoResolveBehaviorSettings());
-    }
-
-    private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
+    private Scenario getSelectedScenario() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
-            return;
+            return null;
         }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+    }
+
+    private void autoResolveScenario() {
+        Scenario scenario = getSelectedScenario();
         if (scenario == null) {
             return;
         }
+        getCampaignGui().getApplication()
+            .startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
+    }
+
+    private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
         if (uids.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
 
         List<Unit> chosen = new ArrayList<>();
-        StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
@@ -889,6 +894,18 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
             }
         }
+
+        return chosen;
+    }
+
+    private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
+        Scenario scenario = getSelectedScenario();
+        if (scenario == null) {
+            return;
+        }
+        StringBuilder undeployed = new StringBuilder();
+        List<Unit> chosen = playerUnits(scenario, undeployed);
+
 
         if (scenario instanceof AtBDynamicScenario) {
             AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
@@ -1052,14 +1069,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void joinScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Scenario scenario = getSelectedScenario();
         if (scenario == null) {
             return;
         }
+
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
         if (uids.isEmpty()) {
             return;
@@ -1100,11 +1114,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deployListFile() {
-        final int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Scenario scenario = getSelectedScenario();
         if (scenario == null) {
             return;
         }
