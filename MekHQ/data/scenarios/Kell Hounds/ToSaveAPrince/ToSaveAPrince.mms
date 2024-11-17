@@ -1,7 +1,7 @@
 #
 #  Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
 #
-#  This file is part of MekHQ.
+#  This file is part of MegaMek.
 #
 #  MegaMek is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -42,6 +42,9 @@ factions:
 - name: Zakahashi's Zombies
   camo: Draconis Combine/Dieron Regulars/Dieron Regulars.jpg
   deploy: N
+
+  fleefrom:
+    border: south
 
   victory:
     - trigger:
@@ -95,7 +98,10 @@ factions:
     id: 106
     force: 2nd Sword of Light|21||Zakahashi's Zombies|22||Support Lance|24
     remaining:
-      RTR: 0
+      armor:
+        RTR: 0
+    crits:
+      LA: 5
     crew:
       name: Cletus Palmer
       piloting: 4
@@ -105,7 +111,12 @@ factions:
     id: 107
     force: 2nd Sword of Light|21||Zakahashi's Zombies|22||Support Lance|24
     remaining:
-      CT: 10
+      armor:
+        CT: 10
+    crits:
+      CT: 11
+      LL: [ 5, 6 ]
+      RL: [ 5, 6 ]
     crew:
       name: Tom Meyer
       callsign: Hands
@@ -156,6 +167,7 @@ factions:
       piloting: 4
       gunnery: 5
 
+# OPFOR -----------------------
 
 - name: Kell Hounds, Second Battalion
   camo: Mercs/Kell Hounds.jpg
@@ -313,9 +325,6 @@ messages:
       Meks off the southern map edge by the end of round 15.
 
       The temperature in this desert area is at 70°C, adding heat to all Meks.
-
-      *Technical note: you can currently retreat off any edge of the battlefield and it will count for victory.
-      If you do this, Princess will be sad.*
     image: tosaveaprince_map.png
     trigger:
       type: and
@@ -381,6 +390,7 @@ end:
   - trigger:
       type: killedunits
       units: [ 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112 ]
+      # can't get through with half the force anymore when 7 are killed
       atleast: 7
 
   - trigger:

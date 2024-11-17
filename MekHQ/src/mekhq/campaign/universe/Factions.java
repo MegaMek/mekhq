@@ -164,7 +164,7 @@ public class Factions {
 
         Factions factions = load("data/universe/factions.xml");
 
-        logger.info("Loaded a total of %d factions", factions.factions.size());
+        logger.info(String.format("Loaded a total of %d factions", factions.factions.size()));
 
         return factions;
     }
