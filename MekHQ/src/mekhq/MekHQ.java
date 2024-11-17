@@ -48,6 +48,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.autoResolve.AutoResolveEngine;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.autoResolve.helper.AutoResolveGame;
 import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.AutoResolveConcludedEvent;
@@ -535,7 +536,7 @@ public class MekHQ implements GameListener {
             tracker.processGame();
 
             ResolveScenarioWizardDialog resolveDialog =
-                new ResolveScenarioWizardDialog(campaignGUI.getCampaign(), campaignGUI.getFrame(),
+                new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
                     true, tracker);
             resolveDialog.setVisible(true);
 
@@ -569,9 +570,8 @@ public class MekHQ implements GameListener {
 
                 boolean isCivilianHelp = false;
 
-                if (tracker.getScenario() instanceof AtBScenario) {
-                    isCivilianHelp = ((AtBScenario) tracker.getScenario())
-                        .getScenarioType() == AtBScenario.CIVILIANHELP;
+                if (tracker.getScenario() instanceof AtBScenario atbScenario) {
+                    isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIANHELP;
                 }
 
                 AutoAwardsController autoAwardsController = new AutoAwardsController();
@@ -787,7 +787,7 @@ public class MekHQ implements GameListener {
 
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
         currentScenario = scenario;
-        new AutoResolveEngine().resolveBattle(this, units, scenario);
+        new AutoResolveEngine(AutoResolveMethod.UNITS_MATTER).resolveBattle(this, units, scenario);
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

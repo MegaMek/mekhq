@@ -687,6 +687,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkRegionalMekVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
     private JCheckBox chkPlayerControlsAttachedUnits;
+    private JCheckBox chkUseBotControlledAutoResolve;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
@@ -3358,9 +3359,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubAtBScenario.add(chkAttachedPlayerCamouflage, gridBagConstraints);
 
         chkPlayerControlsAttachedUnits = new JCheckBox(
-                resources.getString("chkPlayerControlsAttachedUnits.text"));
+            resources.getString("chkPlayerControlsAttachedUnits.text"));
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkPlayerControlsAttachedUnits, gridBagConstraints);
+
+        chkUseBotControlledAutoResolve = new JCheckBox(
+            resources.getString("chkUseBotControlledAutoResolve.text"));
+        chkUseBotControlledAutoResolve.setToolTipText(resources.getString("chkUseBotControlledAutoResolve.toolTipText"));
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkUseBotControlledAutoResolve, gridBagConstraints);
 
         chkUseDropShips = new JCheckBox(resources.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resources.getString("chkUseDropShips.toolTipText"));
@@ -8961,6 +8968,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
+        chkUseBotControlledAutoResolve.setSelected(options.isPrincessBotAutoResolve());
         chkUseDropShips.setSelected(options.isUseDropShips());
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
@@ -9563,6 +9571,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
             options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
+            options.setPrincessBotAutoResolve(chkUseBotControlledAutoResolve.isSelected());
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());

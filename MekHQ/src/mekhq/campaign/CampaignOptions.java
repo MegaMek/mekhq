@@ -600,6 +600,7 @@ public class CampaignOptions {
     private int scenarioModChance;
     private int scenarioModBV;
     private boolean autoConfigMunitions;
+    private boolean princessBotAutoResolve;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1190,6 +1191,7 @@ public class CampaignOptions {
         useAtB = false;
         useStratCon = false;
         setSkillLevel(SkillLevel.REGULAR);
+        princessBotAutoResolve = true;
 
         // Unit Administration
         useAero = false;
@@ -5161,6 +5163,7 @@ public class CampaignOptions {
 
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "princessBotAutoResolve", isPrincessBotAutoResolve());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -6145,6 +6148,8 @@ public class CampaignOptions {
                     // region AtB Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                     retVal.setSkillLevel(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("princessBotAutoResolve")) {
+                    retVal.setPrincessBotAutoResolve(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6418,5 +6423,14 @@ public class CampaignOptions {
             getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, weights[8]);
         }
     }
+
+    public boolean isPrincessBotAutoResolve() {
+        return princessBotAutoResolve;
+    }
+
+    public void setPrincessBotAutoResolve(final boolean princessBotAutoResolve) {
+        this.princessBotAutoResolve = princessBotAutoResolve;
+    }
+
     // endregion File IO
 }

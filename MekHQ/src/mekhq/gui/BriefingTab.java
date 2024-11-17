@@ -862,13 +862,21 @@ public final class BriefingTab extends CampaignGuiTab {
         return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
+    /**
+     * Auto-resolve the selected scenario.
+     * Can run both the auto resolve using princess or using the ACS engine
+     */
     private void autoResolveScenario() {
         Scenario scenario = getSelectedScenario();
         if (scenario == null) {
             return;
         }
-        getCampaignGui().getApplication()
-            .startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
+        if (getCampaignOptions().isPrincessBotAutoResolve()) {
+            startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        } else {
+            getCampaignGui().getApplication()
+                .startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
+        }
     }
 
     private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {

@@ -1,6 +1,7 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem;
 
 import megamek.common.Compute;
+import megamek.common.Entity;
 import megamek.common.IEntityRemovalConditions;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
 import mekhq.campaign.autoResolve.helper.UnitStrengthHelper;
@@ -14,19 +15,25 @@ import mekhq.campaign.mission.ScenarioObjective;
 
 import java.util.*;
 
-public class SimpleScenarioResolver extends ScenarioResolver {
+public class AcsSimpleScenarioResolver extends ScenarioResolver {
 
-    private final Map<Integer, List<UnitResult>> combatRoundResults = new HashMap<>();
-    private final Map<Integer, List<UnitStrength>> survivingUnits = new HashMap<>();
-    private final Map<Integer, List<UnitStrength>> roundDefeatedUnits = new HashMap<>();
-    private final Map<Integer, List<UnitStrength>> roundCapturedUnits = new HashMap<>();
-    private final Map<Integer, List<UnitStrength>> defeatedUnits = new HashMap<>();
+    private static final int MAX_ROUNDS = 100;
+
+    private final Map<TeamID, List<UnitResult>> combatRoundResults = new HashMap<>();
+    private final Map<TeamID, List<UnitStrength>> survivingUnits = new HashMap<>();
+    private final Map<TeamID, List<UnitStrength>> roundDefeatedUnits = new HashMap<>();
+    private final Map<TeamID, List<UnitStrength>> roundCapturedUnits = new HashMap<>();
+    private final Map<TeamID, List<UnitStrength>> defeatedUnits = new HashMap<>();
     private final Map<UnitStrength, Integer> unitLossCount = new HashMap<>();
     private final Random random = new Random();
-    private final Map<Integer, String> forcesNames = new HashMap<>();
+
+    private final Map<ForceID, String> forcesNames = new HashMap<>();
     private final List<String> forceMustBePreserved = new ArrayList<>();
 
-    public SimpleScenarioResolver(AtBScenario scenario) {
+    private final Map<TeamID, List<ForceID>> forcesPerTeam = new HashMap<>();
+    private final Map<ForceID, HashSet<EffectOrSituation>> effectsOrSituationByForce = new HashMap<>();
+
+    public AcsSimpleScenarioResolver(AtBScenario scenario) {
         super(scenario);
     }
 
@@ -45,12 +52,15 @@ public class SimpleScenarioResolver extends ScenarioResolver {
             }
         });
         teams.forEach((teamId, forces) -> {
-            survivingUnits.put(teamId, new ArrayList<>());
+            var teamID = new TeamID(teamId);
+            survivingUnits.put(teamID, new ArrayList<>());
             forces.stream()
-                .peek(force -> forcesNames.put(force.id(), force.forceName()))
-                .flatMap(force -> force.units().stream())
+                .flatMap(force -> {
+                    forcesNames.put(new ForceID(force.id()), force.forceName());
+                    return force.units().stream();
+                })
                 .forEach(unit -> {
-                    survivingUnits.get(teamId).add(UnitStrengthHelper.getUnitStrength(unit));
+                    survivingUnits.get(teamID).add(UnitStrengthHelper.getUnitStrength(unit));
                     unitLossCount.put(UnitStrengthHelper.getUnitStrength(unit), 0);
                 });
         });
@@ -59,8 +69,9 @@ public class SimpleScenarioResolver extends ScenarioResolver {
     @Override
     public AutoResolveConcludedEvent resolveScenario(Map<Integer, List<AutoResolveForce>> teams) {
         initializeState(teams);
-
+        var round = 0;
         while (true) {
+
             // initiativePhase();
             // deploymentPhase();
             // detectionAndReconPhase();
@@ -71,11 +82,12 @@ public class SimpleScenarioResolver extends ScenarioResolver {
             simpleCombatResolution();
             simplePostCombatResolution();
             printRoundResult();
-
             var numberOfSurvivingTeams = getNumberOfSurvivingTeams();
-            if (numberOfSurvivingTeams <= 1) {
+            if (numberOfSurvivingTeams <= 1 || round >= MAX_ROUNDS) {
                 break;
             }
+
+            round++;
         }
 
         return new AutoResolveConcludedEvent(
@@ -85,32 +97,113 @@ public class SimpleScenarioResolver extends ScenarioResolver {
         );
     }
 
+    /**
+     * Currently only forces and teams have effects applied to them.
+     * @param unitId of the UNIT
+     * @return empty list
+     */
+    private Set<EffectOrSituation> getUnitEffectOrSituation(UnitID unitId) {
+        return Set.of();
+    }
+
+    private Set<EffectOrSituation> getForceEffectOrSituation(ForceID forceId) {
+        return effectsOrSituationByForce.getOrDefault(forceId, new HashSet<>());
+    }
+
+    private Set<EffectOrSituation> getTeamEffectOrSituation(TeamID teamId) {
+        var output = new HashSet<EffectOrSituation>();
+        for (var forceId : forcesPerTeam.get(teamId)) {
+            var forceModifiers = getForceEffectOrSituation(forceId);
+            output.addAll(forceModifiers);
+        }
+        return output;
+    }
+
+    private Set<EffectOrSituation> getEffectOrSituation(ID id) {
+        if (id instanceof ForceID forceID) {
+            return getForceEffectOrSituation(forceID);
+        } else if (id instanceof TeamID teamID) {
+            return getTeamEffectOrSituation(teamID);
+        } else if (id instanceof UnitID unitID) {
+            return getUnitEffectOrSituation(unitID);
+        }
+        return Set.of();
+    }
+
+    private int getTargetMovementModifier(UnitID id) {
+        // MANUALLY IMPLEMENT THIS
+        return 0;
+    }
+
+
+    private int getModifier(ID id, EosType effectOrSituation, Modifier modifier) {
+        var modStream = getEffectOrSituation(id).stream().filter(e -> e.type.equals(effectOrSituation));
+        int totalSum = modStream.filter(e -> !e.hasSpecialValue())
+            .map(
+            e -> e.getModifier(modifier)
+            ).reduce(0, Integer::sum);
+
+        if (effectOrSituation.equals(EosType.COMBAT_UNIT) &&
+            hasEffect(id, EffectOrSituation.TARGET_MOVEMENT_MODIFIER) &&
+            id instanceof UnitID) {
+            var tmm = getTargetMovementModifier((UnitID) id);
+            totalSum += tmm;
+        }
+
+        return totalSum;
+    }
+
+    private void addEffect(ID id, EffectOrSituation effectOrSituation) {
+        getEffectOrSituation(id).add(effectOrSituation);
+    }
+
+    private boolean hasEffect(ID id, EffectOrSituation effectOrSituation) {
+        return getEffectOrSituation(id).stream().anyMatch(e -> e.equals(effectOrSituation));
+    }
+
     private void initiativePhase() {
+        // Each player rolls 2D6 and adds the results together to determine Initiative; re-roll ties. The player with the higher
+        // result wins the Initiative for that turn.
 
     }
 
     protected void deploymentPhase() {
-
+        // n the first turn of the game and any turn where new Combat Units arrive on the battlefield (SSRM or PCM) players must deploy
+        // their forces. The player with the lowest initiative places a Formation following the Deployment Phase rules and then the winner
+        // of initiative places a Formation on the map. This repeats until all Formations are deployed.
+        //If there are no new forces arriving in the turn, this step is skipped and play moves immediately to
+        // Step 3: Detection and Reconnaissance Phase.
     }
 
     protected void detectionAndReconPhase() {
-
+        // In this phase newly detected Blips are placed on the appropriate map and each side conducts recon to reveal information about
+        // hostile Blip Counters on the battlefield. The player who won initiative goes first when conducting recon.
     }
 
     protected void movementPhase() {
-
+        // The player with the lowest Initiative roll moves one of their Formations first. Presuming an equal number of units on the
+        // two sides, the Initiative winner then moves one of their Formations, and the players continue alternating their unit movements
+        // until all units have been moved. Recon, Aerospace and Ground movement occurs sequentially with all Recon movement completing
+        // before aerospace and all aerospace before ground movement.
+        // If, during a sub-phase, the number of Formations per side is unequal, the player with the higher number of Formations must move
+        // more units in proportion to that of their opponent. See Unequal Number of Formations (see p. 164) for details.
     }
 
     protected void combatPhase() {
-
+        // The player with the lowest Initiative roll acts first in the Combat Phase. This player then declares and resolves all of their
+        // Formations’ combat actions at this time, followed by the Initiative winner. The Combat Phase only has sub-phases for aerospace
+        // and ground combat. Recon Formations may be targeted directly in the Combat Phase.
     }
 
     protected void endPhase() {
-
+        // Both players may complete the End Phase simultaneously. In this phase, each player checks Fatigue, Morale and expends supply.
+        // After resolving all End Phase actions, the turn ends and the players return to Step 1, repeat all these steps until one side
+        // meets its victory conditions for the scenario. Once victory has been determined,
+        // players may also determine salvage for campaign games.
     }
 
     protected boolean isTeam1Victory() {
-        var team1Victory = survivingUnits.entrySet().stream().anyMatch(e -> e.getKey() == 1);
+        var team1Victory = survivingUnits.entrySet().stream().anyMatch(e -> e.getKey().getID() == 1);
         return team1Victory;
     }
 
@@ -124,12 +217,12 @@ public class SimpleScenarioResolver extends ScenarioResolver {
         printUnitsByCategory("Defeated Units:", defeatedUnits);
     }
 
-    private void printUnitsByCategory(String category, Map<Integer, List<UnitStrength>> units) {
+    private void printUnitsByCategory(String category, Map<TeamID, List<UnitStrength>> units) {
         System.out.println("\n" + category);
-        units.forEach(SimpleScenarioResolver::printTeamUnits);
+        units.forEach(AcsSimpleScenarioResolver::printTeamUnits);
     }
 
-    private static void printTeamUnits(int teamID, List<UnitStrength> teamUnits) {
+    private static void printTeamUnits(TeamID teamID, List<UnitStrength> teamUnits) {
         System.out.println("\tTeam " + teamID + ":");
         for (var unit : teamUnits) {
             System.out.println("\t\t- " + unit.entity().getDisplayName());
@@ -150,7 +243,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
 
 
         while (true) {
-            List<Integer> teamIds = new ArrayList<>(combatRoundResults.keySet());
+            List<TeamID> teamIds = new ArrayList<>(combatRoundResults.keySet());
             // Stop pairing dices if condition is true
             if (lessThanTwoTeamsLeft(teamIds)) break;
 
@@ -170,7 +263,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
     }
 
     private void handleUnitDefeat(SelectedUnit defeated, SelectedUnit winner) {
-        if (forceMustBePreserved.contains(forcesNames.get(defeated.unit().unitStrength().entity().getForceId())) && winner.teamId() == 1) {
+        if (forceMustBePreserved.contains(forcesNames.get(defeated.unit().unitStrength().entity().getForceId())) && winner.teamId().getID() == 1) {
             roundCapturedUnits.computeIfAbsent(defeated.teamId(), k -> new ArrayList<>()).add(defeated.unit().unitStrength());
         } else {
             unitLostRollOff(defeated.unit(), defeated.teamId(), winner.unit());
@@ -193,29 +286,28 @@ public class SimpleScenarioResolver extends ScenarioResolver {
      * @param teamIds   List of team ids
      * @return SelectedUnit
      */
-    private SelectedUnit getUnitFromTeam(List<Integer> teamIds) {
-        int teamId = teamIds.remove(random.nextInt(teamIds.size()));
+    private SelectedUnit getUnitFromTeam(List<TeamID> teamIds) {
+        var teamId = teamIds.remove(random.nextInt(teamIds.size()));
         List<UnitResult> teamUnits = combatRoundResults.get(teamId);
         UnitResult unit = teamUnits.remove(0);
         return new SelectedUnit(teamId, unit);
     }
 
-    private record SelectedUnit(int teamId, UnitResult unit) {
-    }
+    private record SelectedUnit(TeamID teamId, UnitResult unit) { }
 
-    private boolean lessThanTwoTeamsLeft(List<Integer> teamIds) {
+    private boolean lessThanTwoTeamsLeft(List<TeamID> teamIds) {
         teamIds.removeIf(id -> combatRoundResults.get(id).isEmpty());
         return teamIds.size() < 2;
     }
 
-    private void unitLostRollOff(UnitResult unit, int teamId, UnitResult aggressor) {
+    private void unitLostRollOff(UnitResult unit, TeamID teamId, UnitResult aggressor) {
         unitLossCount.put(unit.unitStrength(), Compute.computeTotalDamage(aggressor.unitStrength.entity().getTotalWeaponList()));
         roundDefeatedUnits.computeIfAbsent(teamId, k -> new ArrayList<>()).add(unit.unitStrength());
     }
 
     private void simplePostCombatResolution() {
         for (var entry : roundDefeatedUnits.entrySet()) {
-            int teamId = entry.getKey();
+            TeamID teamId = entry.getKey();
             List<UnitStrength> defeatedList = entry.getValue();
 //            int unitsToRemove = defeatedList.size() % DEFEATS_FOR_UNIT_DESTRUCTION;
             for (UnitStrength unitHit : defeatedList) {
@@ -228,7 +320,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
         roundDefeatedUnits.clear();
 
         for (var entry : roundCapturedUnits.entrySet()) {
-            int teamId = entry.getKey();
+            TeamID teamId = entry.getKey();
             List<UnitStrength> capturedList = entry.getValue();
             for (UnitStrength unitHit : capturedList) {
                 unitDefeated(teamId, unitHit);
@@ -248,7 +340,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
         IEntityRemovalConditions.REMOVE_SALVAGEABLE,
     };
 
-    private void unitDestroyed(int teamId, UnitStrength unitToRemove) {
+    private void unitDestroyed(TeamID teamId, UnitStrength unitToRemove) {
         unitDefeated(teamId, unitToRemove);
         var randomlySelectedRemovalCondition = weightedRemovalConditions[random.nextInt(weightedRemovalConditions.length-1)];
         unitToRemove.entity().setRemovalCondition(randomlySelectedRemovalCondition);
@@ -256,13 +348,13 @@ public class SimpleScenarioResolver extends ScenarioResolver {
         System.out.println("XXXXXXX Unit " + unitToRemove.entity().getDisplayName() + " has been destroyed.");
     }
 
-    private void retreatUnit(int teamId, UnitStrength unitToRemove) {
+    private void retreatUnit(TeamID teamId, UnitStrength unitToRemove) {
         unitDefeated(teamId, unitToRemove);
         unitToRemove.entity().setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
         System.out.println("<<<<<<< Unit " + unitToRemove.entity().getDisplayName() + " has retreated.");
     }
 
-    private void applyDamageToUnit(int teamId, UnitStrength unitToRemove) {
+    private void applyDamageToUnit(TeamID teamId, UnitStrength unitToRemove) {
         var entity = unitToRemove.entity();
         DamageHandlerChooser.chooseHandler(entity).applyDamage(unitLossCount.getOrDefault(unitToRemove, 5));
         System.out.println("@@@@@@@ Unit " + entity.getDisplayName() + " has taken damage.");
@@ -271,7 +363,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
         }
     }
 
-    private void unitDefeated(int teamId, UnitStrength unitToRemove) {
+    private void unitDefeated(TeamID teamId, UnitStrength unitToRemove) {
         survivingUnits.get(teamId).remove(unitToRemove);
         defeatedUnits.computeIfAbsent(teamId, k -> new ArrayList<>()).add(unitToRemove);
     }

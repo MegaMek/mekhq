@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.*;
 
-public class SimpleScenarioResolver extends ScenarioResolver {
+public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
     private static final int DEFEATS_FOR_UNIT_DESTRUCTION = 100;
 
     private final Map<Integer, List<UnitResult>> combatRoundResults = new HashMap<>();
@@ -24,7 +24,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
     private final Map<Integer, String> forcesNames = new HashMap<>();
     private final List<String> forceMustBePreserved = new ArrayList<>();
 
-    public SimpleScenarioResolver(AtBScenario scenario) {
+    public UnitsMatterSimpleScenarioResolver(AtBScenario scenario) {
         super(scenario);
     }
 
@@ -94,7 +94,7 @@ public class SimpleScenarioResolver extends ScenarioResolver {
 
     private void printUnitsByCategory(String category, Map<Integer, List<UnitStrength>> units) {
         System.out.println("\n" + category);
-        units.forEach(SimpleScenarioResolver::printTeamUnits);
+        units.forEach(UnitsMatterSimpleScenarioResolver::printTeamUnits);
     }
 
     private static void printTeamUnits(int teamID, List<UnitStrength> teamUnits) {
