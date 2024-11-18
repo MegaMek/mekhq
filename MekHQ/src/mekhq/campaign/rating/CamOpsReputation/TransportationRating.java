@@ -18,15 +18,15 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TransportationRating {
     private static final MMLogger logger = MMLogger.create(TransportationRating.class);
@@ -72,7 +72,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("asf", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // Meks
         capacity = transportationCapacities.get("mekBays");
@@ -80,7 +82,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("mek", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // Super Heavy Vehicles
         capacity = transportationCapacities.get("superHeavyVehicleBays");
@@ -88,7 +92,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("superHeavyVehicle", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         spareCapacity = Math.max(0, capacity - requirements);
 
@@ -98,7 +104,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("heavyVehicle", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // as this spare capacity can also be used by light vehicles,
         // we need to track the remaining spare capacity
@@ -111,7 +119,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("lightVehicle", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // ProtoMeks
         capacity = transportationCapacities.get("protoMekBays");
@@ -119,7 +129,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("protoMek", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // Battle Armor
         capacity = transportationCapacities.get("battleArmorBays");
@@ -127,7 +139,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("battleArmor", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // Infantry
         capacity = transportationCapacities.get("infantryBays");
@@ -135,7 +149,9 @@ public class TransportationRating {
 
         rating = calculateRating(capacity, requirements);
         transportationValues.put("infantry", rating);
-        transportationRating += rating;
+        if (transportationRating == 0 && rating > 0) {
+            transportationRating += rating;
+        }
 
         // Support Personnel
         capacity = transportationCapacities.get("passengerCapacity");
