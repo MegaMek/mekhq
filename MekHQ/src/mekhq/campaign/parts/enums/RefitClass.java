@@ -136,5 +136,13 @@ public enum RefitClass {
             default -> throw new IllegalArgumentException("RefitClass.fromNumeric must be 0-8");
         };
     }
+    
 
+    /**
+     * @return Is this a class of refit that works with an omni reconfiguration
+     */
+    public boolean isOmniCompatable()
+    {
+        return (this == OMNI_RECONFIG) || (this == NO_CHANGE);
+    }
 }

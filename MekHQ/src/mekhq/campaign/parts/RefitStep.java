@@ -83,7 +83,7 @@ public class RefitStep {
         notes = "";
     }
 
-    public static RefitStep spcialOmniFixedRefit() {
+    public static RefitStep specialOmniFixedRefit() {
         RefitStep step = new RefitStep();
         step.oldLocName = "Whole Unit";
         step.newLocName = "Whole Unit";
@@ -158,7 +158,7 @@ public class RefitStep {
         if (untracked) {
             if ((oldPart instanceof AeroHeatSink) && (newPart instanceof AeroHeatSink)) {
                 AeroHeatSink oldAHS = (AeroHeatSink) oldPart;
-                AeroHeatSink newAHS = (AeroHeatSink) oldPart;
+                AeroHeatSink newAHS = (AeroHeatSink) newPart;
                 refitClass = RefitClass.CLASS_B; // Engine Heat Sinks - treating all untracked HS as this for now
                 isFixedEquipmentChange = true;
 
@@ -199,8 +199,13 @@ public class RefitStep {
             } else if (tempIsHeatSink(oldPart) && tempIsHeatSink(newPart)) {
                 EquipmentPart oldHS = (EquipmentPart) oldPart;
                 EquipmentPart newHS = (EquipmentPart) newPart;
-                refitClass = RefitClass.CLASS_B; // Engine Heat Sinks - treating all untracked HS as this for now
-                isFixedEquipmentChange = true;
+                if (oldUnit.getEntity().isOmni() && (oldUnit.getEntity() instanceof Tank)) {
+                    refitClass = RefitClass.OMNI_RECONFIG;
+                    isFixedEquipmentChange = false;
+                } else {
+                    refitClass = RefitClass.CLASS_B; // Engine Heat Sinks - treating all untracked HS as this for now
+                    isFixedEquipmentChange = true;
+                }
 
                 if(oldHS.getType().equals(newHS.getType())) {
                     if(oldHS.getQuantity() == newHS.getQuantity()) {
@@ -444,31 +449,37 @@ public class RefitStep {
 
         } else if ((oldPart instanceof MekActuator) || (oldPart instanceof MissingMekActuator)) {
             returnsPart = oldPart instanceof MekActuator ? oldPart.clone() : null;
-            refitClass = RefitClass.CLASS_A;
-            type = RefitStepType.REMOVE;
-            baseTime = 90;
-
             int oldType = oldPart instanceof MekActuator ?
                 ((MekActuator) oldPart).getType() : ((MissingMekActuator) oldPart).getType();
-            if ((oldType == Mek.ACTUATOR_HAND) || (oldType == Mek.ACTUATOR_LOWER_ARM)) {
+            
+            if (((oldType == Mek.ACTUATOR_HAND) || (oldType == Mek.ACTUATOR_LOWER_ARM))
+                    && oldUnit.getEntity().isOmni()) {
                 isFixedEquipmentChange = false;
             } else {
                 isFixedEquipmentChange = true;
             }
+            
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_A : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.REMOVE : RefitStepType.DETACH_OMNIPOD;
+            baseTime = isFixedEquipmentChange ? 90 : 30;
+
             return;
 
         } else if (newPart instanceof MekActuator) {
             neededPart = newPart.clone();
-            refitClass = RefitClass.CLASS_B;
-            type = RefitStepType.ADD;
-            baseTime = 90;
-
+            
             int newType = ((MekActuator) newPart).getType();
-            if ((newType == Mek.ACTUATOR_HAND) || (newType == Mek.ACTUATOR_LOWER_ARM)) {
+            if (((newType == Mek.ACTUATOR_HAND) || (newType == Mek.ACTUATOR_LOWER_ARM))
+                    && oldUnit.getEntity().isOmni()) {
                 isFixedEquipmentChange = false;
             } else {
                 isFixedEquipmentChange = true;
             }
+
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_B : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.ADD : RefitStepType.ATTACH_OMNIPOD;
+            baseTime = isFixedEquipmentChange ? 90 : 30;
+
             return;
 
 
@@ -674,10 +685,10 @@ public class RefitStep {
                 return;
             }
 
-            refitClass = RefitClass.CLASS_C;
-            type = RefitStepType.MOVE_AMMO;
             isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
-            baseTime = 240; // 120 out, 120 in
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_C : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.MOVE_AMMO : RefitStepType.MOVE_AMMOPOD;
+            baseTime = isFixedEquipmentChange ? 240 : 60;
             return;
 
         } else if ((oldPart instanceof AmmoBin) || (oldPart instanceof MissingAmmoBin)) {
@@ -686,10 +697,10 @@ public class RefitStep {
             oldQuantity = (oldPart instanceof AmmoBin) ? ((AmmoBin) oldPart).getCurrentShots() : 0;
             returnsPart = new AmmoStorage(0, ((AmmoBin) oldPart).getType(), oldQuantity, campaign);
 
-            refitClass = RefitClass.CLASS_A;
-            type = RefitStepType.UNLOAD;
             isFixedEquipmentChange = !oldPart.isOmniPodded();
-            baseTime = 120;
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_A : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.UNLOAD : RefitStepType.DETACH_AMMOPOD;
+            baseTime = isFixedEquipmentChange ? 120 : 30;
             return;
 
         } else if (newPart instanceof AmmoBin) {
@@ -697,10 +708,10 @@ public class RefitStep {
             newQuantity = ((AmmoBin) newPart).getFullShots();
             neededPart = new AmmoStorage(0, ((AmmoBin) newPart).getType(), newQuantity, campaign);
 
-            refitClass = RefitClass.CLASS_B;
-            type = RefitStepType.LOAD;
             isFixedEquipmentChange = !newPart.isOmniPodded();
-            baseTime = 120;
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_B : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.LOAD : RefitStepType.ATTACH_AMMOPOD;
+            baseTime = isFixedEquipmentChange ? 120 : 30;
             return; 
 
 
@@ -862,38 +873,38 @@ public class RefitStep {
                     isFixedEquipmentChange = false;
                     return;
                 } else {
-                    refitClass = RefitClass.CLASS_B;
-                    type = RefitStepType.CHANGE_FACING;
                     isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
-                    baseTime = 240; // 120 out, 120 in
+                    refitClass = isFixedEquipmentChange ? RefitClass.CLASS_B : RefitClass.OMNI_RECONFIG;
+                    type = isFixedEquipmentChange ? RefitStepType.CHANGE_FACING : RefitStepType.MOVE_OMNIPOD;
+                    baseTime = isFixedEquipmentChange ? 240 : 60;
                     return;
                 }
             }
 
-            refitClass = RefitClass.CLASS_C;
-            type = RefitStepType.MOVE;
             isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
-            baseTime = 240; // 120 out, 120 in
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_C : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.MOVE : RefitStepType.MOVE_OMNIPOD;
+            baseTime = isFixedEquipmentChange ? 240 : 60;
             return;
 
         } else if ((oldPart instanceof EquipmentPart) || (oldPart instanceof MissingEquipmentPart)) {
 
             returnsPart = (oldPart instanceof EquipmentPart) ? oldPart.clone() : null;
 
-            refitClass = RefitClass.CLASS_A;
-            type = RefitStepType.REMOVE;
             isFixedEquipmentChange = !oldPart.isOmniPodded();
-            baseTime = 120;
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_A : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.REMOVE : RefitStepType.DETACH_OMNIPOD;
+            baseTime = isFixedEquipmentChange ? 120 : 30;
             return;
         
         } else if (newPart instanceof EquipmentPart) {
 
             neededPart = newPart.clone();
 
-            refitClass = RefitClass.CLASS_B;
-            type = RefitStepType.ADD;
             isFixedEquipmentChange = !newPart.isOmniPodded();
-            baseTime = 120;
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_B : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.ADD : RefitStepType.ATTACH_OMNIPOD;
+            baseTime = isFixedEquipmentChange ? 120 : 30;
             return;
 
 
@@ -908,39 +919,43 @@ public class RefitStep {
                 return;
             }
 
-            refitClass = RefitClass.CLASS_C;
-            type = RefitStepType.MOVE;
+            isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_C : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.MOVE : RefitStepType.MOVE_OMNIPOD;
             // The MissingPart basetimes seem to be what we need...
-            if (oldPart instanceof MissingPart) {
+            if (!isFixedEquipmentChange) {
+                baseTime = 60;
+            } else if (oldPart instanceof MissingPart) {
                 baseTime = ((MissingPart) oldPart).getBaseTime() * 2;
             } else {
                 baseTime = oldPart.getMissingPart().getBaseTime() * 2;
             }
-            isFixedEquipmentChange = !(oldPart.isOmniPodded() && newPart.isOmniPodded());
             return;
         
         } else if ((oldPart instanceof Part) || (newPart instanceof MissingPart)) {
     
             returnsPart = !(oldPart instanceof MissingPart) ? oldPart.clone() : null;
 
-            refitClass = RefitClass.CLASS_A;
-            type = RefitStepType.REMOVE;
-            if (oldPart instanceof MissingPart) {
+            isFixedEquipmentChange = !oldPart.isOmniPodded();
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_A : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.REMOVE : RefitStepType.DETACH_OMNIPOD;
+            if (!isFixedEquipmentChange) {
+                baseTime = 30;
+            } else if (oldPart instanceof MissingPart) {
                 baseTime = ((MissingPart) oldPart).getBaseTime();
             } else {
                 baseTime = oldPart.getMissingPart().getBaseTime();
             }
-            isFixedEquipmentChange = !oldPart.isOmniPodded();
             return;
 
         } else if (newPart instanceof Part) {
 
             neededPart = newPart.clone();
 
-            refitClass = RefitClass.CLASS_B;
-            type = RefitStepType.ADD;
-            baseTime = newPart.getMissingPart().getBaseTime();
             isFixedEquipmentChange = !newPart.isOmniPodded();
+            refitClass = isFixedEquipmentChange ? RefitClass.CLASS_B : RefitClass.OMNI_RECONFIG;
+            type = isFixedEquipmentChange ? RefitStepType.ADD : RefitStepType.ATTACH_OMNIPOD;
+            baseTime = isFixedEquipmentChange ? newPart.getMissingPart().getBaseTime() : 30;
             return;
 
         }
@@ -955,17 +970,24 @@ public class RefitStep {
 
     // region Helpers
 
-    
-    public void omnify() {
-        type = type.omnify();
-        if (type.isOmniType()) {
-            refitClass = RefitClass.OMNI_RECONFIG;
-            if (type == RefitStepType.MOVE_AMMOPOD || type == RefitStepType.MOVE_OMNIPOD) {
-                baseTime = 60;
-            } else {
-                baseTime = 30;
-            }
+    /**
+     * @return is this step capapble of being carried out in an omni refit
+     */
+    public boolean isOmniCompatable() {
+        if (refitClass.isOmniCompatable()) {
+            return true;
         } else if (type == RefitStepType.ADD_ARMOR && isArmorDamageOnly) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Fix anything that needs to be taken care of if this is an omni refit
+     */
+    public void omniFixup() {
+        if (type == RefitStepType.ADD_ARMOR && isArmorDamageOnly) {
 
             // Want to allow omni refits on units with damaged armor.
 

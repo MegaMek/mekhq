@@ -877,17 +877,18 @@ public class Refit extends Part implements IAcquisitionWork {
 
             boolean anyFixedChanges = false;
             for (RefitStep step : stepsList) {
-                if (step.isFixedEquipmentChange()) {
+                if (!step.isOmniCompatable()) {
                     anyFixedChanges = true;
+                    break;
                 }
             }
             if (anyFixedChanges) {
-                stepsList.add(RefitStep.spcialOmniFixedRefit());
+                stepsList.add(RefitStep.specialOmniFixedRefit());
             } else {
-                isOmniRefit = true;
                 for (RefitStep step : stepsList) {
-                    step.omnify();
+                    step.omniFixup();
                 }
+                isOmniRefit = true;
             }
         }
 
