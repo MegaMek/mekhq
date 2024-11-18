@@ -53,7 +53,6 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -99,6 +98,7 @@ import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.market.enums.ContractMarketMethod.CAM_OPS;
 
 /**
  * @author Justin 'Windchild' Bowen
@@ -8010,6 +8010,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod",
                 ContractMarketMethod.values());
+        comboContractMarketMethod.removeItem(CAM_OPS);
         comboContractMarketMethod.setToolTipText(resources.getString("lblContractMarketMethod.toolTipText"));
         comboContractMarketMethod.setRenderer(new DefaultListCellRenderer() {
             @Override

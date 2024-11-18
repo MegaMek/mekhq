@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Planetary garrison infantry have been reported in the area.</additionalBriefingText>
+	<additionalBriefingText>Planetary garrison infantry are reported in the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
