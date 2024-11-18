@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -203,297 +204,296 @@ public class ReputationController {
      * @return the report text as a string
      */
     public String getReportText(Campaign campaign) {
-        StringBuilder description = new StringBuilder();
+        int titleFontSize = UIUtil.scaleForGUI(7);
+        int subtitleFontSize = UIUtil.scaleForGUI(5);
+        String indent = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
-        description.append("<html><div style='font-size:11px;'>");
-
-        description.append(String.format(resources.getString("unitReputation.text"), reputationRating));
+        StringBuilder description = new StringBuilder("<html>");
+        // HEADER
+        description.append(String.format("<div style='text-align: center;'><font size='%d'><b>%s:</b> %d</font></div>",
+            titleFontSize, campaign.getName(), reputationRating));
+        description.append(String.format("<div style='text-align: center;'><i>%s</i></div><br>",
+            resources.getString("refresh.text")));
 
         // AVERAGE EXPERIENCE RATING
-        description.append(String.format(resources.getString("averageExperienceRating.text"), averageExperienceRating));
-        description.append(String.format(resources.getString("experienceLevel.text"), averageSkillLevel.toString()));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("averageExperienceRating.text"), averageExperienceRating));
+
+        description.append("<table>");
+        description.append(String.format("<tr><td>%s<b>%s:</b></td> <td>%s</td></tr>",
+            indent, resources.getString("experienceLevel.text"), averageSkillLevel.toString()));
+
+        description.append("</table><br>");
 
         // COMMAND RATING
-        description.append(String.format(resources.getString("commandRating.text"), commanderRating));
-        description.append(String.format(resources.getString("leadership.text"), commanderMap.get("leadership")));
-        description.append(String.format(resources.getString("tactics.text"), commanderMap.get("tactics")));
-        description.append(String.format(resources.getString("strategy.text"), commanderMap.get("strategy")));
-        description.append(String.format(resources.getString("negotiation.text"), commanderMap.get("negotiation")));
-        description.append(String.format(resources.getString("traits.text"), commanderMap.get("traits")));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("commandRating.text"), commanderRating));
+
+        description.append("<table>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("leadership.text"), commanderMap.get("leadership")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("tactics.text"), commanderMap.get("tactics")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("strategy.text"), commanderMap.get("strategy")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("negotiation.text"), commanderMap.get("negotiation")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d %s<i>%s</i></td></tr>",
+            indent, resources.getString("traits.text"), commanderMap.get("traits"), indent,
+            resources.getString("traitsNotImplemented.text")));
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()
-                && (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
-            description.append(String.format(resources.getString("personality.text"), commanderMap.get("personality")))
-                    .append("<br><br>");
-        } else {
-            description.append("<br><br>");
+            && (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+                indent, resources.getString("personality.text"), commanderMap.get("personality")));
         }
+
+        description.append("</table><br>");
 
         // COMBAT RECORD RATING
-        description.append(String.format(resources.getString("combatRecordRating.text"), combatRecordRating));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("combatRecordRating.text"), combatRecordRating));
 
-        description.append(getMissionString("successes", resources.getString("successes.text"), 5));
-        description.append(getMissionString("partialSuccesses", resources.getString("partialSuccesses.text"), 0));
-        description.append(getMissionString("failures", resources.getString("failures.text"), -10));
-        description.append(getMissionString("contractsBreached", resources.getString("contractsBreached.text"), -25));
+        description.append("<table>");
+        description.append(String.format("<tr><th></th><th><b>%s</b></th><th><b>%s</b></th></tr>",
+            resources.getString("count.text"), resources.getString("modifier.text")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">+%d</td></tr>",
+            indent, resources.getString("successes.text"), combatRecordMap.get("successes"),
+            combatRecordMap.get("successes") * 5));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">+%d</td></tr>",
+            indent, resources.getString("partialSuccesses.text"), combatRecordMap.get("partialSuccesses"),
+            combatRecordMap.get("partialSuccesses")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">-%d</td></tr>",
+            indent, resources.getString("failures.text"), combatRecordMap.get("failures"),
+            combatRecordMap.get("failures") * 10));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">-%d</td></tr>",
+            indent, resources.getString("contractsBreached.text"), combatRecordMap.get("contractsBreached"),
+            combatRecordMap.get("contractsBreached") * 25));
 
         if (campaign.getRetainerStartDate() != null) {
-            description.append(getMissionString("retainerDuration", resources.getString("retainerDuration.text"), 5))
-                    .append("<br><br>");
-        } else {
-            description.append("<br><br>");
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">+%d</td></tr>",
+                indent, resources.getString("retainerDuration.text"), combatRecordMap.get("retainerDuration"),
+                combatRecordMap.get("retainerDuration") * 5));
         }
+
+        description.append("</table><br>");
 
         // TRANSPORTATION RATING
-        description.append(String.format(resources.getString("transportationRating.text"), transportationRating));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("transportationRating.text"), transportationRating));
 
-        if (transportationCapacities.get("hasJumpShipOrWarShip") == 1) {
-            description.append(resources.getString("hasJumpShipOrWarShip.text"));
-        }
+        description.append("<table>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s</td></tr>",
+            indent, resources.getString("hasJumpShipOrWarShip.text"),
+            transportationCapacities.get("hasJumpShipOrWarShip") == 1 ? "+10" : "+0"));
 
-        description.append(getDropShipString());
-        description.append(getTransportString("smallCraftCount", "smallCraftBays", "smallCraft",
-                resources.getString("smallCraft.text"), true));
-        description
-                .append(getTransportString("asfCount", "asfBays", "asf", resources.getString("fighters.text"), false));
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s</td></tr>",
+            indent, resources.getString("hasDropShip.text"),
+            transportationRequirements.get("dropShipCount") > 0 ? "+0" : "-5"));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s%s</td></tr>",
+            indent, resources.getString("capacityCombatant.text"),
+            transportationCapacities.get("capacityRating") >= 0 ? "+" : "",
+            transportationCapacities.get("capacityRating")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s%s</td></tr>",
+            indent, resources.getString("capacityNonCombatant.text"),
+            transportationValues.get("passenger") >= 0 ? "+" : "",
+            transportationValues.get("passenger")));
+        description.append("</table>");
+
+        description.append("<table>");
+        description.append(String.format("<tr><th></th><th><b>%s</b></th><th><b>%s</b></th></tr>",
+            resources.getString("required.text"), resources.getString("available.text")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("dockingCollars.text"), transportationRequirements.get("dropShipCount"),
+            transportationCapacities.get("dockingCollars")));
+
+        description.append(String.format("<tr><td><b>%s%s:*</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("smallCraft.text"), transportationRequirements.get("smallCraftCount"),
+            transportationCapacities.get("smallCraftBays")));
+
+        description.append(String.format("<tr><td><b>%s%s:*</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("fighters.text"), transportationRequirements.get("asfCount"),
+            transportationCapacities.get("asfBays")));
+
         // <50.01 compatibility handler
         try {
-            description.append(getTransportString("mekCount", "mekBays", "mek",
-                resources.getString("battleMeks.text"), false));
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+                indent, resources.getString("battleMeks.text"), transportationRequirements.get("mekCount"),
+                transportationCapacities.get("mekBays")));
         } catch (Exception e) {
-            description.append(getTransportString("mechCount", "mechBays", "mech",
-                resources.getString("battleMeks.text"), false));
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+                indent, resources.getString("battleMeks.text"), transportationRequirements.get("mechCount"),
+                transportationCapacities.get("mechBays")));
         }
 
-        description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle",
-                resources.getString("vehicleSuperHeavy.text"), true));
-        description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle",
-                resources.getString("vehicleHeavy.text"), true));
-        description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle",
-                resources.getString("vehicleLight.text"), false));
+        description.append(String.format("<tr><td><b>%s%s:*</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("vehicleSuperHeavy.text"), transportationRequirements.get("superHeavyVehicleCount"),
+            transportationCapacities.get("superHeavyVehicleBays")));
+
+        description.append(String.format("<tr><td><b>%s%s:*</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("vehicleHeavy.text"), transportationRequirements.get("heavyVehicleCount"),
+            transportationCapacities.get("heavyVehicleBays")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("vehicleLight.text"), transportationRequirements.get("lightVehicleCount"),
+            transportationCapacities.get("lightVehicleBays")));
+
         // <50.01 compatibility handler
         try {
-            description.append(getTransportString("protoMekCount", "protoMekBays",
-                "protoMek", resources.getString("protoMeks.text"), false));
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+                indent, resources.getString("protoMeks.text"), transportationRequirements.get("protoMekCount"),
+                transportationCapacities.get("protoMekBays")));
         } catch (Exception e) {
-            description.append(getTransportString("protoMechCount", "protoMechBays",
-                "protoMech", resources.getString("protoMeks.text"), false));
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+                indent, resources.getString("protoMeks.text"), transportationRequirements.get("protoMechCount"),
+                transportationCapacities.get("protoMechBays")));
         }
 
-        description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor",
-                resources.getString("battleArmor.text"), false));
-        description.append(getTransportString("infantryCount", "infantryBays", "infantry",
-                resources.getString("infantry.text"), false));
-        description.append(resources.getString("asterisk.text"));
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("battleArmor.text"), transportationRequirements.get("battleArmorCount"),
+            transportationCapacities.get("battleArmorBays")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("infantry.text"), transportationRequirements.get("infantryCount"),
+            transportationCapacities.get("infantryBays")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("passengers.text"), transportationRequirements.get("passengerCount"),
+            transportationCapacities.get("passengerCapacity")));
+
+        description.append("</table>");
+        description.append(String.format("<i>* %s</i><br><br>", resources.getString("asterisk.text")));
 
         // SUPPORT RATING
-        description.append(String.format(resources.getString("supportRating.text"), supportRating));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("supportRating.text"), supportRating));
 
-        if (crewRequirements.get("crewRequirements") < 0) {
-            description.append(resources.getString("crewRequirements.text"));
-        }
+        description.append("<table>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s</td></tr>",
+            indent, resources.getString("crewRequirements.text"),
+            crewRequirements.get("crewRequirements") >= 0 ? "+0" : "-5"));
 
-        description.append(String.format(resources.getString("administrationRequirements.text"),
-                administrationRequirements.get("personnelCount"),
-                administrationRequirements.get("administratorCount"),
-                administrationRequirements.get("total")));
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s%s</td></tr>",
+            indent, resources.getString("administrationModifier.text"),
+            administrationRequirements.get("total") >= 0 ? "+" : "",
+            administrationRequirements.get("total")));
 
-        description.append(String.format(resources.getString("technicianRequirements.text"),
-                technicianRequirements.get("rating").get(0)));
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s%s</td></tr>",
+            indent, resources.getString("TechnicianModifier.text"),
+            technicianRequirements.get("rating").get(0) >= 0 ? "+" : "",
+            technicianRequirements.get("rating").get(0)));
+        description.append("</table>");
+
+        description.append("<table>");
+        description.append(String.format("<tr><th></th><th><b>%s</b></th><th><b>%s</b></th></tr>",
+            resources.getString("required.text"), resources.getString("available.text")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("administrationRequirements.text"), administrationRequirements.get("personnelCount"),
+            administrationRequirements.get("administratorCount")));
 
         // <50.01 compatibility handler
         try {
-            description.append(getTechnicianString("mek"));
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+                indent, resources.getString("battleMeksAndProtoMeks.text"), technicianRequirements.get("mek").get(0),
+                technicianRequirements.get("mek").get(1)));
         } catch (Exception e) {
-            description.append(getTechnicianString("mech"));
+            description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                    "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+                indent, resources.getString("battleMeksAndProtoMeks.text"), technicianRequirements.get("mech").get(0),
+                technicianRequirements.get("mech").get(1)));
         }
-        description.append(getTechnicianString("vehicle"));
-        description.append(getTechnicianString("aero"));
-        description.append(getTechnicianString("battleArmor"));
 
-        description.append("<br>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("vehicles.text"), technicianRequirements.get("vehicle").get(0),
+            technicianRequirements.get("vehicle").get(1)));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("fightersAndSmallCraft.text"), technicianRequirements.get("aero").get(0),
+            technicianRequirements.get("aero").get(1)));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td style=\"text-align:center;\">" +
+                "%d</td> <td style=\"text-align:center;\">%d</td></tr>",
+            indent, resources.getString("battleArmor.text"), technicianRequirements.get("battleArmor").get(0),
+            technicianRequirements.get("battleArmor").get(1)));
+        description.append("</table><br>");
 
         // FINANCIAL RATING
-        description.append(String.format(resources.getString("financialRating.text"), financialRating));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("financialRating.text"), financialRating));
 
-        if ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) {
-            description.append(resources.getString("hasLoanOrDebt.text"));
-        } else {
-            description.append("<br>");
-        }
+        description.append("<table>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s</td></tr>",
+            indent, resources.getString("hasLoanOrDebt.text"),
+            ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) ? "-10" : "0"));
+        description.append("</table><br>");
 
         // CRIME RATING
-        description.append(String.format(resources.getString("crimeRating.text"), crimeRating));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("crimeRating.text"), crimeRating));
+
+        description.append("<table>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("piracy.text"), crimeRatingMap.get("piracy")));
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("otherCrimes.text"), crimeRatingMap.get("other")));
+        description.append("</table>");
 
         if (crimeRating < 0) {
-            int piracy = crimeRatingMap.get("piracy");
-            if (piracy < 0) {
-                description.append(String.format(resources.getString("piracy.text"), piracy));
-            }
-
-            int otherCrimes = crimeRatingMap.get("other");
-            if (otherCrimes < 0) {
-                description.append(String.format(resources.getString("otherCrimes.text"), otherCrimes));
-            }
-
-            description.append(String.format(resources.getString("dateOfLastCrime.text"), dateOfLastCrime));
-        } else {
-            description.append("<br>");
+            description.append(String.format("<b>%s%s:</b> %s<br>", indent,
+                resources.getString("dateOfLastCrime.text"), dateOfLastCrime == null ? "" : dateOfLastCrime));
         }
 
         // OTHER MODIFIERS
-        description.append(String.format(resources.getString("otherModifiers.text"), otherModifiers));
+        description.append(String.format("<b><font size='%d'>%s: %d</font></b><br>",
+            subtitleFontSize, resources.getString("otherModifiers.text"), otherModifiers));
 
-        int inactiveYears = otherModifiersMap.get("inactiveYears");
+        description.append("<table>");
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td> <td>%d</td></tr>",
+            indent, resources.getString("inactiveYears.text"), otherModifiersMap.get("inactiveYears"),
+            otherModifiersMap.get("inactiveYears") * -5));
 
-        if (inactiveYears > 0) {
-            description.append(String.format(resources.getString("inactiveYears.text"), -inactiveYears * 5));
-        }
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
+            indent, resources.getString("customModifier.text"), otherModifiersMap.get("customModifier")));
+        description.append("</table>");
 
-        int customModifier = otherModifiersMap.get("customModifier");
-
-        if (customModifier != 0) {
-            String modifier = String.format("(%+d)", customModifier);
-            description.append(String.format(resources.getString("customModifier.text"), modifier));
-        }
-
-        description.append("</div></html>");
+        description.append("</html>");
 
         return description.toString();
-    }
-
-    /**
-     * Appends the technician requirement information for the given type.
-     * If the technician requirement exceeds 0, it generates an HTML formatted
-     * string
-     * with the technician label and the current count and maximum count of
-     * technicians.
-     *
-     * @param type the type of technician requirement (mek, vehicle, aero,
-     *             battleArmor)
-     * @return the generated technician requirement string in HTML format,
-     *         or an empty string if either technicianRequirement value is 0.
-     */
-    private String getTechnicianString(String type) {
-        List<Integer> technicianRequirement = technicianRequirements.get(type);
-
-        if ((technicianRequirement.get(0) > 0) || (technicianRequirement.get(1) > 0)) {
-            String label = switch (type) {
-                // <50.01 compatibility handler
-                case "mek", "mech" -> resources.getString("battleMeksAndProtoMeks.text");
-                case "vehicle" -> resources.getString("vehicles.text");
-                case "aero" -> resources.getString("fightersAndSmallCraft.text");
-                case "battleArmor" -> resources.getString("battleArmor.text");
-                default -> throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/rating/CamOpsReputation/ReputationController.java/getTechnicianString: "
-                                + type);
-            };
-
-            return String.format(resources.getString("technicianString.text"),
-                    label,
-                    technicianRequirement.get(0),
-                    technicianRequirement.get(1));
-        }
-
-        return "";
-    }
-
-    /**
-     * Generates the mission string with the given key, label, and multiplier.
-     *
-     * @param key        the key for accessing the combat record count
-     * @param label      the label to be displayed in the mission string
-     * @param multiplier the multiplier to apply to the count
-     * @return the generated mission string, formatted as
-     *         "<br>
-     *         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (count *
-     *         multiplier)<br>
-     *         ", or null if the count is <= 0
-     */
-    private String getMissionString(String key, String label, int multiplier) {
-        int count = combatRecordMap.get(key);
-        int total = count * multiplier;
-
-        if (count > 0) {
-            return String.format(resources.getString("mission.text"),
-                    label,
-                    count,
-                    String.format(total > 0 ? "+%d" : "%d", total));
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Generates DropShip string information for the unit report
-     *
-     * @return the generated string in HTML format, formatted as
-     *         "<br>
-     *         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>unitCount / bayCapacity
-     *         Docking Collars (modifier)<br>
-     *         "
-     */
-    private String getDropShipString() {
-        int unitCount = transportationRequirements.get("dropShipCount");
-        int bayCapacity = transportationCapacities.get("dockingCollars");
-        String modifier = "0";
-
-        if (unitCount == 0) {
-            modifier = resources.getString("noDropShip.text");
-        } else if (bayCapacity >= unitCount) {
-            modifier = "+5";
-        }
-
-        return String.format(resources.getString("dropShipString.text"),
-                unitCount,
-                bayCapacity,
-                modifier);
-    }
-
-    /**
-     * Generates a transport string with the given unitKey, bayKey, valueKey, label,
-     * and displayAsterisk.
-     *
-     * @param unitKey         the key to access the unit count in the
-     *                        transportationRequirements map
-     * @param bayKey          the key to access the bay capacity in the
-     *                        transportationCapacities map
-     * @param valueKey        the key to access the rating in the
-     *                        transportationValues map
-     * @param label           the label to be displayed in the transport string
-     * @param displayAsterisk whether to display an asterisk in the transport string
-     * @return the generated transport string in HTML format, formatted as
-     *         "<br>
-     *         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>unitCount / bayCount Bays*
-     *         modifier<br>
-     *         ", or an empty string if unitCount and bayCount
-     *         are both 0
-     */
-    private String getTransportString(String unitKey, String bayKey, String valueKey, String label,
-            boolean displayAsterisk) {
-        int unitCount = transportationRequirements.get(unitKey);
-        int bayCount = transportationCapacities.get(bayKey);
-        int rating = transportationValues.get(valueKey);
-
-        String asterisk = displayAsterisk ? "*" : "";
-        String modifier = "";
-
-        if (unitCount > 0 || bayCount > 0) {
-            if (rating > 0) {
-                modifier = String.format("(+%d)", rating);
-            } else if (rating < 0) {
-                modifier = String.format("(%d)", rating);
-            }
-
-            return String.format(resources.getString("transportString.text"),
-                    label,
-                    unitCount,
-                    bayCount,
-                    asterisk,
-                    modifier);
-        } else {
-            return "";
-        }
     }
 
     /**
@@ -587,8 +587,6 @@ public class ReputationController {
      * @param map    the map to write to XML, where the keys are strings, and the
      *               values can be any type
      * @param <T>    the type of the values in the map
-     * @return the updated value of the indent parameter after writing the map to
-     *         XML
      */
     private <T> void writeMapToXML(final PrintWriter pw, final int indent, final Map<String, T> map) {
         for (String key : map.keySet()) {
