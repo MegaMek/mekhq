@@ -210,13 +210,7 @@ public class TransportationRating {
                     yield AT_CAPACITY;
                 }
             }
-            case DOUBLE_CAPACITY -> switch (rating) {
-                case DOUBLE_CAPACITY -> DOUBLE_CAPACITY;
-                case BELOW_CAPACITY -> BELOW_CAPACITY;
-                case AT_CAPACITY -> AT_CAPACITY;
-                default -> capacityRating; // USE_FALLBACK
-            };
-            default -> USE_FALLBACK;
+            default -> rating; // Use Fallback, or Double Capacity
         };
     }
 
