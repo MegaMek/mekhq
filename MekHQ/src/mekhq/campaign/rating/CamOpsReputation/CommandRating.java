@@ -18,10 +18,6 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -31,6 +27,10 @@ import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);
@@ -82,15 +82,20 @@ public class CommandRating {
      * @param skill  the skill
      */
     private static int getSkillValue(Person person, String skill) {
+        int skillValue = 0;
+
         if (person == null) {
             return 0;
         }
 
         if (person.hasSkill(skill)) {
-            return person.getSkill(skill).getExperienceLevel();
+            skillValue += person.getSkill(skill).getLevel();
+            skillValue += person.getSkill(skill).getBonus();
         } else {
             return 0;
         }
+
+        return skillValue;
     }
 
     /**
