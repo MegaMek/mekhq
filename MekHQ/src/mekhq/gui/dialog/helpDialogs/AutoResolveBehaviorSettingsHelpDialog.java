@@ -16,9 +16,7 @@ public class AutoResolveBehaviorSettingsHelpDialog extends AbstractHelpDialog {
 
     /**
      * Creates a new instance of AutoResolveBehaviorSettingsHelpDialog.
-     * <p>
      * This screen opens a help dialog, using the megamek help dialog, which open an HTML file
-     * </p>
      * @param frame  parent frame
      */
     public AutoResolveBehaviorSettingsHelpDialog(final JFrame frame) {
