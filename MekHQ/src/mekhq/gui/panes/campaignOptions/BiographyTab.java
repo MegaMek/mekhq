@@ -766,7 +766,7 @@ public class BiographyTab {
         // Create the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DeathAgeGroupsPanel", true,
             "DeathAgeGroupsPanel");
-        panel.setLayout(new GridLayout(ageGroups.length / 2, 1));
+        panel.setLayout(new GridLayout((ageGroups.length / 2) + 1, 1));
 
         // Contents
         for (final AgeGroup ageGroup : ageGroups) {
