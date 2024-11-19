@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-    <additionalBriefingText>Your force will be deployed under the command of an allied commander.</additionalBriefingText>
+    <additionalBriefingText>Your employer is dispatching a force to assist with this objective.</additionalBriefingText>
     <allowedMapLocations>
         <allowedMapLocation>AllGroundTerrain</allowedMapLocation>
         <allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -18,14 +18,14 @@
         <deployOffboard>false</deployOffboard>
         <deploymentZones />
         <destinationZone>5</destinationZone>
-        <fixedUnitCount>1</fixedUnitCount>
-        <forceAlignment>0</forceAlignment>
-        <forceMultiplier>1.0</forceMultiplier>
-        <forceName>Allied Commander</forceName>
-        <generationMethod>3</generationMethod>
+        <fixedUnitCount>0</fixedUnitCount>
+        <forceAlignment>1</forceAlignment>
+        <forceMultiplier>0.25</forceMultiplier>
+        <forceName>Joint Force</forceName>
+        <generationMethod>2</generationMethod>
         <generationOrder>1</generationOrder>
         <maxWeightClass>4</maxWeightClass>
-        <minWeightClass>3</minWeightClass>
+        <minWeightClass>2</minWeightClass>
         <retreatThreshold>0</retreatThreshold>
         <startingAltitude>0</startingAltitude>
         <objectiveLinkedForces>

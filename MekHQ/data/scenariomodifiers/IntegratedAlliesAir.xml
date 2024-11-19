@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-    <additionalBriefingText>Your force will be deployed as part of an integrated unit.</additionalBriefingText>
+    <additionalBriefingText>Your employer has deployed you alongside an integrated force.</additionalBriefingText>
     <benefitsPlayer>true</benefitsPlayer>
     <eventTiming>PreForceGeneration</eventTiming>
     <forceDefinition>
@@ -14,11 +14,11 @@
         <deployOffboard>false</deployOffboard>
         <deploymentZones />
         <destinationZone>5</destinationZone>
-        <fixedUnitCount>2</fixedUnitCount>
+        <fixedUnitCount>0</fixedUnitCount>
         <forceAlignment>1</forceAlignment>
-        <forceMultiplier>1.0</forceMultiplier>
+        <forceMultiplier>0.5</forceMultiplier>
         <forceName>Integrated Allies</forceName>
-        <generationMethod>3</generationMethod>
+        <generationMethod>2</generationMethod>
         <generationOrder>1</generationOrder>
         <maxWeightClass>4</maxWeightClass>
         <minWeightClass>1</minWeightClass>
