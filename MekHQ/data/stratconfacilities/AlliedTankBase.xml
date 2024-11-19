@@ -5,7 +5,6 @@
     <localModifiers>AlliedTankGarrison.xml</localModifiers>
     <owner>Allied</owner>
     <sharedModifiers>AlliedTankReinforcements.xml</sharedModifiers>
-    <userDescription>Allied vehicles will participate in scenarios on this track and defend this
-        facility.</userDescription>
+    <userDescription>Allied vehicles will participate in scenarios on this track and defend this facility.</userDescription>
     <visible>true</visible>
 </StratconFacility>

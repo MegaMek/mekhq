@@ -141,6 +141,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
@@ -269,6 +270,7 @@ public class Campaign implements ITechManager {
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
     private FameAndInfamyController fameAndInfamy;
+    private List<Unit> automatedMothballUnits;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -336,6 +338,7 @@ public class Campaign implements ITechManager {
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
         fameAndInfamy = new FameAndInfamyController();
+        automatedMothballUnits = new ArrayList<>();
     }
 
     /**
@@ -3662,6 +3665,12 @@ public class Campaign implements ITechManager {
                 }
             }
 
+            if (Objects.equals(location.getCurrentSystem(), contract.getSystem())) {
+                if (!automatedMothballUnits.isEmpty()) {
+                    performAutomatedActivation(this);
+                }
+            }
+
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
                     if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
@@ -4599,16 +4608,19 @@ public class Campaign implements ITechManager {
         // otherwise we would need to check it once for each active person in the
         // campaign
         if (campaignOptions.isUseFatigue()) {
-            long validPersonnel;
+            int personnelCount;
 
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                validPersonnel = getActivePersonnel().stream()
-                        .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
-                        .count();
+                personnelCount = (int) getActivePersonnel().stream()
+                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
+                    .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
+                    .count();
             } else {
-                validPersonnel = getActivePersonnel().size();
+                personnelCount = (int) getActivePersonnel().stream()
+                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
+                    .count();
             }
-            fieldKitchenWithinCapacity = validPersonnel <= Fatigue.checkFieldKitchenCapacity(this);
+            fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;
         }
@@ -5311,6 +5323,14 @@ public class Campaign implements ITechManager {
         return fameAndInfamy;
     }
 
+    public List<Unit> getAutomatedMothballUnits() {
+        return automatedMothballUnits;
+    }
+
+    public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
+        this.automatedMothballUnits = automatedMothballUnits;
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -5492,6 +5512,12 @@ public class Campaign implements ITechManager {
         }
 
         retirementDefectionTracker.writeToXML(pw, indent);
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
+        for (Unit unit : automatedMothballUnits) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
 
         // Customised planetary events
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
@@ -8375,4 +8401,27 @@ public class Campaign implements ITechManager {
     public boolean showExtinct() {
         return !campaignOptions.isDisallowExtinctStuff();
     }
+
+    /**
+     * Gets a string to use for addressing the commander.
+     * If no commander is flagged, returns a default address.
+     *
+     * @return The title of the commander, or a default string if no commander.
+     */
+    public String getCommanderAddress() {
+        Person commander = getFlaggedCommander();
+
+        if (commander == null) {
+            return resources.getString("generalFallbackAddress.text");
+        }
+
+        String commanderRank = commander.getRankName();
+
+        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
+            return commander.getFullName();
+        }
+
+        return commanderRank;
+    }
+
 }

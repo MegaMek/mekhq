@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,22 +29,24 @@ import java.util.ResourceBundle;
  * Identifies the standard tabs and provides a creation method.
  * The mnemonics used in this are included in the list at {@link CampaignGUI#initMenu()}, and they
  * MUST be unique on that list.
+ * The order in which the tabs appear on onthe CampaignGUI is determined by the order in which they
+ * are declared here.
  * @author Neoancient
  */
 public enum MHQTabType {
     //region Enum Declaration
     COMMAND_CENTER("MHQTabType.COMMAND_CENTER.text", KeyEvent.VK_O),
+    INTERSTELLAR_MAP("MHQTabType.INTERSTELLAR_MAP.text", KeyEvent.VK_S),
     TOE("MHQTabType.TOE.text", KeyEvent.VK_T),
     BRIEFING_ROOM("MHQTabType.BRIEFING_ROOM.text", KeyEvent.VK_B),
-    INTERSTELLAR_MAP("MHQTabType.INTERSTELLAR_MAP.text", KeyEvent.VK_S),
+    STRAT_CON("MHQTabType.STRAT_CON.text", KeyEvent.VK_C),
     PERSONNEL("MHQTabType.PERSONNEL.text", KeyEvent.VK_P),
     HANGAR("MHQTabType.HANGAR.text", KeyEvent.VK_H),
-    WAREHOUSE("MHQTabType.WAREHOUSE.text", KeyEvent.VK_W),
     REPAIR_BAY("MHQTabType.REPAIR_BAY.text", KeyEvent.VK_R),
+    WAREHOUSE("MHQTabType.WAREHOUSE.text", KeyEvent.VK_W),
     INFIRMARY("MHQTabType.INFIRMARY.text", KeyEvent.VK_I),
     FINANCES("MHQTabType.FINANCES.text", KeyEvent.VK_N),
-    MEK_LAB("MHQTabType.MEK_LAB.text", KeyEvent.VK_L),
-    STRAT_CON("MHQTabType.STRAT_CON.text", KeyEvent.VK_C);
+    MEK_LAB("MHQTabType.MEK_LAB.text", KeyEvent.VK_L);
     //endregion Enum Declaration
 
     //region Variable Declarations

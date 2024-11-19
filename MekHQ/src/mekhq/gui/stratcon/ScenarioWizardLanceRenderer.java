@@ -56,7 +56,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
             roleString = lance.getRole().toString() + ", ";
         }
 
-        setText(String.format("%s (%sBV: %d)", value.getName(), roleString, value.getTotalBV(campaign, false)));
+        setText(String.format("%s (%sBV: %d)", value.getName(), roleString, value.getTotalBV(campaign, true)));
 
         return this;
     }

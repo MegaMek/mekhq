@@ -3777,7 +3777,9 @@ public class Person {
     }
 
     public int getMaintenanceTimeUsing() {
-        return getTechUnits().stream().mapToInt(Unit::getMaintenanceTime).sum();
+        return getTechUnits().stream()
+            .filter(unit -> !(unit.isRefitting() && unit.getRefit().getTech() == this))
+            .mapToInt(Unit::getMaintenanceTime).sum();
     }
 
     public boolean isMothballing() {

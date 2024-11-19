@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -68,10 +68,10 @@ public class StratconContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int numTracks = Math.max(1, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
-        for (int x = 0; x < numTracks; x++) {
+        for (int x = 0; x < maximumTrackIndex; x++) {
             int scenarioOdds = contractDefinition.getScenarioOdds()
                     .get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
             int deploymentTime = contractDefinition.getDeploymentTimes()
@@ -79,7 +79,7 @@ public class StratconContractInitializer {
 
             StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime,
                     planetaryTemperature);
-            track.setDisplayableName(String.format("Track %d", x));
+            track.setDisplayableName(String.format("Sector %d", x));
             campaignState.addTrack(track);
         }
 
@@ -95,7 +95,7 @@ public class StratconContractInitializer {
 
             StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime,
                     planetaryTemperature);
-            track.setDisplayableName(String.format("Track %d", campaignState.getTracks().size()));
+            track.setDisplayableName(String.format("Sector %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
 
@@ -289,6 +289,13 @@ public class StratconContractInitializer {
 
             StratconCoords coords = getUnoccupiedCoords(trackState);
 
+            if (coords == null) {
+                logger.warn(String.format("Unable to place facility on track %s," +
+                        " as all coords were occupied. Aborting.",
+                    trackState.getDisplayableName()));
+                return;
+            }
+
             trackState.addFacility(coords, sf);
 
             if (strategicObjective) {
@@ -336,6 +343,13 @@ public class StratconContractInitializer {
 
             StratconCoords coords = getUnoccupiedCoords(trackState);
 
+            if (coords == null) {
+                logger.error(String.format("Unable to place objective scenario on track %s," +
+                        " as all coords were occupied. Aborting.",
+                    trackState.getDisplayableName()));
+                return;
+            }
+
             // facility
             if (template.isFacilityScenario()) {
                 StratconFacility facility = template.isHostileFacility()
@@ -376,18 +390,24 @@ public class StratconContractInitializer {
      * Utility function that, given a track state, picks a random set of unoccupied
      * coordinates.
      */
-    private static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
-        // plonk
+    public static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
+        // Maximum number of attempts
+        int maxAttempts = trackState.getWidth() * trackState.getHeight();
+        int attempts = 0;
+
         int x = Compute.randomInt(trackState.getWidth());
         int y = Compute.randomInt(trackState.getHeight());
         StratconCoords coords = new StratconCoords(x, y);
 
-        // make sure we don't put the facility down on top of anything else
-        while ((trackState.getFacility(coords) != null) ||
-                (trackState.getScenario(coords) != null)) {
+        while ((trackState.getFacility(coords) != null || trackState.getScenario(coords) != null) && attempts < maxAttempts) {
             x = Compute.randomInt(trackState.getWidth());
             y = Compute.randomInt(trackState.getHeight());
             coords = new StratconCoords(x, y);
+            attempts++;
+        }
+
+        if (attempts == maxAttempts) {
+            return null;
         }
 
         return coords;

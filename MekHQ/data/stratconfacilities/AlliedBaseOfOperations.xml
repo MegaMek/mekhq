@@ -8,8 +8,8 @@
 	<localModifiers>AlliedTurrets.xml</localModifiers>
 	<localModifiers>AlliedOfficerMek.xml</localModifiers>
 	<sharedModifiers>AlliedOfficerMek.xml</sharedModifiers>
-	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in
-		a Mek. &lt;br&gt;
-		The commander will participate in scenarios on this track.</userDescription>
+	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a Mek.
+
+        The commander will participate in scenarios on this track.</userDescription>
 	<visible>true</visible>
 </StratconFacility>

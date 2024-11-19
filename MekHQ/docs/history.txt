@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.01-SNAPSHOT
+0.50.02-SNAPSHOT
+
+0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
 + FIX #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
 + PR #4655: Refactored Random Company Name Generator to Use CSV
@@ -161,6 +163,33 @@ MEKHQ VERSION HISTORY:
 + PR #5121: Label OmniUnits as Omni in the MekHQ UI
 + Fix #5119 && #5108 && #4297 Fixed Position of NewDayEvent Trigger in processNewDay
 + PR #5126: Rebalanced Random Unit Quality
++ Fix #5131: Fixed Faction Conflict Checks for Reeducation Camps
++ PR #5137: Stopped Scenarios Pulling Units from the Hangar
++ Fix #5139: Refactored Field Kitchen Personnel Count Logic
++ PR #5141: Handled StratCon Scenario Placement Failure when All Coordinates Occupied
++ PR #5142: Added New StratCon Scenario Generation Utility Method
++ PR #5143: Fix Track Calculation in StratconContractInitializer
++ PR #5144: [FG3] Adjusted Generation Method in Some Scenarios
++ PR #5145: [FG3] Refactored Difficulty Multiplier Application
++ PR #5146: Adjusted Scenario Loot Box Behavior
++ PR #5147: Refactored JScrollPaneWithSpeed Constructor
++ PR #5148: ResolveScenarioWizardDialog - Rebuild as a tabbed dialog, improve UI
++ PR #5151: Fixed Line Breaks in StratCon Facility Descriptions
++ PR #5152: Update odds add lightning storm and adjust others
++ PR #5154: Renamed Tracks and AtB Campaign State in StratCon
++ PR #5156: Refactor Supply Depot SP Modifiers to be Monthly
++ PR #5157: Fixed StratCon Reinforcement Deployment Check
++ PR #5159: CampaignGUI Tab reordering
++ PR #5161: Changed wording in "Potential Capture Style"
++ PR #5163: Added Force BV Multiplier Logging & Adjusted Calculation in AtBDynamicScenarioFactory
++ FIX #5160, #5162: Updated Infantry Generation Method and Trainee Settings
++ PR #5168: StratCon will No Longer Display GBV when Using FG3
++ PR #5172: Added Contract Automation
++ PR #5174: Updated Faction Loading Log Format
++ PR #5175: Temporarily Disabled Preset Confirm in New Campaign Dialog
++ PR #5176: Temporarily Removed CAM_OPS from Contract Market Method ComboBox
++ PR #5179: Fix Perm. Injury showing as Injury on Personnel tabel
++ PR #5180: Show refitting techs and fix refit countdown
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)

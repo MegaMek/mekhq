@@ -2,8 +2,7 @@
 <!--
 for a given key the chance is value / sum(odds values)
 example 10 / sum(100) = 0.1 or 10%
-mekhq.log contains TerrainConditionsOddsManifest validations to help find errors. only runs once on
-startup
+mekhq.log contains TerrainConditionsOddsManifest validations to help find errors. only runs once on startup
 can delete this file to reload defaults
 -->
 
@@ -43,32 +42,32 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>LIGHT_PITCH_BLACK</key>
-                <value>1</value>
-            </entry>
-            <entry>
-                <key>LIGHT_DUSK</key>
-                <value>200</value>
-            </entry>
-            <entry>
-                <key>LIGHT_FULL_MOON</key>
-                <value>70</value>
-            </entry>
-            <entry>
-                <key>LIGHT_DAY</key>
-                <value>600</value>
-            </entry>
-            <entry>
-                <key>LIGHT_SOLAR_FLARE</key>
-                <value>30</value>
+                <key>LIGHT_MOONLESS</key>
+                <value>60</value>
             </entry>
             <entry>
                 <key>LIGHT_GLARE</key>
-                <value>30</value>
+                <value>10</value>
             </entry>
             <entry>
-                <key>LIGHT_MOONLESS</key>
-                <value>69</value>
+                <key>LIGHT_SOLAR_FLARE</key>
+                <value>9</value>
+            </entry>
+            <entry>
+                <key>LIGHT_DAY</key>
+                <value>680</value>
+            </entry>
+            <entry>
+                <key>LIGHT_FULL_MOON</key>
+                <value>60</value>
+            </entry>
+            <entry>
+                <key>LIGHT_DUSK</key>
+                <value>180</value>
+            </entry>
+            <entry>
+                <key>LIGHT_PITCH_BLACK</key>
+                <value>1</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -84,32 +83,32 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>LIGHT_PITCH_BLACK</key>
-                <value>10</value>
-            </entry>
-            <entry>
-                <key>LIGHT_DUSK</key>
-                <value>20</value>
-            </entry>
-            <entry>
-                <key>LIGHT_FULL_MOON</key>
-                <value>9</value>
-            </entry>
-            <entry>
-                <key>LIGHT_DAY</key>
-                <value>50</value>
-            </entry>
-            <entry>
-                <key>LIGHT_SOLAR_FLARE</key>
-                <value>1</value>
+                <key>LIGHT_MOONLESS</key>
+                <value>115</value>
             </entry>
             <entry>
                 <key>LIGHT_GLARE</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
-                <key>LIGHT_MOONLESS</key>
-                <value>9</value>
+                <key>LIGHT_SOLAR_FLARE</key>
+                <value>10</value>
+            </entry>
+            <entry>
+                <key>LIGHT_DAY</key>
+                <value>540</value>
+            </entry>
+            <entry>
+                <key>LIGHT_FULL_MOON</key>
+                <value>115</value>
+            </entry>
+            <entry>
+                <key>LIGHT_DUSK</key>
+                <value>200</value>
+            </entry>
+            <entry>
+                <key>LIGHT_PITCH_BLACK</key>
+                <value>10</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -138,32 +137,32 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>WIND_STORM</key>
-                <value>3</value>
-            </entry>
-            <entry>
-                <key>WIND_MOD_GALE</key>
-                <value>10</value>
-            </entry>
-            <entry>
-                <key>WIND_TORNADO_F1_TO_F3</key>
-                <value>2</value>
-            </entry>
-            <entry>
-                <key>WIND_LIGHT_GALE</key>
-                <value>10</value>
-            </entry>
-            <entry>
-                <key>WIND_CALM</key>
-                <value>70</value>
+                <key>WIND_STRONG_GALE</key>
+                <value>32</value>
             </entry>
             <entry>
                 <key>WIND_TORNADO_F4</key>
                 <value>1</value>
             </entry>
             <entry>
-                <key>WIND_STRONG_GALE</key>
-                <value>4</value>
+                <key>WIND_CALM</key>
+                <value>730</value>
+            </entry>
+            <entry>
+                <key>WIND_LIGHT_GALE</key>
+                <value>140</value>
+            </entry>
+            <entry>
+                <key>WIND_TORNADO_F1_TO_F3</key>
+                <value>2</value>
+            </entry>
+            <entry>
+                <key>WIND_MOD_GALE</key>
+                <value>90</value>
+            </entry>
+            <entry>
+                <key>WIND_STORM</key>
+                <value>5</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -189,31 +188,31 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>WIND_STORM</key>
-                <value>5</value>
-            </entry>
-            <entry>
-                <key>WIND_MOD_GALE</key>
-                <value>14</value>
-            </entry>
-            <entry>
-                <key>WIND_TORNADO_F1_TO_F3</key>
-                <value>4</value>
-            </entry>
-            <entry>
-                <key>WIND_LIGHT_GALE</key>
-                <value>15</value>
-            </entry>
-            <entry>
-                <key>WIND_CALM</key>
-                <value>50</value>
+                <key>WIND_STRONG_GALE</key>
+                <value>100</value>
             </entry>
             <entry>
                 <key>WIND_TORNADO_F4</key>
-                <value>2</value>
+                <value>3</value>
             </entry>
             <entry>
-                <key>WIND_STRONG_GALE</key>
+                <key>WIND_CALM</key>
+                <value>500</value>
+            </entry>
+            <entry>
+                <key>WIND_LIGHT_GALE</key>
+                <value>200</value>
+            </entry>
+            <entry>
+                <key>WIND_TORNADO_F1_TO_F3</key>
+                <value>7</value>
+            </entry>
+            <entry>
+                <key>WIND_MOD_GALE</key>
+                <value>180</value>
+            </entry>
+            <entry>
+                <key>WIND_STORM</key>
                 <value>10</value>
             </entry>
         </odds>
@@ -237,15 +236,15 @@ can delete this file to reload defaults
         <odds>
             <entry>
                 <key>WEATHER_LIGHTNING_STORM</key>
-                <value>0</value>
+                <value>5</value>
             </entry>
             <entry>
                 <key>WEATHER_DOWNPOUR</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
             <entry>
                 <key>WEATHER_SLEET</key>
-                <value>3</value>
+                <value>30</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_HAIL</key>
@@ -253,7 +252,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_MOD_RAIN</key>
-                <value>4</value>
+                <value>40</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_HAIL</key>
@@ -261,35 +260,35 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_RAIN</key>
-                <value>4</value>
+                <value>40</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_SNOW</key>
-                <value>6</value>
+                <value>60</value>
             </entry>
             <entry>
                 <key>WEATHER_GUSTING_RAIN</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
             <entry>
                 <key>WEATHER_CLEAR</key>
-                <value>67</value>
+                <value>670</value>
             </entry>
             <entry>
                 <key>WEATHER_ICE_STORM</key>
-                <value>1</value>
+                <value>5</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_RAIN</key>
-                <value>7</value>
+                <value>70</value>
             </entry>
             <entry>
                 <key>WEATHER_MOD_SNOW</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_SNOW</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -305,15 +304,15 @@ can delete this file to reload defaults
         <odds>
             <entry>
                 <key>WEATHER_LIGHTNING_STORM</key>
-                <value>0</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_DOWNPOUR</key>
-                <value>5</value>
+                <value>50</value>
             </entry>
             <entry>
                 <key>WEATHER_SLEET</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_HAIL</key>
@@ -321,7 +320,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_MOD_RAIN</key>
-                <value>12</value>
+                <value>120</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_HAIL</key>
@@ -329,19 +328,19 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_RAIN</key>
-                <value>10</value>
+                <value>100</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_SNOW</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_GUSTING_RAIN</key>
-                <value>8</value>
+                <value>80</value>
             </entry>
             <entry>
                 <key>WEATHER_CLEAR</key>
-                <value>47</value>
+                <value>460</value>
             </entry>
             <entry>
                 <key>WEATHER_ICE_STORM</key>
@@ -349,7 +348,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_RAIN</key>
-                <value>16</value>
+                <value>160</value>
             </entry>
             <entry>
                 <key>WEATHER_MOD_SNOW</key>
@@ -371,15 +370,15 @@ can delete this file to reload defaults
         <odds>
             <entry>
                 <key>WEATHER_LIGHTNING_STORM</key>
-                <value>0</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_DOWNPOUR</key>
-                <value>6</value>
+                <value>60</value>
             </entry>
             <entry>
                 <key>WEATHER_SLEET</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_HAIL</key>
@@ -387,7 +386,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_MOD_RAIN</key>
-                <value>10</value>
+                <value>100</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_HAIL</key>
@@ -395,35 +394,35 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_RAIN</key>
-                <value>8</value>
+                <value>80</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_SNOW</key>
-                <value>6</value>
+                <value>60</value>
             </entry>
             <entry>
                 <key>WEATHER_GUSTING_RAIN</key>
-                <value>6</value>
+                <value>60</value>
             </entry>
             <entry>
                 <key>WEATHER_CLEAR</key>
-                <value>46</value>
+                <value>450</value>
             </entry>
             <entry>
                 <key>WEATHER_ICE_STORM</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_RAIN</key>
-                <value>12</value>
+                <value>120</value>
             </entry>
             <entry>
                 <key>WEATHER_MOD_SNOW</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_SNOW</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -446,15 +445,15 @@ can delete this file to reload defaults
         <odds>
             <entry>
                 <key>WEATHER_LIGHTNING_STORM</key>
-                <value>0</value>
+                <value>5</value>
             </entry>
             <entry>
                 <key>WEATHER_DOWNPOUR</key>
-                <value>1</value>
+                <value>5</value>
             </entry>
             <entry>
                 <key>WEATHER_SLEET</key>
-                <value>8</value>
+                <value>80</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_HAIL</key>
@@ -462,7 +461,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_MOD_RAIN</key>
-                <value>3</value>
+                <value>30</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_HAIL</key>
@@ -470,35 +469,35 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_RAIN</key>
-                <value>3</value>
+                <value>30</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_SNOW</key>
-                <value>12</value>
+                <value>120</value>
             </entry>
             <entry>
                 <key>WEATHER_GUSTING_RAIN</key>
-                <value>1</value>
-            </entry>
-            <entry>
-                <key>WEATHER_CLEAR</key>
-                <value>46</value>
-            </entry>
-            <entry>
-                <key>WEATHER_ICE_STORM</key>
-                <value>4</value>
-            </entry>
-            <entry>
-                <key>WEATHER_LIGHT_RAIN</key>
-                <value>6</value>
-            </entry>
-            <entry>
-                <key>WEATHER_MOD_SNOW</key>
                 <value>10</value>
             </entry>
             <entry>
+                <key>WEATHER_CLEAR</key>
+                <value>460</value>
+            </entry>
+            <entry>
+                <key>WEATHER_ICE_STORM</key>
+                <value>40</value>
+            </entry>
+            <entry>
+                <key>WEATHER_LIGHT_RAIN</key>
+                <value>60</value>
+            </entry>
+            <entry>
+                <key>WEATHER_MOD_SNOW</key>
+                <value>100</value>
+            </entry>
+            <entry>
                 <key>WEATHER_HEAVY_SNOW</key>
-                <value>6</value>
+                <value>60</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -523,7 +522,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_SLEET</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_HAIL</key>
@@ -531,7 +530,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_MOD_RAIN</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_HEAVY_HAIL</key>
@@ -543,7 +542,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_SNOW</key>
-                <value>1</value>
+                <value>10</value>
             </entry>
             <entry>
                 <key>WEATHER_GUSTING_RAIN</key>
@@ -551,7 +550,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_CLEAR</key>
-                <value>95</value>
+                <value>950</value>
             </entry>
             <entry>
                 <key>WEATHER_ICE_STORM</key>
@@ -559,7 +558,7 @@ can delete this file to reload defaults
             </entry>
             <entry>
                 <key>WEATHER_LIGHT_RAIN</key>
-                <value>2</value>
+                <value>20</value>
             </entry>
             <entry>
                 <key>WEATHER_MOD_SNOW</key>
@@ -587,16 +586,16 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>FOG_NONE</key>
-                <value>90</value>
+                <key>FOG_LIGHT</key>
+                <value>50</value>
             </entry>
             <entry>
                 <key>FOG_HEAVY</key>
-                <value>5</value>
+                <value>50</value>
             </entry>
             <entry>
-                <key>FOG_LIGHT</key>
-                <value>5</value>
+                <key>FOG_NONE</key>
+                <value>900</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -621,16 +620,16 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>FOG_NONE</key>
-                <value>60</value>
+                <key>FOG_LIGHT</key>
+                <value>100</value>
             </entry>
             <entry>
                 <key>FOG_HEAVY</key>
-                <value>20</value>
+                <value>100</value>
             </entry>
             <entry>
-                <key>FOG_LIGHT</key>
-                <value>20</value>
+                <key>FOG_NONE</key>
+                <value>800</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -651,16 +650,16 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>FOG_NONE</key>
-                <value>60</value>
+                <key>FOG_LIGHT</key>
+                <value>10</value>
             </entry>
             <entry>
                 <key>FOG_HEAVY</key>
-                <value>20</value>
+                <value>10</value>
             </entry>
             <entry>
-                <key>FOG_LIGHT</key>
-                <value>20</value>
+                <key>FOG_NONE</key>
+                <value>980</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -697,12 +696,12 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>BLOWING_SAND_NONE</key>
-                <value>90</value>
+                <key>BLOWING_SAND</key>
+                <value>100</value>
             </entry>
             <entry>
-                <key>BLOWING_SAND</key>
-                <value>10</value>
+                <key>BLOWING_SAND_NONE</key>
+                <value>900</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -720,12 +719,12 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>BLOWING_SAND_NONE</key>
-                <value>40</value>
+                <key>BLOWING_SAND</key>
+                <value>300</value>
             </entry>
             <entry>
-                <key>BLOWING_SAND</key>
-                <value>60</value>
+                <key>BLOWING_SAND_NONE</key>
+                <value>700</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -763,12 +762,12 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>EMI</key>
-                <value>1</value>
-            </entry>
-            <entry>
                 <key>EMI_NONE</key>
                 <value>999</value>
+            </entry>
+            <entry>
+                <key>EMI</key>
+                <value>1</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>
@@ -785,12 +784,12 @@ can delete this file to reload defaults
         </terrains>
         <odds>
             <entry>
-                <key>EMI</key>
-                <value>10</value>
+                <key>EMI_NONE</key>
+                <value>950</value>
             </entry>
             <entry>
-                <key>EMI_NONE</key>
-                <value>90</value>
+                <key>EMI</key>
+                <value>50</value>
             </entry>
         </odds>
     </TerrainConditionsOdds>

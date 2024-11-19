@@ -2,6 +2,7 @@
  * ContractMarketDialog.java
  *
  * Copyright (c) 2014-2024 Carl Spain. All rights reserved.
+ * Copyright (c) 2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +49,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 /**
@@ -479,6 +481,8 @@ public class ContractMarketDialog extends JDialog {
                     return;
                 }
             }
+
+            contractStartPrompt(campaign, selectedContract);
 
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),

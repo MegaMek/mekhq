@@ -2,6 +2,7 @@
  * Contract.java
  *
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,14 +21,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -38,6 +31,13 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -163,7 +163,7 @@ public class Contract extends Mission {
      * This sets the Start Date and End Date of the Contract based on the length of
      * the contract and
      * the starting date provided
-     * 
+     *
      * @param startDate the date the contract starts at
      */
     public void setStartAndEndDate(LocalDate startDate) {
@@ -442,7 +442,7 @@ public class Contract extends Mission {
                 .minus(getTotalEstimatedPayrollExpenses(c));
     }
 
-    private int getTravelDays(Campaign c) {
+    public int getTravelDays(Campaign c) {
         if (null != this.getSystem()) {
             JumpPath jumpPath = getJumpPath(c);
             double days = Math.round(jumpPath.getTotalTime(c.getLocalDate(), c.getLocation().getTransitTime()) * 100.0)
@@ -567,7 +567,7 @@ public class Contract extends Mission {
      * Only do this at the time the contract is set up, otherwise amounts may change
      * after
      * the ink is signed, which is a no-no.
-     * 
+     *
      * @param c current campaign
      */
     public void calculateContract(Campaign c) {

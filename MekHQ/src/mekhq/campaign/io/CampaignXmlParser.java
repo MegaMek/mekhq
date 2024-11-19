@@ -285,6 +285,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
+                } else if (xn.equalsIgnoreCase("automatedMothballUnits")) {
+                    retVal.setAutomatedMothballUnits(processAutomatedMothballNodes(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     retVal.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
@@ -936,6 +938,39 @@ public class CampaignXmlParser {
     private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
         logger.info("Loading Fame and Infamy Nodes from XML...");
         FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
+    }
+
+    private static List<Unit> processAutomatedMothballNodes(Node workingNode, Campaign campaign) {
+        logger.info("Loading Automated Mothball Nodes from XML...");
+
+        List<Unit> mothballedUnits = new ArrayList<>();
+
+        NodeList workingList = workingNode.getChildNodes();
+        for (int x = 0; x < workingList.getLength(); x++) {
+            Node childNode = workingList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!childNode.getNodeName().equalsIgnoreCase("mothballedUnit")) {
+                logger.error("Unknown node type not loaded in Automated Mothball nodes: "
+                    + childNode.getNodeName());
+                continue;
+            }
+
+            Unit unit = campaign.getUnit(UUID.fromString(childNode.getTextContent()));
+
+            if (unit == null) {
+                logger.error("Unknown UUID: " + childNode.getTextContent());
+            }
+
+            mothballedUnits.add(unit);
+        }
+
+        logger.info("Load Automated Mothball Nodes Complete!");
+        return mothballedUnits;
     }
 
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {
