@@ -1793,8 +1793,8 @@ public class AtBContract extends Contract {
         double allyRatio = switch (getCommandRights()) {
             case INDEPENDENT    -> 0; // no allies
             case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
-            case HOUSE          -> 0.25; // allies with same (G)BV budget
-            case INTEGRATED     -> 0.5; // allies with twice the player's (G)BV budget
+            case HOUSE          -> 0.25; // allies with 25% the player's (G)BV budget
+            case INTEGRATED     -> 0.5; // allies with 50% the player's (G)BV budget
         };
 
         if (allyRatio > 0) {
