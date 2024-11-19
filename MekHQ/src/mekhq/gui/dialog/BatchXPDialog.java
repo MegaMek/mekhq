@@ -18,26 +18,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -49,12 +31,21 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 public final class BatchXPDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(BatchXPDialog.class);
@@ -403,26 +394,6 @@ public final class BatchXPDialog extends JDialog {
                 p.spendXP(cost);
                 PersonalLogger.improvedSkill(campaign, p, campaign.getLocalDate(),
                         p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
-
-                // The next part isn't ideal and doesn't belong here, but as long as we hardcode
-                // AtB ...
-                if (campaign.getCampaignOptions().isUseAtB()) {
-                    if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
-                            && (p.getExperienceLevel(campaign, false) > startingExperienceLevel)
-                            && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
-                        final SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        final String spa = spaGenerator.rollSPA(campaign, p);
-                        if (spa == null) {
-                            if (campaign.getCampaignOptions().isUseEdge()) {
-                                p.changeEdge(1);
-                                p.changeCurrentEdge(1);
-                                PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());
-                            }
-                        } else {
-                            PersonalLogger.gainedSPA(campaign, p, campaign.getLocalDate(), spa);
-                        }
-                    }
-                }
                 campaign.personUpdated(p);
             }
 
