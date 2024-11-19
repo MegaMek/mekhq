@@ -3,13 +3,14 @@ package mekhq.gui.panes.campaignOptions;
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
 
 import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 
+import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
@@ -618,22 +619,23 @@ public class FinancesTab {
         boolean reverseQualities = campaign.getCampaignOptions().isReverseQualityNames();
 
         // Contents
-        lblUsedPartPriceMultipliers = new JLabel[Part.QUALITY_F + 1];
-        spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
+        lblUsedPartPriceMultipliers = new JLabel[QUALITY_F.ordinal() + 1];
+        spnUsedPartPriceMultipliers = new JSpinner[QUALITY_F.ordinal() + 1];
 
-        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            final String qualityLevel = Part.getQualityName(i, reverseQualities);
+        for (PartQuality partQuality : PartQuality.values()) {
+            final String qualityLevel = partQuality.toName(reverseQualities);
+            int ordinal = partQuality.ordinal();
 
-            lblUsedPartPriceMultipliers[i] = new JLabel(qualityLevel);
-            lblUsedPartPriceMultipliers[i].setName("lbl" + qualityLevel);
+            lblUsedPartPriceMultipliers[ordinal] = new JLabel(qualityLevel);
+            lblUsedPartPriceMultipliers[ordinal].setName("lbl" + qualityLevel);
 
-            spnUsedPartPriceMultipliers[i] = new JSpinner(
+            spnUsedPartPriceMultipliers[ordinal] = new JSpinner(
                 new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-            spnUsedPartPriceMultipliers[i].setName("spn" + qualityLevel);
-            spnUsedPartPriceMultipliers[i]
-                .setEditor(new NumberEditor(spnUsedPartPriceMultipliers[i], "0.00"));
+            spnUsedPartPriceMultipliers[ordinal].setName("spn" + qualityLevel);
+            spnUsedPartPriceMultipliers[ordinal]
+                .setEditor(new NumberEditor(spnUsedPartPriceMultipliers[ordinal], "0.00"));
 
-            DefaultEditor editor = (DefaultEditor) spnUsedPartPriceMultipliers[i].getEditor();
+            DefaultEditor editor = (DefaultEditor) spnUsedPartPriceMultipliers[ordinal].getEditor();
             editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
         }
 

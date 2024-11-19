@@ -19,9 +19,9 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
