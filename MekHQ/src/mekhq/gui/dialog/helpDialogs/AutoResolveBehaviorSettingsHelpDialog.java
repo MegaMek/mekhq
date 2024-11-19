@@ -13,7 +13,6 @@ public class AutoResolveBehaviorSettingsHelpDialog extends AbstractHelpDialog {
         "mekhq.resources.AutoResolveBehaviorSettingsDialog",
         MekHQ.getMHQOptions().getLocale());
 
-
     /**
      * Creates a new instance of AutoResolveBehaviorSettingsHelpDialog.
      * This screen opens a help dialog, using the megamek help dialog, which open an HTML file
