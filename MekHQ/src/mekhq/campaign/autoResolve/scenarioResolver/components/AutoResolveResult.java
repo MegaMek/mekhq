@@ -1,4 +1,4 @@
-package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
+package mekhq.campaign.autoResolve.scenarioResolver.components;
 
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;

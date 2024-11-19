@@ -4,7 +4,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.AutoResolveForce;
+import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveForce;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -17,27 +17,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SetupTeams {
 
-    static public Map<Integer, List<AutoResolveForce>> setupTeams(MekHQ app, List<Unit> units, AtBScenario scenario) {
+    static public Map<Integer, List<AutoResolveForce>> setupTeams(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         Map<Integer, List<AutoResolveForce>> tmpTeams = new HashMap<>();
-        for (AutoResolveForce force : getAutoResolveForces(app, units, scenario)) {
+        for (AutoResolveForce force : getAutoResolveForces(campaign, units, scenario)) {
             tmpTeams.computeIfAbsent(force.team(), k -> new ArrayList<>()).add(force);
         }
         return tmpTeams;
     }
 
-    static private List<AutoResolveForce> getAutoResolveForces(MekHQ app, List<Unit> units, AtBScenario scenario) {
+    static private List<AutoResolveForce> getAutoResolveForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         AtomicInteger i = new AtomicInteger(0);
 
         List<AutoResolveForce> forces = new ArrayList<>();
-        forces.add(playerForce(i.incrementAndGet(), app.getCampaign().getPlayer().getName(), units));
-        forces.addAll(getBotForces(app, units, scenario, i));
+        forces.add(playerForce(i.incrementAndGet(), campaign.getPlayer().getName(), units));
+        forces.addAll(getBotForces(campaign, units, scenario, i));
         return forces;
     }
 
-    static private List<AutoResolveForce> getBotForces(MekHQ app, List<Unit> units, AtBScenario scenario, AtomicInteger i) {
+    static private List<AutoResolveForce> getBotForces(Campaign campaign, List<Unit> units, AtBScenario scenario, AtomicInteger i) {
         return new ArrayList<>(scenario.getBotForces().stream().map(botForce ->
             new AutoResolveForce(botForce.getTeam(), botForce.getName(), i.get(),
-                setupBotEntities(app.getCampaign(), units, botForce, scenario, i.getAndIncrement()))
+                setupBotEntities(campaign, units, botForce, scenario, i.getAndIncrement()))
         ).toList());
     }
 

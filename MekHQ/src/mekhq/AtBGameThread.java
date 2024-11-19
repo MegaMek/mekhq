@@ -699,7 +699,7 @@ public class AtBGameThread extends GameThread {
      * Utility function to copy some deployment parameters between source and
      * destination entities
      */
-    private void copyDeploymentParameters(Entity source, Entity destination) {
+    public static void copyDeploymentParameters(Entity source, Entity destination) {
         destination.setDeployRound(source.getDeployRound());
         destination.setStartingPos(source.getStartingPos(false));
         destination.setAltitude(source.getAltitude());

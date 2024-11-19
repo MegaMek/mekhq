@@ -51,7 +51,7 @@ import mekhq.campaign.autoResolve.AutoResolveEngine;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.autoResolve.helper.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.AutoResolveConcludedEvent;
+import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
@@ -453,7 +453,6 @@ public class MekHQ implements GameListener {
 
         client.getGame().addGameListener(this);
         currentScenario = scenario;
-
         // Start the game thread
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings);
@@ -531,7 +530,7 @@ public class MekHQ implements GameListener {
     public void autoResolveConcluded(AutoResolveConcludedEvent arce){
         try {
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), arce.controlledScenario());
-            tracker.setClient(new AutoResolveClient(new AutoResolveGame(getCampaign())));
+            tracker.setClient(new AutoResolveClient(arce.getGame()));
             tracker.setEvent(arce);
             tracker.processGame();
 

@@ -1,9 +1,15 @@
 package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
 
 import megamek.common.*;
+import megamek.common.force.Forces;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
+import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.helper.SetupTeams;
 import mekhq.campaign.autoResolve.helper.UnitStrengthHelper;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
+import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
+import mekhq.campaign.autoResolve.scenarioResolver.components.UnitResult;
+import mekhq.campaign.autoResolve.scenarioResolver.components.UnitStrength;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioObjective;
 
@@ -12,7 +18,6 @@ import java.util.Map;
 import java.util.*;
 
 public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
-    private static final int DEFEATS_FOR_UNIT_DESTRUCTION = 100;
 
     private final Map<Integer, List<UnitResult>> combatRoundResults = new HashMap<>();
     private final Map<Integer, List<UnitStrength>> survivingUnits = new HashMap<>();
@@ -28,7 +33,7 @@ public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
         super(scenario);
     }
 
-    private void initializeState(Map<Integer, List<AutoResolveForce>> teams) {
+    private void initializeState(AutoResolveGame game) {
         combatRoundResults.clear();
         survivingUnits.clear();
         roundDefeatedUnits.clear();
@@ -42,6 +47,8 @@ public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
                 forceMustBePreserved.addAll(objective.getAssociatedForceNames());
             }
         });
+
+        var teams = SetupTeams.setupTeams(game.getCampaign(), game.getUnits(), scenario);
         teams.forEach((teamId, forces) -> {
             survivingUnits.put(teamId, new ArrayList<>());
             forces.stream()
@@ -55,8 +62,8 @@ public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
     }
 
     @Override
-    public AutoResolveConcludedEvent resolveScenario(Map<Integer, List<AutoResolveForce>> teams) {
-        initializeState(teams);
+    public AutoResolveConcludedEvent resolveScenario(AutoResolveGame game) {
+        initializeState(game);
 
         while (true) {
             // Clear previous combat round results
@@ -73,7 +80,8 @@ public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
         return new AutoResolveConcludedEvent(
             isTeam1Victory(),
             defeatedUnits.values().stream().flatMap(List::stream).map(UnitStrength::entity).toList(),
-            survivingUnits.values().stream().flatMap(List::stream).map(UnitStrength::entity).toList()
+            survivingUnits.values().stream().flatMap(List::stream).map(UnitStrength::entity).toList(),
+            game
         );
     }
 

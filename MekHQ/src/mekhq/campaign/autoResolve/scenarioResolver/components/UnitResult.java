@@ -1,4 +1,4 @@
-package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
+package mekhq.campaign.autoResolve.scenarioResolver.components;
 
 public class UnitResult implements Comparable<UnitResult> {
 

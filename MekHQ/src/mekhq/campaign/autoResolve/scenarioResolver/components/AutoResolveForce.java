@@ -1,4 +1,4 @@
-package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
+package mekhq.campaign.autoResolve.scenarioResolver.components;
 
 import megamek.common.Entity;
 

@@ -1,7 +1,8 @@
-package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
+package mekhq.campaign.autoResolve.scenarioResolver.components;
 
 import megamek.common.Entity;
 import megamek.common.IEntityRemovalConditions;
+import megamek.common.IGame;
 import megamek.common.event.PostGameResolution;
 
 import java.util.Enumeration;
@@ -13,16 +14,22 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
     private final List<Entity> removedEntities;
     private final List<Entity> survivingEntities;
     private final boolean controlledScenario;
+    private final IGame game;
 
 
-    public AutoResolveConcludedEvent(boolean controlledScenario, List<Entity> removedEntities, List<Entity> survivingEntities) {
+    public AutoResolveConcludedEvent(boolean controlledScenario, List<Entity> removedEntities, List<Entity> survivingEntities, IGame game) {
         this.controlledScenario = controlledScenario;
         this.removedEntities = removedEntities;
         this.survivingEntities = survivingEntities;
+        this.game = game;
     }
 
     public String getEventName() {
         return "Auto Resolve Concluded";
+    }
+
+    public IGame getGame() {
+        return game;
     }
 
     public boolean controlledScenario() {

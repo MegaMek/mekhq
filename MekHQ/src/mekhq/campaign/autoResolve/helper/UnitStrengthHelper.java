@@ -1,7 +1,7 @@
 package mekhq.campaign.autoResolve.helper;
 
 import megamek.common.*;
-import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.UnitStrength;
+import mekhq.campaign.autoResolve.scenarioResolver.components.UnitStrength;
 
 public class UnitStrengthHelper {
 
