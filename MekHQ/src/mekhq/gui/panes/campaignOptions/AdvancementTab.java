@@ -1,7 +1,10 @@
 package mekhq.gui.panes.campaignOptions;
 
+import mekhq.campaign.personnel.enums.Phenotype;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
@@ -55,6 +58,53 @@ public class AdvancementTab {
     //end XP Awards Tab
 
     //start Skill Randomization Tab
+    private JCheckBox chkExtraRandomness;
+
+    private JPanel pnlPhenotype;
+    private JLabel[] phenotypeLabels;
+    private JSpinner[] phenotypeSpinners;
+
+    private JPanel pnlRandomAbilities;
+    private JLabel lblAbilityGreen;
+    private JSpinner spnAbilityGreen;
+    private JLabel lblAbilityReg;
+    private JSpinner spnAbilityReg;
+    private JLabel lblAbilityVet;
+    private JSpinner spnAbilityVet;
+    private JLabel lblAbilityElite;
+    private JSpinner spnAbilityElite;
+
+    private JPanel pnlSkillGroups;
+
+    private JPanel pnlTactics;
+    private JLabel lblTacticsGreen;
+    private JSpinner spnTacticsGreen;
+    private JLabel lblTacticsReg;
+    private JSpinner spnTacticsReg;
+    private JLabel lblTacticsVet;
+    private JSpinner spnTacticsVet;
+    private JLabel lblTacticsElite;
+    private JSpinner spnTacticsElite;
+
+    private JPanel pnlSmallArms;
+    private JLabel lblCombatSA;
+    private JSpinner spnCombatSA;
+    private JLabel lblSupportSA;
+    private JSpinner spnSupportSA;
+
+    private JPanel pnlArtillery;
+    private JLabel lblArtyProb;
+    private JSpinner spnArtyProb;
+    private JLabel lblArtyBonus;
+    private JSpinner spnArtyBonus;
+
+    private JPanel pnlSecondarySkills;
+    private JLabel lblAntiMekSkill;
+    private JSpinner spnAntiMekSkill;
+    private JLabel lblSecondProb;
+    private JSpinner spnSecondProb;
+    private JLabel lblSecondBonus;
+    private JSpinner spnSecondBonus;
     //end Skill Randomization Tab
 
     AdvancementTab(JFrame frame, String name) {
@@ -335,6 +385,7 @@ public class AdvancementTab {
         lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP");
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP",
             0, 0, 10000, 1);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsXpPanel", true,
             "AdministratorsXpPanel");
@@ -361,6 +412,338 @@ public class AdvancementTab {
     }
 
     private void initializeSkillRandomizationTab() {
+        chkExtraRandomness = new JCheckBox();
 
+        pnlPhenotype = new JPanel();
+        phenotypeLabels = new JLabel[] {}; // This will be initialized properly later
+        phenotypeSpinners = new JSpinner[] {}; // This will be initialized properly later
+
+        pnlSkillGroups = new JPanel();
+
+        pnlTactics = new JPanel();
+        lblTacticsGreen = new JLabel();
+        spnTacticsGreen = new JSpinner();
+        lblTacticsReg = new JLabel();
+        spnTacticsReg = new JSpinner();
+        lblTacticsVet = new JLabel();
+        spnTacticsVet = new JSpinner();
+        lblTacticsElite = new JLabel();
+        spnTacticsElite = new JSpinner();
+
+        pnlSmallArms = new JPanel();
+        lblCombatSA = new JLabel();
+        spnCombatSA = new JSpinner();
+        lblSupportSA = new JLabel();
+        spnSupportSA = new JSpinner();
+
+        pnlArtillery = new JPanel();
+        lblArtyProb = new JLabel();
+        spnArtyProb = new JSpinner();
+        lblArtyBonus = new JLabel();
+        spnArtyBonus = new JSpinner();
+
+        pnlSecondarySkills = new JPanel();
+        lblAntiMekSkill = new JLabel();
+        spnAntiMekSkill = new JSpinner();
+        lblSecondProb = new JLabel();
+        spnSecondProb = new JSpinner();
+        lblSecondBonus = new JLabel();
+        spnSecondBonus = new JSpinner();
+
+        pnlRandomAbilities = new JPanel();
+        lblAbilityGreen = new JLabel();
+        spnAbilityGreen = new JSpinner();
+        lblAbilityReg = new JLabel();
+        spnAbilityReg = new JSpinner();
+        lblAbilityVet = new JLabel();
+        spnAbilityVet = new JSpinner();
+        lblAbilityElite = new JLabel();
+        spnAbilityElite = new JSpinner();
+    }
+
+    JPanel skillRandomizationTab() {
+        // Header
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
+            getImageDirectory() + "logo_federated_suns.png",
+            true);
+
+        // Contents
+        chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
+
+        pnlPhenotype = createPhenotypePanel();
+        pnlRandomAbilities = createAbilityPanel();
+        pnlSkillGroups = createSkillGroupPanel();
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("SkillRandomizationTab", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
+
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(chkExtraRandomness, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlPhenotype, layout);
+        layout.gridx++;
+        panel.add(pnlRandomAbilities, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 2;
+        panel.add(pnlSkillGroups, layout);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "XpAwardsTab");
+    }
+
+    private JPanel createPhenotypePanel() {
+        // Contents
+        List<Phenotype> phenotypes = Phenotype.getExternalPhenotypes();
+        phenotypeLabels = new JLabel[phenotypes.size()];
+        phenotypeSpinners = new JSpinner[phenotypes.size()];
+
+        final JPanel panel = new CampaignOptionsStandardPanel("PhenotypesPanel", true,
+            "PhenotypesPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = -1;
+        layout.gridy = 0;
+
+        for (int i = 0; i < phenotypes.size(); i++) {
+            phenotypeLabels[i] = new CampaignOptionsLabel(phenotypes.get(i).getName());
+            phenotypeSpinners[i] = new CampaignOptionsSpinner(phenotypes.get(i).getName(),
+                0, 0, 100, 1);
+
+            layout.gridx++;
+            panel.add(phenotypeLabels[i], layout);
+            layout.gridx++;
+            panel.add(phenotypeSpinners[i], layout);
+
+            if (i == (phenotypes.size() / 3)) {
+                layout.gridx = -1;
+                layout.gridy++;
+            }
+        }
+
+        return panel;
+    }
+
+    private JPanel createAbilityPanel() {
+        // Contents
+        lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen");
+        spnAbilityGreen = new CampaignOptionsSpinner("AbilityGreen",
+            0, -10, 10, 1);
+        lblAbilityReg = new CampaignOptionsLabel("AbilityRegular");
+        spnAbilityReg = new CampaignOptionsSpinner("AbilityRegular",
+            0, -10, 10, 1);
+
+        lblAbilityVet = new CampaignOptionsLabel("AbilityVeteran");
+        spnAbilityVet = new CampaignOptionsSpinner("AbilityVeteran",
+            0, -10, 10, 1);
+
+        lblAbilityElite = new CampaignOptionsLabel("AbilityElite");
+        spnAbilityElite = new CampaignOptionsSpinner("AbilityElite",
+            0, -10, 10, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("AbilityPanel", true,
+            "AbilityPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblAbilityGreen, layout);
+        layout.gridx++;
+        panel.add(spnAbilityGreen, layout);
+        layout.gridx++;
+        panel.add(lblAbilityReg, layout);
+        layout.gridx++;
+        panel.add(spnAbilityReg, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAbilityVet, layout);
+        layout.gridx++;
+        panel.add(spnAbilityVet, layout);
+        layout.gridx++;
+        panel.add(lblAbilityElite, layout);
+        layout.gridx++;
+        panel.add(spnAbilityElite, layout);
+
+        return panel;
+    }
+
+    private JPanel createSkillGroupPanel() {
+        // Contents
+        pnlArtillery = createArtilleryPanel();
+        pnlSmallArms = createSmallArmsPanel();
+        pnlSecondarySkills = createSecondarySkillPanel();
+
+        pnlTactics = createTacticsPanel();
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("SkillGroupsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(pnlTactics, layout);
+        layout.gridx++;
+        panel.add(pnlSmallArms, layout);
+        layout.gridx++;
+        panel.add(pnlSecondarySkills, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlSecondarySkills, layout);
+        layout.gridx++;
+        panel.add(pnlArtillery, layout);
+
+        return panel;
+    }
+
+    private JPanel createTacticsPanel() {
+        // Contents
+        lblTacticsGreen = new CampaignOptionsLabel("TacticsGreen");
+        spnTacticsGreen = new CampaignOptionsSpinner("TacticsGreen",
+            0, -10, 10, 1);
+
+        lblTacticsReg = new CampaignOptionsLabel("TacticsRegular");
+        spnTacticsReg = new CampaignOptionsSpinner("TacticsRegular",
+            0, -10, 10, 1);
+
+        lblTacticsVet = new CampaignOptionsLabel("TacticsVeteran");
+        spnTacticsVet = new CampaignOptionsSpinner("TacticsVeteran",
+            0, -10, 10, 1);
+
+        lblTacticsElite = new CampaignOptionsLabel("TacticsElite");
+        spnTacticsElite = new CampaignOptionsSpinner("TacticsElite",
+            0, -10, 10, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("TacticsPanel", true,
+            "TacticsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblTacticsGreen, layout);
+        layout.gridx++;
+        panel.add(spnTacticsGreen, layout);
+        layout.gridx++;
+        panel.add(lblTacticsReg, layout);
+        layout.gridx++;
+        panel.add(spnTacticsReg, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblTacticsVet, layout);
+        layout.gridx++;
+        panel.add(spnTacticsVet, layout);
+        layout.gridx++;
+        panel.add(lblTacticsElite, layout);
+        layout.gridx++;
+        panel.add(spnTacticsElite, layout);
+
+        return panel;
+    }
+
+    private JPanel createSmallArmsPanel() {
+        // Contents
+        lblCombatSA = new CampaignOptionsLabel("CombatSmallArms");
+        spnCombatSA = new CampaignOptionsSpinner("CombatSmallArms",
+            0, -10, 10, 1);
+
+        lblSupportSA = new CampaignOptionsLabel("NonCombatSmallArms");
+        spnSupportSA = new CampaignOptionsSpinner("NonCombatSmallArms",
+            0, -10, 10, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("SmallArmsPanel",
+            true, "SmallArmsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblCombatSA, layout);
+        layout.gridx++;
+        panel.add(spnCombatSA, layout);
+        layout.gridx++;
+        panel.add(lblSupportSA, layout);
+        layout.gridx++;
+        panel.add(spnSupportSA, layout);
+
+        return panel;
+    }
+
+    private JPanel createArtilleryPanel() {
+        // Contents
+        lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
+        spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance",
+            0, -10, 10, 1);
+
+        lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
+        spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus",
+            0, -10, 10, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("ArtilleryPanel",
+            true, "ArtilleryPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblArtyProb, layout);
+        layout.gridx++;
+        panel.add(spnArtyProb, layout);
+        layout.gridx++;
+        panel.add(lblArtyBonus, layout);
+        layout.gridx++;
+        panel.add(spnArtyBonus, layout);
+
+        return panel;
+    }
+
+    private JPanel createSecondarySkillPanel() {
+        // Contents
+        lblAntiMekSkill = new CampaignOptionsLabel("AntiMekChance");
+        spnAntiMekSkill = new CampaignOptionsSpinner("AntiMekChance",
+            0, -10, 10, 1);
+
+        lblSecondProb = new CampaignOptionsLabel("SecondarySkillChance");
+        spnSecondProb = new CampaignOptionsSpinner("SecondarySkillChance",
+            0, -10, 10, 1);
+
+        lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
+        spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus",
+            0, -10, 10, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("SecondarySkillPanel",
+            true, "SecondarySkillPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblAntiMekSkill, layout);
+        layout.gridx++;
+        panel.add(spnAntiMekSkill, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblSecondProb, layout);
+        layout.gridx++;
+        panel.add(spnSecondProb, layout);
+        layout.gridx++;
+        panel.add(lblSecondBonus, layout);
+        layout.gridx++;
+        panel.add(spnSecondBonus, layout);
+
+        return panel;
     }
 }
