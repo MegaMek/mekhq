@@ -193,8 +193,9 @@ public class StratconContractInitializer {
             AtBContractType contractType = contract.getContractType();
 
             // If the contract is a garrison type, we don't want to generate what will appear to be
-            // a full-scale invasion on day one.
-            if (contractType.isGarrisonType()) {
+            // a full-scale invasion on day one. Furthermore, Pirates do not have enough resources
+            // to deploy standing forces in this manner.
+            if (contractType.isGarrisonType() || contractType.isPirateHunting()) {
                 break;
             }
 
@@ -205,7 +206,7 @@ public class StratconContractInitializer {
 
             int multiplier = DEFENSIVE_MULTIPLIER;
 
-            if (contractType.isRaidType() || contractType.isPirateHunting()) {
+            if (contractType.isRaidType() || contractType.isGuerrillaWarfare()) {
                 multiplier = OFFENSIVE_MULTIPLIER;
             } else if (contract.getContractType().isPlanetaryAssault()) {
                 multiplier = OFFENSIVE_MULTIPLIER / 2;
