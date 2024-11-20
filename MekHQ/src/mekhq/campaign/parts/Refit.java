@@ -610,6 +610,16 @@ public class Refit extends Part implements IAcquisitionWork {
             Part oldPart = oldIterator.next();
 
             if ((oldPart instanceof AmmoBin) || (oldPart instanceof MissingAmmoBin)) {
+
+                if (((oldPart instanceof AmmoBin && ((AmmoBin) oldPart).isOneShot()))
+                        || (((oldPart instanceof MissingAmmoBin) && ((MissingAmmoBin) oldPart).isOneShot()))) {
+
+                    // One-shot ammo bins are even more meta than regular ammo bins, we're not going
+                    // to consider them as elements of a refit
+                    oldIterator.remove();
+                    continue;
+                }
+
                 int oldLoc = oldPart.getLocation();
                 AmmoType oldType = (oldPart instanceof AmmoBin) ? 
                         ((AmmoBin) oldPart).getType() : ((MissingAmmoBin) oldPart).getType();
@@ -620,8 +630,10 @@ public class Refit extends Part implements IAcquisitionWork {
                     Part newPart = newIterator.next();
 
                     if ((newPart instanceof AmmoBin) 
-                            && (oldLoc == newPart.getLocation()) && 
-                                (oldType.equalsAmmoTypeOnly(((AmmoBin) newPart).getType()))) {
+                            && (oldLoc == newPart.getLocation()) 
+                            && (oldType.equalsAmmoTypeOnly(((AmmoBin) newPart).getType()))
+                            && (((AmmoBin) oldPart).getFullShots() == ((AmmoBin) newPart).getFullShots())) {
+                        
                         matchFound = true;
                         stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
                         break;
@@ -638,8 +650,9 @@ public class Refit extends Part implements IAcquisitionWork {
                         Part newPart = newIterator.next();
     
                         if ((newPart instanceof AmmoBin) 
-                                && (oldType.equalsAmmoTypeOnly(((AmmoBin) newPart).getType()))) {
-                            
+                                && (oldType.equalsAmmoTypeOnly(((AmmoBin) newPart).getType()))
+                                && (((AmmoBin) oldPart).getFullShots() == ((AmmoBin) newPart).getFullShots())) {
+
                             stepsList.add(new RefitStep(oldUnit, oldPart, newPart));
                             movedMatchFound = true;
                             break;
@@ -662,7 +675,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
             if (newPart instanceof AmmoBin) {
                 newIterator.remove();
-                stepsList.add(new RefitStep(oldUnit, null, newPart));
+                if (!((AmmoBin) newPart).isOneShot()) {
+                    stepsList.add(new RefitStep(oldUnit, null, newPart));
+                }
             }
         }
 
