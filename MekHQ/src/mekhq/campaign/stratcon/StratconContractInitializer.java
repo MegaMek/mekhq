@@ -25,6 +25,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
@@ -32,6 +33,8 @@ import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -185,6 +188,36 @@ public class StratconContractInitializer {
                     false, Collections.emptyList());
         }
 
+        // Initialize non-objective scenarios
+        for (StratconTrackState track : campaignState.getTracks()) {
+            AtBContractType contractType = contract.getContractType();
+
+            // If the contract is a garrison type, we don't want to generate what will appear to be
+            // a full-scale invasion on day one.
+            if (contractType.isGarrisonType()) {
+                break;
+            }
+
+            // otherwise, seed each sector with hidden forces.
+            // the number of hidden forces is dependent on the type of contract.
+            final int OFFENSIVE_MULTIPLIER = 10;
+            final int DEFENSIVE_MULTIPLIER = 20;
+
+            int multiplier = DEFENSIVE_MULTIPLIER;
+
+            if (contractType.isRaidType() || contractType.isPirateHunting()) {
+                multiplier = OFFENSIVE_MULTIPLIER;
+            } else if (contract.getContractType().isPlanetaryAssault()) {
+                multiplier = OFFENSIVE_MULTIPLIER / 2;
+            }
+
+            int preDeployedScenarios = track.getSize() / multiplier;
+
+            for (int i = 0; i < preDeployedScenarios; i++) {
+                addHiddenExternalScenario(campaign, contract, track, null);
+            }
+        }
+
         // clean up objectives for integrated command:
         // we're still going to have all the objective facilities and scenarios
         // but the player has no control over where they go, so they're
@@ -194,8 +227,6 @@ public class StratconContractInitializer {
             for (StratconTrackState track : campaignState.getTracks()) {
                 track.getStrategicObjectives().clear();
             }
-        } else {
-            // Initialize non-objective scenarios
         }
 
         // now we're done
