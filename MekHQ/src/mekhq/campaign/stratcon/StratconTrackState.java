@@ -23,9 +23,9 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
+import mekhq.utilities.MHQXMLUtility;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -107,6 +107,13 @@ public class StratconTrackState {
         this.height = height;
     }
 
+    /**
+     * @return The size of the track derived by multiplying width and height.
+     */
+    public int getSize() {
+        return width * height;
+    }
+
     @XmlElementWrapper(name = "trackFacilities")
     @XmlElement(name = "facility")
     public Map<StratconCoords, StratconFacility> getFacilities() {
@@ -159,7 +166,7 @@ public class StratconTrackState {
             removeScenario(getBackingScenariosMap().get(campaignScenarioID));
         }
     }
-    
+
     /**
      * Removes a StratconScenario from this track.
      */
@@ -169,7 +176,7 @@ public class StratconTrackState {
         Map<StratconCoords, StratconStrategicObjective> objectives = getObjectivesByCoords();
         if (objectives.containsKey(scenario.getCoords())) {
             StrategicObjectiveType objectiveType = objectives.get(scenario.getCoords()).getObjectiveType();
-            
+
             switch (objectiveType) {
                 case RequiredScenarioVictory:
                 case SpecificScenarioVictory:
