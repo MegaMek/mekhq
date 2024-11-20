@@ -70,6 +70,7 @@ public class StratconContractInitializer {
 
         int maximumTrackIndex = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
+        double planetaryDiameter = campaign.getLocation().getPlanet().getDiameter();
 
         for (int x = 0; x < maximumTrackIndex; x++) {
             int scenarioOdds = contractDefinition.getScenarioOdds()
@@ -78,7 +79,7 @@ public class StratconContractInitializer {
                     .get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
             StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime,
-                    planetaryTemperature);
+                    planetaryTemperature, planetaryDiameter);
             track.setDisplayableName(String.format("Sector %d", x));
             campaignState.addTrack(track);
         }
@@ -94,7 +95,7 @@ public class StratconContractInitializer {
                     .get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
             StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime,
-                    planetaryTemperature);
+                    planetaryTemperature, planetaryDiameter);
             track.setDisplayableName(String.format("Sector %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
@@ -193,6 +194,8 @@ public class StratconContractInitializer {
             for (StratconTrackState track : campaignState.getTracks()) {
                 track.getStrategicObjectives().clear();
             }
+        } else {
+            // Initialize non-objective scenarios
         }
 
         // now we're done
@@ -203,20 +206,24 @@ public class StratconContractInitializer {
      * lances.
      */
     public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds,
-            int deploymentTime, int planetaryTemp) {
+                                                          int deploymentTime, int planetaryTemp,
+                                                          double planetaryDiameter) {
         // to initialize a track,
         // 1. we set the # of required lances
-        // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is
+        // 2. set the track size to a total of numlances * 84 hexes, a rectangle that is
         // wider than it is taller
-        // the idea being to create a roughly rectangular playing field that,
-        // if one deploys a scout lance each week to a different spot, can be more or
-        // less fully covered
 
         StratconTrackState retVal = new StratconTrackState();
         retVal.setRequiredLanceCount(numLances);
 
+        // calculate planet surface area
+        double radius = planetaryDiameter / 2;
+        double planetSurfaceArea = 4 * Math.PI * Math.pow(radius, 2);
+        // This gives us a decently sized track, without it feeling too large
+        planetSurfaceArea /= 1000000;
+
         // set width and height
-        int numHexes = numLances * 28;
+        int numHexes = (int) Math.round(planetSurfaceArea);
         int height = (int) Math.floor(Math.sqrt(numHexes));
         int width = numHexes / height;
         retVal.setWidth(width);
