@@ -119,8 +119,8 @@ public class GeneralTab {
         btnIcon.addActionListener(this::btnIconActionPerformed);
 
         // Initialize the parent panel
-        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame, "generalPanel",
-            new GridBagLayout());
+        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
+            "generalPanel", new GridBagLayout());
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -168,7 +168,7 @@ public class GeneralTab {
         layout.gridwidth = 5;
         layout.gridx = GridBagConstraints.RELATIVE;
 
-        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         iconsPanel.setBorder(BorderFactory.createTitledBorder(""));
 
         iconsPanel.add(lblIcon);
@@ -178,18 +178,9 @@ public class GeneralTab {
         iconsPanel.add(btnCamo);
 
         panel.add(iconsPanel, layout);
-
-        final JPanel outerPanel = new CampaignOptionsStandardPanel("generalTab", true);
-        // Add some padding left and right (inside the border!)
-        outerPanel.setLayout(new BorderLayout());
-        outerPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)), BorderLayout.LINE_START);
-        outerPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)), BorderLayout.LINE_END);
-        outerPanel.add(panel, BorderLayout.CENTER);
-        JLabel label = new JLabel(resources.getString("lblQuote01.text"));
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        outerPanel.add(label, BorderLayout.SOUTH);
-
-        generalPanel.add(outerPanel);
+        layout.gridy++;
+        panel.add(createFurtherReadingPanel(), layout);
+        generalPanel.add(panel);
 
         return generalPanel;
     }
@@ -335,11 +326,55 @@ public class GeneralTab {
         }
     }
 
+    /**
+     * Event handler for the button action of btnIcon.
+     * Opens a {@link UnitIconDialog} for the user to select a unit icon.
+     * If selection is confirmed, the button's icon is updated to the selected one.
+     *
+     * @param actionEvent The {@link ActionEvent} object generated when button btnIcon is clicked.
+     */
     private void btnIconActionPerformed(ActionEvent actionEvent) {
         final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
         if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
             unitIcon = unitIconDialog.getSelectedItem();
             btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
         }
+    }
+
+    /**
+     * Creates a {@link JPanel} named FurtherReadingPanel.
+     * The panel contains other panels: headerPanelBMM, headerPanelTotalWarfare, and
+     * headerPanelCampaignOperations, each defining a specific campaign option.
+     * The panels are added to FurtherReadingPanel in top-to-bottom order.
+     *
+     * @return the constructed {@link JPanel}.
+     */
+    private JPanel createFurtherReadingPanel() {
+        // Contents
+        JPanel headerPanelBMM = new CampaignOptionsHeaderPanel("BMMPanel", "",
+            true);
+
+        JPanel headerPanelTotalWarfare = new CampaignOptionsHeaderPanel("TotalWarfarePanel",
+            "", true);
+
+        JPanel headerPanelCampaignOperations = new CampaignOptionsHeaderPanel("CampaignOperationsPanel",
+            "", true);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("FurtherReadingPanel",
+            true, "FurtherReadingPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanelBMM, layout);
+
+        layout.gridy++;
+        panel.add(headerPanelTotalWarfare, layout);
+
+        layout.gridy++;
+        panel.add(headerPanelCampaignOperations, layout);
+
+        return panel;
     }
 }
