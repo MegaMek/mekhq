@@ -542,7 +542,9 @@ public class AtBContract extends Contract {
                 setEndDate(today.plusDays(1));
             }
 
-            processMassRout(campaign, getStratconCampaignState());
+            if (campaign.getCampaignOptions().isUseStratCon()) {
+                processMassRout(campaign, getStratconCampaignState());
+            }
         }
 
         // Process the results of the reinforcement roll
