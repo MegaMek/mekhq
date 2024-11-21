@@ -214,7 +214,18 @@ public class StratconContractInitializer {
         // now we're done
     }
 
-    public static boolean seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
+    /**
+     * Seeds pre-deployed (hidden) forces in a {@link StratconTrackState}, taking into account
+     * contract type and intensity.
+     *
+     * @param contract  the current contract
+     * @param campaign  the current campaign.
+     * @param track     the relevant {@link StratconTrackState}
+     *
+     * @return a boolean where {@code true} means forces were not deployed due to being garrison
+     * type or pirate hunting and {@code false} implies forces have been deployed successfully.
+     */
+    private static boolean seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
         AtBContractType contractType = contract.getContractType();
 
         // If the contract is a garrison type, we don't want to generate what will appear to be
@@ -254,11 +265,6 @@ public class StratconContractInitializer {
     public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds,
                                                           int deploymentTime, int planetaryTemp,
                                                           double planetaryDiameter) {
-        // to initialize a track,
-        // 1. we set the # of required lances
-        // 2. set the track size to a total of numlances * 84 hexes, a rectangle that is
-        // wider than it is taller
-
         StratconTrackState retVal = new StratconTrackState();
         retVal.setRequiredLanceCount(numLances);
 
