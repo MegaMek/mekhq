@@ -2062,6 +2062,30 @@ public class StratconRulesManager {
         }
     }
 
+    /**
+     * Processes a mass rout in the given campaign state.
+     * <p>
+     * Loops through all tracks in the campaign state.
+     * For each track, it retrieves all scenarios.
+     * If scenario's deployment date is {@code null} and scenario is not a strategic objective,
+     * it is removed from the track and then updated.
+     *
+     * @param campaign        the current campaign.
+     * @param campaignState   the relevant StratCon campaign state.
+     */
+    public static void processMassRout(Campaign campaign, StratconCampaignState campaignState) {
+        for (StratconTrackState track : campaignState.getTracks()) {
+            List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
+
+            for (StratconScenario scenario : allScenarios) {
+                if (scenario.getDeploymentDate() == null && !scenario.isStrategicObjective()) {
+                    track.removeScenario(scenario);
+                    track.updateScenario(scenario);
+                }
+            }
+        }
+    }
+
     public void startup() {
         MekHQ.registerHandler(this);
     }
