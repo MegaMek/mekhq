@@ -375,6 +375,16 @@ public class AtBContract extends Contract {
         setLength(getContractType().calculateLength(variable, this));
     }
 
+    /**
+     * Calculates the number of lances required for this contract, based on [campaign].
+     *
+     * @param campaign The campaign to reference.
+     * @return The number of lances required.
+     */
+    public static int calculateRequiredLances(Campaign campaign) {
+        return Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+    }
+
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
         for (UUID uuid : campaign.getForces().getAllUnits(true)) {
@@ -1477,7 +1487,7 @@ public class AtBContract extends Contract {
             enemyCode = "REB";
         }
 
-        requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+        requiredLances = calculateRequiredLances(campaign);
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
 
