@@ -52,6 +52,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -431,6 +432,7 @@ public class AtBContract extends Contract {
             if (today.isAfter(routEnd)) {
                 setMoraleLevel(AtBMoraleLevel.STALEMATE);
                 routEnd = null;
+
                 updateEnemy(campaign, today); // mix it up a little
             } else {
                 setMoraleLevel(AtBMoraleLevel.ROUTED);
@@ -493,8 +495,20 @@ public class AtBContract extends Contract {
             miscModifiers += 2;
         }
 
+        int balanceOfPower = 0;
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            balanceOfPower = -campaign.getLanceList().size() * 5;
+
+            int enemyForceCount = 0;
+            for (StratconTrackState track : getStratconCampaignState().getTracks()) {
+                enemyForceCount = track.getScenarios().size();
+            }
+
+            balanceOfPower += enemyForceCount;
+        }
+
         // Total morale modifier calculation
-        int totalModifier = enemySkillModifier - allySkillModifier + performanceModifier + miscModifiers;
+        int totalModifier = enemySkillModifier - allySkillModifier + performanceModifier + miscModifiers + balanceOfPower;
         int roll = Compute.d6(2) + totalModifier;
 
         // Morale level determination based on roll value

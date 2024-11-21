@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Random;
 
 import static java.lang.Math.round;
+import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
 import static mekhq.campaign.stratcon.StratconRulesManager.calculateScenarioOdds;
 
@@ -194,34 +195,8 @@ public class StratconContractInitializer {
 
         // Initialize non-objective scenarios
         for (StratconTrackState track : campaignState.getTracks()) {
-            AtBContractType contractType = contract.getContractType();
-
-            // If the contract is a garrison type, we don't want to generate what will appear to be
-            // a full-scale invasion on day one. Furthermore, Pirates do not have enough resources
-            // to deploy standing forces in this manner.
-            if (contractType.isGarrisonType() || contractType.isPirateHunting()) {
+            if (seedPreDeployedForces(contract, campaign, track)) {
                 break;
-            }
-
-            // otherwise, seed each sector with hidden forces.
-            // the number of hidden forces is dependent on the type of contract.
-            final int OFFENSIVE_MULTIPLIER = 10;
-            final int DEFENSIVE_MULTIPLIER = 20;
-
-            int multiplier = DEFENSIVE_MULTIPLIER;
-
-            if (contractType.isRaidType() || contractType.isGuerrillaWarfare()) {
-                multiplier = OFFENSIVE_MULTIPLIER;
-            } else if (contract.getContractType().isPlanetaryAssault()) {
-                multiplier = OFFENSIVE_MULTIPLIER / 2;
-            }
-
-            int preDeployedScenarios = track.getSize() / multiplier;
-            preDeployedScenarios = (int) round(preDeployedScenarios
-                * ((double) calculateScenarioOdds(track, contract, false) / 100));
-
-            for (int i = 0; i < preDeployedScenarios; i++) {
-                addHiddenExternalScenario(campaign, contract, track, null, false);
             }
         }
 
@@ -237,6 +212,39 @@ public class StratconContractInitializer {
         }
 
         // now we're done
+    }
+
+    public static boolean seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
+        AtBContractType contractType = contract.getContractType();
+
+        // If the contract is a garrison type, we don't want to generate what will appear to be
+        // a full-scale invasion on day one. Furthermore, Pirates do not have enough resources
+        // to deploy standing forces in this manner.
+        if (contractType.isGarrisonType() || contractType.isPirateHunting()) {
+            return true;
+        }
+
+        // otherwise, seed each sector with hidden forces.
+        // the number of hidden forces is dependent on the type of contract.
+        final int OFFENSIVE_MULTIPLIER = 10;
+        final int DEFENSIVE_MULTIPLIER = 20;
+
+        int multiplier = DEFENSIVE_MULTIPLIER;
+
+        if (contractType.isRaidType() || contractType.isGuerrillaWarfare()) {
+            multiplier = OFFENSIVE_MULTIPLIER;
+        } else if (contract.getContractType().isPlanetaryAssault()) {
+            multiplier = OFFENSIVE_MULTIPLIER / 2;
+        }
+
+        int preDeployedScenarios = track.getSize() / multiplier;
+        preDeployedScenarios = (int) round(preDeployedScenarios
+            * ((double) calculateScenarioOdds(track, contract, false) / 100));
+
+        for (int i = 0; i < preDeployedScenarios; i++) {
+            addHiddenExternalScenario(campaign, contract, track, null, false);
+        }
+        return false;
     }
 
     /**
@@ -456,8 +464,7 @@ public class StratconContractInitializer {
             for (int x = 0; x < trackWidth; x++) {
                 StratconCoords coords = new StratconCoords(x, y);
 
-                if (trackState.getScenario(coords) == null) {
-                    suitableCoords.add(coords);
+                if (trackState.getScenario(coords) != null) {
                     continue;
                 }
 
@@ -482,6 +489,48 @@ public class StratconContractInitializer {
             int randomIndex = new Random().nextInt(suitableCoords.size());
             return suitableCoords.get(randomIndex);
         }
+    }
+
+    /**
+     * Searches for and returns a suitable adjacent coordinate to the given origin coordinates on
+     * the provided {@link StratconTrackState}.
+     * The method checks all the possible directions and considers a coordinate suitable if it
+     * doesn't contain a scenario and if it either doesn't contain a facility or contains a
+     * player-allied one.
+     * If there are multiple suitable coordinates, one is chosen at random.
+     *
+     * @param originCoords the {@link StratconCoords} around which to search for a suitable coordinate
+     * @param trackState   the {@link StratconTrackState} on which to perform the search
+     * @return a {@link StratconCoords} object representing the coordinates of a suitable adjacent
+     * location, or {code null} if no suitable location was found.
+     */
+    public static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
+                                                                       StratconTrackState trackState) {
+        List<StratconCoords> suitableCoords = new ArrayList<>();
+
+        for (int direction : ALL_DIRECTIONS) {
+            StratconCoords newCoords = originCoords.translate(direction);
+
+            if (trackState.getScenario(newCoords) != null) {
+                continue;
+            }
+
+            if (trackState.getFacility(newCoords) == null) {
+                suitableCoords.add(newCoords);
+                continue;
+            }
+
+            if (trackState.getFacility(newCoords).getOwner() != ForceAlignment.Opposing) {
+                suitableCoords.add(newCoords);
+            }
+        }
+
+        if (suitableCoords.isEmpty()) {
+            return null;
+        }
+
+        int randomIndex = new Random().nextInt(suitableCoords.size());
+        return suitableCoords.get(randomIndex);
     }
 
     /**

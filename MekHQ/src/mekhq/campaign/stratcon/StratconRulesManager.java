@@ -57,6 +57,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedAdjacentCoords;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 
 /**
@@ -1709,49 +1710,37 @@ public class StratconRulesManager {
      * figure out the odds of a scenario occurring.
      */
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
-            boolean playerDeployingForce) {
-        // rules:
-        // ROUTED: 0%
-        // CRITICAL: -10% when deploying forces to track, 0% attack
-        // WEAKENED: -5%
-        // ADVANCING: +5%
-        // DOMINATING: +10%
-        // OVERWHELMING: +100%
-        int moraleModifier = 0;
-
-        switch (contract.getMoraleLevel()) {
-            case ROUTED:
-                return 0;
-            case CRITICAL:
-                if (playerDeployingForce) {
-                    moraleModifier = -10;
-                } else {
-                    return 0;
-                }
-                break;
-            case WEAKENED:
-                moraleModifier = -5;
-                break;
-            case ADVANCING:
-                moraleModifier = 5;
-                break;
-            case DOMINATING:
-                if (playerDeployingForce) {
-                    moraleModifier = 20;
-                } else {
-                    return 10;
-                }
-                break;
-            case OVERWHELMING:
-                if (playerDeployingForce) {
-                    moraleModifier = 50;
-                } else {
-                    return 25;
-                }
-                break;
-            default:
-                break;
+            boolean isReinforcements) {
+        if (contract.getMoraleLevel().isRouted()) {
+            return 0;
         }
+
+        int moraleModifier = switch (contract.getMoraleLevel()) {
+            case CRITICAL -> {
+                if (isReinforcements) {
+                    yield -10;
+                } else {
+                    yield 0;
+                }
+            }
+            case WEAKENED -> -5;
+            case ADVANCING -> 5;
+            case DOMINATING -> {
+                if (isReinforcements) {
+                    yield 20;
+                } else {
+                    yield 10;
+                }
+            }
+            case OVERWHELMING -> {
+                if (isReinforcements) {
+                    yield 50;
+                } else {
+                    yield 25;
+                }
+            }
+            default -> 0;
+        };
 
         int dataCenterModifier = track.getScenarioOddsAdjustment();
 
@@ -2031,6 +2020,48 @@ public class StratconRulesManager {
         return true;
     }
 
+    /**
+     * Performs the daily movement processing for each active scenario in every track of the given
+     * {@link StratconCampaignState}.
+     * This processing involves evaluating each scenario and, if it is not yet deployed, attempting
+     * to move it to an unoccupied coordinate.
+     * If movement is possible, the scenario is updated with the new coordinates and parameters are
+     * set based on the new location's biome.
+     * If the new location contains a facility, the scenario is replaced with a facility scenario.
+     *
+     * @param campaign       the current campaign
+     * @param campaignState  the relevant {@link StratconCampaignState}
+     */
+    public static void processDailyMovement(Campaign campaign, StratconCampaignState campaignState) {
+        for (StratconTrackState track : campaignState.getTracks()) {
+            List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
+
+            for (StratconScenario scenario : allScenarios) {
+                StratconCoords scenarioCoords = scenario.getCoords();
+
+                if (scenario.getDeploymentDate() == null) {
+                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(scenarioCoords, track);
+
+                    if (newCoords == null) {
+                        continue;
+                    }
+
+                    track.removeScenario(scenario);
+                    track.updateScenario(scenario);
+
+                    if (track.getFacility(newCoords) == null) {
+                        scenario.setCoords(newCoords);
+                        setScenarioParametersFromBiome(track, scenario);
+                        track.addScenario(scenario);
+                    } else {
+                        generateExternalScenario(campaign, campaignState.getContract(), track, newCoords,
+                            null, true);
+                    }
+                }
+            }
+        }
+    }
+
     public void startup() {
         MekHQ.registerHandler(this);
     }
@@ -2074,9 +2105,17 @@ public class StratconRulesManager {
                         }
                     }
 
-                    // on monday, generate new scenarios
+                    processDailyMovement(ev.getCampaign(), campaignState);
+
+                    // on monday, generate new scenarios and reinforce existing enemy forces
                     if (isMonday) {
                         generateScenariosForTrack(ev.getCampaign(), contract, track);
+
+                        int reinforcementOdds = calculateScenarioOdds(track, contract, true);
+
+                        while (Compute.randomInt(100) < reinforcementOdds) {
+                            addHiddenExternalScenario(ev.getCampaign(), contract, track, null, false);
+                        }
                     }
                 }
             }
