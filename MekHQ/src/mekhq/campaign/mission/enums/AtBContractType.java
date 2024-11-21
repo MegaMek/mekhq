@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import java.util.ResourceBundle;
-
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -27,6 +25,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
+
+import java.util.ResourceBundle;
 
 public enum AtBContractType {
     // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
@@ -137,6 +137,16 @@ public enum AtBContractType {
 
     public boolean isRaidType() {
         return isDiversionaryRaid() || isObjectiveRaid() || isReconRaid() || isExtractionRaid();
+    }
+
+    /**
+     * Checks if the given contract is offensive.
+     *
+     * @return {@code true} if the contract is of raid type, pirate hunting, or guerrilla warfare;
+     * {@code false} otherwise
+     */
+    public boolean isOffensive() {
+        return isRaidType() || isPirateHunting() || isGuerrillaWarfare();
     }
     // endregion Boolean Comparison Methods
 

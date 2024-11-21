@@ -38,8 +38,8 @@ import java.util.Random;
 
 import static java.lang.Math.round;
 import static megamek.common.Coords.ALL_DIRECTIONS;
+import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
-import static mekhq.campaign.stratcon.StratconRulesManager.calculateScenarioOdds;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -195,9 +195,7 @@ public class StratconContractInitializer {
 
         // Initialize non-objective scenarios
         for (StratconTrackState track : campaignState.getTracks()) {
-            if (seedPreDeployedForces(contract, campaign, track)) {
-                break;
-            }
+            seedPreDeployedForces(contract, campaign, track);
         }
 
         // clean up objectives for integrated command:
@@ -216,48 +214,51 @@ public class StratconContractInitializer {
 
     /**
      * Seeds pre-deployed (hidden) forces in a {@link StratconTrackState}, taking into account
-     * contract type and intensity.
+     * contract type, enemy quality, and enemy faction.
      *
      * @param contract  the current contract
      * @param campaign  the current campaign.
      * @param track     the relevant {@link StratconTrackState}
-     *
-     * @return a boolean where {@code true} means forces were not deployed due to being garrison
-     * type or pirate hunting and {@code false} implies forces have been deployed successfully.
      */
-    public static boolean seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
+    public static void seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
+        final int CLAN_CLUSTER = 27; // Stars
+        final int IS_BATTALION = 27; // Lances
+        final int COMSTAR_LEVEL_IV = 36; // Level IIs
+
+        double multiplier = switch (contract.getEnemyQuality()) {
+            case DRAGOON_F -> 0.25;
+            case DRAGOON_D -> 0.5;
+            case DRAGOON_C -> 0.75;
+            case DRAGOON_B -> 1;
+            case DRAGOON_A -> 1.5;
+            case DRAGOON_ASTAR -> 2;
+            default ->
+                throw new IllegalStateException(
+                    "Unexpected value in mekhq/campaign/stratcon/StratconContractInitializer.java/seedPreDeployedForces: "
+                        + contract.getEnemyQuality());
+        };
+
         AtBContractType contractType = contract.getContractType();
 
-        // If the contract is a garrison type, we don't want to generate what will appear to be
-        // a full-scale invasion on day one. Furthermore, Pirates do not have enough resources
-        // to deploy standing forces in this manner.
-        if (contractType.isGarrisonType() || contractType.isPirateHunting()) {
-            return true;
+        if (contractType.isPirateHunting() || contractType.isGarrisonType()) {
+            multiplier *= 0.5;
+        } else if (contractType.isOffensive()) {
+            multiplier *= 2;
         }
 
-        // otherwise, seed each sector with hidden forces.
-        // the number of hidden forces is dependent on the type of contract.
-        final int OFFENSIVE_MULTIPLIER = 10;
-        final int DEFENSIVE_MULTIPLIER = 20;
+        int elementCount = IS_BATTALION;
 
-        int multiplier = DEFENSIVE_MULTIPLIER;
-
-        if (contractType.isGarrisonType() || contractType.isPirateHunting()) {
-            multiplier = (int) (DEFENSIVE_MULTIPLIER * 1.5);
-        } else if (contractType.isRaidType() || contractType.isGuerrillaWarfare()) {
-            multiplier = OFFENSIVE_MULTIPLIER;
-        } else if (contract.getContractType().isPlanetaryAssault()) {
-            multiplier = OFFENSIVE_MULTIPLIER / 2;
+        if (contract.getEnemy().isClan()) {
+            elementCount = CLAN_CLUSTER;
+        } else if (contract.getEnemy().isComStarOrWoB()) {
+            elementCount = COMSTAR_LEVEL_IV;
         }
 
-        int preDeployedScenarios = track.getSize() / multiplier;
-        preDeployedScenarios = (int) round(preDeployedScenarios
-            * ((double) calculateScenarioOdds(track, contract, false) / 100));
+        elementCount = (int) round(elementCount * multiplier);
 
-        for (int i = 0; i < preDeployedScenarios; i++) {
+        for (int i = 0; i < elementCount; i++) {
             addHiddenExternalScenario(campaign, contract, track, null, false);
         }
-        return false;
     }
 
     /**
