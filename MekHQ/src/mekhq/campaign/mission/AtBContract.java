@@ -85,6 +85,7 @@ import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.stratcon.StratconContractInitializer.seedPreDeployedForces;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
@@ -434,6 +435,12 @@ public class AtBContract extends Contract {
                 routEnd = null;
 
                 updateEnemy(campaign, today); // mix it up a little
+
+                if (campaign.getCampaignOptions().isUseStratCon()) {
+                    for (StratconTrackState track : getStratconCampaignState().getTracks()) {
+                        seedPreDeployedForces(this, campaign, track);
+                    }
+                }
             } else {
                 setMoraleLevel(AtBMoraleLevel.ROUTED);
             }

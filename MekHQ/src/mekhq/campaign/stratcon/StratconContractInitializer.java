@@ -225,7 +225,7 @@ public class StratconContractInitializer {
      * @return a boolean where {@code true} means forces were not deployed due to being garrison
      * type or pirate hunting and {@code false} implies forces have been deployed successfully.
      */
-    private static boolean seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
+    public static boolean seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
         AtBContractType contractType = contract.getContractType();
 
         // If the contract is a garrison type, we don't want to generate what will appear to be
@@ -242,7 +242,9 @@ public class StratconContractInitializer {
 
         int multiplier = DEFENSIVE_MULTIPLIER;
 
-        if (contractType.isRaidType() || contractType.isGuerrillaWarfare()) {
+        if (contractType.isGarrisonType() || contractType.isPirateHunting()) {
+            multiplier = (int) (DEFENSIVE_MULTIPLIER * 1.5);
+        } else if (contractType.isRaidType() || contractType.isGuerrillaWarfare()) {
             multiplier = OFFENSIVE_MULTIPLIER;
         } else if (contract.getContractType().isPlanetaryAssault()) {
             multiplier = OFFENSIVE_MULTIPLIER / 2;
