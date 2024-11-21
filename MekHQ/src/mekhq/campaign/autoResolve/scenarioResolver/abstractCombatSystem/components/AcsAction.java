@@ -2,7 +2,6 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.compone
 
 import megamek.common.IGame;
 import megamek.common.actions.EntityAction;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
 
 public interface AcsAction extends EntityAction {
 

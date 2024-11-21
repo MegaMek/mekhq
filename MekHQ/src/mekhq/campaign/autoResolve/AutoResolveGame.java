@@ -1,20 +1,21 @@
-package mekhq.campaign.autoResolve.helper;
+package mekhq.campaign.autoResolve;
 
 import megamek.client.ui.swing.sbf.SelectDirection;
 import megamek.common.*;
+import megamek.common.actions.EntityAction;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.GamePhase;
-import megamek.common.event.GameEntityNewEvent;
 import megamek.common.event.GamePhaseChangeEvent;
-import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.options.BasicGameOptions;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.SBFRuleOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.strategicBattleSystems.SBFFormation;
+import megamek.common.strategicBattleSystems.SBFUnit;
 import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryHelper;
+import megamek.server.victory.VictoryResult;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsActionHandler;
@@ -25,8 +26,6 @@ import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static java.util.stream.Collectors.toList;
 
 public class AutoResolveGame extends AbstractGame implements PlanetaryConditionsUsing {
     private static final MMLogger logger = MMLogger.create(AutoResolveGame.class);
@@ -52,7 +51,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      */
     private final SBFFullGameReport gameReport = new SBFFullGameReport();
     private final List<AcsTurn> turnList = new ArrayList<>();
-    private int turnIndex = -1;
+
     private boolean gameEnded = false;
 
     /**
@@ -68,6 +67,9 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     private final Map<String, Object> victoryContext = new HashMap<>();
     private final VictoryHelper victoryHelper = new VictoryHelper(getOptions());
+    private int victoryPlayerId = Player.PLAYER_NONE;
+    private int victoryTeam = Player.TEAM_NONE;
+
 
     public AutoResolveGame(MekHQ app, List<Unit> units, AtBScenario scenario) {
         setBoard(0, new Board());
@@ -117,6 +119,12 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return objects.stream().filter(Entity.class::isInstance).map(o -> (Entity) o).toList();
     }
 
+    @Override
+    public void addAction(EntityAction action) {
+        pendingActions.add(action);
+    }
+
+
     public int getNoOfEntities() {
         return inGameTWEntities().size();
     }
@@ -143,7 +151,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         // Return the number of selected entities.
         return retVal;
     }
-
 
     /**
      * Returns an enumeration of salvageable entities.
@@ -263,12 +270,18 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     @Override
-    public @Nullable AcsTurn getTurn() {
+    public AcsTurn getTurn() {
         if ((turnIndex < 0) || (turnIndex >= turnList.size())) {
             return null;
-        } else {
-            return turnList.get(turnIndex);
         }
+        return turnList.get(turnIndex);
+    }
+
+    public Optional<AcsTurn> getCurrentTurn() {
+        if ((turnIndex < 0) || (turnIndex >= turnList.size())) {
+            return Optional.empty();
+        }
+        return Optional.of(turnList.get(turnIndex));
     }
 
     @Override
@@ -384,8 +397,62 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     @Override
+    public int getLiveDeployedEntitiesOwnedBy(Player player) {
+        var res = getInGameObjects().stream()
+            .filter(unit -> unit instanceof SBFFormation)
+            .filter(unit -> unit.getOwnerId() == player.getId())
+            .filter(unit -> ((SBFFormation) unit).isDeployed())
+            .mapToInt(unit -> ((SBFFormation) unit).getUnits().stream().mapToInt(SBFUnit::getCurrentArmor).sum())
+            .filter(armor -> armor > 0).count();
+
+        return (int) res;
+    }
+
+    @Override
     public ReportEntry getNewReport(int messageId) {
+        // NOT IMPLEMENTED
         return null;
+    }
+
+    @Override
+    public void setVictoryPlayerId(int victoryPlayerId) {
+        this.victoryPlayerId = victoryPlayerId;
+    }
+
+    @Override
+    public void setVictoryTeam(int victoryTeam) {
+        this.victoryTeam = victoryTeam;
+    }
+
+    @Override
+    public void cancelVictory() {
+        this.victoryPlayerId = Player.PLAYER_NONE;
+        this.victoryTeam = Player.TEAM_NONE;
+    }
+
+    @Override
+    public int getVictoryPlayerId() {
+        return victoryPlayerId;
+    }
+
+    @Override
+    public int getVictoryTeam() {
+        return victoryTeam;
+    }
+
+    @Override
+    public boolean gameTimerIsExpired() {
+        return getOptions().booleanOption(OptionsConstants.VICTORY_USE_GAME_TURN_LIMIT)
+            && (getRoundCount() == getOptions().intOption(OptionsConstants.VICTORY_GAME_TURN_LIMIT));
+    }
+
+    private int getRoundCount() {
+        return currentRound;
+    }
+
+    @Override
+    public int getLiveCommandersOwnedBy(Player player) {
+        return 0;
     }
 
     public List<AcsActionHandler> getActionHandlers() {
@@ -396,8 +463,9 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return getInGameObjects();
     }
 
-    public AcsTurn changeToNextTurn() {
-        return null;
+    public Optional<AcsTurn> changeToNextTurn() {
+        turnIndex++;
+        return getCurrentTurn();
     }
 
     public boolean hasEligibleFormation(AcsFormationTurn turn) {
@@ -542,18 +610,22 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      */
     public List<SBFFormation> getActiveFormations() {
         return inGameObjects.values().stream()
-            .filter(u -> u instanceof SBFFormation)
-            .map(u -> (SBFFormation) u)
-            .toList();
+                .filter(u -> u instanceof SBFFormation)
+                .map(u -> (SBFFormation) u)
+                .toList();
     }
 
     public List<SBFFormation> getActiveFormations(Player player) {
         return getActiveFormations().stream()
-            .filter(f -> f.getOwnerId() == player.getId())
-            .toList();
+                .filter(f -> f.getOwnerId() == player.getId())
+                .toList();
     }
 
     public boolean gameHasEnded() {
         return gameEnded || isForceVictory();
+    }
+
+    public VictoryResult getVictoryResult() {
+        return victoryHelper.checkForVictory(this, victoryContext);
     }
 }

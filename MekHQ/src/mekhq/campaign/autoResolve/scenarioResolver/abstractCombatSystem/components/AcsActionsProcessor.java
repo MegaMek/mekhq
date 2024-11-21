@@ -14,6 +14,8 @@ public record AcsActionsProcessor(AcsGameManager gameManager) implements AcsGame
         for (EntityAction action : game().getActionsVector()) {
             if (action instanceof AcsAttackAction attack && attack.getHandler(gameManager) != null) {
                 game().addActionHandler(attack.getHandler(gameManager));
+            } else if (action instanceof AcsEngagementControlAction engagementControl && engagementControl.getHandler(gameManager) != null) {
+                game().addActionHandler(engagementControl.getHandler(gameManager));
             }
         }
     }

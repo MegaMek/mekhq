@@ -4,7 +4,7 @@ import megamek.common.IGame;
 import megamek.common.alphaStrike.ASRange;
 import megamek.common.strategicBattleSystems.SBFFormation;
 import megamek.logging.MMLogger;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 
 import java.util.Optional;
 

@@ -50,7 +50,6 @@ import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.autoResolve.AutoResolveEngine;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;

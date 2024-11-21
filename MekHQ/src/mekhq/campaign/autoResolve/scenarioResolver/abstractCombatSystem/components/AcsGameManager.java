@@ -22,7 +22,6 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.compone
 import megamek.common.*;
 import megamek.common.actions.EntityAction;
 import megamek.common.enums.GamePhase;
-import megamek.common.net.enums.PacketCommand;
 import megamek.common.net.packets.Packet;
 import megamek.common.strategicBattleSystems.SBFFormation;
 import megamek.common.strategicBattleSystems.SBFReportEntry;
@@ -30,8 +29,8 @@ import megamek.logging.MMLogger;
 import megamek.server.AbstractGameManager;
 import megamek.server.Server;
 import megamek.server.commands.ServerCommand;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.PhaseHandler;
+import megamek.server.victory.VictoryResult;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 
 import java.util.*;
 
@@ -49,20 +48,28 @@ public final class AcsGameManager extends AbstractGameManager {
 
     final AcsPhaseEndManager phaseEndManager = new AcsPhaseEndManager(this);
     final AcsPhasePreparationManager phasePreparationManager = new AcsPhasePreparationManager(this);
-    final AcsMovementProcessor movementProcessor = new AcsMovementProcessor(this);
+    final AcsEngagementControlProcessor engagementControlProcessor = new AcsEngagementControlProcessor(this);
     final AcsAttackProcessor attackProcessor = new AcsAttackProcessor(this);
     final AcsActionsProcessor actionsProcessor = new AcsActionsProcessor(this);
     final AcsInitiativeHelper initiativeHelper = new AcsInitiativeHelper(this);
-    final AcsDetectionHelper detectionHelper = new AcsDetectionHelper(this);
+    final AcsRecoveringNerveProcessor recoveringNerveProcessor = new AcsRecoveringNerveProcessor(this);
+
     final List<PhaseHandler> phaseHandlers = new ArrayList<>();
 
     public AutoResolveGame getGame() {
         return game;
     }
 
-    public AcsGameManager addPhaseHandler(PhaseHandler handler) {
+    public void addPhaseHandler(PhaseHandler handler) {
         phaseHandlers.add(handler);
-        return this;
+    }
+
+    public void addAttack(List<EntityAction> actions, SBFFormation formation) {
+        attackProcessor.processAttacks(actions, formation);
+    }
+
+    public void addNerveRecovery(AcsRecoveringNerveAction recoveringNerveAction, SBFFormation formation) {
+        recoveringNerveProcessor.processRecoveringNerve(recoveringNerveAction, formation);
     }
 
     @Override
@@ -72,35 +79,6 @@ public final class AcsGameManager extends AbstractGameManager {
             return;
         }
         game = (AutoResolveGame) g;
-    }
-
-    @Override
-    public void send(Packet packet) {
-        // This runs offline, there are no packets to send
-    }
-
-    @Override
-    public void resetGame() {
-    }
-
-    @Override
-    public void disconnect(Player player) {
-    }
-
-    @Override
-    public void removeAllEntitiesOwnedBy(Player player) {
-    }
-
-    @Override
-    public void handleCfrPacket(Server.ReceivedPacket rp) {
-    }
-
-    @Override
-    public void requestGameMaster(Player player) {
-    }
-
-    @Override
-    public void requestTeamChange(int teamId, Player player) {
     }
 
     @Override
@@ -159,12 +137,16 @@ public final class AcsGameManager extends AbstractGameManager {
         player.setDone(done);
     }
 
+
+    public void addEngagementControl(AcsEngagementControlAction action, SBFFormation formation) {
+        engagementControlProcessor.processEngagementControl(action, formation);
+    }
+
     /**
      * Rolls initiative for all teams.
      */
     void rollInitiative() {
         TurnOrdered.rollInitiative(game.getTeams(), false);
-        transmitAllPlayerUpdates();
     }
 
     public void clearPendingReports() {
@@ -179,155 +161,90 @@ public final class AcsGameManager extends AbstractGameManager {
         gameReport.add(game.getCurrentRound(), pendingReports);
     }
 
-    /**
-     * Tries to change to the next turn. If there are no more turns, ends the
-     * current phase. If the player whose turn it is next is not connected, we
-     * allow the other players to skip that player.
-     */
-    private void changeToNextTurn() {
-        if (!game.hasMoreTurns()) {
+    public void changeToNextTurn() {
+        var nextTurn = getNextValidTurn();
+        if (nextTurn.isEmpty()) {
             endCurrentPhase();
-            return;
         }
+    }
 
-        AcsTurn nextTurn = game.changeToNextTurn();
-        boolean isValidTurn = nextTurn.isValid(game);
-        while (game.hasMoreTurns() && !isValidTurn) {
+    public Optional<AcsTurn> getNextValidTurn() {
+        Optional<AcsTurn> nextTurn = game.changeToNextTurn();
+        while (nextTurn.isPresent() && !nextTurn.get().isValid(game)) {
             nextTurn = game.changeToNextTurn();
-            isValidTurn = nextTurn.isValid(game);
         }
-
-        if (!isValidTurn) {
-            endCurrentPhase();
-        }
+        return nextTurn;
     }
 
-    private List<InGameObject> getVisibleUnits(Player viewer) {
-        return game.getFullyVisibleUnits(viewer);
-    }
-
-    /**
-     * Send the round report to all connected clients.
-     */
-    public void sendReport() {
-        // EmailService mailer = Server.getServerInstance().getEmailService();
-        // if (mailer != null) {
-        // for (var player: mailer.getEmailablePlayers(game)) {
-        // try {
-        // var reports = filterReportVector(vPhaseReport, player);
-        // var message = mailer.newReportMessage(game, reports, player);
-        // mailer.send(message);
-        // } catch (Exception ex) {
-        // logger.error("Error sending round report", ex);
-        // }
-        // }
-        // }
-        // game.getPlayersList().forEach(player -> send(player.getId(), createReportPacket(player)));
-    }
-
-    /**
-     * Receives an entity movement packet, and if valid, executes it and ends
-     * the current turn.
-     */
-    private void receiveMovement(Packet packet, int connId) {
-        var movePath = (AcsMovePath) packet.getObject(0);
-        movePath.restore(game);
-        Optional<SBFFormation> formationInfo = game.getFormation(movePath.getEntityId());
-        if (formationInfo.isEmpty()) {
-            logger.error("Malformed packet {}", packet);
-            return;
-        }
-        AcsTurn turn = game.getTurn();
-        if ((turn == null) || !turn.isValid(connId, formationInfo.get(), game)) {
-            logger.error("It is not player {}'s turn! ", connId);
-            return;
-        }
-
-        movementProcessor.processMovement(movePath, formationInfo.get());
-    }
-
-    /**
-     * Called when the current player has done his current turn and the turn
-     * counter needs to be advanced.
-     */
     void endCurrentTurn() {
         changeToNextTurn();
-    }
-
-    public void receiveAttack(int formationId, List<EntityAction> attacks, int playerId) {
-        Optional<SBFFormation> formationInfo = game.getFormation(formationId);
-
-        if (formationInfo.isEmpty()
-            || !attacks.stream().map(EntityAction::getEntityId).allMatch(id -> id == formationId)) {
-            logger.error("Invalid formation ID or diverging attacker IDs");
-            changeToNextTurn();
-            return;
-        }
-
-        for (EntityAction action : attacks) {
-            if (!validateEntityAction(action, playerId)) {
-                return;
-            }
-        }
-
-        // is this the right phase?
-        if (!getGame().getPhase().isFiring() && !getGame().getPhase().isPhysical()
-            && !getGame().getPhase().isTargeting() && !getGame().getPhase().isOffboard()) {
-            logger.error("Server got attack packet in wrong phase");
-            return;
-        }
-
-        // looks like mostly everything's okay
-        attackProcessor.processAttacks(attacks, formationInfo.get());
-    }
-
-    private boolean validateEntityAction(EntityAction action, int playerId) {
-        Optional<SBFFormation> formationInfo = game.getFormation(action.getEntityId());
-        if (formationInfo.isEmpty()) {
-            logger.error("Incorrect formation ID {}", action.getEntityId());
-            return false;
-        }
-        AcsTurn turn = game.getTurn();
-        if ((turn == null) || !turn.isValid(playerId, formationInfo.get(), game)) {
-            logger.error("It is not player {}'s turn! ", playerId);
-            return false;
-        }
-
-        return true;
-    }
-
-    public void detectHiddenUnits() {
-    }
-
-    public void applyBuildingDamage() {
-    }
-
-    public void resolveCallSupport() {
-    }
-
-    public void updateSpacecraftDetection() {
-    }
-
-    public void detectSpacecraft() {
-    }
-
-
-    @Override
-    public void handlePacket(int connId, Packet packet) {
-        // This runs offline, there are no packets to send
-    }
-
-    @Override
-    public void transmitAllPlayerUpdates() {
-        // This runs offline, there are no packets to send
-    }
-
-    @Override
-    public void send(int connId, Packet packet) {
-        // This runs offline, there are no packets to send
     }
 
     public void runGame() {
         changePhase(GamePhase.STARTING_SCENARIO);
     }
+
+
+    /**
+     * Returns true if victory conditions have been met. Victory conditions are
+     * when there is only one player left with meks or only one team. will also
+     * add some reports to reporting
+     */
+
+    public boolean checkForVictory() {
+        VictoryResult vr = game.getVictoryResult();
+        var reports = vr.processVictory(game);
+        if (!reports.isEmpty()) {
+            reports.forEach(this::addReport);
+            vr.setVictory(true);
+        }
+        return vr.isVictory();
+    }
+
+
+// region not in use
+    @Override
+    public void send(Packet packet) {
+    }
+
+    @Override
+    public void resetGame() {
+    }
+
+    @Override
+    public void disconnect(Player player) {
+    }
+
+    @Override
+    public void removeAllEntitiesOwnedBy(Player player) {
+    }
+
+    @Override
+    public void handleCfrPacket(Server.ReceivedPacket rp) {
+    }
+
+    @Override
+    public void requestGameMaster(Player player) {
+    }
+
+    @Override
+    public void requestTeamChange(int teamId, Player player) {
+    }
+
+    public void resolveCallSupport() {
+    }
+
+    @Override
+    public void handlePacket(int connId, Packet packet) {
+    }
+
+    @Override
+    public void transmitAllPlayerUpdates() {
+    }
+
+    @Override
+    public void send(int connId, Packet packet) {
+    }
+
+// endregion not in use
 }

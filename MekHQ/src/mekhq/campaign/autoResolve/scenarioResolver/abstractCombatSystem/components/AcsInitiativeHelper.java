@@ -20,13 +20,7 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
      */
     void determineTurnOrder(GamePhase phase) {
         final List<AcsTurn> turns;
-        if (phase.isDeployMinefields()) {
-            turns = game().getPlayersList().stream()
-                .filter(Player::hasMinefields)
-                .map(p -> new AcsPlayerTurn(p.getId()))
-                .collect(Collectors.toList());
-
-        } else if (phase.isFiring()) {
+        if (phase.isFiring() || phase.isMovement()) {
             turns = game().getInGameObjects().stream()
                 .filter(SBFFormation.class::isInstance)
                 .filter(unit -> ((SBFFormation) unit).isDeployed())
@@ -88,7 +82,6 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
 
         game().setTurns(turns);
         game().resetTurnIndex();
-        send(packetHelper().createTurnListPacket());
     }
 
     void writeInitiativeReport() {

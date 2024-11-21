@@ -1,9 +1,8 @@
 package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
 
 import megamek.common.*;
-import megamek.common.force.Forces;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.helper.SetupTeams;
 import mekhq.campaign.autoResolve.helper.UnitStrengthHelper;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;

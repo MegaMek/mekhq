@@ -26,9 +26,7 @@ public record AcsUnitUpdateHelper(AcsGameManager gameManager) implements AcsGame
      * @see #sendUnitUpdate(Player, InGameObject)
      */
     void sendAllUnitUpdate(Player player) {
-        for (InGameObject unit : game().getInGameObjects()) {
-            sendUnitUpdate(player, unit);
-        }
+
     }
 
     /**
@@ -55,9 +53,7 @@ public record AcsUnitUpdateHelper(AcsGameManager gameManager) implements AcsGame
      * @param unit The unit to send
      */
     void sendUnitUpdate(InGameObject unit) {
-        for (Player player : game().getPlayersList()) {
-            sendUnitUpdate(player, unit);
-        }
+        // do nothing
     }
 
     private InGameObject getReplacement(SBFFormation formation, SBFVisibilityStatus visibility) {

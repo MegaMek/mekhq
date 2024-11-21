@@ -1,7 +1,6 @@
 package mekhq.campaign.autoResolve;
 
 import mekhq.MekHQ;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
 

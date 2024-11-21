@@ -1,7 +1,7 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
 
 import megamek.common.AbstractPlayerTurn;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 
 public abstract class AcsTurn extends AbstractPlayerTurn {
 

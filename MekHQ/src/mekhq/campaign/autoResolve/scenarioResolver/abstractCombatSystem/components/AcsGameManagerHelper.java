@@ -3,7 +3,7 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.compone
 import megamek.common.net.packets.Packet;
 import megamek.common.strategicBattleSystems.SBFReportEntry;
 import megamek.server.GameManagerPacketHelper;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 
 public interface AcsGameManagerHelper {
 

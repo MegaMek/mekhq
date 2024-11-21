@@ -15,7 +15,7 @@ public record AcsPhasePreparationManager (AcsGameManager gameManager) implements
     void managePhase() {
         clearActions();
         switch (game().getPhase()) {
-            case LOUNGE:
+            case STARTING_SCENARIO:
                 gameManager.clearPendingReports();
                 MapSettings mapSettings = game().getMapSettings();
                 mapSettings.setBoardsAvailableVector(ServerBoardHelper.scanForBoards(mapSettings));
@@ -33,20 +33,14 @@ public record AcsPhasePreparationManager (AcsGameManager gameManager) implements
                     game().getCurrentRound(), MegaMek.getMemoryUsed());
                 break;
             case SBF_DETECTION:
-                gameManager.detectionHelper.performSensorDetection();
-                break;
             case MOVEMENT:
-                break;
-            case FIRING_REPORT:
+            case FIRING:
+                gameManager.initiativeHelper.determineTurnOrder(game().getPhase());
                 break;
             case END:
-                resetEntityPhase(game().getPhase());
-                gameManager.clearPendingReports();
-                break;
             case VICTORY:
-                gameManager.clearPendingReports();
-                // prepareVictoryReport();
                 gameManager.addPendingReportsToGame();
+                gameManager.clearPendingReports();
                 break;
             default:
                 break;

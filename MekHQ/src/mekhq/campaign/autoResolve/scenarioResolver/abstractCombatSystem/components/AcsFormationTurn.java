@@ -3,7 +3,7 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.compone
 import megamek.common.IGame;
 import megamek.common.InGameObject;
 import megamek.common.strategicBattleSystems.SBFFormation;
-import mekhq.campaign.autoResolve.helper.AutoResolveGame;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 
 public class AcsFormationTurn extends AcsTurn {
 

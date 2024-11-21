@@ -1,7 +1,6 @@
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
 
 import megamek.common.enums.GamePhase;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
 
 public abstract class PhaseHandler {
 
