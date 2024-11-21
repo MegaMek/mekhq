@@ -5,8 +5,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -24,9 +22,10 @@ import static mekhq.campaign.personnel.SkillType.isCombatSkill;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
-    private static final Logger log = LogManager.getLogger(SkillsTab.class);
     JFrame frame;
     String name;
+
+    private static final List<JScrollPane> allTableScrollPanes = new ArrayList<>();
 
     //start Target Numbers
     private Hashtable<String, JSpinner> hashSkillTargets;
@@ -104,9 +103,37 @@ public class SkillsTab {
             "CombatSkillsTab" : "SupportSkillsTab", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Create a button to toggle the table
+        JButton hideAllButton = new JButton(resources.getString("borderHideAll.text"));
+        hideAllButton.addActionListener(e -> {
+            for (JScrollPane scrollPane : allTableScrollPanes) {
+                scrollPane.setVisible(false);
+            }
+            panel.revalidate();
+            panel.repaint();
+        });
+
+
+        // Create a button to toggle the table
+        JButton showAllButton = new JButton(resources.getString("borderDisplayAll.text"));
+        showAllButton.addActionListener(e -> {
+            for (JScrollPane scrollPane : allTableScrollPanes) {
+                scrollPane.setVisible(true);
+            }
+            panel.revalidate();
+            panel.repaint();
+        });
+
         layout.gridwidth = 5;
         layout.gridy = 0;
         panel.add(headerPanel, layout);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(showAllButton, layout);
+        layout.gridx++;
+        panel.add(hideAllButton, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -144,12 +171,27 @@ public class SkillsTab {
         tableScrollPane.setPreferredSize(new Dimension(UIUtil.scaleForGUI(250, 370)));
         tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        allTableScrollPanes.add(tableScrollPane);
+        tableScrollPane.setVisible(false);
 
         final JPanel panel = new CampaignOptionsStandardPanel(panelName, true, panelName);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Create a button to toggle the table
+        JButton toggleButton = new JButton(resources.getString("borderToggle.text"));
+        toggleButton.addActionListener(e -> {
+            boolean visible = tableScrollPane.isVisible();
+            tableScrollPane.setVisible(!visible);
+            panel.revalidate();
+            panel.repaint();
+        });
+
         layout.gridy = 0;
         layout.gridx = 0;
+        layout.gridwidth = 2;
+        panel.add(toggleButton, layout);
+        layout.gridy++;
+
         layout.gridwidth = 1;
         panel.add(label, layout);
         layout.gridx++;
@@ -270,7 +312,6 @@ class CustomTableComponent {
         table.getColumnModel().getColumn(1).setCellEditor(new SpinnerEditor());
         table.getColumnModel().getColumn(1).setCellRenderer(new SpinnerRenderer());
 
-        JComboBox<SkillLevel> skillComboBox = new JComboBox<>(skillLevels);
         table.getColumnModel().getColumn(2).setCellEditor(new SkillLevelEditor(model, skillLevels));
 
         table.setRowHeight(UIUtil.scaleForGUI(30));
