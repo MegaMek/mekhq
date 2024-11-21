@@ -2037,10 +2037,9 @@ public class StratconRulesManager {
             List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
 
             for (StratconScenario scenario : allScenarios) {
-                StratconCoords scenarioCoords = scenario.getCoords();
-
                 if (scenario.getDeploymentDate() == null) {
-                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(scenarioCoords, track);
+                    StratconCoords scenarioCoords = scenario.getCoords();
+                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(scenarioCoords, track, true);
 
                     if (newCoords == null) {
                         continue;

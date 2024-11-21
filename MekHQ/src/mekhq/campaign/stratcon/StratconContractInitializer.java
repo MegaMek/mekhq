@@ -508,12 +508,16 @@ public class StratconContractInitializer {
      *
      * @param originCoords the {@link StratconCoords} around which to search for a suitable coordinate
      * @param trackState   the {@link StratconTrackState} on which to perform the search
+     * @param weightPlayerForces whether to place greater emphasis on player-allied forces and facilities.
      * @return a {@link StratconCoords} object representing the coordinates of a suitable adjacent
      * location, or {code null} if no suitable location was found.
      */
     public static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
-                                                                       StratconTrackState trackState) {
+                                                                       StratconTrackState trackState,
+                                                                       boolean weightPlayerForces) {
         List<StratconCoords> suitableCoords = new ArrayList<>();
+        List<StratconCoords> playerForceCoords = new ArrayList<>();
+        List<StratconCoords> playerFacilityCoords = new ArrayList<>();
 
         for (int direction : ALL_DIRECTIONS) {
             StratconCoords newCoords = originCoords.translate(direction);
@@ -529,6 +533,14 @@ public class StratconContractInitializer {
 
             if (trackState.getFacility(newCoords).getOwner() != ForceAlignment.Opposing) {
                 suitableCoords.add(newCoords);
+
+                if (weightPlayerForces) {
+                    playerFacilityCoords.add(newCoords);
+                }
+            }
+
+            if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
+                playerForceCoords.add(newCoords);
             }
         }
 
@@ -536,7 +548,21 @@ public class StratconContractInitializer {
             return null;
         }
 
-        int randomIndex = new Random().nextInt(suitableCoords.size());
+        Random random = new Random();
+
+        if (weightPlayerForces) {
+            if (!playerFacilityCoords.isEmpty()) {
+                int randomIndex = random.nextInt(playerFacilityCoords.size());
+                return playerFacilityCoords.get(randomIndex);
+            }
+
+            if (!playerForceCoords.isEmpty()) {
+                int randomIndex = random.nextInt(playerForceCoords.size());
+                return playerForceCoords.get(randomIndex);
+            }
+        }
+
+        int randomIndex = random.nextInt(suitableCoords.size());
         return suitableCoords.get(randomIndex);
     }
 
