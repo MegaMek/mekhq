@@ -649,21 +649,13 @@ public class StratconRulesManager {
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != ForceAlignment.Allied);
-        int targetNum = calculateScenarioOdds(track, contract, true);
-        boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= targetNum);
 
-        if (isNonAlliedFacility || spawnScenario) {
+        if (isNonAlliedFacility) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             setScenarioParametersFromBiome(track, scenario);
-
-            // if we wound up with a field scenario, we may sub in dropships carrying
-            // units of the force in question
-            if (spawnScenario && !isNonAlliedFacility) {
-                swapInPlayerUnits(scenario, campaign, forceID);
-            }
 
             commitPrimaryForces(campaign, scenario, track);
         }

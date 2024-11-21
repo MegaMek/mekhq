@@ -34,7 +34,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
+import static mekhq.campaign.stratcon.StratconRulesManager.calculateScenarioOdds;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -213,6 +215,8 @@ public class StratconContractInitializer {
             }
 
             int preDeployedScenarios = track.getSize() / multiplier;
+            preDeployedScenarios = (int) round(preDeployedScenarios
+                * ((double) calculateScenarioOdds(track, contract, false) / 100));
 
             for (int i = 0; i < preDeployedScenarios; i++) {
                 addHiddenExternalScenario(campaign, contract, track, null);
@@ -255,7 +259,7 @@ public class StratconContractInitializer {
         planetSurfaceArea /= 1000000;
 
         // set width and height
-        int numHexes = (int) Math.round(planetSurfaceArea);
+        int numHexes = (int) round(planetSurfaceArea);
         int height = (int) Math.floor(Math.sqrt(numHexes));
         int width = numHexes / height;
         retVal.setWidth(width);
