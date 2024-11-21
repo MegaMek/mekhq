@@ -1,16 +1,48 @@
 package mekhq.gui.panes.campaignOptions;
 
+import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+
+import static mekhq.campaign.personnel.SkillType.isCombatSkill;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
+    private static final Logger log = LogManager.getLogger(SkillsTab.class);
     JFrame frame;
     String name;
+
+    //start Target Numbers
+    private Hashtable<String, JSpinner> hashSkillTargets;
+    private Hashtable<String, JSpinner> hashGreenSkill;
+    private Hashtable<String, JSpinner> hashRegSkill;
+    private Hashtable<String, JSpinner> hashVetSkill;
+    private Hashtable<String, JSpinner> hashEliteSkill;
+    //end Target Numbers
 
     //start Combat Skills Tab
     //end Combat Skills Tab
 
     //start Support Skills Tab
     //end Support Skills Tab
+
+    private static final MMLogger logger = MMLogger.create(SkillsTab.class);
 
     SkillsTab(JFrame frame, String name) {
         this.frame = frame;
@@ -20,12 +52,243 @@ public class SkillsTab {
     }
 
     private void initialize() {
+        initializeTargetNumbers();
         initializeCombatSkillsTab();
-        initializeSupportSkillsTab();
+    }
+
+    private void initializeTargetNumbers() {
+        hashSkillTargets = new Hashtable<>();
+        hashGreenSkill = new Hashtable<>();
+        hashRegSkill = new Hashtable<>();
+        hashVetSkill = new Hashtable<>();
+        hashEliteSkill = new Hashtable<>();
     }
 
     private void initializeCombatSkillsTab() {
     }
-    private void initializeSupportSkillsTab() {
+
+    JPanel createSkillsTab(boolean isCombatTab) {
+        // Header
+        JPanel headerPanel = null;
+        if (isCombatTab) {
+            headerPanel = new CampaignOptionsHeaderPanel("CombatSkillsTab",
+                getImageDirectory() + "logo_clan_ghost_bear.png",
+                true);
+        } else {
+            headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsTab",
+                getImageDirectory() + "logo_clan_ghost_bear.png",
+                true);
+        }
+
+        // Contents
+        List<String> skills = new ArrayList<>();
+
+        for (String skillName : SkillType.getSkillList()) {
+            SkillType skill = SkillType.getType(skillName);
+            boolean isCombatSkill = isCombatSkill(skill);
+
+            if (isCombatSkill == isCombatTab) {
+                skills.add(skill.getName());
+            }
+        }
+
+        java.util.List<JPanel> skillPanels = new ArrayList<>();
+
+        for (String skill : skills) {
+            JPanel skillPanel = createSkillPanel(skill);
+            skillPanels.add(skillPanel);
+        }
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel(isCombatTab ?
+            "CombatSkillsTab" : "SupportSkillsTab", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 5;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        int tableCounter = 0;
+        for (int i = 0; i < 4; i++) {
+            layout.gridy++;
+            layout.gridx = 0;
+            for (int j = 0; j < 5; j++) {
+                if (tableCounter < skillPanels.size()) {
+                    panel.add(skillPanels.get(tableCounter), layout);
+                    layout.gridx++;
+                }
+                tableCounter++;
+            }
+        }
+
+        // Create Parent Panel
+        return createParentPanel(panel, "CombatSkillsTab");
+    }
+
+    private static JPanel createSkillPanel(String skillName) {
+        String panelName = "SkillPanel" + skillName.replace(" ", "");
+
+        // Create the target number spinner
+        JLabel label = new CampaignOptionsLabel("SkillPanelTargetNumber");
+        JSpinner spinner = new CampaignOptionsSpinner("SkillPanelTargetNumber",
+            0, 0, 10, 1);
+
+        // Create the table
+        JTable skillTable = CustomTableComponent.createCustomTable();
+
+        // Wrap it in a scrollPane, ideally the scrollbars will never be needed.
+        // We could disable them, but it's better that we have them present in case we muck up the scaling.
+        JScrollPane tableScrollPane = new JScrollPane(skillTable);
+        tableScrollPane.setPreferredSize(new Dimension(UIUtil.scaleForGUI(250, 370)));
+        tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        final JPanel panel = new CampaignOptionsStandardPanel(panelName, true, panelName);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(label, layout);
+        layout.gridx++;
+        panel.add(spinner, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
+        layout.gridwidth = 4;
+        panel.add(tableScrollPane, layout);
+
+        return panel;
+    }
+}
+
+class CustomTableComponent {
+    private static final MMLogger logger = MMLogger.create(CustomTableComponent.class);
+
+    static class SpinnerRenderer implements TableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            JSpinner spinner = new JSpinner();
+            spinner.setValue(Integer.parseInt(value.toString()));
+            return spinner;
+        }
+    }
+
+    static class SkillLevelEditor extends AbstractCellEditor implements TableCellEditor {
+        private JComboBox<SkillLevel> comboBox = new JComboBox<>();
+        private int currentRow = -1;
+
+        SkillLevelEditor(DefaultTableModel model, SkillLevel... skillLevels) {
+            comboBox.setModel(new DefaultComboBoxModel<>(skillLevels));
+            comboBox.addItemListener(e -> {
+                if (e.getStateChange() == ItemEvent.SELECTED && currentRow > 0) {
+                    SkillLevel selected = (SkillLevel) comboBox.getSelectedItem();
+                    SkillLevel above = (SkillLevel) model.getValueAt(currentRow-1, 2);
+
+                    if (selected == null) {
+                        logger.error("Null selection in SkillLevelEditor");
+                        return;
+                    }
+
+                    if (selected.ordinal() < above.ordinal()) {
+                        comboBox.setSelectedItem(above);
+                    }
+
+                    for (int i = currentRow + 1; i < model.getRowCount(); i++) {
+                        model.setValueAt(comboBox.getSelectedItem(), i, 2);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            comboBox.setSelectedItem(comboBox.getSelectedItem());
+            return super.stopCellEditing();
+        }
+
+        @Override
+        public Component getTableCellEditorComponent (JTable table, Object value, boolean isSelected, int row, int column) {
+            currentRow = row;
+            comboBox.setSelectedItem(value);
+            return comboBox;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return comboBox.getSelectedItem();
+        }
+    }
+
+    static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
+        private final JSpinner spinner = new JSpinner();
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            spinner.setValue(value);
+            return spinner;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return spinner.getValue();
+        }
+    }
+
+    public static JTable createCustomTable() {
+        DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return switch (column) {
+                    case 0, 1 -> Integer.class;
+                    case 2 -> SkillLevel.class;
+                    default -> String.class;
+                };
+            }
+        };
+
+        model.addColumn("Level");
+        model.addColumn("Cost");
+        model.addColumn("Milestone");
+
+        SkillLevel[] skillLevels = Arrays.stream(SkillLevel.values())
+            .filter(e -> e != SkillLevel.HEROIC && e != SkillLevel.LEGENDARY)
+            .toArray(SkillLevel[]::new);
+
+        for (int i = 0; i <= 10; i++) {
+            model.addRow(new Object[] {i, 0, skillLevels[0]});
+        }
+
+        JTable table = new JTable(model);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+
+        table.getColumnModel().getColumn(1).setCellEditor(new SpinnerEditor());
+        table.getColumnModel().getColumn(1).setCellRenderer(new SpinnerRenderer());
+
+        JComboBox<SkillLevel> skillComboBox = new JComboBox<>(skillLevels);
+        table.getColumnModel().getColumn(2).setCellEditor(new SkillLevelEditor(model, skillLevels));
+
+        table.setRowHeight(UIUtil.scaleForGUI(30));
+        table.setPreferredScrollableViewportSize(new Dimension(UIUtil.scaleForGUI(500, 200)));
+        table.setFillsViewportHeight(true);
+
+        return table;
+    }
+
+    public static void main(String... args) {
+        JFrame frame = new JFrame();
+        frame.setSize(UIUtil.scaleForGUI(600, 300));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.add(new JScrollPane(createCustomTable()));
+
+        frame.add(panel);
+        frame.setVisible(true);
     }
 }

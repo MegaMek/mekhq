@@ -81,7 +81,7 @@ public class CampaignOptionsUtilities {
          */
         public CampaignOptionsSpinner(String name, double defaultValue, double minimum, double maximum,
                                       double stepSize) {
-            this(name, null, defaultValue, minimum, maximum, stepSize);
+            this(name, null, defaultValue, minimum, maximum, stepSize, false);
         }
 
         /**
@@ -97,12 +97,17 @@ public class CampaignOptionsUtilities {
          * @param minimum          The minimum value of the spinner
          * @param maximum          The maximum value of the spinner
          * @param stepSize         The step size of the spinner
+         * @param noTooltip        {@code true} if the component should be created without a tooltip
          */
         public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, double defaultValue,
-                                      double minimum, double maximum, double stepSize) {
+                                      double minimum, double maximum, double stepSize, boolean noTooltip) {
             super(new SpinnerNumberModel(defaultValue, minimum, maximum, stepSize));
-            setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
-                processWrapSize(customWrapSize)));
+
+            if (!noTooltip) {
+                setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
+                    processWrapSize(customWrapSize)));
+            }
+
             setName("spn" + name);
 
             setFontScaling(this, false, 1);
@@ -128,7 +133,7 @@ public class CampaignOptionsUtilities {
          * @param name             the name of the label
          */
         public CampaignOptionsLabel(String name) {
-            this(name, null);
+            this(name, null, false);
         }
 
         /**
@@ -142,12 +147,17 @@ public class CampaignOptionsUtilities {
          * @param name             the name of the label
          * @param customWrapSize   the maximum number of characters (including whitespaces) on each line
          *                        of the tooltip; defaults to 100 if {@code null}
+         * @param noTooltip        if {@code true} the component will be created without a tooltip.
          */
-        public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize) {
+        public CampaignOptionsLabel(String name, @Nullable Integer customWrapSize, boolean noTooltip) {
             super(String.format("<html>%s</html>",
                 resources.getString("lbl" + name + ".text")));
-            setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
-                processWrapSize(customWrapSize)));
+
+            if (!noTooltip) {
+                setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
+                    processWrapSize(customWrapSize)));
+            }
+
             setName("lbl" + name);
 
             setFontScaling(this, false, 1);
