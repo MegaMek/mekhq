@@ -2113,8 +2113,12 @@ public class StratconRulesManager {
 
                         int reinforcementOdds = calculateScenarioOdds(track, contract, true);
 
-                        while (Compute.randomInt(100) < reinforcementOdds) {
+                        int roll = Compute.randomInt(100);
+                        while (roll < reinforcementOdds) {
                             addHiddenExternalScenario(ev.getCampaign(), contract, track, null, false);
+
+                            reinforcementOdds -= roll;
+                            roll = Compute.randomInt(100);
                         }
                     }
                 }
