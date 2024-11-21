@@ -120,6 +120,7 @@ public class StratconRulesManager {
         } else if (contract.getMoraleLevel().isOverwhelming()) {
             scenarioRolls += 2;
         }
+
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
 
@@ -127,7 +128,7 @@ public class StratconRulesManager {
             // generate a scenario
             if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
                 // pick random coordinates and force to drive the scenario
-                StratconCoords scenarioCoords = getUnoccupiedCoords(track);
+                StratconCoords scenarioCoords = getUnoccupiedCoords(track, true);
 
                 if (scenarioCoords == null) {
                     logger.warn("Target track is full, skipping scenario generation");
@@ -206,7 +207,8 @@ public class StratconRulesManager {
      * @return A newly generated {@link StratconScenario}, or {@code null} if scenario creation fails.
      */
     public static @Nullable StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract) {
-        return generateExternalScenario(campaign, contract, null, null, null);
+        return generateExternalScenario(campaign, contract, null, null,
+            null, false);
     }
 
     /**
@@ -223,11 +225,13 @@ public class StratconRulesManager {
      *                 {@code null}
      * @param template A specific {@link ScenarioTemplate} to use for scenario generation,
      *                 or {@code null} to select scenario template randomly.
+     * @param allowPlayerFacilities Whether the scenario is allowed to spawn on top of
+     *                             player-allied facilities.
      * @return A newly generated {@link StratconScenario}, or {@code null} if scenario creation fails.
      */
      public static @Nullable StratconScenario generateExternalScenario(Campaign campaign, AtBContract contract,
                                     @Nullable StratconTrackState track, @Nullable StratconCoords scenarioCoords,
-                                    @Nullable ScenarioTemplate template) {
+                                    @Nullable ScenarioTemplate template, boolean allowPlayerFacilities) {
          // If we're not generating for a specific track, randomly pick one.
          if (track == null) {
              track = getRandomTrack(contract);
@@ -247,7 +251,7 @@ public class StratconRulesManager {
 
          // Select the target coords.
          if (scenarioCoords == null) {
-             scenarioCoords = getUnoccupiedCoords(track);
+             scenarioCoords = getUnoccupiedCoords(track, allowPlayerFacilities);
          }
 
          if (scenarioCoords == null) {
@@ -322,6 +326,8 @@ public class StratconRulesManager {
      *                  If {@code null}, a random trackState is selected.
      * @param template   The {@link ScenarioTemplate} for the scenario.
      *                  If {@code null}, the default template is used.
+     * @param allowPlayerFacilities Whether the scenario is allowed to spawn on top of
+     *                             player-allied facilities.
      *
      * @return The created {@link StratconScenario} or @code null},
      * if no {@link ScenarioTemplate} is found or if all coordinates in the provided
@@ -329,7 +335,8 @@ public class StratconRulesManager {
      */
     public static @Nullable StratconScenario addHiddenExternalScenario(Campaign campaign, AtBContract contract,
                                                       @Nullable StratconTrackState trackState,
-                                                      @Nullable ScenarioTemplate template) {
+                                                      @Nullable ScenarioTemplate template,
+                                                      boolean allowPlayerFacilities) {
         // If we're not generating for a specific track, randomly pick one.
         if (trackState == null) {
             trackState = getRandomTrack(contract);
@@ -340,7 +347,7 @@ public class StratconRulesManager {
             }
         }
 
-        StratconCoords coords = getUnoccupiedCoords(trackState);
+        StratconCoords coords = getUnoccupiedCoords(trackState, allowPlayerFacilities);
 
         if (coords == null) {
             logger.error(String.format("Unable to place objective scenario on track %s," +
