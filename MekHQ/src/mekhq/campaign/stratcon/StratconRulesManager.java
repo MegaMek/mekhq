@@ -2070,10 +2070,9 @@ public class StratconRulesManager {
      * If scenario's deployment date is {@code null} and scenario is not a strategic objective,
      * it is removed from the track and then updated.
      *
-     * @param campaign        the current campaign.
      * @param campaignState   the relevant StratCon campaign state.
      */
-    public static void processMassRout(Campaign campaign, StratconCampaignState campaignState) {
+    public static void processMassRout(StratconCampaignState campaignState) {
         for (StratconTrackState track : campaignState.getTracks()) {
             List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
 

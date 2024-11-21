@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.round;
 import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.rating.IUnitRating.*;
@@ -221,28 +222,25 @@ public class StratconContractInitializer {
      * @param track     the relevant {@link StratconTrackState}
      */
     public static void seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
-        final int CLAN_CLUSTER = 27; // Stars
-        final int IS_BATTALION = 27; // Lances
-        final int COMSTAR_LEVEL_IV = 36; // Level IIs
+        // TODO remove reductions once we have friendly forces deploying too
+        final int CLAN_CLUSTER = 11; // 22 Stars, reduced to 11
+        final int IS_BATTALION = 14; // 27 Lances, reduced to 14
+        final int COMSTAR_LEVEL_IV = 18; // 36 Level IIs, reduced to 18
 
         double multiplier = switch (contract.getEnemyQuality()) {
             case DRAGOON_F -> 0.25;
             case DRAGOON_D -> 0.5;
             case DRAGOON_C -> 0.75;
-            case DRAGOON_B -> 1;
             case DRAGOON_A -> 1.5;
             case DRAGOON_ASTAR -> 2;
-            default ->
-                throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/stratcon/StratconContractInitializer.java/seedPreDeployedForces: "
-                        + contract.getEnemyQuality());
+            default -> 1; // DRAGOON_B
         };
 
         AtBContractType contractType = contract.getContractType();
 
         if (contractType.isPirateHunting() || contractType.isGarrisonType()) {
             multiplier *= 0.5;
-        } else if (contractType.isOffensive()) {
+        } else if (contractType.isPlanetaryAssault()) {
             multiplier *= 2;
         }
 
@@ -254,7 +252,7 @@ public class StratconContractInitializer {
             elementCount = COMSTAR_LEVEL_IV;
         }
 
-        elementCount = (int) round(elementCount * multiplier);
+        elementCount = (int) ceil(elementCount * multiplier);
 
         for (int i = 0; i < elementCount; i++) {
             addHiddenExternalScenario(campaign, contract, track, null, false);

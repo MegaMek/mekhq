@@ -543,7 +543,7 @@ public class AtBContract extends Contract {
             }
 
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                processMassRout(campaign, getStratconCampaignState());
+                processMassRout(getStratconCampaignState());
             }
         }
 

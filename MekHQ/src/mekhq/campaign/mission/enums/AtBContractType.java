@@ -146,7 +146,7 @@ public enum AtBContractType {
      * {@code false} otherwise
      */
     public boolean isOffensive() {
-        return isRaidType() || isPirateHunting() || isGuerrillaWarfare();
+        return isRaidType() || isPirateHunting() || isGuerrillaWarfare() || isPlanetaryAssault();
     }
     // endregion Boolean Comparison Methods
 
