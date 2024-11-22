@@ -2070,13 +2070,15 @@ public class StratconRulesManager {
      * it is removed from the track and then updated.
      *
      * @param campaignState   the relevant StratCon campaign state.
+     * @param removeAll       whether to remove all scenarios, including those with dates or
+     *                       strategic objectives. This should be used sparingly.
      */
-    public static void processMassRout(StratconCampaignState campaignState) {
+    public static void processMassRout(StratconCampaignState campaignState, boolean removeAll) {
         for (StratconTrackState track : campaignState.getTracks()) {
             List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
 
             for (StratconScenario scenario : allScenarios) {
-                if (scenario.getDeploymentDate() == null && !scenario.isStrategicObjective()) {
+                if (removeAll || (scenario.getDeploymentDate() == null && !scenario.isStrategicObjective())) {
                     track.removeScenario(scenario);
                     track.updateScenario(scenario);
                 }

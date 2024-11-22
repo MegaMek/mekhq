@@ -29,6 +29,7 @@ import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -39,6 +40,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -48,7 +50,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
@@ -75,6 +76,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
@@ -85,6 +87,7 @@ import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractInitializer.seedPreDeployedForces;
 import static mekhq.campaign.stratcon.StratconRulesManager.processMassRout;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -184,6 +187,16 @@ public class AtBContract extends Contract {
         this(null);
     }
 
+    /**
+     * Sets the end date of the rout.
+     * This should only be applied on contracts whose morale equals ROUTED
+     *
+     * @param routEnd the {@code LocalDate} representing the end date of the rout
+     */
+    public void setRoutEndDate(LocalDate routEnd) {
+        this.routEnd = routEnd;
+    }
+
     public AtBContract(String name) {
         super(name, "Independent");
         employerCode = "IND";
@@ -196,9 +209,9 @@ public class AtBContract extends Contract {
 
         setContractType(AtBContractType.GARRISON_DUTY);
         setAllySkill(REGULAR);
-        allyQuality = IUnitRating.DRAGOON_C;
+        allyQuality = DRAGOON_C;
         setEnemySkill(REGULAR);
-        enemyQuality = IUnitRating.DRAGOON_C;
+        enemyQuality = DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
         setAllyCamouflage(new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name()));
@@ -427,7 +440,7 @@ public class AtBContract extends Contract {
     public void checkMorale(Campaign campaign, LocalDate today) {
         // Check whether enemy forces have been reinforced, and whether any current rout continues
         // beyond its expected date
-        boolean routContinue = Compute.randomInt(4) < 3;
+        boolean routContinue = Compute.randomInt(4) == 0;
 
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
         if (routEnd != null && !routContinue) {
@@ -439,7 +452,7 @@ public class AtBContract extends Contract {
 
                 if (campaign.getCampaignOptions().isUseStratCon()) {
                     for (StratconTrackState track : getStratconCampaignState().getTracks()) {
-                        seedPreDeployedForces(this, campaign, track);
+                        seedPreDeployedForces(this, campaign, track, true);
                     }
                 }
             } else {
@@ -448,7 +461,84 @@ public class AtBContract extends Contract {
             return;
         }
 
-        // Initialize counters for victories and defeats
+        TargetRoll targetNumber = new TargetRoll();
+
+        // Confidence:
+        int enemySkillRating = getEnemySkill().getAdjustedValue() - 2;
+        int allySkillRating = getAllySkill().getAdjustedValue() - 2;
+
+        if (getCommandRights().isIndependent()) {
+            allySkillRating = (campaign.getCampaignOptions().getUnitRatingMethod().isFMMR() ? getAllySkill()
+                : campaign.getReputation().getAverageSkillLevel()).getAdjustedValue();
+            allySkillRating -= 2;
+        }
+
+        final LocalDate THE_GREAT_REFUSAL = LocalDate.of(3060, 4, 12);
+
+        if (campaign.getLocalDate().isBefore(THE_GREAT_REFUSAL)) {
+            if (getEnemy().isClan() && !getEmployerFaction().isClan()) {
+                enemySkillRating++;
+            } else if (!getEnemy().isClan() && getEmployerFaction().isClan()) {
+                allySkillRating++;
+            }
+        }
+
+        int confidence = enemySkillRating - allySkillRating;
+        targetNumber.addModifier(confidence, "confidence");
+
+        // Reliability:
+        int reliability = getEnemyQuality();
+
+        Faction enemy = getEnemy();
+        if (enemy.isClan()) {
+            reliability = Math.max(5, reliability + 1);
+        }
+
+        reliability = switch (reliability) {
+            case DRAGOON_F -> -1;
+            case DRAGOON_D -> {
+                if (Compute.randomInt(1) == 0) {
+                    yield -1;
+                } else {
+                    yield 0;
+                }
+            }
+            case DRAGOON_C -> 0;
+            case DRAGOON_B -> {
+                if (Compute.randomInt(1) == 0) {
+                    yield 0;
+                } else {
+                    yield +1;
+                }
+            }
+            case DRAGOON_A -> +1;
+            default -> { // DRAGOON_ASTAR
+                if (Compute.randomInt(1) == 0) {
+                    yield +1;
+                } else {
+                    yield +2;
+                }
+            }
+        };
+
+        if (enemy.isRebel()
+            || enemy.isMinorPower()
+            || enemy.isMercenary()
+            || enemy.isPirate()) {
+            reliability--;
+        } else if (enemy.isClan()) {
+            reliability++;
+        }
+
+        targetNumber.addModifier(reliability, "reliability");
+
+        // Force Type (unimplemented)
+        // TODO once we have force types defined on the StratCon map, we should handle modifiers here.
+        // 'Mek or Aircraft == +1
+        // Vehicle == +0
+        // Infantry == -1 (if unsupported)
+
+        // Performance
         int victories = 0;
         int defeats = 0;
         LocalDate lastMonth = today.minusMonths(1);
@@ -474,10 +564,6 @@ public class AtBContract extends Contract {
             }
         }
 
-        // Calculate various modifiers for morale
-        int enemySkillModifier = getEnemySkill().getAdjustedValue() - REGULAR.getAdjustedValue();
-        int allySkillModifier = getAllySkill().getAdjustedValue() - REGULAR.getAdjustedValue();
-
         int performanceModifier = 0;
 
         if (victories > (defeats * 2)) {
@@ -490,34 +576,58 @@ public class AtBContract extends Contract {
             performanceModifier++;
         }
 
-        int miscModifiers = moraleMod;
+        targetNumber.addModifier(performanceModifier, "performanceModifier");
 
-        // Additional morale modifications depending on faction properties
-        if (Factions.getInstance().getFaction(enemyCode).isPirate()) {
-            miscModifiers -= 2;
-        } else if (Factions.getInstance().getFaction(enemyCode).isRebel()
-                || isMinorPower(enemyCode)
-                || Factions.getInstance().getFaction(enemyCode).isMercenary()) {
-            miscModifiers -= 1;
-        } else if (Factions.getInstance().getFaction(enemyCode).isClan()) {
-            miscModifiers += 2;
-        }
-
+        // Balance of Power
         int balanceOfPower = 0;
         if (campaign.getCampaignOptions().isUseStratCon()) {
-            balanceOfPower = -campaign.getLanceList().size() * 5;
+            int playerForceCount = 0;
+
+            for (Lance lance : campaign.getLances().values()) {
+                try {
+                    Force force = campaign.getForce(lance.getForceId());
+
+                    if (force.isCombatForce()) {
+                        playerForceCount++;
+                    }
+                } catch (Exception ex) {
+                    logger.error(String.format("Failed to fetch force %s: %s",
+                        lance.getForceId(), ex.getMessage()));
+                }
+            }
+
+            playerForceCount = (int) ceil((double) playerForceCount / campaign.getActiveContracts().size());
+
+            if (getCommandRights().isHouse() || getCommandRights().isLiaison()) {
+                playerForceCount = (int) round(playerForceCount * 1.25);
+            } else if (getCommandRights().isIntegrated()) {
+                playerForceCount = (int) round(playerForceCount * 1.5);
+            }
 
             int enemyForceCount = 0;
             for (StratconTrackState track : getStratconCampaignState().getTracks()) {
-                enemyForceCount = track.getScenarios().size();
+                enemyForceCount += track.getScenarios().size();
             }
 
-            balanceOfPower += enemyForceCount;
+            if (playerForceCount >= (enemyForceCount * 3)) {
+                balanceOfPower = -6;
+            } else if (playerForceCount >= (enemyForceCount * 2)) {
+                balanceOfPower = -4;
+            } else if (playerForceCount > enemyForceCount) {
+                balanceOfPower = -2;
+            } else if (enemyForceCount >= (playerForceCount * 3)) {
+                balanceOfPower = 6;
+            } else if (enemyForceCount >= (playerForceCount * 2)) {
+                balanceOfPower = 4;
+            } else if (enemyForceCount > playerForceCount) {
+                balanceOfPower = 2;
+            }
         }
 
+        targetNumber.addModifier(balanceOfPower, "balanceOfPower");
+
         // Total morale modifier calculation
-        int totalModifier = enemySkillModifier - allySkillModifier + performanceModifier + miscModifiers + balanceOfPower;
-        int roll = Compute.d6(2) + totalModifier;
+        int roll = Compute.d6(2) + targetNumber.getValue();
 
         // Morale level determination based on roll value
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
@@ -543,15 +653,8 @@ public class AtBContract extends Contract {
             }
 
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                processMassRout(getStratconCampaignState());
+                processMassRout(getStratconCampaignState(), true);
             }
-        }
-
-        // Process the results of the reinforcement roll
-        if (!getMoraleLevel().isRouted() && !routContinue) {
-            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
-            campaign.addReport("Long ranged scans have detected the arrival of additional enemy forces.");
-            return;
         }
 
         // Reset external morale modifier
@@ -611,7 +714,7 @@ public class AtBContract extends Contract {
             repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
         }
 
-        if (unitRating >= IUnitRating.DRAGOON_B) {
+        if (unitRating >= DRAGOON_B) {
             repairLocation++;
         }
 
@@ -892,7 +995,7 @@ public class AtBContract extends Contract {
                         case 6:
                             final String unitName = c.getUnitMarket().addSingleUnit(c,
                                     UnitMarketType.EMPLOYER, MEK, getEmployerFaction(),
-                                    IUnitRating.DRAGOON_F, 50);
+                                    DRAGOON_F, 50);
                             if (unitName != null) {
                                 text += String.format(
                                         "Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>",
@@ -1840,7 +1943,7 @@ public class AtBContract extends Contract {
         double difference = enemyPower - playerPower;
         double percentDifference = (difference / playerPower) * 100;
 
-        int mappedValue = (int) Math.ceil(Math.abs(percentDifference) / 20);
+        int mappedValue = (int) ceil(Math.abs(percentDifference) / 20);
         if (percentDifference < 0) {
             mappedValue = 5 - mappedValue;
         } else {

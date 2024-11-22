@@ -27,10 +27,13 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.universe.Faction;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +44,7 @@ import static java.lang.Math.round;
 import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
+import static mekhq.campaign.stratcon.StratconRulesManager.processMassRout;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -196,7 +200,7 @@ public class StratconContractInitializer {
 
         // Initialize non-objective scenarios
         for (StratconTrackState track : campaignState.getTracks()) {
-            seedPreDeployedForces(contract, campaign, track);
+            seedPreDeployedForces(contract, campaign, track, true);
         }
 
         // clean up objectives for integrated command:
@@ -210,6 +214,22 @@ public class StratconContractInitializer {
             }
         }
 
+        // Determine starting morale
+        if (contract.getContractType().isGarrisonDuty()) {
+            contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
+
+            LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            contract.setRoutEndDate(routEnd);
+
+            processMassRout(campaignState, true);
+        } else {
+            contract.checkMorale(campaign, campaign.getLocalDate());
+
+            if (contract.getMoraleLevel().isRouted()) {
+                contract.setMoraleLevel(AtBMoraleLevel.CRITICAL);
+            }
+        }
+
         // now we're done
     }
 
@@ -220,14 +240,17 @@ public class StratconContractInitializer {
      * @param contract  the current contract
      * @param campaign  the current campaign.
      * @param track     the relevant {@link StratconTrackState}
+     * @param isEnemy   whether we are seeding forces for the enemy, or player's allies
      */
-    public static void seedPreDeployedForces(AtBContract contract, Campaign campaign, StratconTrackState track) {
+    public static int seedPreDeployedForces(AtBContract contract, Campaign campaign,
+                                            StratconTrackState track, boolean isEnemy) {
         // TODO remove reductions once we have friendly forces deploying too
         final int CLAN_CLUSTER = 11; // 22 Stars, reduced to 11
         final int IS_BATTALION = 14; // 27 Lances, reduced to 14
         final int COMSTAR_LEVEL_IV = 18; // 36 Level IIs, reduced to 18
 
-        double multiplier = switch (contract.getEnemyQuality()) {
+        int quality = isEnemy ? contract.getEnemyQuality() : contract.getAllyQuality();
+        double multiplier = switch (quality) {
             case DRAGOON_F -> 0.25;
             case DRAGOON_D -> 0.5;
             case DRAGOON_C -> 0.75;
@@ -246,9 +269,11 @@ public class StratconContractInitializer {
 
         int elementCount = IS_BATTALION;
 
-        if (contract.getEnemy().isClan()) {
+        Faction faction = isEnemy ? contract.getEnemy() : contract.getEmployerFaction();
+
+        if (faction.isClan()) {
             elementCount = CLAN_CLUSTER;
-        } else if (contract.getEnemy().isComStarOrWoB()) {
+        } else if (faction.isComStarOrWoB()) {
             elementCount = COMSTAR_LEVEL_IV;
         }
 
@@ -257,6 +282,8 @@ public class StratconContractInitializer {
         for (int i = 0; i < elementCount; i++) {
             addHiddenExternalScenario(campaign, contract, track, null, false);
         }
+
+        return elementCount;
     }
 
     /**

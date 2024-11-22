@@ -3648,6 +3648,14 @@ public class Campaign implements ITechManager {
                 contract.setStartAndEndDate(getLocalDate().plusDays((int) Math.ceil(getLocation().getTransitTime())));
                 addReport("The start and end dates of " + contract.getName()
                         + " have been shifted to reflect the current ETA.");
+
+                if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
+                    LocalDate newRoutEndDate = contract.getStartDate()
+                        .plusMonths(Math.max(1, Compute.d6() - 3))
+                        .minusDays(1);
+                    contract.setRoutEndDate(newRoutEndDate);
+                }
+
                 continue;
             }
 
@@ -3782,14 +3790,22 @@ public class Campaign implements ITechManager {
             }
 
             for (AtBContract contract : getActiveAtBContracts()) {
+                AtBMoraleLevel oldMorale = contract.getMoraleLevel();
+
                 contract.checkMorale(this, getLocalDate());
+                AtBMoraleLevel newMorale = contract.getMoraleLevel();
 
-                AtBMoraleLevel morale = contract.getMoraleLevel();
+                String report = "";
+                if (contract.getContractType().isGarrisonDuty()) {
+                    report = resources.getString("garrisonDutyRouted.text");
+                } else if (oldMorale != newMorale) {
+                    report = String.format(resources.getString("contractMoraleReport.text"),
+                        newMorale, contract.getName(), newMorale.getToolTipText());
+                }
 
-                String report = "Current enemy condition is <b>" + morale + "</b> on contract "
-                    + contract.getName() + "<br><br>" + morale.getToolTipText();
-
-                addReport(report);
+                if (!report.isBlank()) {
+                    addReport(report);
+                }
             }
         }
 
