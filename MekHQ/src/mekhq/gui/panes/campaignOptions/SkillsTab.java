@@ -1,20 +1,12 @@
 package mekhq.gui.panes.campaignOptions;
 
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
@@ -24,15 +16,14 @@ public class SkillsTab {
     JFrame frame;
     String name;
 
-    private static List<JScrollPane> allTableScrollPanes = new ArrayList<>();
-    private static List<List<Integer>> storedValues = new ArrayList<>();
+    private static List<JLabel> allSkillLabels = new ArrayList<>();
+    private static List<JSpinner> allSkillSpinners = new ArrayList<>();
+    private static List<JComboBox<SkillLevel>> allSkillComboBoxes = new ArrayList<>();
+    private static double storedTargetNumber = 0;
+    private static List<Double> storedValuesSpinners = new ArrayList<>();
+    private static List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
     //start Target Numbers
-    private Hashtable<String, JSpinner> hashSkillTargets;
-    private Hashtable<String, JSpinner> hashGreenSkill;
-    private Hashtable<String, JSpinner> hashRegSkill;
-    private Hashtable<String, JSpinner> hashVetSkill;
-    private Hashtable<String, JSpinner> hashEliteSkill;
     //end Target Numbers
 
     //start Combat Skills Tab
@@ -56,11 +47,6 @@ public class SkillsTab {
     }
 
     private void initializeTargetNumbers() {
-        hashSkillTargets = new Hashtable<>();
-        hashGreenSkill = new Hashtable<>();
-        hashRegSkill = new Hashtable<>();
-        hashVetSkill = new Hashtable<>();
-        hashEliteSkill = new Hashtable<>();
     }
 
     private void initializeCombatSkillsTab() {
@@ -106,9 +92,8 @@ public class SkillsTab {
         // Create a button to toggle the table
         JButton hideAllButton = new JButton(resources.getString("btnHideAll.text"));
         hideAllButton.addActionListener(e -> {
-            for (JScrollPane scrollPane : allTableScrollPanes) {
-                scrollPane.setVisible(false);
-            }
+            setVisibleForAll(false);
+
             panel.revalidate();
             panel.repaint();
         });
@@ -116,9 +101,8 @@ public class SkillsTab {
         // Create a button to toggle the table
         JButton showAllButton = new JButton(resources.getString("btnDisplayAll.text"));
         showAllButton.addActionListener(e -> {
-            for (JScrollPane scrollPane : allTableScrollPanes) {
-                scrollPane.setVisible(true);
-            }
+            setVisibleForAll(true);
+
             panel.revalidate();
             panel.repaint();
         });
@@ -153,62 +137,65 @@ public class SkillsTab {
         return createParentPanel(panel, "CombatSkillsTab");
     }
 
+    private void setVisibleForAll(boolean visible) {
+        for (int i = 0; i < allSkillLabels.size(); i++) {
+            allSkillLabels.get(i).setVisible(visible);
+            allSkillSpinners.get(i).setVisible(visible);
+            allSkillComboBoxes.get(i).setVisible(visible);
+        }
+    }
+
     private static JPanel createSkillPanel(String skillName) {
         String panelName = "SkillPanel" + skillName.replace(" ", "");
 
         // Create the target number spinner
-        JLabel label = new CampaignOptionsLabel("SkillPanelTargetNumber");
-        JSpinner spinner = new CampaignOptionsSpinner("SkillPanelTargetNumber",
+        JLabel lblTargetNumber = new CampaignOptionsLabel("SkillPanelTargetNumber");
+        JSpinner spnTargetNumber = new CampaignOptionsSpinner("SkillPanelTargetNumber",
             0, 0, 10, 1);
 
-        // Create the table
-        JTable skillTable = CustomTableComponent.createCustomTable();
+        List<JLabel> labels = new ArrayList<>();
+        List<JSpinner> spinners = new ArrayList<>();
+        List<JComboBox<SkillLevel>> comboBoxes = new ArrayList<>();
 
-        // Wrap it in a scrollPane, ideally the scrollbars will never be needed.
-        // We could disable them, but it's better that we have them present in case we muck up the scaling.
-        JScrollPane tableScrollPane = new JScrollPane(skillTable);
-        tableScrollPane.setPreferredSize(new Dimension(UIUtil.scaleForGUI(250, 370)));
-        tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        allTableScrollPanes.add(tableScrollPane);
-        tableScrollPane.setVisible(false);
+        for (int i = 0; i < 11; i++) {
+            JLabel label = new CampaignOptionsLabel("SkillLevel" + i, null, true);
+            label.setVisible(false);
+            labels.add(label);
+            allSkillLabels.add(label);
+
+            JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + i,
+                null, 0, 0, 10, 1, true);
+            spinner.setVisible(false);
+            spinners.add(spinner);
+            allSkillSpinners.add(spinner);
+
+            JComboBox<SkillLevel> comboBox = new JComboBox<>(SkillLevel.values());
+            comboBox.addActionListener(e -> milestoneActionListener(comboBoxes, comboBox));
+            comboBox.setVisible(false);
+            comboBoxes.add(comboBox);
+            allSkillComboBoxes.add(comboBox);
+        }
 
         JButton copyButton = new JButton(resources.getString("btnCopy.text"));
         copyButton.addActionListener(e -> {
-            storedValues.clear();
+            storedTargetNumber = (Double) spnTargetNumber.getValue();
 
-            int spinnerValue = ((Double) spinner.getValue()).intValue();
-            List<Integer> intermediateList = List.of(spinnerValue);
-            storedValues.add(new ArrayList<>(intermediateList));
+            storedValuesSpinners = new ArrayList<>();
+            storedValuesComboBoxes = new ArrayList<>();
 
-            JTable table = (JTable) tableScrollPane.getViewport().getView();
-            for (int row = 0; row < table.getRowCount(); row++) {
-                List<Integer> rowValues = new ArrayList<>();
-                rowValues.add((Integer) table.getValueAt(row, 1));
-
-                SkillLevel milestone = (SkillLevel) table.getValueAt(row, 2);
-                rowValues.add(milestone.ordinal());
-
-                storedValues.add(rowValues);
+            for (int i = 0; i < labels.size(); i++) {
+                storedValuesSpinners.add((Double) spinners.get(i).getValue());
+                storedValuesComboBoxes.add((SkillLevel) comboBoxes.get(i).getSelectedItem());
             }
-
-            logger.info(storedValues);
         });
 
         JButton pasteButton = new JButton(resources.getString("btnPaste.text"));
         pasteButton.addActionListener(e -> {
-            spinner.setValue((double) storedValues.get(0).get(0));
+            spnTargetNumber.setValue(storedTargetNumber);
 
-            JTable table = (JTable) tableScrollPane.getViewport().getView();
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
-
-            int tableRowCount = model.getRowCount();
-
-            for (int row = 1; row < tableRowCount; row++) {
-                List<Integer> rowValues = storedValues.get(row);
-
-                model.setValueAt(rowValues.get(0), row, 1);
-                model.setValueAt(SkillLevel.parseFromInteger(rowValues.get(1)), row, 2);
+            for (int i = 0; i < labels.size(); i++) {
+                spinners.get(i).setValue(storedValuesSpinners.get(i));
+                comboBoxes.get(i).setSelectedItem(storedValuesComboBoxes.get(i));
             }
         });
 
@@ -218,164 +205,82 @@ public class SkillsTab {
         // Create a button to toggle the table
         JButton toggleButton = new JButton(resources.getString("btnToggle.text"));
         toggleButton.addActionListener(e -> {
-            boolean visible = tableScrollPane.isVisible();
-            tableScrollPane.setVisible(!visible);
-            panel.revalidate();
-            panel.repaint();
+            for (JLabel label : labels) {
+                label.setVisible(!label.isVisible());
+            }
+
+            for (JComboBox<SkillLevel> comboBox : comboBoxes) {
+                comboBox.setVisible(!comboBox.isVisible());
+            }
+
+            for (JSpinner spinner : spinners) {
+                spinner.setVisible(!spinner.isVisible());
+            }
         });
 
         layout.gridy = 0;
-        layout.gridx = 0;
+        layout.gridx = 1;
         layout.gridwidth = 2;
         panel.add(toggleButton, layout);
         layout.gridy++;
 
         layout.gridy++;
-        layout.gridx = 0;
+        layout.gridx = 1;
         layout.gridwidth = 1;
         panel.add(copyButton, layout);
         layout.gridx++;
         panel.add(pasteButton, layout);
 
         layout.gridy++;
-        layout.gridx = 0;
-        panel.add(label, layout);
+        layout.gridx = 1;
+        panel.add(lblTargetNumber, layout);
         layout.gridx++;
-        panel.add(spinner, layout);
+        panel.add(spnTargetNumber, layout);
 
-        layout.gridy++;
-        layout.gridx = 0;
-        layout.gridwidth = 4;
-        panel.add(tableScrollPane, layout);
+        for (int i = 0; i < labels.size(); i++) {
+            layout.gridy++;
+            layout.gridx = 0;
+            layout.gridwidth = 1;
+            panel.add(labels.get(i), layout);
+            layout.gridx++;
+            panel.add(spinners.get(i), layout);
+            layout.gridx++;
+            panel.add(comboBoxes.get(i), layout);
+        }
 
         return panel;
     }
-}
 
-class CustomTableComponent {
-    private static final MMLogger logger = MMLogger.create(CustomTableComponent.class);
+    private static void milestoneActionListener(List<JComboBox<SkillLevel>> comboBoxes, JComboBox<SkillLevel> comboBox) {
+        int originIndex = comboBoxes.indexOf(comboBox);
 
-    static class SpinnerRenderer implements TableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int row, int column) {
-            JSpinner spinner = new JSpinner();
-            spinner.setValue(Integer.parseInt(value.toString()));
-            return spinner;
+        SkillLevel currentSelection = (SkillLevel) comboBox.getSelectedItem();
+
+        if (currentSelection == null) {
+            return;
         }
-    }
 
-    static class SkillLevelEditor extends AbstractCellEditor implements TableCellEditor {
-        private JComboBox<SkillLevel> comboBox = new JComboBox<>();
-        private int currentRow = -1;
+        if (originIndex != 0) {
+            JComboBox<SkillLevel> previousComboBox = comboBoxes.get(originIndex - 1);
+            SkillLevel previousSelection = (SkillLevel) previousComboBox.getSelectedItem();
 
-        SkillLevelEditor(DefaultTableModel model, SkillLevel... skillLevels) {
-            comboBox.setModel(new DefaultComboBoxModel<>(skillLevels));
-            comboBox.addItemListener(e -> {
-                if (e.getStateChange() == ItemEvent.SELECTED && currentRow > 0) {
-                    SkillLevel selected = (SkillLevel) comboBox.getSelectedItem();
-                    SkillLevel above = (SkillLevel) model.getValueAt(currentRow-1, 2);
-
-                    if (selected == null) {
-                        logger.error("Null selection in SkillLevelEditor");
-                        return;
-                    }
-
-                    if (selected.ordinal() < above.ordinal()) {
-                        comboBox.setSelectedItem(above);
-                    }
-
-                    for (int i = currentRow + 1; i < model.getRowCount(); i++) {
-                        model.setValueAt(comboBox.getSelectedItem(), i, 2);
-                    }
+            if (previousSelection != null) {
+                if (previousSelection.ordinal() > currentSelection.ordinal()) {
+                    comboBox.setSelectedItem(previousSelection);
+                } else if (currentSelection.ordinal() > previousSelection.ordinal() + 1) {
+                    comboBox.setSelectedItem(SkillLevel.parseFromInteger(previousSelection.ordinal() + 1));
                 }
-            });
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            comboBox.setSelectedItem(comboBox.getSelectedItem());
-            return super.stopCellEditing();
-        }
-
-        @Override
-        public Component getTableCellEditorComponent (JTable table, Object value, boolean isSelected, int row, int column) {
-            currentRow = row;
-            comboBox.setSelectedItem(value);
-            return comboBox;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            return comboBox.getSelectedItem();
-        }
-    }
-
-    static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
-        private final JSpinner spinner = new JSpinner();
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            spinner.setValue(value);
-            return spinner;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            return spinner.getValue();
-        }
-    }
-
-    public static JTable createCustomTable() {
-        DefaultTableModel model = new DefaultTableModel() {
-            @Override
-            public Class<?> getColumnClass(int column) {
-                return switch (column) {
-                    case 0, 1 -> Integer.class;
-                    case 2 -> SkillLevel.class;
-                    default -> String.class;
-                };
             }
-        };
-
-        model.addColumn("Level");
-        model.addColumn("Cost");
-        model.addColumn("Milestone");
-
-        SkillLevel[] skillLevels = Arrays.stream(SkillLevel.values())
-            .filter(e -> e != SkillLevel.HEROIC && e != SkillLevel.LEGENDARY)
-            .toArray(SkillLevel[]::new);
-
-        for (int i = 0; i <= 10; i++) {
-            model.addRow(new Object[] {i, 0, skillLevels[0]});
+        } else {
+            if (comboBox.getSelectedItem() != SkillLevel.NONE) {
+                comboBox.setSelectedItem(SkillLevel.ULTRA_GREEN);
+            }
         }
 
-        JTable table = new JTable(model);
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-
-        table.getColumnModel().getColumn(1).setCellEditor(new SpinnerEditor());
-        table.getColumnModel().getColumn(1).setCellRenderer(new SpinnerRenderer());
-
-        table.getColumnModel().getColumn(2).setCellEditor(new SkillLevelEditor(model, skillLevels));
-
-        table.setRowHeight(UIUtil.scaleForGUI(30));
-        table.setPreferredScrollableViewportSize(new Dimension(UIUtil.scaleForGUI(500, 200)));
-        table.setFillsViewportHeight(true);
-
-        return table;
-    }
-
-    public static void main(String... args) {
-        JFrame frame = new JFrame();
-        frame.setSize(UIUtil.scaleForGUI(600, 300));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel panel = new JPanel();
-        panel.add(new JScrollPane(createCustomTable()));
-
-        frame.add(panel);
-        frame.setVisible(true);
+        if (originIndex < comboBoxes.size() - 1) {
+            originIndex++;
+            JComboBox<SkillLevel> nextComboBox = comboBoxes.get(originIndex);
+            nextComboBox.setSelectedItem(comboBox.getSelectedItem());
+        }
     }
 }
