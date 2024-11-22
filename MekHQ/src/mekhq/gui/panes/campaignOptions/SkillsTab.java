@@ -1,7 +1,6 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
 
 import javax.swing.*;
@@ -23,17 +22,6 @@ public class SkillsTab {
     private static List<Double> storedValuesSpinners = new ArrayList<>();
     private static List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
-    //start Target Numbers
-    //end Target Numbers
-
-    //start Combat Skills Tab
-    //end Combat Skills Tab
-
-    //start Support Skills Tab
-    //end Support Skills Tab
-
-    private static final MMLogger logger = MMLogger.create(SkillsTab.class);
-
     SkillsTab(JFrame frame, String name) {
         this.frame = frame;
         this.name = name;
@@ -42,19 +30,21 @@ public class SkillsTab {
     }
 
     private void initialize() {
-        initializeTargetNumbers();
-        initializeCombatSkillsTab();
+        initializeGeneral();
     }
 
-    private void initializeTargetNumbers() {
-    }
-
-    private void initializeCombatSkillsTab() {
+    private void initializeGeneral() {
+        allSkillLabels = new ArrayList<>();
+        allSkillSpinners = new ArrayList<>();
+        allSkillComboBoxes = new ArrayList<>();
+        storedTargetNumber = 0;
+        storedValuesSpinners = new ArrayList<>();
+        storedValuesComboBoxes = new ArrayList<>();
     }
 
     JPanel createSkillsTab(boolean isCombatTab) {
         // Header
-        JPanel headerPanel = null;
+        JPanel headerPanel;
         if (isCombatTab) {
             headerPanel = new CampaignOptionsHeaderPanel("CombatSkillsTab",
                 getImageDirectory() + "logo_clan_ghost_bear.png",
