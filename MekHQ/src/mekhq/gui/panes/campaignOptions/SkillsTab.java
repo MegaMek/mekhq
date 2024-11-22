@@ -4,7 +4,6 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -25,7 +24,8 @@ public class SkillsTab {
     JFrame frame;
     String name;
 
-    private static final List<JScrollPane> allTableScrollPanes = new ArrayList<>();
+    private static List<JScrollPane> allTableScrollPanes = new ArrayList<>();
+    private static List<List<Integer>> storedValues = new ArrayList<>();
 
     //start Target Numbers
     private Hashtable<String, JSpinner> hashSkillTargets;
@@ -104,7 +104,7 @@ public class SkillsTab {
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton hideAllButton = new JButton(resources.getString("borderHideAll.text"));
+        JButton hideAllButton = new JButton(resources.getString("btnHideAll.text"));
         hideAllButton.addActionListener(e -> {
             for (JScrollPane scrollPane : allTableScrollPanes) {
                 scrollPane.setVisible(false);
@@ -113,9 +113,8 @@ public class SkillsTab {
             panel.repaint();
         });
 
-
         // Create a button to toggle the table
-        JButton showAllButton = new JButton(resources.getString("borderDisplayAll.text"));
+        JButton showAllButton = new JButton(resources.getString("btnDisplayAll.text"));
         showAllButton.addActionListener(e -> {
             for (JScrollPane scrollPane : allTableScrollPanes) {
                 scrollPane.setVisible(true);
@@ -174,11 +173,50 @@ public class SkillsTab {
         allTableScrollPanes.add(tableScrollPane);
         tableScrollPane.setVisible(false);
 
+        JButton copyButton = new JButton(resources.getString("btnCopy.text"));
+        copyButton.addActionListener(e -> {
+            storedValues.clear();
+
+            int spinnerValue = ((Double) spinner.getValue()).intValue();
+            List<Integer> intermediateList = List.of(spinnerValue);
+            storedValues.add(new ArrayList<>(intermediateList));
+
+            JTable table = (JTable) tableScrollPane.getViewport().getView();
+            for (int row = 0; row < table.getRowCount(); row++) {
+                List<Integer> rowValues = new ArrayList<>();
+                rowValues.add((Integer) table.getValueAt(row, 1));
+
+                SkillLevel milestone = (SkillLevel) table.getValueAt(row, 2);
+                rowValues.add(milestone.ordinal());
+
+                storedValues.add(rowValues);
+            }
+
+            logger.info(storedValues);
+        });
+
+        JButton pasteButton = new JButton(resources.getString("btnPaste.text"));
+        pasteButton.addActionListener(e -> {
+            spinner.setValue((double) storedValues.get(0).get(0));
+
+            JTable table = (JTable) tableScrollPane.getViewport().getView();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+            int tableRowCount = model.getRowCount();
+
+            for (int row = 1; row < tableRowCount; row++) {
+                List<Integer> rowValues = storedValues.get(row);
+
+                model.setValueAt(rowValues.get(0), row, 1);
+                model.setValueAt(SkillLevel.parseFromInteger(rowValues.get(1)), row, 2);
+            }
+        });
+
         final JPanel panel = new CampaignOptionsStandardPanel(panelName, true, panelName);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         // Create a button to toggle the table
-        JButton toggleButton = new JButton(resources.getString("borderToggle.text"));
+        JButton toggleButton = new JButton(resources.getString("btnToggle.text"));
         toggleButton.addActionListener(e -> {
             boolean visible = tableScrollPane.isVisible();
             tableScrollPane.setVisible(!visible);
@@ -192,7 +230,15 @@ public class SkillsTab {
         panel.add(toggleButton, layout);
         layout.gridy++;
 
+        layout.gridy++;
+        layout.gridx = 0;
         layout.gridwidth = 1;
+        panel.add(copyButton, layout);
+        layout.gridx++;
+        panel.add(pasteButton, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
         panel.add(label, layout);
         layout.gridx++;
         panel.add(spinner, layout);
