@@ -24,6 +24,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -230,6 +231,16 @@ public class ReputationController {
             subtitleFontSize, resources.getString("commandRating.text"), commanderRating));
 
         description.append("<table>");
+        Person commander = campaign.getFlaggedCommander();
+
+        String commanderName = resources.getString("commanderNone.text");
+        if (commander != null) {
+            commanderName = commander.getFullName();
+        }
+
+        description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%s</td></tr>",
+            indent, resources.getString("commander.text"), commanderName));
+
         description.append(String.format("<tr><td><b>%s%s:</b></td> <td>%d</td></tr>",
             indent, resources.getString("leadership.text"), commanderMap.get("leadership")));
 
