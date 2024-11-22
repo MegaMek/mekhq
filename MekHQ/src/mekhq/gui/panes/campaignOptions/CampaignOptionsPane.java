@@ -160,7 +160,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "xpAwardsTab", advancementTab.xpAwardsTab(),
             "randomizationTab", advancementTab.skillRandomizationTab()));
 
-        // Combat Skills + Non-Combat Skills + Roleplay Skills
         JTabbedPane skillsContentTabs = createSubTabs(Map.of(
             "combatSkillsTab", skillsTab.createSkillsTab(true),
             "supportSkillsTab", skillsTab.createSkillsTab(false)));
