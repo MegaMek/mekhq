@@ -2022,9 +2022,9 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getCurrentPrisoners() {
-        return getPersonnel().stream()
-                .filter(p -> p.getPrisonerStatus().isCurrentPrisoner())
-                .collect(Collectors.toList());
+        return getActivePersonnel().stream()
+            .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
+            .collect(Collectors.toList());
     }
 
     /**
