@@ -1682,6 +1682,8 @@ public class Campaign implements ITechManager {
 
         List<Person> children = new ArrayList<>();
         Person currentSpouse = null;
+        Person babysFather = null;
+        Person spousesBabysFather = null;
 
         // run the simulation
         for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
@@ -1716,34 +1718,36 @@ public class Campaign implements ITechManager {
             }
 
             // then we check for children
-            if (person.getGender().isFemale()) {
+            if ((person.getGender().isFemale()) && (!person.isPregnant())) {
                 getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
 
                 if (person.isPregnant()) {
 
-                    Person father = null;
-
                     if ((currentSpouse != null) && (currentSpouse.getGender().isMale())) {
-                        father = currentSpouse;
+                        babysFather = currentSpouse;
                     }
-
-                    children.addAll(getProcreation().birthHistoric(this, person.getDueDate(), person, father));
                 }
             }
 
-            if ((currentSpouse != null) && (currentSpouse.getGender().isFemale())) {
-                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
+            if ((currentSpouse != null) && (currentSpouse.getGender().isFemale()) && (!currentSpouse.isPregnant())) {
+                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), currentSpouse, true);
 
-                if (person.isPregnant()) {
-
-                    Person father = null;
+                if (currentSpouse.isPregnant()) {
 
                     if (person.getGender().isMale()) {
-                        father = currentSpouse;
+                        spousesBabysFather = person;
                     }
-
-                    getProcreation().birthHistoric(this, person.getDueDate(), person, father);
                 }
+            }
+
+            if((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
+                children.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
+                babysFather = null;
+            }
+
+            if((currentSpouse != null) && (currentSpouse.isPregnant()) && (currentDate.isAfter(currentSpouse.getDueDate()))) {
+                children.addAll(getProcreation().birthHistoric(this, localDate, currentSpouse, spousesBabysFather));
+                spousesBabysFather = null;
             }
         }
 
