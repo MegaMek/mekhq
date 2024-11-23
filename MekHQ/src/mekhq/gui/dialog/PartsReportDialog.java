@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.Insets;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -32,6 +33,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 
 import static javax.swing.GroupLayout.Alignment;
 import javax.swing.JDialog;
@@ -65,7 +67,8 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
  */
 public class PartsReportDialog extends JDialog {
 
-    private JCheckBox ignoreMothballedCheck;
+    private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
+    private JButton topUpButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
@@ -127,6 +130,7 @@ public class PartsReportDialog extends JDialog {
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_REQUSTED_STOCK, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
         // Default starting sort
@@ -266,6 +270,17 @@ public class PartsReportDialog extends JDialog {
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
 
+        topUpWeeklyCheck = new JCheckBox(resourceMap.getString("chkTopUpWeekly.text"));
+        topUpWeeklyCheck.addActionListener(evt -> topUpWeekly());
+
+        topUpButton = new JButton();
+        topUpButton.setText(resourceMap.getString("topUpBtn.text"));
+        topUpButton.setIcon(null);
+        topUpButton.setFocusPainted(false);
+        topUpButton.setEnabled(true);
+        topUpButton.setBorder(null);
+        topUpButton.setMargin(new Insets(10,20,10,20));
+
         boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
         String[] qualities = {
             " ", // Combo box is blank for first one because it accepts everything and is default
@@ -292,6 +307,8 @@ public class PartsReportDialog extends JDialog {
                     .addComponent(ignorePartsUnderLabel)
                     .addComponent(ignoreSparesUnderQualityCB)
                     .addComponent(ignoreMothballedCheck)
+                    .addComponent(topUpWeeklyCheck)
+                    .addComponent(topUpButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnClose))));
 
@@ -301,6 +318,8 @@ public class PartsReportDialog extends JDialog {
                 .addComponent(ignoreMothballedCheck)
                 .addComponent(ignorePartsUnderLabel)
                 .addComponent(ignoreSparesUnderQualityCB)
+                .addComponent(topUpWeeklyCheck)
+                .addComponent(topUpButton)
                 .addComponent(btnClose)));
 
         setPreferredSize(UIUtil.scaleForGUI(1400,1000));
@@ -346,4 +365,11 @@ public class PartsReportDialog extends JDialog {
         column.setEnabled(campaign.isGM());
     }
 
+    private void topUp() {
+
+    }
+
+    private void topUpWeekly() {
+
+    }
 }

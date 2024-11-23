@@ -37,6 +37,7 @@ public class PartInUse {
     private int plannedCount;
     private Money cost = Money.zero();
     private List<Part> spares = new ArrayList<>();
+    private int requestedStock;
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -79,6 +80,7 @@ public class PartInUse {
         if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
         }
+        this.requestedStock = 0;
     }
 
     public String getDescription() {
@@ -167,6 +169,14 @@ public class PartInUse {
 
     public Money getCost() {
         return cost;
+    }
+
+    public int getRequestedStock() {
+        return requestedStock;
+    }
+
+    public void setRequestedStock(int requestedStock) {
+        this.requestedStock = requestedStock;
     }
 
     @Override

@@ -39,6 +39,7 @@ import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.event.*;
 
 import mekhq.MekHQ;
 import mekhq.campaign.parts.PartInUse;
@@ -55,14 +56,15 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_IN_USE = 1;
     public final static int COL_STORED = 2;
     public final static int COL_TONNAGE = 3;
-    public final static int COL_IN_TRANSFER = 4;
-    public final static int COL_COST = 5;
-    public final static int COL_BUTTON_BUY  = 6;
-    public final static int COL_BUTTON_BUY_BULK  = 7;
-    public final static int COL_BUTTON_SELL = 8;
-    public final static int COL_BUTTON_SELL_BULK = 9;
-    public final static int COL_BUTTON_GMADD  = 10;
-    public final static int COL_BUTTON_GMADD_BULK  = 11;
+    public final static int COL_REQUSTED_STOCK = 4;
+    public final static int COL_IN_TRANSFER = 5;
+    public final static int COL_COST = 6;
+    public final static int COL_BUTTON_BUY  = 7;
+    public final static int COL_BUTTON_BUY_BULK  = 8;
+    public final static int COL_BUTTON_SELL = 9;
+    public final static int COL_BUTTON_SELL_BULK = 10;
+    public final static int COL_BUTTON_GMADD  = 11;
+    public final static int COL_BUTTON_GMADD_BULK  = 12;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
             MekHQ.getMHQOptions().getLocale());
@@ -96,6 +98,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 return resourceMap.getString("ordered.heading");
             case COL_COST:
                 return resourceMap.getString("cost.heading");
+            case COL_REQUSTED_STOCK:
+                return resourceMap.getString("requestedStock.heading");
             default:
                 return EMPTY_CELL;
         }
@@ -136,6 +140,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 return resourceMap.getString("add.text");
             case COL_BUTTON_GMADD_BULK:
                 return resourceMap.getString("addInBulk.text");
+            case COL_REQUSTED_STOCK:
+                return piu.getRequestedStock();
             default:
                 return EMPTY_CELL;
         }
@@ -143,7 +149,12 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public Class<?> getColumnClass(int c) {
-        return String.class;
+        switch(c) {
+            case COL_REQUSTED_STOCK:
+                return Integer.class;
+            default:
+                return String.class;
+        } 
     }
 
     @Override
@@ -155,6 +166,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_BUTTON_SELL_BULK:
             case COL_BUTTON_GMADD:
             case COL_BUTTON_GMADD_BULK:
+            case COL_REQUSTED_STOCK:
                 return true;
             default:
                 return false;
@@ -192,6 +204,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_TONNAGE:
             case COL_IN_TRANSFER:
             case COL_COST:
+            case COL_REQUSTED_STOCK:
                 return SwingConstants.RIGHT;
             default:
                 return SwingConstants.CENTER;
@@ -206,6 +219,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_BUTTON_BUY, COL_BUTTON_SELL -> 25;
             case COL_BUTTON_GMADD -> 65;
             case COL_BUTTON_BUY_BULK, COL_BUTTON_SELL_BULK -> 65;
+            case COL_REQUSTED_STOCK -> 45;
             default -> 100;
         };
     }
@@ -398,6 +412,24 @@ public class PartsInUseTableModel extends DataTableModel {
             renderButton.setEnabled(enabled && buyable);
 
             return renderButton;
+        }
+    }
+
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        if(columnIndex == COL_REQUSTED_STOCK) {
+            try {
+                int newVal = Integer.parseInt(value.toString());
+                PartInUse piu = getPartInUse(rowIndex);
+                if(piu != null) {
+                    piu.setRequestedStock(newVal);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                }
+            } catch (NumberFormatException e) {
+                
+            }
+        } else {
+            super.setValueAt(value, rowIndex, columnIndex);
         }
     }
 }
