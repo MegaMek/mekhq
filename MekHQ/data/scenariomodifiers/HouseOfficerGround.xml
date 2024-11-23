@@ -8,7 +8,7 @@
     <eventTiming>PreForceGeneration</eventTiming>
     <forceDefinition>
         <actualDeploymentZone>-1</actualDeploymentZone>
-        <allowAeroBombs>true</allowAeroBombs>
+        <allowAeroBombs>false</allowAeroBombs>
         <allowedUnitType>0</allowedUnitType>
         <arrivalTurn>0</arrivalTurn>
         <canReinforceLinked>false</canReinforceLinked>
@@ -20,7 +20,7 @@
         <destinationZone>5</destinationZone>
         <fixedUnitCount>0</fixedUnitCount>
         <forceAlignment>1</forceAlignment>
-        <forceMultiplier>1.0</forceMultiplier>
+        <forceMultiplier>0.25</forceMultiplier>
         <forceName>Joint Force</forceName>
         <generationMethod>2</generationMethod>
         <generationOrder>1</generationOrder>
