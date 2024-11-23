@@ -144,7 +144,7 @@ import static mekhq.campaign.market.contractMarket.ContractAutomation.performAut
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
+import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
@@ -6312,7 +6312,7 @@ public class Campaign implements ITechManager {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
-        if (partWork.getUnit().getSite() < SITE_FACILITY_MAINTENANCE) {
+        if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
             if (getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
                 Planet planet = getLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
