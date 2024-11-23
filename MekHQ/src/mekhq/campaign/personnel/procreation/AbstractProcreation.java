@@ -480,6 +480,10 @@ public abstract class AbstractProcreation {
             babies.add(baby);
         }
 
+        if (Compute.d6(1) <= 2) {
+            mother.setTryingToConceive(false);
+        }
+
         // Cleanup Data
         removePregnancy(mother);
 
