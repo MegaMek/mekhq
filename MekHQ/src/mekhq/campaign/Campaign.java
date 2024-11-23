@@ -3793,6 +3793,10 @@ public class Campaign implements ITechManager {
             }
         }
 
+        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfMonth() == 1)) {
+            negotiateAdditionalSupportPoints();
+        }
+
         processNewDayATBScenarios();
 
         for (AtBContract contract : getActiveAtBContracts()) {
@@ -3803,6 +3807,82 @@ public class Campaign implements ITechManager {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Handles monthly negotiation of additional support points for active AtB Contracts.
+     * Admin/Transport personnel skill levels and contract start dates are considered during negotiations.
+     * Side effects include state changes and report generation.
+     */
+    private void negotiateAdditionalSupportPoints() {
+        // Fetch a list of all Admin/Transport personnel
+        List<Person> adminTransport = new ArrayList<>();
+
+        for (Person person : getAdmins()) {
+            if (person.getPrimaryRole().isAdministratorTransport()
+                || person.getSecondaryRole().isAdministratorTransport()) {
+                adminTransport.add(person);
+            }
+        }
+
+        // Sort that list based on skill
+        adminTransport.sort((person1, person2) -> {
+            Skill person1Skill = person1.getSkill(SkillType.S_ADMIN);
+            int person1SkillValue = person1Skill.getLevel() + person1Skill.getBonus();
+
+            Skill person2Skill = person2.getSkill(SkillType.S_ADMIN);
+            int person2SkillValue = person2Skill.getLevel() + person2Skill.getBonus();
+
+            return Double.compare(person1SkillValue, person2SkillValue);
+        });
+
+        // Fetch a list of all active AtB Contracts and sort that list oldest -> newest
+        List<AtBContract> activeContracts = getActiveAtBContracts();
+
+        List<AtBContract> sortedContracts = activeContracts.stream()
+            .sorted(Comparator.comparing(AtBContract::getStartDate))
+            .toList();
+
+        // Loop through available contracts, rolling for additional Support Points until we run
+        // out of Admin/Transport personnel, or we run out of active contracts
+        for (AtBContract contract : sortedContracts) {
+            int negoatiatedSupportPoints = 0;
+            int tracks = contract.getStratconCampaignState().getTracks().size();
+
+            if (adminTransport.isEmpty()) {
+                break;
+            }
+
+            int availableAdmins = adminTransport.size();
+
+            for (int i = 0; i < availableAdmins; i++) {
+                Person assignedAdmin = adminTransport.get(0);
+                adminTransport.remove(0);
+
+                int targetNumber = assignedAdmin.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                int roll = Compute.d6(2);
+
+                if (roll >= targetNumber) {
+                    negoatiatedSupportPoints++;
+                }
+
+                if (negoatiatedSupportPoints >= tracks) {
+                    break;
+                }
+            }
+
+            if (negoatiatedSupportPoints > 0) {
+                contract.getStratconCampaignState().addSupportPoints(negoatiatedSupportPoints);
+
+                addReport(String.format(resources.getString("stratConWeeklySupportPoints.text"),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    negoatiatedSupportPoints, CLOSING_SPAN_TAG, contract.getName()));
+            } else {
+                addReport(String.format(resources.getString("stratConWeeklySupportPointsFailed.text"),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    CLOSING_SPAN_TAG, contract.getName()));
             }
         }
     }
