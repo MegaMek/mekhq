@@ -21,7 +21,9 @@
 package mekhq.campaign.market.contractMarket;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -50,6 +52,7 @@ import static megamek.common.icons.AbstractIcon.DEFAULT_ICON_FILENAME;
  */
 public class ContractAutomation {
     private final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ContractAutomation");
+    private static final MMLogger logger = MMLogger.create(ContractAutomation.class);
 
     /**
      * Main function to initiate a sequence of automated tasks when a contract is started.
@@ -268,13 +271,27 @@ public class ContractAutomation {
             for (UUID unitId : force.getUnits()) {
                 Unit unit = campaign.getUnit(unitId);
 
-                if (unit != null) {
-                    if (unit.isAvailable(false) && !unit.isUnderRepair()) {
-                        mothballTargets.add(unit);
-                    } else {
-                        campaign.addReport(String.format(resources.getString("mothballingFailed.text"),
-                            unit.getName()));
+                if (unit == null) {
+                    logger.error(String.format("Failed to get unit for unit ID %s", unitId));
+                    continue;
+                }
+
+                try {
+                    Entity entity = unit.getEntity();
+
+                    if (entity.isLargeCraft()) {
+                        continue;
                     }
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to get entity for %s", unit.getName()));
+                    continue;
+                }
+
+                if (unit.isAvailable(false) && !unit.isUnderRepair()) {
+                    mothballTargets.add(unit);
+                } else {
+                    campaign.addReport(String.format(resources.getString("mothballingFailed.text"),
+                        unit.getName()));
                 }
             }
         }

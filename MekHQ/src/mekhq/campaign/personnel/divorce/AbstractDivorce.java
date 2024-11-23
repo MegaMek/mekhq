@@ -266,7 +266,7 @@ public abstract class AbstractDivorce {
         }
 
         if (spouse.getPrimaryRole().isDependent()) {
-            departingPartners.add(origin);
+            departingPartners.add(spouse);
         }
 
         if (!departingPartners.isEmpty()) {

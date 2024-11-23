@@ -375,6 +375,16 @@ public class AtBContract extends Contract {
         setLength(getContractType().calculateLength(variable, this));
     }
 
+    /**
+     * Calculates the number of lances required for this contract, based on [campaign].
+     *
+     * @param campaign The campaign to reference.
+     * @return The number of lances required.
+     */
+    public static int calculateRequiredLances(Campaign campaign) {
+        return Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+    }
+
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
         for (UUID uuid : campaign.getForces().getAllUnits(true)) {
@@ -1477,7 +1487,7 @@ public class AtBContract extends Contract {
             enemyCode = "REB";
         }
 
-        requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+        requiredLances = calculateRequiredLances(campaign);
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
 
@@ -1793,8 +1803,8 @@ public class AtBContract extends Contract {
         double allyRatio = switch (getCommandRights()) {
             case INDEPENDENT    -> 0; // no allies
             case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
-            case HOUSE          -> 1; // allies with same (G)BV budget
-            case INTEGRATED     -> 2; // allies with twice the player's (G)BV budget
+            case HOUSE          -> 0.25; // allies with 25% the player's (G)BV budget
+            case INTEGRATED     -> 0.5; // allies with 50% the player's (G)BV budget
         };
 
         if (allyRatio > 0) {

@@ -94,7 +94,7 @@ The first hired mekwarrior is the force commanding officer and gets a +1 bonus t
 Meks can be generated in several ways (or not at all) although I recommend to use the system detailed in the rules file under Company_Creation for the first time. If this file is not available a roll on the Chosen Rat can be an alternative. To add a mek Marketplace -> Purchase Unit, select Unit Type "Mek" and the desired weight class finish by using the "Add (GM)" button.
 
 Before accepting a contract it is necessary to fill out the TO&E, in order to do so mekwarriors need to be assigned to their rides, in the Personnel tab right-click on the pilot -> assign to unit -> select desired unit. As soon as all available meks are assigned to a pilot you must sort them into lances in the TO&E tab. By right-clicking on the "My Campaign" force icon new forces can be added. A 12 mek company usually consists of three lances with four meks each, every lance must be commanded by an officer. There are certain size and weight limits to lances see the rules file for more information.
-The unit is now established yet there is more preparation to be done. I recommend to use "Add Funds (GM)" under the Finance tab to add some starting capital, 5%-20% of your starting net worth is reasonable. Before the cash can be spend the options turned off during creation must be turned on again.
+The unit is now established yet there is more preparation to be done. I recommend to use "Add Transaction (GM)" under the Finance tab to add some starting capital, 5%-20% of your starting net worth is reasonable. Before the cash can be spend the options turned off during creation must be turned on again.
 
 File -> Campaign Options
 "Finance" Tab

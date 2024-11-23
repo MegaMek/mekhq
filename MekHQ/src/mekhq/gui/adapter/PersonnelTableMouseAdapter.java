@@ -49,7 +49,6 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -480,30 +479,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().addReport(String.format(resources.getString("improved.format"),
                         selectedPerson.getHyperlinkedName(), type));
 
-                if (gui.getCampaign().getCampaignOptions().isUseAtB()
-                        && gui.getCampaign().getCampaignOptions().isUseAbilities()) {
-                    if (selectedPerson.getPrimaryRole().isCombat()
-                            && (selectedPerson.getExperienceLevel(gui.getCampaign(), false) > oldExpLevel)
-                            && (oldExpLevel >= SkillType.EXP_REGULAR)) {
-                        SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
-                        String spa = spaGenerator.rollSPA(gui.getCampaign(), selectedPerson);
-                        if (spa == null) {
-                            if (gui.getCampaign().getCampaignOptions().isUseEdge()) {
-                                selectedPerson.changeEdge(1);
-                                selectedPerson.changeCurrentEdge(1);
-                                PersonalLogger.gainedEdge(gui.getCampaign(), selectedPerson,
-                                        gui.getCampaign().getLocalDate());
-                                gui.getCampaign().addReport(String.format(resources.getString("gainedEdge.format"),
-                                        selectedPerson.getHyperlinkedName()));
-                            }
-                        } else {
-                            PersonalLogger.gainedSPA(gui.getCampaign(), selectedPerson,
-                                    gui.getCampaign().getLocalDate(), spa);
-                            gui.getCampaign().addReport(String.format(resources.getString("gained.format"),
-                                    selectedPerson.getHyperlinkedName(), spa));
-                        }
-                    }
-                }
                 gui.getCampaign().personUpdated(selectedPerson);
                 break;
             }
