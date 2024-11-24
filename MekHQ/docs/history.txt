@@ -1,10 +1,32 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.02-SNAPSHOT
++ Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
++ PR #5206: Re-enabled CamOps Contract Market Method
++ PR #5207: Re-enabled Confirm Preset Option for New Campaign Preset Picker
++ Fix #5203: Handled Exception when Fetching Force by ID in StratconPanel
++ Fix #5202, #5226: Increase Time Limit Scale Factors in Scenario Templates
++ Fix #5197: Reduced Force Multiplier for Pirate Scenarios #5211
++ Fix #5196: Fix Spouse Dependency Check in Divorce Logic
++ Fix #5190: Enhanced Mothballing in ContractAutomation
++ Fix #5184: Corrected Unit Site Comparison Logic
++ Fix #5182: Refactored getCurrentPrisoners to use getActivePersonnel
++ Fix #4652, #5194, #5193, #5205: Reputation Error Corrections & Report Reformatting
++ Fix #5204: Enhanced INVALID Formation Level Checking
++ Fix #5220: Lowered Capture Percentage Requirement to 25%
++ PR #5223: Adjusted Command Rights Scenario Modifiers
++ Fix #5219: Updated Force Generation for Irregular Scenarios
++ PR #5225: Removed Legacy AtB Guaranteed SPAs
++ PR #5227: Renamed "Add Funds" to "Add Transaction" for Clarity
++ PR #5228: Added Monthly StratCon Support Points Generation #5228
++ Fix #5181: Generate required lances for manual AtB contracts for StratCon init
++ PR #5234: Refined Turnover Prompt Dialog Text
+
+
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
-+ FIX #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
++ Fix #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
 + PR #4655: Refactored Random Company Name Generator to Use CSV
 + PR #4691: Revised CamOps Reputation Derived AtB Modifier, Renamed getUnitRatingMod Method
 + PR #4693: Refactored Personality Characteristic Display in Personnel Table
