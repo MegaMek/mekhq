@@ -60,9 +60,8 @@ public class CampaignManagementDialog extends JDialog {
 
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
-            lblTrackScenarioOdds.setText(String.format("Track Reinforcement Odds: %d%%",
-                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
-                        true)));
+            lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%",
+                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(), false)));
         }
     }
 

@@ -26,25 +26,16 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.universe.Faction;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import static java.lang.Math.ceil;
-import static java.lang.Math.round;
-import static megamek.common.Coords.ALL_DIRECTIONS;
-import static mekhq.campaign.rating.IUnitRating.*;
-import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
-import static mekhq.campaign.stratcon.StratconRulesManager.processMassRout;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -83,7 +74,6 @@ public class StratconContractInitializer {
 
         int maximumTrackIndex = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
-        double planetaryDiameter = campaign.getLocation().getPlanet().getDiameter();
 
         for (int x = 0; x < maximumTrackIndex; x++) {
             int scenarioOdds = contractDefinition.getScenarioOdds()
@@ -92,7 +82,7 @@ public class StratconContractInitializer {
                     .get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
             StratconTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK, scenarioOdds, deploymentTime,
-                    planetaryTemperature, planetaryDiameter);
+                    planetaryTemperature);
             track.setDisplayableName(String.format("Sector %d", x));
             campaignState.addTrack(track);
         }
@@ -108,7 +98,7 @@ public class StratconContractInitializer {
                     .get(Compute.randomInt(contractDefinition.getDeploymentTimes().size()));
 
             StratconTrackState track = initializeTrackState(oddLanceCount, scenarioOdds, deploymentTime,
-                    planetaryTemperature, planetaryDiameter);
+                    planetaryTemperature);
             track.setDisplayableName(String.format("Sector %d", campaignState.getTracks().size()));
             campaignState.addTrack(track);
         }
@@ -198,11 +188,6 @@ public class StratconContractInitializer {
                     false, Collections.emptyList());
         }
 
-        // Initialize non-objective scenarios
-        for (StratconTrackState track : campaignState.getTracks()) {
-            seedPreDeployedForces(contract, campaign, track, true);
-        }
-
         // clean up objectives for integrated command:
         // we're still going to have all the objective facilities and scenarios
         // but the player has no control over where they go, so they're
@@ -220,8 +205,6 @@ public class StratconContractInitializer {
 
             LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
             contract.setRoutEndDate(routEnd);
-
-            processMassRout(campaignState, true);
         } else {
             contract.checkMorale(campaign, campaign.getLocalDate());
 
@@ -234,76 +217,24 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Seeds pre-deployed (hidden) forces in a {@link StratconTrackState}, taking into account
-     * contract type, enemy quality, and enemy faction.
-     *
-     * @param contract  the current contract
-     * @param campaign  the current campaign.
-     * @param track     the relevant {@link StratconTrackState}
-     * @param isEnemy   whether we are seeding forces for the enemy, or player's allies
-     */
-    public static int seedPreDeployedForces(AtBContract contract, Campaign campaign,
-                                            StratconTrackState track, boolean isEnemy) {
-        // TODO remove reductions once we have friendly forces deploying too
-        final int CLAN_CLUSTER = 11; // 22 Stars, reduced to 11
-        final int IS_BATTALION = 14; // 27 Lances, reduced to 14
-        final int COMSTAR_LEVEL_IV = 18; // 36 Level IIs, reduced to 18
-
-        int quality = isEnemy ? contract.getEnemyQuality() : contract.getAllyQuality();
-        double multiplier = switch (quality) {
-            case DRAGOON_F -> 0.25;
-            case DRAGOON_D -> 0.5;
-            case DRAGOON_C -> 0.75;
-            case DRAGOON_A -> 1.5;
-            case DRAGOON_ASTAR -> 2;
-            default -> 1; // DRAGOON_B
-        };
-
-        AtBContractType contractType = contract.getContractType();
-
-        if (contractType.isPirateHunting() || contractType.isGarrisonType()) {
-            multiplier *= 0.5;
-        } else if (contractType.isPlanetaryAssault()) {
-            multiplier *= 2;
-        }
-
-        int elementCount = IS_BATTALION;
-
-        Faction faction = isEnemy ? contract.getEnemy() : contract.getEmployerFaction();
-
-        if (faction.isClan()) {
-            elementCount = CLAN_CLUSTER;
-        } else if (faction.isComStarOrWoB()) {
-            elementCount = COMSTAR_LEVEL_IV;
-        }
-
-        elementCount = (int) ceil(elementCount * multiplier);
-
-        for (int i = 0; i < elementCount; i++) {
-            addHiddenExternalScenario(campaign, contract, track, null, false);
-        }
-
-        return elementCount;
-    }
-
-    /**
      * Set up initial state of a track, dimensions are based on number of assigned
      * lances.
      */
     public static StratconTrackState initializeTrackState(int numLances, int scenarioOdds,
-                                                          int deploymentTime, int planetaryTemp,
-                                                          double planetaryDiameter) {
+            int deploymentTime, int planetaryTemp) {
+        // to initialize a track,
+        // 1. we set the # of required lances
+        // 2. set the track size to a total of numlances * 28 hexes, a rectangle that is
+        // wider than it is taller
+        // the idea being to create a roughly rectangular playing field that,
+        // if one deploys a scout lance each week to a different spot, can be more or
+        // less fully covered
+
         StratconTrackState retVal = new StratconTrackState();
         retVal.setRequiredLanceCount(numLances);
 
-        // calculate planet surface area
-        double radius = planetaryDiameter / 2;
-        double planetSurfaceArea = 4 * Math.PI * Math.pow(radius, 2);
-        // This gives us a decently sized track, without it feeling too large
-        planetSurfaceArea /= 1000000;
-
         // set width and height
-        int numHexes = (int) round(planetSurfaceArea);
+        int numHexes = numLances * 28;
         int height = (int) Math.floor(Math.sqrt(numHexes));
         int width = numHexes / height;
         retVal.setWidth(width);
@@ -523,74 +454,6 @@ public class StratconContractInitializer {
             int randomIndex = new Random().nextInt(suitableCoords.size());
             return suitableCoords.get(randomIndex);
         }
-    }
-
-    /**
-     * Searches for and returns a suitable adjacent coordinate to the given origin coordinates on
-     * the provided {@link StratconTrackState}.
-     * The method checks all the possible directions and considers a coordinate suitable if it
-     * doesn't contain a scenario and if it either doesn't contain a facility or contains a
-     * player-allied one.
-     * If there are multiple suitable coordinates, one is chosen at random.
-     *
-     * @param originCoords the {@link StratconCoords} around which to search for a suitable coordinate
-     * @param trackState   the {@link StratconTrackState} on which to perform the search
-     * @param weightPlayerForces whether to place greater emphasis on player-allied forces and facilities.
-     * @return a {@link StratconCoords} object representing the coordinates of a suitable adjacent
-     * location, or {code null} if no suitable location was found.
-     */
-    public static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
-                                                                       StratconTrackState trackState,
-                                                                       boolean weightPlayerForces) {
-        List<StratconCoords> suitableCoords = new ArrayList<>();
-        List<StratconCoords> playerForceCoords = new ArrayList<>();
-        List<StratconCoords> playerFacilityCoords = new ArrayList<>();
-
-        for (int direction : ALL_DIRECTIONS) {
-            StratconCoords newCoords = originCoords.translate(direction);
-
-            if (trackState.getScenario(newCoords) != null) {
-                continue;
-            }
-
-            if (trackState.getFacility(newCoords) == null) {
-                suitableCoords.add(newCoords);
-                continue;
-            }
-
-            if (trackState.getFacility(newCoords).getOwner() != ForceAlignment.Opposing) {
-                suitableCoords.add(newCoords);
-
-                if (weightPlayerForces) {
-                    playerFacilityCoords.add(newCoords);
-                }
-            }
-
-            if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
-                playerForceCoords.add(newCoords);
-            }
-        }
-
-        if (suitableCoords.isEmpty()) {
-            return null;
-        }
-
-        Random random = new Random();
-
-        if (weightPlayerForces) {
-            if (!playerFacilityCoords.isEmpty()) {
-                int randomIndex = random.nextInt(playerFacilityCoords.size());
-                return playerFacilityCoords.get(randomIndex);
-            }
-
-            if (!playerForceCoords.isEmpty()) {
-                int randomIndex = random.nextInt(playerForceCoords.size());
-                return playerForceCoords.get(randomIndex);
-            }
-        }
-
-        int randomIndex = random.nextInt(suitableCoords.size());
-        return suitableCoords.get(randomIndex);
     }
 
     /**

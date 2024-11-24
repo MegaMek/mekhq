@@ -40,7 +40,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -53,7 +52,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -88,8 +86,6 @@ import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.rating.IUnitRating.*;
-import static mekhq.campaign.stratcon.StratconContractInitializer.seedPreDeployedForces;
-import static mekhq.campaign.stratcon.StratconRulesManager.processMassRout;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
@@ -449,12 +445,6 @@ public class AtBContract extends Contract {
                 routEnd = null;
 
                 updateEnemy(campaign, today); // mix it up a little
-
-                if (campaign.getCampaignOptions().isUseStratCon()) {
-                    for (StratconTrackState track : getStratconCampaignState().getTracks()) {
-                        seedPreDeployedForces(this, campaign, track, true);
-                    }
-                }
             } else {
                 setMoraleLevel(AtBMoraleLevel.ROUTED);
             }
@@ -578,54 +568,6 @@ public class AtBContract extends Contract {
 
         targetNumber.addModifier(performanceModifier, "performanceModifier");
 
-        // Balance of Power
-        int balanceOfPower = 0;
-        if (campaign.getCampaignOptions().isUseStratCon()) {
-            int playerForceCount = 0;
-
-            for (Lance lance : campaign.getLances().values()) {
-                try {
-                    Force force = campaign.getForce(lance.getForceId());
-
-                    if (force.isCombatForce()) {
-                        playerForceCount++;
-                    }
-                } catch (Exception ex) {
-                    logger.error(String.format("Failed to fetch force %s: %s",
-                        lance.getForceId(), ex.getMessage()));
-                }
-            }
-
-            playerForceCount = (int) ceil((double) playerForceCount / campaign.getActiveContracts().size());
-
-            if (getCommandRights().isHouse() || getCommandRights().isLiaison()) {
-                playerForceCount = (int) round(playerForceCount * 1.25);
-            } else if (getCommandRights().isIntegrated()) {
-                playerForceCount = (int) round(playerForceCount * 1.5);
-            }
-
-            int enemyForceCount = 0;
-            for (StratconTrackState track : getStratconCampaignState().getTracks()) {
-                enemyForceCount += track.getScenarios().size();
-            }
-
-            if (playerForceCount >= (enemyForceCount * 3)) {
-                balanceOfPower = -6;
-            } else if (playerForceCount >= (enemyForceCount * 2)) {
-                balanceOfPower = -4;
-            } else if (playerForceCount > enemyForceCount) {
-                balanceOfPower = -2;
-            } else if (enemyForceCount >= (playerForceCount * 3)) {
-                balanceOfPower = 6;
-            } else if (enemyForceCount >= (playerForceCount * 2)) {
-                balanceOfPower = 4;
-            } else if (enemyForceCount > playerForceCount) {
-                balanceOfPower = 2;
-            }
-        }
-
-        targetNumber.addModifier(balanceOfPower, "balanceOfPower");
-
         // Total morale modifier calculation
         int roll = Compute.d6(2) + targetNumber.getValue();
 
@@ -650,10 +592,6 @@ public class AtBContract extends Contract {
                 campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
                         " The contract will conclude tomorrow.");
                 setEndDate(today.plusDays(1));
-            }
-
-            if (campaign.getCampaignOptions().isUseStratCon()) {
-                processMassRout(getStratconCampaignState(), true);
             }
         }
 

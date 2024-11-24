@@ -138,16 +138,6 @@ public enum AtBContractType {
     public boolean isRaidType() {
         return isDiversionaryRaid() || isObjectiveRaid() || isReconRaid() || isExtractionRaid();
     }
-
-    /**
-     * Checks if the given contract is offensive.
-     *
-     * @return {@code true} if the contract is of raid type, pirate hunting, or guerrilla warfare;
-     * {@code false} otherwise
-     */
-    public boolean isOffensive() {
-        return isRaidType() || isPirateHunting() || isGuerrillaWarfare() || isPlanetaryAssault();
-    }
     // endregion Boolean Comparison Methods
 
     public int calculateLength(final boolean variable, final AtBContract contract) {

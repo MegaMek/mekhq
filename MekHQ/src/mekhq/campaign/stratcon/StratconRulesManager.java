@@ -57,7 +57,6 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
-import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedAdjacentCoords;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 
 /**
@@ -657,13 +656,21 @@ public class StratconRulesManager {
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != ForceAlignment.Allied);
+        int targetNum = calculateScenarioOdds(track, contract, true);
+        boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= targetNum);
 
-        if (isNonAlliedFacility) {
+        if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             setScenarioParametersFromBiome(track, scenario);
+
+            // if we wound up with a field scenario, we may sub in dropships carrying
+            // units of the force in question
+            if (spawnScenario && !isNonAlliedFacility) {
+                swapInPlayerUnits(scenario, campaign, forceID);
+            }
 
             commitPrimaryForces(campaign, scenario, track);
         }
@@ -2020,72 +2027,6 @@ public class StratconRulesManager {
         return true;
     }
 
-    /**
-     * Performs the daily movement processing for each active scenario in every track of the given
-     * {@link StratconCampaignState}.
-     * This processing involves evaluating each scenario and, if it is not yet deployed, attempting
-     * to move it to an unoccupied coordinate.
-     * If movement is possible, the scenario is updated with the new coordinates and parameters are
-     * set based on the new location's biome.
-     * If the new location contains a facility, the scenario is replaced with a facility scenario.
-     *
-     * @param campaign       the current campaign
-     * @param campaignState  the relevant {@link StratconCampaignState}
-     */
-    public static void processDailyMovement(Campaign campaign, StratconCampaignState campaignState) {
-        for (StratconTrackState track : campaignState.getTracks()) {
-            List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
-
-            for (StratconScenario scenario : allScenarios) {
-                if (scenario.getDeploymentDate() == null && !scenario.isStrategicObjective()) {
-                    StratconCoords scenarioCoords = scenario.getCoords();
-                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(scenarioCoords, track, true);
-
-                    if (newCoords == null) {
-                        continue;
-                    }
-
-                    track.removeScenario(scenario);
-                    track.updateScenario(scenario);
-
-                    if (track.getFacility(newCoords) == null) {
-                        scenario.setCoords(newCoords);
-                        setScenarioParametersFromBiome(track, scenario);
-                        track.addScenario(scenario);
-                    } else {
-                        generateExternalScenario(campaign, campaignState.getContract(), track, newCoords,
-                            null, true);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Processes a mass rout in the given campaign state.
-     * <p>
-     * Loops through all tracks in the campaign state.
-     * For each track, it retrieves all scenarios.
-     * If scenario's deployment date is {@code null} and scenario is not a strategic objective,
-     * it is removed from the track and then updated.
-     *
-     * @param campaignState   the relevant StratCon campaign state.
-     * @param removeAll       whether to remove all scenarios, including those with dates or
-     *                       strategic objectives. This should be used sparingly.
-     */
-    public static void processMassRout(StratconCampaignState campaignState, boolean removeAll) {
-        for (StratconTrackState track : campaignState.getTracks()) {
-            List<StratconScenario> allScenarios = new ArrayList<>(track.getScenarios().values());
-
-            for (StratconScenario scenario : allScenarios) {
-                if (removeAll || (scenario.getDeploymentDate() == null && !scenario.isStrategicObjective())) {
-                    track.removeScenario(scenario);
-                    track.updateScenario(scenario);
-                }
-            }
-        }
-    }
-
     public void startup() {
         MekHQ.registerHandler(this);
     }
@@ -2129,21 +2070,9 @@ public class StratconRulesManager {
                         }
                     }
 
-                    processDailyMovement(ev.getCampaign(), campaignState);
-
-                    // on monday, generate new scenarios and reinforce existing enemy forces
+                    // on monday, generate new scenarios
                     if (isMonday) {
                         generateScenariosForTrack(ev.getCampaign(), contract, track);
-
-                        int reinforcementOdds = calculateScenarioOdds(track, contract, true);
-
-                        int roll = Compute.randomInt(100);
-                        while (roll < reinforcementOdds) {
-                            addHiddenExternalScenario(ev.getCampaign(), contract, track, null, false);
-
-                            reinforcementOdds -= roll;
-                            roll = Compute.randomInt(100);
-                        }
                     }
                 }
             }
