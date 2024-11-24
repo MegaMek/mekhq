@@ -37,6 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Math.min;
+
 /**
  * This class handles StratCon state initialization when a contract is signed.
  */
@@ -200,7 +202,7 @@ public class StratconContractInitializer {
         }
 
         // Determine starting morale
-        if (contract.getContractType().isGarrisonDuty()) {
+        if (contract.getContractType().isGarrisonType()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
 
             LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
@@ -210,6 +212,12 @@ public class StratconContractInitializer {
 
             if (contract.getMoraleLevel().isRouted()) {
                 contract.setMoraleLevel(AtBMoraleLevel.CRITICAL);
+            }
+
+            if (contract.getContractType().isReliefDuty()) {
+                int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
+
+                contract.setMoraleLevel(AtBMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
             }
         }
 
