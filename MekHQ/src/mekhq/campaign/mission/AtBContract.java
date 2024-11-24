@@ -566,14 +566,14 @@ public class AtBContract extends Contract {
 
         int performanceModifier = 0;
 
-        if (victories > (defeats * 2)) {
-            performanceModifier -= 2;
+        if (victories >= (defeats * 2)) {
+            performanceModifier -= 4;
         } else if (victories > defeats) {
-            performanceModifier--;
-        } else if (defeats > (victories * 2)) {
+            performanceModifier -= 2;
+        } else if (defeats >= (victories * 2)) {
+            performanceModifier += 4;
+        } else if (defeats > victories) {
             performanceModifier += 2;
-        } else {
-            performanceModifier++;
         }
 
         targetNumber.addModifier(performanceModifier, "performanceModifier");
