@@ -468,8 +468,7 @@ public abstract class AbstractProcreation {
             // set education based on age
             if(baby.getAge(today) < 16) {
                 baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-            }
-            else {
+            } else {
                 baby.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
             }
 
