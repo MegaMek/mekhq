@@ -21,7 +21,10 @@ MEKHQ VERSION HISTORY:
 + PR #5228: Added Monthly StratCon Support Points Generation #5228
 + Fix #5181: Generate required lances for manual AtB contracts for StratCon init
 + PR #5234: Refined Turnover Prompt Dialog Text
-
++ PR #5210: Update Rank Systems to Version 0.50.02-SNAPSHOT
++ Fix #5239: Simulated Relationship Behavior Fixes
++ Fix #5235: Fixed Typo and Added null check in RetirementDefectionTracker
++ PR #5243: Updated MekHQ Morale & StratCon Scenario Spawn Methods
 
 
 0.50.01 (2024-11-10 1800 UTC)
