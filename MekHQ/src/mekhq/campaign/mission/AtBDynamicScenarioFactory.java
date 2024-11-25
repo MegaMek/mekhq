@@ -2501,7 +2501,11 @@ public class AtBDynamicScenarioFactory {
 
                 // Roll for unit types
                 if (totalWeight <= 0) {
-                    actualUnitType = checkForProtoMek(faction, campaign);
+                    for (int x = 0; x < unitCount; x++) {
+                        unitTypes.addAll(checkForProtoMek(faction, campaign));
+                    }
+
+                    return unitTypes;
                 } else {
                     int roll = randomInt(totalWeight);
                     if (roll < vehicleLanceWeight) {
@@ -2513,16 +2517,24 @@ public class AtBDynamicScenarioFactory {
                             if (addTank) {
                                 unitTypes.add(TANK);
                             } else {
-                                unitTypes.add(checkForProtoMek(faction, campaign));
+                                unitTypes.addAll(checkForProtoMek(faction, campaign));
                             }
                         }
                         return unitTypes;
                     } else {
-                        actualUnitType = checkForProtoMek(faction, campaign);
+                        for (int x = 0; x < unitCount; x++) {
+                            unitTypes.addAll(checkForProtoMek(faction, campaign));
+                        }
+
+                        return unitTypes;
                     }
                 }
             } else {
-                actualUnitType = checkForProtoMek(faction, campaign);
+                for (int x = 0; x < unitCount; x++) {
+                    unitTypes.addAll(checkForProtoMek(faction, campaign));
+                }
+
+                return unitTypes;
             }
         } else if (unitTypeCode == SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
             // Use the Vehicle/Mixed ratios from campaign options as weighted values for
@@ -2612,22 +2624,32 @@ public class AtBDynamicScenarioFactory {
 
         return unitTypes;
     }
+
     /**
      * Checks if the given faction is a Clan faction, if the current game year is 3057 or greater,
      * and if a random integer between 0 and 99 inclusive is less than 6. If all these conditions
-     * are met, the method returns the PROTOMEK constant, otherwise it returns the MEK constant.
+     * are met, the method returns a list containing five instances of the PROTOMEK constant. If not,
+     * it creates a new list with a single instance of the MEK constant.
      *
      * @param faction the Faction to check for Clan-ness
      * @param campaign the current Campaign, used to get the current game year
      *
-     * @return PROTOMEK if all conditions are met, otherwise MEK
+     * @return List of PROTOMEK constants if all conditions are met, otherwise a list containing MEK
      */
-    private static int checkForProtoMek(Faction faction, Campaign campaign) {
+    private static List<Integer> checkForProtoMek(Faction faction, Campaign campaign) {
+        List<Integer> unitTypes = new ArrayList<>();
         if (faction.isClan() && (campaign.getGameYear() >= 3057) && (randomInt(100) < 6)) {
-            return PROTOMEK;
+            // There are five ProtoMeks to a Point
+            for (int i = 0; i < 5; i++) {
+                unitTypes.add(PROTOMEK);
+            }
         }
 
-        return MEK;
+        if (unitTypes.isEmpty()) {
+            unitTypes.add(MEK);
+        }
+
+        return unitTypes;
     }
 
     /**
