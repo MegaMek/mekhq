@@ -87,6 +87,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -165,6 +167,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
     private JSpinner spnMaxAcquisitions;
+    private JSpinner spnDefaultStockPercent;
 
     // Delivery
     private JSpinner spnNDiceTransitTime;
@@ -1299,9 +1302,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMaxAcquisitions.setName("spnMaxAcquisitions");
         spnMaxAcquisitions.setToolTipText(resources.getString("spnMaxAcquisitions.toolTipText"));
 
+        spnDefaultStockPercent = new JSpinner(
+                new SpinnerNumberModel(0.1, 0.1, CampaignOptions.DEFAULT_STOCK_PERCENTAGE,
+                        0.1));
+        spnDefaultStockPercent.setEditor(new NumberEditor(spnDefaultStockPercent, "0.0"));
+        spnDefaultStockPercent.setName("spnDefaultStockPercent");
+        spnDefaultStockPercent.setToolTipText(resources.getString("spnDefaultStockPercent.toolTipText"));
+
         JPanel pnlMaxAcquisitions = new JPanel();
         pnlMaxAcquisitions.add(spnMaxAcquisitions);
         pnlMaxAcquisitions.add(new JLabel(resources.getString("lblMaxAcquisitions.text")));
+
+        JPanel pnlDefaultStockPercent = new JPanel();
+        pnlDefaultStockPercent.add(spnDefaultStockPercent);
+        pnlDefaultStockPercent.add(new JLabel(resources.getString("lblDefaultStockPercent.text")));
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1312,6 +1326,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlMaxAcquisitions, gridBagConstraints);
+        panSubAcquire.add(pnlClanPenalty, gridBagConstraints);
+        panSubAcquire.add(pnlDefaultStockPercent, gridBagConstraints);
 
         spnNDiceTransitTime = new JSpinner(new SpinnerNumberModel(0, 0, 365, 1));
         ((DefaultEditor) spnNDiceTransitTime.getEditor()).getTextField().setEditable(false);
@@ -8381,6 +8397,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
         spnMaxAcquisitions.setValue(options.getMaxAcquisitions());
+        spnDefaultStockPercent.setValue(options.getDefaultStockPercent());
+        
 
         spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
         spnConstantTransitTime.setValue(options.getConstantTransitTime());
@@ -9061,6 +9079,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
             options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
             options.setMaxAcquisitions((Integer) spnMaxAcquisitions.getValue());
+            options.setDefaultStockPercent((Double) spnDefaultStockPercent.getValue());
 
             options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getValue());
             options.setConstantTransitTime((Integer) spnConstantTransitTime.getValue());

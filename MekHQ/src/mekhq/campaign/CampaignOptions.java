@@ -76,6 +76,8 @@ public class CampaignOptions {
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
+    public static final double DEFAULT_STOCK_PERCENTAGE = 10.0;
+
     public static String getTechLevelName(final int techLevel) {
         return switch (techLevel) {
             case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
@@ -147,6 +149,7 @@ public class CampaignOptions {
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
     private int maxAcquisitions;
+    private double defaultStockPercent;
 
     // Delivery
     private int nDiceTransitTime;
@@ -660,6 +663,7 @@ public class CampaignOptions {
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
         maxAcquisitions = 0;
+        defaultStockPercent = 10.0;
 
         // Delivery
         nDiceTransitTime = 1;
@@ -4258,6 +4262,14 @@ public class CampaignOptions {
         this.maxAcquisitions = maxAcquisitions;
     }
 
+    public double getDefaultStockPercent() {
+        return defaultStockPercent;
+    }
+
+    public void setDefaultStockPercent(double defaultStockPercent) {
+        this.defaultStockPercent = defaultStockPercent;
+    }
+
     public boolean isUseAtB() {
         return useAtB;
     }
@@ -4775,6 +4787,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficialMaintenance", isUseUnofficialMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultStockPercent", defaultStockPercent);
 
         // region Personnel Tab
         // region General Personnel
@@ -5439,6 +5452,8 @@ public class CampaignOptions {
                     retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                     retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("defaultStockPercent")) {
+                    retVal.defaultStockPercent = Double.parseDouble(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel

@@ -60,6 +60,8 @@ import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
@@ -68,7 +70,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 public class PartsReportDialog extends JDialog {
 
     private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
-    private JButton topUpButton;
+    private JButton topUpButton, topUpGMButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
@@ -280,6 +282,16 @@ public class PartsReportDialog extends JDialog {
         topUpButton.setEnabled(true);
         topUpButton.setBorder(null);
         topUpButton.setMargin(new Insets(10,20,10,20));
+        topUpButton.addActionListener(evt -> topUp());
+
+        topUpGMButton = new JButton();
+        topUpGMButton.setText(resourceMap.getString("topUpGMBtn.text"));
+        topUpGMButton.setIcon(null);
+        topUpGMButton.setFocusPainted(false);
+        topUpGMButton.setEnabled(true);
+        topUpGMButton.setBorder(null);
+        topUpGMButton.setMargin(new Insets(10,20,10,20));
+        topUpGMButton.addActionListener(evt -> topUpGM());
 
         boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
         String[] qualities = {
@@ -309,6 +321,7 @@ public class PartsReportDialog extends JDialog {
                     .addComponent(ignoreMothballedCheck)
                     .addComponent(topUpWeeklyCheck)
                     .addComponent(topUpButton)
+                    .addComponent(topUpGMButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnClose))));
 
@@ -320,6 +333,7 @@ public class PartsReportDialog extends JDialog {
                 .addComponent(ignoreSparesUnderQualityCB)
                 .addComponent(topUpWeeklyCheck)
                 .addComponent(topUpButton)
+                .addComponent(topUpGMButton)
                 .addComponent(btnClose)));
 
         setPreferredSize(UIUtil.scaleForGUI(1400,1000));
@@ -363,13 +377,55 @@ public class PartsReportDialog extends JDialog {
         column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK)
                 .getCellRenderer();
         column.setEnabled(campaign.isGM());
+        topUpGMButton.setEnabled(campaign.isGM());
     }
 
     private void topUp() {
+        for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse piu = overviewPartsModel.getPartInUse(row);
+            int toBuy = findTopUpAmount(piu);
+            if(toBuy > 0) {
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                campaign.getShoppingList().addShoppingItem(partToBuy, toBuy, campaign);
+                refreshOverviewSpecificPart(row, piu, partToBuy);
+            }
+        }
+    }
 
+    private void topUpGM() {
+        for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse piu = overviewPartsModel.getPartInUse(row);
+            int toBuy = findTopUpAmount(piu);
+            while(toBuy > 0) {
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                -- toBuy;
+                refreshOverviewSpecificPart(row, piu, partToBuy);
+            }
+        }
     }
 
     private void topUpWeekly() {
 
+    }
+
+    private int findTopUpAmount(PartInUse piu) {
+        IAcquisitionWork partToBuy = piu.getPartToBuy();
+        int inventory = piu.getStoreCount() + piu.getTransferCount() + piu.getPlannedCount();
+        int needed = (int)Math.ceil(piu.getRequestedStock()/100.0 * piu.getUseCount());
+        int toBuy = needed-inventory;
+
+        if(piu.getIsBundle() == true) {
+            toBuy = (int)Math.ceil((float)toBuy * piu.getTonnagePerItem() / 5);
+            //special case for ammo, need to track down if there's a way to code this properly
+        }
+
+        if(toBuy > 0) {
+            System.out.println("TPI: " + piu.getTonnagePerItem() + " " + String.format("Inv: %d needed: %d tobuy: %d", inventory, needed, toBuy));
+            System.out.println("||");
+        }
+
+       
+        return toBuy;
     }
 }

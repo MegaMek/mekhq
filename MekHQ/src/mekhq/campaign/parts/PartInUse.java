@@ -37,7 +37,8 @@ public class PartInUse {
     private int plannedCount;
     private Money cost = Money.zero();
     private List<Part> spares = new ArrayList<>();
-    private int requestedStock;
+    private double requestedStock;
+    private boolean isBundle;
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -59,6 +60,7 @@ public class PartInUse {
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
+        this.isBundle = false;
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if (partToBuy instanceof AmmoStorage) {
@@ -76,6 +78,7 @@ public class PartInUse {
         if (part instanceof Armor) {
             // Armor needs different tonnage values
             this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
+            this.isBundle = true;
         }
         if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
@@ -171,12 +174,24 @@ public class PartInUse {
         return cost;
     }
 
-    public int getRequestedStock() {
+    public double getRequestedStock() {
         return requestedStock;
     }
 
-    public void setRequestedStock(int requestedStock) {
+    public void setRequestedStock(double requestedStock) {
         this.requestedStock = requestedStock;
+    }
+
+    public boolean getIsBundle() {
+        return isBundle;
+    }
+
+    public void setIsBundle(boolean isBundle) {
+        this.isBundle = isBundle;
+    }
+
+    public double getTonnagePerItem() {
+        return tonnagePerItem;
     }
 
     @Override

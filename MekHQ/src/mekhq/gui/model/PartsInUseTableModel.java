@@ -141,7 +141,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_BUTTON_GMADD_BULK:
                 return resourceMap.getString("addInBulk.text");
             case COL_REQUSTED_STOCK:
-                return piu.getRequestedStock();
+                return piu.getRequestedStock() + "%";
             default:
                 return EMPTY_CELL;
         }
@@ -149,12 +149,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public Class<?> getColumnClass(int c) {
-        switch(c) {
-            case COL_REQUSTED_STOCK:
-                return Integer.class;
-            default:
-                return String.class;
-        } 
+        return String.class;
     }
 
     @Override
@@ -419,7 +414,8 @@ public class PartsInUseTableModel extends DataTableModel {
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
         if(columnIndex == COL_REQUSTED_STOCK) {
             try {
-                int newVal = Integer.parseInt(value.toString());
+                //Quick String parsing here, we ignore anything that isn't a number or a . so that a user can input a % symbol or not, it's added regardless
+                double newVal = Double.parseDouble(value.toString().replaceAll("[^0-9.]", ""));
                 PartInUse piu = getPartInUse(rowIndex);
                 if(piu != null) {
                     piu.setRequestedStock(newVal);
@@ -432,4 +428,5 @@ public class PartsInUseTableModel extends DataTableModel {
             super.setValueAt(value, rowIndex, columnIndex);
         }
     }
+
 }
