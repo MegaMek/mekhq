@@ -315,17 +315,6 @@ public class StrategicFormation {
         }
 
         if (hasGround) {
-            // Parent Forces
-            List<Force> parentForces = force.getAllParents();
-
-            for (Force parentForce : parentForces) {
-                if (parentForce.isStrategicFormation()) {
-                    force.setStrategicFormation(false);
-                    return false;
-                }
-            }
-
-            // Child Forces
             List<Force> childForces = force.getAllSubForces();
 
             for (Force childForce : childForces) {
