@@ -47,7 +47,7 @@ import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
 
 /**
- * Used by Against the Bot & StratCon to track additional information about each force
+ * Used by Against the Bot &amp; StratCon to track additional information about each force
  * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
  * the force counts as a Strategic Formation eligible for assignment to a scenario role
  * and what the assignment is on which contract.
@@ -576,7 +576,7 @@ public class StrategicFormation {
     /**
      * Worker function that calculates the total weight of a force with the given ID
      *
-     * @param c       Campaign in which the force resides
+     * @param campaign       Campaign in which the force resides
      * @param forceId Force for which to calculate weight
      * @return Total force weight
      */
