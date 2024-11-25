@@ -876,7 +876,7 @@ public class AtBDynamicScenarioFactory {
             && BatchallFactions.usesBatchalls(factionCode)
             && contract.isBatchallAccepted()) {
             // Simulate bidding away of forces
-            List<String> bidAwayForces = new ArrayList<>();
+            List<Entity> bidAwayForces = new ArrayList<>();
             int supplementedForces = 0;
 
             if (generatedForce.getTeam() != 1
@@ -884,74 +884,82 @@ public class AtBDynamicScenarioFactory {
                 && BatchallFactions.usesBatchalls(factionCode)
                 && contract.isBatchallAccepted()) {
 
-                // Add dialog
-                bidAwayForces = new ArrayList<>();
-
                 // Player force values
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
-                // Bot force values
-                int botBattleValue = 0;
-                for (Entity entity : generatedForce.getFullEntityList(campaign)) {
-                    botBattleValue += entity.calculateBattleValue();
-                }
-
                 // First bid away units that exceed the player's estimated Battle Value
-                while ((botBattleValue > (playerBattleValue * getHonorRating(campaign, factionCode)))
-                        && (generatedForce.getFullEntityList(campaign).size() > 1)) {
-                    int targetUnit = randomInt(generatedForce.getFullEntityList(campaign).size());
-                    bidAwayForces.add(generatedForce.getFullEntityList(campaign).get(targetUnit).getShortNameRaw());
-                    botBattleValue -= generatedForce.getFullEntityList(campaign).get(targetUnit).calculateBattleValue();
-                    generatedForce.removeEntity(targetUnit);
+                int targetBattleValue = (int) round(playerBattleValue * getHonorRating(campaign, factionCode));
+                int currentBattleValue = 0;
+
+                List<Entity> entities = generatedForce.getFullEntityList(campaign);
+                Collections.shuffle(entities);
+
+                for (Entity entity : entities) {
+                    int battleValue = entity.calculateBattleValue();
+                    if ((currentBattleValue + battleValue) > targetBattleValue) {
+                        bidAwayForces.add(entity);
+                        continue;
+                    }
+
+                    currentBattleValue += battleValue;
                 }
 
-                // There is no point in adding extra Battle Armor to non-ground scenarios
-                // Similarly, there is no point adding Battle Armor to scenarios they cannot survive in.
-                if (scenario.getBoardType() == T_GROUND && scenario.getWind() != TORNADO_F4) {
-                    // We want to purposefully exclude off-board artillery, to stop them being
-                    // assigned random units of Battle Armor.
-                    // If we ever implement the ability to move those units on-board, or for players
-                    // to intercept off-board units, we'll probably want to remove this exclusion,
-                    // so they can have some bodyguards.
-                    if (!forceTemplate.getUseArtillery() && !forceTemplate.getDeployOffboard()) {
-                        // Similarly, there is no value in adding random Battle Armor to aircraft forces
-                        if (forceTemplate.getAllowedUnitType() != SPECIAL_UNIT_TYPE_ATB_MIX) {
-                            // Next, if the size of the forces results in a Player:Bot unit count ratio of >= 2:1,
-                            // add additional units of Battle Armor to compensate.
-                            int sizeDisparity = playerUnitValue - generatedForce.getFullEntityList(campaign).size();
-                            sizeDisparity = (int) round(sizeDisparity * 0.5);
+                for (Entity entity : bidAwayForces) {
+                    int entityIndex = entities.indexOf(entity);
+                    generatedForce.removeEntity(entityIndex);
+                }
 
-                            List<Entity> allRemainingUnits = new ArrayList<>(generatedForce.getFullEntityList(campaign));
-                            Collections.shuffle(allRemainingUnits);
+                // We don't want to sub in Battle Armor for forces that are meant to only have a
+                // certain number of units.
+                if (forceTemplate.getGenerationMethod() != ForceGenerationMethod.FixedUnitCount.ordinal()) {
+                    // There is no point in adding extra Battle Armor to non-ground scenarios
+                    // Similarly, there is no point adding Battle Armor to scenarios they cannot survive in.
+                    if (scenario.getBoardType() == T_GROUND && scenario.getWind() != TORNADO_F4) {
+                        // We want to purposefully exclude off-board artillery, to stop them being
+                        // assigned random units of Battle Armor.
+                        // If we ever implement the ability to move those units on-board, or for players
+                        // to intercept off-board units, we'll probably want to remove this exclusion,
+                        // so they can have some bodyguards.
+                        if (!forceTemplate.getUseArtillery() && !forceTemplate.getDeployOffboard()) {
+                            // Similarly, there is no value in adding random Battle Armor to aircraft forces
+                            if (forceTemplate.getAllowedUnitType() != SPECIAL_UNIT_TYPE_ATB_MIX) {
+                                // Next, if the size of the forces results in a Player:Bot unit count ratio of >= 2:1,
+                                // add additional units of Battle Armor to compensate.
+                                int sizeDisparity = playerUnitValue - generatedForce.getFullEntityList(campaign).size();
+                                sizeDisparity = (int) round(sizeDisparity * 0.5);
 
-                            // First, attempt to add Mechanized Battle Armor
-                            Iterator<Entity> entityIterator = allRemainingUnits.iterator();
-                            while (entityIterator.hasNext() && sizeDisparity > 0) {
-                                Entity entity = entityIterator.next();
-                                if (!entity.isOmni()) {
-                                    continue;
-                                }
+                                List<Entity> allRemainingUnits = new ArrayList<>(generatedForce.getFullEntityList(campaign));
+                                Collections.shuffle(allRemainingUnits);
 
-                                List<Entity> generatedBA = generateBAForNova(scenario, List.of(entity),
+                                // First, attempt to add Mechanized Battle Armor
+                                Iterator<Entity> entityIterator = allRemainingUnits.iterator();
+                                while (entityIterator.hasNext() && sizeDisparity > 0) {
+                                    Entity entity = entityIterator.next();
+                                    if (!entity.isOmni()) {
+                                        continue;
+                                    }
+
+                                    List<Entity> generatedBA = generateBAForNova(scenario, List.of(entity),
                                         factionCode, skill, quality, campaign, true);
 
-                                if (!generatedBA.isEmpty()) {
-                                    for (Entity battleArmor : generatedBA) {
-                                        generatedForce.addEntity(battleArmor);
+                                    if (!generatedBA.isEmpty()) {
+                                        for (Entity battleArmor : generatedBA) {
+                                            generatedForce.addEntity(battleArmor);
+                                        }
+                                        supplementedForces += generatedBA.size();
+                                        sizeDisparity -= generatedBA.size();
                                     }
-                                    supplementedForces += generatedBA.size();
-                                    sizeDisparity -= generatedBA.size();
                                 }
-                            }
 
-                            // If there is still a disproportionate size disparity, add loose Battle Armor
-                            for (int i = 0; i < sizeDisparity; i++) {
-                                Entity newEntity = getEntity(factionCode, skill, quality,
+                                // If there is still a disproportionate size disparity, add loose Battle Armor
+                                for (int i = 0; i < sizeDisparity; i++) {
+                                    Entity newEntity = getEntity(factionCode, skill, quality,
                                         BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED, campaign);
-                                if (newEntity != null) {
-                                    generatedForce.addEntity(newEntity);
-                                    supplementedForces++;
+                                    if (newEntity != null) {
+                                        generatedForce.addEntity(newEntity);
+                                        supplementedForces++;
+                                    }
                                 }
                             }
                         }
@@ -964,8 +972,8 @@ public class AtBDynamicScenarioFactory {
                 && campaign.getCampaignOptions().isUseGenericBattleValue()
                 && BatchallFactions.usesBatchalls(factionCode)
                 && contract.isBatchallAccepted()) {
-                reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce,
-                    supplementedForces, factionCode);
+                reportResultsOfBidding(campaign, bidAwayForces, generatedForce, supplementedForces,
+                    factionCode);
             }
         }
 
@@ -1016,15 +1024,14 @@ public class AtBDynamicScenarioFactory {
     /**
      * Reports the results of Clan bidding for a scenario.
      *
-     * @param scenario           the scenario for which bidding was done
      * @param campaign           the campaign in which the bidding took place
      * @param bidAwayForces      the list of forces bid away by the generated force
      * @param generatedForce     the force that generated the bid
      * @param supplementedForces the number of additional Battle Armor units supplemented to the force
      */
-    private static void reportResultsOfBidding(AtBDynamicScenario scenario, Campaign campaign,
-                                               List<String> bidAwayForces, BotForce generatedForce,
-                                               int supplementedForces, String factionCode) {
+    private static void reportResultsOfBidding(Campaign campaign, List<Entity> bidAwayForces,
+                                               BotForce generatedForce, int supplementedForces,
+                                               String factionCode) {
         double honor = getHonorRating(campaign, factionCode);
         String honorLevel;
 
@@ -1044,12 +1051,12 @@ public class AtBDynamicScenarioFactory {
         StringBuilder report = new StringBuilder();
 
         if (useVerboseBidding) {
-            for (String unitName : bidAwayForces) {
+            for (Entity entity : bidAwayForces) {
                 if (report.isEmpty()) {
                     report.append(String.format(resources.getString("bidAwayForcesVerbose.text"),
-                            generatedForce.getName(), unitName));
+                            generatedForce.getName(), entity.getFullChassis()));
                 } else {
-                    report.append(unitName).append("<br>");
+                    report.append(entity.getFullChassis()).append("<br>");
                 }
             }
         } else {
@@ -1058,13 +1065,13 @@ public class AtBDynamicScenarioFactory {
                         generatedForce.getName(), bidAwayForces.size(), bidAwayForces.size() > 1 ? "s" : ""));
 
                 boolean isUseLoggerHeader = true;
-                for (String unitName : bidAwayForces) {
+                for (Entity entity : bidAwayForces) {
                     if (isUseLoggerHeader) {
                         logger.info(String.format(resources.getString("bidAwayForcesLogger.text"),
                             generatedForce.getName()));
                         isUseLoggerHeader = false;
                     }
-                    logger.info(unitName);
+                    logger.info(String.format("%s, %s", entity.getFullChassis(), entity.getGenericBattleValue()));
                 }
             }
         }
