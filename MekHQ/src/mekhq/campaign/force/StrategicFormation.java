@@ -39,9 +39,12 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
 
 /**
  * Used by Against the Bot & StratCon to track additional information about each force
@@ -206,9 +209,30 @@ public class StrategicFormation {
          */
         double weight = calculateTotalWeight(campaign, forceId);
 
+        Force originForce = campaign.getForce(forceId);
+
+        if (originForce == null) {
+            return WEIGHT_ULTRA_LIGHT;
+        }
+
+        List<Force> subForces = originForce.getSubForces();
+        int subForcesCount = subForces.size();
+
+        for (Force childForce : subForces) {
+            double childForceWeight = calculateTotalWeight(campaign, childForce.getId());
+
+            if (childForceWeight > 0) {
+                weight += childForceWeight;
+            } else {
+                subForcesCount--;
+            }
+        }
+
+        weight = weight / subForcesCount;
+
         weight = weight * 4.0 / getStdLanceSize(campaign.getFaction());
         if (weight < 40) {
-            return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+            return WEIGHT_ULTRA_LIGHT;
         }
         if (weight <= 130) {
             return EntityWeightClass.WEIGHT_LIGHT;
@@ -229,7 +253,12 @@ public class StrategicFormation {
         // ensure the lance is marked as a combat force
         final Force force = campaign.getForce(forceId);
 
-        if ((force == null) || !force.isCombatForce()) {
+        if (force == null) {
+            return false;
+        }
+
+        if (!force.isCombatForce()) {
+            force.setStrategicFormation(false);
             return false;
         }
 
@@ -241,12 +270,14 @@ public class StrategicFormation {
             int size = getSize(campaign);
             if (size < getStdLanceSize(campaign.getFaction()) - 1 ||
                     size > getStdLanceSize(campaign.getFaction()) + 2) {
+                force.setStrategicFormation(false);
                 return false;
             }
         }
 
         if (campaign.getCampaignOptions().isLimitLanceWeight() &&
                 getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
+            force.setStrategicFormation(false);
             return false;
         }
 
@@ -258,6 +289,7 @@ public class StrategicFormation {
 
                 if (entity != null) {
                     if (entity.getUnitType() >= UnitType.JUMPSHIP) {
+                        force.setStrategicFormation(false);
                         return false;
                     }
                     if ((entity.getEntityType() & ETYPE_GROUND) != 0) {
@@ -267,19 +299,28 @@ public class StrategicFormation {
             }
         }
 
-        if (hasGround) {
-            ArrayList<StrategicFormation> strategicFormations = campaign.getStrategicFormationList();
-            List<Integer> allLanceForceIds = new ArrayList<>();
+        int isOverridden = force.getOverrideStrategicFormation();
+        if (isOverridden != STRATEGIC_FORMATION_OVERRIDE_NONE) {
+            boolean overrideState = isOverridden == STRATEGIC_FORMATION_OVERRIDE_TRUE;
+            force.setStrategicFormation(overrideState);
 
-            for (StrategicFormation strategicFormation : strategicFormations) {
-                allLanceForceIds.add(strategicFormation.getForceId());
+            List<Force> associatedForces = force.getAllParents();
+            associatedForces.addAll(force.getAllSubForces());
+
+            for (Force associatedForce : associatedForces) {
+                associatedForce.setStrategicFormation(false);
             }
 
+            return overrideState;
+        }
+
+        if (hasGround) {
             // Parent Forces
             List<Force> parentForces = force.getAllParents();
 
             for (Force parentForce : parentForces) {
-                if (allLanceForceIds.contains(parentForce.getId())) {
+                if (parentForce.isStrategicFormation()) {
+                    force.setStrategicFormation(false);
                     return false;
                 }
             }
@@ -288,11 +329,14 @@ public class StrategicFormation {
             List<Force> childForces = force.getAllSubForces();
 
             for (Force childForce : childForces) {
-                if (allLanceForceIds.contains(childForce.getId())) {
+                if (childForce.isStrategicFormation()) {
+                    force.setStrategicFormation(false);
                     return false;
                 }
             }
         }
+
+        force.setStrategicFormation(hasGround);
 
         return hasGround;
     }

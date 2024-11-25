@@ -68,11 +68,17 @@ public class Force {
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
+    public static final int STRATEGIC_FORMATION_OVERRIDE_NONE = -1;
+    public static final int STRATEGIC_FORMATION_OVERRIDE_FALSE = 0;
+    public static final int STRATEGIC_FORMATION_OVERRIDE_TRUE = 1;
+
     private String name;
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
+    private boolean isStrategicFormation;
+    private int overrideStrategicFormation;
     private FormationLevel formationLevel;
     private FormationLevel overrideFormationLevel;
     private Force parentForce;
@@ -94,6 +100,8 @@ public class Force {
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
+        this.isStrategicFormation = false;
+        this.overrideStrategicFormation = STRATEGIC_FORMATION_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
         this.overrideFormationLevel = FormationLevel.NONE;
         this.parentForce = null;
@@ -161,6 +169,22 @@ public class Force {
                 force.setCombatForce(combatForce, true);
             }
         }
+    }
+
+    public boolean isStrategicFormation() {
+        return isStrategicFormation;
+    }
+
+    public void setStrategicFormation(final boolean isStrategicFormation) {
+        this.isStrategicFormation = isStrategicFormation;
+    }
+
+    public int getOverrideStrategicFormation() {
+        return overrideStrategicFormation;
+    }
+
+    public void setOverrideStrategicFormation(final int overrideStrategicFormation) {
+        this.overrideStrategicFormation = overrideStrategicFormation;
     }
 
     public FormationLevel getFormationLevel() {
@@ -232,12 +256,18 @@ public class Force {
     public List<Force> getAllParents() {
         List<Force> parentForces = new ArrayList<>();
 
-        Force parentForce = getParentForce();
+        Force parentFormation = parentForce;
 
-        while (parentForce.getParentForce() != null) {
-            parentForces.add(parentForce.getParentForce());
+        if (parentForce != null) {
+            parentForces.add(parentForce);
+        }
 
-            parentForce = parentForce.getParentForce();
+        while (parentFormation != null) {
+            parentFormation = parentFormation.getParentForce();
+
+            if (parentFormation != null) {
+                parentForces.add(parentFormation);
+            }
         }
 
         return parentForces;
@@ -653,6 +683,7 @@ public class Force {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideStrategicFormation", overrideStrategicFormation);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
@@ -700,6 +731,8 @@ public class Force {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideStrategicFormation")) {
+                    retVal.setOverrideStrategicFormation(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
                     retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {

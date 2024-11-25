@@ -1427,48 +1427,52 @@ public class StratconRulesManager {
 
     /**
      * This is a list of all force IDs for forces that can be deployed to a scenario
-     * in the given force
-     * template a) have not been assigned to a track b) are combat-capable c) are
-     * not deployed to a
-     * scenario d) if attempting to deploy as reinforcements, haven't already failed
+     * in the given force template a) have not been assigned to a track b) are combat-capable c) are
+     * not deployed to a scenario d) if attempting to deploy as reinforcements, haven't already failed
      * to deploy
      */
     public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, StratconTrackState currentTrack,
             boolean reinforcements, @Nullable StratconScenario currentScenario, StratconCampaignState campaignState) {
         List<Integer> retVal = new ArrayList<>();
 
-        // assemble a set of all force IDs that are currently assigned to tracks that
-        // are not this one
+        // assemble a set of all force IDs that are currently assigned to tracks that are not this one
         Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
                 .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
                 .filter(track -> (track != currentTrack) || !reinforcements)
                 .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
                 .collect(Collectors.toSet());
 
-        // if there's an existing scenario and we're doing reinforcements,
+        // if there's an existing scenario, and we're doing reinforcements,
         // prevent forces that failed to deploy from trying to deploy again
         if (reinforcements && (currentScenario != null)) {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (int key : campaign.getStrategicFormations().keySet()) {
-            Force force = campaign.getForce(key);
+        for (StrategicFormation formation : campaign.getStrategicFormations().values()) {
+            if (!formation.isEligible(campaign)) {
+                continue;
+            }
+
+            Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
                 continue;
             }
 
+            logger.info(force.getName());
+
             int primaryUnitType = force.getPrimaryUnitType(campaign);
             boolean noReinforcementRestriction = !reinforcements || (reinforcements
                     && (getReinforcementType(force.getId(), currentTrack, campaign,
                             campaignState) != ReinforcementEligibilityType.None));
-            if ((force.getScenarioId() <= 0) && !force.getUnits().isEmpty()
+            if ((force.getScenarioId() <= 0) && !force.getAllUnits(true).isEmpty()
                     && !forcesInTracks.contains(force.getId())
                     && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
                     && noReinforcementRestriction
                     && !subElementsOrSelfDeployed(force, campaign)) {
                 retVal.add(force.getId());
             }
+            retVal.add(force.getId());
         }
 
         return retVal;

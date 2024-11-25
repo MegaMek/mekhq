@@ -18,13 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.Component;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
-
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
@@ -34,6 +27,10 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import java.awt.*;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -51,7 +48,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         setOpaque(false);
 
-        if (value instanceof Unit) {
+        if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
             if (((Unit) value).getEntity() instanceof GunEmplacement) {
@@ -59,7 +56,6 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
             String c3network = "";
             StringBuilder transport = new StringBuilder();
-            Unit unit = (Unit) value;
             Person person = unit.getCommander();
             if (person != null) {
                 name = person.getFullTitle();
@@ -142,14 +138,17 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
-        } else if (value instanceof Force) {
-            Force force = (Force) value;
+        } else if (value instanceof Force force) {
             getAccessibleContext().setAccessibleName((
                     force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
             if (!sel && force.isDeployed()) {
                 setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
+            }
+
+            if (force.isStrategicFormation()) {
+                setText("<html><u>" + force.getName() + "</u></html>");
             }
         } else {
             logger.error("Attempted to render node with unknown node class of "

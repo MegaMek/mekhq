@@ -279,8 +279,8 @@ public class CampaignXmlParser {
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     retVal.getUnitMarket().fillFromXML(wn, retVal, version);
                     foundUnitMarket = true;
-                } else if (xn.equalsIgnoreCase("lances")) {
-                    processLanceNodes(retVal, wn);
+                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("strategicFormations")) {
+                    processStrategicFormationNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
@@ -759,29 +759,30 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static void processLanceNodes(Campaign retVal, Node wn) {
-        NodeList wList = wn.getChildNodes();
+    private static void processStrategicFormationNodes(Campaign campaign, Node workingNode) {
+        NodeList workingNodes = workingNode.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Okay, let's iterate through the children, eh?
+        for (int x = 0; x < workingNodes.getLength(); x++) {
+            Node wn2 = workingNodes.item(x);
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (!wn2.getNodeName().equalsIgnoreCase("lance")) {
+            if (!wn2.getNodeName().equalsIgnoreCase("lance")
+                && !wn2.getNodeName().equalsIgnoreCase("strategicFormations")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger.error("Unknown node type not loaded in Lance nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in strategicFormations nodes: " + wn2.getNodeName());
                 continue;
             }
 
-            StrategicFormation l = StrategicFormation.generateInstanceFromXML(wn2);
+            StrategicFormation strategicFormation = StrategicFormation.generateInstanceFromXML(wn2);
 
-            if (l != null) {
-                retVal.importLance(l);
+            if (strategicFormation != null) {
+                campaign.importLance(strategicFormation);
             }
         }
     }

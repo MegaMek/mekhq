@@ -387,7 +387,7 @@ class LanceAssignmentTableModel extends DataTableModel {
     public LanceAssignmentTableModel(Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<>();
-        columnNames = new String[]{"Force", "Wt", "Mission", "Role"};
+        columnNames = new String[]{"Force", "Weight Class", "Mission", "Role"};
     }
 
     @Override
@@ -429,7 +429,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        final String[] WEIGHT_CODES = {"UL", "L", "M", "H", "A", "SH"};
+        final String[] WEIGHT_CODES = {"Ultra-Light", "Light", "Medium", "Heavy", "Assault", "Super Heavy"};
 
         if (row >= getRowCount()) {
             return "";
