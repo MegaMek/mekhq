@@ -19,17 +19,15 @@
 package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.ProtoMek;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+
+import static java.lang.Math.max;
 
 public class AverageExperienceRating {
     private static final MMLogger logger = MMLogger.create(AverageExperienceRating.class);
@@ -157,7 +155,7 @@ public class AverageExperienceRating {
             } else if (entity instanceof ProtoMek) {
                 // ProtoMek entities only use gunnery for calculation
                 if (person.hasSkill(SkillType.S_GUN_PROTO)) {
-                    totalExperience += person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue();
+                    totalExperience += max(0, person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue());
                 }
 
                 personnelCount++;
@@ -209,8 +207,8 @@ public class AverageExperienceRating {
      */
     private static double calculateInfantryExperience(Infantry infantry, Crew crew) {
         // Average of gunnery and antiMek skill
-        int gunnery = crew.getGunnery();
-        int antiMek = infantry.getAntiMekSkill();
+        int gunnery = max(0, crew.getGunnery());
+        int antiMek = max(0, infantry.getAntiMekSkill());
 
         return (double) (gunnery + antiMek) / 2;
     }
@@ -231,13 +229,13 @@ public class AverageExperienceRating {
 
         if (unit.isDriver(person)) {
             skillType = SkillType.getDrivingSkillFor(entity);
-            skillValue += person.getSkill(skillType).getFinalSkillValue();
+            skillValue += max(0, person.getSkill(skillType).getFinalSkillValue());
             skillCount++;
         }
 
         if (unit.isGunner(person)) {
             skillType = SkillType.getGunnerySkillFor(entity);
-            skillValue += person.getSkill(skillType).getFinalSkillValue();
+            skillValue += max(0, person.getSkill(skillType).getFinalSkillValue());
             skillCount++;
         }
 
