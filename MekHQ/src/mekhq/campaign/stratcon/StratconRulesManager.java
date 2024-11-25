@@ -1459,20 +1459,19 @@ public class StratconRulesManager {
                 continue;
             }
 
-            logger.info(force.getName());
-
             int primaryUnitType = force.getPrimaryUnitType(campaign);
-            boolean noReinforcementRestriction = !reinforcements || (reinforcements
-                    && (getReinforcementType(force.getId(), currentTrack, campaign,
-                            campaignState) != ReinforcementEligibilityType.None));
-            if ((force.getScenarioId() <= 0) && !force.getAllUnits(true).isEmpty()
-                    && !forcesInTracks.contains(force.getId())
-                    && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
-                    && noReinforcementRestriction
-                    && !subElementsOrSelfDeployed(force, campaign)) {
+            boolean noReinforcementRestriction = !reinforcements ||
+                (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.None);
+
+            if ((force.getScenarioId() <= 0)
+                && !force.getAllUnits(true).isEmpty()
+                && !forcesInTracks.contains(force.getId())
+                && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
+                && noReinforcementRestriction
+                && !subElementsOrSelfDeployed(force, campaign)) {
+
                 retVal.add(force.getId());
             }
-            retVal.add(force.getId());
         }
 
         return retVal;

@@ -438,14 +438,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
             gui.undeployForces(forces);
             gui.getTOETab().refreshForceView();
+
+            for (Force formation : gui.getCampaign().getAllForces()) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            }
         } else if (command.contains(CHANGE_STRATEGIC_FORCE_OVERRIDE)) {
             if (singleForce == null) {
                 return;
             }
 
-            boolean overrideState = singleForce.getOverrideStrategicFormation() == STRATEGIC_FORMATION_OVERRIDE_TRUE;
-            singleForce.setStrategicFormation(!overrideState);
-            singleForce.setOverrideStrategicFormation(!overrideState ? STRATEGIC_FORMATION_OVERRIDE_TRUE : STRATEGIC_FORMATION_OVERRIDE_FALSE);
+            boolean formationState = singleForce.isStrategicFormation();
+            singleForce.setStrategicFormation(!formationState);
+            singleForce.setOverrideStrategicFormation(!formationState ? STRATEGIC_FORMATION_OVERRIDE_TRUE : STRATEGIC_FORMATION_OVERRIDE_FALSE);
 
             for (Force formation : gui.getCampaign().getAllForces()) {
                 MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
@@ -1048,8 +1052,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             popup.add(menuItem);
 
-            JMenuItem optionStrategicForceOverride = new JMenuItem(force.isStrategicFormation() ?
-                "Remove Strategic Formation Assignment" : "Assign as Strategic Formation");
+            JMenuItem optionStrategicForceOverride = new JMenuItem((force.isStrategicFormation() ?
+                "Never" : "Always") + " Consider Force a Strategic Formation");
             optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
             optionStrategicForceOverride.addActionListener(this);
             popup.add(optionStrategicForceOverride);
