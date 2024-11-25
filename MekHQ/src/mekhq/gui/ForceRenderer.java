@@ -32,6 +32,8 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
+import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
+
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
 
@@ -147,9 +149,16 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
 
+            String format;
             if (force.isStrategicFormation()) {
-                setText("<html><u>" + force.getName() + "</u></html>");
+                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
+                    "<html><b><u>%s</u></b></html>" : "<html><b>%s</b></html>";
+            } else {
+                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
+                    "<html><u>%s</u></html>" : "%s";
             }
+
+            setText(String.format(format, force.getName()));
         } else {
             logger.error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));
