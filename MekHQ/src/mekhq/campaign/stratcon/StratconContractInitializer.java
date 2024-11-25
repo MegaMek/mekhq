@@ -19,19 +19,25 @@
 package mekhq.campaign.stratcon;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.stratcon.StratconContractDefinition.ObjectiveParameters;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
+import static java.lang.Math.min;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -195,6 +201,26 @@ public class StratconContractInitializer {
             }
         }
 
+        // Determine starting morale
+        if (contract.getContractType().isGarrisonType()) {
+            contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
+
+            LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            contract.setRoutEndDate(routEnd);
+        } else {
+            contract.checkMorale(campaign, campaign.getLocalDate());
+
+            if (contract.getMoraleLevel().isRouted()) {
+                contract.setMoraleLevel(AtBMoraleLevel.CRITICAL);
+            }
+
+            if (contract.getContractType().isReliefDuty()) {
+                int currentMoraleLevel = min(6, contract.getMoraleLevel().ordinal() + 1);
+
+                contract.setMoraleLevel(AtBMoraleLevel.parseFromString(String.valueOf(currentMoraleLevel)));
+            }
+        }
+
         // now we're done
     }
 
@@ -287,7 +313,7 @@ public class StratconContractInitializer {
             sf.setStrategicObjective(strategicObjective);
             sf.getLocalModifiers().addAll(modifiers);
 
-            StratconCoords coords = getUnoccupiedCoords(trackState);
+            StratconCoords coords = getUnoccupiedCoords(trackState, false);
 
             if (coords == null) {
                 logger.warn(String.format("Unable to place facility on track %s," +
@@ -341,7 +367,7 @@ public class StratconContractInitializer {
             ScenarioTemplate template = StratconScenarioFactory.getSpecificScenario(
                     objectiveScenarios.get(Compute.randomInt(objectiveScenarios.size())));
 
-            StratconCoords coords = getUnoccupiedCoords(trackState);
+            StratconCoords coords = getUnoccupiedCoords(trackState, false);
 
             if (coords == null) {
                 logger.error(String.format("Unable to place objective scenario on track %s," +
@@ -387,30 +413,55 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Utility function that, given a track state, picks a random set of unoccupied
-     * coordinates.
+     * Searches for a suitable coordinate on the given {@link StratconTrackState}.
+     * The suitability of a coordinate is determined by the absence of a scenario in the coordinate
+     * and the absence of a facility or the presence of a player-allied facility (determined by the
+     * value of allowPlayerFacilities).
+     * <p>
+     * The method iterates through all possible coordinates and shuffles them to ensure randomness.
+     * A random coordinate is then selected from the list of suitable coordinates and returned.
+     *
+     * @param trackState            the {@link StratconTrackState} object on which to perform the search
+     * @param allowPlayerFacilities a {@link boolean} value indicating whether player-owned facilities
+     *                             should be considered suitable
+     * @return a {@link StratconCoords} object representing the coordinates of a suitable location,
+     * or {@code null} if no suitable location was found
      */
-    public static StratconCoords getUnoccupiedCoords(StratconTrackState trackState) {
-        // Maximum number of attempts
-        int maxAttempts = trackState.getWidth() * trackState.getHeight();
-        int attempts = 0;
+    public static @Nullable StratconCoords getUnoccupiedCoords(StratconTrackState trackState, boolean allowPlayerFacilities) {
+        int trackHeight = trackState.getHeight();
+        int trackWidth = trackState.getWidth();
 
-        int x = Compute.randomInt(trackState.getWidth());
-        int y = Compute.randomInt(trackState.getHeight());
-        StratconCoords coords = new StratconCoords(x, y);
+        List<StratconCoords> suitableCoords = new ArrayList<>();
 
-        while ((trackState.getFacility(coords) != null || trackState.getScenario(coords) != null) && attempts < maxAttempts) {
-            x = Compute.randomInt(trackState.getWidth());
-            y = Compute.randomInt(trackState.getHeight());
-            coords = new StratconCoords(x, y);
-            attempts++;
+        for (int y = 0; y < trackHeight; y++) {
+            for (int x = 0; x < trackWidth; x++) {
+                StratconCoords coords = new StratconCoords(x, y);
+
+                if (trackState.getScenario(coords) != null) {
+                    continue;
+                }
+
+                if (trackState.getFacility(coords) == null) {
+                    suitableCoords.add(coords);
+                    continue;
+                }
+
+                if (trackState.getFacility(coords).getOwner() != ForceAlignment.Opposing) {
+                    if (allowPlayerFacilities) {
+                        suitableCoords.add(coords);
+                    }
+                }
+            }
         }
 
-        if (attempts == maxAttempts) {
+        Collections.shuffle(suitableCoords);
+
+        if (suitableCoords.isEmpty()) {
             return null;
+        } else {
+            int randomIndex = new Random().nextInt(suitableCoords.size());
+            return suitableCoords.get(randomIndex);
         }
-
-        return coords;
     }
 
     /**

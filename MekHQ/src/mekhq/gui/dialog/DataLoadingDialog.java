@@ -289,7 +289,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // Campaign Preset
                 final SelectPresetDialog presetSelectionDialog =
-                    new SelectPresetDialog(getFrame(), false, true);
+                    new SelectPresetDialog(getFrame(), true, true);
                 CampaignPreset preset;
                 boolean isSelect = false;
 

@@ -21,19 +21,6 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
-import static mekhq.campaign.personnel.Person.getLoyaltyName;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
@@ -55,6 +42,18 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
  * @author Neoancient
@@ -177,10 +176,12 @@ public class RetirementDefectionTracker {
                 LocalDate today = campaign.getLocalDate();
                 LocalDate lastPromotionDate = person.getLastRankChangeDate();
 
-                long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
+                if (lastPromotionDate != null) {
+                    long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
 
-                if (monthsBetween <= 6) {
-                    targetNumber.addModifier(- 1, resources.getString("recentpromotion.text"));
+                    if (monthsBetween <= 6) {
+                        targetNumber.addModifier(-1, resources.getString("recentPromotion.text"));
+                    }
                 }
             }
 
