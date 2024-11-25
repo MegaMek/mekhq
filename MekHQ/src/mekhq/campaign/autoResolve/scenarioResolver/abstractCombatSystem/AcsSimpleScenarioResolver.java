@@ -1,9 +1,14 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem;
 
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.MapSettings;
+import megamek.common.Roll;
 import megamek.common.actions.EntityAction;
 import megamek.common.alphaStrike.ASRange;
 import megamek.common.preference.PreferenceManager;
 import megamek.common.strategicBattleSystems.SBFFormation;
+import megamek.server.ServerBoardHelper;
 import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.helper.RandomUtils;
 import mekhq.campaign.autoResolve.helper.SetupForces;
@@ -30,7 +35,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
     private final AcsGameManager gameManager = new AcsGameManager();
 
     private static final WeightedList<EngagementControl> normal = WeightedList.of(
-            EngagementControl.FORCE_ENGAGEMENT, 1.0,
+            EngagementControl.FORCED_ENGAGEMENT, 1.0,
             EngagementControl.EVADE, 0.0,
             EngagementControl.STANDARD, 1.0,
             EngagementControl.OVERRUN, 1.0,
@@ -38,7 +43,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
     );
 
     private static final WeightedList<EngagementControl> unsteady =  WeightedList.of(
-            EngagementControl.FORCE_ENGAGEMENT, 0.5,
+            EngagementControl.FORCED_ENGAGEMENT, 0.5,
             EngagementControl.EVADE, 0.02,
             EngagementControl.STANDARD, 1.0,
             EngagementControl.OVERRUN, 0.1,
@@ -46,7 +51,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
     );
 
     private static final WeightedList<EngagementControl> shaken =  WeightedList.of(
-            EngagementControl.FORCE_ENGAGEMENT, 0.2,
+            EngagementControl.FORCED_ENGAGEMENT, 0.2,
             EngagementControl.EVADE, 0.1,
             EngagementControl.STANDARD, 0.8,
             EngagementControl.OVERRUN, 0.05,
@@ -54,7 +59,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
     );
 
     private static final WeightedList<EngagementControl> broken = WeightedList.of(
-            EngagementControl.FORCE_ENGAGEMENT, 0.05,
+            EngagementControl.FORCED_ENGAGEMENT, 0.05,
             EngagementControl.EVADE, 1.0,
             EngagementControl.STANDARD, 0.5,
             EngagementControl.OVERRUN, 0.05,
@@ -65,12 +70,12 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
             EngagementControl.NONE, 1.0
     );
 
-    private static final Map<SBFFormation.MoraleStatus, WeightedList<EngagementControl>> engagementControlOptions = Map.of(
-            SBFFormation.MoraleStatus.NORMAL, normal,
-            SBFFormation.MoraleStatus.UNSTEADY, unsteady,
-            SBFFormation.MoraleStatus.SHAKEN, shaken,
-            SBFFormation.MoraleStatus.BROKEN, broken,
-            SBFFormation.MoraleStatus.ROUTED, routed
+    private static final Map<AcsFormation.MoraleStatus, WeightedList<EngagementControl>> engagementControlOptions = Map.of(
+        AcsFormation.MoraleStatus.NORMAL, normal,
+        AcsFormation.MoraleStatus.UNSTEADY, unsteady,
+        AcsFormation.MoraleStatus.SHAKEN, shaken,
+        AcsFormation.MoraleStatus.BROKEN, broken,
+        AcsFormation.MoraleStatus.ROUTED, routed
     );
 
     public AcsSimpleScenarioResolver(AtBScenario scenario) {
@@ -97,6 +102,20 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
                 getGameManager().getGame().getPlanetaryConditions().determineWind();
                 getGameManager().getGame().setupDeployment();
                 getGameManager().getGame().setVictoryContext(new HashMap<>());
+                MapSettings mapSettings = getGameManager().getGame().getMapSettings();
+                mapSettings.setBoardsAvailableVector(ServerBoardHelper.scanForBoards(mapSettings));
+
+            }
+        });
+
+        gameManager.addPhaseHandler(new PhaseHandler(gameManager, INITIATIVE) {
+            @Override
+            protected void executePhase() {
+                getGameManager().calculatePlayerInitialCounts();
+                getGameManager().resetPlayersDone();
+                getGameManager().rollInitiative();
+                getGameManager().incrementAndSendGameRound();
+                getGameManager().getInitiativeHelper().writeInitiativeReport();
             }
         });
 
@@ -119,89 +138,118 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         gameManager.addPhaseHandler(new PhaseHandler(gameManager, MOVEMENT) {
             @Override
             protected void executePhase() {
+
                 while (getGameManager().getGame().hasMoreTurns()) {
-                    var allFormations = getGameManager().getGame().getActiveFormations();
 
-                    while (getGameManager().getGame().hasMoreTurns()) {
-
-                        var turn = getGameManager().getGame().getTurn();
-
-                        if (turn instanceof AcsFormationTurn formationTurn) {
-                            var player = getGameManager().getGame().getPlayer(formationTurn.playerId());
-                            var actingFormationOptional = allFormations.stream()
-                                    .filter(f -> f.getOwnerId() == player.getId())
-                                    .filter(f -> !f.isDone())
-                                    .findAny();
-
-                            if (actingFormationOptional.isEmpty()) {
-                                continue;
-                            }
-                            var actingFormation = actingFormationOptional.get();
-
-                            var target = selectTarget(allFormations, actingFormation);
-                            if (target.isEmpty()) {
-                                continue;
-                            }
-
-                            var engagementControl = engagementControlOptions.get(actingFormation.moraleStatus()).sample();
-
-                            getGameManager().addEngagementControl(
-                                    new AcsEngagementControlAction(
-                                            actingFormation.getId(),
-                                            target.get().getId(),
-                                            engagementControl.orElseThrow()),
-                                    actingFormation);
-                        }
+                    var optTurn = getGameManager().getGame().changeToNextTurn();
+                    if (optTurn.isEmpty()) {
+                        break;
                     }
-                }
-            }
-
-            private Optional<SBFFormation> selectTarget(List<SBFFormation> allFormations, SBFFormation actingFormation) {
-                return allFormations.stream()
-                        .filter(f -> f.getOwnerId() != actingFormation.getOwnerId())
-                        .filter(f -> f.isGround() == actingFormation.isGround())
-                        .collect(RandomUtils.toShuffledList()).stream().findAny();
-            }
-        });
-        gameManager.addPhaseHandler(new PhaseHandler(gameManager, FIRING) {
-            @Override
-            protected void executePhase() {
-                var allFormations = getGameManager().getGame().getActiveFormations();
-
-                while (getGameManager().getGame().hasMoreTurns()) {
-
-                    var turn = getGameManager().getGame().getTurn();
+                    var turn = optTurn.get();
 
                     if (turn instanceof AcsFormationTurn formationTurn) {
                         var player = getGameManager().getGame().getPlayer(formationTurn.playerId());
-                        var actingFormationOptional = allFormations.stream()
-                                .filter(f -> f.getOwnerId() == player.getId())
-                                .filter(f -> !f.isDone())
-                                .findAny();
-
-                        if (actingFormationOptional.isEmpty()) {
-                            continue;
-                        }
-                        var actingFormation = actingFormationOptional.get();
-                        var target = selectTarget(allFormations, actingFormation);
-                        if (target.isEmpty()) {
-                            continue;
-                        }
-                        List<EntityAction> attacks = new ArrayList<>();
-                        for (int i = 0; i < actingFormation.getUnits().size(); i++) {
-                            var attack = new AcsStandardUnitAttack(actingFormation.getId(), i, target.get().getId(), ASRange.LONG);
-                            attacks.add(attack);
-                        }
-                        getGameManager().addAttack(attacks, actingFormation);
+                        getGameManager().getGame().getActiveFormations(player)
+                            .stream()
+                            .filter(f -> f.isEligibleForPhase(getGameManager().getGame().getPhase())) // only eligible formations
+                            .findAny()
+                            .map(this::engage) // engage with target
+                            .filter(Optional::isPresent) // if it will engage and has a target
+                            .map(Optional::get)
+                            .ifPresent(this::engagementAndControl); // add engage and control action
                     }
                 }
             }
 
-            private Optional<SBFFormation> selectTarget(List<SBFFormation> allFormations, SBFFormation actingFormation) {
-                return allFormations.stream()
-                    .filter(f -> f.getOwnerId() != actingFormation.getOwnerId())
-                    .filter(f -> f.isGround() == actingFormation.isGround())
-                    .collect(RandomUtils.toShuffledList()).stream().findAny();
+            private Optional<EngagementControlRecord> engage(AcsFormation activeFormation) {
+                var target = selectTarget(activeFormation);
+                return target.map(sbfFormation -> new EngagementControlRecord(activeFormation, sbfFormation));
+            }
+
+            private record EngagementControlRecord(AcsFormation actingFormation, AcsFormation target) { }
+
+            private void engagementAndControl(EngagementControlRecord engagement) {
+                var engagementControl = engagementControlOptions.get(engagement.actingFormation.moraleStatus()).sample();
+                getGameManager().addEngagementControl(
+                    new AcsEngagementControlAction(
+                        engagement.actingFormation.getId(),
+                        engagement.target.getId(),
+                        engagementControl.orElseThrow()),
+                    engagement.actingFormation);
+            }
+        });
+
+        gameManager.addPhaseHandler(new PhaseHandler(gameManager, FIRING) {
+            @Override
+            protected void executePhase() {
+                while (getGameManager().getGame().hasMoreTurns()) {
+
+                    var optTurn = getGameManager().getGame().changeToNextTurn();
+                    if (optTurn.isEmpty()) {
+                        break;
+                    }
+                    var turn = optTurn.get();
+
+                    if (turn instanceof AcsFormationTurn formationTurn) {
+                        var player = getGameManager().getGame().getPlayer(formationTurn.playerId());
+                        getGameManager().getGame().getActiveFormations(player)
+                            .stream()
+                            .filter(f -> f.isEligibleForPhase(getGameManager().getGame().getPhase())) // only eligible formations
+                            .findAny()
+                            .map(this::attack) // engage with target
+                            .filter(Optional::isPresent) // if it will engage and has a target
+                            .map(Optional::get)
+                            .ifPresent(this::standardUnitAttacks); // add engage and control action
+                    }
+                }
+            }
+
+            private void standardUnitAttacks(AttackRecord attackRecord) {
+                AcsFormation actingFormation = attackRecord.actingFormation;
+                var target = attackRecord.target;
+
+                var attacks = new ArrayList<EntityAction>();
+
+                var actingFormationToHit = AcsManueverToHitData.compileToHit(gameManager.getGame(), actingFormation);
+                var targetFormationToHit = AcsManueverToHitData.compileToHit(gameManager.getGame(), target);
+
+                ASRange range = actingFormation.getRange(target.getId());
+
+                if (!actingFormation.isRangeSet(target.getId())) {
+                    var actingFormationMos = Compute.rollD6(2).getIntValue() - actingFormationToHit.getValue();
+                    var targetFormationMos = Compute.rollD6(2).getIntValue() - targetFormationToHit.getValue();
+
+                    if (actingFormationMos > targetFormationMos) {
+                        range = WeightedList.of(
+                            ASRange.LONG, actingFormation.getStdDamage().L.damage,
+                            ASRange.MEDIUM, actingFormation.getStdDamage().M.damage,
+                            ASRange.SHORT, actingFormation.getStdDamage().S.damage
+                        ).sampleGet();
+
+                    } else if (actingFormationMos < targetFormationMos) {
+                        range = WeightedList.of(
+                            ASRange.LONG, target.getStdDamage().L.damage,
+                            ASRange.MEDIUM, target.getStdDamage().M.damage,
+                            ASRange.SHORT, target.getStdDamage().S.damage
+                        ).sampleGet();
+                    }
+
+                    target.setRange(actingFormation.getId(), range);
+                    actingFormation.setRange(target.getId(), range);
+                }
+                for (int i = 0; i < actingFormation.getUnits().size(); i++) {
+                    var attack = new AcsStandardUnitAttack(actingFormation.getId(), i, target.getId(), range);
+                    attacks.add(attack);
+                }
+
+                getGameManager().addAttack(attacks, actingFormation);
+            }
+
+            private record AttackRecord(AcsFormation actingFormation, AcsFormation target) { }
+
+            private Optional<AttackRecord> attack(AcsFormation actingFormation) {
+                var target = selectTarget(actingFormation);
+                return target.map(sbfFormation -> new AttackRecord(actingFormation, sbfFormation));
             }
 
         });
@@ -209,7 +257,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
             @Override
             protected void executePhase() {
                 var recoveringNerves = getGameManager().getGame().getActiveFormations().stream()
-                        .filter(f -> f.moraleStatus().ordinal() >= SBFFormation.MoraleStatus.SHAKEN.ordinal())
+                        .filter(f -> f.moraleStatus().ordinal() >= AcsFormation.MoraleStatus.SHAKEN.ordinal())
                         .toList();
 
                 for (var formation : recoveringNerves) {
@@ -219,11 +267,24 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         });
     }
 
+
+    private Optional<AcsFormation> selectTarget(AcsFormation actingFormation) {
+        var game = gameManager.getGame();
+        var player = game.getPlayer(actingFormation.getOwnerId());
+        var targetables = gameManager.getGame().getActiveFormations().stream()
+            .filter(f -> actingFormation.getTargetFormationId() == Entity.NONE || f.getId() == actingFormation.getTargetFormationId())
+            .filter(SBFFormation::isDeployed)
+            .filter(f -> f.isGround() == actingFormation.isGround())
+            .filter(f -> game.getPlayer(f.getOwnerId()).isEnemyOf(player))
+            .collect(RandomUtils.toShuffledList());
+        return targetables.stream().findFirst();
+    }
+
     @Override
     public AutoResolveConcludedEvent resolveScenario(AutoResolveGame game) {
         initializeState(game);
-
         gameManager.runGame();
+
         return new AutoResolveConcludedEvent(gameManager.getGame().getVictoryPlayerId() == game.getCampaign().getPlayer().getId(),
                 game.getGraveyardEntities(),
                 game.inGameTWEntities(),

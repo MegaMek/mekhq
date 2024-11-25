@@ -5,17 +5,11 @@ import megamek.common.enums.GamePhase;
 public abstract class PhaseHandler {
 
     private final GamePhase phase;
-    private final GamePhase nextPhase;
     private final AcsGameManager gameManager;
 
-    public PhaseHandler(AcsGameManager gameManager, GamePhase phase, GamePhase nextPhase) {
-        this.phase = phase;
-        this.nextPhase = nextPhase;
-        this.gameManager = gameManager;
-    }
-
     public PhaseHandler(AcsGameManager gameManager, GamePhase phase) {
-        this(gameManager, phase, null);
+        this.phase = phase;
+        this.gameManager = gameManager;
     }
 
     private boolean isPhase(GamePhase phase) {
@@ -27,11 +21,9 @@ public abstract class PhaseHandler {
     }
 
     public void execute() {
-        if (this.phase.equals(gameManager.getGame().getPhase())) {
+        if (isPhase(gameManager.getGame().getPhase())) {
             executePhase();
-            if (nextPhase != null){
-                gameManager.changePhase(nextPhase);
-            }
+            gameManager.endCurrentPhase();
         }
     }
 

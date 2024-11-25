@@ -30,12 +30,12 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
             if (attackerOpt.isEmpty() || targetOpt.isEmpty()) {
                 return;
             }
-            SBFFormation attacker = attackerOpt.get();
-            SBFFormation target = targetOpt.get();
+            AcsFormation attacker = attackerOpt.get();
+            AcsFormation target = targetOpt.get();
+
             SBFUnit attackingUnit = attacker.getUnits().get(attack.getUnitNumber());
             List<SBFUnit> targetUnits = target.getUnits();
             SBFUnit targetUnit = targetUnits.get(0);
-
             AcsToHitData toHit = AcsToHitData.compileToHit(game(), attack);
             SBFReportEntry report = new SBFReportEntry(2001).noNL();
             report.add(new SBFUnitReportEntry(attacker, attack.getUnitNumber(), ownerColor(attacker, game())).text());

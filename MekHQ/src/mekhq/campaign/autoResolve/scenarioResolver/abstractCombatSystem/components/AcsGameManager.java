@@ -23,7 +23,6 @@ import megamek.common.*;
 import megamek.common.actions.EntityAction;
 import megamek.common.enums.GamePhase;
 import megamek.common.net.packets.Packet;
-import megamek.common.strategicBattleSystems.SBFFormation;
 import megamek.common.strategicBattleSystems.SBFReportEntry;
 import megamek.logging.MMLogger;
 import megamek.server.AbstractGameManager;
@@ -56,19 +55,36 @@ public final class AcsGameManager extends AbstractGameManager {
 
     final List<PhaseHandler> phaseHandlers = new ArrayList<>();
 
+
+    public void runGame() {
+        changePhase(GamePhase.STARTING_SCENARIO);
+        while (!game.getPhase().equals(GamePhase.VICTORY)) {
+            changePhase(GamePhase.INITIATIVE);
+        }
+    }
+
+
     public AutoResolveGame getGame() {
         return game;
+    }
+
+    public AcsPhasePreparationManager getPhasePreparationManager() {
+        return phasePreparationManager;
+    }
+
+    public AcsInitiativeHelper getInitiativeHelper() {
+        return initiativeHelper;
     }
 
     public void addPhaseHandler(PhaseHandler handler) {
         phaseHandlers.add(handler);
     }
 
-    public void addAttack(List<EntityAction> actions, SBFFormation formation) {
+    public void addAttack(List<EntityAction> actions, AcsFormation formation) {
         attackProcessor.processAttacks(actions, formation);
     }
 
-    public void addNerveRecovery(AcsRecoveringNerveAction recoveringNerveAction, SBFFormation formation) {
+    public void addNerveRecovery(AcsRecoveringNerveAction recoveringNerveAction, AcsFormation formation) {
         recoveringNerveProcessor.processRecoveringNerve(recoveringNerveAction, formation);
     }
 
@@ -96,7 +112,7 @@ public final class AcsGameManager extends AbstractGameManager {
         for (Player player : game.getPlayersList()) {
             player.setInitialEntityCount(Math.toIntExact(game.getActiveFormations(player).stream()
                 .filter(entity -> !entity.isRouted()).count()));
-            game.getActiveFormations(player).stream().map(SBFFormation::getPointValue).reduce(Integer::sum)
+            game.getActiveFormations(player).stream().map(AcsFormation::getPointValue).reduce(Integer::sum)
                 .ifPresent(player::setInitialBV);
         }
     }
@@ -129,23 +145,18 @@ public final class AcsGameManager extends AbstractGameManager {
      */
     public void resetPlayersDone() {
         for (Player player : game.getPlayersList()) {
-            setPlayerDone(player, false);
+            player.setDone(false);
         }
     }
 
-    private void setPlayerDone(Player player, boolean done) {
-        player.setDone(done);
-    }
-
-
-    public void addEngagementControl(AcsEngagementControlAction action, SBFFormation formation) {
+    public void addEngagementControl(AcsEngagementControlAction action, AcsFormation formation) {
         engagementControlProcessor.processEngagementControl(action, formation);
     }
 
     /**
      * Rolls initiative for all teams.
      */
-    void rollInitiative() {
+    public void rollInitiative() {
         TurnOrdered.rollInitiative(game.getTeams(), false);
     }
 
@@ -178,10 +189,6 @@ public final class AcsGameManager extends AbstractGameManager {
 
     void endCurrentTurn() {
         changeToNextTurn();
-    }
-
-    public void runGame() {
-        changePhase(GamePhase.STARTING_SCENARIO);
     }
 
 

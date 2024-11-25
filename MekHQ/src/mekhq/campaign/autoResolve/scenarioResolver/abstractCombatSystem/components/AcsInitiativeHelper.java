@@ -5,7 +5,6 @@ import megamek.common.enums.GamePhase;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.strategicBattleSystems.*;
 
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,30 +21,38 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
         final List<AcsTurn> turns;
         if (phase.isFiring() || phase.isMovement()) {
             turns = game().getInGameObjects().stream()
-                .filter(SBFFormation.class::isInstance)
-                .filter(unit -> ((SBFFormation) unit).isDeployed())
-                .filter(unit -> ((SBFFormation) unit).isEligibleForPhase(phase))
+                .filter(AcsFormation.class::isInstance)
+                .filter(unit -> ((AcsFormation) unit).isDeployed())
+                .filter(unit -> ((AcsFormation) unit).isEligibleForPhase(phase))
                 .map(InGameObject::getOwnerId)
                 .map(AcsFormationTurn::new)
+                .sorted(Comparator.comparing(t -> game().getPlayer(t.playerId()).getInitiative()))
                 .collect(Collectors.toList());
-
-            turns.sort(Comparator.comparing(t -> game().getPlayer(t.playerId()).getInitiative()));
+        } else if (phase.isDeployment()) {
+            // Deployment phase: sort by initiative
+            turns = game().getInGameObjects().stream()
+                .filter(AcsFormation.class::isInstance)
+                .filter(unit -> !((AcsFormation) unit).isDeployed())
+                .map(InGameObject::getOwnerId)
+                .map(AcsFormationTurn::new)
+                .sorted(Comparator.comparing(t -> game().getPlayer(t.playerId()).getInitiative()))
+                .collect(Collectors.toList());
 
         } else {
             // As a fallback, provide unsorted turns
             turns = game().getInGameObjects().stream()
-                .filter(SBFFormation.class::isInstance)
-                .filter(unit -> ((SBFFormation) unit).isDeployed())
-                .filter(unit -> ((SBFFormation) unit).isEligibleForPhase(phase))
+                .filter(AcsFormation.class::isInstance)
+                .filter(unit -> ((AcsFormation) unit).isDeployed())
+                .filter(unit -> ((AcsFormation) unit).isEligibleForPhase(phase))
                 .map(InGameObject::getOwnerId)
                 .map(AcsFormationTurn::new)
                 .collect(Collectors.toList());
 
             // Now, assemble formations and sort by initiative and relative formation count
             Map<Integer, Long> unitCountsByPlayer = game().getInGameObjects().stream()
-                .filter(SBFFormation.class::isInstance)
-                .filter(unit -> ((SBFFormation) unit).isDeployed())
-                .filter(unit -> ((SBFFormation) unit).isEligibleForPhase(phase))
+                .filter(AcsFormation.class::isInstance)
+                .filter(unit -> ((AcsFormation) unit).isDeployed())
+                .filter(unit -> ((AcsFormation) unit).isEligibleForPhase(phase))
                 .collect(Collectors.groupingBy(InGameObject::getOwnerId, Collectors.counting()));
 
             if (!unitCountsByPlayer.isEmpty()) {
@@ -84,7 +91,7 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
         game().resetTurnIndex();
     }
 
-    void writeInitiativeReport() {
+    public void writeInitiativeReport() {
         writeHeader();
         writeInitiativeRolls();
         writeTurnOrder();

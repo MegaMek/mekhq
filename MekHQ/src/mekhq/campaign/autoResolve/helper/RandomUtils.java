@@ -74,6 +74,10 @@ public class RandomUtils {
             return Optional.empty();
         }
 
+        public T sampleGet() {
+            return sample().orElseThrow();
+        }
+
         public List<T> values() {
             return entries.stream().map(WeightedEntry::value).toList();
         }

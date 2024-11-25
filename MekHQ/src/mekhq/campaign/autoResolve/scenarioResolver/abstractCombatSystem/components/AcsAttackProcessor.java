@@ -16,7 +16,6 @@ public record AcsAttackProcessor(AcsGameManager gameManager) implements AcsGameM
 
         actions.forEach(game()::addAction);
         formation.setDone(true);
-        gameManager.endCurrentTurn();
     }
 
     private boolean validatePermitted(List<EntityAction> actions, SBFFormation formation) {

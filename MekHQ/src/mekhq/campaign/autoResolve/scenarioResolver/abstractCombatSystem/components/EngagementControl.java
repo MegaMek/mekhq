@@ -5,5 +5,5 @@ public enum EngagementControl {
     STANDARD,
     EVADE,
     OVERRUN,
-    FORCE_ENGAGEMENT
+    FORCED_ENGAGEMENT
 }

@@ -47,7 +47,7 @@ public class AcsRecoveringNerveActionToHitData extends TargetRoll {
         //
     }
 
-    /**processCombatModifierprocessCombatModifierprocessCombatModifierprocessCombatModifierprocessCombatModifierprocessCombatModifier
+    /**
      * Returns a list of target IDs of all the targets of all attacks that the attacker of the given
      * attack is performing this round. The result can be empty (the unit isn't attacking anything or
      * it is not the firing phase), it can have one or two entries.
@@ -60,7 +60,7 @@ public class AcsRecoveringNerveActionToHitData extends TargetRoll {
         return game.getActionsVector().stream()
             .filter(a -> a.getEntityId() == unit.getId())
             .filter(a -> a instanceof AcsEngagementControlAction)
-            .map(a -> ((SBFAttackAction) a).getTargetId())
+            .map(a -> ((AcsEngagementControlAction) a).getTargetFormationId())
             .distinct()
             .toList();
     }

@@ -529,7 +529,7 @@ public class MekHQ implements GameListener {
     public void autoResolveConcluded(AutoResolveConcludedEvent arce){
         try {
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), arce.controlledScenario());
-            tracker.setClient(new AutoResolveClient(arce.getGame()));
+            tracker.setClient(new AutoResolveClient(arce.getGame(), getCampaign().getPlayer()));
             tracker.setEvent(arce);
             tracker.processGame();
 
@@ -785,7 +785,7 @@ public class MekHQ implements GameListener {
 
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
         currentScenario = scenario;
-        new AutoResolveEngine(AutoResolveMethod.UNITS_MATTER).resolveBattle(this, units, scenario);
+        new AutoResolveEngine(AutoResolveMethod.ABSTRACT_COMBAT_SYSTEM).resolveBattle(this, units, scenario);
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

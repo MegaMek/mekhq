@@ -55,8 +55,8 @@ public class AcsStandardUnitAttack extends AbstractAcsAttackAction {
         var autoResolveGame = (AutoResolveGame) game;
         String message;
 
-        Optional<SBFFormation> possibleAttacker = autoResolveGame.getFormation(getEntityId());
-        Optional<SBFFormation> possibleTarget = autoResolveGame.getFormation(getTargetId());
+        Optional<AcsFormation> possibleAttacker = autoResolveGame.getFormation(getEntityId());
+        Optional<AcsFormation> possibleTarget = autoResolveGame.getFormation(getTargetId());
         if (getEntityId() == getTargetId()) {
             message = String.format("Formations cannot attack themselves! %h", this);
             logger.error(message);

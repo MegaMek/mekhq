@@ -1,17 +1,15 @@
 package mekhq.campaign.autoResolve.helper;
 
 import io.sentry.Sentry;
-import megamek.client.bot.BotClient;
-import megamek.client.bot.princess.Princess;
 import megamek.common.*;
+import megamek.common.force.Force;
 import megamek.common.force.Forces;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.strategicBattleSystems.SBFFormationConverter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.force.Force;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationConverter;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -49,7 +47,7 @@ public class SetupForces {
         setupMapSettings();
         getPlanetaryConditions();
         setupPlayerForces(campaign, units, scenario);
-        var localBots = new HashMap<String, BotClient>();
+        var localBots = new HashMap<String, Player>();
         /* Add bots */
         for (int i = 0; i < scenario.getNumBots(); i++) {
             BotForce bf = scenario.getBotForce(i);
@@ -61,31 +59,35 @@ public class SetupForces {
                 }
                 name += append;
             }
-            Princess botClient = new Princess(name, "", 0);
-            botClient.setLocalPlayerNumber(game.getNoOfPlayers() + 1);
-            botClient.setBehaviorSettings(bf.getBehaviorSettings());
-            localBots.put(name, botClient);
-            game.addPlayer(botClient.getLocalPlayerNumber(), botClient.getLocalPlayer());
-            configureBot(botClient.getLocalPlayer(), bf);
+            var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
+            Player bot = new Player(highestPlayerId + 1, name);
+            localBots.put(name, bot);
+            game.addPlayer(bot.getId(), bot);
+            configureBot(bot, bf);
         }
+        var idOfEntitiesToRemove = game.getInGameObjects().stream().map(InGameObject::getId).toList();
+
+        ConsolidateForces.consolidateForces(game);
 
         // convert forces:
-        for(var force : game.getForces().getAllForces()) {
-            var entitiesToRemoveFromForce = game.getForces().getForce(force.getId()).getEntities();
-            var formation = new SBFFormationConverter(force, game).convert();
+        for(var force : game.getForces().getTopLevelForces()) {
+            var formation = new AcsFormationConverter(force, game).convert();
             if (formation == null) {
                 System.out.println("Error, formation is null for force " + force.getName());
             } else {
+                formation.setTargetFormationId(Entity.NONE);
                 game.addUnit(formation);
                 game.getForces().addEntity(formation, force.getId());
             }
-            entitiesToRemoveFromForce.forEach(id -> game.getForces().removeEntityFromForces(id));
+        }
+
+        for (var id : idOfEntitiesToRemove) {
+            game.getForces().removeEntityFromForces(id);
         }
     }
 
     private void setupPlayerForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         var player = campaign.getPlayer();
-        game.addPlayer(player.getId(), player);
         player.setCamouflage(campaign.getCamouflage().clone());
         player.setColour(campaign.getColour());
         player.setStartingPos(scenario.getStartingPos());
@@ -100,7 +102,7 @@ public class SetupForces {
         player.setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
         player.setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
         player.setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
-
+        game.addPlayer(player.getId(), player);
         var entities = new ArrayList<Entity>();
         /*
          * If the player is making a combat drop (either required by scenario
@@ -159,10 +161,11 @@ public class SetupForces {
                 }
             }
             entity.setDeployRound(deploymentRound);
-            Force force = campaign.getForceFor(unit);
+            var force = campaign.getForceFor(unit);
             if (force != null) {
                 entity.setForceString(force.getFullMMName());
             }
+            entities.add(entity);
         }
 
         for (Entity entity : scenario.getAlliesPlayer()) {
@@ -240,9 +243,7 @@ public class SetupForces {
     }
 
     private void configureBot(Player bot, BotForce botForce) {
-        game.addPlayer(bot.getId(), bot);
         bot.setTeam(botForce.getTeam());
-
         // set deployment
         bot.setStartingPos(botForce.getStartingPos());
         bot.setStartOffset(botForce.getStartOffset());
@@ -255,6 +256,8 @@ public class SetupForces {
         // set camo
         bot.setCamouflage(botForce.getCamouflage().clone());
         bot.setColour(botForce.getColour());
+
+        game.addPlayer(bot.getId(), bot);
         setupBotEntities(bot, botForce);
     }
 
@@ -296,7 +299,6 @@ public class SetupForces {
 
     private void sendEntities(List<Entity> entities) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
-
         for (final Entity entity : new ArrayList<>(entities)) {
             entity.restore();
             if (entity instanceof ProtoMek) {
@@ -346,8 +348,8 @@ public class SetupForces {
                     topLevel = false;
                 }
                 entity.setForceString("");
+                game.addEntity(entity);
                 game.getForces().addEntity(entity, realId);
-                // add force
             }
         }
     }

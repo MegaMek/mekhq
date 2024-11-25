@@ -12,9 +12,6 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
 
     void managePhase() {
         switch (gameManager.getGame().getPhase()) {
-            case STARTING_SCENARIO:
-                gameManager.changePhase(GamePhase.INITIATIVE);
-                break;
             case INITIATIVE:
                 gameManager.getGame().setupDeployment();
                 if (gameManager.getGame().shouldDeployThisRound()) {
@@ -43,10 +40,9 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
             case END:
                 if (gameManager.checkForVictory()) {
                     gameManager.changePhase(GamePhase.VICTORY);
-                } else {
-                    gameManager.changePhase(GamePhase.INITIATIVE);
                 }
                 break;
+            case STARTING_SCENARIO:
             case VICTORY:
             default:
                 break;

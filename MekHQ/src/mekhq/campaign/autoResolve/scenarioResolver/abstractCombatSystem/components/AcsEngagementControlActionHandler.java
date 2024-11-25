@@ -1,14 +1,8 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
 
-import megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.Roll;
 import megamek.common.strategicBattleSystems.*;
-
-import java.util.List;
-
-import static megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip.ownerColor;
 
 public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler {
 
@@ -23,63 +17,79 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
 
     @Override
     public void handle() {
-        AcsEngagementControlAction engagementControl = (AcsEngagementControlAction) getAction();
-        if (!engagementControl.isIllegal()) {
-            var attackerOpt = game().getFormation(engagementControl.getEntityId());
-            var targetOpt = game().getFormation(engagementControl.getTargetFormationId());
-            if (attackerOpt.isEmpty() || targetOpt.isEmpty()) {
-                return;
-            }
-            SBFFormation attacker = attackerOpt.get();
-            SBFFormation target = targetOpt.get();
-
-            List<SBFUnit> targetUnits = target.getUnits();
-            SBFUnit targetUnit = targetUnits.get(0);
-
-            // Process Engagement Controll roll in here
-
-            AcsEngagementControlToHitData toHit = AcsEngagementControlToHitData.compileToHit(game(), engagementControl);
-            SBFReportEntry report = new SBFReportEntry(2001).noNL();
-            report.add(new SBFUnitReportEntry(attacker, -1, ownerColor(attacker, game())).text());
-            report.add(new SBFFormationReportEntry(
-                target.generalName(), UIUtil.hexColor(SBFInGameObjectTooltip.ownerColor(target, game()))).text());
-            addReport(report);
-            // TODO : Change everything from here and down!
-            if (toHit.cannotSucceed()) {
-                addReport(new SBFReportEntry(2010).add(toHit.getDesc()));
-            } else {
-                addReport(new SBFReportEntry(2003).add(toHit.getValue()).noNL());
-                Roll roll = Compute.rollD6(2);
-                report = new SBFReportEntry(2020).noNL();
-                report.add(new SBFPlayerNameReportEntry(game().getPlayer(attacker.getOwnerId())).text());
-                report.add(new SBFRollReportEntry(roll).noNL().text());
-                addReport(report);
-//
-//                if (roll.getIntValue() < toHit.getValue()) {
-//                    addReport(new SBFPublicReportEntry(2012));
-//                } else {
-//                    addReport(new SBFPublicReportEntry(2013));
-//                    int damage = attackingUnit.getCurrentDamage().getDamage(attack.getRange()).damage;
-//                    if (damage > 0) {
-//                        int newArmor = targetUnit.getCurrentArmor() - damage;
-//                        addReport(new SBFPublicReportEntry(3100).add(damage).add(damage));
-//                        if (newArmor < 0) {
-//                            newArmor = 0;
-//                        }
-//                        targetUnits.get(0).setCurrentArmor(newArmor);
-//                        if (newArmor == 0) {
-//                            addReport(new SBFPublicReportEntry(3092));
-//                        }
-//                        if (newArmor * 2 < targetUnit.getArmor()) {
-//                            targetUnit.addDamageCrit();
-//                        }
-////                        gameManager().sendUnitUpdate(target);
-//                    } else {
-//                        addReport(new SBFPublicReportEntry(3068));
-//                    }
-//                }
-            }
-        }
+        performEngagementControl();
         setFinished();
     }
+
+    private void performEngagementControl() {
+        // WARNING: THIS IS NOT UP TO RULES AS WRITTEN
+        AcsEngagementControlAction engagementControl = (AcsEngagementControlAction) getAction();
+        if (engagementControl.isIllegal()) {
+            return;
+        }
+
+        var attackerOpt = game().getFormation(engagementControl.getEntityId());
+        var targetOpt = game().getFormation(engagementControl.getTargetFormationId());
+        if (attackerOpt.isEmpty() || targetOpt.isEmpty()) {
+            return;
+        }
+        var attacker = attackerOpt.get();
+        if (attacker.getEngagementControl() != null) {
+            // the attacker is already tied down in an engagement and control
+            return;
+        }
+        var target = targetOpt.get();
+
+        if (engagementControl.getEngagementControl().equals(EngagementControl.NONE)) {
+            attacker.setEngagementControl(EngagementControl.NONE);
+            // Selected none, nothing to do here
+            return;
+        }
+
+        var toHit = AcsEngagementControlToHitData.compileToHit(game(), engagementControl);
+        var toHitDefender = AcsEngagementControlToHitData.compileToHit(game(), new AcsEngagementControlAction(target.getId(), attacker.getId(), engagementControl.getEngagementControl()));
+
+//        SBFReportEntry report = new SBFReportEntry(2001).noNL();
+//        report.add(new SBFUnitReportEntry(attacker, -1, ownerColor(attacker, game())).text());
+//        report.add(new SBFFormationReportEntry(
+//            target.generalName(), UIUtil.hexColor(SBFInGameObjectTooltip.ownerColor(target, game()))).text());
+//        addReport(report);
+        // TODO : Change everything from here and down!
+
+//            addReport(new SBFReportEntry(2003).add(toHit.getValue()).noNL());
+        Roll attackerRoll = Compute.rollD6(2);
+        Roll defenderRoll = Compute.rollD6(2);
+
+//            report = new SBFReportEntry(2020).noNL();
+//            report.add(new SBFPlayerNameReportEntry(game().getPlayer(attacker.getOwnerId())).text());
+//            report.add(new SBFRollReportEntry(attackerRoll).noNL().text());
+//            addReport(report);
+
+        var attackerDelta = attackerRoll.getIntValue() - toHit.getValue();
+        var defenderDelta = defenderRoll.getIntValue() - toHitDefender.getValue();
+
+        if (attackerDelta > defenderDelta) {
+            attacker.setEngagementControl(engagementControl.getEngagementControl());
+            attacker.setEngagementControlFailed(false);
+
+            switch (engagementControl.getEngagementControl()) {
+                case NONE:
+                    attacker.setEngagementControl(EngagementControl.NONE);
+                    break;
+                case FORCED_ENGAGEMENT:
+                    attacker.setTargetFormationId(target.getId());
+                    target.setTargetFormationId(attacker.getId());
+                case EVADE:
+                case OVERRUN:
+                case STANDARD:
+                    target.setEngagementControl(engagementControl.getEngagementControl());
+            }
+
+        } else {
+            addReport(new SBFPublicReportEntry(3068));
+        }
+
+
+    }
+
 }

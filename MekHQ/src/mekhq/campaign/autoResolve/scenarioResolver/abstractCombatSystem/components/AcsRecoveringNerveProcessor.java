@@ -6,16 +6,15 @@ import megamek.logging.MMLogger;
 public record AcsRecoveringNerveProcessor(AcsGameManager gameManager) implements AcsGameManagerHelper {
     private static final MMLogger logger = MMLogger.create(AcsRecoveringNerveProcessor.class);
 
-    void processRecoveringNerve(AcsRecoveringNerveAction recoveringNerveAction, SBFFormation formation) {
+    void processRecoveringNerve(AcsRecoveringNerveAction recoveringNerveAction, AcsFormation formation) {
         if (!validatePermitted(recoveringNerveAction, formation)) {
             return;
         }
         game().addAction(recoveringNerveAction);
         formation.setDone(true);
-        gameManager.endCurrentTurn();
     }
 
-    private boolean validatePermitted(AcsRecoveringNerveAction recoveringNerveAction, SBFFormation formation) {
+    private boolean validatePermitted(AcsRecoveringNerveAction recoveringNerveAction, AcsFormation formation) {
         if (!game().getPhase().isEnd()) {
             logger.error("Server got movement packet in wrong phase!");
             return false;

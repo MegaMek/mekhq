@@ -11,7 +11,6 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.SBFRuleOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.strategicBattleSystems.SBFFormation;
 import megamek.common.strategicBattleSystems.SBFUnit;
 import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryHelper;
@@ -19,13 +18,14 @@ import megamek.server.victory.VictoryResult;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsActionHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsTurn;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class AutoResolveGame extends AbstractGame implements PlanetaryConditionsUsing {
     private static final MMLogger logger = MMLogger.create(AutoResolveGame.class);
@@ -43,8 +43,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     private GamePhase phase = GamePhase.UNKNOWN;
     private GamePhase lastPhase = GamePhase.UNKNOWN;
     private final PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-    protected final Map<Integer, Player> players = new HashMap<>();
-    protected final CopyOnWriteArrayList<Team> teams = new CopyOnWriteArrayList<>();
+
     private int lastEntityId;
     /**
      * Report and turnlist
@@ -69,11 +68,12 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     private final VictoryHelper victoryHelper = new VictoryHelper(getOptions());
     private int victoryPlayerId = Player.PLAYER_NONE;
     private int victoryTeam = Player.TEAM_NONE;
-
+    private Player localPlayer;
 
     public AutoResolveGame(MekHQ app, List<Unit> units, AtBScenario scenario) {
         setBoard(0, new Board());
         this.campaign = app.getCampaign();
+        this.localPlayer = campaign.getPlayer();
         this.units = units;
         this.scenario = scenario;
     }
@@ -124,6 +124,14 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         pendingActions.add(action);
     }
 
+    @Override
+    protected List<Deployable> deployableInGameObjects() {
+        return inGameObjects.values().stream()
+            .filter(unit -> unit instanceof Deployable)
+            .filter(unit -> unit instanceof AcsFormation)
+            .map(unit -> (Deployable) unit)
+            .collect(Collectors.toList());
+    }
 
     public int getNoOfEntities() {
         return inGameTWEntities().size();
@@ -331,13 +339,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     @Override
     public boolean isCurrentPhasePlayable() {
-        return switch (phase) {
-            case INITIATIVE, END, PREMOVEMENT, DEPLOY_MINEFIELDS, SET_ARTILLERY_AUTOHIT_HEXES, PREFIRING, TARGETING, PHYSICAL, OFFBOARD, OFFBOARD_REPORT, SBF_DETECTION, SBF_DETECTION_REPORT ->
-                false;
-            case DEPLOYMENT, MOVEMENT, FIRING ->
-                hasMoreTurns();
-            default -> true;
-        };
+        return true;
     }
 
     @Override
@@ -354,22 +356,22 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     @Override
     public void setupTeams() {
-        List<Team> initTeams = new ArrayList<>();
+        Vector<Team> initTeams = new Vector<>();
 
         // Now, go through all the teams, and add the appropriate player
         for (int t = Player.TEAM_NONE + 1; t < Player.TEAM_NAMES.length; t++) {
-            Team tempTeam = null;
+            Team newTeam = null;
             for (Player player : getPlayersList()) {
                 if (player.getTeam() == t) {
-                    if (tempTeam == null) {
-                        tempTeam = new Team(t);
+                    if (newTeam == null) {
+                        newTeam = new Team(t);
                     }
-                    tempTeam.addPlayer(player);
+                    newTeam.addPlayer(player);
                 }
             }
 
-            if (tempTeam != null) {
-                initTeams.add(tempTeam);
+            if (newTeam != null) {
+                initTeams.addElement(newTeam);
             }
         }
 
@@ -377,6 +379,14 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
             for (Team oldTeam : teams) {
                 if (newTeam.equals(oldTeam)) {
                     newTeam.setInitiative(oldTeam.getInitiative());
+                }
+            }
+        }
+
+        // Carry over faction settings
+        for (Team newTeam : initTeams) {
+            for (Team oldTeam : teams) {
+                if (newTeam.equals(oldTeam)) {
                     newTeam.setFaction(oldTeam.getFaction());
                 }
             }
@@ -399,10 +409,10 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     @Override
     public int getLiveDeployedEntitiesOwnedBy(Player player) {
         var res = getInGameObjects().stream()
-            .filter(unit -> unit instanceof SBFFormation)
+            .filter(unit -> unit instanceof AcsFormation)
             .filter(unit -> unit.getOwnerId() == player.getId())
-            .filter(unit -> ((SBFFormation) unit).isDeployed())
-            .mapToInt(unit -> ((SBFFormation) unit).getUnits().stream().mapToInt(SBFUnit::getCurrentArmor).sum())
+            .filter(unit -> ((AcsFormation) unit).isDeployed())
+            .mapToInt(unit -> ((AcsFormation) unit).getUnits().stream().mapToInt(SBFUnit::getCurrentArmor).sum())
             .filter(armor -> armor > 0).count();
 
         return (int) res;
@@ -478,9 +488,9 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * @param formationID the ID to look for
      * @return The formation or an empty Optional
      */
-    public Optional<SBFFormation> getFormation(int formationID) {
+    public Optional<AcsFormation> getFormation(int formationID) {
         Optional<InGameObject> unit = getInGameObject(formationID);
-        if (unit.isPresent() && unit.get() instanceof SBFFormation formation) {
+        if (unit.isPresent() && unit.get() instanceof AcsFormation formation) {
             return Optional.of(formation);
         } else {
             return Optional.empty();
@@ -512,13 +522,22 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         victoryContext.putAll(ctx);
     }
 
+    @Override
+    public Player getPlayer(int id) {
+        if (players.containsKey(id)) {
+            return players.get(id);
+        } else {
+            System.out.println("Player not found: " + id);
+            return null;
+        }
+    }
 
-    public boolean areHostile(SBFFormation formation, Player player) {
+    public boolean areHostile(AcsFormation formation, Player player) {
         return player.isEnemyOf(getPlayer(formation.getOwnerId()));
     }
 
     // check current turn, phase, formation
-    private boolean isEligibleForAction(SBFFormation formation) {
+    private boolean isEligibleForAction(AcsFormation formation) {
         return (getTurn() instanceof AcsFormationTurn)
             && getTurn().isValidEntity(formation, this);
     }
@@ -527,7 +546,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * @return the first formation in the list of formations that is alive and
      *         eligible for the current game phase.
      */
-    public Optional<SBFFormation> getNextEligibleFormation() {
+    public Optional<AcsFormation> getNextEligibleFormation() {
         return getNextEligibleFormation(BTObject.NONE);
     }
 
@@ -535,7 +554,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * @return the preceding formation in the list of formations that is alive and
      *         eligible for the current game phase.
      */
-    public Optional<SBFFormation> getPreviousEligibleFormation() {
+    public Optional<AcsFormation> getPreviousEligibleFormation() {
         return getPreviousEligibleFormation(BTObject.NONE);
     }
 
@@ -547,7 +566,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      *         returns the first eligible formation in the list of formations that
      *         is alive and eligible.
      */
-    public Optional<SBFFormation> getNextEligibleFormation(int currentFormationID) {
+    public Optional<AcsFormation> getNextEligibleFormation(int currentFormationID) {
         return getEligibleFormationImpl(currentFormationID, phase, SelectDirection.NEXT_UNIT);
     }
 
@@ -559,7 +578,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      *         returns the last eligible formation from the list of formations that
      *         is alive and eligible.
      */
-    public Optional<SBFFormation> getPreviousEligibleFormation(int currentFormationID) {
+    public Optional<AcsFormation> getPreviousEligibleFormation(int currentFormationID) {
         return getEligibleFormationImpl(currentFormationID, phase, SelectDirection.PREVIOUS_UNIT);
     }
 
@@ -577,15 +596,15 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * @return the formation that precedes or follows the given formation ID, if one
      *         can be found
      */
-    private Optional<SBFFormation> getEligibleFormationImpl(int currentFormationID, GamePhase phase,
+    private Optional<AcsFormation> getEligibleFormationImpl(int currentFormationID, GamePhase phase,
                                                             SelectDirection direction) {
-        List<SBFFormation> eligibleFormations = getActiveFormations().stream()
+        var eligibleFormations = getActiveFormations().stream()
             .filter(this::isEligibleForAction)
             .toList();
         if (eligibleFormations.isEmpty()) {
             return Optional.empty();
         } else {
-            Optional<SBFFormation> currentFormation = getFormation(currentFormationID);
+            var currentFormation = getFormation(currentFormationID);
             int index = currentFormation.map(eligibleFormations::indexOf).orElse(-1);
             if (index == -1) {
                 // when no current unit is found, the next unit is the first, the previous unit
@@ -608,14 +627,14 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      *
      * @return The currently active formations
      */
-    public List<SBFFormation> getActiveFormations() {
+    public List<AcsFormation> getActiveFormations() {
         return inGameObjects.values().stream()
-                .filter(u -> u instanceof SBFFormation)
-                .map(u -> (SBFFormation) u)
+                .filter(u -> u instanceof AcsFormation)
+                .map(u -> (AcsFormation) u)
                 .toList();
     }
 
-    public List<SBFFormation> getActiveFormations(Player player) {
+    public List<AcsFormation> getActiveFormations(Player player) {
         return getActiveFormations().stream()
                 .filter(f -> f.getOwnerId() == player.getId())
                 .toList();

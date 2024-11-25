@@ -6,16 +6,16 @@ import megamek.logging.MMLogger;
 public record AcsEngagementControlProcessor(AcsGameManager gameManager) implements AcsGameManagerHelper {
     private static final MMLogger logger = MMLogger.create(AcsEngagementControlProcessor.class);
 
-    void processEngagementControl(AcsEngagementControlAction engagementControl, SBFFormation formation) {
+    void processEngagementControl(AcsEngagementControlAction engagementControl, AcsFormation formation) {
         if (!validatePermitted(engagementControl, formation)) {
             return;
         }
         game().addAction(engagementControl);
         formation.setDone(true);
-        gameManager.endCurrentTurn();
+        formation.setEngagementControl(engagementControl.getEngagementControl());
     }
 
-    private boolean validatePermitted(AcsEngagementControlAction engagementControl, SBFFormation formation) {
+    private boolean validatePermitted(AcsEngagementControlAction engagementControl, AcsFormation formation) {
         if (!game().getPhase().isMovement()) {
             logger.error("Server got movement packet in wrong phase!");
             return false;

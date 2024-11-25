@@ -15,8 +15,6 @@ public class AcsToHitData extends TargetRoll {
         super(value, desc);
     }
 
-    public AcsToHitData() { }
-
     public static AcsToHitData compileToHit(AutoResolveGame game, AcsStandardUnitAttack attack) {
         if (!attack.isDataValid(game)) {
             return new AcsToHitData(TargetRoll.IMPOSSIBLE, "Invalid attack");
@@ -103,8 +101,8 @@ public class AcsToHitData extends TargetRoll {
     public static List<Integer> targetsOfFormation(InGameObject unit, AutoResolveGame game) {
         return game.getActionsVector().stream()
             .filter(a -> a.getEntityId() == unit.getId())
-            .filter(a -> a instanceof SBFAttackAction)
-            .map(a -> ((SBFAttackAction) a).getTargetId())
+            .filter(a -> a instanceof AcsAttackAction)
+            .map(a -> ((AcsAttackAction) a).getTargetId())
             .distinct()
             .toList();
     }
