@@ -76,8 +76,6 @@ public class CampaignOptions {
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
-    public static final double DEFAULT_STOCK_PERCENTAGE = 10.0;
-
     public static String getTechLevelName(final int techLevel) {
         return switch (techLevel) {
             case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];

@@ -1303,8 +1303,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMaxAcquisitions.setToolTipText(resources.getString("spnMaxAcquisitions.toolTipText"));
 
         spnDefaultStockPercent = new JSpinner(
-                new SpinnerNumberModel(0.1, 0.1, CampaignOptions.DEFAULT_STOCK_PERCENTAGE,
-                        0.1));
+                new SpinnerNumberModel(10.0, 0.0, 10000,
+                        0.5));
         spnDefaultStockPercent.setEditor(new NumberEditor(spnDefaultStockPercent, "0.0"));
         spnDefaultStockPercent.setName("spnDefaultStockPercent");
         spnDefaultStockPercent.setToolTipText(resources.getString("spnDefaultStockPercent.toolTipText"));
@@ -1326,7 +1326,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlMaxAcquisitions, gridBagConstraints);
+
+        gridBagConstraints.gridy = 7;
         panSubAcquire.add(pnlClanPenalty, gridBagConstraints);
+
+        gridBagConstraints.gridy = 8;
         panSubAcquire.add(pnlDefaultStockPercent, gridBagConstraints);
 
         spnNDiceTransitTime = new JSpinner(new SpinnerNumberModel(0, 0, 365, 1));

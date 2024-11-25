@@ -2236,6 +2236,7 @@ public class Campaign implements ITechManager {
             p = ((MissingPart) p).getNewPart();
         }
         PartInUse result = new PartInUse(p);
+        result.setRequestedStock(getCampaignOptions().getDefaultStockPercent());
         return (null != result.getPartToBuy()) ? result : null;
     }
 
