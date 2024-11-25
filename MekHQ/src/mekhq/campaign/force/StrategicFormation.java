@@ -39,19 +39,20 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
- * Used by Against the Bot to track additional information about each force
- * on the TO&amp;E that has at least one unit assigned. Extra info includes
- * whether
- * the force counts as a lance (or star or level II) eligible for assignment
- * to a mission role and what the assignment is on which contract.
+ * Used by Against the Bot & StratCon to track additional information about each force
+ * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
+ * the force counts as a Strategic Formation eligible for assignment to a scenario role
+ * and what the assignment is on which contract.
  *
  * @author Neoancient
  */
-public class Lance {
-    private static final MMLogger logger = MMLogger.create(Lance.class);
+public class StrategicFormation {
+    private static final MMLogger logger = MMLogger.create(StrategicFormation.class);
 
     public static final int STR_IS = 4;
     public static final int STR_CLAN = 5;
@@ -68,29 +69,39 @@ public class Lance {
     private AtBLanceRole role;
     private UUID commanderId;
 
-    public static int getStdLanceSize(Faction f) {
-        if (f.isClan()) {
+    /**
+     * Determines the standard size for a given faction. The size varies depending on whether the
+     * faction is a Clan, ComStar/WoB, or others (Inner Sphere).
+     *
+     * @param faction The {@link Faction} object for which the standard force size is to be calculated.
+     * @return The standard force size for the given faction. It returns {@code STR_CLAN} if the
+     * faction is a Clan, {@code STR_CS} if the faction is ComStar or WoB, and {@code STR_IS} otherwise.
+     */
+    public static int getStdLanceSize(Faction faction) {
+        if (faction.isClan()) {
             return STR_CLAN;
-        } else if (f.getShortName().equals("CS") || f.getShortName().equals("WOB")) {
+        } else if (faction.isComStarOrWoB()) {
             return STR_CS;
         } else {
             return STR_IS;
         }
     }
 
-    public Lance() {
-    }
+    /**
+     * Default constructor
+     */
+    public StrategicFormation() {}
 
-    public Lance(int fid, Campaign c) {
-        forceId = fid;
+    public StrategicFormation(int forceId, Campaign campaign) {
+        this.forceId = forceId;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
-        for (AtBContract contract : c.getActiveAtBContracts()) {
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null)
                     ? contract
                     : contract.getParentContract()).getId();
         }
-        commanderId = findCommander(forceId, c);
+        commanderId = findCommander(this.forceId, campaign);
     }
 
     public int getForceId() {
@@ -101,15 +112,15 @@ public class Lance {
         return missionId;
     }
 
-    public AtBContract getContract(Campaign c) {
-        return (AtBContract) c.getMission(missionId);
+    public AtBContract getContract(Campaign campaign) {
+        return (AtBContract) campaign.getMission(missionId);
     }
 
-    public void setContract(AtBContract c) {
-        if (null == c) {
+    public void setContract(AtBContract atBContract) {
+        if (null == atBContract) {
             missionId = NO_MISSION;
         } else {
-            missionId = c.getId();
+            missionId = atBContract.getId();
         }
     }
 
@@ -125,8 +136,8 @@ public class Lance {
         return commanderId;
     }
 
-    public Person getCommander(Campaign c) {
-        return c.getPerson(commanderId);
+    public Person getCommander(Campaign campaign) {
+        return campaign.getPerson(commanderId);
     }
 
     public void setCommander(UUID id) {
@@ -137,22 +148,22 @@ public class Lance {
         commanderId = p.getId();
     }
 
-    public void refreshCommander(Campaign c) {
-        commanderId = findCommander(forceId, c);
+    public void refreshCommander(Campaign campaign) {
+        commanderId = findCommander(forceId, campaign);
     }
 
-    public int getSize(Campaign c) {
-        if (c.getFaction().isClan()) {
-            return (int) Math.ceil(getEffectivePoints(c));
+    public int getSize(Campaign campaign) {
+        if (campaign.getFaction().isClan()) {
+            return (int) Math.ceil(getEffectivePoints(campaign));
         }
-        if (c.getForce(forceId) != null) {
-            return c.getForce(forceId).getUnits().size();
+        if (campaign.getForce(forceId) != null) {
+            return campaign.getForce(forceId).getUnits().size();
         } else {
             return 0;
         }
     }
 
-    public double getEffectivePoints(Campaign c) {
+    public double getEffectivePoints(Campaign campaign) {
         /*
          * Used to check against force size limits; for this purpose we
          * consider a 'Mek and a Point of BA to be a single Point so that
@@ -163,8 +174,8 @@ public class Lance {
         double armor = 0.0;
         double infantry = 0.0;
         double other = 0.0;
-        for (UUID id : c.getForce(forceId).getUnits()) {
-            Unit unit = c.getUnit(id);
+        for (UUID id : campaign.getForce(forceId).getUnits()) {
+            Unit unit = campaign.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
@@ -185,7 +196,7 @@ public class Lance {
         return Math.max(armor, infantry) + other;
     }
 
-    public int getWeightClass(Campaign c) {
+    public int getWeightClass(Campaign campaign) {
         /*
          * Clan units only count half the weight of ASF and vehicles
          * (2/Point). IS units only count half the weight of vehicles
@@ -193,9 +204,9 @@ public class Lance {
          * weight class and decreasing the enemy force against vehicle/combined
          * lances.
          */
-        double weight = calculateTotalWeight(c, forceId);
+        double weight = calculateTotalWeight(campaign, forceId);
 
-        weight = weight * 4.0 / getStdLanceSize(c.getFaction());
+        weight = weight * 4.0 / getStdLanceSize(campaign.getFaction());
         if (weight < 40) {
             return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
         }
@@ -214,9 +225,10 @@ public class Lance {
         return EntityWeightClass.WEIGHT_SUPER_HEAVY;
     }
 
-    public boolean isEligible(Campaign c) {
+    public boolean isEligible(Campaign campaign) {
         // ensure the lance is marked as a combat force
-        final Force force = c.getForce(forceId);
+        final Force force = campaign.getForce(forceId);
+
         if ((force == null) || !force.isCombatForce()) {
             return false;
         }
@@ -225,25 +237,26 @@ public class Lance {
          * Check that the number of units and weight are within the limits
          * and that the force contains at least one ground unit.
          */
-        if (c.getCampaignOptions().isLimitLanceNumUnits()) {
-            int size = getSize(c);
-            if (size < getStdLanceSize(c.getFaction()) - 1 ||
-                    size > getStdLanceSize(c.getFaction()) + 2) {
+        if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
+            int size = getSize(campaign);
+            if (size < getStdLanceSize(campaign.getFaction()) - 1 ||
+                    size > getStdLanceSize(campaign.getFaction()) + 2) {
                 return false;
             }
         }
 
-        if (c.getCampaignOptions().isLimitLanceWeight() &&
-                getWeightClass(c) > EntityWeightClass.WEIGHT_ASSAULT) {
+        if (campaign.getCampaignOptions().isLimitLanceWeight() &&
+                getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
             return false;
         }
 
         boolean hasGround = false;
         for (UUID id : force.getUnits()) {
-            Unit unit = c.getUnit(id);
-            if (null != unit) {
+            Unit unit = campaign.getUnit(id);
+            if (unit != null) {
                 Entity entity = unit.getEntity();
-                if (null != entity) {
+
+                if (entity != null) {
                     if (entity.getUnitType() >= UnitType.JUMPSHIP) {
                         return false;
                     }
@@ -254,37 +267,64 @@ public class Lance {
             }
         }
 
+        if (hasGround) {
+            ArrayList<StrategicFormation> strategicFormations = campaign.getStrategicFormationList();
+            List<Integer> allLanceForceIds = new ArrayList<>();
+
+            for (StrategicFormation strategicFormation : strategicFormations) {
+                allLanceForceIds.add(strategicFormation.getForceId());
+            }
+
+            // Parent Forces
+            List<Force> parentForces = force.getAllParents();
+
+            for (Force parentForce : parentForces) {
+                if (allLanceForceIds.contains(parentForce.getId())) {
+                    return false;
+                }
+            }
+
+            // Child Forces
+            List<Force> childForces = force.getAllSubForces();
+
+            for (Force childForce : childForces) {
+                if (allLanceForceIds.contains(childForce.getId())) {
+                    return false;
+                }
+            }
+        }
+
         return hasGround;
     }
 
     /* Code to find unit commander from ForceViewPanel */
-    public static UUID findCommander(int forceId, Campaign c) {
-        return c.getForce(forceId).getForceCommanderID();
+    public static UUID findCommander(int forceId, Campaign campaign) {
+        return campaign.getForce(forceId).getForceCommanderID();
     }
 
     public static LocalDate getBattleDate(LocalDate today) {
         return today.plusDays(Compute.randomInt(7));
     }
 
-    public AtBScenario checkForBattle(Campaign c) {
+    public AtBScenario checkForBattle(Campaign campaign) {
         // Make sure there is a battle first
-        if ((c.getCampaignOptions().getAtBBattleChance(role) == 0)
-                || (Compute.randomInt(100) > c.getCampaignOptions().getAtBBattleChance(role))) {
+        if ((campaign.getCampaignOptions().getAtBBattleChance(role) == 0)
+                || (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role))) {
             // No battle
             return null;
         }
 
         // if we are using StratCon, don't *also* generate legacy scenarios
-        if (c.getCampaignOptions().isUseStratCon() &&
-                (getContract(c).getStratconCampaignState() != null)) {
+        if (campaign.getCampaignOptions().isUseStratCon() &&
+                (getContract(campaign).getStratconCampaignState() != null)) {
             return null;
         }
 
         int roll;
         // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
         // adjust 0-based random int
-        int battleTypeMod = 1 + (AtBMoraleLevel.STALEMATE.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
-        battleTypeMod += getContract(c).getBattleTypeMod();
+        int battleTypeMod = 1 + (AtBMoraleLevel.STALEMATE.ordinal() - getContract(campaign).getMoraleLevel().ordinal()) * 5;
+        battleTypeMod += getContract(campaign).getBattleTypeMod();
 
         // debugging code that will allow you to force the generation of a particular
         // scenario.
@@ -294,8 +334,8 @@ public class Lance {
 
         /*
          * if (true) {
-         * AtBScenario scenario = AtBScenarioFactory.createScenario(c, this,
-         * AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
+         * AtBScenario scenario = AtBScenarioFactory.createScenario(campaign, this,
+         * AtBScenario.BASEATTACK, true, getBattleDate(campaign.getLocalDate()));
          * scenario.setMissionId(this.getMissionId());
          * return scenario;
          * }
@@ -305,144 +345,144 @@ public class Lance {
             case FIGHTING: {
                 roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BREAKTHROUGH, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.STANDUP, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 25) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.STANDUP, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 33) {
-                    if (c.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(c, this,
+                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.CHASE, false,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(c, this,
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.HOLDTHELINE, false,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.HOLDTHELINE, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BASEATTACK, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 }
             }
             case SCOUTING: {
                 roll = Compute.randomInt(60) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 11) {
-                    if (c.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(c, this,
+                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.CHASE, true,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(c, this,
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.HIDEANDSEEK, false,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 21) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.HIDEANDSEEK, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 31) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.PROBE, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 41) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.PROBE, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 51) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.EXTRACTION, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.RECONRAID, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 }
             }
             case DEFENCE: {
                 roll = Compute.randomInt(20) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.HOLDTHELINE, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.RECONRAID, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 13) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.EXTRACTION, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 17) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.HIDEANDSEEK, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BREAKTHROUGH, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 }
             }
             case TRAINING: {
                 roll = Compute.randomInt(10) + battleTypeMod;
                 if (roll < 1) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BASEATTACK, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 3) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.HOLDTHELINE, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 5) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.BREAKTHROUGH, true,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else if (roll < 7) {
-                    if (c.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(c, this,
+                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.CHASE, true,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(c, this,
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.BREAKTHROUGH, false,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     }
                 } else if (roll < 9) {
-                    return AtBScenarioFactory.createScenario(c, this,
+                    return AtBScenarioFactory.createScenario(campaign, this,
                             AtBScenario.HIDEANDSEEK, false,
-                            getBattleDate(c.getLocalDate()));
+                            getBattleDate(campaign.getLocalDate()));
                 } else {
-                    if (c.getCampaignOptions().isGenerateChases()) {
-                        return AtBScenarioFactory.createScenario(c, this,
+                    if (campaign.getCampaignOptions().isGenerateChases()) {
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.CHASE, false,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     } else {
-                        return AtBScenarioFactory.createScenario(c, this,
+                        return AtBScenarioFactory.createScenario(campaign, this,
                                 AtBScenario.HOLDTHELINE, false,
-                                getBattleDate(c.getLocalDate()));
+                                getBattleDate(campaign.getLocalDate()));
                     }
                 }
             }
@@ -461,13 +501,13 @@ public class Lance {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lance");
     }
 
-    public static Lance generateInstanceFromXML(Node wn) {
-        Lance retVal = null;
+    public static StrategicFormation generateInstanceFromXML(Node wn) {
+        StrategicFormation retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
         try {
-            retVal = (Lance) Class.forName(className).newInstance();
+            retVal = (StrategicFormation) Class.forName(className).newInstance();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -496,11 +536,11 @@ public class Lance {
      * @param forceId Force for which to calculate weight
      * @return Total force weight
      */
-    public static double calculateTotalWeight(Campaign c, int forceId) {
+    public static double calculateTotalWeight(Campaign campaign, int forceId) {
         double weight = 0.0;
 
-        for (UUID id : c.getForce(forceId).getUnits()) {
-            Unit unit = c.getUnit(id);
+        for (UUID id : campaign.getForce(forceId).getUnits()) {
+            Unit unit = campaign.getUnit(id);
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
@@ -509,13 +549,13 @@ public class Lance {
                             (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         weight += entity.getWeight();
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (c.getFaction().isClan() || c.getCampaignOptions().isAdjustPlayerVehicles()) {
+                        if (campaign.getFaction().isClan() || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
                             weight += entity.getWeight() * 0.5;
                         } else {
                             weight += entity.getWeight();
                         }
                     } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
-                        if (c.getFaction().isClan()) {
+                        if (campaign.getFaction().isClan()) {
                             weight += entity.getWeight() * 0.5;
                         } else {
                             weight += entity.getWeight();

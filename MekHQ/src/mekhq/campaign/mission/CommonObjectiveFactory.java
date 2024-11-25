@@ -37,7 +37,7 @@ import java.util.UUID;
  *
  */
 public class CommonObjectiveFactory {
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
             MekHQ.getMHQOptions().getLocale());
 
     /**
@@ -77,7 +77,7 @@ public class CommonObjectiveFactory {
             keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, ""));
             keepFriendliesAlive.setFixedAmount(number);
         } else {
-            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, "%"));
+            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, '%'));
             keepFriendliesAlive.setPercentage(number);
         }
         keepFriendliesAlive.setObjectiveCriterion(ObjectiveCriterion.Preserve);
@@ -108,7 +108,7 @@ public class CommonObjectiveFactory {
             keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, ""));
             keepFriendliesAlive.setFixedAmount(number);
         } else {
-            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, "%"));
+            keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, '%'));
             keepFriendliesAlive.setPercentage(number);
         }
 
@@ -228,8 +228,8 @@ public class CommonObjectiveFactory {
 
         // some scenarios have a lance assigned
         // some scenarios have individual units assigned
-        if (scenario.getLanceForceId() != AtBScenario.NO_LANCE) {
-            objective.addForce(campaign.getForce(scenario.getLanceForceId()).getName());
+        if (scenario.getStrategicFormationId() != AtBScenario.NO_LANCE) {
+            objective.addForce(campaign.getForce(scenario.getStrategicFormationId()).getName());
         } else {
             int unitCount = 0;
 

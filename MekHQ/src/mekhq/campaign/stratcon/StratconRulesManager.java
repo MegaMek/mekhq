@@ -33,7 +33,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -833,7 +833,7 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        if (campaign.getLances().get(forceID).getRole().isScouting()) {
+        if (campaign.getStrategicFormations().get(forceID).getRole().isScouting()) {
             for (int direction = 0; direction < 6; direction++) {
                 StratconCoords checkCoords = coords.translate(direction);
 
@@ -1043,7 +1043,7 @@ public class StratconRulesManager {
         if (lanceCommander != null){
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                Lance lance = campaign.getLances().get(commanderUnit.getForceId());
+                StrategicFormation lance = campaign.getStrategicFormations().get(commanderUnit.getForceId());
 
                 return (lance != null) && lance.getRole().isDefence();
             }
@@ -1415,7 +1415,7 @@ public class StratconRulesManager {
         // that are
         // deployed to a scenario and not in a track already
 
-        return campaign.getLances().keySet().stream()
+        return campaign.getStrategicFormations().keySet().stream()
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
@@ -1451,7 +1451,7 @@ public class StratconRulesManager {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (int key : campaign.getLances().keySet()) {
+        for (int key : campaign.getStrategicFormations().keySet()) {
             Force force = campaign.getForce(key);
 
             if (force == null) {
@@ -1672,8 +1672,8 @@ public class StratconRulesManager {
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight
         // lance' rules
-        if (campaign.getLances().containsKey(forceID)
-                && (campaign.getLances().get(forceID).getRole().isFighting())) {
+        if (campaign.getStrategicFormations().containsKey(forceID)
+                && (campaign.getStrategicFormations().get(forceID).getRole().isFighting())) {
             return ReinforcementEligibilityType.FightLance;
         }
 

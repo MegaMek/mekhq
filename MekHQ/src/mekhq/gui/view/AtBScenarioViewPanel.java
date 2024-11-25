@@ -292,8 +292,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(lblForce, gridBagConstraints);
 
-            if (null != scenario.getLance(campaign)) {
-                lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
+            if (null != scenario.getStrategicFormation(campaign)) {
+                lblForceDesc.setText(campaign.getForce(scenario.getStrategicFormationId()).getFullName());
             } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
@@ -376,12 +376,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
 
             for (String forceName : objective.getAssociatedForceNames()) {
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(forceName);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
             for (String associatedUnitID : objective.getAssociatedUnitIDs()) {
@@ -399,22 +399,22 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 if (associatedUnitName.isBlank()) {
                     continue;
                 }
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(associatedUnitName);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
-            objectiveBuilder.append("\t");
+            objectiveBuilder.append('\t');
             objectiveBuilder.append(objective.getTimeLimitString());
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
 
             for (String detail : objective.getDetails()) {
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(detail);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
         }
 
         objectiveBuilder.append(scenario.getBattlefieldControlDescription());

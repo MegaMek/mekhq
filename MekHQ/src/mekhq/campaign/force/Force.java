@@ -221,12 +221,57 @@ public class Force {
         return parentForce;
     }
 
+    /**
+     * This method generates a list of all parent forces for the current force object in the
+     * hierarchy. It repeatedly fetches the parent force of the current force and adds it to a list
+     * until no more parent forces can be found (i.e., until the top of the force hierarchy is reached).
+     *
+     * @return A list of {@link Force} objects representing all the parent forces of the current
+     * force object in the hierarchy. The list will be empty if there are no parent forces.
+     */
+    public List<Force> getAllParents() {
+        List<Force> parentForces = new ArrayList<>();
+
+        Force parentForce = getParentForce();
+
+        while (parentForce.getParentForce() != null) {
+            parentForces.add(parentForce.getParentForce());
+
+            parentForce = parentForce.getParentForce();
+        }
+
+        return parentForces;
+    }
+
     public void setParentForce(final @Nullable Force parent) {
         this.parentForce = parent;
     }
 
     public Vector<Force> getSubForces() {
         return subForces;
+    }
+
+    /**
+     * Returns a list of all of this forces' descendant forces.
+     * This includes direct child forces and their descendents recursively.
+     * <p>
+     * This method works by first adding all direct child forces to the list, and
+     * then recursively adding their descendants by calling this method on each child
+     * force.
+     *
+     * @return A list of {@link Force} objects representing all descendant forces.
+     *         If there are no descendant forces, this method will return an empty list.
+     */
+    public List<Force> getAllSubForces() {
+        List<Force> allSubForces = new ArrayList<>();
+
+        for (Force subForce : subForces) {
+            allSubForces.add(subForce);
+
+            allSubForces.addAll(subForce.getAllSubForces());
+        }
+
+        return allSubForces;
     }
 
     public boolean isAncestorOf(Force otherForce) {

@@ -35,7 +35,7 @@ import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -345,10 +345,10 @@ public class CampaignXmlParser {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, Lance> lances = retVal.getLances();
+            Hashtable<Integer, StrategicFormation> lances = retVal.getStrategicFormations();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
-                    lances.put(f.getId(), new Lance(f.getId(), retVal));
+                    lances.put(f.getId(), new StrategicFormation(f.getId(), retVal));
                     logger.warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
@@ -778,7 +778,7 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            Lance l = Lance.generateInstanceFromXML(wn2);
+            StrategicFormation l = StrategicFormation.generateInstanceFromXML(wn2);
 
             if (l != null) {
                 retVal.importLance(l);

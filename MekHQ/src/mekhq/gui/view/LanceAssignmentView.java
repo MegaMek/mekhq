@@ -25,7 +25,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
@@ -169,8 +169,8 @@ public class LanceAssignmentView extends JPanel {
         RowFilter<LanceAssignmentTableModel, Integer> laFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends LanceAssignmentTableModel, ? extends Integer> entry) {
-                Lance l = entry.getModel().getRow(entry.getIdentifier());
-                return l.isEligible(campaign);
+                StrategicFormation strategicFormation = entry.getModel().getRow(entry.getIdentifier());
+                return strategicFormation.isEligible(campaign);
             }
         };
         final NaturalOrderComparator noc = new NaturalOrderComparator();
@@ -223,14 +223,14 @@ public class LanceAssignmentView extends JPanel {
             cbContract.addItem(contract);
         }
         AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
-        for (Lance l : campaign.getLances().values()) {
-            if ((l.getContract(campaign) == null)
-                    || !l.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
-                l.setContract(defaultContract);
+        for (StrategicFormation strategicFormation : campaign.getStrategicFormations().values()) {
+            if ((strategicFormation.getContract(campaign) == null)
+                    || !strategicFormation.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
+                strategicFormation.setContract(defaultContract);
             }
         }
         ((DataTableModel) tblRequiredLances.getModel()).setData(activeContracts);
-        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getLanceList());
+        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getStrategicFormationList());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
     }
 
@@ -341,14 +341,13 @@ class RequiredLancesTableModel extends DataTableModel {
         if (COL_CONTRACT == column) {
             return ((AtBContract) data.get(row)).getName();
         }
-        if (data.get(row) instanceof AtBContract) {
-            AtBContract contract = (AtBContract) data.get(row);
+        if (data.get(row) instanceof AtBContract contract) {
             if (column == COL_TOTAL) {
                 int t = 0;
-                for (Lance l : campaign.getLanceList()) {
-                    if (data.get(row).equals(l.getContract(campaign))
-                            && (l.getRole() != AtBLanceRole.UNASSIGNED)
-                            && l.isEligible(campaign)) {
+                for (StrategicFormation strategicFormation : campaign.getStrategicFormationList()) {
+                    if (data.get(row).equals(strategicFormation.getContract(campaign))
+                            && (strategicFormation.getRole() != AtBLanceRole.UNASSIGNED)
+                            && strategicFormation.isEligible(campaign)) {
                         t++;
                     }
                 }
@@ -358,10 +357,10 @@ class RequiredLancesTableModel extends DataTableModel {
                 return Integer.toString(contract.getRequiredLances());
             } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
                 int t = 0;
-                for (Lance l : campaign.getLanceList()) {
-                    if (data.get(row).equals(l.getContract(campaign))
-                            && (l.getRole() == l.getContract(campaign).getContractType().getRequiredLanceRole())
-                            && l.isEligible(campaign)) {
+                for (StrategicFormation strategicFormation : campaign.getStrategicFormationList()) {
+                    if (data.get(row).equals(strategicFormation.getContract(campaign))
+                            && (strategicFormation.getRole() == strategicFormation.getContract(campaign).getContractType().getRequiredLanceRole())
+                            && strategicFormation.isEligible(campaign)) {
                         t++;
                     }
                 }
@@ -402,29 +401,21 @@ class LanceAssignmentTableModel extends DataTableModel {
     }
 
     public int getColumnWidth(int col) {
-        switch (col) {
-            case COL_FORCE:
-            case COL_CONTRACT:
-                    return 100;
-            case COL_WEIGHT_CLASS:
-                    return 5;
-            default:
-                    return 50;
-        }
+        return switch (col) {
+            case COL_FORCE, COL_CONTRACT -> 100;
+            case COL_WEIGHT_CLASS -> 5;
+            default -> 50;
+        };
     }
 
     @Override
     public Class<?> getColumnClass(int c) {
-        switch (c) {
-            case COL_FORCE:
-                return Force.class;
-            case COL_CONTRACT:
-                return AtBContract.class;
-            case COL_ROLE:
-                return AtBLanceRole.class;
-            default:
-                return String.class;
-        }
+        return switch (c) {
+            case COL_FORCE -> Force.class;
+            case COL_CONTRACT -> AtBContract.class;
+            case COL_ROLE -> AtBLanceRole.class;
+            default -> String.class;
+        };
     }
 
     @Override
@@ -432,8 +423,8 @@ class LanceAssignmentTableModel extends DataTableModel {
         return col > COL_WEIGHT_CLASS;
     }
 
-    public Lance getRow(int row) {
-        return (Lance) data.get(row);
+    public StrategicFormation getRow(int row) {
+        return (StrategicFormation) data.get(row);
     }
 
     @Override
@@ -443,27 +434,22 @@ class LanceAssignmentTableModel extends DataTableModel {
         if (row >= getRowCount()) {
             return "";
         }
-        switch (column) {
-            case COL_FORCE:
-                return campaign.getForce(((Lance) data.get(row)).getForceId());
-            case COL_WEIGHT_CLASS:
-                return WEIGHT_CODES[((Lance) data.get(row)).getWeightClass(campaign)];
-            case COL_CONTRACT:
-                return campaign.getMission(((Lance) data.get(row)).getMissionId());
-            case COL_ROLE:
-                return ((Lance) data.get(row)).getRole();
-            default:
-                return "?";
-        }
+        return switch (column) {
+            case COL_FORCE -> campaign.getForce(((StrategicFormation) data.get(row)).getForceId());
+            case COL_WEIGHT_CLASS -> WEIGHT_CODES[((StrategicFormation) data.get(row)).getWeightClass(campaign)];
+            case COL_CONTRACT -> campaign.getMission(((StrategicFormation) data.get(row)).getMissionId());
+            case COL_ROLE -> ((StrategicFormation) data.get(row)).getRole();
+            default -> "?";
+        };
     }
 
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_CONTRACT) {
-            ((Lance) data.get(row)).setContract((AtBContract) value);
+            ((StrategicFormation) data.get(row)).setContract((AtBContract) value);
         } else if (col == COL_ROLE) {
             if (value instanceof AtBLanceRole) {
-                ((Lance) data.get(row)).setRole((AtBLanceRole) value);
+                ((StrategicFormation) data.get(row)).setRole((AtBLanceRole) value);
             }
         }
         fireTableDataChanged();
