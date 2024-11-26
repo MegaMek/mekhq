@@ -259,7 +259,7 @@ public class AtBGameThread extends GameThread {
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
                     if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
-                        entity.setNCrew(unit.getActiveCrew().size());
+                        entity.setNCrew(unit.getActiveCrew().size() + entity.getBayPersonnel()); //We don't track bay personnel currently.
                         // TODO : Change this when marines are fully implemented
                         entity.setNMarines(unit.getMarineCount());
                     }
