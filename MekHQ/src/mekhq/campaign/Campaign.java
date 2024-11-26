@@ -2447,6 +2447,14 @@ public class Campaign implements ITechManager {
         return getTechs(noZeroMinute, false);
     }
 
+    public List<Person> getTechsExpanded() {
+        return getTechsExpanded(false, false, true);
+    }
+
+    public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
+        return getTechsExpanded(noZeroMinute, eliteFirst, false);
+    }
+
     /**
      * Returns a list of active technicians.
      *
@@ -2454,12 +2462,14 @@ public class Campaign implements ITechManager {
      *                     excluded from the list.
      * @param eliteFirst   If TRUE and sorted also TRUE, then return the list sorted
      *                     from best to worst
+     * @param expanded     If TRUE, then include techs with expanded roles (e.g. Tech/Vessel skill)
      * @return The list of active {@link Person}s who qualify as technicians
-     *         ({@link Person#isTech()}).
+     *         ({@link Person#isTech()}), or who qualify as expanded technicians ({@link Person#isTechExpanded()}).
      */
-    public List<Person> getTechs(final boolean noZeroMinute, final boolean eliteFirst) {
+    public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
         final List<Person> techs = getActivePersonnel().stream()
-                .filter(person -> person.isTech() && (!noZeroMinute || (person.getMinutesLeft() > 0)))
+                .filter(person -> (expanded ? person.isTechExpanded() : person.isTech())
+                    && (!noZeroMinute || (person.getMinutesLeft() > 0)))
                 .collect(Collectors.toList());
 
         // also need to loop through and collect engineers on self-crewed vessels

@@ -1614,7 +1614,7 @@ public class CampaignGUI extends JPanel {
                 StringBuilder nameBuilder = new StringBuilder(128);
                 nameBuilder.append("<html>")
                     .append(tech.getFullName())
-                    .append(", <b>") 
+                    .append(", <b>")
                     .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
                     .append("</b> ")
                     .append(tech.getPrimaryRoleDesc())
@@ -1722,7 +1722,7 @@ public class CampaignGUI extends JPanel {
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
         Map<String, Person> techHash = new LinkedHashMap<>();
-        for (Person tech : getCampaign().getTechs()) {
+        for (Person tech : getCampaign().getTechsExpanded()) {
             if (!tech.isMothballing() && tech.canTech(u.getEntity())) {
                 int time = tech.getMinutesLeft();
                 if (!ignoreMaintenance) {
