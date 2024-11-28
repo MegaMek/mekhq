@@ -265,6 +265,7 @@ public class Campaign implements ITechManager {
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
+    private int initiativeBonus;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
@@ -306,6 +307,7 @@ public class Campaign implements ITechManager {
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
+        initiativeBonus = 10;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -4462,6 +4464,22 @@ public class Campaign implements ITechManager {
 
         if (currentDay.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             reputation.initializeReputation(this);
+        }
+    }
+
+    public int getInitiativeBonus(){
+        System.out.println("reached here"+ initiativeBonus);
+        return initiativeBonus;
+    }
+     public void setInitiativeBonus(int bonus){
+        initiativeBonus = bonus;
+    }
+
+    public void initiativeBonusIncrement(boolean change){
+        if(change){
+            setInitiativeBonus(++initiativeBonus);
+        }else{
+             setInitiativeBonus(--initiativeBonus);
         }
     }
 

@@ -204,6 +204,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.getLocalPlayer().setStartingAnyNWy(scenario.getStartingAnyNWy());
                 client.getLocalPlayer().setStartingAnySEx(scenario.getStartingAnySEx());
                 client.getLocalPlayer().setStartingAnySEy(scenario.getStartingAnySEy());
+                client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
 
                 client.getLocalPlayer().setTeam(1);
 

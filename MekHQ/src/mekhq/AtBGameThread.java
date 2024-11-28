@@ -132,6 +132,7 @@ public class AtBGameThread extends GameThread {
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
+                client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
