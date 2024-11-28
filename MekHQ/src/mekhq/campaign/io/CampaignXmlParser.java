@@ -688,6 +688,8 @@ public class CampaignXmlParser {
                     retVal.setRetainerStartDate(LocalDate.parse(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("crimeRating")) {
                     retVal.setCrimeRating(Integer.parseInt(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("initiativeBonus")) {
+                    retVal.setInitiativeBonus(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("crimePirateModifier")) {
                     retVal.setCrimePirateModifier(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("dateOfLastCrime")) {
