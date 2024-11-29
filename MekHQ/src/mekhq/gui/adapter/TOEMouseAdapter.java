@@ -18,24 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
@@ -67,6 +49,15 @@ import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.*;
+
+import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_FALSE;
+import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
@@ -136,6 +127,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String CHANGE_NAME = "CHANGE_NAME";
     private static final String CHANGE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS";
     private static final String CHANGE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES";
+    private static final String CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE";
+    private static final String REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE";
 
     private static final String COMMAND_CHANGE_FORCE_CAMO = "CHANGE_CAMO|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_DESC = "CHANGE_DESC|FORCE|empty|";
@@ -146,6 +139,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES|FORCE|empty|";
+    private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
+    private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
 
     private static final String COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL = "OVERRIDE_FORMATION_LEVEL|FORCE|FORMATION_LEVEL|";
 
@@ -443,6 +438,32 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
             gui.undeployForces(forces);
             gui.getTOETab().refreshForceView();
+
+            for (Force formation : gui.getCampaign().getAllForces()) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            }
+        } else if (command.contains(CHANGE_STRATEGIC_FORCE_OVERRIDE)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            boolean formationState = singleForce.isStrategicFormation();
+            singleForce.setStrategicFormation(!formationState);
+            singleForce.setOverrideStrategicFormation(!formationState ? STRATEGIC_FORMATION_OVERRIDE_TRUE : STRATEGIC_FORMATION_OVERRIDE_FALSE);
+
+            for (Force formation : gui.getCampaign().getAllForces()) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            }
+        } else if (command.contains(REMOVE_STRATEGIC_FORCE_OVERRIDE)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            singleForce.setOverrideStrategicFormation(STRATEGIC_FORMATION_OVERRIDE_NONE);
+
+            for (Force formation : gui.getCampaign().getAllForces()) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            }
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Force force : forces) {
                 if (null != force && null != force.getParentForce()) {
@@ -1030,6 +1051,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
             menuItem.addActionListener(this);
             popup.add(menuItem);
+
+            JMenuItem optionStrategicForceOverride = new JMenuItem((force.isStrategicFormation() ?
+                "Never" : "Always") + " Consider Force a Strategic Formation");
+            optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
+            optionStrategicForceOverride.addActionListener(this);
+            popup.add(optionStrategicForceOverride);
+
+            JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Strategic Force Override");
+            optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
+            optionRemoveStrategicForceOverride.addActionListener(this);
+            optionRemoveStrategicForceOverride.setVisible(force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE);
+            popup.add(optionRemoveStrategicForceOverride);
 
             if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces)
                     && StaticChecks.areAllCombatForces(forces)) {

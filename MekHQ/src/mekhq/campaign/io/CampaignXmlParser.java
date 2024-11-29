@@ -36,7 +36,7 @@ import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -283,8 +283,8 @@ public class CampaignXmlParser {
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     retVal.getUnitMarket().fillFromXML(wn, retVal, version);
                     foundUnitMarket = true;
-                } else if (xn.equalsIgnoreCase("lances")) {
-                    processLanceNodes(retVal, wn);
+                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("strategicFormations")) {
+                    processStrategicFormationNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
@@ -354,10 +354,10 @@ public class CampaignXmlParser {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, Lance> lances = retVal.getLances();
+            Hashtable<Integer, StrategicFormation> lances = retVal.getStrategicFormations();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
-                    lances.put(f.getId(), new Lance(f.getId(), retVal));
+                    lances.put(f.getId(), new StrategicFormation(f.getId(), retVal));
                     logger.warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
@@ -770,29 +770,30 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static void processLanceNodes(Campaign retVal, Node wn) {
-        NodeList wList = wn.getChildNodes();
+    private static void processStrategicFormationNodes(Campaign campaign, Node workingNode) {
+        NodeList workingNodes = workingNode.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Okay, let's iterate through the children, eh?
+        for (int x = 0; x < workingNodes.getLength(); x++) {
+            Node wn2 = workingNodes.item(x);
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (!wn2.getNodeName().equalsIgnoreCase("lance")) {
+            if (!wn2.getNodeName().equalsIgnoreCase("lance")
+                && !wn2.getNodeName().equalsIgnoreCase("strategicFormations")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger.error("Unknown node type not loaded in Lance nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in strategicFormations nodes: " + wn2.getNodeName());
                 continue;
             }
 
-            Lance l = Lance.generateInstanceFromXML(wn2);
+            StrategicFormation strategicFormation = StrategicFormation.generateInstanceFromXML(wn2);
 
-            if (l != null) {
-                retVal.importLance(l);
+            if (strategicFormation != null) {
+                campaign.importLance(strategicFormation);
             }
         }
     }

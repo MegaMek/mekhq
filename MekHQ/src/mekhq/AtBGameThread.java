@@ -32,7 +32,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -266,8 +266,8 @@ public class AtBGameThread extends GameThread {
                         // Set scenario type-specific delay
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                        if (scenario.getLanceRole().isScouting() && (scenario.getLance(campaign) != null)
-                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
+                        if (scenario.getLanceRole().isScouting() && (scenario.getStrategicFormation(campaign) != null)
+                                && (scenario.getStrategicFormation(campaign).getForceId() == scenario.getStrategicFormationId())
                                 && !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
@@ -335,7 +335,7 @@ public class AtBGameThread extends GameThread {
                         }
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         if (!useDropship && scenario.getLanceRole().isScouting()
-                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())) {
+                                && (scenario.getStrategicFormation(campaign).getForceId() == scenario.getStrategicFormationId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
@@ -602,12 +602,12 @@ public class AtBGameThread extends GameThread {
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+            lanceSize = StrategicFormation.getStdLanceSize(contract.getEnemy());
         } else {
-            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+            lanceSize = StrategicFormation.getStdLanceSize(contract.getEmployerFaction());
         }
 
-        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));
         comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
@@ -618,13 +618,13 @@ public class AtBGameThread extends GameThread {
             }
 
             if ((i != 0)
-                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                    && !lastType.equals(Entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 forceIdLance++;
                 lanceName = RCG.generate();
                 i = forceIdLance * lanceSize;
             }
 
-            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            lastType = Entity.getEntityMajorTypeName(entity.getEntityType());
             entity.setOwner(botClient.getLocalPlayer());
             String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);

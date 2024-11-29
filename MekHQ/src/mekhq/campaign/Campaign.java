@@ -53,7 +53,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -201,7 +201,7 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private final Hashtable<Integer, Lance> lances; // AtB
+    private final Hashtable<Integer, StrategicFormation> strategicFormations; // AtB
 
     private Faction faction;
     private int techFactionCode;
@@ -314,7 +314,7 @@ public class Campaign implements ITechManager {
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
-        lances = new Hashtable<>();
+        strategicFormations = new Hashtable<>();
         finances = new Finances();
         astechPool = 0;
         medicPool = 0;
@@ -454,16 +454,16 @@ public class Campaign implements ITechManager {
         return new ArrayList<>(forceIds.values());
     }
 
-    public void importLance(Lance l) {
-        lances.put(l.getForceId(), l);
+    public void importLance(StrategicFormation l) {
+        strategicFormations.put(l.getForceId(), l);
     }
 
-    public Hashtable<Integer, Lance> getLances() {
-        return lances;
+    public Hashtable<Integer, StrategicFormation> getStrategicFormations() {
+        return strategicFormations;
     }
 
-    public ArrayList<Lance> getLanceList() {
-        return lances.values().stream()
+    public ArrayList<StrategicFormation> getStrategicFormationList() {
+        return strategicFormations.values().stream()
                 .filter(l -> forceIds.containsKey(l.getForceId()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -910,8 +910,8 @@ public class Campaign implements ITechManager {
         lastForceId = id;
 
         if (campaignOptions.isUseAtB() && !force.getUnits().isEmpty()) {
-            if (null == lances.get(id)) {
-                lances.put(id, new Lance(force.getId(), this));
+            if (null == strategicFormations.get(id)) {
+                strategicFormations.put(id, new StrategicFormation(force.getId(), this));
             }
         }
 
@@ -1009,11 +1009,11 @@ public class Campaign implements ITechManager {
 
         if (campaignOptions.isUseAtB()) {
             if ((null != prevForce) && prevForce.getUnits().isEmpty()) {
-                lances.remove(prevForce.getId());
+                strategicFormations.remove(prevForce.getId());
             }
 
-            if ((null == lances.get(id)) && (null != force)) {
-                lances.put(id, new Lance(force.getId(), this));
+            if ((null == strategicFormations.get(id)) && (null != force)) {
+                strategicFormations.put(id, new StrategicFormation(force.getId(), this));
             }
         }
     }
@@ -1021,10 +1021,9 @@ public class Campaign implements ITechManager {
     /**
      * Adds force and all its subforces to the AtB lance table
      */
-
     private void addAllLances(Force force) {
-        if (!force.getUnits().isEmpty()) {
-            lances.put(force.getId(), new Lance(force.getId(), this));
+        if (force.isStrategicFormation()) {
+            strategicFormations.put(force.getId(), new StrategicFormation(force.getId(), this));
         }
         for (Force f : force.getSubForces()) {
             addAllLances(f);
@@ -3634,7 +3633,7 @@ public class Campaign implements ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
-        for (Lance l : lances.values()) {
+        for (StrategicFormation l : strategicFormations.values()) {
             if (!l.getRole().isUnassigned() && (l.getMissionId() == contract.getId())) {
                 total++;
                 if (l.getRole() == requiredLanceRole) {
@@ -3733,8 +3732,8 @@ public class Campaign implements ITechManager {
             // If there is a standard battle set for today, deploy the lance.
             for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
                 if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = s.getLanceForceId();
-                    if ((lances.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
+                    int forceId = s.getStrategicFormationId();
+                    if ((strategicFormations.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
@@ -3792,11 +3791,11 @@ public class Campaign implements ITechManager {
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
 
-            // Training Experience - Award to eligible training lances on active contracts
-            getLances().values().stream()
-                    .filter(lance -> lance.getRole().isTraining()
-                            && (lance.getContract(this) != null) && lance.isEligible(this)
-                            && lance.getContract(this).isActiveOn(getLocalDate(), true))
+            // Training Experience - Award to eligible training Strategic Formations on active contracts
+            getStrategicFormations().values().stream()
+                    .filter(strategicFormation -> strategicFormation.getRole().isTraining()
+                            && (strategicFormation.getContract(this) != null) && strategicFormation.isEligible(this)
+                            && strategicFormation.getContract(this).isActiveOn(getLocalDate(), true))
                     .forEach(this::awardTrainingXP);
         }
 
@@ -4872,9 +4871,9 @@ public class Campaign implements ITechManager {
      * commanding officer and
      * the minimum experience level of the unit's members.
      *
-     * @param l The {@link Lance} to calculate XP to award for training.
+     * @param l The {@link StrategicFormation} to calculate XP to award for training.
      */
-    private void awardTrainingXP(final Lance l) {
+    private void awardTrainingXP(final StrategicFormation l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getHangar().getUnit(trainerId);
 
@@ -4998,7 +4997,7 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.isUseAtB()) {
-            lances.remove(fid);
+            strategicFormations.remove(fid);
         }
 
         if (null != force.getParentForce()) {
@@ -5051,7 +5050,7 @@ public class Campaign implements ITechManager {
             }
 
             if (campaignOptions.isUseAtB() && force.getUnits().isEmpty()) {
-                lances.remove(force.getId());
+                strategicFormations.remove(force.getId());
             }
         }
     }
@@ -5626,14 +5625,14 @@ public class Campaign implements ITechManager {
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXML(pw, indent);
 
-            if (!lances.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lances");
-                for (Lance l : lances.values()) {
+            if (!strategicFormations.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "strategicFormations");
+                for (StrategicFormation l : strategicFormations.values()) {
                     if (forceIds.containsKey(l.getForceId())) {
                         l.writeToXML(pw, indent);
                     }
                 }
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lances");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "strategicFormations");
             }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
@@ -6659,8 +6658,8 @@ public class Campaign implements ITechManager {
     }
 
     public @Nullable AtBContract getAttachedAtBContract(Unit unit) {
-        if (null != unit && null != lances.get(unit.getForceId())) {
-            return lances.get(unit.getForceId()).getContract(this);
+        if (null != unit && null != strategicFormations.get(unit.getForceId())) {
+            return strategicFormations.get(unit.getForceId()).getContract(this);
         }
         return null;
     }
