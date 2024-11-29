@@ -19,6 +19,7 @@
 package mekhq.campaign.io;
 
 import megamek.Version;
+import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
@@ -76,6 +77,9 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
+
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+
 
 public class CampaignXmlParser {
     private final InputStream is;
@@ -294,6 +298,11 @@ public class CampaignXmlParser {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
                     retVal.setShipSearchExpiration(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("autoResolveBehaviorSettings")) {
+                    retVal.setAutoResolveBehaviorSettings(
+                        firstNonNull(BehaviorSettingsFactory.getInstance().getBehavior(wn.getTextContent()),
+                            BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR)
+                        );
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }

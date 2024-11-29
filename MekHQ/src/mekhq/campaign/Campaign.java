@@ -21,6 +21,8 @@
  */
 package mekhq.campaign;
 
+import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -269,6 +271,7 @@ public class Campaign implements ITechManager {
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
     private FameAndInfamyController fameAndInfamy;
+    private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
@@ -337,6 +340,7 @@ public class Campaign implements ITechManager {
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
         fameAndInfamy = new FameAndInfamyController();
+        autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
     }
 
@@ -5608,6 +5612,7 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveBehaviorSettings", autoResolveBehaviorSettings.getDescription());
         }
 
         retirementDefectionTracker.writeToXML(pw, indent);
@@ -8499,6 +8504,14 @@ public class Campaign implements ITechManager {
     @Override
     public boolean showExtinct() {
         return !campaignOptions.isDisallowExtinctStuff();
+    }
+
+    public BehaviorSettings getAutoResolveBehaviorSettings() {
+        return autoResolveBehaviorSettings;
+    }
+
+    public void setAutoResolveBehaviorSettings(BehaviorSettings settings) {
+        autoResolveBehaviorSettings = settings;
     }
 
     /**
