@@ -186,7 +186,7 @@ public class Thrusters extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingThrusters(getUnitTonnage(), campaign);
+        return new MissingThrusters(getUnitTonnage(), campaign, isLeftThrusters);
     }
 
     @Override
