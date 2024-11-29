@@ -267,6 +267,7 @@ public class Campaign implements ITechManager {
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
+    private int initiativeBonus;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
@@ -309,6 +310,7 @@ public class Campaign implements ITechManager {
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
+        initiativeBonus = 0;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -4479,6 +4481,21 @@ public class Campaign implements ITechManager {
         }
     }
 
+    public int getInitiativeBonus(){
+        return initiativeBonus;
+    }
+     public void setInitiativeBonus(int bonus){
+        initiativeBonus = bonus;
+    }
+
+    public void initiativeBonusIncrement(boolean change){
+        if(change){
+            setInitiativeBonus(++initiativeBonus);
+        }else{
+             setInitiativeBonus(--initiativeBonus);
+        }
+    }
+
     /**
      * This method processes the random dependents for a campaign. It shuffles the active dependents list and performs
      * actions based on the campaign options and unit rating modifiers.
@@ -5503,7 +5520,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "InitiativeBonus", initiativeBonus);
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
