@@ -18,46 +18,32 @@
  */
 package mekhq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.swing.JOptionPane;
-
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.Princess;
+import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Infantry;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
-import megamek.common.UnitType;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.force.StrategicFormation;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units
@@ -621,7 +607,7 @@ public class AtBGameThread extends GameThread {
             lanceSize = StrategicFormation.getStdLanceSize(contract.getEmployerFaction());
         }
 
-        Comparator<Entity> comp = Comparator.comparing(((Entity entity) -> entity.getEntityMajorTypeName(e.getEntityType())));
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));
         comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
@@ -632,13 +618,13 @@ public class AtBGameThread extends GameThread {
             }
 
             if ((i != 0)
-                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                    && !lastType.equals(Entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 forceIdLance++;
                 lanceName = RCG.generate();
                 i = forceIdLance * lanceSize;
             }
 
-            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            lastType = Entity.getEntityMajorTypeName(entity.getEntityType());
             entity.setOwner(botClient.getLocalPlayer());
             String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);
