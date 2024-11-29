@@ -452,9 +452,9 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
 
-            baby.setDateOfBirth(today);// Limit skills by age for children and adolescents
+            baby.setDateOfBirth(mother.getDueDate());
 
-            baby.removeAllSkills();
+            baby.removeAllSkills();// Limit skills by age for children and adolescents
 
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
@@ -466,13 +466,21 @@ public abstract class AbstractProcreation {
             baby.setLoyalty(Compute.d6(3) + 2);
 
             // set education based on age
-            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+            if(baby.getAge(today) < 16) {
+                baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+            } else {
+                baby.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+            }
 
             // Create reports and log the birth
             logAndUpdateFamily(campaign, today, mother, baby, father);
 
             // add to the list of babies
             babies.add(baby);
+        }
+
+        if (Compute.d6(1) <= 2) {
+            mother.setTryingToConceive(false);
         }
 
         // Cleanup Data

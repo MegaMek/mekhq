@@ -482,8 +482,6 @@ public class ContractMarketDialog extends JDialog {
                 }
             }
 
-            contractStartPrompt(campaign, selectedContract);
-
             selectedContract.setName(contractView.getContractName());
             campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
                     selectedContract.getTotalAdvanceAmount(),
@@ -491,9 +489,11 @@ public class ContractMarketDialog extends JDialog {
             campaign.addMission(selectedContract);
             // must be invoked after campaign.addMission to ensure presence of mission ID
             selectedContract.acceptContract(campaign);
+            contractStartPrompt(campaign, selectedContract);
+
             contractMarket.removeContract(selectedContract);
             ((DefaultTableModel) tableContracts.getModel()).removeRow(tableContracts
-                    .convertRowIndexToModel(tableContracts.getSelectedRow()));
+                .convertRowIndexToModel(tableContracts.getSelectedRow()));
             refreshContractView();
         }
     }
@@ -527,6 +527,10 @@ public class ContractMarketDialog extends JDialog {
             resourceKey = "messageChallengeVeryHard.text";
         } else if (difficulty > 6) {
             resourceKey = "messageChallengeHard.text";
+        }
+
+        if (((AtBContract) selectedContract).getContractType().isGarrisonDuty()) {
+            resourceKey = "messageChallengeGarrison.text";
         }
 
         // If resourceKey is not found, just return true, acting as if the player had accepted the mission

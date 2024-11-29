@@ -60,36 +60,6 @@
             </value>
         </entry>
         <entry>
-            <key>OpFor</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones />
-                <destinationZone>5</destinationZone>
-                <fixedUnitCount>-1</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>OpFor</forceName>
-                <generationMethod>1</generationMethod>
-                <generationOrder>5</generationOrder>
-                <maxWeightClass>3</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
-                <objectiveLinkedForces />
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-        <entry>
             <key>Infantry</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
@@ -140,9 +110,9 @@
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Irregulars</forceName>
-                <generationMethod>1</generationMethod>
+                <generationMethod>2</generationMethod>
                 <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
+                <maxWeightClass>1</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
@@ -153,6 +123,36 @@
                     <forceRole>CIVILIAN</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
+            </value>
+        </entry>
+        <entry>
+            <key>OpFor</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones />
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>-1</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>OpFor</forceName>
+                <generationMethod>1</generationMethod>
+                <generationOrder>6</generationOrder>
+                <maxWeightClass>3</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
             </value>
         </entry>
     </scenarioForces>

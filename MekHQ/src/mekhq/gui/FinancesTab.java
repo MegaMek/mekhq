@@ -36,7 +36,6 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -75,7 +74,7 @@ public final class FinancesTab extends CampaignGuiTab {
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
             MekHQ.getMHQOptions().getLocale());
 
     //region Constructors
@@ -169,7 +168,7 @@ public final class FinancesTab extends CampaignGuiTab {
         JPanel panelFinanceRight = new JPanel(new BorderLayout());
 
         JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
-        btnAddFunds = new JButton("Add Funds (GM)");
+        btnAddFunds = new JButton("Add Transaction (GM)");
         btnAddFunds.addActionListener(ev -> addFundsActionPerformed());
         btnAddFunds.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnAddFunds);
@@ -303,8 +302,7 @@ public final class FinancesTab extends CampaignGuiTab {
         plot.setRangeCrosshairVisible(true);
 
         XYItemRenderer r = plot.getRenderer();
-        if (r instanceof XYLineAndShapeRenderer) {
-            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) r;
+        if (r instanceof XYLineAndShapeRenderer renderer) {
             renderer.setDefaultShapesVisible(true);
             renderer.setDefaultShapesFilled(true);
             renderer.setDrawSeriesLineAsPath(true);
@@ -401,43 +399,43 @@ public final class FinancesTab extends CampaignGuiTab {
         longest = Math.max(
                 netWorth.toAmountAndSymbolString().length(),
                 longest);
-        String formatted = "%1$" + longest + "s";
+        String formatted = "%1$" + longest + 's';
         sb.append("Net Worth................ ")
                 .append(String.format(formatted, netWorth.toAmountAndSymbolString())).append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, assets.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, assets.toAmountAndSymbolString())).append('\n');
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append('\n');
         if (r.getMekValue().isPositive()) {
             sb.append("       Meks............. ")
-                    .append(String.format(formatted, r.getMekValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMekValue().toAmountAndSymbolString())).append('\n');
         }
         if (r.getVeeValue().isPositive()) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getVeeValue().toAmountAndSymbolString())).append('\n');
         }
         if (r.getBattleArmorValue().isPositive()) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getBattleArmorValue().toAmountAndSymbolString())).append('\n');
         }
         if (r.getInfantryValue().isPositive()) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append('\n');
         }
         if (r.getProtoMekValue().isPositive()) {
             sb.append("       ProtoMeks........ ")
-                    .append(String.format(formatted, r.getProtoMekValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getProtoMekValue().toAmountAndSymbolString())).append('\n');
         }
         if (r.getSmallCraftValue().isPositive()) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getSmallCraftValue().toAmountAndSymbolString())).append('\n');
         }
         if (r.getLargeCraftValue().isPositive()) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getLargeCraftValue().toAmountAndSymbolString())).append('\n');
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getSparePartsValue().toAmountAndSymbolString())).append('\n');
 
         if (!getCampaign().getFinances().getAssets().isEmpty()) {
             for (Asset asset : getCampaign().getFinances().getAssets()) {
@@ -453,12 +451,12 @@ public final class FinancesTab extends CampaignGuiTab {
                 assetName += " ";
                 sb.append("       ").append(assetName)
                         .append(String.format(formatted, asset.getValue().toAmountAndSymbolString()))
-                        .append("\n");
+                        .append('\n');
             }
         }
-        sb.append("\n");
+        sb.append('\n');
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, liabilities.toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, liabilities.toAmountAndSymbolString())).append('\n');
         sb.append("       Loans............. ")
                 .append(String.format(formatted, r.getLoans().toAmountAndSymbolString())).append("\n\n\n");
 
@@ -466,24 +464,24 @@ public final class FinancesTab extends CampaignGuiTab {
                 .append(String.format(formatted, r.getMonthlyIncome().minus(r.getMonthlyExpenses()).toAmountAndSymbolString()))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getMonthlyIncome().toAmountAndSymbolString())).append('\n');
         sb.append("    Contract Payments.... ")
                 .append(String.format(formatted, r.getContracts().toAmountAndSymbolString())).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getMonthlyExpenses().toAmountAndSymbolString())).append('\n');
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getSalaries().toAmountAndSymbolString())).append('\n');
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append('\n');
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append("\n");
+                .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append('\n');
         if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append('\n');
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMonthlyAmmoCosts().toAmountAndSymbolString())).append('\n');
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())).append("\n");
+                    .append(String.format(formatted, r.getMonthlyFuelCosts().toAmountAndSymbolString())).append('\n');
         }
 
         return sb.toString();

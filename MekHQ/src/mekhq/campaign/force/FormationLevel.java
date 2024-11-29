@@ -18,11 +18,11 @@
  */
 package mekhq.campaign.force;
 
-import java.util.ResourceBundle;
-
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
+
+import java.util.ResourceBundle;
 
 public enum FormationLevel {
     // region Enum Declarations
@@ -218,7 +218,7 @@ public enum FormationLevel {
         return switch (formationLevel) {
             case "0", "Remove Override" -> REMOVE_OVERRIDE;
             case "1", "None" -> NONE;
-            case "2", "Invalid" -> INVALID;
+            case "2", "Invalid", "Invalid Formation" -> INVALID;
 
             // Inner Sphere
             case "3", "Lance" -> LANCE;

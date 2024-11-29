@@ -331,7 +331,7 @@ public class MekLabTab extends CampaignGuiTab {
             tonnage = ((BattleArmor) entity).getTrooperWeight() * ((BattleArmor) entity).getTroopers();
         }
 
-        if (entity.getWeight() < testEntity.calculateWeight()) {
+        if (tonnage < testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Unit is overweight.");
             // } else if (entity.getWeight() > testEntity.calculateWeight()) {
