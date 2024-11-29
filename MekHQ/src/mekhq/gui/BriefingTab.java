@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -94,6 +95,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private JButton btnGetMul;
     private JButton btnClearAssignedUnits;
     private JButton btnResolveScenario;
+    private JButton btnAutoResolveScenario;
 
     private ScenarioTableModel scenarioModel;
 
@@ -266,6 +268,12 @@ public final class BriefingTab extends CampaignGuiTab {
         btnResolveScenario.addActionListener(ev -> resolveScenario());
         btnResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnResolveScenario);
+
+        btnAutoResolveScenario = new JButton(resourceMap.getString("btnAutoResolveScenario.text"));
+        btnAutoResolveScenario.setToolTipText(resourceMap.getString("btnAutoResolveScenario.toolTipText"));
+        btnAutoResolveScenario.addActionListener(ev -> autoResolveScenario());
+        btnAutoResolveScenario.setEnabled(false);
+        panScenarioButtons.add(btnAutoResolveScenario);
 
         btnClearAssignedUnits = new JButton(resourceMap.getString("btnClearAssignedUnits.text"));
         btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText"));
@@ -842,6 +850,14 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void startScenario() {
+        startScenario(null);
+    }
+
+    private void autoResolveScenario() {
+        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+    }
+
+    private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -927,7 +943,9 @@ public final class BriefingTab extends CampaignGuiTab {
             // Ensure that the MegaMek year GameOption matches the campaign year
             getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
                     .setValue(getCampaign().getGameYear());
-            getCampaignGui().getApplication().startHost(scenario, false, chosen);
+            getCampaignGui().getApplication()
+                .startHost(scenario, false, chosen, autoResolveBehaviorSettings);
+
         }
     }
 
@@ -1242,6 +1260,7 @@ public final class BriefingTab extends CampaignGuiTab {
             btnGetMul.setEnabled(false);
             btnClearAssignedUnits.setEnabled(false);
             btnResolveScenario.setEnabled(false);
+            btnAutoResolveScenario.setEnabled(false);
             btnPrintRS.setEnabled(false);
             selectedScenario = -1;
             return;
@@ -1269,6 +1288,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGetMul.setEnabled(canStartGame);
         btnClearAssignedUnits.setEnabled(canStartGame);
         btnResolveScenario.setEnabled(canStartGame);
+        btnAutoResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(canStartGame);
     }
 

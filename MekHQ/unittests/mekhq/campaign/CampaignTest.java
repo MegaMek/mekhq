@@ -133,6 +133,7 @@ public class CampaignTest {
         when(testCampaign.getTechs()).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
+        when(testCampaign.getTechsExpanded(anyBoolean(), anyBoolean(), anyBoolean())).thenCallRealMethod();
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);
