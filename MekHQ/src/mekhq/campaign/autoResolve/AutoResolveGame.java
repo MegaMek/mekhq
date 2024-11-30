@@ -83,7 +83,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     private Vector<Entity> graveyard = new Vector<>();
 
     private final Map<String, Object> victoryContext = new HashMap<>();
-    private final VictoryHelper victoryHelper = new VictoryHelper(getOptions());
+    private final VictoryHelper victoryHelper = new VictoryHelper(this);
     private int victoryPlayerId = Player.PLAYER_NONE;
     private int victoryTeam = Player.TEAM_NONE;
     private Player localPlayer;
@@ -480,6 +480,18 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     @Override
     public int getLiveCommandersOwnedBy(Player player) {
         return 0;
+    }
+
+    @Override
+    public Optional<Player> playerForPlayername(String playerName) {
+        // not implemented
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> idForPlayername(String playerName) {
+        // not implemented
+        return Optional.empty();
     }
 
     public List<AcsActionHandler> getActionHandlers() {

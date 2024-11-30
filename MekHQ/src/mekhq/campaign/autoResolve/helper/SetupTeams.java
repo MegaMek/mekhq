@@ -5,7 +5,7 @@ import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveForce;
-import mekhq.campaign.force.Lance;
+
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -14,6 +14,8 @@ import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static mekhq.campaign.force.StrategicFormation.getStdLanceSize;
 
 public class SetupTeams {
 
@@ -62,9 +64,9 @@ public class SetupTeams {
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+            lanceSize = getStdLanceSize(contract.getEnemy());
         } else {
-            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+            lanceSize = getStdLanceSize(contract.getEmployerFaction());
         }
 
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));
