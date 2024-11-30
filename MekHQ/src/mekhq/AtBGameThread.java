@@ -32,7 +32,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -44,6 +43,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units
@@ -602,9 +603,9 @@ public class AtBGameThread extends GameThread {
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = StrategicFormation.getStdLanceSize(contract.getEnemy());
+            lanceSize = getStandardForceSize(contract.getEnemy());
         } else {
-            lanceSize = StrategicFormation.getStdLanceSize(contract.getEmployerFaction());
+            lanceSize = getStandardForceSize(contract.getEmployerFaction());
         }
 
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));

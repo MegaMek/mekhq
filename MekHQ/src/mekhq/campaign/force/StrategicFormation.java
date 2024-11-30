@@ -2,7 +2,7 @@
  * Lance.java
  *
  * Copyright (c) 2011 - Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static megamek.common.Entity.ETYPE_AEROSPACEFIGHTER;
+import static megamek.common.Entity.ETYPE_MEK;
+import static megamek.common.Entity.ETYPE_PROTOMEK;
+import static megamek.common.Entity.ETYPE_TANK;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
@@ -61,8 +65,8 @@ public class StrategicFormation {
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
 
-    public static final long ETYPE_GROUND = Entity.ETYPE_MEK |
-            Entity.ETYPE_TANK | Entity.ETYPE_INFANTRY | Entity.ETYPE_PROTOMEK;
+    public static final long ETYPE_GROUND = ETYPE_MEK |
+            ETYPE_TANK | Entity.ETYPE_INFANTRY | ETYPE_PROTOMEK;
 
     /** Indicates a lance has no assigned mission */
     public static final int NO_MISSION = -1;
@@ -80,7 +84,7 @@ public class StrategicFormation {
      * @return The standard force size for the given faction. It returns {@code STR_CLAN} if the
      * faction is a Clan, {@code STR_CS} if the faction is ComStar or WoB, and {@code STR_IS} otherwise.
      */
-    public static int getStdLanceSize(Faction faction) {
+    public static int getStandardForceSize(Faction faction) {
         if (faction.isClan()) {
             return STR_CLAN;
         } else if (faction.isComStarOrWoB()) {
@@ -182,13 +186,13 @@ public class StrategicFormation {
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MEK) != 0) {
+                    if ((entity.getEntityType() & ETYPE_MEK) != 0) {
                         armor += 1;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_AEROSPACEFIGHTER) != 0) {
                         other += 0.5;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_TANK) != 0) {
                         armor += 0.5;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_PROTOMEK) != 0) {
                         other += 0.2;
                     } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         infantry += ((Infantry) entity).isSquad() ? 0.2 : 1;
@@ -228,22 +232,33 @@ public class StrategicFormation {
             }
         }
 
-        weight = weight / subForcesCount;
+        if (subForcesCount > 0) {
+            weight = weight / subForcesCount;
+        }
 
-        weight = weight * 4.0 / getStdLanceSize(campaign.getFaction());
-        if (weight < 40) {
+        int standardForceSize = getStandardForceSize(campaign.getFaction());
+
+        weight = weight / standardForceSize;
+
+        final int CATEGORY_ULTRA_LIGHT = 20;
+        final int CATEGORY_LIGHT = 35;
+        final int CATEGORY_MEDIUM = 55;
+        final int CATEGORY_HEAVY = 75;
+        final int CATEGORY_ASSAULT = 100;
+
+        if (weight < CATEGORY_ULTRA_LIGHT) {
             return WEIGHT_ULTRA_LIGHT;
         }
-        if (weight <= 130) {
+        if (weight <= CATEGORY_LIGHT) {
             return EntityWeightClass.WEIGHT_LIGHT;
         }
-        if (weight <= 200) {
+        if (weight <= CATEGORY_MEDIUM) {
             return EntityWeightClass.WEIGHT_MEDIUM;
         }
-        if (weight <= 280) {
+        if (weight <= CATEGORY_HEAVY) {
             return EntityWeightClass.WEIGHT_HEAVY;
         }
-        if (weight <= 390) {
+        if (weight <= CATEGORY_ASSAULT) {
             return EntityWeightClass.WEIGHT_ASSAULT;
         }
         return EntityWeightClass.WEIGHT_SUPER_HEAVY;
@@ -268,8 +283,8 @@ public class StrategicFormation {
          */
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
-            if (size < getStdLanceSize(campaign.getFaction()) - 1 ||
-                    size > getStdLanceSize(campaign.getFaction()) + 2) {
+            if (size < getStandardForceSize(campaign.getFaction()) - 1 ||
+                    size > getStandardForceSize(campaign.getFaction()) + 2) {
                 force.setStrategicFormation(false);
                 return false;
             }
@@ -566,35 +581,37 @@ public class StrategicFormation {
      * Worker function that calculates the total weight of a force with the given ID
      *
      * @param campaign       Campaign in which the force resides
-     * @param forceId Force for which to calculate weight
+     * @param forceId        Force for which to calculate weight
      * @return Total force weight
      */
     public static double calculateTotalWeight(Campaign campaign, int forceId) {
         double weight = 0.0;
 
         for (UUID id : campaign.getForce(forceId).getUnits()) {
-            Unit unit = campaign.getUnit(id);
-            if (null != unit) {
+            try {
+                Unit unit = campaign.getUnit(id);
                 Entity entity = unit.getEntity();
-                if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MEK) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
+
+                boolean isClan = campaign.getFaction().isClan();
+                long entityType = entity.getEntityType();
+
+                if (entityType == ETYPE_TANK) {
+                    if (isClan || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
+                        weight += entity.getWeight() * 0.5;
+                    } else {
                         weight += entity.getWeight();
-                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (campaign.getFaction().isClan() || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
-                        if (campaign.getFaction().isClan()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
                     }
+                } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
+                    if (isClan) {
+                        weight += entity.getWeight() * 0.5;
+                    } else {
+                        weight += entity.getWeight();
+                    }
+                } else {
+                    weight += entity.getWeight();
                 }
+            } catch (Exception exception) {
+                logger.error(String.format("Failed to parse unit ID %s: %s", forceId, exception));
             }
         }
 
