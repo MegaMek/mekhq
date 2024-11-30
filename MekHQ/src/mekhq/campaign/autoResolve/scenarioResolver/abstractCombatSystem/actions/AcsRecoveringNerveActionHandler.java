@@ -1,15 +1,24 @@
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ */
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
-import megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip;
-import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.Compute;
-import megamek.common.Roll;
-import megamek.common.strategicBattleSystems.*;
+import megamek.common.strategicBattleSystems.SBFFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
 
-import java.util.List;
-
-import static megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip.ownerColor;
-
+/**
+ * @author Luana Coppio
+ */
 public class AcsRecoveringNerveActionHandler extends AbstractAcsActionHandler {
 
     public AcsRecoveringNerveActionHandler(AcsRecoveringNerveAction action, AcsGameManager gameManager) {

@@ -16,7 +16,7 @@ public class MekDamageHandler implements DamageHandler<Mek> {
     }
 
     @Override
-    public Mek getEntity() {
+    public Mek entity() {
         return entity;
     }
 
@@ -36,8 +36,8 @@ public class MekDamageHandler implements DamageHandler<Mek> {
 
     @Override
     public HitData getHitData(int hitLocation) {
-        boolean isRear = hitLocation == Mek.LOC_CT || hitLocation == Mek.LOC_LT || hitLocation == Mek.LOC_RT;
-        boolean isRearHit = isRear && entity.getArmor(hitLocation, true) > 0 && random.nextInt(10) == 0;
+        boolean hasRead = hitLocation == Mek.LOC_CT || hitLocation == Mek.LOC_LT || hitLocation == Mek.LOC_RT;
+        boolean isRearHit = hasRead && entity.getArmor(hitLocation, true) > 0 && Compute.d6(2) > 10;
         return new HitData(hitLocation, isRearHit, HitData.EFFECT_NONE);
     }
 }

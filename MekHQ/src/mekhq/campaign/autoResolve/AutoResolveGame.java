@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ */
 package mekhq.campaign.autoResolve;
 
 import megamek.client.ui.swing.sbf.SelectDirection;
@@ -12,12 +25,15 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.SBFRuleOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.strategicBattleSystems.SBFUnit;
+import megamek.common.weapons.AreaEffectHelper;
 import megamek.logging.MMLogger;
+import megamek.server.totalwarfare.TWGameManager;
 import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsActionHandler;
+import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsActionHandler;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsTurn;
@@ -27,6 +43,9 @@ import mekhq.campaign.unit.Unit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author Luana Coppio
+ */
 public class AutoResolveGame extends AbstractGame implements PlanetaryConditionsUsing {
     private static final MMLogger logger = MMLogger.create(AutoResolveGame.class);
     /**
@@ -48,7 +67,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     /**
      * Report and turnlist
      */
-    private final SBFFullGameReport gameReport = new SBFFullGameReport();
     private final List<AcsTurn> turnList = new ArrayList<>();
 
     private boolean gameEnded = false;
@@ -62,7 +80,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     /**
      * Contains all units that have left the game by any means.
      */
-    private Vector<Entity> vOutOfGame = new Vector<>();
+    private Vector<Entity> graveyard = new Vector<>();
 
     private final Map<String, Object> victoryContext = new HashMap<>();
     private final VictoryHelper victoryHelper = new VictoryHelper(getOptions());
@@ -93,9 +111,9 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return units;
     }
 
-    public void addUnit(InGameObject unit) { // This is a server-side method!
+    public void addUnit(InGameObject unit) {
         int id = unit.getId();
-        if (inGameObjects.containsKey(id)) {
+        if (inGameObjects.containsKey(id) || isOutOfGame(id) || (Entity.NONE == id)) {
             id = getNextEntityId();
             unit.setId(id);
         }
@@ -164,16 +182,15 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * Returns an enumeration of salvageable entities.
      */
     public List<Entity> getGraveyardEntities() {
-        List<Entity> graveyard = new ArrayList<>();
-
-        for (Entity entity : vOutOfGame) {
+        List<Entity> destroyed = new ArrayList<>();
+        for (Entity entity : this.graveyard) {
             if ((entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
                 || (entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)) {
-                graveyard.add(entity);
+                destroyed.add(entity);
             }
         }
 
-        return graveyard;
+        return destroyed;
     }
 
     /** @return The entity with the given id number, if any. */
@@ -236,7 +253,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     public boolean isOutOfGame(int id) {
-        for (Entity entity : vOutOfGame) {
+        for (Entity entity : graveyard) {
             if (entity.getId() == id) {
                 return true;
             }
@@ -629,15 +646,16 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      */
     public List<AcsFormation> getActiveFormations() {
         return inGameObjects.values().stream()
-                .filter(u -> u instanceof AcsFormation)
-                .map(u -> (AcsFormation) u)
-                .toList();
+            .filter(u -> u instanceof AcsFormation)
+            .filter(u -> ((AcsFormation) u).getUnits().stream().anyMatch(unit -> unit.getCurrentArmor() > 0))
+            .map(u -> (AcsFormation) u)
+            .toList();
     }
 
     public List<AcsFormation> getActiveFormations(Player player) {
         return getActiveFormations().stream()
-                .filter(f -> f.getOwnerId() == player.getId())
-                .toList();
+            .filter(f -> f.getOwnerId() == player.getId())
+            .toList();
     }
 
     public boolean gameHasEnded() {
@@ -646,5 +664,45 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     public VictoryResult getVictoryResult() {
         return victoryHelper.checkForVictory(this, victoryContext);
+    }
+
+    public void destroyUnits(AcsFormation formation, List<SBFUnit> destroyedUnits) {
+        for (SBFUnit unit : destroyedUnits) {
+            for (var element : unit.getElements()) {
+                var entityOpt = getEntity(element.getId());
+                if (entityOpt.isPresent()) {
+                    var entity = entityOpt.get();
+                    damageEntity(entity);
+                    graveyard.add(entity);
+                    inGameObjects.remove(entity.getId());
+                    var roll = Compute.rollD6(2);
+                    switch (roll.getIntValue()) {
+                        case 2 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_CAPTURED);
+                        case 3, 4 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
+                        case 5, 6, 7, 8, 9 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+                        case 10, 11 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
+                        case 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
+                    }
+
+                }
+            }
+
+            formation.getUnits().remove(unit);
+            if (formation.getUnits().isEmpty()) {
+                // formation destroyed
+                inGameObjects.remove(formation.getId());
+            }
+        }
+    }
+
+    private void damageEntity(Entity entity) {
+        double damage = switch (entity.getRemovalCondition()) {
+            case IEntityRemovalConditions.REMOVE_CAPTURED -> entity.getTotalOArmor() * 0.4;
+            case IEntityRemovalConditions.REMOVE_DEVASTATED -> entity.getTotalOArmor() + entity.getTotalOInternal() / 2.0;
+            case IEntityRemovalConditions.REMOVE_EJECTED -> (double) entity.getTotalOArmor() / Compute.rollD6(1).getIntValue();
+            case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
+            default -> entity.getTotalOArmor() * 0.33;
+        };
+        DamageHandlerChooser.chooseHandler(entity).applyDamage((int) damage);
     }
 }

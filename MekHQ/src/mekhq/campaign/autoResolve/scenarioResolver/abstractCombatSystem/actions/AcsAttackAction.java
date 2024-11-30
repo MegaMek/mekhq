@@ -11,24 +11,17 @@
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
-
-import megamek.common.strategicBattleSystems.SBFReportEntry;
-import mekhq.campaign.autoResolve.AutoResolveGame;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
 /**
  * @author Luana Coppio
  */
-public interface AcsGameManagerHelper {
+public interface AcsAttackAction extends AcsAction {
 
-    AcsGameManager gameManager();
-
-    default AutoResolveGame game() {
-        return gameManager().getGame();
-    }
-
-    default void addReport(SBFReportEntry reportEntry) {
-        gameManager().addReport(reportEntry);
-    }
+    /**
+     * @return The game ID of the target of the attack
+     */
+    int getTargetId();
 
 }
+

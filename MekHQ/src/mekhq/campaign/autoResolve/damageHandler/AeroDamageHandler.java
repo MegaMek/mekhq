@@ -1,7 +1,6 @@
 package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.Aero;
-import megamek.common.Entity;
 import megamek.common.HitData;
 
 import java.util.ArrayList;
@@ -20,13 +19,13 @@ public class AeroDamageHandler implements DamageHandler<Aero> {
     }
 
     @Override
-    public Aero getEntity() {
+    public Aero entity() {
         return entity;
     }
 
     @Override
     public int getHitLocation() {
-        var entity = getEntity();
+        var entity = entity();
         List<Integer> validLocations = new ArrayList<>();
         for (int i = 0; i < entity.locations(); i++) {
             if (entity.getOArmor(i) <= 0) {
@@ -43,7 +42,7 @@ public class AeroDamageHandler implements DamageHandler<Aero> {
     @Override
     public void damageInternals(HitDetails hitDetails) {
         HitData hit = hitDetails.hit();
-        var entity = getEntity();
+        var entity = entity();
         int currentInternalValue = entity.getSI();
         int newInternalValue = Math.max(currentInternalValue + hitDetails.setArmorValueTo(), 0);
         entity.setArmor(0, hit);

@@ -1,30 +1,40 @@
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ */
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
 
-public class AcsManueverToHitData extends TargetRoll {
+/**
+ * @author Luana Coppio
+ */
+public class AcsManeuverToHitData extends TargetRoll {
 
-    public AcsManueverToHitData(int value, String desc) {
+    public AcsManeuverToHitData(int value, String desc) {
         super(value, desc);
     }
 
-    public static AcsManueverToHitData compileToHit(AutoResolveGame game, AcsFormation formation) {
-        var toHit = new AcsManueverToHitData(formation.getTactics(), "Tactics");
+    public static AcsManeuverToHitData compileToHit(AutoResolveGame game, AcsFormation formation) {
+        var toHit = new AcsManeuverToHitData(formation.getTactics(), "Tactics");
         processFormationModifiers(toHit, game, formation);
         processCombatUnit(toHit, game, formation);
-        processFatigue(toHit, game, formation);
         return toHit;
     }
 
-    private static void processFatigue(AcsManueverToHitData toHit, AutoResolveGame game, AcsFormation formation) {
-        if (formation.getFatigue() > 0) {
-            toHit.addModifier(formation.getFatigue(), "Fatigue");
-        }
-    }
-
-
-    private static void processFormationModifiers(AcsManueverToHitData toHit, AutoResolveGame game, AcsFormation formation) {
+    private static void processFormationModifiers(AcsManeuverToHitData toHit, AutoResolveGame game, AcsFormation formation) {
         if (formation.getEngagementControl() == EngagementControl.FORCED_ENGAGEMENT) {
             toHit.addModifier(1, "Forced Engagement");
         }
@@ -33,7 +43,7 @@ public class AcsManueverToHitData extends TargetRoll {
         }
     }
 
-    private static void processCombatUnit(AcsManueverToHitData toHit, AutoResolveGame game, AcsFormation formation) {
+    private static void processCombatUnit(AcsManeuverToHitData toHit, AutoResolveGame game, AcsFormation formation) {
         switch (formation.getSkill()) {
             case 7 -> toHit.addModifier(+4, "Wet behind the ears");
             case 6 -> toHit.addModifier(+3, "Really Green");

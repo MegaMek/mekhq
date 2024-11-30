@@ -9,12 +9,12 @@ import static megamek.common.Compute.randomInt;
 
 public interface DamageHandler<E extends Entity> {
 
-    E getEntity();
+    E entity();
 
     default void applyDamage(int dmg) {
         int hitLocation = getHitLocation();
         if (hitLocation == -1) {
-            getEntity().setDestroyed(true);
+            entity().setDestroyed(true);
             return;
         }
         HitData hit = getHitData(hitLocation);
@@ -23,7 +23,7 @@ public interface DamageHandler<E extends Entity> {
     }
 
     default int getHitLocation() {
-        var entity = getEntity();
+        var entity = entity();
         List<Integer> validLocations = new ArrayList<>();
         for (int i = 0; i < entity.locations(); i++) {
             if (entity.getOArmor(i) <= 0) {
@@ -48,7 +48,7 @@ public interface DamageHandler<E extends Entity> {
 
     default void damageInternals(HitDetails hitDetails) {
         HitData hit = hitDetails.hit();
-        var entity = getEntity();
+        var entity = entity();
         int currentInternalValue = entity.getInternal(hit);
         int newInternalValue = Math.max(currentInternalValue + hitDetails.setArmorValueTo(), 0);
         entity.setArmor(0, hit);
@@ -61,7 +61,7 @@ public interface DamageHandler<E extends Entity> {
     }
 
     default void destroyLocation(HitData hit) {
-        var entity = getEntity();
+        var entity = entity();
         entity.destroyLocation(hit.getLocation());
         System.out.println("Location destroyed: " + hit.getLocation());
         if (hit.getLocation() == Mek.LOC_CT || hit.getLocation() == Mek.LOC_HEAD) {
@@ -78,7 +78,7 @@ public interface DamageHandler<E extends Entity> {
         if (hitCrew == 0) {
             return;
         }
-        var entity = getEntity();
+        var entity = entity();
         Crew crew = entity.getCrew();
         crew.setHits(crew.getHits() + hitCrew, 0);
         System.out.println("Crew hits: " + crew.getHits());
@@ -90,7 +90,7 @@ public interface DamageHandler<E extends Entity> {
     }
 
     default void applyDamageToEquipments(HitData hit) {
-        var entity = getEntity();
+        var entity = entity();
         for (CriticalSlot slot : entity.getCriticalSlots(hit.getLocation())) {
             if (slot != null && slot.isHittable() && !slot.isHit() && !slot.isDestroyed()) {
                 slot.setHit(true);
@@ -102,7 +102,7 @@ public interface DamageHandler<E extends Entity> {
     }
 
     default void damageArmor(HitDetails hitDetails) {
-        getEntity().setArmor(Math.max(hitDetails.setArmorValueTo(), 0), hitDetails.hit());
+        entity().setArmor(Math.max(hitDetails.setArmorValueTo(), 0), hitDetails.hit());
         System.out.println("Armor: " + Math.max(hitDetails.setArmorValueTo(), 0));
     }
 
@@ -111,9 +111,9 @@ public interface DamageHandler<E extends Entity> {
     }
 
     default HitDetails setupHitDetails(HitData hit, int dmg) {
-        int originalArmor = getEntity().getOArmor(hit);
+        int originalArmor = entity().getOArmor(hit);
         int damageToApply = Math.max((int) Math.floor((double) originalArmor / 10), dmg);
-        int currentArmorValue = getEntity().getArmor(hit);
+        int currentArmorValue = entity().getArmor(hit);
         int setArmorValueTo = currentArmorValue - damageToApply;
         boolean hitInternal = setArmorValueTo < 0;
         int hitCrew = hitInternal ? 1 : 0;

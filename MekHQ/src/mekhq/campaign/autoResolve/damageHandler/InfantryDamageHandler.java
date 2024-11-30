@@ -2,18 +2,7 @@ package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
 
-public class InfantryDamageHandler implements DamageHandler<Infantry> {
-
-    private final Infantry entity;
-
-    public InfantryDamageHandler(Infantry entity) {
-        this.entity = entity;
-    }
-
-    @Override
-    public Infantry getEntity() {
-        return entity;
-    }
+public record InfantryDamageHandler(Infantry entity) implements DamageHandler<Infantry> {
 
     @Override
     public void applyDamage(int dmg) {

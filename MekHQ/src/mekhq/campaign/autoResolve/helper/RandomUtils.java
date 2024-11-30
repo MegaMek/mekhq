@@ -5,6 +5,7 @@ import org.apache.commons.lang3.stream.Streams;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RandomUtils {
 
@@ -30,6 +31,15 @@ public class RandomUtils {
     public static <T> Optional<T> sample(List<T> list) {
         return list.stream().collect(toShuffledList()).stream().findFirst();
     }
+
+    public static <T> T sampleUnchecked(List<T> list) {
+        return list.stream().collect(toShuffledList()).stream().findFirst().orElseThrow();
+    }
+
+    public static <T> List<T> sampleUnchecked(List<T> list, int count) {
+        return list.stream().collect(toShuffledList()).stream().limit(count).toList();
+    }
+
 
     public static class WeightedList<T> {
         private final List<WeightedEntry<T>> entries = new ArrayList<>();
@@ -74,6 +84,22 @@ public class RandomUtils {
             return Optional.empty();
         }
 
+        public Optional<T> sample(T except) {
+            double randomValue = random.nextDouble() * totalWeight;
+            double cumulativeWeight = 0.0;
+            for (WeightedEntry<T> entry : entries) {
+                if (entry.value().equals(except)) {
+                    continue;
+                }
+                cumulativeWeight += entry.weight();
+                if (randomValue <= cumulativeWeight) {
+                    return Optional.of(entry.value());
+                }
+            }
+
+            return Optional.empty();
+        }
+
         public T sampleGet() {
             return sample().orElseThrow();
         }
@@ -95,6 +121,12 @@ public class RandomUtils {
         }
 
         private record WeightedEntry<T>(T value, double weight) { }
+
+        public static <T> WeightedList<T> of(Map<T, Double> collection) {
+            var weightedList = new WeightedList<T>();
+            collection.forEach(weightedList::addEntry);
+            return weightedList;
+        }
 
         public static <T> WeightedList<T> of(T k1, double v1) {
             return new WeightedList<>(k1, v1);

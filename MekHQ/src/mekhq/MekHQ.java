@@ -785,7 +785,7 @@ public class MekHQ implements GameListener {
 
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
         currentScenario = scenario;
-        new AutoResolveEngine(AutoResolveMethod.ABSTRACT_COMBAT_SYSTEM).resolveBattle(this, units, scenario);
+        new AutoResolveEngine(AutoResolveMethod.UNITS_MATTER).resolveBattle(this, units, scenario);
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

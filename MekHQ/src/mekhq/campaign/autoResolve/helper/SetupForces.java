@@ -65,7 +65,7 @@ public class SetupForces {
             game.addPlayer(bot.getId(), bot);
             configureBot(bot, bf);
         }
-        var idOfEntitiesToRemove = game.getInGameObjects().stream().map(InGameObject::getId).toList();
+        var idOfEntitiesToRemoveFromForces = game.getInGameObjects().stream().map(InGameObject::getId).toList();
 
         ConsolidateForces.consolidateForces(game);
 
@@ -81,7 +81,7 @@ public class SetupForces {
             }
         }
 
-        for (var id : idOfEntitiesToRemove) {
+        for (var id : idOfEntitiesToRemoveFromForces) {
             game.getForces().removeEntityFromForces(id);
         }
     }

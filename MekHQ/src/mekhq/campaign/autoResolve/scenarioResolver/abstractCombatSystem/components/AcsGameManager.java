@@ -1,21 +1,15 @@
-
 /*
  * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- * MegaMek is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MegaMek is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
  */
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
 
@@ -23,6 +17,7 @@ import megamek.common.*;
 import megamek.common.actions.EntityAction;
 import megamek.common.enums.GamePhase;
 import megamek.common.net.packets.Packet;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.strategicBattleSystems.SBFReportEntry;
 import megamek.logging.MMLogger;
 import megamek.server.AbstractGameManager;
@@ -30,16 +25,25 @@ import megamek.server.Server;
 import megamek.server.commands.ServerCommand;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.*;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase.PhaseHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.components.HtmlGameLogger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 
 /**
- * This class manages an SBF game on the server side. As of 2024, this is under
- * construction.
+ * @author Luana Coppio
  */
-
 public final class AcsGameManager extends AbstractGameManager {
     private static final MMLogger logger = MMLogger.create(megamek.server.sbf.SBFGameManager.class);
+    private final HtmlGameLogger gameLogger = HtmlGameLogger
+        .create(PreferenceManager.getClientPreferences().getGameLogFilename())
+        .printToConsole();
+
 
     private AutoResolveGame game;
     private final SBFFullGameReport gameReport = new SBFFullGameReport();
@@ -47,12 +51,8 @@ public final class AcsGameManager extends AbstractGameManager {
 
     final AcsPhaseEndManager phaseEndManager = new AcsPhaseEndManager(this);
     final AcsPhasePreparationManager phasePreparationManager = new AcsPhasePreparationManager(this);
-    final AcsEngagementControlProcessor engagementControlProcessor = new AcsEngagementControlProcessor(this);
-    final AcsAttackProcessor attackProcessor = new AcsAttackProcessor(this);
     final AcsActionsProcessor actionsProcessor = new AcsActionsProcessor(this);
     final AcsInitiativeHelper initiativeHelper = new AcsInitiativeHelper(this);
-    final AcsRecoveringNerveProcessor recoveringNerveProcessor = new AcsRecoveringNerveProcessor(this);
-
     final List<PhaseHandler> phaseHandlers = new ArrayList<>();
 
 
@@ -80,12 +80,32 @@ public final class AcsGameManager extends AbstractGameManager {
         phaseHandlers.add(handler);
     }
 
+    public void addMoraleCheck(AcsMoraleCheckAction acsMoraleCheckAction, AcsFormation formation) {
+        getGame().addAction(acsMoraleCheckAction);
+        formation.setDone(true);
+    }
+
     public void addAttack(List<EntityAction> actions, AcsFormation formation) {
-        attackProcessor.processAttacks(actions, formation);
+        actions.forEach(getGame()::addAction);
+        formation.setDone(true);
     }
 
     public void addNerveRecovery(AcsRecoveringNerveAction recoveringNerveAction, AcsFormation formation) {
-        recoveringNerveProcessor.processRecoveringNerve(recoveringNerveAction, formation);
+        getGame().addAction(recoveringNerveAction);
+    }
+
+    public void addWithdraw(AcsWithdrawAction acsWithdrawAction, AcsFormation formation) {
+        getGame().addAction(acsWithdrawAction);
+    }
+
+    public void addEngagementControl(AcsEngagementControlAction action, AcsFormation formation) {
+        getGame().addAction(action);
+        formation.setDone(true);
+    }
+
+    public void flushPendingReports() {
+        pendingReports.forEach(r -> gameReport.add(game.getCurrentRound(), r));
+        pendingReports.clear();
     }
 
     @Override
@@ -138,6 +158,7 @@ public final class AcsGameManager extends AbstractGameManager {
     public void executeCurrentPhase() {
         logger.info("Executing phase {}", game.getPhase());
         phaseHandlers.forEach(PhaseHandler::execute);
+        endCurrentPhase();
     }
 
     /**
@@ -149,8 +170,16 @@ public final class AcsGameManager extends AbstractGameManager {
         }
     }
 
-    public void addEngagementControl(AcsEngagementControlAction action, AcsFormation formation) {
-        engagementControlProcessor.processEngagementControl(action, formation);
+    public void resetFormationsDone() {
+        for (AcsFormation formation : game.getActiveFormations()) {
+            formation.setDone(false);
+        }
+    }
+
+    public void resetFormations() {
+        for (AcsFormation formation : game.getActiveFormations()) {
+            formation.reset();
+        }
     }
 
     /**
@@ -252,6 +281,8 @@ public final class AcsGameManager extends AbstractGameManager {
     @Override
     public void send(int connId, Packet packet) {
     }
+
+
 
 // endregion not in use
 }

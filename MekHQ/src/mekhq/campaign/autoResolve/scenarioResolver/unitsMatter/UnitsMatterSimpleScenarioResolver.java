@@ -1,8 +1,22 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ */
 package mekhq.campaign.autoResolve.scenarioResolver.unitsMatter;
 
-import megamek.common.*;
-import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
+import megamek.common.Compute;
+import megamek.common.IEntityRemovalConditions;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
 import mekhq.campaign.autoResolve.helper.SetupTeams;
 import mekhq.campaign.autoResolve.helper.UnitStrengthHelper;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
@@ -12,10 +26,11 @@ import mekhq.campaign.autoResolve.scenarioResolver.components.UnitStrength;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioObjective;
 
-import java.util.List;
-import java.util.Map;
 import java.util.*;
 
+/**
+ * @author Luana Coppio
+ */
 public class UnitsMatterSimpleScenarioResolver extends ScenarioResolver {
 
     private final Map<Integer, List<UnitResult>> combatRoundResults = new HashMap<>();

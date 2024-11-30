@@ -1,19 +1,31 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ */
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
 
-import megamek.common.Player;
 import megamek.common.enums.GamePhase;
-import megamek.common.strategicBattleSystems.SBFReportEntry;
-import megamek.server.sbf.SBFGameManagerHelper;
-import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
 
-import static megamek.common.enums.GamePhase.*;
-
+/**
+ * @author Luana Coppio
+ */
 public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameManagerHelper {
 
     void managePhase() {
         switch (gameManager.getGame().getPhase()) {
             case INITIATIVE:
                 gameManager.getGame().setupDeployment();
+                gameManager.resetFormationsDone();
+                gameManager.flushPendingReports();
                 if (gameManager.getGame().shouldDeployThisRound()) {
                     gameManager.changePhase(GamePhase.DEPLOYMENT);
                 } else {
@@ -22,22 +34,28 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
                 break;
             case DEPLOYMENT:
                 gameManager.getGame().clearDeploymentThisRound();
+                phaseCleanup();
                 gameManager.changePhase(GamePhase.SBF_DETECTION);
                 break;
             case SBF_DETECTION:
                 gameManager.actionsProcessor.handleActions();
+                phaseCleanup();
                 gameManager.changePhase(GamePhase.MOVEMENT);
                 break;
             case MOVEMENT:
                 gameManager.resolveCallSupport();
                 gameManager.actionsProcessor.handleActions();
+                phaseCleanup();
                 gameManager.changePhase(GamePhase.FIRING);
                 break;
             case FIRING:
                 gameManager.actionsProcessor.handleActions();
+                phaseCleanup();
                 gameManager.changePhase(GamePhase.END);
                 break;
             case END:
+                gameManager.actionsProcessor.handleActions();
+                phaseCleanup();
                 if (gameManager.checkForVictory()) {
                     gameManager.changePhase(GamePhase.VICTORY);
                 }
@@ -47,5 +65,11 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
             default:
                 break;
         }
+    }
+
+    private void phaseCleanup() {
+        gameManager.resetPlayersDone();
+        gameManager.resetFormations();
+        gameManager.flushPendingReports();
     }
 }

@@ -1,18 +1,42 @@
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ */
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
 import megamek.common.IGame;
 import megamek.common.alphaStrike.ASRange;
-import megamek.common.strategicBattleSystems.SBFFormation;
 import megamek.logging.MMLogger;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
 
 import java.util.Optional;
 
+/**
+ * @author Luana Coppio
+ */
 public class AcsStandardUnitAttack extends AbstractAcsAttackAction {
     private static final MMLogger logger = MMLogger.create(AcsStandardUnitAttack.class);
 
     private final int unitNumber;
     private final ASRange range;
+    private final ManueverResult manueverResult;
+
+    public enum ManueverResult {
+        SUCCESS,
+        FAILURE,
+        DRAW
+    }
 
     /**
      * Creates a standard attack of an SBF Unit on another formation.
@@ -24,10 +48,11 @@ public class AcsStandardUnitAttack extends AbstractAcsAttackAction {
      * @param unitNumber  The number of the attacking SBF Unit inside the formation
      * @param targetId    The target's ID
      */
-    public AcsStandardUnitAttack(int formationId, int unitNumber, int targetId, ASRange range) {
+    public AcsStandardUnitAttack(int formationId, int unitNumber, int targetId, ASRange range, ManueverResult manueverResult) {
         super(formationId, targetId);
         this.unitNumber = unitNumber;
         this.range = range;
+        this.manueverResult = manueverResult;
     }
 
     /**
@@ -43,6 +68,10 @@ public class AcsStandardUnitAttack extends AbstractAcsAttackAction {
 
     public ASRange getRange() {
         return range;
+    }
+
+    public ManueverResult getManueverResult() {
+        return manueverResult;
     }
 
     @Override
