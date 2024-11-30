@@ -71,8 +71,9 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
                         var entityOpt = gameManager.getGame().getEntity(element.getId());
                         if (entityOpt.isPresent()) {
                             var entity = entityOpt.get();
-                            var percent = unit.getCurrentArmor() / unit.getArmor();
-                            DamageHandlerChooser.chooseHandler(entity).applyDamage(entity.getTotalArmor() * percent);
+                            var percent = (double) unit.getCurrentArmor() / unit.getArmor();
+                            var totalDamage = (int) (entity.getTotalArmor() * (1 - percent));
+                            DamageHandlerChooser.chooseHandler(entity).applyDamage(totalDamage);
                         }
                     }
                 }

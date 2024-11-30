@@ -15,9 +15,14 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.compone
 
 import megamek.common.Entity;
 import megamek.common.IGame;
+import megamek.common.alphaStrike.AlphaStrikeElement;
+import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.force.Force;
+import megamek.common.force.Forces;
 import megamek.common.strategicBattleSystems.BaseFormationConverter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
