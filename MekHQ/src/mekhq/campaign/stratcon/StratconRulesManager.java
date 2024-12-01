@@ -1438,7 +1438,7 @@ public class StratconRulesManager {
         // assemble a set of all force IDs that are currently assigned to tracks that are not this one
         Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
                 .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
-                .filter(track -> (track != currentTrack) || !reinforcements)
+                .filter(track -> (!Objects.equals(track, currentTrack)) || !reinforcements)
                 .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
                 .collect(Collectors.toSet());
 
@@ -1449,10 +1449,6 @@ public class StratconRulesManager {
         }
 
         for (StrategicFormation formation : campaign.getStrategicFormations().values()) {
-            if (!formation.isEligible(campaign)) {
-                continue;
-            }
-
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {

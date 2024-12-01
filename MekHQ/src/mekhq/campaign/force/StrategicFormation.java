@@ -2,7 +2,7 @@
  * Lance.java
  *
  * Copyright (c) 2011 - Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,7 +23,9 @@ package mekhq.campaign.force;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -39,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
@@ -263,8 +266,7 @@ public class StrategicFormation {
         }
 
         /*
-         * Check that the number of units and weight are within the limits
-         * and that the force contains at least one ground unit.
+         * Check that the number of units and weight are within the limits.
          */
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
@@ -319,6 +321,15 @@ public class StrategicFormation {
 
             for (Force childForce : childForces) {
                 if (childForce.isStrategicFormation()) {
+                    force.setStrategicFormation(false);
+                    return false;
+                }
+            }
+
+            List<Force> parentForces = force.getAllParents();
+
+            for (Force parentForce : parentForces) {
+                if (parentForce.isStrategicFormation()) {
                     force.setStrategicFormation(false);
                     return false;
                 }
@@ -599,5 +610,28 @@ public class StrategicFormation {
         }
 
         return weight;
+    }
+
+    /**
+     * This static method updates the strategic formations across the campaign.
+     * It starts at the top level force, and calculates the strategic formations for each sub-force.
+     * It keeps only the eligible strategic formations and imports them into the campaign.
+     * After every formation is processed, an 'OrganizationChangedEvent' is triggered by that force.
+     *
+     * @param campaign the current campaign.
+     */
+    public static void recalculateStrategicFormations(Campaign campaign) {
+        campaign.setStrategicFormations(new Hashtable<>());
+
+        Force originNode = campaign.getForce(0);
+        for (Force force : originNode.getAllSubForces()) {
+            StrategicFormation strategicFormation = new StrategicFormation(force.getId(), campaign);
+
+            if (strategicFormation.isEligible(campaign)) {
+                campaign.importStrategicFormation(strategicFormation);
+            }
+
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+        }
     }
 }

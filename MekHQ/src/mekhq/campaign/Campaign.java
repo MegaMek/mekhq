@@ -142,6 +142,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -201,7 +202,7 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private final Hashtable<Integer, StrategicFormation> strategicFormations; // AtB
+    private Hashtable<Integer, StrategicFormation> strategicFormations; // AtB
 
     private Faction faction;
     private int techFactionCode;
@@ -271,7 +272,7 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private FameAndInfamyController fameAndInfamy;
+    private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
 
@@ -454,15 +455,38 @@ public class Campaign implements ITechManager {
         return new ArrayList<>(forceIds.values());
     }
 
-    public void importLance(StrategicFormation l) {
-        strategicFormations.put(l.getForceId(), l);
+    public void importStrategicFormation(StrategicFormation strategicFormation) {
+        strategicFormations.put(strategicFormation.getForceId(), strategicFormation);
+    }
+
+    public void setStrategicFormations(final Hashtable<Integer, StrategicFormation> strategicFormations) {
+        this.strategicFormations = strategicFormations;
     }
 
     public Hashtable<Integer, StrategicFormation> getStrategicFormations() {
+        // Here we sanitize the list, ensuring ineligible formations have been removed before
+        // returning the hashtable. In theory, this shouldn't be necessary, however, having this
+        // sanitizing step should remove the need for isEligible() checks whenever we fetch the
+        // hashtable.
+        List<Integer> formationsToSanitize = new ArrayList<>();
+        for (StrategicFormation strategicFormation : strategicFormations.values()) {
+            if (!strategicFormation.isEligible(this)) {
+                formationsToSanitize.add(strategicFormation.getForceId());
+            }
+        }
+
+        for (int id : formationsToSanitize) {
+            strategicFormations.remove(id);
+        }
+
         return strategicFormations;
     }
 
     public ArrayList<StrategicFormation> getStrategicFormationList() {
+        // This call allows us to utilize the self-sanitizing feature of getStrategicFormations(),
+        // without needing to directly include the code here, too.
+        strategicFormations = getStrategicFormations();
+
         return strategicFormations.values().stream()
                 .filter(l -> forceIds.containsKey(l.getForceId()))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -909,13 +933,11 @@ public class Campaign implements ITechManager {
         forceIds.put(id, force);
         lastForceId = id;
 
-        if (campaignOptions.isUseAtB() && !force.getUnits().isEmpty()) {
-            if (null == strategicFormations.get(id)) {
-                strategicFormations.put(id, new StrategicFormation(force.getId(), this));
-            }
-        }
-
         force.updateCommander(this);
+
+        if (campaignOptions.isUseAtB()) {
+            recalculateStrategicFormations(this);
+        }
     }
 
     public void moveForce(Force force, Force superForce) {
@@ -1008,25 +1030,18 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.isUseAtB()) {
-            if ((null != prevForce) && prevForce.getUnits().isEmpty()) {
-                strategicFormations.remove(prevForce.getId());
-            }
-
-            if ((null == strategicFormations.get(id)) && (null != force)) {
-                strategicFormations.put(id, new StrategicFormation(force.getId(), this));
-            }
+            recalculateStrategicFormations(this);
         }
     }
 
     /**
      * Adds force and all its subforces to the AtB lance table
      */
-    private void addAllLances(Force force) {
-        if (force.isStrategicFormation()) {
-            strategicFormations.put(force.getId(), new StrategicFormation(force.getId(), this));
-        }
-        for (Force f : force.getSubForces()) {
-            addAllLances(f);
+    private void addAllStrategicFormations(Force force) {
+        recalculateStrategicFormations(this);
+
+        for (Force subForce : force.getSubForces()) {
+            addAllStrategicFormations(subForce);
         }
     }
 
@@ -4989,15 +5004,11 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-        MekHQ.triggerEvent(new OrganizationChangedEvent(this, force));
+
         // also remove this force's id from any scenarios
         if (force.isDeployed()) {
             Scenario s = getScenario(force.getScenarioId());
             s.removeForce(fid);
-        }
-
-        if (campaignOptions.isUseAtB()) {
-            strategicFormations.remove(fid);
         }
 
         if (null != force.getParentForce()) {
@@ -5013,10 +5024,8 @@ public class Campaign implements ITechManager {
             }
         }
 
-        ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
-        for (Force sub : subs) {
-            removeForce(sub);
-            MekHQ.triggerEvent(new OrganizationChangedEvent(this, sub));
+        if (campaignOptions.isUseAtB()) {
+            recalculateStrategicFormations(this);
         }
     }
 
@@ -8305,7 +8314,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            addAllLances(this.forces);
+            addAllStrategicFormations(this.forces);
 
             // Determine whether or not there is an active contract
             setHasActiveContract();

@@ -793,7 +793,7 @@ public class CampaignXmlParser {
             StrategicFormation strategicFormation = StrategicFormation.generateInstanceFromXML(wn2);
 
             if (strategicFormation != null) {
-                campaign.importLance(strategicFormation);
+                campaign.importStrategicFormation(strategicFormation);
             }
         }
     }
