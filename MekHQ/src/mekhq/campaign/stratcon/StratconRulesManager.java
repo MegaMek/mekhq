@@ -833,7 +833,7 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        if (campaign.getStrategicFormations().get(forceID).getRole().isScouting()) {
+        if (campaign.getStrategicFormationsTable().get(forceID).getRole().isScouting()) {
             for (int direction = 0; direction < 6; direction++) {
                 StratconCoords checkCoords = coords.translate(direction);
 
@@ -1043,7 +1043,7 @@ public class StratconRulesManager {
         if (lanceCommander != null){
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                StrategicFormation lance = campaign.getStrategicFormations().get(commanderUnit.getForceId());
+                StrategicFormation lance = campaign.getStrategicFormationsTable().get(commanderUnit.getForceId());
 
                 return (lance != null) && lance.getRole().isDefence();
             }
@@ -1415,7 +1415,7 @@ public class StratconRulesManager {
         // that are
         // deployed to a scenario and not in a track already
 
-        return campaign.getStrategicFormations().keySet().stream()
+        return campaign.getStrategicFormationsTable().keySet().stream()
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
@@ -1448,7 +1448,7 @@ public class StratconRulesManager {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (StrategicFormation formation : campaign.getStrategicFormations().values()) {
+        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
@@ -1671,8 +1671,8 @@ public class StratconRulesManager {
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight
         // lance' rules
-        if (campaign.getStrategicFormations().containsKey(forceID)
-                && (campaign.getStrategicFormations().get(forceID).getRole().isFighting())) {
+        if (campaign.getStrategicFormationsTable().containsKey(forceID)
+                && (campaign.getStrategicFormationsTable().get(forceID).getRole().isFighting())) {
             return ReinforcementEligibilityType.FightLance;
         }
 

@@ -223,14 +223,14 @@ public class LanceAssignmentView extends JPanel {
             cbContract.addItem(contract);
         }
         AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
-        for (StrategicFormation strategicFormation : campaign.getStrategicFormations().values()) {
+        for (StrategicFormation strategicFormation : campaign.getStrategicFormationsTable().values()) {
             if ((strategicFormation.getContract(campaign) == null)
                     || !strategicFormation.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                 strategicFormation.setContract(defaultContract);
             }
         }
         ((DataTableModel) tblRequiredLances.getModel()).setData(activeContracts);
-        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getStrategicFormationList());
+        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getAllStrategicFormations());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
     }
 
@@ -285,7 +285,7 @@ class RequiredLancesTableModel extends DataTableModel {
     public static final int COL_TRAINING = 5;
     public static final int COL_NUM = 6;
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
@@ -344,7 +344,7 @@ class RequiredLancesTableModel extends DataTableModel {
         if (data.get(row) instanceof AtBContract contract) {
             if (column == COL_TOTAL) {
                 int t = 0;
-                for (StrategicFormation strategicFormation : campaign.getStrategicFormationList()) {
+                for (StrategicFormation strategicFormation : campaign.getAllStrategicFormations()) {
                     if (data.get(row).equals(strategicFormation.getContract(campaign))
                             && (strategicFormation.getRole() != AtBLanceRole.UNASSIGNED)
                             && strategicFormation.isEligible(campaign)) {
@@ -357,7 +357,7 @@ class RequiredLancesTableModel extends DataTableModel {
                 return Integer.toString(contract.getRequiredLances());
             } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
                 int t = 0;
-                for (StrategicFormation strategicFormation : campaign.getStrategicFormationList()) {
+                for (StrategicFormation strategicFormation : campaign.getAllStrategicFormations()) {
                     if (data.get(row).equals(strategicFormation.getContract(campaign))
                             && (strategicFormation.getRole() == strategicFormation.getContract(campaign).getContractType().getRequiredLanceRole())
                             && strategicFormation.isEligible(campaign)) {
@@ -382,7 +382,7 @@ class LanceAssignmentTableModel extends DataTableModel {
     public static final int COL_ROLE = 3;
     public static final int COL_NUM = 4;
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     public LanceAssignmentTableModel(Campaign campaign) {
         this.campaign = campaign;

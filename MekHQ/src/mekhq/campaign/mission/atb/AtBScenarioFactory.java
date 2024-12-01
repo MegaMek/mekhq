@@ -32,7 +32,7 @@ import java.util.*;
 public class AtBScenarioFactory {
     private static final MMLogger logger = MMLogger.create(AtBScenarioFactory.class);
 
-    private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
+    private static final Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
 
     static {
         registerScenario(new AceDuelBuiltInScenario());
@@ -126,7 +126,7 @@ public class AtBScenarioFactory {
         }
 
         // If we have an active contract, then we can progress with generation
-        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormations();
+        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
 
         List<AtBScenario> sList;
         List<Integer> assignedLances = new ArrayList<>();

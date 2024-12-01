@@ -621,7 +621,7 @@ public class StrategicFormation {
      * @param campaign the current campaign.
      */
     public static void recalculateStrategicFormations(Campaign campaign) {
-        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormations();
+        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
         StrategicFormation strategicFormation = strategicFormations.get(0); // This is the origin node
         Force force = campaign.getForce(0);
 
@@ -640,7 +640,7 @@ public class StrategicFormation {
             boolean isEligible = strategicFormation.isEligible(campaign);
 
             if (isEligible) {
-                campaign.importStrategicFormation(strategicFormation);
+                campaign.addStrategicFormation(strategicFormation);
             }
 
             force.setStrategicFormation(isEligible);
@@ -648,7 +648,7 @@ public class StrategicFormation {
 
         // Update the TO&E and then begin recursively walking it
         MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-        recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormations(), force);
+        recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
     }
 
     /**
@@ -686,7 +686,7 @@ public class StrategicFormation {
                 boolean isEligible = strategicFormation.isEligible(campaign);
 
                 if (isEligible) {
-                    campaign.importStrategicFormation(strategicFormation);
+                    campaign.addStrategicFormation(strategicFormation);
                 }
 
                 force.setStrategicFormation(isEligible);
@@ -694,7 +694,7 @@ public class StrategicFormation {
 
             // Update the TO&E and then continue recursively walking it
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-            recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormations(), force);
+            recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
         }
     }
 }

@@ -192,7 +192,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
 
-    private Map<Integer, Integer> numPlayerMinefields;
+    private final Map<Integer, Integer> numPlayerMinefields;
 
     private String terrainType;
 
@@ -1971,7 +1971,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public StrategicFormation getStrategicFormation(Campaign campaign) {
-        return campaign.getStrategicFormations().get(strategicFormationId);
+        return campaign.getStrategicFormationsTable().get(strategicFormationId);
     }
 
     public void setLance(StrategicFormation strategicFormation) {

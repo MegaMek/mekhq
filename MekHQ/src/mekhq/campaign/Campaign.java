@@ -455,15 +455,35 @@ public class Campaign implements ITechManager {
         return new ArrayList<>(forceIds.values());
     }
 
-    public void importStrategicFormation(StrategicFormation strategicFormation) {
+    /**
+     * Adds a {@link StrategicFormation} to the {@code strategicFormations} {@link Hashtable} using
+     * {@code forceId} as the key.
+     *
+     * @param strategicFormation the {@link StrategicFormation} to be added to the {@link Hashtable}
+     */
+    public void addStrategicFormation(StrategicFormation strategicFormation) {
         strategicFormations.put(strategicFormation.getForceId(), strategicFormation);
     }
 
+    /**
+     * Removes a {@link StrategicFormation} from the {@code strategicFormations} {@link Hashtable}
+     * using {@code forceId} as they key.
+     *
+     * @param forceId the key of the {@link StrategicFormation} to be removed from the {@link Hashtable}
+     */
     public void removeStrategicFormation(final int forceId) {
         this.strategicFormations.remove(forceId);
     }
 
-    public Hashtable<Integer, StrategicFormation> getStrategicFormations() {
+    /**
+     * Returns the {@link Hashtable} containing all the {@link StrategicFormation} objects after
+     * removing the ineligible ones. Although sanitization might not be necessary, it ensures that
+     * there is no need for {@code isEligible()} checks when fetching the {@link Hashtable}.
+     *
+     * @return the sanitized {@link Hashtable} of {@link StrategicFormation} objects stored in the
+     * current campaign.
+     */
+    public Hashtable<Integer, StrategicFormation> getStrategicFormationsTable() {
         // Here we sanitize the list, ensuring ineligible formations have been removed before
         // returning the hashtable. In theory, this shouldn't be necessary, however, having this
         // sanitizing step should remove the need for isEligible() checks whenever we fetch the
@@ -489,10 +509,19 @@ public class Campaign implements ITechManager {
         return strategicFormations;
     }
 
-    public ArrayList<StrategicFormation> getStrategicFormationList() {
-        // This call allows us to utilize the self-sanitizing feature of getStrategicFormations(),
+    /**
+     * Returns an {@link ArrayList} of all {@link StrategicFormation} objects in the
+     * {@code strategicFormations} {@link Hashtable}.
+     * Calls the {@code getStrategicFormationsTable()} method to sanitize the {@link Hashtable}
+     * before conversion to {@link ArrayList}.
+     *
+     * @return an {@link ArrayList} of all the {@link StrategicFormation} objects in the
+     * {@code strategicFormations} {@link Hashtable}
+     */
+    public ArrayList<StrategicFormation> getAllStrategicFormations() {
+        // This call allows us to utilize the self-sanitizing feature of getStrategicFormationsTable(),
         // without needing to directly include the code here, too.
-        strategicFormations = getStrategicFormations();
+        strategicFormations = getStrategicFormationsTable();
 
         return strategicFormations.values().stream()
                 .filter(l -> forceIds.containsKey(l.getForceId()))
@@ -3814,7 +3843,7 @@ public class Campaign implements ITechManager {
             processShipSearch();
 
             // Training Experience - Award to eligible training Strategic Formations on active contracts
-            getStrategicFormations().values().stream()
+            getStrategicFormationsTable().values().stream()
                     .filter(strategicFormation -> strategicFormation.getRole().isTraining()
                             && (strategicFormation.getContract(this) != null) && strategicFormation.isEligible(this)
                             && strategicFormation.getContract(this).isActiveOn(getLocalDate(), true))
