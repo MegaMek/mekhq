@@ -40,6 +40,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -52,6 +53,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
@@ -115,18 +117,30 @@ public class StratconRulesManager {
         // multiplies the BV budget of all
         int scenarioRolls = track.getRequiredLanceCount();
 
-        if (contract.getMoraleLevel().isDominating()) {
-            scenarioRolls++;
-        } else if (contract.getMoraleLevel().isOverwhelming()) {
-            scenarioRolls += 2;
+        if (!autoAssignLances) {
+            AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
+
+            switch (moraleLevel) {
+                case STALEMATE -> scenarioRolls = (int) round(scenarioRolls * 1.25);
+                case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.5);
+                case DOMINATING -> scenarioRolls = scenarioRolls * 2;
+                case OVERWHELMING -> scenarioRolls = scenarioRolls * 3;
+            }
         }
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
+            if (autoAssignLances && availableForceIDs.isEmpty()) {
+                break;
+            }
+
             int targetNum = calculateScenarioOdds(track, contract, false);
+            int roll = Compute.randomInt(100);
+
+            logger.info(String.format("StratCon Weekly Scenario Roll: %s vs. %s", roll, targetNum));
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
+            if (roll < targetNum) {
                 // pick random coordinates and force to drive the scenario
                 StratconCoords scenarioCoords = getUnoccupiedCoords(track, true);
 
@@ -151,9 +165,11 @@ public class StratconRulesManager {
                 int randomForceIndex = Compute.randomInt(availableForceIDs.size());
                 int randomForceID = availableForceIDs.get(randomForceIndex);
 
-                // remove the force from the available lists so we don't designate it as primary
+                // remove the force from the available lists, so we don't designate it as primary
                 // twice
-                availableForceIDs.remove(randomForceIndex);
+                if (autoAssignLances) {
+                    availableForceIDs.remove(randomForceIndex);
+                }
 
                 // we want to remove the actual int with the value, not the value at the index
                 sortedAvailableForceIDs.get(AllGroundTerrain).remove((Integer) randomForceID);
