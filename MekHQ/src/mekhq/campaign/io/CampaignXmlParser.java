@@ -78,6 +78,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 
@@ -854,6 +855,7 @@ public class CampaignXmlParser {
             }
         }
 
+        recalculateStrategicFormations(retVal);
         logger.info("Load of Force Organization complete!");
     }
 

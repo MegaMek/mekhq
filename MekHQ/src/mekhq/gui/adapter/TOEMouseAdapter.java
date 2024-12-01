@@ -452,6 +452,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             singleForce.setStrategicFormation(!formationState);
             singleForce.setOverrideStrategicFormation(formationState ? STRATEGIC_FORMATION_OVERRIDE_FALSE : STRATEGIC_FORMATION_OVERRIDE_TRUE);
 
+            for (Force childForce : singleForce.getAllSubForces()) {
+                childForce.setOverrideStrategicFormation(STRATEGIC_FORMATION_OVERRIDE_NONE);
+            }
+
+            for (Force parentForce : singleForce.getAllParents()) {
+                parentForce.setOverrideStrategicFormation(STRATEGIC_FORMATION_OVERRIDE_NONE);
+            }
+
             recalculateStrategicFormations(gui.getCampaign());
         } else if (command.contains(REMOVE_STRATEGIC_FORCE_OVERRIDE)) {
             if (singleForce == null) {

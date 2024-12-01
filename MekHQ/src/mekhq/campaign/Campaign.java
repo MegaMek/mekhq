@@ -472,6 +472,13 @@ public class Campaign implements ITechManager {
         for (StrategicFormation strategicFormation : strategicFormations.values()) {
             if (!strategicFormation.isEligible(this)) {
                 formationsToSanitize.add(strategicFormation.getForceId());
+                try {
+                    Force force = getForce(strategicFormation.getForceId());
+                    force.setStrategicFormation(false);
+                } catch (Exception ex) {
+                    // We're not too worried if we can't find the associated Force,
+                    // as this just means it has been deleted at some point and not removed correctly.
+                }
             }
         }
 
@@ -4333,6 +4340,7 @@ public class Campaign implements ITechManager {
     private void processNewDayForces() {
         // update formation levels
         Force.populateFormationLevelsFromOrigin(this);
+        recalculateStrategicFormations(this);
 
         // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {

@@ -622,16 +622,52 @@ public class StrategicFormation {
      */
     public static void recalculateStrategicFormations(Campaign campaign) {
         campaign.setStrategicFormations(new Hashtable<>());
+        for (Force force : campaign.getAllForces()) {
+            force.setStrategicFormation(false);
+        }
 
         Force originNode = campaign.getForce(0);
-        for (Force force : originNode.getAllSubForces()) {
+
+        StrategicFormation strategicFormation = new StrategicFormation(0, campaign);
+        boolean isEligible = strategicFormation.isEligible(campaign);
+
+        if (isEligible) {
+            originNode.setStrategicFormation(true);
+            campaign.importStrategicFormation(strategicFormation);
+        }
+
+        MekHQ.triggerEvent(new OrganizationChangedEvent(originNode));
+
+        recalculateSubForceStrategicStatus(campaign, originNode);
+    }
+
+    /**
+     * This method is used to update the strategic formations for the campaign working downwards
+     * from a specified node, through all of its sub-forces.
+     * It creates a new {@link StrategicFormation} for each sub-force and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the strategic formation status of
+     * the respective force is set to {@code true}.
+     * After every force is processed, an 'OrganizationChangedEvent' is triggered.
+     * This function runs recursively on each sub-force, effectively traversing the complete TO&E.
+     *
+     * @param campaign the current {@link Campaign}.
+     * @param workingNode the {@link Force} node from which the method starts working down through
+     *                   all its sub-forces.
+     */
+    private static void recalculateSubForceStrategicStatus(Campaign campaign, Force workingNode) {
+        for (Force force : workingNode.getSubForces()) {
             StrategicFormation strategicFormation = new StrategicFormation(force.getId(), campaign);
 
-            if (strategicFormation.isEligible(campaign)) {
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (isEligible) {
                 campaign.importStrategicFormation(strategicFormation);
+                force.setStrategicFormation(true);
             }
 
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+
+            recalculateSubForceStrategicStatus(campaign, force);
         }
     }
 }

@@ -397,9 +397,7 @@ public class Force {
         }
 
         for (Force force : subForces) {
-            if (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_FALSE) {
-                allUnits.addAll(force.getAllUnits(combatForcesOnly));
-            }
+            allUnits.addAll(force.getAllUnits(combatForcesOnly));
         }
 
         return allUnits;
