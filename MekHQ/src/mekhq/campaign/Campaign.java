@@ -459,8 +459,8 @@ public class Campaign implements ITechManager {
         strategicFormations.put(strategicFormation.getForceId(), strategicFormation);
     }
 
-    public void setStrategicFormations(final Hashtable<Integer, StrategicFormation> strategicFormations) {
-        this.strategicFormations = strategicFormations;
+    public void removeStrategicFormation(final int forceId) {
+        this.strategicFormations.remove(forceId);
     }
 
     public Hashtable<Integer, StrategicFormation> getStrategicFormations() {

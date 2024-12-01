@@ -621,24 +621,34 @@ public class StrategicFormation {
      * @param campaign the current campaign.
      */
     public static void recalculateStrategicFormations(Campaign campaign) {
-        campaign.setStrategicFormations(new Hashtable<>());
-        for (Force force : campaign.getAllForces()) {
-            force.setStrategicFormation(false);
+        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormations();
+        StrategicFormation strategicFormation = strategicFormations.get(0); // This is the origin node
+        Force force = campaign.getForce(0);
+
+        // Does the force already exist in our hashtable? If so, update it accordingly
+        if (strategicFormation != null) {
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (!isEligible) {
+                campaign.removeStrategicFormation(0);
+            }
+
+            force.setStrategicFormation(isEligible);
+        // Otherwise, create a new formation and then add it to the table, if appropriate
+        } else {
+            strategicFormation = new StrategicFormation(0, campaign);
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (isEligible) {
+                campaign.importStrategicFormation(strategicFormation);
+            }
+
+            force.setStrategicFormation(isEligible);
         }
 
-        Force originNode = campaign.getForce(0);
-
-        StrategicFormation strategicFormation = new StrategicFormation(0, campaign);
-        boolean isEligible = strategicFormation.isEligible(campaign);
-
-        if (isEligible) {
-            originNode.setStrategicFormation(true);
-            campaign.importStrategicFormation(strategicFormation);
-        }
-
-        MekHQ.triggerEvent(new OrganizationChangedEvent(originNode));
-
-        recalculateSubForceStrategicStatus(campaign, originNode);
+        // Update the TO&E and then begin recursively walking it
+        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+        recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormations(), force);
     }
 
     /**
@@ -654,20 +664,37 @@ public class StrategicFormation {
      * @param workingNode the {@link Force} node from which the method starts working down through
      *                   all its sub-forces.
      */
-    private static void recalculateSubForceStrategicStatus(Campaign campaign, Force workingNode) {
+    private static void recalculateSubForceStrategicStatus(Campaign campaign, Hashtable<Integer,
+        StrategicFormation> strategicFormations, Force workingNode) {
+
         for (Force force : workingNode.getSubForces()) {
-            StrategicFormation strategicFormation = new StrategicFormation(force.getId(), campaign);
+            int forceId = force.getId();
+            StrategicFormation strategicFormation = strategicFormations.get(forceId);
 
-            boolean isEligible = strategicFormation.isEligible(campaign);
+            // Does the force already exist in our hashtable? If so, update it accordingly
+            if (strategicFormation != null) {
+                boolean isEligible = strategicFormation.isEligible(campaign);
 
-            if (isEligible) {
-                campaign.importStrategicFormation(strategicFormation);
-                force.setStrategicFormation(true);
+                if (!isEligible) {
+                    campaign.removeStrategicFormation(forceId);
+                }
+
+                force.setStrategicFormation(isEligible);
+            // Otherwise, create a new formation and then add it to the table, if appropriate
+            } else {
+                strategicFormation = new StrategicFormation(forceId, campaign);
+                boolean isEligible = strategicFormation.isEligible(campaign);
+
+                if (isEligible) {
+                    campaign.importStrategicFormation(strategicFormation);
+                }
+
+                force.setStrategicFormation(isEligible);
             }
 
+            // Update the TO&E and then continue recursively walking it
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-
-            recalculateSubForceStrategicStatus(campaign, force);
+            recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormations(), force);
         }
     }
 }
