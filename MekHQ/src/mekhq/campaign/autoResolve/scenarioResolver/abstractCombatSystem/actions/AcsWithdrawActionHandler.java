@@ -16,6 +16,7 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions
 import megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
+import megamek.common.IEntityRemovalConditions;
 import megamek.common.Roll;
 import megamek.common.strategicBattleSystems.*;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
@@ -76,12 +77,20 @@ public class AcsWithdrawActionHandler extends AbstractAcsActionHandler {
         report.add(new SBFRollReportEntry(withdrawRoll).noNL().text());
         addReport(report);
 
-        var withdrawingDelta = withdrawRoll.getIntValue() - toHit.getValue();
-
-        if (withdrawingDelta > toHit.getValue()) {
+        if (withdrawRoll.getIntValue() == 12) {
             // successful withdraw
             withdrawFormation.setDeployed(false);
+            for (var unit : withdrawFormation.getUnits()) {
+                for (var element : unit.getElements()) {
+                    game().getEntity(element.getId()).ifPresent(entity -> {
+                        entity.setDeployed(false);
+                        entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
+                        game().damageEntity(entity, IEntityRemovalConditions.REMOVE_IN_RETREAT);
+                    });
+                }
+            }
             addReport(new SBFPublicReportEntry(3333));
+            game().removeFormation(withdrawFormation);
         } else {
             addReport(new SBFPublicReportEntry(3334));
         }

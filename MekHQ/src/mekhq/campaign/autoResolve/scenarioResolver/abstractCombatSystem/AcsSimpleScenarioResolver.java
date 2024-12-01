@@ -57,10 +57,14 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         initializeState(game);
         gameManager.runGame();
         checkDamageToEntities();
-        return new AutoResolveConcludedEvent(gameManager.getGame().getVictoryPlayerId() == game.getCampaign().getPlayer().getId(),
-                game.getGraveyardEntities(),
-                game.inGameTWEntities(),
-                game);
+
+        var playerTeamWon = gameManager.getGame().getVictoryTeam() == gameManager.getGame().getCampaign().getPlayer().getTeam();
+
+        return new AutoResolveConcludedEvent(
+            playerTeamWon,
+            game.getGraveyardEntities(),
+            game.inGameTWEntities(),
+            game);
     }
 
     private void checkDamageToEntities() {
@@ -73,7 +77,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
                             var entity = entityOpt.get();
                             var percent = (double) unit.getCurrentArmor() / unit.getArmor();
                             var totalDamage = (int) (entity.getTotalArmor() * (1 - percent));
-                            DamageHandlerChooser.chooseHandler(entity).applyDamage(totalDamage);
+                            DamageHandlerChooser.chooseHandler(entity).applyDamageInClusters(totalDamage, 5);
                         }
                     }
                 }

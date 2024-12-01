@@ -46,7 +46,7 @@ public final class AcsGameManager extends AbstractGameManager {
 
 
     private AutoResolveGame game;
-    private final SBFFullGameReport gameReport = new SBFFullGameReport();
+//    private final SBFFullGameReport gameReport = new SBFFullGameReport();
     private final List<SBFReportEntry> pendingReports = new ArrayList<>();
 
     final AcsPhaseEndManager phaseEndManager = new AcsPhaseEndManager(this);
@@ -104,7 +104,7 @@ public final class AcsGameManager extends AbstractGameManager {
     }
 
     public void flushPendingReports() {
-        pendingReports.forEach(r -> gameReport.add(game.getCurrentRound(), r));
+        pendingReports.forEach(r -> gameLogger.add(r.text()));
         pendingReports.clear();
     }
 
@@ -124,7 +124,11 @@ public final class AcsGameManager extends AbstractGameManager {
 
     @Override
     public void addReport(ReportEntry r) {
-        pendingReports.add((SBFReportEntry) r);
+        if (r instanceof SBFReportEntry) {
+            pendingReports.add((SBFReportEntry) r);
+        } else {
+            pendingReports.add(new SBFReportEntry(999).add(r.text()));
+        }
     }
 
     @Override
@@ -189,18 +193,6 @@ public final class AcsGameManager extends AbstractGameManager {
         TurnOrdered.rollInitiative(game.getTeams(), false);
     }
 
-    public void clearPendingReports() {
-        pendingReports.clear();
-    }
-
-    List<SBFReportEntry> getPendingReports() {
-        return pendingReports;
-    }
-
-    void addPendingReportsToGame() {
-        gameReport.add(game.getCurrentRound(), pendingReports);
-    }
-
     public void changeToNextTurn() {
         var nextTurn = getNextValidTurn();
         if (nextTurn.isEmpty()) {
@@ -233,6 +225,7 @@ public final class AcsGameManager extends AbstractGameManager {
         if (!reports.isEmpty()) {
             reports.forEach(this::addReport);
             vr.setVictory(true);
+            game.setVictoryTeam(vr.getWinningTeam());
         }
         return vr.isVictory();
     }

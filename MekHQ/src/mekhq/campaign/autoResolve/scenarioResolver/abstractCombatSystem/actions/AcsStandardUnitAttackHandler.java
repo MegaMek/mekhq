@@ -18,6 +18,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Roll;
+import megamek.common.alphaStrike.AlphaStrikeElement;
 import megamek.common.strategicBattleSystems.*;
 import mekhq.campaign.autoResolve.helper.RandomUtils;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
@@ -25,6 +26,7 @@ import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.componen
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip.ownerColor;
 
@@ -101,14 +103,18 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
                         if (newArmor * 2 <= targetUnit.getCurrentArmor()) {
                             target.setHighStressEpisode(true);
                         }
+
                         targetUnit.setCurrentArmor(newArmor);
+
                         if (target.isCrippled() && newArmor > 0) {
                             addReport(new SBFPublicReportEntry(3091));
                             target.setHighStressEpisode(true);
                         }
+
                         if (newArmor == 0) {
                             addReport(new SBFPublicReportEntry(3092));
                             target.setHighStressEpisode(true);
+                            countKill(attackingUnit, targetUnit);
                         } else {
                             if (newArmor * 2 < targetUnit.getArmor()) {
                                 var critRoll = Compute.rollD6(2);
@@ -138,6 +144,7 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
                                         .add(targetUnit.getName())
                                         .add(targetUnit.getDamageCrits()));
                                 } else {
+                                    countKill(attackingUnit, targetUnit);
                                     targetUnit.setCurrentArmor(0);
                                     target.setHighStressEpisode(true);
                                     addReport(new SBFPublicReportEntry(3092));
@@ -149,6 +156,18 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
                     }
                 }
             }
+        }
+    }
+
+    private void countKill(SBFUnit attackingUnit, SBFUnit targetUnit) {
+        var killers = attackingUnit.getElements().stream().map(AlphaStrikeElement::getId).map(e -> gameManager().getGame().getEntity(e)).filter(Optional::isPresent).map(Optional::get).toList();
+        var targets = targetUnit.getElements().stream().map(AlphaStrikeElement::getId).map(e -> gameManager().getGame().getEntity(e)).filter(Optional::isPresent).map(Optional::get).toList();
+        for (var target : targets) {
+            var killer = RandomUtils.sample(killers);
+            if (killer.isEmpty()) {
+                continue;
+            }
+            killer.get().addKill(target);
         }
     }
 

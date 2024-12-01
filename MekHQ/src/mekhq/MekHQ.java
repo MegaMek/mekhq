@@ -526,11 +526,16 @@ public class MekHQ implements GameListener {
         // Why Empty?
     }
 
-    public void autoResolveConcluded(AutoResolveConcludedEvent arce){
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent){
         try {
-            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), arce.controlledScenario());
-            tracker.setClient(new AutoResolveClient(arce.getGame(), getCampaign().getPlayer()));
-            tracker.setEvent(arce);
+            String message = autoResolveConcludedEvent.controlledScenario() ?
+                "Your forces won the scenario. Did your side control the battlefield at the end of the scenario?" :
+                "Your forces lost the scenario. Do you want to declare your side as controlling the battlefield at the end of the scenario?";
+            String title = autoResolveConcludedEvent.controlledScenario() ? "Victory!" : "Defeat!";
+            boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
+            tracker.setClient(new AutoResolveClient(autoResolveConcludedEvent.getGame(), getCampaign().getPlayer()));
+            tracker.setEvent(autoResolveConcludedEvent);
             tracker.processGame();
 
             ResolveScenarioWizardDialog resolveDialog =
@@ -579,7 +584,7 @@ public class MekHQ implements GameListener {
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
                 Person person = getCampaign().getPerson(personId);
 
-                if (person.getStatus() == PersonnelStatus.MIA && !arce.controlledScenario()) {
+                if (person.getStatus() == PersonnelStatus.MIA && !autoResolveConcludedEvent.controlledScenario()) {
                     person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
                         PersonnelStatus.POW);
                 }

@@ -29,7 +29,9 @@ public class EndPhase extends PhaseHandler {
             var destroyedUnits = formation.getUnits().stream()
                 .filter(u -> u.getCurrentArmor() <= 0)
                 .toList();
-            getGameManager().getGame().destroyUnits(formation, destroyedUnits);
+            if (!destroyedUnits.isEmpty()) {
+                getGameManager().getGame().destroyUnits(formation, destroyedUnits);
+            }
         }
     }
 

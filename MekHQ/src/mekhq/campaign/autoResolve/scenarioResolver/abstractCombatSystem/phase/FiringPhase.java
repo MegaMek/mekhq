@@ -118,8 +118,8 @@ public class FiringPhase extends PhaseHandler {
 
         var ret = new ArrayList<AttackRecord>();
 
-        if (target.size() == 2) {
-            var sizeOfGroupA = Compute.randomInt(unitIds.size() - 1);
+        if (target.size() == 2 && unitIds.size() > 1) {
+            var sizeOfGroupA = Compute.randomInt(unitIds.size());
             var sizeOfGroupB = unitIds.size() - sizeOfGroupA;
 
             List<Integer> shuffledList = unitIds.stream().collect(toShuffledList());
@@ -145,7 +145,7 @@ public class FiringPhase extends PhaseHandler {
         var player = game.getPlayer(actingFormation.getOwnerId());
         var canBeTargets = getGameManager().getGame().getActiveFormations().stream()
             .filter(SBFFormation::isDeployed)
-            .filter(f -> f.isGround() == actingFormation.isGround())
+//            .filter(f -> f.isGround() == actingFormation.isGround())
             .filter(f -> game.getPlayer(f.getOwnerId()).isEnemyOf(player))
             .filter(f -> f.getId() != actingFormation.getTargetFormationId())
             .filter( f -> !formationWasOverrunByFormation(actingFormation, f))

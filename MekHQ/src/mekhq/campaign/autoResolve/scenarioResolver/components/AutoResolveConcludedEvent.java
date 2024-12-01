@@ -40,10 +40,6 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
         this.game = game;
     }
 
-    public String getEventName() {
-        return "Auto Resolve Concluded";
-    }
-
     public IGame getGame() {
         return game;
     }
@@ -64,6 +60,16 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
 
     @Override
     public Entity getEntity(int id) {
+        for (Entity entity : survivingEntities) {
+            if (entity.getId() == id) {
+                return entity;
+            }
+        }
+        for (Entity entity : removedEntities) {
+            if (entity.getId() == id) {
+                return entity;
+            }
+        }
         return null;
     }
 

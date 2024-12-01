@@ -31,6 +31,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -136,6 +137,10 @@ public class ResolveScenarioTracker {
             // assume its missing until we can confirm otherwise
             unitsStatus.put(u.getId(), new UnitStatus(u));
         }
+    }
+
+    public boolean isAutoResolve() {
+        return this.client instanceof AutoResolveClient;
     }
 
     public void findUnitFile() {

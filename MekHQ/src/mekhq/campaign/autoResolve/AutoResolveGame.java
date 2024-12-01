@@ -24,10 +24,9 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.SBFRuleOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.common.strategicBattleSystems.SBFReportEntry;
 import megamek.common.strategicBattleSystems.SBFUnit;
-import megamek.common.weapons.AreaEffectHelper;
 import megamek.logging.MMLogger;
-import megamek.server.totalwarfare.TWGameManager;
 import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
 import mekhq.MekHQ;
@@ -282,10 +281,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return phase;
     }
 
-    public void forget(int unitId) {
-        inGameObjects.remove(unitId);
-    }
-
     public void addActionHandler(AcsActionHandler handler) {
         if (actionHandlers.contains(handler)) {
             logger.error("Tried to re-add action handler {}!", handler);
@@ -338,7 +333,8 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     @Override
     public boolean isForceVictory() {
-        return currentRound > 100;
+//        return currentRound > 50;
+        return false;
     }
 
     @Override
@@ -425,20 +421,16 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     @Override
     public int getLiveDeployedEntitiesOwnedBy(Player player) {
-        var res = getInGameObjects().stream()
-            .filter(unit -> unit instanceof AcsFormation)
-            .filter(unit -> unit.getOwnerId() == player.getId())
-            .filter(unit -> ((AcsFormation) unit).isDeployed())
-            .mapToInt(unit -> ((AcsFormation) unit).getUnits().stream().mapToInt(SBFUnit::getCurrentArmor).sum())
-            .filter(armor -> armor > 0).count();
+        var res = getActiveFormations(player).stream()
+            .filter(AcsFormation::isDeployed)
+            .count();
 
         return (int) res;
     }
 
     @Override
     public ReportEntry getNewReport(int messageId) {
-        // NOT IMPLEMENTED
-        return null;
+        return new SBFReportEntry(messageId);
     }
 
     @Override
@@ -659,7 +651,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     public List<AcsFormation> getActiveFormations() {
         return inGameObjects.values().stream()
             .filter(u -> u instanceof AcsFormation)
-            .filter(u -> ((AcsFormation) u).getUnits().stream().anyMatch(unit -> unit.getCurrentArmor() > 0))
             .map(u -> (AcsFormation) u)
             .toList();
     }
@@ -670,51 +661,56 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
             .toList();
     }
 
-    public boolean gameHasEnded() {
-        return gameEnded || isForceVictory();
-    }
-
     public VictoryResult getVictoryResult() {
         return victoryHelper.checkForVictory(this, victoryContext);
     }
 
+    public void addUnitToGraveyard(Entity entity) {
+        var entityInGame = getEntity(entity.getId());
+        if (entityInGame.isPresent()) {
+            inGameObjects.remove(entity.getId());
+            graveyard.add(entity);
+        }
+    }
+
+    public void removeFormation(AcsFormation formation) {
+        inGameObjects.remove(formation.getId());
+    }
+
     public void destroyUnits(AcsFormation formation, List<SBFUnit> destroyedUnits) {
+        System.out.println("Destroying units: " + destroyedUnits);
         for (SBFUnit unit : destroyedUnits) {
             for (var element : unit.getElements()) {
                 var entityOpt = getEntity(element.getId());
                 if (entityOpt.isPresent()) {
                     var entity = entityOpt.get();
-                    damageEntity(entity);
-                    graveyard.add(entity);
-                    inGameObjects.remove(entity.getId());
+                    addUnitToGraveyard(entity);
                     var roll = Compute.rollD6(2);
                     switch (roll.getIntValue()) {
-                        case 2 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_CAPTURED);
-                        case 3, 4 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
-                        case 5, 6, 7, 8, 9 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-                        case 10, 11 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
-                        case 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
+                        case 2, 3 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
+                        case 1, 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
+                        default -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
                     }
-
+                    damageEntity(entity, entity.getRemovalCondition());
                 }
             }
 
-            formation.getUnits().remove(unit);
+            formation.removeUnit(unit);
             if (formation.getUnits().isEmpty()) {
-                // formation destroyed
-                inGameObjects.remove(formation.getId());
+                removeFormation(formation);
             }
         }
     }
 
-    private void damageEntity(Entity entity) {
-        double damage = switch (entity.getRemovalCondition()) {
-            case IEntityRemovalConditions.REMOVE_CAPTURED -> entity.getTotalOArmor() * 0.4;
-            case IEntityRemovalConditions.REMOVE_DEVASTATED -> entity.getTotalOArmor() + entity.getTotalOInternal() / 2.0;
-            case IEntityRemovalConditions.REMOVE_EJECTED -> (double) entity.getTotalOArmor() / Compute.rollD6(1).getIntValue();
+    public void damageEntity(Entity entity, int removalCondition) {
+        double targetDamage = switch (removalCondition) {
+            case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> (double) entity.getTotalOArmor() / Compute.d6();
+            case IEntityRemovalConditions.REMOVE_DEVASTATED -> 1000; // no damage is actually applied
             case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
+            case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
             default -> entity.getTotalOArmor() * 0.33;
         };
-        DamageHandlerChooser.chooseHandler(entity).applyDamage((int) damage);
+        var numberOfDices = (int) (targetDamage / 6 / 0.6);
+        DamageHandlerChooser.chooseHandler(entity).applyDamageInClusters(Compute.d6(numberOfDices), Compute.d6());
     }
 }

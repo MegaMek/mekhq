@@ -3,13 +3,29 @@ package mekhq.campaign.autoResolve.damageHandler;
 import megamek.common.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static megamek.common.Compute.randomInt;
+import static megamek.common.Compute.rollD6;
 
 public interface DamageHandler<E extends Entity> {
 
     E entity();
+
+    default void applyDamageInClusters(int dmg, int clusterSize) {
+        int totalDamage = dmg;
+        while (totalDamage > 0) {
+            if (entity().getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED) {
+                // devastated units don't need to take any damage
+                break;
+            }
+            var clusterDamage = Math.min(totalDamage, clusterSize);
+            applyDamage(clusterDamage);
+            totalDamage -= clusterDamage;
+
+        }
+    }
 
     default void applyDamage(int dmg) {
         int hitLocation = getHitLocation();
@@ -29,12 +45,14 @@ public interface DamageHandler<E extends Entity> {
             if (entity.getOArmor(i) <= 0) {
                 continue;
             }
-            if (!entity.isLocationBlownOff(i) && entity.getInternal(i) > 0) {
+            var locationIsNotBlownOff = !entity.isLocationBlownOff(i);
+            var locationIsNotDestroyed = entity.getInternal(i) > 0;
+            if (locationIsNotBlownOff && locationIsNotDestroyed) {
                 validLocations.add(i);
             }
         }
-
-        return validLocations.isEmpty() ? -1 : validLocations.get(randomInt(validLocations.size()));
+        Collections.shuffle(validLocations);
+        return validLocations.isEmpty() ? -1 : validLocations.get(0);
     }
 
     default void hitEntity(HitDetails hitDetails) {
@@ -66,10 +84,22 @@ public interface DamageHandler<E extends Entity> {
         System.out.println("Location destroyed: " + hit.getLocation());
         if (hit.getLocation() == Mek.LOC_CT || hit.getLocation() == Mek.LOC_HEAD) {
             entity.setDestroyed(true);
-            entity.setSalvage(true);
             if (hit.getLocation() == Mek.LOC_HEAD) {
-                entity.getCrew().setHits(Crew.DEATH, 0);
-                System.out.println("Crew dead");
+                var toHit = new ToHitData();
+                toHit.addModifier(8, "Ejection");
+                if (rollD6(2).isTargetRollSuccess(toHit) && entity().isEjectionPossible()) {
+                    entity.getCrew().setEjected(true);
+                    entity.getCrew().setHits(5, 0);
+                } else {
+                    entity.getCrew().setHits(Crew.DEATH, 0);
+                }
+                if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
+                    entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+                    entity.setSalvage(true);
+                }
+            } else {
+                entity.setSalvage(false);
+                entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
             }
         }
     }
@@ -85,6 +115,7 @@ public interface DamageHandler<E extends Entity> {
         if (crew.isDead()) {
             entity.setDestroyed(true);
             entity.setSalvage(true);
+            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
             System.out.println("Crew dead");
         }
     }

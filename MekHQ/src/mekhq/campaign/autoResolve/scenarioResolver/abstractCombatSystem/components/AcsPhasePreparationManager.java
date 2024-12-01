@@ -54,7 +54,6 @@ public record AcsPhasePreparationManager (AcsGameManager gameManager) implements
     }
 
     private void clearReports() {
-        gameManager.addPendingReportsToGame();
-        gameManager.clearPendingReports();
+        gameManager.flushPendingReports();
     }
 }

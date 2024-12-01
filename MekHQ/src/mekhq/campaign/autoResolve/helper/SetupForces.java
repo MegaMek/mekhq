@@ -4,6 +4,7 @@ import io.sentry.Sentry;
 import megamek.common.*;
 import megamek.common.force.Force;
 import megamek.common.force.Forces;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static mekhq.Utilities.retrieveUnit;
 
 
 public class SetupForces {
@@ -300,11 +303,10 @@ public class SetupForces {
     private void sendEntities(List<Entity> entities) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
         for (final Entity entity : new ArrayList<>(entities)) {
-            entity.restore();
+
             if (entity instanceof ProtoMek) {
                 int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
                     private final int ownerId = entity.getOwnerId();
-
                     @Override
                     public boolean accept(Entity entity) {
                         return (entity instanceof ProtoMek) && (ownerId == entity.getOwnerId());
@@ -317,7 +319,6 @@ public class SetupForces {
             if (Entity.NONE == entity.getId()) {
                 entity.setId(game.getNextEntityId());
             }
-            // game.addEntity(entity);
 
             // Give the unit a spotlight, if it has the spotlight quirk
             entity.setExternalSearchlight(entity.hasExternalSearchlight()
