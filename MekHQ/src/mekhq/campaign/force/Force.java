@@ -389,15 +389,17 @@ public class Force {
      */
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
         Vector<UUID> allUnits;
+
         if (combatForcesOnly && !isCombatForce()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
         }
 
-        for (Force f : subForces) {
-            allUnits.addAll(f.getAllUnits(combatForcesOnly));
+        for (Force force : subForces) {
+            allUnits.addAll(force.getAllUnits(combatForcesOnly));
         }
+
         return allUnits;
     }
 
@@ -841,11 +843,7 @@ public class Force {
     public int getTotalBV(Campaign campaign, boolean forceStandardBattleValue) {
         int bvTotal = 0;
 
-        for (Force subforce : getSubForces()) {
-            bvTotal += subforce.getTotalBV(campaign, forceStandardBattleValue);
-        }
-
-        for (UUID unitId : getUnits()) {
+        for (UUID unitId : getAllUnits(false)) {
             // no idea how this would happen, but sometimes a unit in a forces unit ID list
             // has an invalid ID?
             if (campaign.getUnit(unitId) == null) {
@@ -904,16 +902,16 @@ public class Force {
      * Calculates the unit type most represented in this force
      * and all subforces.
      *
-     * @param c Working campaign
+     * @param campaign Working campaign
      * @return Majority unit type.
      */
-    public int getPrimaryUnitType(Campaign c) {
+    public int getPrimaryUnitType(Campaign campaign) {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
 
-        for (UUID id : getUnits()) {
-            int unitType = c.getUnit(id).getEntity().getUnitType();
+        for (UUID id : getAllUnits(false)) {
+            int unitType = campaign.getUnit(id).getEntity().getUnitType();
 
             unitTypeBuckets.merge(unitType, 1, Integer::sum);
 

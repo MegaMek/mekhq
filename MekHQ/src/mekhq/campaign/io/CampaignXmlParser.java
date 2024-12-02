@@ -78,6 +78,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 
@@ -354,7 +355,7 @@ public class CampaignXmlParser {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, StrategicFormation> lances = retVal.getStrategicFormations();
+            Hashtable<Integer, StrategicFormation> lances = retVal.getStrategicFormationsTable();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new StrategicFormation(f.getId(), retVal));
@@ -795,7 +796,7 @@ public class CampaignXmlParser {
             StrategicFormation strategicFormation = StrategicFormation.generateInstanceFromXML(wn2);
 
             if (strategicFormation != null) {
-                campaign.importLance(strategicFormation);
+                campaign.addStrategicFormation(strategicFormation);
             }
         }
     }
@@ -856,6 +857,7 @@ public class CampaignXmlParser {
             }
         }
 
+        recalculateStrategicFormations(retVal);
         logger.info("Load of Force Organization complete!");
     }
 
