@@ -611,7 +611,7 @@ public class StrategicFormation {
                     weight += entity.getWeight();
                 }
             } catch (Exception exception) {
-                logger.error(String.format("Failed to parse unit ID %s: %s", forceId, exception));
+                logger.error("Failed to parse unit ID {}: {}", forceId, exception);
             }
         }
 

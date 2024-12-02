@@ -549,10 +549,7 @@ public class MekHQ implements GameListener {
                     // person.setStatus(PersonnelStatus.ACTIVE);
                     person.setHits(person.getHitsPrior());
                 }
-                for (Unit unit : ((AutoResolveGame) autoResolveConcludedEvent.getGame()).getUnits()) {
-                    var entity = unit.getEntity();
 
-                }
                 // should I do something here? Maybe do the trigger?
                 // MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
                 return;
