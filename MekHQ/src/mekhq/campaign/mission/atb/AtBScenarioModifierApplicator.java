@@ -79,6 +79,9 @@ public class AtBScenarioModifierApplicator {
 
         int weightClass = randomForceWeight();
 
+        logger.info(String.format("++ Generating a force for the %s template ++",
+            templateToApply.getForceName()).toUpperCase());
+
         generateForce(scenario, scenario.getContract(campaign), campaign, effectiveBV,
                 effectiveUnitCount, weightClass, templateToApply, true);
 

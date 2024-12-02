@@ -283,12 +283,13 @@ public class AtBDynamicScenarioFactory {
             effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign, false);
 
             for (ScenarioForceTemplate forceTemplate : currentForceTemplates) {
+                logger.info(String.format("++ Generating a force for the %s template ++",
+                    forceTemplate.getForceName()).toUpperCase());
+
                 if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     int weightClass = randomForceWeight();
-                    logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
-
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
@@ -398,6 +399,10 @@ public class AtBDynamicScenarioFactory {
                 effectiveBV = (int) round(effectiveBV * difficultyMultiplier);
                 effectiveUnitCount = (int) round(effectiveUnitCount  * difficultyMultiplier);
 
+                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+                    logger.info(String.format("Effective xBV Budget: %s (adjusted for difficulty)",
+                        effectiveBV));
+                }
                 // Intentional fall-through: opposing third parties are either the contracted
                 // enemy or "Unidentified Hostiles" which are considered pirates or bandit caste
                 // with random quality and skill
@@ -445,12 +450,15 @@ public class AtBDynamicScenarioFactory {
         int forceBV = 0;
         double forceMultiplier = forceTemplate.getForceMultiplier();
 
-        if (forceMultiplier == 0) {
-            forceMultiplier = 1;
-        }
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()
+            || forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
+            // This means force multiplier wasn't initialized in the template
+            if (forceMultiplier == 0) {
+                forceMultiplier = 1;
+                logger.warn(String.format("Force multiplier is zero for %s", forceTemplate.getForceName()));
+            }
 
-        if (forceMultiplier != 1) {
-            logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
+            logger.info(String.format("Force Multiplier: %s (from scenario template)", forceMultiplier));
         }
 
         int forceBVBudget = (int) (effectiveBV * forceMultiplier);
@@ -459,8 +467,8 @@ public class AtBDynamicScenarioFactory {
             forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100));
         }
 
-        if (forceTemplate.getForceMultiplier() != 1) {
-            logger.info(String.format("BV Budget was %s, now %s (includes Modifier settings and Multiplier)",
+        if (forceTemplate.getForceMultiplier() != 1 && forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+            logger.info(String.format("BV Budget was %s, now %s",
                 effectiveBV, forceBVBudget));
         }
 
@@ -468,6 +476,9 @@ public class AtBDynamicScenarioFactory {
 
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
+
+            logger.info(String.format("Unit Budget was %s, now %s",
+                effectiveUnitCount, forceUnitBudget));
         } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal())
             || (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
             forceUnitBudget = forceTemplate.getFixedUnitCount() == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE ? lanceSize : forceTemplate.getFixedUnitCount();
@@ -2957,7 +2968,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        logger.info(String.format("Total Base %s Budget: %s (adjusted for campaign difficulty)",
+        logger.info(String.format("Total Base %s Budget: %s (may be adjusted by Effective Player BV Multiplier)",
             generationMethod, bvBudget));
 
         return bvBudget;
