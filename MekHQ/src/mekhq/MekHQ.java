@@ -26,6 +26,7 @@ import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -34,6 +35,7 @@ import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
@@ -373,7 +375,29 @@ public class MekHQ implements GameListener {
         gameThread.start();
     }
 
+    /**
+     * Start hosting a game.
+     * This method is used to start hosting a game. It will create a new server and a client and connect to it.
+     *
+     * @param scenario                      The scenario to host
+     * @param loadSavegame                  Whether to load a savegame
+     * @param meks                          The units you want to use in the scenario
+     */
     public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks) {
+        startHost(scenario, loadSavegame, meks, null);
+    }
+
+    /**
+     * Start hosting a game.
+     * This method is used to start hosting a game. It will create a new server and a client and connect to it.
+     *
+     * @param scenario                      The scenario to host
+     * @param loadSavegame                  Whether to load a savegame
+     * @param meks                          The units you want to use in the scenario
+     * @param autoResolveBehaviorSettings   The auto resolve behavior settings to use if running an AtB scenario and auto resolve is wanted
+     */
+    public void startHost(Scenario scenario, boolean loadSavegame, List<Unit> meks, @Nullable BehaviorSettings autoResolveBehaviorSettings)
+    {
         HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getName());
         hostDialog.setVisible(true);
 
@@ -426,7 +450,7 @@ public class MekHQ implements GameListener {
 
         // Start the game thread
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
@@ -493,7 +517,7 @@ public class MekHQ implements GameListener {
     }
 
     @Override
-    public void gameVictory(GameVictoryEvent gve) {
+    public void gameVictory(PostGameResolution gve) {
         // Prevent double run
         if (gameThread.stopRequested()) {
             return;

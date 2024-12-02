@@ -2169,7 +2169,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         if (specialistMenu.getMenuComponentCount() > 0) {
                             abMenu.add(specialistMenu);
                         }
-                    } else if ((person.getOptions().getOption(spa.getName()).getType() == IOption.CHOICE)
+                    } else if (Optional.ofNullable((person.getOptions().getOption(spa.getName()))).isPresent()
+                            && (person.getOptions().getOption(spa.getName()).getType() == IOption.CHOICE)
                             && !(person.getOptions().getOption(spa.getName()).booleanValue())) {
                         JMenu specialistMenu = new JMenu(spa.getDisplayName());
                         List<String> choices = spa.getChoiceValues();

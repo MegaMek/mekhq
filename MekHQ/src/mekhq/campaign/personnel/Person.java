@@ -3753,8 +3753,13 @@ public class Person {
     }
 
     public boolean canTech(final Entity entity) {
+        if (entity == null) {
+            return false;
+        }
         if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
             return hasSkill(SkillType.S_TECH_MEK);
+        } else if (entity instanceof Dropship || entity instanceof Jumpship) {
+            return hasSkill(SkillType.S_TECH_VESSEL);
         } else if (entity instanceof Aero) {
             return hasSkill(SkillType.S_TECH_AERO);
         } else if (entity instanceof BattleArmor) {
@@ -3845,11 +3850,21 @@ public class Person {
     public void setMinutesLeft(final int minutesLeft) {
         this.minutesLeft = minutesLeft;
         if (engineer && (getUnit() != null)) {
-            // set minutes for all crewmembers
-            for (Person p : getUnit().getActiveCrew()) {
-                p.setMinutesLeft(minutesLeft);
-            }
+            // set minutes for all crew members, except the engineer to not cause infinite recursion.
+            getUnit().getActiveCrew()
+                .stream()
+                .filter(this::isNotSelf)
+                .forEach(p -> p.setMinutesLeft(minutesLeft));
         }
+    }
+
+    /**
+     * Checks if the other person is not the same person as this person, easy right?
+     * @param p Person to check against
+     * @return  true if the person is not the same person as this person
+     */
+    private boolean isNotSelf(Person p) {
+        return !this.equals(p);
     }
 
     public int getOvertimeLeft() {
@@ -3859,10 +3874,10 @@ public class Person {
     public void setOvertimeLeft(final int overtimeLeft) {
         this.overtimeLeft = overtimeLeft;
         if (engineer && (getUnit() != null)) {
-            // set minutes for all crewmembers
-            for (Person p : getUnit().getActiveCrew()) {
-                p.setMinutesLeft(overtimeLeft);
-            }
+            getUnit().getActiveCrew()
+                .stream()
+                .filter(this::isNotSelf)
+                .forEach(p -> p.setOvertimeLeft(overtimeLeft));
         }
     }
 
@@ -3899,6 +3914,19 @@ public class Person {
 
     public boolean isTech() {
         return isTechMek() || isTechAero() || isTechMechanic() || isTechBA();
+    }
+
+    /**
+     * Checks if the person is a tech, includes mektek, mechanic, aerotek, BAtek and the non-cannon "large vessel tek"
+     * @return true if the person is a tech
+     */
+    public boolean isTechExpanded() {
+        return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
+    }
+    
+    public boolean isTechLargeVessel() {
+        boolean hasSkill = hasSkill(SkillType.S_TECH_VESSEL);
+        return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
     }
 
     public boolean isTechMek() {

@@ -370,7 +370,7 @@ public abstract class AbstractProcreation {
 
             // if the mother is at school, add the baby to the list of tag alongs
             if ((mother.getEduAcademyName() != null)
-                    && (!EducationController.getAcademy(mother.getEduAcademyName(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
+                    && (!EducationController.getAcademy(mother.getEduAcademySet(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
 
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);

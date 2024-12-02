@@ -18,9 +18,6 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
@@ -28,16 +25,14 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
@@ -103,7 +98,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
         ArrayList<Entity> otherForce = new ArrayList<>();

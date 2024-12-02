@@ -21,6 +21,7 @@
 package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -133,6 +134,7 @@ public class CampaignTest {
         when(testCampaign.getTechs()).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean())).thenCallRealMethod();
         when(testCampaign.getTechs(anyBoolean(), anyBoolean())).thenCallRealMethod();
+        when(testCampaign.getTechsExpanded(anyBoolean(), anyBoolean(), anyBoolean())).thenCallRealMethod();
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);
@@ -181,5 +183,29 @@ public class CampaignTest {
 
         // Ensure it was removed
         assertTrue(campaign.getTransportShips().isEmpty());
+    }
+
+    @Test
+    void testIniative() {
+        Campaign campaign = new Campaign();
+
+        campaign.applyInitiativeBonus(6);
+        // should increase bonus to 6 and max to 6
+        assertTrue(campaign.getInitiativeBonus() == 6);
+        assertTrue(campaign.getInitiativeMaxBonus() == 6);
+        // Should not be able to increment over max of 6
+        campaign.initiativeBonusIncrement(true);
+        assertFalse(campaign.getInitiativeBonus() == 7);
+        campaign.applyInitiativeBonus(2);
+        assertEquals(campaign.getInitiativeBonus(), 6);
+        // But should be able to decrease below max
+        campaign.initiativeBonusIncrement(false);
+        assertEquals(campaign.getInitiativeBonus(), 5);
+        // After setting lower Max Bonus any appied bonus thats less then max should set
+        // bonus to max
+        campaign.setInitiativeMaxBonus(3);
+        campaign.applyInitiativeBonus(2);
+        assertEquals(campaign.getInitiativeBonus(), 3);
+
     }
 }
