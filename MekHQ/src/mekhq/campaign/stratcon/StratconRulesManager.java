@@ -38,6 +38,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -365,10 +366,24 @@ public class StratconRulesManager {
          return scenario;
      }
 
+    /**
+     * Generates a reinforcement interception scenario for a given StratCon track.
+     * An interception scenario is set up at unoccupied coordinates on the track.
+     * If the scenario setup is successful, it is finalized and the deployment date for the
+     * scenario is set as the current date.
+     *
+     * @param campaign the current campaign
+     * @param contract the {@link AtBContract for which the scenario is created
+     * @param track the {@link StratconTrackState} where the scenario is located, or {@code null}
+     * if not located on a track
+     * @param template the {@link ScenarioTemplate} used to create the scenario
+     * @param interceptedForce the {@link Force} that's being intercepted in the scenario
+     */
      public static @Nullable void generateReinforcementInterceptionScenario(
          Campaign campaign, AtBContract contract,
-         StratconTrackState track, StratconCoords scenarioCoords,
-         ScenarioTemplate template, Force interceptedForce) {
+         StratconTrackState track, ScenarioTemplate template, Force interceptedForce) {
+         StratconCoords scenarioCoords = getUnoccupiedCoords(track, false);
+
          StratconScenario scenario = setupScenario(scenarioCoords, interceptedForce.getId(), campaign,
              contract, track, template, true);
 
@@ -378,6 +393,7 @@ public class StratconRulesManager {
          }
 
          finalizeBackingScenario(campaign, contract, track, true, scenario);
+         scenario.setDeploymentDate(campaign.getLocalDate());
      }
 
     /**
@@ -1026,9 +1042,9 @@ public class StratconRulesManager {
         if (track != null) {
             for (StratconFacility facility : track.getFacilities().values()) {
                 if (facility.getOwner().equals(ForceAlignment.Player) || facility.getOwner().equals(Allied)) {
-                    facilityModifier++;
-                } else {
                     facilityModifier--;
+                } else {
+                    facilityModifier++;
                 }
             }
         }
@@ -1036,25 +1052,28 @@ public class StratconRulesManager {
         reinforcementTargetNumber.addModifier(facilityModifier, "Facilities");
 
         // Skill Modifier
-        int skillModifier = contract.getAllySkill().getAdjustedValue();
+        int skillModifier = -contract.getAllySkill().getAdjustedValue();
 
-        if (contract.getCommandRights().isIndependent()) {
+        ContractCommandRights commandRights = contract.getCommandRights();
+        if (commandRights.isIndependent()) {
             if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
                 skillModifier = campaign.getReputation().getAverageSkillLevel().getAdjustedValue();
             }
         }
 
-        skillModifier -= contract.getEnemySkill().getAdjustedValue();
+        skillModifier += contract.getEnemySkill().getAdjustedValue();
 
         reinforcementTargetNumber.addModifier(skillModifier, "Skill");
 
         // Liaison Modifier
         int liaisonModifier = 0;
-        if (contract.getCommandRights().isLiaison()) {
-            liaisonModifier = 2;
+        if (commandRights.isLiaison()) {
+            liaisonModifier -= 1;
+        } else if (commandRights.isHouse() || commandRights.isIntegrated()) {
+            liaisonModifier -= 2;
         }
 
-        reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
+        reinforcementTargetNumber.addModifier(liaisonModifier, "Command Rights");
 
         // Make the roll
         int roll = d6(2);
@@ -1091,17 +1110,8 @@ public class StratconRulesManager {
         int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
         int interceptionRoll = Compute.randomInt(100);
 
-        // Was the reinforcement attempt successful, or did the enemy choose not to intercept?
-        if (roll >= reinforcementTargetNumber.getValue()) {
-            reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
-            return SUCCESS;
-        }
-
-        if (interceptionRoll >= interceptionOdds) {
+        // Was the reinforcement attempt successful?
+        if (roll >= reinforcementTargetNumber.getValue() && interceptionRoll >= interceptionOdds) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsSuccessNoInterception.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
@@ -1161,7 +1171,7 @@ public class StratconRulesManager {
                 case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
             };
 
-            generateReinforcementInterceptionScenario(campaign, contract, track, scenarioCoords, scenarioTemplate, force);
+            generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
             return INTERCEPTED;
         }
@@ -1176,6 +1186,10 @@ public class StratconRulesManager {
                 CLOSING_SPAN_TAG, roll, targetNumber));
 
             campaign.addReport(reportStatus.toString());
+
+            if (campaign.getCampaignOptions().isUseFatigue()) {
+                increaseFatigue(force.getId(), campaign);
+            }
 
             return DELAYED;
         }
@@ -1197,7 +1211,7 @@ public class StratconRulesManager {
             case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
         };
 
-        generateReinforcementInterceptionScenario(campaign, contract, track, scenarioCoords, scenarioTemplate, force);
+        generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
         return INTERCEPTED;
     }
