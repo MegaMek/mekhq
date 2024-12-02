@@ -19,9 +19,7 @@
 package mekhq.campaign.stratcon;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Minefield;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -39,9 +37,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
@@ -52,12 +50,26 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
+import static java.lang.Math.round;
+import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.SkillType.S_TACTICS;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.FIGHT_LANCE;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.SUCCESS;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -709,7 +721,7 @@ public class StratconRulesManager {
 
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
-        boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != ForceAlignment.Allied);
+        boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
         int targetNum = calculateScenarioOdds(track, contract, true);
         boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= targetNum);
 
@@ -771,7 +783,7 @@ public class StratconRulesManager {
 
         if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
             StratconFacility facility = track.getFacility(coords);
-            boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
+            boolean alliedFacility = facility.getOwner() == Allied;
             template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
             scenario = generateScenario(campaign, contract, track, forceID, coords, template);
             setupFacilityScenario(scenario, facility);
@@ -816,7 +828,7 @@ public class StratconRulesManager {
         // - if so indicated by parameter, roll a random allied facility objective and
         // add it if not defend
         AtBScenarioModifier objectiveModifier = null;
-        boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
+        boolean alliedFacility = facility.getOwner() == Allied;
 
         objectiveModifier = alliedFacility ? AtBScenarioModifier.getRandomAlliedFacilityModifier()
                 : AtBScenarioModifier.getRandomHostileFacilityModifier();
@@ -1013,7 +1025,7 @@ public class StratconRulesManager {
         int facilityModifier = 0;
         if (track != null) {
             for (StratconFacility facility : track.getFacilities().values()) {
-                if (facility.getOwner().equals(Player) || facility.getOwner().equals(Allied)) {
+                if (facility.getOwner().equals(ForceAlignment.Player) || facility.getOwner().equals(Allied)) {
                     facilityModifier++;
                 } else {
                     facilityModifier--;
@@ -1245,7 +1257,7 @@ public class StratconRulesManager {
         }
 
         // set the # of rerolls based on the actual lance assigned.
-        int tactics = scenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
+        int tactics = scenario.getBackingScenario().getLanceCommanderSkill(S_TACTICS, campaign);
         scenario.getBackingScenario().setRerolls(tactics);
         // The number of defensive points available to a force entering a scenario is
         // 2 x tactics. By default, those points are spent on conventional minefields.
@@ -1900,7 +1912,7 @@ public class StratconRulesManager {
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
         if (campaign.getStrategicFormationsTable().containsKey(forceID)) {
-            Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormations();
+            Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
             StrategicFormation formation = strategicFormations.get(forceID);
 
             if (formation == null) {
@@ -1939,7 +1951,7 @@ public class StratconRulesManager {
         boolean nonCloakedOrNoscenario = (scenario == null) || scenario.getBackingScenario().isCloaked();
 
         StratconFacility facility = track.getFacility(coords);
-        boolean alliedFacility = (facility != null) && (facility.getOwner() == ForceAlignment.Allied);
+        boolean alliedFacility = (facility != null) && (facility.getOwner() == Allied);
 
         return (!track.areAnyForceDeployedTo(coords) || alliedFacility) && nonCloakedOrNoscenario;
     }
@@ -2131,10 +2143,10 @@ public class StratconRulesManager {
         // if we the facility didn't have any data defined for what happens when it's
         // captured
         // fall back to the default of just switching the owner
-        if (facility.getOwner() == ForceAlignment.Allied) {
+        if (facility.getOwner() == Allied) {
             facility.setOwner(Opposing);
         } else {
-            facility.setOwner(ForceAlignment.Allied);
+            facility.setOwner(Allied);
         }
     }
 
@@ -2203,7 +2215,7 @@ public class StratconRulesManager {
                 if (localFacility != null) {
                     // if the ignored scenario was on top of an allied facility
                     // then it'll get captured, and the player will possibly lose a SO
-                    if (localFacility.getOwner() == ForceAlignment.Allied) {
+                    if (localFacility.getOwner() == Allied) {
                         localFacility.setOwner(Opposing);
                     }
 
