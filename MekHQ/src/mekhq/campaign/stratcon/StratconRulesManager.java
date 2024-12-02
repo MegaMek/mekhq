@@ -373,7 +373,7 @@ public class StratconRulesManager {
      * scenario is set as the current date.
      *
      * @param campaign the current campaign
-     * @param contract the {@link AtBContract for which the scenario is created
+     * @param contract the {@link AtBContract} for which the scenario is created
      * @param track the {@link StratconTrackState} where the scenario is located, or {@code null}
      * if not located on a track
      * @param template the {@link ScenarioTemplate} used to create the scenario
@@ -1160,7 +1160,6 @@ public class StratconRulesManager {
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
 
-            StratconCoords scenarioCoords = scenario.getCoords();
             MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
 
             String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
@@ -1200,7 +1199,6 @@ public class StratconRulesManager {
             CLOSING_SPAN_TAG, roll, targetNumber));
         campaign.addReport(reportStatus.toString());
 
-        StratconCoords scenarioCoords = scenario.getCoords();
         MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
 
         String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";

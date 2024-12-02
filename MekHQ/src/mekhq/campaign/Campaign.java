@@ -3932,7 +3932,7 @@ public class Campaign implements ITechManager {
      * Admin/Transport personnel skill levels and contract start dates are considered during negotiations.
      * Side effects include state changes and report generation.
      */
-    private void negotiateAdditionalSupportPoints() {
+    public void negotiateAdditionalSupportPoints() {
         // Fetch a list of all Admin/Transport personnel
         List<Person> adminTransport = new ArrayList<>();
 
@@ -4565,7 +4565,7 @@ public class Campaign implements ITechManager {
     public int getInitiativeBonus() {
         return initiativeBonus;
     }
-    
+
     public void setInitiativeBonus(int bonus) {
         initiativeBonus = bonus;
     }
@@ -4573,7 +4573,7 @@ public class Campaign implements ITechManager {
     public void applyInitiativeBonus(int bonus) {
         if (bonus > initiativeMaxBonus) {
             initiativeMaxBonus = bonus;
-        } 
+        }
         if ((bonus + initiativeBonus) > initiativeMaxBonus) {
             initiativeBonus = initiativeMaxBonus;
         } else {
