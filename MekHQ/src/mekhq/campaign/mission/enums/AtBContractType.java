@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import java.util.ResourceBundle;
-
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -27,6 +25,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
+
+import java.util.ResourceBundle;
 
 public enum AtBContractType {
     // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,

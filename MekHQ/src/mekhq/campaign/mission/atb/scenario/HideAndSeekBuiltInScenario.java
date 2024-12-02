@@ -29,6 +29,7 @@ import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        Map<String, MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
         List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
@@ -107,10 +108,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         }
 
         if (isAttacker()) {
-            addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign),
+            addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign),
                     EntityWeightClass.WEIGHT_ASSAULT, 2, 0, campaign);
         } else {
-            addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign),
+            addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign),
                     EntityWeightClass.WEIGHT_HEAVY, 0, 0, campaign);
         }
 

@@ -18,24 +18,15 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.OffBoardDirection;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class ReconRaidBuiltInScenario extends AtBScenario {
@@ -85,7 +76,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign),
+        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign),
                 isAttacker() ? EntityWeightClass.WEIGHT_ASSAULT : EntityWeightClass.WEIGHT_MEDIUM, 0, 0, campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);

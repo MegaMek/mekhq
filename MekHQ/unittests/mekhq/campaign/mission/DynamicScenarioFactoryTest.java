@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,15 +19,13 @@
 package mekhq.campaign.mission;
 
 import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.UnitType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests relevant to the AtBDynamicScenarioFactory
- * 
+ *
  * @author NickAragua
  */
 public class DynamicScenarioFactoryTest {
@@ -56,62 +54,5 @@ public class DynamicScenarioFactoryTest {
 
         startingEdge = Board.START_NW;
         assertEquals(Board.START_SE, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
-    }
-
-    private void testAeroLanceSizeInner(int unitTypeCode, int numFightersPerFlight, boolean isPlanetOwner) {
-        int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight;
-        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-        int expected;
-        switch (unitTypeCode) {
-            case UnitType.AEROSPACEFIGHTER:
-                expected = numFightersPerFlight;
-                break;
-            case UnitType.CONV_FIGHTER:
-                expected = weightCountRoll;
-                break;
-            default:
-                expected = (useASFRoll >= 4) ? numFightersPerFlight : weightCountRoll;
-        }
-
-        assertEquals(expected, AtBDynamicScenarioFactory.getAeroLanceSize(unitTypeCode, numFightersPerFlight,
-                weightCountRoll, useASFRoll));
-    }
-
-    @Test
-    public void testAeroLanceSize() {
-        assertEquals(2, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AEROSPACEFIGHTER, true, "FC"));
-        assertEquals(3, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AEROSPACEFIGHTER, true, "CC"));
-        assertEquals(2,
-                AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, false,
-                        "FC"));
-        assertEquals(3,
-                AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, false,
-                        "CC"));
-
-        // Roll some "random" values and check inner function return values
-        int unitTypeCode = UnitType.AEROSPACEFIGHTER;
-        int numFightersPerFlight = 2;
-        boolean isPlanetOwner = false;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        isPlanetOwner = true;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        numFightersPerFlight = 3;
-        isPlanetOwner = false;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        isPlanetOwner = true;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-
-        unitTypeCode = UnitType.CONV_FIGHTER;
-        numFightersPerFlight = 2;
-        isPlanetOwner = false;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        isPlanetOwner = true;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        numFightersPerFlight = 3;
-        isPlanetOwner = false;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
-        isPlanetOwner = true;
-        testAeroLanceSizeInner(unitTypeCode, numFightersPerFlight, isPlanetOwner);
     }
 }

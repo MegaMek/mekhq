@@ -1,10 +1,53 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.02-SNAPSHOT
++ Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
++ PR #5206: Re-enabled CamOps Contract Market Method
++ PR #5207: Re-enabled Confirm Preset Option for New Campaign Preset Picker
++ Fix #5203: Handled Exception when Fetching Force by ID in StratconPanel
++ Fix #5202, #5226: Increase Time Limit Scale Factors in Scenario Templates
++ Fix #5197: Reduced Force Multiplier for Pirate Scenarios #5211
++ Fix #5196: Fix Spouse Dependency Check in Divorce Logic
++ Fix #5190: Enhanced Mothballing in ContractAutomation
++ Fix #5184: Corrected Unit Site Comparison Logic
++ Fix #5182: Refactored getCurrentPrisoners to use getActivePersonnel
++ Fix #4652, #5194, #5193, #5205: Reputation Error Corrections & Report Reformatting
++ Fix #5204: Enhanced INVALID Formation Level Checking
++ Fix #5220: Lowered Capture Percentage Requirement to 25%
++ PR #5223: Adjusted Command Rights Scenario Modifiers
++ Fix #5219: Updated Force Generation for Irregular Scenarios
++ PR #5225: Removed Legacy AtB Guaranteed SPAs
++ PR #5227: Renamed "Add Funds" to "Add Transaction" for Clarity
++ PR #5228: Added Monthly StratCon Support Points Generation #5228
++ Fix #5181: Generate required lances for manual AtB contracts for StratCon init
++ PR #5234: Refined Turnover Prompt Dialog Text
++ PR #5173: Rename TroopSpace to InfantryCompartment
++ PR #5210: Update Rank Systems to Version 0.50.02-SNAPSHOT
++ Fix #5239: Simulated Relationship Behavior Fixes
++ Fix #5235: Fixed Typo and Added null check in RetirementDefectionTracker
++ PR #5243: Updated MekHQ Morale & StratCon Scenario Spawn Methods
++ PR #5155: CombatMath: Make princess take the reins so you can play a game of spreadsheets!
++ Fix #5238: Added Better Handling for Negative Skill Levels
++ PR #5247: [FG3] Updated Aircraft Force Generation, Unit Culling, and Added ProtoMeks
++ Fix #5236: Stop My Mechwarrior Won't Stop Having Babies
++ Fix #4849: Replaced Cubicles Persist after Saving & Loading
++ Fix #4529: adds null check before accessing skill property
++ PR #5253: Allows to select a previous engineer or new crew member to activate large vessels
++ Fix #4163: This allows the left thruster to be a missing part
++ Fix #4085: MegaMek fails to load Dropship sent from MekHQ
++ Fix #4600: Add Persistent Initiative Bonus to campaign
++ Fix #5169: Added temp Astechs and Medics to Personnel Report; Support Personnel Salaries now match the Finances tab.
++ PR #5250: Renamed 'Lances' to 'Strategic Formations', Expanded Functionality
++ Fix #4600: Added initiativeMaxBonus to Campaign
++ PR #5263: Refactored Strategic Formation Weight Categories
++ Fix #5262: Refactored Scenario Force Building Logic.
++ PR #5266: Refactored Morale Calculations and Logging
++ PR #5268: Refactored Strategic Formations
++ Fix #5149: Better error message for null values in contract fields
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
-+ FIX #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
++ Fix #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
 + PR #4655: Refactored Random Company Name Generator to Use CSV
 + PR #4691: Revised CamOps Reputation Derived AtB Modifier, Renamed getUnitRatingMod Method
 + PR #4693: Refactored Personality Characteristic Display in Personnel Table

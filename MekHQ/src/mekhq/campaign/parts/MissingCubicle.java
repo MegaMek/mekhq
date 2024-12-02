@@ -92,10 +92,11 @@ public class MissingCubicle extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
+            Part parentReference = parentPart;
             remove(false);
-            if (null != parentPart) {
-                parentPart.addChildPart(actualReplacement);
-                parentPart.updateConditionFromPart();
+            if (null != parentReference) {
+                parentReference.addChildPart(actualReplacement);
+                parentReference.updateConditionFromPart();
             }
         }
     }

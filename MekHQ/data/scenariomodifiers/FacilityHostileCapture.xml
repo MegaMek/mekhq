@@ -29,7 +29,7 @@
 			<description>Leave intact the following force(s) and unit(s) to be able to take control of this facility:</description>
 			<destinationEdge>NONE</destinationEdge>
 			<objectiveCriterion>Preserve</objectiveCriterion>
-			<percentage>75</percentage>
+			<percentage>25</percentage>
 			<timeLimit>0</timeLimit>
 			<timeLimitAtMost>true</timeLimitAtMost>
 			<timeLimitType>None</timeLimitType>

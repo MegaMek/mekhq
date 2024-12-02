@@ -82,15 +82,20 @@ public class CommandRating {
      * @param skill  the skill
      */
     private static int getSkillValue(Person person, String skill) {
+        int skillValue = 0;
+
         if (person == null) {
             return 0;
         }
 
         if (person.hasSkill(skill)) {
-            return person.getSkill(skill).getExperienceLevel();
+            skillValue += person.getSkill(skill).getLevel();
+            skillValue += person.getSkill(skill).getBonus();
         } else {
             return 0;
         }
+
+        return skillValue;
     }
 
     /**

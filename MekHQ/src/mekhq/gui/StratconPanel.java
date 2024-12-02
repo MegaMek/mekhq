@@ -655,6 +655,17 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
+                        String forceName = "";
+                        try {
+                            Force force = campaign.getForce(forceID);
+                            forceName = force.getName();
+                        } catch (Exception e) {
+                            // If we can't successfully fetch the Force, there is no point trying
+                            // to draw it on the map.
+                            logger.error(String.format("Failed to fetch force from ID %s", forceID));
+                            continue;
+                        }
+
                         g2D.setColor(Color.GREEN);
 
                         BufferedImage forceImage = getImage(StratconBiomeManifest.FORCE_FRIENDLY,
@@ -670,7 +681,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                 TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD));
                         g2D.setFont(newFont);
 
-                        drawTextEffect(g2D, forceMarker, campaign.getForce(forceID).getName(), currentCoords);
+                        drawTextEffect(g2D, forceMarker, forceName, currentCoords);
 
                         g2D.setFont(currentFont);
                     }

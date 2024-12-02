@@ -279,7 +279,7 @@ public class MiscAwards {
      */
     private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
-            return campaign.getLanceList().stream()
+            return campaign.getAllStrategicFormations().stream()
                     .anyMatch(lance -> (lance.getRole().isTraining()) && (lance.getCommanderId().equals(person)));
         }
 

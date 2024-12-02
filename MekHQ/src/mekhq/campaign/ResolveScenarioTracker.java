@@ -24,7 +24,7 @@ package mekhq.campaign;
 import megamek.client.Client;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.event.GameVictoryEvent;
+import megamek.common.event.PostGameResolution;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -91,7 +91,7 @@ public class ResolveScenarioTracker {
     Optional<File> unitList = Optional.empty();
     Client client;
     Boolean control;
-    private GameVictoryEvent victoryEvent;
+    private PostGameResolution victoryEvent;
 
     private static final MMLogger logger = MMLogger.create(ResolveScenarioTracker.class);
 
@@ -2142,7 +2142,7 @@ public class ResolveScenarioTracker {
         }
     }
 
-    public void setEvent(GameVictoryEvent gve) {
+    public void setEvent(PostGameResolution gve) {
         victoryEvent = gve;
     }
 
