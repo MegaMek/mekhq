@@ -445,6 +445,10 @@ public class AtBDynamicScenarioFactory {
         int forceBV = 0;
         double forceMultiplier = forceTemplate.getForceMultiplier();
 
+        if (forceMultiplier == 0) {
+            forceMultiplier = 1;
+        }
+
         if (forceMultiplier != 1) {
             logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
         }
@@ -800,51 +804,49 @@ public class AtBDynamicScenarioFactory {
                 forceTemplate.getForceName(), forceBV, forceBVBudget, balancingType));
 
             if ((forceBV > forceBVBudget) && generatedEntities.size() != 1) {
-                List<Entity> culledEntities = new ArrayList<>();
+                List<Entity> forceComposition = new ArrayList<>();
                 Collections.shuffle(generatedEntities);
 
                 forceBV = 0;
 
                 for (Entity entity : generatedEntities) {
-                    int battleValue;
-
-                    if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-                        battleValue = entity.getGenericBattleValue();
-                    } else {
-                        battleValue = entity.calculateBattleValue();
+                    // We count transported units and their transporters as one unit when building a force.
+                    // This prevents issues where we cull an APC, leaving infantry stranded.
+                    if (entity.getTransportId() != Entity.NONE) {
+                        continue;
                     }
 
-                    if ((forceBV + battleValue) > forceBVBudget) {
-                        culledEntities.add(entity);
+                    int battleValue = getBattleValue(campaign, entity);
 
+                    if (forceBV > forceBVBudget) {
                         logger.info(String.format("Culled %s (%s %s BV)",
                             entity.getDisplayName(), battleValue, balancingType));
 
                         continue;
                     }
 
-                    forceBV += battleValue;
-                }
+                    // The +10% bound allows us to have a degree of leeway when building the force
+                    if ((forceBV + battleValue) <= (forceBVBudget * 1.1)) {
+                        forceComposition.add(entity);
 
-                if (generatedEntities.isEmpty()) {
-                    Entity entity = culledEntities.get(0);
+                        for (Transporter transporter : entity.getTransports()) {
+                            forceComposition.addAll(transporter.getLoadedUnits());
+                        }
 
-                    int battleValue;
-                    if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-                        battleValue = entity.getGenericBattleValue();
+                        forceBV += battleValue;
                     } else {
-                        battleValue = entity.calculateBattleValue();
+                        logger.info(String.format("Culled %s (%s %s BV)",
+                            entity.getDisplayName(), battleValue, balancingType));
                     }
-
-                    logger.info(String.format("Ended up with an empty force, restoring %s (%s %s BV)",
-                        entity.getDisplayName(), battleValue, balancingType));
-
-                    culledEntities.remove(0);
                 }
 
-                generatedEntities.removeAll(culledEntities);
-            }
+                if (forceComposition.isEmpty()) {
+                    implementForceCompositionFallback(generatedEntities, forceComposition);
+                }
 
+                generatedEntities.clear();
+                generatedEntities.addAll(forceComposition);
+            }
 
             logger.info(String.format("Final force %s / %s %s BV",
                     forceBV, forceBVBudget, balancingType));
@@ -883,32 +885,52 @@ public class AtBDynamicScenarioFactory {
                 && campaign.getCampaignOptions().isUseGenericBattleValue()
                 && BatchallFactions.usesBatchalls(factionCode)
                 && contract.isBatchallAccepted()) {
-
                 // Player force values
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
                 // First bid away units that exceed the player's estimated Battle Value
-                int targetBattleValue = (int) round(playerBattleValue * getHonorRating(campaign, factionCode));
-                int currentBattleValue = 0;
+                forceBVBudget = (int) round(playerBattleValue * getHonorRating(campaign, factionCode));
+                forceBV = 0;
 
-                List<Entity> entities = generatedForce.getFullEntityList(campaign);
-                Collections.shuffle(entities);
+                List<Entity> forceComposition = new ArrayList<>();
+                Collections.shuffle(generatedEntities);
 
-                for (Entity entity : entities) {
-                    int battleValue = entity.calculateBattleValue();
-                    if ((currentBattleValue + battleValue) > targetBattleValue) {
+                for (Entity entity : generatedEntities) {
+                    // As before, we count transported units and their transporters as one unit when
+                    // building a force.
+                    // This prevents issues where we cull an APC, leaving infantry stranded.
+                    if (entity.getTransportId() != Entity.NONE) {
+                        continue;
+                    }
+
+                    int battleValue = getBattleValue(campaign, entity);
+
+                    if (forceBV > forceBVBudget) {
                         bidAwayForces.add(entity);
                         continue;
                     }
 
-                    currentBattleValue += battleValue;
+                    // The +10% bound allows us to have a degree of leeway when building the force
+                    if ((forceBV + battleValue) <= (forceBVBudget * 1.1)) {
+                        forceComposition.add(entity);
+
+                        for (Transporter transporter : entity.getTransports()) {
+                            forceComposition.addAll(transporter.getLoadedUnits());
+                        }
+
+                        forceBV += battleValue;
+                    } else {
+                        bidAwayForces.add(entity);
+                    }
                 }
 
-                for (Entity entity : bidAwayForces) {
-                    int entityIndex = entities.indexOf(entity);
-                    generatedForce.removeEntity(entityIndex);
+                if (forceComposition.isEmpty()) {
+                    implementForceCompositionFallback(generatedEntities, forceComposition);
                 }
+
+                generatedEntities.clear();
+                generatedEntities.addAll(forceComposition);
 
                 // We don't want to sub in Battle Armor for forces that are meant to only have a
                 // certain number of units.
@@ -978,6 +1000,68 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * This method creates a fallback force consisting of a single unit and any units occupying one
+     * of its transporters.
+     * It iterates through the provided ArrayList of Entities, and adds the first non-transported
+     * entity it encounters along with any units in its transporters, to the provided List of
+     * Entities, forceComposition.
+     *
+     * @param generatedEntities An ArrayList of Entities that have been generated.
+     * @param forceComposition  A List of Entities representing a force composition to be updated.
+     */
+    private static void implementForceCompositionFallback(ArrayList<Entity> generatedEntities,
+                                                          List<Entity> forceComposition) {
+        for (Entity entity : generatedEntities) {
+            if (entity.getTransportId() != Entity.NONE) {
+                continue;
+            }
+
+            forceComposition.add(entity);
+
+            for (Transporter transporter : entity.getTransports()) {
+                forceComposition.addAll(transporter.getLoadedUnits());
+            }
+
+            logger.info(String.format("Ended up with an empty force, restoring %s and any" +
+                    " units in its transporters",
+                entity.getDisplayName()));
+        }
+    }
+
+    /**
+     * This method calculates the Battle Value of a given Entity for use in force composition generation.
+     * The calculation is made either using a genericBattleValue or a calculatedBattleValue,
+     * depending on Campaign Options.
+     * When calculating Battle Value, the method also considers any Entities loaded in the
+     * transporters of the base Entity, adding their respective Battle Values to the total.
+     *
+     * @param campaign The current campaign.
+     * @param entity   The Entity for which the Battle Value is being calculated.
+     * @return The calculated Battle Value as integer.
+     */
+    private static int getBattleValue(Campaign campaign, Entity entity) {
+        int battleValue;
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            battleValue = entity.getGenericBattleValue();
+
+            for (Transporter transporter : entity.getTransports()) {
+                for (Entity loadedEntity : transporter.getLoadedUnits()) {
+                    battleValue += loadedEntity.getGenericBattleValue();
+                }
+            }
+        } else {
+            battleValue = entity.calculateBattleValue();
+
+            for (Transporter transporter : entity.getTransports()) {
+                for (Entity loadedEntity : transporter.getLoadedUnits()) {
+                    battleValue += loadedEntity.calculateBattleValue();
+                }
+            }
+        }
+        return battleValue;
     }
 
     /**

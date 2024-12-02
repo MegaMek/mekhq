@@ -2,7 +2,7 @@
  * Lance.java
  *
  * Copyright (c) 2011 - Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,7 +23,9 @@ package mekhq.campaign.force;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -39,9 +41,14 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
+import static megamek.common.Entity.ETYPE_AEROSPACEFIGHTER;
+import static megamek.common.Entity.ETYPE_MEK;
+import static megamek.common.Entity.ETYPE_PROTOMEK;
+import static megamek.common.Entity.ETYPE_TANK;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
@@ -61,8 +68,8 @@ public class StrategicFormation {
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
 
-    public static final long ETYPE_GROUND = Entity.ETYPE_MEK |
-            Entity.ETYPE_TANK | Entity.ETYPE_INFANTRY | Entity.ETYPE_PROTOMEK;
+    public static final long ETYPE_GROUND = ETYPE_MEK |
+            ETYPE_TANK | Entity.ETYPE_INFANTRY | ETYPE_PROTOMEK;
 
     /** Indicates a lance has no assigned mission */
     public static final int NO_MISSION = -1;
@@ -80,7 +87,7 @@ public class StrategicFormation {
      * @return The standard force size for the given faction. It returns {@code STR_CLAN} if the
      * faction is a Clan, {@code STR_CS} if the faction is ComStar or WoB, and {@code STR_IS} otherwise.
      */
-    public static int getStdLanceSize(Faction faction) {
+    public static int getStandardForceSize(Faction faction) {
         if (faction.isClan()) {
             return STR_CLAN;
         } else if (faction.isComStarOrWoB()) {
@@ -182,13 +189,13 @@ public class StrategicFormation {
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MEK) != 0) {
+                    if ((entity.getEntityType() & ETYPE_MEK) != 0) {
                         armor += 1;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_AEROSPACEFIGHTER) != 0) {
                         other += 0.5;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_TANK) != 0) {
                         armor += 0.5;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0) {
+                    } else if ((entity.getEntityType() & ETYPE_PROTOMEK) != 0) {
                         other += 0.2;
                     } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         infantry += ((Infantry) entity).isSquad() ? 0.2 : 1;
@@ -228,22 +235,33 @@ public class StrategicFormation {
             }
         }
 
-        weight = weight / subForcesCount;
+        if (subForcesCount > 0) {
+            weight = weight / subForcesCount;
+        }
 
-        weight = weight * 4.0 / getStdLanceSize(campaign.getFaction());
-        if (weight < 40) {
+        int standardForceSize = getStandardForceSize(campaign.getFaction());
+
+        weight = weight / standardForceSize;
+
+        final int CATEGORY_ULTRA_LIGHT = 20;
+        final int CATEGORY_LIGHT = 35;
+        final int CATEGORY_MEDIUM = 55;
+        final int CATEGORY_HEAVY = 75;
+        final int CATEGORY_ASSAULT = 100;
+
+        if (weight < CATEGORY_ULTRA_LIGHT) {
             return WEIGHT_ULTRA_LIGHT;
         }
-        if (weight <= 130) {
+        if (weight <= CATEGORY_LIGHT) {
             return EntityWeightClass.WEIGHT_LIGHT;
         }
-        if (weight <= 200) {
+        if (weight <= CATEGORY_MEDIUM) {
             return EntityWeightClass.WEIGHT_MEDIUM;
         }
-        if (weight <= 280) {
+        if (weight <= CATEGORY_HEAVY) {
             return EntityWeightClass.WEIGHT_HEAVY;
         }
-        if (weight <= 390) {
+        if (weight <= CATEGORY_ASSAULT) {
             return EntityWeightClass.WEIGHT_ASSAULT;
         }
         return EntityWeightClass.WEIGHT_SUPER_HEAVY;
@@ -263,13 +281,12 @@ public class StrategicFormation {
         }
 
         /*
-         * Check that the number of units and weight are within the limits
-         * and that the force contains at least one ground unit.
+         * Check that the number of units and weight are within the limits.
          */
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
-            if (size < getStdLanceSize(campaign.getFaction()) - 1 ||
-                    size > getStdLanceSize(campaign.getFaction()) + 2) {
+            if (size < getStandardForceSize(campaign.getFaction()) - 1 ||
+                    size > getStandardForceSize(campaign.getFaction()) + 2) {
                 force.setStrategicFormation(false);
                 return false;
             }
@@ -319,6 +336,15 @@ public class StrategicFormation {
 
             for (Force childForce : childForces) {
                 if (childForce.isStrategicFormation()) {
+                    force.setStrategicFormation(false);
+                    return false;
+                }
+            }
+
+            List<Force> parentForces = force.getAllParents();
+
+            for (Force parentForce : parentForces) {
+                if (parentForce.isStrategicFormation()) {
                     force.setStrategicFormation(false);
                     return false;
                 }
@@ -566,38 +592,126 @@ public class StrategicFormation {
      * Worker function that calculates the total weight of a force with the given ID
      *
      * @param campaign       Campaign in which the force resides
-     * @param forceId Force for which to calculate weight
+     * @param forceId        Force for which to calculate weight
      * @return Total force weight
      */
     public static double calculateTotalWeight(Campaign campaign, int forceId) {
         double weight = 0.0;
 
         for (UUID id : campaign.getForce(forceId).getUnits()) {
-            Unit unit = campaign.getUnit(id);
-            if (null != unit) {
+            try {
+                Unit unit = campaign.getUnit(id);
                 Entity entity = unit.getEntity();
-                if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MEK) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
+
+                boolean isClan = campaign.getFaction().isClan();
+                long entityType = entity.getEntityType();
+
+                if (entityType == ETYPE_TANK) {
+                    if (isClan || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
+                        weight += entity.getWeight() * 0.5;
+                    } else {
                         weight += entity.getWeight();
-                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (campaign.getFaction().isClan() || campaign.getCampaignOptions().isAdjustPlayerVehicles()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
-                        if (campaign.getFaction().isClan()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
                     }
+                } else if (entityType == ETYPE_AEROSPACEFIGHTER) {
+                    if (isClan) {
+                        weight += entity.getWeight() * 0.5;
+                    } else {
+                        weight += entity.getWeight();
+                    }
+                } else {
+                    weight += entity.getWeight();
                 }
+            } catch (Exception exception) {
+                logger.error(String.format("Failed to parse unit ID %s: %s", forceId, exception));
             }
         }
 
         return weight;
+    }
+
+    /**
+     * This static method updates the strategic formations across the campaign.
+     * It starts at the top level force, and calculates the strategic formations for each sub-force.
+     * It keeps only the eligible strategic formations and imports them into the campaign.
+     * After every formation is processed, an 'OrganizationChangedEvent' is triggered by that force.
+     *
+     * @param campaign the current campaign.
+     */
+    public static void recalculateStrategicFormations(Campaign campaign) {
+        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
+        StrategicFormation strategicFormation = strategicFormations.get(0); // This is the origin node
+        Force force = campaign.getForce(0);
+
+        // Does the force already exist in our hashtable? If so, update it accordingly
+        if (strategicFormation != null) {
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (!isEligible) {
+                campaign.removeStrategicFormation(0);
+            }
+
+            force.setStrategicFormation(isEligible);
+        // Otherwise, create a new formation and then add it to the table, if appropriate
+        } else {
+            strategicFormation = new StrategicFormation(0, campaign);
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (isEligible) {
+                campaign.addStrategicFormation(strategicFormation);
+            }
+
+            force.setStrategicFormation(isEligible);
+        }
+
+        // Update the TO&E and then begin recursively walking it
+        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+        recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
+    }
+
+    /**
+     * This method is used to update the strategic formations for the campaign working downwards
+     * from a specified node, through all of its sub-forces.
+     * It creates a new {@link StrategicFormation} for each sub-force and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the strategic formation status of
+     * the respective force is set to {@code true}.
+     * After every force is processed, an 'OrganizationChangedEvent' is triggered.
+     * This function runs recursively on each sub-force, effectively traversing the complete TO&E.
+     *
+     * @param campaign the current {@link Campaign}.
+     * @param workingNode the {@link Force} node from which the method starts working down through
+     *                   all its sub-forces.
+     */
+    private static void recalculateSubForceStrategicStatus(Campaign campaign, Hashtable<Integer,
+        StrategicFormation> strategicFormations, Force workingNode) {
+
+        for (Force force : workingNode.getSubForces()) {
+            int forceId = force.getId();
+            StrategicFormation strategicFormation = strategicFormations.get(forceId);
+
+            // Does the force already exist in our hashtable? If so, update it accordingly
+            if (strategicFormation != null) {
+                boolean isEligible = strategicFormation.isEligible(campaign);
+
+                if (!isEligible) {
+                    campaign.removeStrategicFormation(forceId);
+                }
+
+                force.setStrategicFormation(isEligible);
+            // Otherwise, create a new formation and then add it to the table, if appropriate
+            } else {
+                strategicFormation = new StrategicFormation(forceId, campaign);
+                boolean isEligible = strategicFormation.isEligible(campaign);
+
+                if (isEligible) {
+                    campaign.addStrategicFormation(strategicFormation);
+                }
+
+                force.setStrategicFormation(isEligible);
+            }
+
+            // Update the TO&E and then continue recursively walking it
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+            recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
+        }
     }
 }

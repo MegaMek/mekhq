@@ -381,7 +381,7 @@ public class AtBDynamicScenario extends AtBScenario {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }
 
-        StrategicFormation strategicFormation = campaign.getStrategicFormations().get(getForceIDs().get(0));
+        StrategicFormation strategicFormation = campaign.getStrategicFormationsTable().get(getForceIDs().get(0));
 
         if (strategicFormation != null) {
             strategicFormation.refreshCommander(campaign);

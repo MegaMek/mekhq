@@ -19,7 +19,9 @@
 package mekhq.campaign.stratcon;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Minefield;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -37,8 +39,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
@@ -50,26 +52,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.max;
-import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
-import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Player;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.SkillType.S_TACTICS;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.FIGHT_LANCE;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.SUCCESS;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -152,18 +140,30 @@ public class StratconRulesManager {
         // multiplies the BV budget of all
         int scenarioRolls = track.getRequiredLanceCount();
 
-        if (contract.getMoraleLevel().isDominating()) {
-            scenarioRolls++;
-        } else if (contract.getMoraleLevel().isOverwhelming()) {
-            scenarioRolls += 2;
+        if (!autoAssignLances) {
+            AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
+
+            switch (moraleLevel) {
+                case STALEMATE -> scenarioRolls = (int) round(scenarioRolls * 1.25);
+                case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.5);
+                case DOMINATING -> scenarioRolls = scenarioRolls * 2;
+                case OVERWHELMING -> scenarioRolls = scenarioRolls * 3;
+            }
         }
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
+            if (autoAssignLances && availableForceIDs.isEmpty()) {
+                break;
+            }
+
             int targetNum = calculateScenarioOdds(track, contract, false);
+            int roll = Compute.randomInt(100);
+
+            logger.info(String.format("StratCon Weekly Scenario Roll: %s vs. %s", roll, targetNum));
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
+            if (roll < targetNum) {
                 // pick random coordinates and force to drive the scenario
                 StratconCoords scenarioCoords = getUnoccupiedCoords(track, true);
 
@@ -188,9 +188,11 @@ public class StratconRulesManager {
                 int randomForceIndex = Compute.randomInt(availableForceIDs.size());
                 int randomForceID = availableForceIDs.get(randomForceIndex);
 
-                // remove the force from the available lists so we don't designate it as primary
+                // remove the force from the available lists, so we don't designate it as primary
                 // twice
-                availableForceIDs.remove(randomForceIndex);
+                if (autoAssignLances) {
+                    availableForceIDs.remove(randomForceIndex);
+                }
 
                 // we want to remove the actual int with the value, not the value at the index
                 sortedAvailableForceIDs.get(AllGroundTerrain).remove((Integer) randomForceID);
@@ -350,6 +352,7 @@ public class StratconRulesManager {
          // We return the scenario in case we want to make specific changes.
          return scenario;
      }
+
      public static @Nullable void generateReinforcementInterceptionScenario(
          Campaign campaign, AtBContract contract,
          StratconTrackState track, StratconCoords scenarioCoords,
@@ -885,7 +888,7 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        if (campaign.getStrategicFormations().get(forceID).getRole().isScouting()) {
+        if (campaign.getStrategicFormationsTable().get(forceID).getRole().isScouting()) {
             for (int direction = 0; direction < 6; direction++) {
                 StratconCoords checkCoords = coords.translate(direction);
 
@@ -939,7 +942,6 @@ public class StratconRulesManager {
     /**
      * Worker function that processes the effects of deploying a reinforcement force to a scenario
      *
-     * @param id
      * @param reinforcementType the type of reinforcement being deployed
      * @param campaignState     the state of the campaign
      * @param scenario          the current scenario
@@ -1270,7 +1272,7 @@ public class StratconRulesManager {
         if (lanceCommander != null){
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                StrategicFormation lance = campaign.getStrategicFormations().get(commanderUnit.getForceId());
+                StrategicFormation lance = campaign.getStrategicFormationsTable().get(commanderUnit.getForceId());
 
                 return (lance != null) && lance.getRole().isDefence();
             }
@@ -1642,7 +1644,7 @@ public class StratconRulesManager {
         // that are
         // deployed to a scenario and not in a track already
 
-        return campaign.getStrategicFormations().keySet().stream()
+        return campaign.getStrategicFormationsTable().keySet().stream()
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
@@ -1665,7 +1667,7 @@ public class StratconRulesManager {
         // assemble a set of all force IDs that are currently assigned to tracks that are not this one
         Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
                 .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
-                .filter(track -> (track != currentTrack) || !reinforcements)
+                .filter(track -> (!Objects.equals(track, currentTrack)) || !reinforcements)
                 .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
                 .collect(Collectors.toSet());
 
@@ -1675,11 +1677,7 @@ public class StratconRulesManager {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (StrategicFormation formation : campaign.getStrategicFormations().values()) {
-            if (!formation.isEligible(campaign)) {
-                continue;
-            }
-
+        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
@@ -1901,7 +1899,7 @@ public class StratconRulesManager {
         // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
-        if (campaign.getStrategicFormations().containsKey(forceID)) {
+        if (campaign.getStrategicFormationsTable().containsKey(forceID)) {
             Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormations();
             StrategicFormation formation = strategicFormations.get(forceID);
 

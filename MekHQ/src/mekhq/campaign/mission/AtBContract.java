@@ -462,6 +462,9 @@ public class AtBContract extends Contract {
         }
 
         TargetRoll targetNumber = new TargetRoll();
+        logger.info("Making Morale Check");
+        logger.info(String.format("Current Morale: %s (%s)",
+            getMoraleLevel().toString(), getMoraleLevel().ordinal()));
 
         // Confidence:
         int enemySkillRating = getEnemySkill().getAdjustedValue() - 2;
@@ -485,6 +488,7 @@ public class AtBContract extends Contract {
 
         int confidence = enemySkillRating - allySkillRating;
         targetNumber.addModifier(confidence, "confidence");
+        logger.info(String.format("Confidence: %s", confidence >= 0 ? "+" + confidence : confidence));
 
         // Reliability:
         int reliability = getEnemyQuality();
@@ -531,6 +535,7 @@ public class AtBContract extends Contract {
         }
 
         targetNumber.addModifier(reliability, "reliability");
+        logger.info(String.format("Reliability: %s", reliability >= 0 ? "+" + reliability : reliability));
 
         // Force Type (unimplemented)
         // TODO once we have force types defined on the StratCon map, we should handle modifiers here.
@@ -566,32 +571,46 @@ public class AtBContract extends Contract {
 
         int performanceModifier = 0;
 
-        if (victories >= (defeats * 2)) {
-            performanceModifier -= 4;
-        } else if (victories > defeats) {
-            performanceModifier -= 2;
-        } else if (defeats >= (victories * 2)) {
-            performanceModifier += 4;
+        if (victories > defeats) {
+            if (victories >= (defeats * 2)) {
+                performanceModifier -= 4;
+            } else {
+                performanceModifier -= 2;
+            }
         } else if (defeats > victories) {
-            performanceModifier += 2;
+            if (defeats >= (victories * 2)) {
+                performanceModifier += 4;
+            } else {
+                performanceModifier += 2;
+            }
         }
 
         targetNumber.addModifier(performanceModifier, "performanceModifier");
+        logger.info(String.format("Performance: %s", performanceModifier >= 0 ?
+            "+" + performanceModifier : performanceModifier));
 
         // Total morale modifier calculation
         int roll = Compute.d6(2) + targetNumber.getValue();
+        logger.info(String.format("Total Modifier: %s", targetNumber.getValue()));
+        logger.info(String.format("Roll: %s", roll));
 
         // Morale level determination based on roll value
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
 
         if (roll < 2) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 2, 0)]);
+            logger.info("Result: Morale Level -2");
         } else if (roll < 5) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 1, 0)]);
+            logger.info("Result: Morale Level -1");
         } else if ((roll > 12)) {
             setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
+            logger.info("Result: Morale Level +1");
         } else if ((roll > 9)) {
             setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
+            logger.info("Result: Morale Level +2");
+        } else {
+            logger.info("Result: Morale Unchanged");
         }
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
