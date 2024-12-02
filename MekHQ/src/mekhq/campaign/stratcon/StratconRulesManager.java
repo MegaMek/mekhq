@@ -19,9 +19,7 @@
 package mekhq.campaign.stratcon;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Minefield;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -39,8 +37,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
@@ -52,12 +50,26 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
+import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Player;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
+import static mekhq.campaign.personnel.SkillType.S_TACTICS;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.FIGHT_LANCE;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.SUCCESS;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -74,22 +86,47 @@ public class StratconRulesManager {
         /**
          * Nothing
          */
-        None,
+        NONE,
 
         /**
          * Lance is already deployed to the track
          */
-        ChainedScenario,
+        CHAINED_SCENARIO,
 
         /**
-         * We pay a support point or convert a Campaign Victory Point to a support point
+         * We pay a support point and make a regular roll
          */
-        SupportPoint,
+        REGULAR,
 
         /**
-         * The lance's deployment orders are "Fight"
+         * The lance's deployment orders are "Fight". We pay a support point and make an enhanced roll
          */
-        FightLance
+        FIGHT_LANCE
+    }
+
+    /**
+     * What were the results of the reinforcement roll?
+     */
+    public enum ReinforcementResultsType {
+        /**
+         * The reinforcement attempt was successful.
+         */
+        SUCCESS,
+
+        /**
+         * The reinforcements arrive later than normal.
+         */
+        DELAYED,
+
+        /**
+         * The attempt failed, nothing else happens.
+         */
+        FAILED,
+
+        /**
+         * The reinforcements were intercepted.
+         */
+        INTERCEPTED
     }
 
     /**
@@ -300,7 +337,7 @@ public class StratconRulesManager {
                  randomForceID = availableForceIDs.get(randomForceIndex);
              }
 
-             scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track, template);
+             scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track, template, false);
          }
 
          if (scenario == null) {
@@ -312,6 +349,20 @@ public class StratconRulesManager {
 
          // We return the scenario in case we want to make specific changes.
          return scenario;
+     }
+     public static @Nullable void generateReinforcementInterceptionScenario(
+         Campaign campaign, AtBContract contract,
+         StratconTrackState track, StratconCoords scenarioCoords,
+         ScenarioTemplate template, Force interceptedForce) {
+         StratconScenario scenario = setupScenario(scenarioCoords, interceptedForce.getId(), campaign,
+             contract, track, template, true);
+
+         if (scenario == null) {
+             logger.error("Failed to generate a random interception scenario, aborting scenario generation.");
+             return;
+         }
+
+         finalizeBackingScenario(campaign, contract, track, true, scenario);
      }
 
     /**
@@ -605,7 +656,7 @@ public class StratconRulesManager {
 
         for (int forceID : forceIDs) {
             if (firstForce) {
-                scenario = setupScenario(scenarioCoords, forceID, campaign, contract, track, template);
+                scenario = setupScenario(scenarioCoords, forceID, campaign, contract, track, template, false);
                 firstForce = false;
 
                 if (scenario == null) {
@@ -688,7 +739,7 @@ public class StratconRulesManager {
      */
     private static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
                                                   AtBContract contract, StratconTrackState track) {
-        return setupScenario(coords, forceID, campaign, contract, track, null);
+        return setupScenario(coords, forceID, campaign, contract, track, null, false);
     }
 
     /**
@@ -707,14 +758,15 @@ public class StratconRulesManager {
      * @param track     The relevant StratCon track.
      * @param template  A specific {@link ScenarioTemplate} to use for scenario setup, or
      *                  {@code null} to select the scenario template randomly.
+     * @param ignoreFacilities  Whether we should ignore any facilities at the selected location
      * @return The newly set up {@link StratconScenario}.
      */
     private static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
                                                   AtBContract contract, StratconTrackState track,
-                                                  @Nullable ScenarioTemplate template) {
+                                                  @Nullable ScenarioTemplate template, boolean ignoreFacilities) {
         StratconScenario scenario;
 
-        if (track.getFacilities().containsKey(coords)) {
+        if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
             StratconFacility facility = track.getFacility(coords);
             boolean alliedFacility = facility.getOwner() == ForceAlignment.Allied;
             template = StratconScenarioFactory.getFacilityScenario(alliedFacility);
@@ -887,78 +939,253 @@ public class StratconRulesManager {
     /**
      * Worker function that processes the effects of deploying a reinforcement force to a scenario
      *
+     * @param id
      * @param reinforcementType the type of reinforcement being deployed
-     * @param campaignState the state of the campaign
-     * @param scenario the current scenario
-     * @param campaign the campaign instance
+     * @param campaignState     the state of the campaign
+     * @param scenario          the current scenario
+     * @param campaign          the campaign instance
      * @return {@code true} if the reinforcement deployment is successful, {@code false} otherwise
      */
-    public static boolean processReinforcementDeployment(ReinforcementEligibilityType reinforcementType,
-            StratconCampaignState campaignState, StratconScenario scenario, Campaign campaign) {
-        // if the force is already deployed to the track, we're done
-        // if the force is a fight lance or we're using a support point
-        // if there is an SP to burn, burn it and we're done
-        // if there is a VP to burn, burn it and we're done
-        // now, roll 2d6 + lance commander tactics
-        // 9+ = deploy
-        // 6+ = deploy, apply negative modifier to scenario
-        // 2+ = fail to deploy, apply negative modifier to scenario; if fight lance,
-        // treat as 6+
+    public static ReinforcementResultsType processReinforcementDeployment(
+        Force force, ReinforcementEligibilityType reinforcementType, StratconCampaignState campaignState,
+        StratconScenario scenario, Campaign campaign) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+            MekHQ.getMHQOptions().getLocale());
 
-        switch (reinforcementType) {
-            case FightLance:
-            case SupportPoint:
-                if (campaignState.getSupportPoints() > 0) {
-                    campaignState.useSupportPoint();
-                    return true;
-                }
-
-                int tactics = scenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
-                int roll = Compute.d6(2);
-                int result = roll + tactics;
-
-                StringBuilder reportStatus = new StringBuilder();
-                reportStatus
-                        .append(String.format("Attempting to reinforce scenario %s without SP/VP, roll 2d6 + %d: %d",
-                                scenario.getName(), tactics, result));
-
-                // fail to reinforce
-                if ((result < 6) && (reinforcementType != ReinforcementEligibilityType.FightLance)) {
-                    reportStatus.append(" - reinforcement attempt failed.");
-                    campaign.addReport(reportStatus.toString());
-                    return false;
-                    // succeed but get an extra negative event added to the scenario
-                } else if (result < 9) {
-                    MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
-                    AtBScenarioModifier scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation,
-                            false);
-
-                    // keep rolling until we get an applicable one
-                    // TODO: have the AtBScenarioModifier sort these out instead for performance?
-                    while (scenarioModifier.getEventTiming() != EventTiming.PostForceGeneration) {
-                        scenarioModifier = AtBScenarioModifier.getRandomBattleModifier(mapLocation, false);
-                    }
-
-                    scenarioModifier.processModifier(scenario.getBackingScenario(), campaign,
-                            EventTiming.PostForceGeneration);
-
-                    reportStatus.append(String.format(
-                            " - reinforcement attempt succeeded; extra negative modifier (%s) applied to scenario.",
-                            scenarioModifier.getModifierName()));
-                    campaign.addReport(reportStatus.toString());
-                    return true;
-                    // succeed without reservation
-                } else {
-                    reportStatus.append(" - reinforcement attempt succeeded;");
-                    campaign.addReport(reportStatus.toString());
-                    return true;
-                }
-            case ChainedScenario:
-                return true;
-            case None:
-            default:
-                return false;
+        if (reinforcementType.equals(ReinforcementEligibilityType.CHAINED_SCENARIO)) {
+            return SUCCESS;
         }
+
+        AtBContract contract = campaignState.getContract();
+
+        // Start by determining who will be making the attempt
+        Person commandLiaison = campaign.getSeniorAdminCommandPerson();
+
+        if (commandLiaison == null) {
+            campaign.addReport(String.format(resources.getString("reinforcementsNoAdmin.text"),
+                scenario.getName(),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            return FAILED;
+        }
+
+        // Assuming we found a relevant character, spend the support point required for the attempt
+        if (campaignState.getSupportPoints() >= 1) {
+            campaignState.useSupportPoint();
+        } else {
+            campaign.addReport(String.format(resources.getString("reinforcementsNoSupportPoints.text"),
+                scenario.getName(),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            return FAILED;
+        }
+
+        // Then calculate the target number and modifiers
+
+        Skill skill = commandLiaison.getSkill(S_ADMIN);
+
+        if (skill == null) {
+            campaign.addReport(String.format(resources.getString("reinforcementsNoAdminSkill.text"),
+                scenario.getName(),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG), commandLiaison.getHyperlinkedFullTitle());
+            return FAILED;
+        }
+
+        int skillTargetNumber = skill.getFinalSkillValue();
+
+        TargetRoll reinforcementTargetNumber = new TargetRoll();
+
+        // Base Target Number
+        reinforcementTargetNumber.addModifier(skillTargetNumber, "Base TN");
+
+        // Facilities Modifier
+        StratconTrackState track = null;
+        for (StratconTrackState trackState : campaignState.getTracks()) {
+            if (trackState.getScenarios().containsValue(scenario)) {
+                track = trackState;
+                break;
+            }
+        }
+
+        int facilityModifier = 0;
+        if (track != null) {
+            for (StratconFacility facility : track.getFacilities().values()) {
+                if (facility.getOwner().equals(Player) || facility.getOwner().equals(Allied)) {
+                    facilityModifier++;
+                } else {
+                    facilityModifier--;
+                }
+            }
+        }
+
+        reinforcementTargetNumber.addModifier(facilityModifier, "Facilities");
+
+        // Skill Modifier
+        int skillModifier = contract.getAllySkill().getAdjustedValue();
+
+        if (contract.getCommandRights().isIndependent()) {
+            if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+                skillModifier = campaign.getReputation().getAverageSkillLevel().getAdjustedValue();
+            }
+        }
+
+        skillModifier -= contract.getEnemySkill().getAdjustedValue();
+
+        reinforcementTargetNumber.addModifier(skillModifier, "Skill");
+
+        // Liaison Modifier
+        int liaisonModifier = 0;
+        if (contract.getCommandRights().isLiaison()) {
+            liaisonModifier = 2;
+        }
+
+        reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
+
+        // Make the roll
+        int roll = d6(2);
+
+        // If the formation is in Fight Stance, use the highest of two rolls
+        String fightStanceReport = "";
+        if (reinforcementType == FIGHT_LANCE) {
+            int secondRoll = d6(2);
+            roll = max(roll, secondRoll);
+            fightStanceReport = String.format(" (%s)", roll);
+        }
+
+        StringBuilder modifierString = new StringBuilder();
+
+        for (TargetRollModifier modifier : reinforcementTargetNumber.getModifiers()) {
+            modifierString.append(modifier.getDesc()).append(' ').append(modifier.getValue()).append(' ');
+        }
+
+        logger.info(String.format("Reinforcement Roll Modifiers: %s", modifierString));
+
+        StringBuilder reportStatus = new StringBuilder();
+        reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
+                scenario.getName(), roll, fightStanceReport, reinforcementTargetNumber.getValue()));
+
+        if (roll == 2) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return FAILED;
+        }
+
+        int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
+        int interceptionRoll = Compute.randomInt(100);
+
+        // Was the reinforcement attempt successful, or did the enemy choose not to intercept?
+        if (roll >= reinforcementTargetNumber.getValue()) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return SUCCESS;
+        }
+
+        if (interceptionRoll >= interceptionOdds) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsSuccessNoInterception.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return SUCCESS;
+        }
+
+        reportStatus.append(' ');
+        reportStatus.append(String.format(resources.getString("reinforcementsInterceptionAttempt.text"),
+            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+            CLOSING_SPAN_TAG));
+
+        UUID commanderId = force.getForceCommanderID();
+
+        if (commanderId == null) {
+            logger.error("Force Commander ID is null.");
+
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsErrorNoCommander.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return FAILED;
+        }
+
+        Person commander = campaign.getPerson(commanderId);
+
+        if (commander == null) {
+            logger.error("Failed to fetch commander from ID.");
+
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsErrorUnableToFetchCommander.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return FAILED;
+        }
+
+        Skill tactics = commander.getSkill(S_TACTICS);
+
+        if (tactics == null) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementCommanderNoSkill.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+
+            StratconCoords scenarioCoords = scenario.getCoords();
+            MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+
+            String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
+
+            ScenarioTemplate scenarioTemplate = switch (mapLocation) {
+                case AllGroundTerrain, SpecificGroundTerrain -> ScenarioTemplate.Deserialize(String.format(templateString, ""));
+                case Space -> ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+                case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+            };
+
+            generateReinforcementInterceptionScenario(campaign, contract, track, scenarioCoords, scenarioTemplate, force);
+
+            return INTERCEPTED;
+        }
+
+        roll = d6(2);
+        int targetNumber = 12 - tactics.getFinalSkillValue();
+
+        if (roll >= targetNumber) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementEvasionSuccessful.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                CLOSING_SPAN_TAG, roll, targetNumber));
+
+            campaign.addReport(reportStatus.toString());
+
+            return DELAYED;
+        }
+
+        reportStatus.append(' ');
+        reportStatus.append(String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
+            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+            CLOSING_SPAN_TAG, roll, targetNumber));
+        campaign.addReport(reportStatus.toString());
+
+        StratconCoords scenarioCoords = scenario.getCoords();
+        MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+
+        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
+
+        ScenarioTemplate scenarioTemplate = switch (mapLocation) {
+            case AllGroundTerrain, SpecificGroundTerrain -> ScenarioTemplate.Deserialize(String.format(templateString, ""));
+            case Space -> ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+            case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+        };
+
+        generateReinforcementInterceptionScenario(campaign, contract, track, scenarioCoords, scenarioTemplate, force);
+
+        return INTERCEPTED;
     }
 
     /**
@@ -1461,7 +1688,7 @@ public class StratconRulesManager {
 
             int primaryUnitType = force.getPrimaryUnitType(campaign);
             boolean noReinforcementRestriction = !reinforcements ||
-                (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.None);
+                (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.NONE);
 
             if ((force.getScenarioId() <= 0)
                 && !force.getAllUnits(true).isEmpty()
@@ -1667,26 +1894,31 @@ public class StratconRulesManager {
                 .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
                 .anyMatch(track -> !Objects.equals(track, trackState)
                         && track.getAssignedForceCoords().containsKey(forceID))) {
-            return ReinforcementEligibilityType.None;
+            return ReinforcementEligibilityType.NONE;
         }
 
         // TODO: If the force has completed a scenario which allows it,
         // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
 
-        // if the force is in 'fight' stance, it'll be able to deploy using 'fight
-        // lance' rules
-        if (campaign.getStrategicFormations().containsKey(forceID)
-                && (campaign.getStrategicFormations().get(forceID).getRole().isFighting())) {
-            return ReinforcementEligibilityType.FightLance;
+        // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
+        if (campaign.getStrategicFormations().containsKey(forceID)) {
+            Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormations();
+            StrategicFormation formation = strategicFormations.get(forceID);
+
+            if (formation == null) {
+                return ReinforcementEligibilityType.NONE;
+            }
+
+            if (campaignState.getSupportPoints() > 0) {
+                if (formation.getRole().isFighting()) {
+                    return FIGHT_LANCE;
+                } else {
+                    return ReinforcementEligibilityType.REGULAR;
+                }
+            }
         }
 
-        // otherwise, the force requires support points to deploy
-        if (campaignState.getSupportPoints() > 0) {
-            return ReinforcementEligibilityType.SupportPoint;
-        }
-
-        /// if we don't have any of these things, it can't be deployed
-        return ReinforcementEligibilityType.None;
+        return ReinforcementEligibilityType.NONE;
     }
 
     /**
@@ -1902,7 +2134,7 @@ public class StratconRulesManager {
         // captured
         // fall back to the default of just switching the owner
         if (facility.getOwner() == ForceAlignment.Allied) {
-            facility.setOwner(ForceAlignment.Opposing);
+            facility.setOwner(Opposing);
         } else {
             facility.setOwner(ForceAlignment.Allied);
         }
@@ -1974,7 +2206,7 @@ public class StratconRulesManager {
                     // if the ignored scenario was on top of an allied facility
                     // then it'll get captured, and the player will possibly lose a SO
                     if (localFacility.getOwner() == ForceAlignment.Allied) {
-                        localFacility.setOwner(ForceAlignment.Opposing);
+                        localFacility.setOwner(Opposing);
                     }
 
                     return true;
@@ -1995,7 +2227,7 @@ public class StratconRulesManager {
 
                         scenario.setCoords(newCoords);
 
-                        int daysForward = Math.max(1, track.getDeploymentTime());
+                        int daysForward = max(1, track.getDeploymentTime());
 
                         scenario.setDeploymentDate(scenario.getDeploymentDate().plusDays(daysForward));
                         scenario.setActionDate(scenario.getActionDate().plusDays(daysForward));

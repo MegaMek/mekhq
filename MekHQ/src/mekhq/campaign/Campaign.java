@@ -143,6 +143,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
@@ -271,7 +272,7 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
-    private FameAndInfamyController fameAndInfamy;
+    private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
 
@@ -2669,6 +2670,33 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * This method finds and returns the most senior command administrator.
+     * It checks for both primary and secondary roles of the administrator.
+     * In case of multiple administrators with the command role, it uses the
+     * {@code outRanksUsingSkillTiebreaker} method to decide the seniority.
+     *
+     * @return the senior administrator with a command role, or {@code null} if no such
+     * administrator exists.
+     */
+    public @Nullable Person getSeniorAdminCommandPerson() {
+        Person seniorAdmin = null;
+
+        for (Person person : getAdmins()) {
+            if (person.getPrimaryRole().isAdministratorCommand() || person.getSecondaryRole().isAdministratorCommand()) {
+                if (seniorAdmin == null) {
+                    seniorAdmin = person;
+                    continue;
+                }
+
+                if (person.outRanksUsingSkillTiebreaker(this, seniorAdmin)) {
+                    seniorAdmin = person;
+                }
+            }
+        }
+        return seniorAdmin;
+    }
+
+    /**
      * Gets a list of applicable logistics personnel, or an empty list
      * if acquisitions automatically succeed.
      *
@@ -3864,10 +3892,10 @@ public class Campaign implements ITechManager {
 
         // Sort that list based on skill
         adminTransport.sort((person1, person2) -> {
-            Skill person1Skill = person1.getSkill(SkillType.S_ADMIN);
+            Skill person1Skill = person1.getSkill(S_ADMIN);
             int person1SkillValue = person1Skill.getLevel() + person1Skill.getBonus();
 
-            Skill person2Skill = person2.getSkill(SkillType.S_ADMIN);
+            Skill person2Skill = person2.getSkill(S_ADMIN);
             int person2SkillValue = person2Skill.getLevel() + person2Skill.getBonus();
 
             return Double.compare(person1SkillValue, person2SkillValue);
@@ -3896,7 +3924,7 @@ public class Campaign implements ITechManager {
                 Person assignedAdmin = adminTransport.get(0);
                 adminTransport.remove(0);
 
-                int targetNumber = assignedAdmin.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                int targetNumber = assignedAdmin.getSkill(S_ADMIN).getFinalSkillValue();
                 int roll = Compute.d6(2);
 
                 if (roll >= targetNumber) {
