@@ -268,6 +268,7 @@ public class Campaign implements ITechManager {
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
     private int initiativeBonus;
+    private int initiativeMaxBonus;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
@@ -311,6 +312,7 @@ public class Campaign implements ITechManager {
         crimePirateModifier = 0;
         dateOfLastCrime = null;
         initiativeBonus = 0;
+        initiativeMaxBonus = 1;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -4480,19 +4482,42 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public int getInitiativeBonus(){
+    public int getInitiativeBonus() {
         return initiativeBonus;
     }
-     public void setInitiativeBonus(int bonus){
+    
+    public void setInitiativeBonus(int bonus) {
         initiativeBonus = bonus;
     }
 
-    public void initiativeBonusIncrement(boolean change){
-        if(change){
-            setInitiativeBonus(++initiativeBonus);
-        }else{
-             setInitiativeBonus(--initiativeBonus);
+    public void applyInitiativeBonus(int bonus) {
+        if (bonus > initiativeMaxBonus) {
+            initiativeMaxBonus = bonus;
+        } 
+        if ((bonus + initiativeBonus) > initiativeMaxBonus) {
+            initiativeBonus = initiativeMaxBonus;
+        } else {
+            initiativeBonus += bonus;
         }
+    }
+
+    public void initiativeBonusIncrement(boolean change) {
+        if (change) {
+            setInitiativeBonus(++initiativeBonus);
+        } else {
+            setInitiativeBonus(--initiativeBonus);
+        }
+        if (initiativeBonus > initiativeMaxBonus) {
+            initiativeBonus = initiativeMaxBonus;
+        }
+    }
+
+    public int getInitiativeMaxBonus() {
+        return initiativeMaxBonus;
+    }
+
+    public void setInitiativeMaxBonus(int bonus) {
+        initiativeMaxBonus = bonus;
     }
 
     /**
@@ -5519,7 +5544,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "InitiativeBonus", initiativeBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "initiativeBonus", initiativeBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "initiativeMaxBonus", initiativeMaxBonus);
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());

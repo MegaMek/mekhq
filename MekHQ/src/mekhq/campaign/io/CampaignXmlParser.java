@@ -699,6 +699,8 @@ public class CampaignXmlParser {
                     retVal.setCrimeRating(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("initiativeBonus")) {
                     retVal.setInitiativeBonus(Integer.parseInt(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("initiativeMaxBonus")) {
+                    retVal.setInitiativeMaxBonus(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("crimePirateModifier")) {
                     retVal.setCrimePirateModifier(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("dateOfLastCrime")) {
