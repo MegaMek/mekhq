@@ -2,9 +2,8 @@ package mekhq.campaign.autoResolve.helper;
 
 import io.sentry.Sentry;
 import megamek.common.*;
-import megamek.common.force.Force;
+import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.force.Forces;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
@@ -21,12 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static mekhq.Utilities.retrieveUnit;
+import java.util.*;
 
 
 public class SetupForces {
@@ -36,7 +30,6 @@ public class SetupForces {
     private final List<Unit> units;
     private final AtBScenario scenario;
     private final AutoResolveGame game;
-    private final List<Force> forces = new ArrayList<>();
 
     public SetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, AutoResolveGame game) {
         this.campaign = campaign;
@@ -106,7 +99,7 @@ public class SetupForces {
         player.setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
         player.setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
         game.addPlayer(player.getId(), player);
-        var entities = new ArrayList<Entity>();
+
         /*
          * If the player is making a combat drop (either required by scenario
          * or player chose to deploy a DropShip), do not use deployment
@@ -129,11 +122,16 @@ public class SetupForces {
                 }
             }
         }
+        var entities = new ArrayList<Entity>();
 
         for (Unit unit : units) {
             // Get the Entity
-            Entity entity = unit.getEntity();
+            var entity = ASConverter.getUndamagedEntity(unit.getEntity());
             // Set the TempID for auto reporting
+            if (Objects.isNull(entity)) {
+                continue;
+            }
+
             entity.setExternalIdAsString(unit.getId().toString());
             // Set the owner
             entity.setOwner(player);
@@ -168,6 +166,9 @@ public class SetupForces {
             if (force != null) {
                 entity.setForceString(force.getFullMMName());
             }
+
+            var newCrewRef = getNewCrewRef(unit);
+            entity.setCrew(newCrewRef);
             entities.add(entity);
         }
 
@@ -199,6 +200,18 @@ public class SetupForces {
         }
 
         sendEntities(entities);
+    }
+
+    private static Crew getNewCrewRef(Unit unit) {
+        var originalCrew = unit.getEntity().getCrew();
+        var newCrewRef = new Crew(originalCrew.getCrewType(), originalCrew.getName(), originalCrew.getSize(),
+            originalCrew.getGunnery(), originalCrew.getPiloting(), originalCrew.getGender(), originalCrew.isClanPilot(),
+            originalCrew.getExtraData());
+
+        for (int i = 0; i < originalCrew.getCrewType().getCrewSlots(); i++) {
+            newCrewRef.setExternalIdAsString(originalCrew.getExternalIdAsString(i), i);
+        }
+        return newCrewRef;
     }
 
     private void setupMapSettings() {
@@ -242,6 +255,7 @@ public class SetupForces {
             mapSettings.setMapSize(1, 1);
             mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
         }
+
         game.setMapSettings(mapSettings);
     }
 
@@ -303,7 +317,6 @@ public class SetupForces {
     private void sendEntities(List<Entity> entities) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
         for (final Entity entity : new ArrayList<>(entities)) {
-
             if (entity instanceof ProtoMek) {
                 int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
                     private final int ownerId = entity.getOwnerId();
@@ -349,6 +362,7 @@ public class SetupForces {
                     topLevel = false;
                 }
                 entity.setForceString("");
+
                 game.addEntity(entity);
                 game.getForces().addEntity(entity, realId);
             }

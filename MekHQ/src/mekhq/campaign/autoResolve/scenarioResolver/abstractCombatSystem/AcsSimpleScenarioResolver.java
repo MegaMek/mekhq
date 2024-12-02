@@ -13,8 +13,11 @@
  */
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem;
 
+import megamek.common.Compute;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.damageHandler.CrewMustSurvive;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
+import mekhq.campaign.autoResolve.damageHandler.EntityMustSurvive;
 import mekhq.campaign.autoResolve.helper.SetupForces;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
@@ -29,7 +32,7 @@ import mekhq.campaign.mission.AtBScenario;
 public class AcsSimpleScenarioResolver extends ScenarioResolver {
 
     private final AcsGameManager gameManager = new AcsGameManager();
-    //    private final List<String> forceMustBePreserved = new ArrayList<>();
+
 
     public AcsSimpleScenarioResolver(AtBScenario scenario) {
         super(scenario);
@@ -44,12 +47,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         gameManager.addPhaseHandler(new MovementPhase(gameManager));
         gameManager.addPhaseHandler(new FiringPhase(gameManager));
         gameManager.addPhaseHandler(new EndPhase(gameManager));
-//        forceMustBePreserved.clear();
-//        scenario.getScenarioObjectives().forEach(objective -> {
-//            if (objective.getObjectiveCriterion().equals(ScenarioObjective.ObjectiveCriterion.Preserve)) {
-//                forceMustBePreserved.addAll(objective.getAssociatedForceNames());
-//            }
-//        });
+
     }
 
     @Override
@@ -76,8 +74,12 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
                         if (entityOpt.isPresent()) {
                             var entity = entityOpt.get();
                             var percent = (double) unit.getCurrentArmor() / unit.getArmor();
-                            var totalDamage = (int) (entity.getTotalArmor() * (1 - percent));
-                            DamageHandlerChooser.chooseHandler(entity).applyDamageInClusters(totalDamage, 5);
+                            var crits = Math.min(9, unit.getTargetingCrits() + unit.getMpCrits() + unit.getDamageCrits());
+                            percent -= percent * (crits / 11.0);
+                            percent = Math.min(0.95, percent);
+                            var totalDamage = (int) ((entity.getTotalArmor() + entity.getTotalInternal()) * (1 - percent));
+                            DamageHandlerChooser.chooseHandler(entity, CrewMustSurvive.YES, EntityMustSurvive.YES)
+                                .applyDamageInClusters(totalDamage, 5);
                         }
                     }
                 }

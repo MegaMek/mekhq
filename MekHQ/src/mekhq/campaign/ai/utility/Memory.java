@@ -27,8 +27,9 @@ public class Memory {
         return Optional.ofNullable(memory.getOrDefault(key, null));
     }
 
+    @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getMemories(String key) {
-        return (List<Map<String, Object>>) memory.getOrDefault(key, new ArrayList<Map<String, Object>>());
+        return (List<Map<String, Object>>) memory.computeIfAbsent(key, k -> new ArrayList<Map<String, Object>>());
     }
 
     public boolean containsKey(String key) {

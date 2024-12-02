@@ -21,8 +21,6 @@ import megamek.common.strategicBattleSystems.*;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,8 +96,10 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
 
         var attackerDelta = attackerRoll.getIntValue() - toHit.getValue();
         var defenderDelta = defenderRoll.getIntValue() - toHitDefender.getValue();
-        var engagements = (List<Map<String, Object>>) attacker.getMemory().computeIfAbsent("engagementControl", k -> new ArrayList<Map<String, Object>>());
-        var targetEngagements = (List<Map<String, Object>>) target.getMemory().computeIfAbsent("engagementControl", k -> new ArrayList<Map<String, Object>>());
+
+        var engagements = attacker.getMemory().getMemories("engagementControl");
+        var targetEngagements = target.getMemory().getMemories("engagementControl");
+
         attacker.setEngagementControl(engagementControl.getEngagementControl());
         attacker.setEngagementControlFailed(true);
 
@@ -117,11 +117,11 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
                     //
                 case EVADE:
                     // If the Evading Formation wins the Engagement Control Roll, it evades
-                    //the hostile Formation and it may pay its MP to move into any adjacent
+                    //the hostile Formation, and it may pay its MP to move into any adjacent
                     //hex (the evading Formation may continue its moving if it has not
                     //completed its movement yet this turn). An evading Formation may not
                     //engage in any combat this turn, including returning fire from an attack.
-                    //However the hostile Formation gets one free attack (the player of the
+                    //However, the hostile Formation gets one free attack (the player of the
                     //hostile Formation may select which Unit conducts the attack), applying
                     //+1 to-hit modifier and reducing damage from a successful attack by
                     //one-quarter (rounding down). This damage applies immediately,

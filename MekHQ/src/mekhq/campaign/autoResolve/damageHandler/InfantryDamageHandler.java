@@ -5,12 +5,34 @@ import megamek.common.*;
 public record InfantryDamageHandler(Infantry entity) implements DamageHandler<Infantry> {
 
     @Override
-    public void applyDamage(int dmg) {
-        applyDamageToInfantry(entity);
+    public CrewMustSurvive crewMustSurvive() {
+        return null;
     }
 
-    private void applyDamageToInfantry(Infantry infantry) {
-        if (infantry instanceof BattleArmor te) {
+    @Override
+    public EntityMustSurvive entityMustSurvive() {
+        return null;
+    }
+
+    @Override
+    public void damageArmor(HitDetails hitDetails) {
+        if (entity() instanceof BattleArmor te) {
+            for (int i = 0; i < te.getTroopers(); i++) {
+                var currentValueArmor = te.getArmor(BattleArmor.LOC_SQUAD);
+                var newArmorValue = Math.max(currentValueArmor - 1, 0);
+                if (te.getArmor(BattleArmor.LOC_TROOPER_1 + i) > 0) {
+                    te.setArmor(newArmorValue, BattleArmor.LOC_TROOPER_1 + i);
+                }
+            }
+        }
+        if (entity().isCrippled()) {
+            entity().setDestroyed(true);
+        }
+    }
+
+    @Override
+    public void damageInternals(HitDetails hitDetails) {
+        if (entity() instanceof BattleArmor te) {
             for (int i = 0; i < te.getTroopers(); i++) {
                 var currentValue = te.getInternal(BattleArmor.LOC_SQUAD);
                 var newValue = Math.max(currentValue - 1, 0);
@@ -19,13 +41,13 @@ public record InfantryDamageHandler(Infantry entity) implements DamageHandler<In
                 }
             }
         } else {
-            var currentValue = infantry.getInternal(Infantry.LOC_INFANTRY);
+            var currentValue = entity().getInternal(Infantry.LOC_INFANTRY);
             var newValue = Math.max(currentValue - 1, 0);
-            infantry.setInternal(newValue, Infantry.LOC_INFANTRY);
+            entity().setInternal(newValue, Infantry.LOC_INFANTRY);
         }
 
-        if (infantry.isCrippled()) {
-            infantry.setDestroyed(true);
+        if (entity().isCrippled()) {
+            entity().setDestroyed(true);
         }
     }
 }

@@ -1,9 +1,6 @@
 package mekhq.campaign.autoResolve.damageHandler;
 
-import megamek.common.*;
+import megamek.common.Entity;
 
-import java.util.Random;
-
-public record SimpleDamageHandler(Entity entity) implements DamageHandler<Entity> {
-
-}
+public record SimpleDamageHandler(Entity entity, CrewMustSurvive crewMustSurvive, EntityMustSurvive entityMustSurvive)
+    implements DamageHandler<Entity> {}

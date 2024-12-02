@@ -1,17 +1,24 @@
 package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
+import mekhq.campaign.autoResolve.helper.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static megamek.common.Compute.randomInt;
 import static megamek.common.Compute.rollD6;
 
 public interface DamageHandler<E extends Entity> {
 
+    enum PilotEjected {
+        YES, NO
+    }
+
     E entity();
+
+    CrewMustSurvive crewMustSurvive();
+    EntityMustSurvive entityMustSurvive();
 
     default void applyDamageInClusters(int dmg, int clusterSize) {
         int totalDamage = dmg;
@@ -23,7 +30,6 @@ public interface DamageHandler<E extends Entity> {
             var clusterDamage = Math.min(totalDamage, clusterSize);
             applyDamage(clusterDamage);
             totalDamage -= clusterDamage;
-
         }
     }
 
@@ -61,7 +67,12 @@ public interface DamageHandler<E extends Entity> {
             hitDetails = hitDetails.withIncrementedHitCrew();
             damageInternals(hitDetails);
         }
-        damageCrew(hitDetails.hitCrew());
+        tryToDamageCrew(hitDetails.hitCrew());
+    }
+
+    default void
+    destroyLocationAfterEjection() {
+        // default implementation does nothing
     }
 
     default void damageInternals(HitDetails hitDetails) {
@@ -70,8 +81,10 @@ public interface DamageHandler<E extends Entity> {
         int currentInternalValue = entity.getInternal(hit);
         int newInternalValue = Math.max(currentInternalValue + hitDetails.setArmorValueTo(), 0);
         entity.setArmor(0, hit);
+        if (entityMustSurvive() == EntityMustSurvive.YES) {
+            newInternalValue = Math.max(newInternalValue, Compute.d6());
+        }
         entity.setInternal(newInternalValue, hit);
-        System.out.println("Internal: " + newInternalValue);
         applyDamageToEquipments(hit);
         if (newInternalValue == 0) {
             destroyLocation(hit);
@@ -82,47 +95,64 @@ public interface DamageHandler<E extends Entity> {
         var entity = entity();
         entity.destroyLocation(hit.getLocation());
         System.out.println("Location destroyed: " + hit.getLocation());
-        if (hit.getLocation() == Mek.LOC_CT || hit.getLocation() == Mek.LOC_HEAD) {
+        entity.setDestroyed(true);
+        tryToDamageCrew(Crew.DEATH);
+        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
+            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+            entity.setSalvage(true);
+        }
+    }
+
+    default void tryToDamageCrew(int hitCrew) {
+        if (hitCrew == 0 || (entity().getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)) {
+            return;
+        }
+
+        var entity = entity();
+        Crew crew = entity.getCrew();
+        if (crew == null || crew.isEjected()) {
+            return;
+        }
+        var hits = Math.min(crew.getHits() + hitCrew, Crew.DEATH);
+
+        if ((crewMustSurvive() == CrewMustSurvive.YES) && (hits == Crew.DEATH)) {
+            var ejectionResult = tryToEjectCrew();
+            if (ejectionResult == PilotEjected.YES) {
+                destroyLocationAfterEjection();
+                return;
+            }
+            hits = Crew.DEATH - 1;
+        }
+
+        crew.setHits(hits, 0);
+        if (crew.isDead()) {
             entity.setDestroyed(true);
-            if (hit.getLocation() == Mek.LOC_HEAD) {
-                var toHit = new ToHitData();
-                toHit.addModifier(8, "Ejection");
-                if (rollD6(2).isTargetRollSuccess(toHit) && entity().isEjectionPossible()) {
-                    entity.getCrew().setEjected(true);
-                    entity.getCrew().setHits(5, 0);
-                } else {
-                    entity.getCrew().setHits(Crew.DEATH, 0);
-                }
-                if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
-                    entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-                    entity.setSalvage(true);
-                }
-            } else {
-                entity.setSalvage(false);
-                entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
+            if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
+                entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+                entity.setSalvage(true);
             }
         }
     }
 
-    private void damageCrew(int hitCrew) {
-        if (hitCrew == 0) {
-            return;
-        }
+    default PilotEjected tryToEjectCrew() {
         var entity = entity();
-        Crew crew = entity.getCrew();
-        crew.setHits(crew.getHits() + hitCrew, 0);
-        System.out.println("Crew hits: " + crew.getHits());
-        if (crew.isDead()) {
-            entity.setDestroyed(true);
-            entity.setSalvage(true);
-            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-            System.out.println("Crew dead");
+        var crew = entity.getCrew();
+        if (crew == null || crew.isEjected() || !entity().isEjectionPossible()) {
+            return PilotEjected.NO;
         }
+        crew.setEjected(true);
+        entity.setDestroyed(true);
+        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
+            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+            entity.setSalvage(true);
+        }
+        return PilotEjected.YES;
     }
 
     default void applyDamageToEquipments(HitData hit) {
         var entity = entity();
-        for (CriticalSlot slot : entity.getCriticalSlots(hit.getLocation())) {
+        var criticalSlots = entity.getCriticalSlots(hit.getLocation()).stream().collect(RandomUtils.toShuffledList());
+        for (CriticalSlot slot : criticalSlots) {
             if (slot != null && slot.isHittable() && !slot.isHit() && !slot.isDestroyed()) {
                 slot.setHit(true);
                 slot.setDestroyed(true);

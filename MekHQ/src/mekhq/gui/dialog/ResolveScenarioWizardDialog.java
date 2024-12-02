@@ -208,6 +208,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JTextArea txtRewards;
     //endregion Preview Panel components
 
+    private boolean aborted = true;
+
     private static final MMLogger logger = MMLogger.create(ResolveScenarioWizardDialog.class);
 
     private final transient ResourceBundle resourceMap =
@@ -330,7 +332,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(5, 0, 5, 5);
         panButtons.add(btnCancel, gridBagConstraints);
-        btnCancel.setEnabled(!tracker.isAutoResolve());
+//        btnCancel.setEnabled(!tracker.isAutoResolve());
 
         btnBack = new JButton(resourceMap.getString("btnBack.text"));
         btnBack.setName("btnBack");
@@ -1638,6 +1640,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         StratconRulesManager.processScenarioCompletion(tracker);
+        aborted = false;
         this.setVisible(false);
     }
 
@@ -2024,5 +2027,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             int idx = Integer.parseInt(((JButton) evt.getSource()).getName());
             editUnit(id, idx, salvage);
         }
+    }
+
+    public boolean wasAborted() {
+        return aborted;
     }
 }

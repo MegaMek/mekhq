@@ -2,7 +2,7 @@ package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.GunEmplacement;
 
-public record GunEmplacementDamageHandler(GunEmplacement entity) implements DamageHandler<GunEmplacement> {
+public record GunEmplacementDamageHandler(GunEmplacement entity, CrewMustSurvive crewMustSurvive, EntityMustSurvive entityMustSurvive) implements DamageHandler<GunEmplacement> {
 
     @Override
     public int getHitLocation() {

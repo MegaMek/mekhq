@@ -48,6 +48,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.autoResolve.AutoResolveEngine;
+import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
@@ -542,6 +543,20 @@ public class MekHQ implements GameListener {
                 new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
                     true, tracker);
             resolveDialog.setVisible(true);
+            if (resolveDialog.wasAborted()) {
+                for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                    Person person = getCampaign().getPerson(personId);
+                    // person.setStatus(PersonnelStatus.ACTIVE);
+                    person.setHits(person.getHitsPrior());
+                }
+                for (Unit unit : ((AutoResolveGame) autoResolveConcludedEvent.getGame()).getUnits()) {
+                    var entity = unit.getEntity();
+
+                }
+                // should I do something here? Maybe do the trigger?
+                // MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+                return;
+            }
 
             if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,

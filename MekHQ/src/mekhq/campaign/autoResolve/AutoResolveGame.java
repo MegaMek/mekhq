@@ -31,12 +31,16 @@ import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.autoResolve.damageHandler.CrewMustSurvive;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
+import mekhq.campaign.autoResolve.damageHandler.EntityMustSurvive;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsActionHandler;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsTurn;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
@@ -53,7 +57,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
-
+    private final List<String> forceMustBePreserved = new ArrayList<>();
     /**
      * Game Phase and rules
      */
@@ -67,8 +71,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * Report and turnlist
      */
     private final List<AcsTurn> turnList = new ArrayList<>();
-
-    private boolean gameEnded = false;
 
     /**
      * Tools for the game
@@ -85,14 +87,22 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     private final VictoryHelper victoryHelper = new VictoryHelper(this);
     private int victoryPlayerId = Player.PLAYER_NONE;
     private int victoryTeam = Player.TEAM_NONE;
-    private Player localPlayer;
 
     public AutoResolveGame(MekHQ app, List<Unit> units, AtBScenario scenario) {
         setBoard(0, new Board());
         this.campaign = app.getCampaign();
-        this.localPlayer = campaign.getPlayer();
         this.units = units;
         this.scenario = scenario;
+        this.setupScenarioObjectives();
+    }
+
+    private void setupScenarioObjectives() {
+        forceMustBePreserved.clear();
+        scenario.getScenarioObjectives().forEach(objective -> {
+            if (objective.getObjectiveCriterion().equals(ScenarioObjective.ObjectiveCriterion.Preserve)) {
+                forceMustBePreserved.addAll(objective.getAssociatedForceNames());
+            }
+        });
     }
 
     public MapSettings getMapSettings() {
@@ -202,50 +212,22 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     public void addEntity(Entity entity) {
-        // entity.setGame(this); Cant set the game!
-        if (entity instanceof Mek) {
-            ((Mek) entity).setBAGrabBars();
-            ((Mek) entity).setProtoMekClampMounts();
-        } else if (entity instanceof Tank) {
-            ((Tank) entity).setBAGrabBars();
-            ((Tank) entity).setTrailerHitches();
-        }
-
-        // Add magnetic clamp mounts
-        if ((entity instanceof Mek) && !entity.isOmni() && !entity.hasBattleArmorHandles()) {
-            entity.addTransporter(new ClampMountMek());
-        } else if ((entity instanceof Tank) && !entity.isOmni()
-            && !entity.hasBattleArmorHandles()) {
-            entity.addTransporter(new ClampMountTank());
-        }
-
-        entity.setGameOptions();
-        if (entity.getC3UUIDAsString() == null) {
-            // We don't want to be resetting a UUID that exists already!
-            entity.setC3UUID();
-        }
-        // Add this Entity, ensuring that its id is unique
         int id = entity.getId();
         if (isIdUsed(id)) {
             id = getNextEntityId();
             entity.setId(id);
         }
         inGameObjects.put(id, entity);
-
         if (id > lastEntityId) {
             lastEntityId = id;
         }
 
         if (entity instanceof Mek mek) {
-            if (getOptions().booleanOption(OptionsConstants.RPG_CONDITIONAL_EJECTION)) {
-                mek.setAutoEject(true);
-                mek.setCondEjectAmmo(!entity.hasCase() && !entity.hasCASEII());
-                mek.setCondEjectEngine(true);
-                mek.setCondEjectCTDest(true);
-                mek.setCondEjectHeadshot(true);
-            } else {
-                mek.setAutoEject(!entity.hasCase() && !entity.hasCASEII());
-            }
+            mek.setAutoEject(true);
+            mek.setCondEjectAmmo(!entity.hasCase() && !entity.hasCASEII());
+            mek.setCondEjectEngine(true);
+            mek.setCondEjectCTDest(true);
+            mek.setCondEjectHeadshot(true);
         }
 
         entity.setInitialBV(entity.calculateBattleValue(false, false));
@@ -711,6 +693,18 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
             default -> entity.getTotalOArmor() * 0.33;
         };
         var numberOfDices = (int) (targetDamage / 6 / 0.6);
-        DamageHandlerChooser.chooseHandler(entity).applyDamageInClusters(Compute.d6(numberOfDices), Compute.d6());
+        var damage = Compute.d6(numberOfDices);
+        var clusterSize = 5;
+
+        var retreating = removalCondition == IEntityRemovalConditions.REMOVE_IN_RETREAT;
+        var captured = removalCondition == IEntityRemovalConditions.REMOVE_CAPTURED;
+        var ejected = removalCondition == IEntityRemovalConditions.REMOVE_EJECTED;
+        var devastated = removalCondition == IEntityRemovalConditions.REMOVE_DEVASTATED;
+
+        var crewMustSurvive = (retreating || captured || ejected) ? CrewMustSurvive.YES : CrewMustSurvive.NO;
+        var entityMustSurvive = devastated ? EntityMustSurvive.NO : EntityMustSurvive.YES;
+
+        DamageHandlerChooser.chooseHandler(entity, crewMustSurvive, entityMustSurvive)
+            .applyDamageInClusters(damage, clusterSize);
     }
 }
