@@ -267,15 +267,10 @@ public class AtBContract extends Contract {
         List<Path> allPaths = null;
 
         try {
-            // if(factionCode == "Root"){
-            //     allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory), Integer.MAX_VALUE,
-            //             (path, bfa) -> bfa.isRegularFile())
-            //             .toList();
-            // }else {
             allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
                     (path, bfa) -> bfa.isRegularFile())
                 .toList();
-            // }
+
         } catch (IOException e) {
             logger.error("Error getting list of camouflages", e);
         }
