@@ -259,12 +259,12 @@ public class StratconRulesManager {
                 // twice
                 if (autoAssignLances) {
                     availableForceIDs.removeIf(id -> id.equals(randomForceIndex));
-                }
 
-                // we want to remove the actual int with the value, not the value at the index
-                sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
-                sortedAvailableForceIDs.get(LowAtmosphere).removeIf(id -> id.equals(randomForceID));
-                sortedAvailableForceIDs.get(Space).removeIf(id -> id.equals(randomForceID));
+                    // we want to remove the actual int with the value, not the value at the index
+                    sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
+                    sortedAvailableForceIDs.get(LowAtmosphere).removeIf(id -> id.equals(randomForceID));
+                    sortedAvailableForceIDs.get(Space).removeIf(id -> id.equals(randomForceID));
+                }
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
