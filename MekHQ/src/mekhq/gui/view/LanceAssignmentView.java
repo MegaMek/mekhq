@@ -140,7 +140,10 @@ public class LanceAssignmentView extends JPanel {
                     switch (column) {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
-                                setText((((Force) value)).getFullName());
+                                String forceName = (((Force) value)).getFullName();
+                                String originNodeName = ", " + campaign.getForce(0).getName();
+                                forceName = forceName.replaceAll(originNodeName, "");
+                                setText(forceName);
                             }
                             break;
                         case LanceAssignmentTableModel.COL_CONTRACT:
