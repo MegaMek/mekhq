@@ -203,7 +203,7 @@ public abstract class AbstractContractMarket {
 
                 if (roll == 2) {
                     availableForces = (int) round((double) availableForces * 0.25);
-                } else if (roll <= 3) {
+                } else if (roll == 3) {
                     availableForces = (int) round((double) availableForces * 0.5);
                 } else if (roll < 5) {
                     availableForces = (int) round((double) availableForces * 0.75);
