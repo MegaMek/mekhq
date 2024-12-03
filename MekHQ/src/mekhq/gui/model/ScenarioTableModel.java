@@ -20,19 +20,13 @@ package mekhq.gui.model;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.stratcon.StratconCampaignState;
-import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -46,8 +40,7 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int COL_STATUS     = 1;
     public final static int COL_DATE       = 2;
     public final static int COL_ASSIGN     = 3;
-    public final static int COL_SECTOR     = 4;
-    public final static int N_COL          = 5;
+    public final static int N_COL          = 4;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel",
             MekHQ.getMHQOptions().getLocale());
@@ -67,22 +60,29 @@ public class ScenarioTableModel extends DataTableModel {
 
     @Override
     public String getColumnName(int column) {
-        return switch (column) {
-            case COL_NAME -> resources.getString("col_name.text");
-            case COL_STATUS -> resources.getString("col_status.text");
-            case COL_DATE -> resources.getString("col_date.text");
-            case COL_ASSIGN -> resources.getString("col_assign.text");
-            case COL_SECTOR -> resources.getString("col_sector.text");
-            default -> resources.getString("col_unknown.text");
-        };
+        switch (column) {
+            case COL_NAME:
+                return resources.getString("col_name.text");
+            case COL_STATUS:
+                return resources.getString("col_status.text");
+            case COL_DATE:
+                return resources.getString("col_date.text");
+            case COL_ASSIGN:
+                return resources.getString("col_assign.text");
+            default:
+                return resources.getString("col_unknown.text");
+        }
     }
 
     public int getColumnWidth(int c) {
-        return switch (c) {
-            case COL_NAME -> 100;
-            case COL_STATUS -> 50;
-            default -> 20;
-        };
+        switch (c) {
+            case COL_NAME:
+                return 100;
+            case COL_STATUS:
+                return 50;
+            default:
+                return 20;
+        }
     }
 
     public int getAlignment(int col) {
@@ -119,23 +119,6 @@ public class ScenarioTableModel extends DataTableModel {
             }
         } else if (col == COL_ASSIGN) {
             return scenario.getForces(getCampaign()).getAllUnits(true).size();
-        } else if (col == COL_SECTOR) {
-            if (campaign.getCampaignOptions().isUseStratCon()) {
-                if (scenario instanceof AtBScenario) {
-                    AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
-                    StratconCampaignState campaignState = contract.getStratconCampaignState();
-
-                    for (StratconTrackState track : campaignState.getTracks()) {
-                        for (StratconScenario stratconScenario : track.getScenarios().values()) {
-                            if (Objects.equals(stratconScenario.getBackingScenario(), scenario)) {
-                                return track.getDisplayableName();
-                            }
-                        }
-                    }
-                }
-            }
-
-            return "-";
         } else {
             return "?";
         }
