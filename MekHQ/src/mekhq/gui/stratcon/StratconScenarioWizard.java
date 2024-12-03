@@ -24,7 +24,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
@@ -41,6 +40,9 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.personnel.SkillType.S_LEADER;
+import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
+import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 /**
@@ -54,8 +56,8 @@ public class StratconScenarioWizard extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
             MekHQ.getMHQOptions().getLocale());
 
-    private Map<String, JList<Force>> availableForceLists = new HashMap<>();
-    private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
+    private final Map<String, JList<Force>> availableForceLists = new HashMap<>();
+    private final Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
 
     private JList<Unit> availableInfantryUnits = new JList<>();
     private JList<Unit> availableLeadershipUnits = new JList<>();
@@ -96,34 +98,30 @@ public class StratconScenarioWizard extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         setInstructions(gbc);
 
-        switch (currentScenario.getCurrentState()) {
-            case UNRESOLVED:
+        if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
+            gbc.gridy++;
+            setAssignForcesUI(gbc, false);
+        } else {
+            gbc.gridy++;
+            setAssignForcesUI(gbc, true);
+            gbc.gridy++;
+
+            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(
+                S_LEADER, campaign);
+
+            List<Unit> eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign,
+                currentScenario.getPrimaryForceIDs(), leadershipSkill);
+            eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
+
+            if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
+                setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
                 gbc.gridy++;
-                setAssignForcesUI(gbc, false);
-                break;
-            default:
+            }
+
+            if (currentScenario.getNumDefensivePoints() > 0) {
+                setDefensiveUI(gbc);
                 gbc.gridy++;
-                setAssignForcesUI(gbc, true);
-                gbc.gridy++;
-
-                List<Unit> eligibleLeadershipUnits = StratconRulesManager.getEligibleLeadershipUnits(campaign,
-                        currentScenario.getPrimaryForceIDs());
-
-                eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
-
-                int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER,
-                        campaign);
-
-                if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
-                    setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-                    gbc.gridy++;
-                }
-
-                if (currentScenario.getNumDefensivePoints() > 0) {
-                    setDefensiveUI(gbc);
-                    gbc.gridy++;
-                }
-                break;
+            }
         }
 
         gbc.gridx = 0;
@@ -222,7 +220,7 @@ public class StratconScenarioWizard extends JDialog {
         eligibleInfantryUnits.sort(Comparator.comparing(Unit::getName));
 
         availableInfantryUnits = addIndividualUnitSelector(eligibleInfantryUnits, gbc,
-                currentScenario.getNumDefensivePoints());
+                currentScenario.getNumDefensivePoints(), false);
 
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
@@ -238,32 +236,18 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     private void setLeadershipUI(GridBagConstraints gbc, List<Unit> eligibleUnits, int leadershipSkill) {
-        int maxSelectionSize = leadershipSkill - currentScenario.getLeadershipPointsUsed();
+        int leadershipBudget = BASE_LEADERSHIP_BUDGET * leadershipSkill;
+        int maxSelectionSize = leadershipBudget - currentScenario.getLeadershipPointsUsed();
 
         gbc.anchor = GridBagConstraints.WEST;
 
-        if (maxSelectionSize <= 0) {
-            // either the full text or empty string
-            String leadershipUsedText = currentScenario.getLeadershipPointsUsed() > 0
-                    ? String.format(resourceMap.getString("lblLeaderUnitsUsed.Text"),
-                            currentScenario.getLeadershipPointsUsed())
-                    : "";
-            String leadershipUnavailable = resourceMap.getString("lblLeadershipReinforcementsUnavailable.Text");
-
-            JLabel lblLeadershipInstructions = new JLabel(
-                    String.format(resourceMap.getString("lblFCLeadershipAvailable.Text"),
-                            leadershipSkill, leadershipUsedText, leadershipUnavailable));
-            getContentPane().add(lblLeadershipInstructions, gbc);
-            gbc.gridy++;
-            return;
-        }
-
-        JLabel lblLeadershipInstructions = new JLabel(resourceMap.getString("lblLeadershipInstructions.Text"));
+        JLabel lblLeadershipInstructions = new JLabel(String.format(resourceMap.getString("lblLeadershipInstructions.Text"),
+            maxSelectionSize));
         getContentPane().add(lblLeadershipInstructions, gbc);
 
         gbc.gridy++;
 
-        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize);
+        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize, true);
     }
 
     /**
@@ -301,7 +285,7 @@ public class StratconScenarioWizard extends JDialog {
      * @param maxSelectionSize Maximum number of units that can be selected
      */
     private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gridBagConstraints,
-                                                  int maxSelectionSize) {
+                                                  int maxSelectionSize, boolean usesBV) {
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridBagLayout());
         GridBagConstraints localGridBagConstraints = new GridBagConstraints();
@@ -331,7 +315,7 @@ public class StratconScenarioWizard extends JDialog {
         availableUnits.setModel(availableModel);
         availableUnits.setCellRenderer(new ScenarioWizardUnitRenderer());
         availableUnits.addListSelectionListener(
-                e -> availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize));
+                e -> availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize, usesBV));
 
         JScrollPane infantryContainer = new JScrollPaneWithSpeed();
         infantryContainer.setViewportView(availableUnits);
@@ -535,16 +519,13 @@ public class StratconScenarioWizard extends JDialog {
         JList<Force> sourceList = (JList<Force>) e.getSource();
 
         StringBuilder statusBuilder = new StringBuilder();
-        StringBuilder costBuilder = new StringBuilder();
         statusBuilder.append("<html>");
-        costBuilder.append("<html>");
 
         for (Force force : sourceList.getSelectedValuesList()) {
             statusBuilder.append(buildForceStatus(force, reinforcements));
         }
 
         statusBuilder.append("</html>");
-        costBuilder.append("</html>");
 
         forceStatusLabel.setText(statusBuilder.toString());
 
@@ -556,27 +537,38 @@ public class StratconScenarioWizard extends JDialog {
      * Updates the "# units selected" label and the unit status label.
      * Also checks maximum selection size and disables commit button (TBD).
      *
-     * @param e
+     * @param event               The triggering event
      * @param selectionCountLabel Which label to update with how many items are
      *                            selected
      * @param unitStatusLabel     Which label to update with detailed unit info
      * @param maxSelectionSize    How many items can be selected at most
+     * @param usesBV              Whether we are tracking the BV of selected items, {@code true},
+     *                           or simply the count of selected items, {@code false}
      */
-    private void availableUnitSelectorChanged(ListSelectionEvent e, JLabel selectionCountLabel, JLabel unitStatusLabel,
-            int maxSelectionSize) {
-        if (!(e.getSource() instanceof JList<?>)) {
+    private void availableUnitSelectorChanged(ListSelectionEvent event, JLabel selectionCountLabel,
+                                              JLabel unitStatusLabel, int maxSelectionSize, boolean usesBV) {
+        if (!(event.getSource() instanceof JList<?>)) {
             return;
         }
 
-        JList<Unit> changedList = (JList<Unit>) e.getSource();
-        selectionCountLabel.setText(String.format("%d selected", changedList.getSelectedIndices().length));
+        JList<Unit> changedList = (JList<Unit>) event.getSource();
+
+        int selectedItems;
+        if (usesBV) {
+            selectedItems = 0;
+            for (Unit unit : changedList.getSelectedValuesList()) {
+                selectedItems += unit.getEntity().calculateBattleValue();
+            }
+        } else {
+            selectedItems = changedList.getSelectedIndices().length;
+        }
+        selectionCountLabel.setText(String.format("%d selected", selectedItems));
         // if we've selected too many units here, change the label and disable the
         // commit button
-        if (changedList.getSelectedIndices().length > maxSelectionSize) {
-            selectionCountLabel.setForeground(Color.RED);
+        if (selectedItems > maxSelectionSize) {
+            selectionCountLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
             btnCommit.setEnabled(false);
         } else {
-            selectionCountLabel.setForeground(Color.BLACK);
             btnCommit.setEnabled(true);
         }
 
@@ -599,8 +591,8 @@ public class StratconScenarioWizard extends JDialog {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
 
-        for (Unit u : changedList.getSelectedValuesList()) {
-            sb.append(buildUnitStatus(u));
+        for (Unit unit : changedList.getSelectedValuesList()) {
+            sb.append(buildUnitStatus(unit));
         }
 
         sb.append("</html>");
