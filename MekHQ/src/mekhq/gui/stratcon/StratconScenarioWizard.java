@@ -112,7 +112,7 @@ public class StratconScenarioWizard extends JDialog {
 
             List<Unit> eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign,
                 currentScenario.getPrimaryForceIDs(), leadershipSkill);
-            eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
+            eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
             if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
                 setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
@@ -130,6 +130,35 @@ public class StratconScenarioWizard extends JDialog {
         setNavigationButtons(gbc);
         pack();
         validate();
+    }
+
+    private String getForceNameReversed(Unit unit) {
+        List<String> forceNames = new ArrayList<>();
+
+        Force force = campaign.getForce(unit.getForceId());
+
+        if (force == null) {
+            return "";
+        }
+
+        forceNames.add(force.getName());
+
+        Force parentForce = force.getParentForce();
+        while (parentForce != null) {
+            forceNames.add(parentForce.getName());
+
+            parentForce = parentForce.getParentForce();
+        }
+
+        Collections.reverse(forceNames);
+
+        StringBuilder forceNameReversed = new StringBuilder();
+
+        for (String forceName : forceNames) {
+            forceNameReversed.append(forceName);
+        }
+
+        return forceNameReversed.toString();
     }
 
     /**
