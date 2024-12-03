@@ -20,10 +20,6 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Set;
-
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -39,11 +35,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.*;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -302,7 +298,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract));
+        contract.setRequiredLances(calculateRequiredLances(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -396,7 +392,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract));
+        contract.setRequiredLances(calculateRequiredLances(campaign, contract, true));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
@@ -438,7 +434,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract));
+        contract.setRequiredLances(calculateRequiredLances(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
@@ -488,7 +484,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        int requiredLances = calculateRequiredLances(campaign, contract);
+        int baseRequiredLances = calculateRequiredLances(campaign, contract, true);
+        int requiredLances = contract.getRequiredLances();
+
+        multiplier *= (double) requiredLances / baseRequiredLances;
+
         int maxDeployedLances = calculateMaxDeployedLances(campaign);
         if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
             multiplier *= (double) maxDeployedLances / (double) requiredLances;

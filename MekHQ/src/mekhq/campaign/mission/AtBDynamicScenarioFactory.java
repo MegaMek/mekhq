@@ -71,6 +71,7 @@ import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
@@ -93,10 +94,6 @@ public class AtBDynamicScenarioFactory {
     // target number for 2d6 roll of infantry being upgraded to battle armor,
     // indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
-
-    private static final int IS_LANCE_SIZE = 4;
-    private static final int CLAN_MH_LANCE_SIZE = 5;
-    private static final int COMSTAR_LANCE_SIZE = 6;
 
     private static final double STRICT = 0.75;
     private static final double OPPORTUNISTIC = 1.0;
@@ -439,7 +436,7 @@ public class AtBDynamicScenarioFactory {
         // Get the number of units in the typical ground tactical formation.
         // This will differ depending on whether the owner uses Inner Sphere lances,
         // Clan stars, or CS/WOB Level II formations.
-        int lanceSize = getLanceSize(factionCode);
+        int lanceSize = getStandardForceSize(faction);
 
         // determine generation parameters
         int forceBV = 0;
@@ -3758,32 +3755,6 @@ public class AtBDynamicScenarioFactory {
         scenario.setRerolls(tacticsSkill);
     }
 
-    /**
-     * Convenience function to get the standard ground tactical formation size,
-     * based on faction. In
-     * the case of Clan factions, this returns the number of points rather than a
-     * number of units,
-     * as points may be 2 ground vehicles or 5 ProtoMeks.
-     * TODO: conventional infantry typically uses 3 units per formation (company) -
-     * make a separate method
-     *
-     * @param factionCode string with faction short name/lookup key
-     * @return Number of units (points for Clan) in the formation
-     */
-    public static int getLanceSize(String factionCode) {
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-        if (faction != null) {
-            if (faction.isClan() || faction.isMarianHegemony()) {
-                // Clans and the Marian Hegemony use a fundamental unit size of 5.
-                return CLAN_MH_LANCE_SIZE;
-            } else if (faction.isComStarOrWoB()) {
-                // ComStar and WoB use a fundamental unit size of 6.
-                return COMSTAR_LANCE_SIZE;
-            }
-        }
-
-        return IS_LANCE_SIZE;
-    }
 
     /**
      * Worker function to determine the formation size of fixed wing aircraft.

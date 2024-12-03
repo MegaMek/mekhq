@@ -75,14 +75,19 @@ import java.util.List;
 import java.util.*;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
+import static megamek.common.Compute.d6;
 import static megamek.common.UnitType.MEK;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
+import static mekhq.campaign.force.FormationLevel.BATTALION;
+import static mekhq.campaign.force.FormationLevel.COMPANY;
+import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.rating.IUnitRating.*;
@@ -229,9 +234,12 @@ public class AtBContract extends Contract {
     }
 
     public void initContractDetails(Campaign campaign) {
-        if (getEffectiveNumUnits(campaign) <= 12) {
+        int companySize = getStandardForceSize(campaign.getFaction(), COMPANY.getDepth());
+        int battalionSize = getStandardForceSize(campaign.getFaction(), BATTALION.getDepth());
+
+        if (getEffectiveNumUnits(campaign) <= companySize) {
             setOverheadComp(OH_FULL);
-        } else if (getEffectiveNumUnits(campaign) <= 48) {
+        } else if (getEffectiveNumUnits(campaign) <= battalionSize) {
             setOverheadComp(OH_HALF);
         } else {
             setOverheadComp(OH_NONE);
@@ -394,7 +402,8 @@ public class AtBContract extends Contract {
      * @return The number of lances required.
      */
     public static int calculateRequiredLances(Campaign campaign) {
-        return Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+        int formationSize = getStandardForceSize(campaign.getFaction());
+        return max(getEffectiveNumUnits(campaign) / formationSize, 1);
     }
 
     public static int getEffectiveNumUnits(Campaign campaign) {
@@ -495,7 +504,7 @@ public class AtBContract extends Contract {
 
         Faction enemy = getEnemy();
         if (enemy.isClan()) {
-            reliability = Math.max(5, reliability + 1);
+            reliability = max(5, reliability + 1);
         }
 
         reliability = switch (reliability) {
@@ -590,7 +599,7 @@ public class AtBContract extends Contract {
             "+" + performanceModifier : performanceModifier));
 
         // Total morale modifier calculation
-        int roll = Compute.d6(2) + targetNumber.getValue();
+        int roll = d6(2) + targetNumber.getValue();
         logger.info(String.format("Total Modifier: %s", targetNumber.getValue()));
         logger.info(String.format("Roll: %s", roll));
 
@@ -598,10 +607,10 @@ public class AtBContract extends Contract {
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
 
         if (roll < 2) {
-            setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 2, 0)]);
+            setMoraleLevel(moraleLevels[max(getMoraleLevel().ordinal() - 2, 0)]);
             logger.info("Result: Morale Level -2");
         } else if (roll < 5) {
-            setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 1, 0)]);
+            setMoraleLevel(moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)]);
             logger.info("Result: Morale Level -1");
         } else if ((roll > 12)) {
             setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
@@ -616,7 +625,7 @@ public class AtBContract extends Contract {
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
         if (getMoraleLevel().isRouted()) {
             if (getContractType().isGarrisonType()) {
-                routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+                routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
             } else {
                 campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
                         " The contract will conclude tomorrow.");
@@ -751,12 +760,12 @@ public class AtBContract extends Contract {
 
     public void doBonusRoll(Campaign campaign) {
         int number;
-        int roll = Compute.d6();
+        int roll = d6();
 
         switch (roll) {
             case 1: /* 1d6 dependents */
                 if (campaign.getCampaignOptions().isUseRandomDependentAddition()) {
-                    number = Compute.d6();
+                    number = d6();
                     campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
@@ -893,7 +902,7 @@ public class AtBContract extends Contract {
                     break;
                 case EVT_BETRAYAL:
                     String text = "<b>Special Event:</b> Betrayal (employer minor breach)<br />";
-                    switch (Compute.d6()) {
+                    switch (d6()) {
                         case 1:
                             text += "Major logistics problem: parts availability level for the rest of the contract becomes one level lower.";
                             partsAvailabilityLevel--;
@@ -937,7 +946,7 @@ public class AtBContract extends Contract {
                     break;
                 case EVT_SPECIALEVENTS:
                     text = "<b>Special Event:</b> ";
-                    switch (Compute.d6()) {
+                    switch (d6()) {
                         case 1:
                             text += "Change of Alliance: Next Enemy Morale roll gets a +1 modifier.";
                             moraleMod++;
@@ -1023,9 +1032,9 @@ public class AtBContract extends Contract {
         }
 
         final int extension;
-        final int roll = Compute.d6();
+        final int roll = d6();
         if (roll == 1) {
-            extension = Math.max(1, getLength() / 2);
+            extension = max(1, getLength() / 2);
         } else if (roll == 2) {
             extension = 1;
         } else {
@@ -1917,7 +1926,7 @@ public class AtBContract extends Contract {
             mappedValue = 5 + mappedValue;
         }
 
-        return Math.min(Math.max(mappedValue, 1), 10);
+        return Math.min(max(mappedValue, 1), 10);
     }
 
     /**
