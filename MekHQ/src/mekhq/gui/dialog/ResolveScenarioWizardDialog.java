@@ -1642,10 +1642,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         StratconRulesManager.processScenarioCompletion(tracker);
         aborted = false;
         this.setVisible(false);
+        dispose();
     }
 
     private void cancel() {
         setVisible(false);
+        dispose();
     }
 
     // region Misc II

@@ -33,8 +33,9 @@ public abstract class ScenarioResolver {
 
     public static ScenarioResolver of(AutoResolveMethod method, AtBScenario scenario) {
         return switch (method) {
+            case PRINCESS -> throw new UnsupportedOperationException("Princess method is not run here!");
             case UNITS_MATTER -> new UnitsMatterSimpleScenarioResolver(scenario);
-            case ABSTRACT_COMBAT_SYSTEM -> new AcsSimpleScenarioResolver(scenario);
+            case ABSTRACT_COMBAT -> new AcsSimpleScenarioResolver(scenario);
         };
     }
 

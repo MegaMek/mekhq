@@ -14,10 +14,15 @@
 package mekhq.campaign.autoResolve;
 
 import mekhq.MekHQ;
+import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
 
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author Luana Coppio
@@ -30,11 +35,11 @@ public class AutoResolveEngine {
         this.autoResolveMethod = method;
     }
 
-    public void resolveBattle(MekHQ app, List<Unit> units, AtBScenario scenario) {
+    public void resolveBattle(MekHQ app, List<Unit> units, AtBScenario scenario, Consumer<AutoResolveConcludedEvent> autoResolveConcludedEvent) {
         var scenarioSpecificResolutionResolver = autoResolveMethod.of(scenario);
         var game = new AutoResolveGame(app, units, scenario);
         var result = scenarioSpecificResolutionResolver.resolveScenario(game);
-        app.autoResolveConcluded(result);
+        autoResolveConcludedEvent.accept(result);
     }
 
 }

@@ -48,7 +48,6 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.autoResolve.AutoResolveEngine;
-import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
@@ -80,9 +79,10 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -527,6 +527,7 @@ public class MekHQ implements GameListener {
         // Why Empty?
     }
 
+    // TODO: LUANA
     public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent){
         try {
             String message = autoResolveConcludedEvent.controlledScenario() ?
@@ -693,11 +694,15 @@ public class MekHQ implements GameListener {
             final File tempImageDirectory = new File("data/images/temp");
             if (tempImageDirectory.isDirectory()) {
                 // This can't be null because of the above
-                Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png"))
-                        .forEach(File::delete);
+                var totalDeletedFiles = Stream.of(Objects.requireNonNull(tempImageDirectory.listFiles()))
+                    .filter(file -> file.getName().endsWith(".png"))
+                    .map(File::delete)
+                    .mapToInt(result -> result ? 1 : 0)
+                    .sum();
+                logger.info("Deleted {} temporary image files", totalDeletedFiles);
             }
         } catch (Exception ex) {
-            logger.error(ex, "gameVictory()");
+            logger.error("Exception during gameVictory() run", ex);
         }
     }
 
@@ -802,7 +807,60 @@ public class MekHQ implements GameListener {
 
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
         currentScenario = scenario;
-        new AutoResolveEngine(AutoResolveMethod.ABSTRACT_COMBAT_SYSTEM).resolveBattle(this, units, scenario);
+        String message = "This will auto resolve the battle. Do you want to proceed?";
+        var autoResolveMethod = getCampaign().getCampaignOptions().getAutoResolveMethod();
+        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()
+            // unfortunately UNITS MATTER force creating has a bug that makes it impossible to calculate victory chance without causing
+            // irreversible changes to the campaign
+            && autoResolveMethod.equals(AutoResolveMethod.ABSTRACT_COMBAT)) {
+
+            var percent = calculateVictoryChance(scenario, units);
+            message = "Your chance of victory in this combat is " + percent + "%, do you want to proceed?";
+        }
+        String title = "Auto Resolve Battle";
+        boolean proceed = JOptionPane.showConfirmDialog(campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+
+        if (proceed) {
+            new AutoResolveEngine(autoResolveMethod)
+                .resolveBattle(this, units, scenario, this::autoResolveConcluded);
+        }
+    }
+
+    /**
+     * Calculates the victory chance for a given scenario and list of units by running multiple auto resolve scenarios in parallel.
+     *
+     * @param scenario the scenario to resolve
+     * @param units the list of units involved in the scenario
+     * @return the calculated victory chance as an integer percentage (0 to 100)
+     */
+    private int calculateVictoryChance(AtBScenario scenario, List<Unit> units) {
+        var atomicInt = new AtomicInteger(0);
+        int numTasks = 50;
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Future<?>> futures = new ArrayList<>();
+
+        for (int i = 0; i < numTasks; i++) {
+            futures.add(executor.submit(() -> {
+                new AutoResolveEngine(AutoResolveMethod.ABSTRACT_COMBAT)
+                    .resolveBattle(this, units, scenario, r -> {
+                        if (r.controlledScenario()) {
+                            atomicInt.incrementAndGet();
+                        }
+                    });
+            }));
+        }
+
+        // Wait for all tasks to complete
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Error in parallel execution", e);
+            }
+        }
+
+        executor.shutdown();
+        return atomicInt.get() * 2;
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

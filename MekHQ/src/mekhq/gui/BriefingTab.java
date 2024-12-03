@@ -36,7 +36,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.autoResolve.AutoResolveEngine;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -871,11 +870,10 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             return;
         }
-        if (getCampaignOptions().isPrincessBotAutoResolve()) {
-            startScenario(getCampaign().getAutoResolveBehaviorSettings());
-        } else {
-            getCampaignGui().getApplication()
+        switch(getCampaignOptions().getAutoResolveMethod()) {
+            case ABSTRACT_COMBAT, UNITS_MATTER-> getCampaignGui().getApplication()
                 .startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
+            case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
         }
     }
 

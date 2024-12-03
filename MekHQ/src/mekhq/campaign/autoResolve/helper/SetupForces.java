@@ -166,8 +166,7 @@ public class SetupForces {
             if (force != null) {
                 entity.setForceString(force.getFullMMName());
             }
-
-            var newCrewRef = getNewCrewRef(unit);
+            var newCrewRef = getNewCrewRef(unit.getEntity().getCrew());
             entity.setCrew(newCrewRef);
             entities.add(entity);
         }
@@ -202,8 +201,8 @@ public class SetupForces {
         sendEntities(entities);
     }
 
-    private static Crew getNewCrewRef(Unit unit) {
-        var originalCrew = unit.getEntity().getCrew();
+    public static Crew getNewCrewRef(Crew originalCrew) {
+
         var newCrewRef = new Crew(originalCrew.getCrewType(), originalCrew.getName(), originalCrew.getSize(),
             originalCrew.getGunnery(), originalCrew.getPiloting(), originalCrew.getGender(), originalCrew.isClanPilot(),
             originalCrew.getExtraData());
@@ -282,9 +281,19 @@ public class SetupForces {
         String forceName = bot.getName() + "|1";
         var entities = new ArrayList<Entity>();
         botForce.generateRandomForces(units, campaign);
-        for (Entity entity : botForce.getFullEntityList(campaign)) {
+        for (Entity originalBotEntity : botForce.getFullEntityList(campaign)) {
+            var entity = ASConverter.getUndamagedEntity(originalBotEntity);
+            if (entity == null) {
+                logger.warn("Could not convert entity for bot {} - {}", bot.getName(), originalBotEntity);
+                continue;
+            }
+
             entity.setOwner(bot);
             entity.setForceString(forceName);
+            entity.setCrew(getNewCrewRef(entity.getCrew()));
+            entity.setId(originalBotEntity.getId());
+            entity.setExternalIdAsString(originalBotEntity.getExternalIdAsString());
+            entity.setCommander(originalBotEntity.isCommander());
 
             if (entity.getDeployRound() == 0) {
                 entity.setDeployRound(botForce.getDeployRound());

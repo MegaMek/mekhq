@@ -2,19 +2,17 @@ package mekhq.campaign.autoResolve.helper;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.*;
-import mekhq.MekHQ;
+import megamek.common.alphaStrike.conversion.ASConverter;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveForce;
-
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static mekhq.campaign.autoResolve.helper.SetupForces.getNewCrewRef;
 import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 
 public class SetupTeams {
@@ -44,7 +42,38 @@ public class SetupTeams {
     }
 
     static private AutoResolveForce playerForce(int playerID, String forceName, List<Unit> units) {
-        return new AutoResolveForce(1, forceName, playerID, units.stream().map(Unit::getEntity).toList());
+        return new AutoResolveForce(1, forceName, playerID, units.stream().map(SetupTeams::breakEntityRef).filter(Objects::nonNull).toList());
+    }
+
+    @Nullable
+    public static Entity breakEntityRef(Unit unit) {
+        var entity = ASConverter.getUndamagedEntity(unit.getEntity());
+        // Set the TempID for auto reporting
+        if (Objects.isNull(entity)) {
+            return null;
+        }
+
+        entity.setExternalIdAsString(unit.getId().toString());
+        // Set the owner
+        entity.setOwner(unit.getCampaign().getPlayer());
+
+        // If this unit is a spacecraft, set the crew size and marine size values
+        if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
+            entity.setNCrew(unit.getActiveCrew().size());
+            entity.setNMarines(unit.getMarineCount());
+        }
+        // Calculate deployment round
+        int deploymentRound = entity.getDeployRound();
+
+        entity.setDeployRound(deploymentRound);
+        var force = unit.getCampaign().getForceFor(unit);
+        if (force != null) {
+            entity.setForceString(force.getFullMMName());
+        }
+        var newCrewRef = getNewCrewRef(unit.getEntity().getCrew());
+        entity.setCrew(newCrewRef);
+
+        return entity;
     }
 
     static private List<Entity> setupBotEntities(Campaign campaign, List<Unit> units, BotForce botForce, Scenario scenario, int forceID) {
@@ -74,12 +103,18 @@ public class SetupTeams {
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
 
-        for (Entity entity : entitiesSorted) {
+        for (Entity originalEntity : entitiesSorted) {
+            if (null == originalEntity) {
+                continue;
+            }
+            var entity = ASConverter.getUndamagedEntity(originalEntity);
             if (null == entity) {
                 continue;
             }
             entity.setForceId(forceID);
             entity.setOwner(player);
+            entity.setCrew(getNewCrewRef(originalEntity.getCrew()));
+            entity.setDeployRound(originalEntity.getDeployRound());
             if ((i != 0)
                 && !lastType.equals(Entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 forceIdLance++;
@@ -91,6 +126,7 @@ public class SetupTeams {
             String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);
             entity.setDestroyed(false);
+
             entities.add(entity);
             i++;
             if (entity instanceof GunEmplacement gun) {

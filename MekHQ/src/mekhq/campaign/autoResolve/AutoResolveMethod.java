@@ -13,35 +13,78 @@
  */
 package mekhq.campaign.autoResolve;
 
+import megamek.MegaMek;
+import mekhq.MekHQ;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.AcsSimpleScenarioResolver;
 import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.UnitsMatterSimpleScenarioResolver;
 import mekhq.campaign.mission.AtBScenario;
 
+import java.util.Optional;
+import java.util.ResourceBundle;
+
 /**
  * @author Luana Coppio
  */
 public enum AutoResolveMethod {
-    UNITS_MATTER(){
+    PRINCESS("AutoResolveMethod.PRINCESS.text", "AutoResolveMethod.PRINCESS.toolTipText") {
+        @Override
+        public ScenarioResolver of(AtBScenario scenario) {
+            throw new UnsupportedOperationException("Princess method not implemented");
+        }
+    },
+    UNITS_MATTER("AutoResolveMethod.UNITS_MATTER.text", "AutoResolveMethod.UNITS_MATTER.toolTipText") {
         @Override
         public ScenarioResolver of(AtBScenario scenario) {
             return new UnitsMatterSimpleScenarioResolver(scenario);
         }
     },
-    ABSTRACT_COMBAT_SYSTEM() {
+    ABSTRACT_COMBAT("AutoResolveMethod.ABSTRACT_COMBAT.text", "AutoResolveMethod.ABSTRACT_COMBAT.toolTipText") {
         @Override
         public ScenarioResolver of(AtBScenario scenario) {
             return new AcsSimpleScenarioResolver(scenario);
         }
     };
 
-    public static AutoResolveMethod fromString(String method) {
+    private final String name;
+    private final String toolTipText;
+
+    AutoResolveMethod(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoResolveMethod",
+            MekHQ.getMHQOptions().getLocale());
+        this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
+    }
+
+    public String getToolTipText() {
+        return toolTipText;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static Optional<AutoResolveMethod> fromInteger(int index) {
+        if (index < 0 || index >= values().length) {
+            return Optional.empty();
+        }
+        return Optional.of(values()[index]);
+    }
+
+    public static Optional<AutoResolveMethod> fromString(String method) {
         return switch (method) {
-            case "UNITS_MATTER" -> UNITS_MATTER;
-            case "ABSTRACT_COMBAT_SYSTEM" -> ABSTRACT_COMBAT_SYSTEM;
-            default -> throw new IllegalArgumentException("Invalid method: " + method);
+            case "PRINCESS" -> Optional.of(PRINCESS);
+            case "UNITS_MATTER" -> Optional.of(UNITS_MATTER);
+            case "ABSTRACT_COMBAT_SYSTEM" -> Optional.of(ABSTRACT_COMBAT);
+            default -> Optional.empty();
         };
     }
 
     public abstract ScenarioResolver of(AtBScenario scenario);
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
+

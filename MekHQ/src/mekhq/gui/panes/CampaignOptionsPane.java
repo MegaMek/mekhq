@@ -43,6 +43,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -647,6 +648,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<SkillLevel> comboSkillLevel;
+    private MMComboBox<AutoResolveMethod> comboAutoResolveType;
 
     // unit administration
     private JCheckBox chkUseAero;
@@ -688,7 +690,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkRegionalMekVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
     private JCheckBox chkPlayerControlsAttachedUnits;
-    private JCheckBox chkUseBotControlledAutoResolve;
+
+    private JCheckBox chkAutoResolveVictoryChanceEnabled;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
@@ -3364,14 +3367,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkPlayerControlsAttachedUnits, gridBagConstraints);
 
-        chkUseBotControlledAutoResolve = new JCheckBox(
-            resources.getString("chkUseBotControlledAutoResolve.text"));
-        chkUseBotControlledAutoResolve.setToolTipText(resources.getString("chkUseBotControlledAutoResolve.toolTipText"));
+        JLabel lblAutoResolveType = new JLabel(resources.getString("lblAutoResolveType.text"));
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
-        panSubAtBScenario.add(chkUseBotControlledAutoResolve, gridBagConstraints);
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBScenario.add(lblAutoResolveType, gridBagConstraints);
+
+        final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
+            AutoResolveMethod.values());
+        comboAutoResolveType = new MMComboBox<>("comboAutoResolveType", autoResolveTypeModel);
+        comboAutoResolveType.setToolTipText(resources.getString("lblAutoResolveType.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition;
+        panSubAtBScenario.add(comboAutoResolveType, gridBagConstraints);
+
+        chkAutoResolveVictoryChanceEnabled = new JCheckBox(
+            resources.getString("chkAutoResolveVictoryChanceEnabled.text"));
+        chkAutoResolveVictoryChanceEnabled.setToolTipText(
+            resources.getString("chkAutoResolveVictoryChanceEnabled.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkAutoResolveVictoryChanceEnabled, gridBagConstraints);
 
         chkUseDropShips = new JCheckBox(resources.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resources.getString("chkUseDropShips.toolTipText"));
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkUseDropShips, gridBagConstraints);
 
@@ -8969,7 +8989,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
-        chkUseBotControlledAutoResolve.setSelected(options.isPrincessBotAutoResolve());
+        comboAutoResolveType.setSelectedItem(options.getAutoResolveMethod());
+        chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
         chkUseDropShips.setSelected(options.isUseDropShips());
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
@@ -9572,7 +9593,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
             options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
-            options.setPrincessBotAutoResolve(chkUseBotControlledAutoResolve.isSelected());
+            options.setAutoResolveMethod(comboAutoResolveType.getSelectedItem());
+            options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
