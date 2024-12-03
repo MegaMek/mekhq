@@ -1057,7 +1057,7 @@ public class StratconRulesManager {
         ContractCommandRights commandRights = contract.getCommandRights();
         if (commandRights.isIndependent()) {
             if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-                skillModifier = campaign.getReputation().getAverageSkillLevel().getAdjustedValue();
+                skillModifier = -campaign.getReputation().getAverageSkillLevel().getAdjustedValue();
             }
         }
 
@@ -1098,6 +1098,7 @@ public class StratconRulesManager {
         reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
                 scenario.getName(), roll, fightStanceReport, reinforcementTargetNumber.getValue()));
 
+        // Critical Failure
         if (roll == 2) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCriticalFailure.text"),
@@ -1107,19 +1108,41 @@ public class StratconRulesManager {
             return FAILED;
         }
 
-        int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
-        int interceptionRoll = Compute.randomInt(100);
-
-        // Was the reinforcement attempt successful?
-        if (roll >= reinforcementTargetNumber.getValue() && interceptionRoll >= interceptionOdds) {
+        // Reinforcement successful
+        if (roll >= reinforcementTargetNumber.getValue()) {
             reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementsSuccessNoInterception.text"),
+            reportStatus.append(String.format(resources.getString("reinforcementsSuccess.text"),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return SUCCESS;
         }
 
+        // Reinforcement roll failed, make interception check
+        int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
+        int interceptionRoll = Compute.randomInt(100);
+
+        // Check passed
+        if (interceptionRoll >= interceptionOdds) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return FAILED;
+        }
+
+        // Check failed, but enemy is routed
+        if (contract.getMoraleLevel().isRouted()) {
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsSuccessRouted.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return SUCCESS;
+        }
+
+        // Check failed, enemy attempt interception
         reportStatus.append(' ');
         reportStatus.append(String.format(resources.getString("reinforcementsInterceptionAttempt.text"),
             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
@@ -1176,7 +1199,8 @@ public class StratconRulesManager {
         }
 
         roll = d6(2);
-        int targetNumber = 12 - tactics.getFinalSkillValue();
+        int baseTargetNumber = 9;
+        int targetNumber = baseTargetNumber - tactics.getFinalSkillValue();
 
         if (roll >= targetNumber) {
             reportStatus.append(' ');
@@ -1976,7 +2000,7 @@ public class StratconRulesManager {
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean isReinforcements) {
         if (contract.getMoraleLevel().isRouted()) {
-            return 0;
+            return -1;
         }
 
         int moraleModifier = switch (contract.getMoraleLevel()) {

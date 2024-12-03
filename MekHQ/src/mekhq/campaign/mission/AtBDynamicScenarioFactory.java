@@ -102,7 +102,7 @@ public class AtBDynamicScenarioFactory {
     private static final double OPPORTUNISTIC = 1.0;
     private static final double LIBERAL = 1.25;
 
-    private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
+    private static final int REINFORCEMENT_ARRIVAL_SCALE = 15;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle(
             "mekhq.resources.AtBDynamicScenarioFactory",
@@ -3696,17 +3696,15 @@ public class AtBDynamicScenarioFactory {
             if ((speed < minimumSpeed) && (speed > 0)) {
                 minimumSpeed = speed;
             }
-        }
 
-        // the actual arrival turn will be the scale divided by the slowest speed.
-        // so, a group of Atlases (3/5) should arrive on turn 10 (30 / 3)
-        // a group of jump-capable Griffins (5/8/5) should arrive on turn 5 (30 / 6)
-        // a group of Ostscouts (8/12/8) should arrive on turn 3 (30 / 9, rounded down)
-        // we then subtract the passed-in turn modifier, which is usually the
-        // commander's strategy skill level.
-        int actualArrivalTurn = Math.max(0, (arrivalScale / minimumSpeed) - turnModifier);
+            // the actual arrival turn will be the scale divided by the slowest speed.
+            // so, a group of Atlases (3/5) should arrive at turn 7 (20 / 3)
+            // a group of jump-capable Griffins (5/8/5) should arrive on turn 3 (20 / 6, rounded down)
+            // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
+            // we then subtract the passed-in turn modifier, which is usually the
+            // commander's strategy skill level.
+            int actualArrivalTurn = Math.max(0, (arrivalScale / minimumSpeed) - turnModifier);
 
-        for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }
     }
