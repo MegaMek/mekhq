@@ -1455,7 +1455,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (scenario.getHasTrack()) {
                             continue;
                         }
-
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
                                 + scenario.getId() + '|' + unitIds);
@@ -1471,7 +1470,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 boolean allUnitsSameType = false;
                 double unitWeight = 0;
                 int singleUnitType = -1;
-                boolean areAnyUnitsDeployed = StaticChecks.areAnyUnitsDeployed(units);
 
                 // Add submenus for different types of transports
                 JMenu m_trn = new JMenu(TOEMouseAdapter.MEK_CARRIERS);
@@ -1505,10 +1503,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     menu = new JMenu("Assign Unit to Transport Ship");
                     for (Unit ship : gui.getCampaign().getTransportShips()) {
                         if (ship.isSalvage() || (ship.getCommander() == null)) {
-                            continue;
-                        }
-
-                        if (areAnyUnitsDeployed) {
                             continue;
                         }
 
