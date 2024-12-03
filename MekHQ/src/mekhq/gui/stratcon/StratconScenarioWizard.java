@@ -41,6 +41,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 /**
@@ -54,8 +55,8 @@ public class StratconScenarioWizard extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
             MekHQ.getMHQOptions().getLocale());
 
-    private Map<String, JList<Force>> availableForceLists = new HashMap<>();
-    private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
+    private final Map<String, JList<Force>> availableForceLists = new HashMap<>();
+    private final Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
 
     private JList<Unit> availableInfantryUnits = new JList<>();
     private JList<Unit> availableLeadershipUnits = new JList<>();
@@ -517,6 +518,8 @@ public class StratconScenarioWizard extends JDialog {
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
             setVisible(false);
         }
+
+        translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
 
         this.getParent().repaint();
     }
