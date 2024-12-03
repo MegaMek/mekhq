@@ -207,7 +207,7 @@ public class StratconRulesManager {
                     }
                 }
 
-                int calculatedOperationStatus = 5 + (int) round((double) operationalStatus / unitCount);
+                int calculatedOperationStatus = (int) round(Math.pow((3 - (double) operationalStatus / unitCount), 2.0));
 
                 for (int i = 0; i < calculatedOperationStatus; i++) {
                     availableForcePool.add(forceId);
