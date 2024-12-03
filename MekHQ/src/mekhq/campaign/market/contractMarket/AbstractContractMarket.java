@@ -188,7 +188,7 @@ public abstract class AbstractContractMarket {
      * @return The number of lances required to be deployed.
      */
     public int calculateRequiredLances(Campaign campaign, AtBContract contract, boolean bypassVariance) {
-        int maxDeployedLances = calculateMaxDeployedLances(campaign);
+        int maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
         if (contract.isSubcontract()) {
             return 1;
         } else {
