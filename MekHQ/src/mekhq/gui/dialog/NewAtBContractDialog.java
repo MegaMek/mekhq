@@ -509,7 +509,24 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     @Override
     protected void btnOKActionPerformed(ActionEvent evt) {
+        
         if (!btnOK.equals(evt.getSource())) {
+            return;
+        }
+
+        if (getCurrentEmployerCode() == null) {
+            JOptionPane.showMessageDialog(rootPane, "Make sure you set Employer!",
+                    "Contract is Missing Field", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (getCurrentEnemyCode() == null) {
+            JOptionPane.showMessageDialog(rootPane, "Make sure you set Enemy!",
+                    "Contract is Missing Field", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (cbPlanets.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(rootPane, "Make sure you set the Planet!",
+                    "Contract is Missing Field", JOptionPane.WARNING_MESSAGE);
             return;
         }
 

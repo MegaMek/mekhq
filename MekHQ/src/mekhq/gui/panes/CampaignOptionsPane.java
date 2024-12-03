@@ -98,6 +98,7 @@ import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 
 /**
  * @author Justin 'Windchild' Bowen
@@ -9578,6 +9579,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // endregion Against the Bot
 
             campaign.setCampaignOptions(options);
+
+            recalculateStrategicFormations(campaign);
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception ex) {

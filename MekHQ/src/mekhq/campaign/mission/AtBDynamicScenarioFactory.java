@@ -445,6 +445,10 @@ public class AtBDynamicScenarioFactory {
         int forceBV = 0;
         double forceMultiplier = forceTemplate.getForceMultiplier();
 
+        if (forceMultiplier == 0) {
+            forceMultiplier = 1;
+        }
+
         if (forceMultiplier != 1) {
             logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
         }

@@ -23,7 +23,9 @@ package mekhq.campaign.force;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -39,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
@@ -278,8 +281,7 @@ public class StrategicFormation {
         }
 
         /*
-         * Check that the number of units and weight are within the limits
-         * and that the force contains at least one ground unit.
+         * Check that the number of units and weight are within the limits.
          */
         if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(campaign);
@@ -334,6 +336,15 @@ public class StrategicFormation {
 
             for (Force childForce : childForces) {
                 if (childForce.isStrategicFormation()) {
+                    force.setStrategicFormation(false);
+                    return false;
+                }
+            }
+
+            List<Force> parentForces = force.getAllParents();
+
+            for (Force parentForce : parentForces) {
+                if (parentForce.isStrategicFormation()) {
                     force.setStrategicFormation(false);
                     return false;
                 }
@@ -616,5 +627,91 @@ public class StrategicFormation {
         }
 
         return weight;
+    }
+
+    /**
+     * This static method updates the strategic formations across the campaign.
+     * It starts at the top level force, and calculates the strategic formations for each sub-force.
+     * It keeps only the eligible strategic formations and imports them into the campaign.
+     * After every formation is processed, an 'OrganizationChangedEvent' is triggered by that force.
+     *
+     * @param campaign the current campaign.
+     */
+    public static void recalculateStrategicFormations(Campaign campaign) {
+        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
+        StrategicFormation strategicFormation = strategicFormations.get(0); // This is the origin node
+        Force force = campaign.getForce(0);
+
+        // Does the force already exist in our hashtable? If so, update it accordingly
+        if (strategicFormation != null) {
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (!isEligible) {
+                campaign.removeStrategicFormation(0);
+            }
+
+            force.setStrategicFormation(isEligible);
+        // Otherwise, create a new formation and then add it to the table, if appropriate
+        } else {
+            strategicFormation = new StrategicFormation(0, campaign);
+            boolean isEligible = strategicFormation.isEligible(campaign);
+
+            if (isEligible) {
+                campaign.addStrategicFormation(strategicFormation);
+            }
+
+            force.setStrategicFormation(isEligible);
+        }
+
+        // Update the TO&E and then begin recursively walking it
+        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+        recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
+    }
+
+    /**
+     * This method is used to update the strategic formations for the campaign working downwards
+     * from a specified node, through all of its sub-forces.
+     * It creates a new {@link StrategicFormation} for each sub-force and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the strategic formation status of
+     * the respective force is set to {@code true}.
+     * After every force is processed, an 'OrganizationChangedEvent' is triggered.
+     * This function runs recursively on each sub-force, effectively traversing the complete TO&E.
+     *
+     * @param campaign the current {@link Campaign}.
+     * @param workingNode the {@link Force} node from which the method starts working down through
+     *                   all its sub-forces.
+     */
+    private static void recalculateSubForceStrategicStatus(Campaign campaign, Hashtable<Integer,
+        StrategicFormation> strategicFormations, Force workingNode) {
+
+        for (Force force : workingNode.getSubForces()) {
+            int forceId = force.getId();
+            StrategicFormation strategicFormation = strategicFormations.get(forceId);
+
+            // Does the force already exist in our hashtable? If so, update it accordingly
+            if (strategicFormation != null) {
+                boolean isEligible = strategicFormation.isEligible(campaign);
+
+                if (!isEligible) {
+                    campaign.removeStrategicFormation(forceId);
+                }
+
+                force.setStrategicFormation(isEligible);
+            // Otherwise, create a new formation and then add it to the table, if appropriate
+            } else {
+                strategicFormation = new StrategicFormation(forceId, campaign);
+                boolean isEligible = strategicFormation.isEligible(campaign);
+
+                if (isEligible) {
+                    campaign.addStrategicFormation(strategicFormation);
+                }
+
+                force.setStrategicFormation(isEligible);
+            }
+
+            // Update the TO&E and then continue recursively walking it
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+            recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
+        }
     }
 }

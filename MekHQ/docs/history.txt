@@ -38,6 +38,12 @@ MEKHQ VERSION HISTORY:
 + Fix #4600: Add Persistent Initiative Bonus to campaign
 + Fix #5169: Added temp Astechs and Medics to Personnel Report; Support Personnel Salaries now match the Finances tab.
 + PR #5250: Renamed 'Lances' to 'Strategic Formations', Expanded Functionality
++ Fix #4600: Added initiativeMaxBonus to Campaign
++ PR #5263: Refactored Strategic Formation Weight Categories
++ Fix #5262: Refactored Scenario Force Building Logic.
++ PR #5266: Refactored Morale Calculations and Logging
++ PR #5268: Refactored Strategic Formations
++ Fix #5149: Better error message for null values in contract fields
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

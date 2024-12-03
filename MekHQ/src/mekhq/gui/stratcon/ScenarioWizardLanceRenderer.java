@@ -50,7 +50,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setForeground(foreground);
         setBackground(background);
 
-        StrategicFormation lance = campaign.getStrategicFormations().get(value.getId());
+        StrategicFormation lance = campaign.getStrategicFormationsTable().get(value.getId());
         String roleString = "";
         if (lance != null) {
             roleString = lance.getRole().toString() + ", ";
