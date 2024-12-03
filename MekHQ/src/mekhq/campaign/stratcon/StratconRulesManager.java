@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 import static java.lang.Math.round;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
@@ -180,6 +181,44 @@ public class StratconRulesManager {
 
         // get this list just so we have it available
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+
+        // Build the available force pool - this ensures operational forces have an increased
+        // chance of being picked
+        if (autoAssignLances && !availableForceIDs.isEmpty()) {
+            List<Integer> availableForcePool = new ArrayList<>();
+
+            for (int forceId : availableForceIDs) {
+                Force force = campaign.getForce(forceId);
+
+                if (force == null) {
+                    continue;
+                }
+
+                int operationalStatus = 0;
+                int unitCount = 0;
+
+                for (UUID unitId : force.getAllUnits(true)) {
+                    try {
+                        Unit unit = campaign.getUnit(unitId);
+                        operationalStatus += determineLayeredForceIconOperationalStatus(unit).ordinal();
+                        unitCount++;
+                    } catch (Exception e) {
+                        logger.warn(e.getMessage(), e);
+                    }
+                }
+
+                int calculatedOperationStatus = 5 + (int) round((double) operationalStatus / unitCount);
+
+                for (int i = 0; i < calculatedOperationStatus; i++) {
+                    availableForcePool.add(forceId);
+                }
+            }
+
+            Collections.shuffle(availableForcePool);
+            availableForceIDs = availableForcePool;
+        }
+
+
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
@@ -219,13 +258,13 @@ public class StratconRulesManager {
                 // remove the force from the available lists, so we don't designate it as primary
                 // twice
                 if (autoAssignLances) {
-                    availableForceIDs.remove(randomForceIndex);
+                    availableForceIDs.removeIf(id -> id.equals(randomForceIndex));
                 }
 
                 // we want to remove the actual int with the value, not the value at the index
-                sortedAvailableForceIDs.get(AllGroundTerrain).remove((Integer) randomForceID);
-                sortedAvailableForceIDs.get(LowAtmosphere).remove((Integer) randomForceID);
-                sortedAvailableForceIDs.get(Space).remove((Integer) randomForceID);
+                sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
+                sortedAvailableForceIDs.get(LowAtmosphere).removeIf(id -> id.equals(randomForceID));
+                sortedAvailableForceIDs.get(Space).removeIf(id -> id.equals(randomForceID));
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
