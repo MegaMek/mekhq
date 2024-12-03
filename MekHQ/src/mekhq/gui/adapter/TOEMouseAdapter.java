@@ -1082,6 +1082,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 || !scenario.canDeployForces(forces, gui.getCampaign())) {
                             continue;
                         }
+
+                        if (scenario.getHasTrack()) {
+                            continue;
+                        }
+
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(
                                 TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + '|' + forceIds);
@@ -1097,10 +1102,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Force");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
+                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
                 popup.add(menuItem);
             }
 
             menuItem = new JMenuItem("Remove Force");
+
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
             menuItem.setEnabled(
@@ -1444,6 +1451,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 !scenario.canDeployUnits(units, gui.getCampaign())) {
                             continue;
                         }
+
+                        if (scenario.getHasTrack()) {
+                            continue;
+                        }
+
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
                                 + scenario.getId() + '|' + unitIds);
@@ -1593,11 +1605,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Unit");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
+                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
                 popup.add(menuItem);
             }
 
-            if (StaticChecks.areAllUnitsTransported(units)) {
+            if (StaticChecks.areAllUnitsTransported(units) && !StaticChecks.areAnyUnitsDeployed(units)) {
                 menuItem = new JMenuItem("Unassign Unit from Transport Ship");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP + unitIds);
                 menuItem.addActionListener(this);
