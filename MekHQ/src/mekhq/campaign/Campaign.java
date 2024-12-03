@@ -3961,6 +3961,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (negoatiatedSupportPoints >= maximumSupportPointsNegotiated) {
+                    negoatiatedSupportPoints = maximumSupportPointsNegotiated;
                     break;
                 }
             }
