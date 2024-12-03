@@ -53,6 +53,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -1567,7 +1568,8 @@ public class StratconRulesManager {
         // The criteria are as follows:
         // - unit is eligible to be spawned on the scenario type
         // - unit has a lower BV than the BV budget granted from Leadership
-        int totalBudget = BASE_LEADERSHIP_BUDGET * leadershipSkill;
+        // Leadership budget is capped at 5 levels
+        int totalBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
 
         int primaryUnitType = getPrimaryUnitType(campaign, forceIDs);
 

@@ -40,6 +40,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Math.min;
 import static mekhq.campaign.personnel.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
 import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
@@ -236,7 +237,8 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     private void setLeadershipUI(GridBagConstraints gbc, List<Unit> eligibleUnits, int leadershipSkill) {
-        int leadershipBudget = BASE_LEADERSHIP_BUDGET * leadershipSkill;
+        // Leadership budget is capped at 5 levels
+        int leadershipBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
         int maxSelectionSize = leadershipBudget - currentScenario.getLeadershipPointsUsed();
 
         gbc.anchor = GridBagConstraints.WEST;
