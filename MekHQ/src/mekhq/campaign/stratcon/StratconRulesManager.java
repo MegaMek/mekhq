@@ -68,7 +68,7 @@ import static mekhq.campaign.stratcon.StratconScenarioFactory.convertSpecificUni
  * @author NickAragua
  */
 public class StratconRulesManager {
-    public final static int BASE_LEADERSHIP_BUDGET = 500;
+    public final static int BASE_LEADERSHIP_BUDGET = 1000;
     private static final MMLogger logger = MMLogger.create(StratconRulesManager.class);
 
     /**
@@ -1565,7 +1565,7 @@ public class StratconRulesManager {
         }
 
         // The criteria are as follows:
-        // - unit is of a different unit type than the primary unit type of the force
+        // - unit is eligible to be spawned on the scenario type
         // - unit has a lower BV than the BV budget granted from Leadership
         int totalBudget = BASE_LEADERSHIP_BUDGET * leadershipSkill;
 
@@ -1584,17 +1584,15 @@ public class StratconRulesManager {
                 continue;
             }
 
-            // the general idea is that we want a different unit type than the primary
-            // but also something that can be deployed to the scenario -
-            // e.g. no infantry on air scenarios etc.
-            boolean validUnitType = (primaryUnitType != unit.getEntity().getUnitType()) &&
-                    forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
-                        generalUnitType, true);
+            // the general idea is that we want something that can be deployed to the scenario -
+            // e.g., no infantry on air scenarios etc.
+            boolean validUnitType = (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
+                        generalUnitType, true));
 
             if (validUnitType
                 && !unit.isDeployed()
                 && !unit.isMothballed()
-                && (unit.getEntity().calculateBattleValue() <= totalBudget)
+                && (unit.getEntity().calculateBattleValue(true, true) <= totalBudget)
                 && (unit.checkDeployment() == null)
                 && !isUnitDeployedToStratCon(unit)) {
                 eligibleUnits.add(unit);

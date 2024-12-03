@@ -34,8 +34,6 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
             boolean isSelected, boolean cellHasFocus) {
         Campaign campaign = value.getCampaign();
 
-
-
         int valueForceId = value.getForceId();
         Force force = campaign.getForce(valueForceId);
 
@@ -46,7 +44,10 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
             forceName = forceName.replaceAll(originNodeName, "");
         }
 
-        setText(String.format("%s (BV: %d) %s", value.getName(), value.getEntity().calculateBattleValue(), forceName));
+        setText(String.format("<html><b>%s (%s/%s)</b> - %s - Base BV: %d<br><i>%s</i></html>",
+            value.getName(), value.getEntity().getCrew().getGunnery(), value.getEntity().getCrew().getPiloting(),
+            value.getCondition(), value.getEntity().calculateBattleValue(true, true),
+            forceName));
 
         if (isSelected) {
             setBackground(list.getSelectionBackground());

@@ -557,12 +557,14 @@ public class StratconScenarioWizard extends JDialog {
         if (usesBV) {
             selectedItems = 0;
             for (Unit unit : changedList.getSelectedValuesList()) {
-                selectedItems += unit.getEntity().calculateBattleValue();
+                selectedItems += unit.getEntity().calculateBattleValue(true, true);
+                selectionCountLabel.setText(String.format("%d selected (ignores crew skill)", selectedItems));
             }
         } else {
             selectedItems = changedList.getSelectedIndices().length;
+            selectionCountLabel.setText(String.format("%d selected", selectedItems));
         }
-        selectionCountLabel.setText(String.format("%d selected", selectedItems));
+
         // if we've selected too many units here, change the label and disable the
         // commit button
         if (selectedItems > maxSelectionSize) {
