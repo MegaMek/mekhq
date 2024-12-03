@@ -102,7 +102,7 @@ public class AtBDynamicScenarioFactory {
     private static final double OPPORTUNISTIC = 1.0;
     private static final double LIBERAL = 1.25;
 
-    private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
+    private static final int REINFORCEMENT_ARRIVAL_SCALE = 15;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle(
             "mekhq.resources.AtBDynamicScenarioFactory",
@@ -3502,8 +3502,29 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(forceEntities,
-                            strategy + scenario.getFriendlyReinforcementDelayReduction());
+                    setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
+
+                    // Here we selectively overwrite the earlier entries
+                    if (!scenario.getFriendlyDelayedReinforcements().isEmpty()) {
+                        List<Entity> delayedEntities = new ArrayList<>();
+
+                        for (UUID unitId : scenario.getFriendlyDelayedReinforcements()) {
+                            try {
+                                Unit unit = campaign.getUnit(unitId);
+                                Entity entity = unit.getEntity();
+
+                                delayedEntities.add(entity);
+                            } catch (Exception ex) {
+                                logger.error(ex.getMessage(), ex);
+                            }
+                        }
+
+                        if (!delayedEntities.isEmpty()) {
+                            setDeploymentTurnsForReinforcements(delayedEntities,
+                                strategy + scenario.getFriendlyReinforcementDelayReduction(),
+                                true);
+                        }
+                    }
                 } else {
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
@@ -3628,10 +3649,41 @@ public class AtBDynamicScenarioFactory {
      * @param turnModifier A number to subtract from the deployment turn.
      */
     public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier) {
+        setDeploymentTurnsForReinforcements(entityList, turnModifier, false);
+    }
+
+    /**
+     * Given a list of entities, set the arrival turns for them as if they were all
+     * reinforcements on the same side. This overloaded method allows for defining whether the
+     * force was delayed.
+     *
+     * @param entityList   List of entities to process
+     * @param turnModifier A number to subtract from the deployment turn.
+     * @param isDelayed Whether the arrival of the entities was delayed
+     */
+    public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier,
+                                                           boolean isDelayed) {
         int minimumSpeed = 999;
+        int arrivalScale = REINFORCEMENT_ARRIVAL_SCALE;
+
+        // First, we organize the reinforcements into pools.
+        // This ensures each Force's reinforcements are handled separately.
+        Map<Integer, Integer> delayByForce = new HashMap<>();
 
         // first, we figure out the slowest "atb speed" of this group.
         for (Entity entity : entityList) {
+            if (isDelayed) {
+                int forceId = entity.getForceId();
+
+                if (delayByForce.containsKey(forceId)) {
+                    arrivalScale = delayByForce.get(forceId);
+                } else {
+                    int delayedArrivalScale = REINFORCEMENT_ARRIVAL_SCALE * (randomInt(2) + 2);
+                    delayByForce.put(forceId, delayedArrivalScale);
+                    arrivalScale = delayedArrivalScale;
+                }
+            }
+
             // don't include transported units in this calculation
             if (entity.getTransportId() != Entity.NONE) {
                 continue;
@@ -3644,17 +3696,15 @@ public class AtBDynamicScenarioFactory {
             if ((speed < minimumSpeed) && (speed > 0)) {
                 minimumSpeed = speed;
             }
-        }
 
-        // the actual arrival turn will be the scale divided by the slowest speed.
-        // so, a group of Atlases (3/5) should arrive on turn 10 (30 / 3)
-        // a group of jump-capable Griffins (5/8/5) should arrive on turn 5 (30 / 6)
-        // a group of Ostscouts (8/12/8) should arrive on turn 3 (30 / 9, rounded down)
-        // we then subtract the passed-in turn modifier, which is usually the
-        // commander's strategy skill level.
-        int actualArrivalTurn = Math.max(0, (REINFORCEMENT_ARRIVAL_SCALE / minimumSpeed) - turnModifier);
+            // the actual arrival turn will be the scale divided by the slowest speed.
+            // so, a group of Atlases (3/5) should arrive at turn 7 (20 / 3)
+            // a group of jump-capable Griffins (5/8/5) should arrive on turn 3 (20 / 6, rounded down)
+            // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
+            // we then subtract the passed-in turn modifier, which is usually the
+            // commander's strategy skill level.
+            int actualArrivalTurn = Math.max(0, (arrivalScale / minimumSpeed) - turnModifier);
 
-        for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }
     }

@@ -19,6 +19,7 @@
 package mekhq.gui.stratcon;
 
 import megamek.common.Minefield;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -28,6 +29,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
+import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -41,7 +43,11 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
-import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
@@ -54,13 +60,15 @@ public class StratconScenarioWizard extends JDialog {
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
             MekHQ.getMHQOptions().getLocale());
 
-    private Map<String, JList<Force>> availableForceLists = new HashMap<>();
-    private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
+    private final Map<String, JList<Force>> availableForceLists = new HashMap<>();
+    private final Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
 
     private JList<Unit> availableInfantryUnits = new JList<>();
     private JList<Unit> availableLeadershipUnits = new JList<>();
 
     private JButton btnCommit;
+
+    private static final MMLogger logger = MMLogger.create(StratconScenarioWizard.class);
 
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
@@ -96,39 +104,36 @@ public class StratconScenarioWizard extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         setInstructions(gbc);
 
-        switch (currentScenario.getCurrentState()) {
-            case UNRESOLVED:
+        if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
+            gbc.gridy++;
+            setAssignForcesUI(gbc, false);
+        } else {
+            gbc.gridy++;
+            setAssignForcesUI(gbc, true);
+            gbc.gridy++;
+
+            List<Unit> eligibleLeadershipUnits = StratconRulesManager.getEligibleLeadershipUnits(campaign,
+                currentScenario.getPrimaryForceIDs());
+
+            eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
+
+            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
+
+            if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
+                setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
                 gbc.gridy++;
-                setAssignForcesUI(gbc, false);
-                break;
-            default:
+            }
+
+            if (currentScenario.getNumDefensivePoints() > 0) {
+                setDefensiveUI(gbc);
                 gbc.gridy++;
-                setAssignForcesUI(gbc, true);
-                gbc.gridy++;
-
-                List<Unit> eligibleLeadershipUnits = StratconRulesManager.getEligibleLeadershipUnits(campaign,
-                        currentScenario.getPrimaryForceIDs());
-
-                eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
-
-                int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER,
-                        campaign);
-
-                if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
-                    setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-                    gbc.gridy++;
-                }
-
-                if (currentScenario.getNumDefensivePoints() > 0) {
-                    setDefensiveUI(gbc);
-                    gbc.gridy++;
-                }
-                break;
+            }
         }
 
         gbc.gridx = 0;
         gbc.gridy++;
         setNavigationButtons(gbc);
+
         pack();
         validate();
     }
@@ -148,13 +153,10 @@ public class StratconScenarioWizard extends JDialog {
             labelBuilder.append(currentScenario.getInfo());
         }
 
-        switch (currentScenario.getCurrentState()) {
-            case UNRESOLVED:
-                labelBuilder.append("primaryForceAssignmentInstructions.text");
-                break;
-            default:
-                labelBuilder.append("reinforcementsAndSupportInstructions.text");
-                break;
+        if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
+            labelBuilder.append("primaryForceAssignmentInstructions.text");
+        } else {
+            labelBuilder.append("reinforcementsAndSupportInstructions.text");
         }
 
         labelBuilder.append("<br/>");
@@ -182,9 +184,12 @@ public class StratconScenarioWizard extends JDialog {
             localGbc.gridx = 0;
             localGbc.gridy = 0;
 
-            String labelText = reinforcements ? resourceMap.getString("selectReinforcementsForTemplate.Text")
-                    : String.format(resourceMap.getString("selectForceForTemplate.Text"),
-                            currentScenario.getRequiredPlayerLances());
+            String reinforcementMessage = currentCampaignState.getSupportPoints() > 0 ?
+                resourceMap.getString("selectReinforcementsForTemplate.Text") :
+                resourceMap.getString("selectReinforcementsForTemplateNoSupportPoints.Text");
+
+            String labelText = reinforcements ? reinforcementMessage
+                : resourceMap.getString("selectForceForTemplate.Text");
 
             JLabel assignForceListInstructions = new JLabel(labelText);
             forcePanel.add(assignForceListInstructions, localGbc);
@@ -273,13 +278,10 @@ public class StratconScenarioWizard extends JDialog {
             ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPaneWithSpeed();
 
-        ScenarioWizardLanceModel lanceModel;
-
-        lanceModel = new ScenarioWizardLanceModel(campaign,
-                StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(),
-                        campaign, currentTrackState,
-                        (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
-                        currentScenario, currentCampaignState));
+        ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
+            StratconRulesManager.getAvailableForceIDs(forceTemplate.getAllowedUnitType(), campaign, currentTrackState,
+                (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS),
+                currentScenario, currentCampaignState));
 
         JList<Force> availableForceList = new JList<>();
         availableForceList.setModel(lanceModel);
@@ -405,21 +407,13 @@ public class StratconScenarioWizard extends JDialog {
         costBuilder.append('(');
 
         switch (StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
-            case SupportPoint:
-                costBuilder.append(resourceMap.getString("supportPoint.text"));
-
-                if (currentCampaignState.getSupportPoints() <= 0) {
-                    costBuilder.append(", ");
-
-                    costBuilder.append(messageSurroundedBySpanWithColor(
-                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                            resourceMap.getString("reinforcementRoll.Text")));
-                }
+            case REGULAR:
+                costBuilder.append(resourceMap.getString("regular.text"));
                 break;
-            case ChainedScenario:
+            case CHAINED_SCENARIO:
                 costBuilder.append(resourceMap.getString("fromChainedScenario.text"));
                 break;
-            case FightLance:
+            case FIGHT_LANCE:
                 costBuilder.append(resourceMap.getString("lanceInFightRole.text"));
                 break;
             default:
@@ -459,19 +453,46 @@ public class StratconScenarioWizard extends JDialog {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 // if we are assigning reinforcements, pay the price if appropriate
                 if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                    if (currentCampaignState.getSupportPoints() <= 0) {
+                        campaign.addReport(String.format(resourceMap.getString("reinforcementsNoSupportPoints.text"),
+                            currentScenario.getName(),
+                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            CLOSING_SPAN_TAG));
+                        continue;
+                    }
+
                     ReinforcementEligibilityType reinforcementType = StratconRulesManager.getReinforcementType(
                             force.getId(), currentTrackState,
                             campaign, currentCampaignState);
 
                     // if we failed to deploy as reinforcements, move on to the next force
-                    if (!StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState,
-                            currentScenario, campaign)) {
+                    ReinforcementResultsType reinforcementResults = processReinforcementDeployment(
+                        force, reinforcementType, currentCampaignState, currentScenario, campaign);
+
+                    if (reinforcementResults.ordinal() >= FAILED.ordinal()) {
                         currentScenario.addFailedReinforcements(force.getId());
                         continue;
                     }
-                }
 
-                currentScenario.addForce(force, templateID, campaign);
+                    currentScenario.addForce(force, templateID, campaign);
+
+                    if (reinforcementResults == DELAYED) {
+                        List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
+
+                        for (UUID unitId : force.getAllUnits(true)) {
+                            try {
+                                delayedReinforcements.add(unitId);
+                            } catch (Exception ex) {
+                                logger.error(ex.getMessage(), ex);
+                            }
+                        }
+                    }
+                } else {
+                    // In the event the player has selected multiple forces to act as the primary
+                    // force, only commit the first force
+                    currentScenario.addForce(force, templateID, campaign);
+                    break;
+                }
             }
         }
 
@@ -496,10 +517,8 @@ public class StratconScenarioWizard extends JDialog {
         }
 
         // scenarios that haven't had primary forces committed yet get those committed
-        // now
-        // and the scenario gets published to the campaign and may be played immediately
-        // from the briefing room
-        // that being said, give the player a chance to commit reinforcements too
+        // now and the scenario gets published to the campaign and may be played immediately
+        // from the briefing room that being said, give the player a chance to commit reinforcements too
         if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
             // if we've already generated forces and applied modifiers, no need to do it
             // twice
