@@ -4537,7 +4537,7 @@ public class Campaign implements ITechManager {
     public int getInitiativeBonus() {
         return initiativeBonus;
     }
-    
+
     public void setInitiativeBonus(int bonus) {
         initiativeBonus = bonus;
     }
@@ -4545,7 +4545,7 @@ public class Campaign implements ITechManager {
     public void applyInitiativeBonus(int bonus) {
         if (bonus > initiativeMaxBonus) {
             initiativeMaxBonus = bonus;
-        } 
+        }
         if ((bonus + initiativeBonus) > initiativeMaxBonus) {
             initiativeBonus = initiativeMaxBonus;
         } else {
