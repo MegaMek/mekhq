@@ -1594,7 +1594,7 @@ public class StratconRulesManager {
             if (validUnitType
                 && !unit.isDeployed()
                 && !unit.isMothballed()
-                && (unit.getEntity().calculateBattleValue() < totalBudget)
+                && (unit.getEntity().calculateBattleValue() <= totalBudget)
                 && (unit.checkDeployment() == null)
                 && !isUnitDeployedToStratCon(unit)) {
                 eligibleUnits.add(unit);
