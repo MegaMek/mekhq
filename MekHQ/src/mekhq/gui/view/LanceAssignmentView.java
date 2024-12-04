@@ -140,7 +140,10 @@ public class LanceAssignmentView extends JPanel {
                     switch (column) {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
-                                setText((((Force) value)).getFullName());
+                                String forceName = (((Force) value)).getFullName();
+                                String originNodeName = ", " + campaign.getForce(0).getName();
+                                forceName = forceName.replaceAll(originNodeName, "");
+                                setText(forceName);
                             }
                             break;
                         case LanceAssignmentTableModel.COL_CONTRACT:
@@ -203,7 +206,7 @@ public class LanceAssignmentView extends JPanel {
         }
         int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
                 campaign.getCampaignOptions().getAdditionalStrategyDeployment() * cmdrStrategy;
-        add(new JLabel("Maximum Deployed Units: " + maxDeployedLances));
+        add(new JLabel("Maximum Deployed Forces: " + maxDeployedLances));
 
         panAssignments = new JPanel();
         panAssignments.setLayout(new BoxLayout(panAssignments, BoxLayout.Y_AXIS));

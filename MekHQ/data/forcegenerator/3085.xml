@@ -4768,7 +4768,7 @@
 			</model>
 		</chassis>
 		<chassis name='Cyrano Gunship' unitType='VTOL'>
-			<availability>CC:3,MOC:3,CHH:2-,HL:3,CEI:2,FR:2,MERC:4,CDP:4,RA:2Periphery:4,ROS:6,NIOPS:6,CJF:2-</availability>
+			<availability>CC:3,MOC:3,CHH:2-,HL:3,CEI:2,FR:2,MERC:4,CDP:4,RA:2,Periphery:4,ROS:6,NIOPS:6,CJF:2-</availability>
 			<model name=''>
 				<roles>recon,escort</roles>
 				<availability>CC:4,CEI:4,ROS:5</availability>
@@ -11513,7 +11513,7 @@
 			</model>
 		</chassis>
 		<chassis name='Myrmidon Medium Tank' unitType='Tank'>
-			<availability>MOC:2CC:5,RA.OA:2,LA:5,ROS:5,FS:5,MERC:5,Periphery:2,DC:4</availability>
+			<availability>MOC:2,CC:5,RA.OA:2,LA:5,ROS:5,FS:5,MERC:5,Periphery:2,DC:4</availability>
 			<model name=''>
 				<availability>General:8</availability>
 			</model>

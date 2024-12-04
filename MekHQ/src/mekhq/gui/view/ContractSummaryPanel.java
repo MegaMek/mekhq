@@ -49,13 +49,13 @@ import static megamek.client.ui.WrapLayout.wordWrap;
  */
 public class ContractSummaryPanel extends JPanel {
     //region Variable Declarations
-    private Campaign campaign;
-    private Contract contract;
-    private boolean allowRerolls;
+    private final Campaign campaign;
+    private final Contract contract;
+    private final boolean allowRerolls;
     private int cmdRerolls;
     private int logRerolls;
     private int tranRerolls;
-    private ContractMarketMethod method;
+    private final ContractMarketMethod method;
 
     private JPanel mainPanel;
 
@@ -65,7 +65,7 @@ public class ContractSummaryPanel extends JPanel {
     private JLabel txtStraightSupport;
     private JLabel txtBattleLossComp;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
             MekHQ.getMHQOptions().getLocale());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
@@ -516,8 +516,7 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblRequiredLances, gridBagConstraintsLabels);
 
-            JLabel txtRequiredLances = new JLabel(((AtBContract) contract).getRequiredLances()
-                    + " Lance(s)");
+            JLabel txtRequiredLances = new JLabel(String.valueOf(((AtBContract) contract).getRequiredLances()));
             txtRequiredLances.setName("txtRequiredLances");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtRequiredLances, gridBagConstraintsText);
