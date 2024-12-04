@@ -35,10 +35,12 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
 import java.util.UUID;
 
+import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.generateForce;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.randomForceWeight;
 
@@ -78,6 +80,9 @@ public class AtBScenarioModifierApplicator {
                 templateToApply.getForceName());
 
         int weightClass = randomForceWeight();
+
+        logger.info(String.format("++ Generating a force for the %s template ++",
+            templateToApply.getForceName()).toUpperCase());
 
         generateForce(scenario, scenario.getContract(campaign), campaign, effectiveBV,
                 effectiveUnitCount, weightClass, templateToApply, true);
@@ -125,7 +130,8 @@ public class AtBScenarioModifierApplicator {
                 factionCode = scenario.getContract(campaign).getEnemyCode();
             }
 
-            actualUnitsToRemove = AtBDynamicScenarioFactory.getLanceSize(factionCode);
+            Faction faction = Factions.getInstance().getFaction(factionCode);
+            actualUnitsToRemove = getStandardForceSize(faction);
         }
 
         for (int x = 0; x < actualUnitsToRemove; x++) {

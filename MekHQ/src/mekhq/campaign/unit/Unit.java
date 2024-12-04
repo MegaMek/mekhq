@@ -1,8 +1,8 @@
 /*
  * Unit.java
  *
- * Copyright (C) 2016-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2016-2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -289,7 +289,7 @@ public class Unit implements ITechnology {
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("Omni");
         if (!(type == UnitType.TANK || type == UnitType.MEK)) {
-            toReturn.append(" ");
+            toReturn.append(' ');
         }
         toReturn.append(UnitType.getTypeDisplayableName(type));
         return toReturn.toString();
@@ -4817,8 +4817,31 @@ public class Unit implements ITechnology {
             getCampaign().mothball(this);
         } else {
             completeMothball();
-            getCampaign().addReport(getHyperlinkedName() + " has been mothballed (GM)");
+            getCampaign().addReport(getHyperlinkedName() + " has been mothballed");
         }
+    }
+
+    /**
+     * Returns the engineer responsible for the mothballing or activation of this unit.
+     * @return Person the previous engineer that worked on this vessel, or an empty object.
+     */
+    public Optional<Person> engineerResponsible() {
+        // if it is NOT self crewed or it is NOT mothballed, just get the tech
+        if (!isMothballed() || !isSelfCrewed()) {
+            return Optional.ofNullable(getTech());
+        } else {
+            // if it is self crewed AND is mothballed and has a mothball info, get the tech
+            if (isSelfCrewed() && isMothballed() && (this.mothballInfo != null)) {
+                var previousTech = this.mothballInfo.getTech();
+                var previousTechExists = previousTech != null;
+                var previousTechIsActive = previousTechExists && previousTech.getStatus().isActive();
+                if (previousTechIsActive) {
+                    return Optional.of(previousTech);
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -4858,15 +4881,32 @@ public class Unit implements ITechnology {
         // set this person as tech
         if (!isSelfCrewed() && (tech != null) && !tech.equals(activationTech)) {
             remove(tech, true);
+            tech = activationTech;
+        } else if (!isSelfCrewed() && (null == tech)) {
+            tech = activationTech;
         }
-        tech = activationTech;
+
+        if (isSelfCrewed() && !isConventionalInfantry()) {
+            if (engineerResponsible().isPresent() && engineerResponsible().get().getStatus().isActive()) {
+                var assignedEngineer = engineerResponsible().get();
+                addVesselCrew(assignedEngineer);
+            } else if (activationTech != null && activationTech.isTechLargeVessel()) {
+                addVesselCrew(activationTech);
+            } else {
+                // In this case there is nothing to be done, we cant activate this unit.
+                return;
+            }
+            resetEngineer();
+        } else {
+            tech = activationTech;
+        }
 
         if (!isGM) {
             setMothballTime(getMothballOrActivationTime());
             getCampaign().activate(this);
         } else {
             completeActivation();
-            getCampaign().addReport(getHyperlinkedName() + " has been activated (GM)");
+            getCampaign().addReport(getHyperlinkedName() + " has been activated");
         }
     }
 

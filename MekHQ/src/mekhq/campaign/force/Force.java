@@ -68,12 +68,18 @@ public class Force {
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
+    public static final int STRATEGIC_FORMATION_OVERRIDE_NONE = -1;
+    public static final int STRATEGIC_FORMATION_OVERRIDE_FALSE = 0;
+    public static final int STRATEGIC_FORMATION_OVERRIDE_TRUE = 1;
+
     private String name;
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
     private boolean convoyForce;
+    private boolean isStrategicFormation;
+    private int overrideStrategicFormation;
     private FormationLevel formationLevel;
     private FormationLevel overrideFormationLevel;
     private Force parentForce;
@@ -96,6 +102,8 @@ public class Force {
         setDescription("");
         this.combatForce = true;
         this.convoyForce = false;
+        this.isStrategicFormation = false;
+        this.overrideStrategicFormation = STRATEGIC_FORMATION_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
         this.overrideFormationLevel = FormationLevel.NONE;
         this.parentForce = null;
@@ -190,6 +198,22 @@ public class Force {
         }
     }
 
+    public boolean isStrategicFormation() {
+        return isStrategicFormation;
+    }
+
+    public void setStrategicFormation(final boolean isStrategicFormation) {
+        this.isStrategicFormation = isStrategicFormation;
+    }
+
+    public int getOverrideStrategicFormation() {
+        return overrideStrategicFormation;
+    }
+
+    public void setOverrideStrategicFormation(final int overrideStrategicFormation) {
+        this.overrideStrategicFormation = overrideStrategicFormation;
+    }
+
     public FormationLevel getFormationLevel() {
         return formationLevel;
     }
@@ -248,12 +272,63 @@ public class Force {
         return parentForce;
     }
 
+    /**
+     * This method generates a list of all parent forces for the current force object in the
+     * hierarchy. It repeatedly fetches the parent force of the current force and adds it to a list
+     * until no more parent forces can be found (i.e., until the top of the force hierarchy is reached).
+     *
+     * @return A list of {@link Force} objects representing all the parent forces of the current
+     * force object in the hierarchy. The list will be empty if there are no parent forces.
+     */
+    public List<Force> getAllParents() {
+        List<Force> parentForces = new ArrayList<>();
+
+        Force parentFormation = parentForce;
+
+        if (parentForce != null) {
+            parentForces.add(parentForce);
+        }
+
+        while (parentFormation != null) {
+            parentFormation = parentFormation.getParentForce();
+
+            if (parentFormation != null) {
+                parentForces.add(parentFormation);
+            }
+        }
+
+        return parentForces;
+    }
+
     public void setParentForce(final @Nullable Force parent) {
         this.parentForce = parent;
     }
 
     public Vector<Force> getSubForces() {
         return subForces;
+    }
+
+    /**
+     * Returns a list of all of this forces' descendant forces.
+     * This includes direct child forces and their descendents recursively.
+     * <p>
+     * This method works by first adding all direct child forces to the list, and
+     * then recursively adding their descendants by calling this method on each child
+     * force.
+     *
+     * @return A list of {@link Force} objects representing all descendant forces.
+     *         If there are no descendant forces, this method will return an empty list.
+     */
+    public List<Force> getAllSubForces() {
+        List<Force> allSubForces = new ArrayList<>();
+
+        for (Force subForce : subForces) {
+            allSubForces.add(subForce);
+
+            allSubForces.addAll(subForce.getAllSubForces());
+        }
+
+        return allSubForces;
     }
 
     public boolean isAncestorOf(Force otherForce) {
@@ -341,6 +416,7 @@ public class Force {
      */
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
         Vector<UUID> allUnits;
+
         if (combatForcesOnly && !isCombatForce() && !isConvoyForce()) {
             allUnits = new Vector<>();
         } else {
@@ -350,6 +426,7 @@ public class Force {
         for (Force force : subForces) {
             allUnits.addAll(force.getAllUnits(combatForcesOnly));
         }
+
         return allUnits;
     }
 
@@ -636,6 +713,7 @@ public class Force {
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "convoyForce", convoyForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideStrategicFormation", overrideStrategicFormation);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
@@ -685,6 +763,8 @@ public class Force {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
                     retVal.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideStrategicFormation")) {
+                    retVal.setOverrideStrategicFormation(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
                     retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
@@ -793,11 +873,7 @@ public class Force {
     public int getTotalBV(Campaign campaign, boolean forceStandardBattleValue) {
         int bvTotal = 0;
 
-        for (Force subforce : getSubForces()) {
-            bvTotal += subforce.getTotalBV(campaign, forceStandardBattleValue);
-        }
-
-        for (UUID unitId : getUnits()) {
+        for (UUID unitId : getAllUnits(false)) {
             // no idea how this would happen, but sometimes a unit in a forces unit ID list
             // has an invalid ID?
             if (campaign.getUnit(unitId) == null) {
@@ -856,16 +932,16 @@ public class Force {
      * Calculates the unit type most represented in this force
      * and all subforces.
      *
-     * @param c Working campaign
+     * @param campaign Working campaign
      * @return Majority unit type.
      */
-    public int getPrimaryUnitType(Campaign c) {
+    public int getPrimaryUnitType(Campaign campaign) {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
 
-        for (UUID id : getUnits()) {
-            int unitType = c.getUnit(id).getEntity().getUnitType();
+        for (UUID id : getAllUnits(false)) {
+            int unitType = campaign.getUnit(id).getEntity().getUnitType();
 
             unitTypeBuckets.merge(unitType, 1, Integer::sum);
 

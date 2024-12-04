@@ -75,6 +75,7 @@ public class PersonnelReport extends AbstractReport {
             } else if (p.getStatus().isDead()) {
                 countDead++;
             }
+
         }
 
         StringBuilder sb = new StringBuilder("Combat Personnel\n\n");
@@ -145,7 +146,15 @@ public class PersonnelReport extends AbstractReport {
             if (p.getPrimaryRole().isDependent() && p.getStatus().isActive() && p.getPrisonerStatus().isFree()) {
                 dependents++;
             }
+
+        
         }
+                 
+        //Add Salaries of Temp Workers
+        salary = salary.plus(getCampaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
+                * getCampaign().getAstechPool());
+        salary = salary.plus(getCampaign().getCampaignOptions().getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
+                * getCampaign().getMedicPool());
 
         StringBuilder sb = new StringBuilder("Support Personnel\n\n");
 
@@ -157,6 +166,10 @@ public class PersonnelReport extends AbstractReport {
                         countPersonByType[role.ordinal()]));
             }
         }
+
+        //Add Temp Medics and Astechs to Support List
+        sb.append(String.format("    %-30s    %4s\n", "Temp Medics", getCampaign().getMedicPool()));
+        sb.append(String.format("    %-30s    %4s\n", "Temp Astechs", getCampaign().getAstechPool()));
 
         sb.append('\n')
                 .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))

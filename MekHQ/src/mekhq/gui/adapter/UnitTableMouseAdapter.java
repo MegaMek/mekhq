@@ -205,7 +205,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
                     PartQuality.QUALITY_D.toName(reverse));
-            
+
             PartQuality q = PartQuality.fromName(quality, reverse);
             for (Unit unit : units) {
                 if (null != unit) {
@@ -526,7 +526,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
-        if (!unit.isSelfCrewed()) {
+        if (!unit.isSelfCrewed() || isSelfCrewedButHasNoTech(unit)) {
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
                 tech = gui.getCampaign().getPerson(id);
@@ -542,6 +542,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
         return tech;
+    }
+
+    private boolean isSelfCrewedButHasNoTech(Unit unit) {
+        return unit.isSelfCrewed() && unit.engineerResponsible().isEmpty();
     }
 
     @Override

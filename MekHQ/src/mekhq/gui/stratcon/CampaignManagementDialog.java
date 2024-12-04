@@ -39,8 +39,8 @@ import java.awt.event.ActionEvent;
 public class CampaignManagementDialog extends JDialog {
     private Campaign campaign;
     private StratconCampaignState currentCampaignState;
-    private StratconTab parent;
-    private JButton btnConvertVPToSP;
+    private final StratconTab parent;
+    private JButton btnRemoveCVP;
     private JButton btnRequestResupply;
     private JButton btnGMAddVP;
     private JButton btnGMAddSP;
@@ -59,7 +59,7 @@ public class CampaignManagementDialog extends JDialog {
                         StratconTrackState currentTrack, boolean gmMode) {
         currentCampaignState = campaignState;
 
-        btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
+        btnRemoveCVP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
         btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         btnGMAddVP.setEnabled(gmMode);
         btnGMAddSP.setEnabled(gmMode);
@@ -87,10 +87,10 @@ public class CampaignManagementDialog extends JDialog {
         getContentPane().removeAll();
         getContentPane().setLayout(layout);
 
-        btnConvertVPToSP = new JButton();
-        btnConvertVPToSP.setText("Convert CVP to SP");
-        btnConvertVPToSP.addActionListener(this::convertVPtoSPHandler);
-        getContentPane().add(btnConvertVPToSP);
+        btnRemoveCVP = new JButton();
+        btnRemoveCVP.setText("Remove CVP (GM)");
+        btnRemoveCVP.addActionListener(this::removeCVP);
+        getContentPane().add(btnRemoveCVP);
 
         btnRequestResupply = new JButton();
         btnRequestResupply.setText("Request Resupply");
@@ -113,10 +113,9 @@ public class CampaignManagementDialog extends JDialog {
         pack();
     }
 
-    private void convertVPtoSPHandler(ActionEvent e) {
-        currentCampaignState.convertVictoryToSupportPoint();
-        btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
+    private void removeCVP(ActionEvent e) {
+        currentCampaignState.updateVictoryPoints(-1);
+
         parent.updateCampaignState();
     }
 
@@ -192,7 +191,7 @@ public class CampaignManagementDialog extends JDialog {
 
     private void gmAddVPHandler(ActionEvent e) {
         currentCampaignState.updateVictoryPoints(1);
-        btnConvertVPToSP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
+        btnRemoveCVP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
         parent.updateCampaignState();
     }
 

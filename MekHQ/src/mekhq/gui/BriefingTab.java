@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -38,7 +39,7 @@ import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Lance;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -95,6 +96,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private JButton btnGetMul;
     private JButton btnClearAssignedUnits;
     private JButton btnResolveScenario;
+    private JButton btnAutoResolveScenario;
 
     private ScenarioTableModel scenarioModel;
 
@@ -268,6 +270,12 @@ public final class BriefingTab extends CampaignGuiTab {
         btnResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnResolveScenario);
 
+        btnAutoResolveScenario = new JButton(resourceMap.getString("btnAutoResolveScenario.text"));
+        btnAutoResolveScenario.setToolTipText(resourceMap.getString("btnAutoResolveScenario.toolTipText"));
+        btnAutoResolveScenario.addActionListener(ev -> autoResolveScenario());
+        btnAutoResolveScenario.setEnabled(false);
+        panScenarioButtons.add(btnAutoResolveScenario);
+
         btnClearAssignedUnits = new JButton(resourceMap.getString("btnClearAssignedUnits.text"));
         btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText"));
         btnClearAssignedUnits.addActionListener(ev -> clearAssignedUnits());
@@ -313,12 +321,11 @@ public final class BriefingTab extends CampaignGuiTab {
                     ? new NewAtBContractDialog(getFrame(), true, getCampaign())
                     : new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
-            this.setVisible(false);
             comboMission.setSelectedItem(ncd.getContract());
-        } else {
+        }
+         if (mtd.isMission()) {
             CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
             cmd.setVisible(true);
-            this.setVisible(false);
             comboMission.setSelectedItem(cmd.getMission());
         }
     }
@@ -822,6 +829,14 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void startScenario() {
+        startScenario(null);
+    }
+
+    private void autoResolveScenario() {
+        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+    }
+
+    private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -873,11 +888,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
-            Lance assignedLance = ((AtBScenario) scenario).getLance(getCampaign());
+            StrategicFormation assignedLance = ((AtBScenario) scenario).getStrategicFormation(getCampaign());
             if (assignedLance != null) {
                 int assignedForceId = assignedLance.getForceId();
                 int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
+                Person commander = getCampaign().getPerson(StrategicFormation.findCommander(assignedForceId, getCampaign()));
                 if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
@@ -907,7 +922,9 @@ public final class BriefingTab extends CampaignGuiTab {
             // Ensure that the MegaMek year GameOption matches the campaign year
             getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
                     .setValue(getCampaign().getGameYear());
-            getCampaignGui().getApplication().startHost(scenario, false, chosen);
+            getCampaignGui().getApplication()
+                .startHost(scenario, false, chosen, autoResolveBehaviorSettings);
+
         }
     }
 
@@ -1222,6 +1239,7 @@ public final class BriefingTab extends CampaignGuiTab {
             btnGetMul.setEnabled(false);
             btnClearAssignedUnits.setEnabled(false);
             btnResolveScenario.setEnabled(false);
+            btnAutoResolveScenario.setEnabled(false);
             btnPrintRS.setEnabled(false);
             selectedScenario = -1;
             return;
@@ -1249,6 +1267,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGetMul.setEnabled(canStartGame);
         btnClearAssignedUnits.setEnabled(canStartGame);
         btnResolveScenario.setEnabled(canStartGame);
+        btnAutoResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(canStartGame);
     }
 

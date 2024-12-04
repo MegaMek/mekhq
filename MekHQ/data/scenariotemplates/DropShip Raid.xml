@@ -156,7 +156,7 @@
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>100</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>1</timeLimitScaleFactor>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>

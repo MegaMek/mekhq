@@ -18,7 +18,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.*;
 import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
 import mekhq.gui.stratcon.StratconScenarioWizard;
@@ -39,6 +38,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario
@@ -144,7 +145,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // clear hex selection
         boardState.selectedX = null;
         boardState.selectedY = null;
-        infoArea.setText(buildSelectedHexInfo());
+        infoArea.setText(buildSelectedHexInfo(campaign));
 
         repaint();
     }
@@ -471,7 +472,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     }
 
     private BufferedImage getFacilityImage(StratconFacility facility) {
-        String imageKeyPrefix = facility.getOwner() == ForceAlignment.Allied ? StratconBiomeManifest.FACILITY_ALLIED
+        String imageKeyPrefix = facility.getOwner() == Allied ? StratconBiomeManifest.FACILITY_ALLIED
                 : StratconBiomeManifest.FACILITY_HOSTILE;
         String imageKey = imageKeyPrefix + facility.getFacilityType().name();
 
@@ -569,7 +570,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                     if (currentTrack.getFacility(currentCoords) == null) {
                         drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected", currentCoords);
-                    } else if (currentTrack.getFacility(currentCoords).getOwner() == ForceAlignment.Allied) {
+                    } else if (currentTrack.getFacility(currentCoords).getOwner() == Allied) {
                         drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
                     }
                 }
@@ -610,7 +611,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconFacility facility = currentTrack.getFacility(currentCoords);
 
                 if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
-                    g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.CYAN : Color.RED);
+                    g2D.setColor(facility.getOwner() == Allied ? Color.CYAN : Color.RED);
 
                     BufferedImage facilityImage = getFacilityImage(facility);
 
@@ -655,6 +656,17 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
+                        String forceName = "";
+                        try {
+                            Force force = campaign.getForce(forceID);
+                            forceName = force.getName();
+                        } catch (Exception e) {
+                            // If we can't successfully fetch the Force, there is no point trying
+                            // to draw it on the map.
+                            logger.error(String.format("Failed to fetch force from ID %s", forceID));
+                            continue;
+                        }
+
                         g2D.setColor(Color.GREEN);
 
                         BufferedImage forceImage = getImage(StratconBiomeManifest.FORCE_FRIENDLY,
@@ -670,7 +682,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                 TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD));
                         g2D.setFont(newFont);
 
-                        drawTextEffect(g2D, forceMarker, campaign.getForce(forceID).getName(), currentCoords);
+                        drawTextEffect(g2D, forceMarker, forceName, currentCoords);
 
                         g2D.setFont(currentFont);
                     }
@@ -802,7 +814,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             boolean pointFoundOnBoard = detectClickedHex();
 
             if (pointFoundOnBoard) {
-                infoArea.setText(buildSelectedHexInfo());
+                infoArea.setText(buildSelectedHexInfo(campaign));
             }
 
             repaint();
@@ -839,7 +851,7 @@ public class StratconPanel extends JPanel implements ActionListener {
      * containing info such as whether it's been revealed, assigned forces,
      * scenarios, facilities, etc.
      */
-    private String buildSelectedHexInfo() {
+    private String buildSelectedHexInfo(Campaign campaign) {
         StringBuilder infoBuilder = new StringBuilder();
         infoBuilder.append("<html><br/>");
 
@@ -853,13 +865,13 @@ public class StratconPanel extends JPanel implements ActionListener {
         boolean coordsRevealed = currentTrack.hasActiveTrackReveal()
                 || currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
-            infoBuilder.append("<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                    + "'>Recon complete</span><br/>");
+            infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
+                .append("'>Recon Complete</span><br/>");
         }
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
-                Force force = campaign.getForce(forceID);
+                Force force = this.campaign.getForce(forceID);
                 infoBuilder.append(force.getName()).append(" assigned");
 
                 if (currentTrack.getStickyForces().contains(forceID)) {
@@ -879,12 +891,12 @@ public class StratconPanel extends JPanel implements ActionListener {
             if ((facility != null) && (facility.getFacilityType() != null)) {
                 if (facility.isStrategicObjective()) {
                     infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>",
-                            facility.getOwner() == ForceAlignment.Allied
+                            facility.getOwner() == Allied
                                     ? MekHQ.getMHQOptions().getFontColorPositiveHexColor()
                                     : MekHQ.getMHQOptions().getFontColorNegativeHexColor()));
                 }
                 infoBuilder.append("<span color='")
-                        .append(facility.getOwner() == ForceAlignment.Allied
+                        .append(facility.getOwner() == Allied
                                 ? MekHQ.getMHQOptions().getFontColorPositiveHexColor()
                                 : MekHQ.getMHQOptions().getFontColorNegativeHexColor())
                         .append("'>")
@@ -901,14 +913,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         } else {
             infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegative())
-                    .append("'>Recon incomplete</span>");
+                    .append("'>Recon Incomplete</span>");
         }
         infoBuilder.append("<br/>");
 
         StratconScenario selectedScenario = getSelectedScenario();
         if ((selectedScenario != null) &&
                 ((selectedScenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
-            infoBuilder.append(selectedScenario.getInfo());
+            infoBuilder.append(selectedScenario.getInfo(campaign, true));
         }
 
         infoBuilder.append("</html>");

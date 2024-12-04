@@ -26,12 +26,21 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
 import org.w3c.dom.Node;
 
 import javax.xml.namespace.QName;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +70,9 @@ public class StratconCampaignState {
 
     @XmlElementWrapper(name = "campaignTracks")
     @XmlElement(name = "campaignTrack")
-    private List<StratconTrackState> tracks;
+    private final List<StratconTrackState> tracks;
+
+    private List<LocalDate> weeklyScenarios;
 
     @XmlTransient
     public AtBContract getContract() {
@@ -74,10 +85,12 @@ public class StratconCampaignState {
 
     public StratconCampaignState() {
         tracks = new ArrayList<>();
+        weeklyScenarios = new ArrayList<>();
     }
 
     public StratconCampaignState(AtBContract contract) {
         tracks = new ArrayList<>();
+        weeklyScenarios = new ArrayList<>();
         setContract(contract);
     }
 
@@ -100,6 +113,21 @@ public class StratconCampaignState {
 
     public void addTrack(StratconTrackState track) {
         tracks.add(track);
+    }
+
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    @XmlElementWrapper(name = "weeklyScenarios")
+    @XmlElement(name = "weeklyScenario")
+    public List<LocalDate> getWeeklyScenarios() {
+        return weeklyScenarios;
+    }
+
+    public void addWeeklyScenario(LocalDate weeklyScenario) {
+        weeklyScenarios.add(weeklyScenario);
+    }
+
+    public void setWeeklyScenarios(final List<LocalDate> weeklyScenarios) {
+        this.weeklyScenarios = weeklyScenarios;
     }
 
     public int getSupportPoints() {
@@ -245,5 +273,21 @@ public class StratconCampaignState {
         }
 
         return resultingCampaignState;
+    }
+
+    /**
+     * This adapter provides a way to convert between a LocalDate and the ISO-8601 string
+     * representation of the date that is used for XML marshaling and unmarshalling in JAXB.
+     */
+    public static class LocalDateAdapter extends XmlAdapter<String, LocalDate> {
+        @Override
+        public String marshal(LocalDate date) {
+            return date.toString();
+        }
+
+        @Override
+        public LocalDate unmarshal(String date) throws Exception {
+            return LocalDate.parse(date);
+        }
     }
 }
