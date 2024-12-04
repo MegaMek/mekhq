@@ -11,7 +11,7 @@ import java.util.List;
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
-public class SkillsAndAbilitiesTab {
+public class SkillsTab {
     JFrame frame;
     String name;
 
@@ -22,7 +22,7 @@ public class SkillsAndAbilitiesTab {
     private static List<Double> storedValuesSpinners = new ArrayList<>();
     private static List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
-    SkillsAndAbilitiesTab(JFrame frame, String name) {
+    SkillsTab(JFrame frame, String name) {
         this.frame = frame;
         this.name = name;
 
@@ -272,47 +272,5 @@ public class SkillsAndAbilitiesTab {
             JComboBox<SkillLevel> nextComboBox = comboBoxes.get(originIndex);
             nextComboBox.setSelectedItem(comboBox.getSelectedItem());
         }
-    }
-
-
-
-    JPanel abilitiesTab() {
-        // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("abilitiesTab",
-            getImageDirectory() + "logo_federated_suns.png",
-            true);
-
-        // Contents
-        chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");
-
-        pnlPhenotype = createPhenotypePanel();
-        pnlRandomAbilities = createAbilityPanel();
-        pnlSkillGroups = createSkillGroupPanel();
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("abilitiesTab", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(headerPanel, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(chkExtraRandomness, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(pnlPhenotype, layout);
-        layout.gridx++;
-        panel.add(pnlRandomAbilities, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(pnlSkillGroups, layout);
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "abilitiesTab");
     }
 }
