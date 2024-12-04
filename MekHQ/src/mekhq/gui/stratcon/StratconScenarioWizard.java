@@ -19,6 +19,7 @@
 package mekhq.gui.stratcon;
 
 import megamek.common.Minefield;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -28,6 +29,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
+import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -41,7 +43,12 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
-import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
