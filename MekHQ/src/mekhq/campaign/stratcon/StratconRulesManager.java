@@ -2213,13 +2213,13 @@ public class StratconRulesManager {
                                 CacheType.TRASH_CACHE.ordinal());
 
                             // The rumor is a dud
-                            if (false) { // TODO replace placeholder value
-                                cache.createDudDialog(track, scenario);
-                            } else {
-                                if (Objects.equals(cache.getFaction().getShortName(), "SL")) {
-                                    cache.createProposalDialog();
-                                }
-                            }
+//                            if (false) { // TODO replace placeholder value
+//                                cache.createDudDialog(track, scenario);
+//                            } else {
+//                                if (Objects.equals(cache.getFaction().getShortName(), "SL")) {
+//                                    cache.createProposalDialog();
+//                                }
+//                            }
                         }
                     }
                     break;
