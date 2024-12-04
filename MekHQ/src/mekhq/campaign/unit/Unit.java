@@ -5843,9 +5843,10 @@ public class Unit implements ITechnology {
                 }
             }
         }
+        Set<Person> gunnersToRemove = new HashSet<>();
         for(Person gunner : gunners){
             if (gunner instanceof UnitPersonRef) {
-                gunners.remove(gunner);
+                gunnersToRemove.add(gunner);
                 Person updatedGunner = campaign.getPerson(gunner.getId());
                 if(updatedGunner != null){
                     gunners.add(updatedGunner);
@@ -5857,6 +5858,8 @@ public class Unit implements ITechnology {
                 }
             }
         }
+        gunners.removeAll(gunnersToRemove);
+
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof UnitPersonRef) {
