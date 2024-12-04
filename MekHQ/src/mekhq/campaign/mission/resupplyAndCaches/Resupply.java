@@ -28,6 +28,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
@@ -207,6 +208,19 @@ public class Resupply {
         // We're wanting to round down to the nearest 5 tons.
         int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
         return Math.floor(averageTonnage / 20.0) * 5.0 * dropCount;
+    }
+
+    /**
+     * Calculate the estimated cargo requirements for a given campaign and contract.
+     *
+     * @param campaign The campaign for which the cargo requirements are being estimated.
+     * @param contract The contract associated with the campaign.
+     * @return The estimated cargo requirements in tons as a formatted string, e.g., "50t".
+     */
+    public static String getEstimatedCargoRequirements(Campaign campaign, AtBContract contract) {
+        double baseCapacity = calculateTargetCargoTonnage(campaign, contract, false);
+
+        return (baseCapacity * CARGO_MULTIPLIER) + "t";
     }
 
     /**
@@ -2012,7 +2026,13 @@ public class Resupply {
         playerConvoys = new HashMap<>();
         totalPlayerCargoCapacity = 0;
 
-        for (Force force : campaign.getAllForces()) {
+        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
+            Force force = campaign.getForce(formation.getForceId());
+
+            if (force == null) {
+                continue;
+            }
+
             double cargoCapacitySubTotal = 0;
             if (force.isConvoyForce()) {
                 boolean hasCargo = false;
@@ -2294,8 +2314,8 @@ public class Resupply {
             }
 
             convoyMessage = String.format(convoyMessageTemplate, commanderTitle,
-                calculateTargetCargoTonnage(campaign, contract, false) * CARGO_MULTIPLIER,
-                totalCargoCapacity, convoyCount, convoyCount != 1 ? "s" : "");
+                getEstimatedCargoRequirements(campaign, contract), totalCargoCapacity, convoyCount,
+                convoyCount != 1 ? "s" : "");
         }
 
         int width = UIUtil.scaleForGUI(500);

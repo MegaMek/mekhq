@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getEstimatedCargoRequirements;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -91,6 +92,8 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtScore;
     private JLabel lblSharePct;
     private JLabel txtSharePct;
+    private JLabel lblCargoRequirement;
+    private JLabel txtCargoRequirement;
 
     protected JTable scenarioTable;
 
@@ -589,6 +592,8 @@ public class MissionViewPanel extends JScrollablePanel {
         txtMorale = new JLabel();
         lblSharePct = new JLabel();
         txtSharePct = new JLabel();
+        lblCargoRequirement = new JLabel();
+        txtCargoRequirement = new JLabel();
         lblScore = new JLabel();
         txtScore = new JLabel();
 
@@ -967,13 +972,34 @@ public class MissionViewPanel extends JScrollablePanel {
             txtSharePct.setName("txtSharePct");
             txtSharePct.setText(contract.getSharesPercent() + "%");
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSharePct, gridBagConstraints);
+        }
+
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            lblCargoRequirement.setName("lblCargoRequirement");
+            lblCargoRequirement.setText(resourceMap.getString("lblCargoRequirement.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblCargoRequirement, gridBagConstraints);
+
+            txtCargoRequirement.setName("txtCargoRequirement");
+            txtCargoRequirement.setText(getEstimatedCargoRequirements(campaign, contract));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtCargoRequirement, gridBagConstraints);
         }
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
