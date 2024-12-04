@@ -104,13 +104,14 @@ public class StratconScenario implements IStratconDisplayable {
      * Add an individual unit to the backing scenario, trying to associate it with the given template.
      * Performs house keeping on the unit and scenario and invokes a deployment changed event.
      */
-    public void addUnit(Unit unit, String templateID, boolean useLeadershipPoint) {
+    public void addUnit(Unit unit, String templateID, boolean useLeadership) {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
             backingScenario.addUnit(unit.getId(), templateID);
             unit.setScenarioId(getBackingScenarioID());
 
-            if (useLeadershipPoint) {
-                useLeadershipPoint();
+            if (useLeadership) {
+                int baseBattleValue = unit.getEntity().calculateBattleValue(true, true);
+                leadershipPointsUsed += baseBattleValue;
             }
 
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
@@ -201,19 +202,19 @@ public class StratconScenario implements IStratconDisplayable {
 
         if (deploymentDate != null) {
             stateBuilder.append("Deployment Date: ")
-                .append(deploymentDate.toString())
+                .append(deploymentDate)
                 .append("<br/>");
         }
 
         if (actionDate != null) {
             stateBuilder.append("Battle Date: ")
-                .append(actionDate.toString())
+                .append(actionDate)
                 .append("<br/>");
         }
 
         if (returnDate != null) {
             stateBuilder.append("Return Date: ")
-                .append(returnDate.toString())
+                .append(returnDate)
                 .append("<br/>");
         }
 
@@ -353,11 +354,7 @@ public class StratconScenario implements IStratconDisplayable {
         return leadershipPointsUsed;
     }
 
-    public void setLeadershipPointsUsed(int leadershipPointsUsed) {
+    public void setAvailableLeadershipBudget(int leadershipPointsUsed) {
         this.leadershipPointsUsed = leadershipPointsUsed;
-    }
-
-    public void useLeadershipPoint() {
-        leadershipPointsUsed++;
     }
 }

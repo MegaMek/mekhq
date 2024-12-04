@@ -52,6 +52,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.Force.FORCE_NONE;
@@ -69,6 +70,7 @@ import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.SUCCESS;
+import static mekhq.campaign.stratcon.StratconScenarioFactory.convertSpecificUnitTypeToGeneral;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -78,6 +80,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  * @author NickAragua
  */
 public class StratconRulesManager {
+    public final static int BASE_LEADERSHIP_BUDGET = 1000;
     private static final MMLogger logger = MMLogger.create(StratconRulesManager.class);
 
     /**
@@ -1815,39 +1818,51 @@ public class StratconRulesManager {
      *
      * @return List of unit IDs.
      */
-    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, Set<Integer> forceIDs) {
-        List<Unit> retVal = new ArrayList<>();
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, Set<Integer> forceIDs, int leadershipSkill) {
+        List<Unit> eligibleUnits = new ArrayList<>();
 
-        // The criteria are as follows:
-        // - unit is of a different unit type than the primary unit type of the force
-        // - unit has a lower BV than the force's lowest BV unit
-
-        Integer lowestBV = getLowestBV(campaign, forceIDs);
-
-        // no units assigned, the rest is meaningless.
-        if (lowestBV == null) {
-            return retVal;
+        // If there is no leadership skill, we shouldn't continue
+        if (leadershipSkill <= 0) {
+            return eligibleUnits;
         }
 
+        // The criteria are as follows:
+        // - unit is eligible to be spawned on the scenario type
+        // - unit has a lower BV than the BV budget granted from Leadership
+        // Leadership budget is capped at 5 levels
+        int totalBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
+
         int primaryUnitType = getPrimaryUnitType(campaign, forceIDs);
-        int generalUnitType = StratconScenarioFactory.convertSpecificUnitTypeToGeneral(primaryUnitType);
 
-        for (Unit u : campaign.getUnits()) {
-            // the general idea is that we want a different unit type than the primary
-            // but also something that can be deployed to the scenario -
-            // e.g. no infantry on air scenarios etc.
-            boolean validUnitType = (primaryUnitType != u.getEntity().getUnitType()) &&
-                    forceCompositionMatchesDeclaredUnitType(u.getEntity().getUnitType(), generalUnitType, true);
+        // If there are no units (somehow), we've no reason to continue
+        if (primaryUnitType == -1) {
+            return eligibleUnits;
+        }
 
-            if (validUnitType && !u.isDeployed() && !u.isMothballed()
-                    && (u.getEntity().calculateBattleValue() < lowestBV)
-                    && (u.checkDeployment() == null)
-                    && !isUnitDeployedToStratCon(u)) {
-                retVal.add(u);
+        int generalUnitType = convertSpecificUnitTypeToGeneral(primaryUnitType);
+
+        for (UUID unitId : campaign.getForce(0).getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit == null) {
+                continue;
+            }
+
+            // the general idea is that we want something that can be deployed to the scenario -
+            // e.g., no infantry on air scenarios etc.
+            boolean validUnitType = (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
+                        generalUnitType, true));
+
+            if (validUnitType
+                && !unit.isDeployed()
+                && !unit.isMothballed()
+                && (unit.getEntity().calculateBattleValue(true, true) <= totalBudget)
+                && (unit.checkDeployment() == null)
+                && !isUnitDeployedToStratCon(unit)) {
+                eligibleUnits.add(unit);
             }
         }
 
-        return retVal;
+        return eligibleUnits;
     }
 
     /**
@@ -1864,35 +1879,6 @@ public class StratconRulesManager {
         return u.getCampaign().getActiveAtBContracts().stream()
                 .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
                         contract.getStratconCampaignState().isForceDeployedHere(u.getForceId()));
-    }
-
-    /**
-     * Given a campaign and a list of force IDs, calculate the unit with the lowest
-     * BV.
-     */
-    private static Integer getLowestBV(Campaign campaign, Set<Integer> forceIDs) {
-        Integer lowestBV = null;
-
-        for (int forceID : forceIDs) {
-            Force force = campaign.getForce(forceID);
-            if (force == null) {
-                continue;
-            }
-
-            for (UUID id : force.getUnits()) {
-                if (campaign.getUnit(id) == null) {
-                    continue;
-                }
-
-                int currentBV = campaign.getUnit(id).getEntity().calculateBattleValue();
-
-                if ((lowestBV == null) || (currentBV < lowestBV)) {
-                    lowestBV = currentBV;
-                }
-            }
-        }
-
-        return lowestBV;
     }
 
     /**
