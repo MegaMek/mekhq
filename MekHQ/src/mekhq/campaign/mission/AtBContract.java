@@ -270,6 +270,7 @@ public class AtBContract extends Contract {
             allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
                     (path, bfa) -> bfa.isRegularFile())
                 .toList();
+
         } catch (IOException e) {
             logger.error("Error getting list of camouflages", e);
         }
@@ -326,6 +327,7 @@ public class AtBContract extends Contract {
             case "SL" -> "Star League Defense Force";
             case "TC" -> "Taurian Concordat";
             case "WOB" -> "Word of Blake";
+            case "Root" -> "";
             default -> {
                 Faction faction = Factions.getInstance().getFaction(factionCode);
 

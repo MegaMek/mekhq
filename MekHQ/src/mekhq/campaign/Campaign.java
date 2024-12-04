@@ -150,7 +150,7 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 /**
  * The main campaign class, keeps track of teams and units
  *
@@ -225,7 +225,7 @@ public class Campaign implements ITechManager {
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
+    private Camouflage camouflage = pickRandomCamouflage(3025, "Root");
     private PlayerColour colour = PlayerColour.BLUE;
     private StandardForceIcon unitIcon = new UnitIcon(null, null);
 
