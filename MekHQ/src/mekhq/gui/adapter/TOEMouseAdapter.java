@@ -60,11 +60,6 @@ import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import java.awt.event.ActionEvent;
-import java.util.*;
-
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
 
@@ -1075,8 +1070,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
 
                 if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
-                    menuItem = new JMenuItem(!force.isConvoyForce() ? "Make Force and Subforces Resupply Convoys"
-                        : "Remove Resupply Convoy Status from Force and Subforces");
+                    menuItem = new JMenuItem(!force.isConvoyForce() ? "Make Force and Subforces Resupply Convoys" : "Remove Resupply Convoy Status from Force and Subforces");
                     menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CONVOY_STATUS + forceIds);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);

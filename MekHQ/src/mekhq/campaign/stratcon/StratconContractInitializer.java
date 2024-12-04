@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Random;
 
 import static java.lang.Math.min;
-
 import static mekhq.campaign.stratcon.StratconRulesManager.addHiddenExternalScenario;
 
 /**
@@ -234,7 +233,7 @@ public class StratconContractInitializer {
 
                 if (template != null) {
                     StratconScenario hiddenCache = addHiddenExternalScenario(campaign, contract,
-                        null, template);
+                        null, template, false);
 
                     if (hiddenCache != null) {
                         logger.info(String.format("A secret cache has been spawned for contract %s",

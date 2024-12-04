@@ -90,7 +90,7 @@ public class Resupply {
     private double focusArmor;
     private List<Part> partsPool;
     private double focusParts;
-    private Random random;
+    private final Random random;
     private boolean usePlayerConvoy;
     private Map<Force, Double> playerConvoys;
     private double totalPlayerCargoCapacity;
@@ -643,7 +643,7 @@ public class Resupply {
 
         StratconCoords convoyGridReference;
         if (track != null) {
-            convoyGridReference = getUnoccupiedCoords(track);
+            convoyGridReference = getUnoccupiedCoords(track, false);
         } else {
             convoyGridReference = null;
         }
@@ -998,7 +998,8 @@ public class Resupply {
             deliverDrop(droppedItems);
             return;
         }
-        StratconScenario scenario = generateExternalScenario(campaign, contract, track, convoyGridReference, template);
+        StratconScenario scenario = generateExternalScenario(campaign, contract, track,
+            convoyGridReference, template, false);
 
         // If we successfully generated a scenario, we need to make a couple of final
         // adjustments, including assigning the Resupply contents as loot and
@@ -2307,7 +2308,7 @@ public class Resupply {
  * Class representing details about a part, including the part itself and its drop weight.
  */
 class PartDetails {
-    private Part part;
+    private final Part part;
     private double weight;
 
     /**
