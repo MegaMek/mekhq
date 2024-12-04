@@ -19,7 +19,10 @@
 package mekhq.campaign.stratcon;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.Minefield;
+import megamek.common.TargetRoll;
+import megamek.common.TargetRollModifier;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -55,7 +58,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -134,37 +139,39 @@ public class StratconRulesManager {
     }
 
     /**
-     * This function potentially generates non-player-initiated scenarios for the
-     * given track.
+     * This method generates scenario dates for each week of the StratCon campaign.
+     * <p>
+     * The method first determines the number of required scenario rolls based on the required
+     * lance count from the track, then multiplies that count depending on the contract's morale level.
+     * <p>
+     * If auto-assign for lances is enabled, and either there are no available forces or the number of
+     * weekly scenarios equals or exceeds the number of available forces, it breaks from the scenario
+     * generation loop.
+     * <p>
+     * For each scenario, a scenario odds target number is calculated, and a roll is made against
+     * this target. If the roll is less than the target number, a new weekly scenario is created
+     * with a random date within the week.
+     *
+     * @param campaign The campaign.
+     * @param campaignState The state of the StratCon campaign.
+     * @param contract The AtBContract for the campaign.
+     * @param track The StratCon campaign track.
      */
-    public static void generateScenariosForTrack(Campaign campaign, AtBContract contract, StratconTrackState track) {
+    public static void generateScenariosDatesForWeek(Campaign campaign, StratconCampaignState campaignState,
+                                                 AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
-        List<StratconScenario> generatedScenarios = new ArrayList<>();
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
-
-        // get this list just so we have it available
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
-        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
-        // make X rolls, where X is the number of required lances for the track
-        // that's the chance to spawn a scenario.
-        // if a scenario occurs, then we pick a random non-deployed lance and use it to
-        // drive the opfor generation later
-        // once we've determined that scenarios occur, we loop through the ones that we
-        // generated
-        // and use the random force to drive opfor generation (#required lances
-        // multiplies the BV budget of all
         int scenarioRolls = track.getRequiredLanceCount();
 
-        if (!autoAssignLances) {
-            AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
+        AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
 
-            switch (moraleLevel) {
-                case STALEMATE -> scenarioRolls = (int) round(scenarioRolls * 1.25);
-                case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.5);
-                case DOMINATING -> scenarioRolls = scenarioRolls * 2;
-                case OVERWHELMING -> scenarioRolls = scenarioRolls * 3;
-            }
+        switch (moraleLevel) {
+            case STALEMATE -> scenarioRolls = (int) round(scenarioRolls * 1.25);
+            case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.5);
+            case DOMINATING -> scenarioRolls = scenarioRolls * 2;
+            case OVERWHELMING -> scenarioRolls = scenarioRolls * 3;
         }
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
@@ -172,83 +179,156 @@ public class StratconRulesManager {
                 break;
             }
 
+            if (autoAssignLances && (campaignState.getWeeklyScenarios().size() >= availableForceIDs.size())) {
+                break;
+            }
+
             int targetNum = calculateScenarioOdds(track, contract, false);
-            int roll = Compute.randomInt(100);
+            int roll = randomInt(100);
 
-            logger.info(String.format("StratCon Weekly Scenario Roll: %s vs. %s", roll, targetNum));
-
-            // if we haven't already used all the player forces and are required to randomly
-            // generate a scenario
             if (roll < targetNum) {
-                // pick random coordinates and force to drive the scenario
-                StratconCoords scenarioCoords = getUnoccupiedCoords(track, true);
+                LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
+                campaignState.addWeeklyScenario(scenarioDate);
+                logger.info(String.format("StratCon Weekly Scenario Roll: %s vs. %s (%s)", roll, targetNum, scenarioDate));
+            } else {
+                logger.info(String.format("StratCon Weekly Scenario Roll: %s vs. %s", roll, targetNum));
+            }
+        }
+    }
 
-                if (scenarioCoords == null) {
-                    logger.warn("Target track is full, skipping scenario generation");
+    /**
+     * This method generates a weekly scenario for a specific track.
+     * <p>
+     * First, it initializes empty collections for generated scenarios and available forces, and
+     * determines whether lances are auto-assigned.
+     * <p>
+     * Then it generates a requested number of scenarios. If auto-assign is enabled and there
+     * are no available forces, it breaks from the scenario generation loop.
+     * <p>
+     * For each scenario, it first tries to create a scenario for existing forces on the track.
+     * If that is not possible, it selects random force, removes it from available forces, and
+     * creates a scenario for it. For any scenario, if it is under liaison command, it may set the
+     * scenario as required and attaches the liaison.
+     * <p>
+     * After scenarios are generated, OpFors, events, etc. are finalized for each scenario.
+     *
+     * @param campaign      The current campaign.
+     * @param campaignState The relevant StratCon campaign state.
+     * @param contract      The relevant contract.
+     * @param scenarioCount The number of scenarios to generate.
+     */
+    public static void generateDailyScenariosForTrack(Campaign campaign, StratconCampaignState campaignState,
+                                                      AtBContract contract, int scenarioCount) {
+        final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
+
+        // get this list just so we have it available
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+
+        // Build the available force pool - this ensures operational forces have an increased
+        // chance of being picked
+        if (autoAssignLances && !availableForceIDs.isEmpty()) {
+            List<Integer> availableForcePool = new ArrayList<>();
+
+            for (int forceId : availableForceIDs) {
+                Force force = campaign.getForce(forceId);
+
+                if (force == null) {
                     continue;
                 }
 
-                // if forces are already assigned to these coordinates, use those instead
-                // of randomly-selected ones
-                if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
-                    StratconScenario scenario = generateScenarioForExistingForces(scenarioCoords,
-                            track.getAssignedCoordForces().get(scenarioCoords), contract, campaign, track);
+                int operationalStatus = 0;
+                int unitCount = 0;
 
-                    if (scenario != null) {
-                        generatedScenarios.add(scenario);
+                for (UUID unitId : force.getAllUnits(true)) {
+                    try {
+                        Unit unit = campaign.getUnit(unitId);
+                        operationalStatus += determineLayeredForceIconOperationalStatus(unit).ordinal();
+                        unitCount++;
+                    } catch (Exception e) {
+                        logger.warn(e.getMessage(), e);
                     }
-                    continue;
                 }
 
-                // otherwise, pick a random force from the avail
-                int randomForceIndex = Compute.randomInt(availableForceIDs.size());
+                int calculatedOperationStatus = (int) round(Math.pow((3 - (double) operationalStatus / unitCount), 2.0));
+
+                for (int i = 0; i < calculatedOperationStatus; i++) {
+                    availableForcePool.add(forceId);
+                }
+            }
+
+            Collections.shuffle(availableForcePool);
+            availableForceIDs = availableForcePool;
+        }
+
+
+        Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
+
+        for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
+            if (autoAssignLances && availableForceIDs.isEmpty()) {
+                break;
+            }
+
+            List<StratconTrackState> tracks = campaignState.getTracks();
+            StratconTrackState track = campaignState.getTracks().get(0);
+
+            if (tracks.size() > 1) {
+                track = ObjectUtility.getRandomItem(tracks);
+            }
+
+            if (autoAssignLances && availableForceIDs.isEmpty()) {
+                break;
+            }
+
+            StratconCoords scenarioCoords = getUnoccupiedCoords(track, true);
+
+            if (scenarioCoords == null) {
+                logger.warn("Target track is full, skipping scenario generation");
+                continue;
+            }
+
+            // if forces are already assigned to these coordinates, use those instead of randomly
+            // selected ones
+            StratconScenario scenario;
+            if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
+                scenario = generateScenarioForExistingForces(scenarioCoords,
+                    track.getAssignedCoordForces().get(scenarioCoords), contract, campaign, track);
+            // otherwise, pick a random force from the avail
+            } else {
+                int randomForceIndex = randomInt(availableForceIDs.size());
                 int randomForceID = availableForceIDs.get(randomForceIndex);
 
                 // remove the force from the available lists, so we don't designate it as primary
                 // twice
                 if (autoAssignLances) {
-                    availableForceIDs.remove(randomForceIndex);
-                }
+                    availableForceIDs.removeIf(id -> id.equals(randomForceIndex));
 
-                // we want to remove the actual int with the value, not the value at the index
-                sortedAvailableForceIDs.get(AllGroundTerrain).remove((Integer) randomForceID);
-                sortedAvailableForceIDs.get(LowAtmosphere).remove((Integer) randomForceID);
-                sortedAvailableForceIDs.get(Space).remove((Integer) randomForceID);
+                    // we want to remove the actual int with the value, not the value at the index
+                    sortedAvailableForceIDs.get(AllGroundTerrain).removeIf(id -> id.equals(randomForceID));
+                    sortedAvailableForceIDs.get(LowAtmosphere).removeIf(id -> id.equals(randomForceID));
+                    sortedAvailableForceIDs.get(Space).removeIf(id -> id.equals(randomForceID));
+                }
 
                 // two scenarios on the same coordinates wind up increasing in size
                 if (track.getScenarios().containsKey(scenarioCoords)) {
                     track.getScenarios().get(scenarioCoords).incrementRequiredPlayerLances();
                     assignAppropriateExtraForceToScenario(track.getScenarios().get(scenarioCoords),
-                            sortedAvailableForceIDs);
+                        sortedAvailableForceIDs);
                     continue;
                 }
 
-                StratconScenario scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
-
-                if (scenario != null) {
-                    generatedScenarios.add(scenario);
-                }
+                scenario = setupScenario(scenarioCoords, randomForceID, campaign, contract, track);
             }
-        }
 
-        // If we didn't generate any scenarios, we can just return here
-        if (generatedScenarios.isEmpty()) {
-            return;
-        }
+            if (scenario != null) {
+                // if under liaison command, pick a random scenario from the ones generated
+                // to set as required and attach liaison
+                if (contract.getCommandRights().isLiaison() && (randomInt(4) == 0)) {
+                    scenario.setRequiredScenario(true);
+                    setAttachedUnitsModifier(scenario, contract);
+                }
 
-        // if under liaison command, pick a random scenario from the ones generated
-        // to set as required and attach liaison
-        if (contract.getCommandRights().isLiaison()) {
-            StratconScenario randomScenario = ObjectUtility.getRandomItem(generatedScenarios);
-            randomScenario.setRequiredScenario(true);
-            setAttachedUnitsModifier(randomScenario, contract);
-        }
-
-        // now, we loop through all the scenarios we set up
-        // and generate the opfors / events / etc
-        // if not auto-assigning lances, we then back out the lance assignments.
-        for (StratconScenario scenario : generatedScenarios) {
-            finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+                finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
+            }
         }
     }
 
@@ -351,7 +431,7 @@ public class StratconRulesManager {
              int randomForceID = FORCE_NONE;
 
              if (availableForces > 0) {
-                 int randomForceIndex = Compute.randomInt(availableForces);
+                 int randomForceIndex = randomInt(availableForces);
                  randomForceID = availableForceIDs.get(randomForceIndex);
              }
 
@@ -546,7 +626,7 @@ public class StratconRulesManager {
                 facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
             }
             terrainType = facilityBiome.allowedTerrainTypes
-                    .get(Compute.randomInt(facilityBiome.allowedTerrainTypes.size()));
+                    .get(randomInt(facilityBiome.allowedTerrainTypes.size()));
         } else {
             terrainType = track.getTerrainTile(coords);
         }
@@ -568,7 +648,7 @@ public class StratconRulesManager {
             // scenario
             // TODO: facility spaces will always have a relevant biome
             if (!backingScenario.isUsingFixedMap()) {
-                backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+                backingScenario.setMap(mapTypeList.get(randomInt(mapTypeList.size())));
             }
             backingScenario.setLightConditions();
             backingScenario.setWeatherConditions();
@@ -742,7 +822,7 @@ public class StratconRulesManager {
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
         int targetNum = calculateScenarioOdds(track, contract, true);
-        boolean spawnScenario = (facility == null) && (Compute.randomInt(100) <= targetNum);
+        boolean spawnScenario = (facility == null) && (randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
@@ -1123,7 +1203,7 @@ public class StratconRulesManager {
 
         // Reinforcement roll failed, make interception check
         int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
-        int interceptionRoll = Compute.randomInt(100);
+        int interceptionRoll = randomInt(100);
 
         // Check passed
         if (interceptionRoll >= interceptionOdds) {
@@ -1264,9 +1344,9 @@ public class StratconRulesManager {
             mapLocations.add(AllGroundTerrain); // can only add ground units to ground battles
         }
 
-        MapLocation selectedLocation = mapLocations.get(Compute.randomInt(mapLocations.size()));
+        MapLocation selectedLocation = mapLocations.get(randomInt(mapLocations.size()));
         List<Integer> forceIDs = sortedAvailableForceIDs.get(selectedLocation);
-        int forceIndex = Compute.randomInt(forceIDs.size());
+        int forceIndex = randomInt(forceIDs.size());
         int forceID = forceIDs.get(forceIndex);
         forceIDs.remove(forceIndex);
 
@@ -1391,8 +1471,9 @@ public class StratconRulesManager {
      * given force, on the
      * given track, using the given template. Also registers it with the campaign.
      */
-    static @Nullable StratconScenario generateScenario(Campaign campaign, AtBContract contract, StratconTrackState track,
-            int forceID, StratconCoords coords, ScenarioTemplate template) {
+    static @Nullable StratconScenario generateScenario(Campaign campaign, AtBContract contract,
+                                                       StratconTrackState track, int forceID,
+                                                       StratconCoords coords, ScenarioTemplate template) {
         StratconScenario scenario = new StratconScenario();
 
         if (template == null) {
@@ -1489,7 +1570,7 @@ public class StratconRulesManager {
 
             if (scenarioAtFacility) {
                 modifierIDs = facility.getLocalModifiers();
-            } else if (facility.isVisible() || (Compute.randomInt(100) <= 75)) {
+            } else if (facility.isVisible() || (randomInt(100) <= 75)) {
                 modifierIDs = facility.getSharedModifiers();
             }
 
@@ -1541,7 +1622,7 @@ public class StratconRulesManager {
 
         // if an allied unit is present, then we want to make sure that
         // it's ground units for ground battles
-        if (Compute.randomInt(100) <= alliedUnitOdds) {
+        if (randomInt(100) <= alliedUnitOdds) {
             if ((backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere)
                     || (backingScenario.getTemplate().mapParameters.getMapLocation() == Space)) {
                 backingScenario.addScenarioModifier(
@@ -1608,15 +1689,14 @@ public class StratconRulesManager {
      * current campaign date
      */
     private static void setScenarioDates(StratconTrackState track, Campaign campaign, StratconScenario scenario) {
-        int deploymentDay = track.getDeploymentTime() < 7 ? Compute.randomInt(7 - track.getDeploymentTime()) : 0;
+        int deploymentDay = track.getDeploymentTime() < 7 ? randomInt(7 - track.getDeploymentTime()) : 0;
         setScenarioDates(deploymentDay, track, campaign, scenario);
     }
 
     /**
      * Worker function that sets scenario deploy/battle/return dates based on the
-     * track's properties and
-     * current campaign date. Takes a fixed deployment day of X days from campaign's
-     * today date.
+     * track's properties and current campaign date. Takes a fixed deployment day of X days from
+     * campaign's today date.
      */
     private static void setScenarioDates(int deploymentDay, StratconTrackState track, Campaign campaign,
             StratconScenario scenario) {
@@ -1624,7 +1704,7 @@ public class StratconRulesManager {
         // safety code to prevent attempts to generate random int with upper bound of 0
         // which is apparently illegal
         int battleDay = deploymentDay
-                + (track.getDeploymentTime() > 0 ? Compute.randomInt(track.getDeploymentTime()) : 0);
+                + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
         int returnDay = deploymentDay + track.getDeploymentTime();
 
         LocalDate deploymentDate = campaign.getLocalDate().plusDays(deploymentDay);
@@ -2303,16 +2383,20 @@ public class StratconRulesManager {
      */
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
+        Campaign campaign = ev.getCampaign();
+
         // don't do any of this if StratCon isn't turned on
-        if (!ev.getCampaign().getCampaignOptions().isUseStratCon()) {
+        if (!campaign.getCampaignOptions().isUseStratCon()) {
             return;
         }
-        boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;
-        boolean isStartOfMonth = ev.getCampaign().getLocalDate().getDayOfMonth() == 1;
+
+        LocalDate today = campaign.getLocalDate();
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        boolean isStartOfMonth = today.getDayOfMonth() == 1;
 
         // run scenario generation routine for every track attached to an active
         // contract
-        for (AtBContract contract : ev.getCampaign().getActiveAtBContracts()) {
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
             StratconCampaignState campaignState = contract.getStratconCampaignState();
 
             if (campaignState != null) {
@@ -2323,7 +2407,7 @@ public class StratconRulesManager {
                     // please do this before generating scenarios for track
                     // to avoid unintentionally cleaning out integrated force deployments on
                     // 0-deployment-length tracks
-                    processTrackForceReturnDates(track, ev.getCampaign());
+                    processTrackForceReturnDates(track, campaign);
 
                     processFacilityEffects(track, campaignState, isStartOfMonth);
 
@@ -2331,16 +2415,30 @@ public class StratconRulesManager {
                     // fail it and apply consequences
                     for (StratconScenario scenario : track.getScenarios().values()) {
                         if ((scenario.getDeploymentDate() != null) &&
-                                scenario.getDeploymentDate().isBefore(ev.getCampaign().getLocalDate()) &&
+                                scenario.getDeploymentDate().isBefore(campaign.getLocalDate()) &&
                                 scenario.getPrimaryForceIDs().isEmpty()) {
                             processIgnoredScenario(scenario, campaignState);
                         }
                     }
 
-                    // on monday, generate new scenarios
+                    // on monday, generate new scenario dates
                     if (isMonday) {
-                        generateScenariosForTrack(ev.getCampaign(), contract, track);
+                        generateScenariosDatesForWeek(campaign, campaignState, contract, track);
                     }
+                }
+
+                List<LocalDate> weeklyScenarioDates = campaignState.getWeeklyScenarios();
+
+                if (weeklyScenarioDates.contains(today)) {
+                    int scenarioCount = 0;
+                    for (LocalDate date : weeklyScenarioDates) {
+                        if (date.equals(today)) {
+                            scenarioCount++;
+                        }
+                    }
+                    weeklyScenarioDates.removeIf(date -> date.equals(today));
+
+                    generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioCount);
                 }
             }
         }
