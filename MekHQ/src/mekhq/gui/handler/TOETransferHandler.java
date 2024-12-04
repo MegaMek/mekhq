@@ -18,6 +18,15 @@
  */
 package mekhq.gui.handler;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.unit.Unit;
+import mekhq.gui.CampaignGUI;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -26,22 +35,10 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
-import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.TransferHandler;
-import javax.swing.tree.TreePath;
-
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.unit.Unit;
-import mekhq.gui.CampaignGUI;
-
 public class TOETransferHandler extends TransferHandler {
     private static final MMLogger logger = MMLogger.create(TOETransferHandler.class);
 
-    private CampaignGUI gui;
+    private final CampaignGUI gui;
 
     public TOETransferHandler(CampaignGUI gui) {
         super();
@@ -145,7 +142,7 @@ public class TOETransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean importData(TransferHandler.TransferSupport support) {
+    public boolean importData(TransferSupport support) {
         if (!canImport(support)) {
             return false;
         }
@@ -159,9 +156,15 @@ public class TOETransferHandler extends TransferHandler {
             String id = st.nextToken();
             if (type.equals("UNIT")) {
                 unit = gui.getCampaign().getUnit(UUID.fromString(id));
+                if (unit == null || unit.isDeployed()) {
+                    return false;
+                }
             }
             if (type.equals("FORCE")) {
                 force = gui.getCampaign().getForce(Integer.parseInt(id));
+                if (force == null || force.isDeployed()) {
+                    return false;
+                }
             }
         } catch (UnsupportedFlavorException ufe) {
             logger.error("UnsupportedFlavor: " + ufe.getMessage());
