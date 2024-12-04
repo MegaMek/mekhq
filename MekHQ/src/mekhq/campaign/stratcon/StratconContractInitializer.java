@@ -221,6 +221,9 @@ public class StratconContractInitializer {
             }
         }
 
+        // Determine starting Support Points
+        campaign.negotiateAdditionalSupportPoints();
+
         // now we're done
     }
 

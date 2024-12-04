@@ -18,6 +18,14 @@
  */
 package mekhq.campaign.stratcon;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Node;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -26,17 +34,8 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
-import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Contract-level state object for a StratCon campaign.
@@ -174,11 +173,6 @@ public class StratconCampaignState {
 
     public void useSupportPoint() {
         supportPoints--;
-    }
-
-    public void convertVictoryToSupportPoint() {
-        victoryPoints--;
-        supportPoints++;
     }
 
     /**

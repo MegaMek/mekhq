@@ -71,6 +71,7 @@ import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
+import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
@@ -94,15 +95,11 @@ public class AtBDynamicScenarioFactory {
     // indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
-    private static final int IS_LANCE_SIZE = 4;
-    private static final int CLAN_MH_LANCE_SIZE = 5;
-    private static final int COMSTAR_LANCE_SIZE = 6;
-
     private static final double STRICT = 0.75;
     private static final double OPPORTUNISTIC = 1.0;
     private static final double LIBERAL = 1.25;
 
-    private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
+    private static final int REINFORCEMENT_ARRIVAL_SCALE = 15;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle(
             "mekhq.resources.AtBDynamicScenarioFactory",
@@ -283,12 +280,13 @@ public class AtBDynamicScenarioFactory {
             effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign, false);
 
             for (ScenarioForceTemplate forceTemplate : currentForceTemplates) {
+                logger.info(String.format("++ Generating a force for the %s template ++",
+                    forceTemplate.getForceName()).toUpperCase());
+
                 if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     int weightClass = randomForceWeight();
-                    logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
-
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
@@ -398,6 +396,10 @@ public class AtBDynamicScenarioFactory {
                 effectiveBV = (int) round(effectiveBV * difficultyMultiplier);
                 effectiveUnitCount = (int) round(effectiveUnitCount  * difficultyMultiplier);
 
+                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+                    logger.info(String.format("Effective xBV Budget: %s (adjusted for difficulty)",
+                        effectiveBV));
+                }
                 // Intentional fall-through: opposing third parties are either the contracted
                 // enemy or "Unidentified Hostiles" which are considered pirates or bandit caste
                 // with random quality and skill
@@ -439,18 +441,21 @@ public class AtBDynamicScenarioFactory {
         // Get the number of units in the typical ground tactical formation.
         // This will differ depending on whether the owner uses Inner Sphere lances,
         // Clan stars, or CS/WOB Level II formations.
-        int lanceSize = getLanceSize(factionCode);
+        int lanceSize = getStandardForceSize(faction);
 
         // determine generation parameters
         int forceBV = 0;
         double forceMultiplier = forceTemplate.getForceMultiplier();
 
-        if (forceMultiplier == 0) {
-            forceMultiplier = 1;
-        }
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()
+            || forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
+            // This means force multiplier wasn't initialized in the template
+            if (forceMultiplier == 0) {
+                forceMultiplier = 1;
+                logger.warn(String.format("Force multiplier is zero for %s", forceTemplate.getForceName()));
+            }
 
-        if (forceMultiplier != 1) {
-            logger.info(String.format("Force BV Multiplier: %s (from scenario template)", forceMultiplier));
+            logger.info(String.format("Force Multiplier: %s (from scenario template)", forceMultiplier));
         }
 
         int forceBVBudget = (int) (effectiveBV * forceMultiplier);
@@ -459,8 +464,8 @@ public class AtBDynamicScenarioFactory {
             forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100));
         }
 
-        if (forceTemplate.getForceMultiplier() != 1) {
-            logger.info(String.format("BV Budget was %s, now %s (includes Modifier settings and Multiplier)",
+        if (forceTemplate.getForceMultiplier() != 1 && forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+            logger.info(String.format("BV Budget was %s, now %s",
                 effectiveBV, forceBVBudget));
         }
 
@@ -468,6 +473,9 @@ public class AtBDynamicScenarioFactory {
 
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
+
+            logger.info(String.format("Unit Budget was %s, now %s",
+                effectiveUnitCount, forceUnitBudget));
         } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal())
             || (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
             forceUnitBudget = forceTemplate.getFixedUnitCount() == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE ? lanceSize : forceTemplate.getFixedUnitCount();
@@ -2957,7 +2965,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        logger.info(String.format("Total Base %s Budget: %s (adjusted for campaign difficulty)",
+        logger.info(String.format("Total Base %s Budget: %s (may be adjusted by Effective Player BV Multiplier)",
             generationMethod, bvBudget));
 
         return bvBudget;
@@ -3502,8 +3510,29 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(forceEntities,
-                            strategy + scenario.getFriendlyReinforcementDelayReduction());
+                    setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
+
+                    // Here we selectively overwrite the earlier entries
+                    if (!scenario.getFriendlyDelayedReinforcements().isEmpty()) {
+                        List<Entity> delayedEntities = new ArrayList<>();
+
+                        for (UUID unitId : scenario.getFriendlyDelayedReinforcements()) {
+                            try {
+                                Unit unit = campaign.getUnit(unitId);
+                                Entity entity = unit.getEntity();
+
+                                delayedEntities.add(entity);
+                            } catch (Exception ex) {
+                                logger.error(ex.getMessage(), ex);
+                            }
+                        }
+
+                        if (!delayedEntities.isEmpty()) {
+                            setDeploymentTurnsForReinforcements(delayedEntities,
+                                strategy + scenario.getFriendlyReinforcementDelayReduction(),
+                                true);
+                        }
+                    }
                 } else {
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
@@ -3628,10 +3657,41 @@ public class AtBDynamicScenarioFactory {
      * @param turnModifier A number to subtract from the deployment turn.
      */
     public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier) {
+        setDeploymentTurnsForReinforcements(entityList, turnModifier, false);
+    }
+
+    /**
+     * Given a list of entities, set the arrival turns for them as if they were all
+     * reinforcements on the same side. This overloaded method allows for defining whether the
+     * force was delayed.
+     *
+     * @param entityList   List of entities to process
+     * @param turnModifier A number to subtract from the deployment turn.
+     * @param isDelayed Whether the arrival of the entities was delayed
+     */
+    public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier,
+                                                           boolean isDelayed) {
         int minimumSpeed = 999;
+        int arrivalScale = REINFORCEMENT_ARRIVAL_SCALE;
+
+        // First, we organize the reinforcements into pools.
+        // This ensures each Force's reinforcements are handled separately.
+        Map<Integer, Integer> delayByForce = new HashMap<>();
 
         // first, we figure out the slowest "atb speed" of this group.
         for (Entity entity : entityList) {
+            if (isDelayed) {
+                int forceId = entity.getForceId();
+
+                if (delayByForce.containsKey(forceId)) {
+                    arrivalScale = delayByForce.get(forceId);
+                } else {
+                    int delayedArrivalScale = REINFORCEMENT_ARRIVAL_SCALE * (randomInt(2) + 2);
+                    delayByForce.put(forceId, delayedArrivalScale);
+                    arrivalScale = delayedArrivalScale;
+                }
+            }
+
             // don't include transported units in this calculation
             if (entity.getTransportId() != Entity.NONE) {
                 continue;
@@ -3644,17 +3704,15 @@ public class AtBDynamicScenarioFactory {
             if ((speed < minimumSpeed) && (speed > 0)) {
                 minimumSpeed = speed;
             }
-        }
 
-        // the actual arrival turn will be the scale divided by the slowest speed.
-        // so, a group of Atlases (3/5) should arrive on turn 10 (30 / 3)
-        // a group of jump-capable Griffins (5/8/5) should arrive on turn 5 (30 / 6)
-        // a group of Ostscouts (8/12/8) should arrive on turn 3 (30 / 9, rounded down)
-        // we then subtract the passed-in turn modifier, which is usually the
-        // commander's strategy skill level.
-        int actualArrivalTurn = Math.max(0, (REINFORCEMENT_ARRIVAL_SCALE / minimumSpeed) - turnModifier);
+            // the actual arrival turn will be the scale divided by the slowest speed.
+            // so, a group of Atlases (3/5) should arrive at turn 7 (20 / 3)
+            // a group of jump-capable Griffins (5/8/5) should arrive on turn 3 (20 / 6, rounded down)
+            // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
+            // we then subtract the passed-in turn modifier, which is usually the
+            // commander's strategy skill level.
+            int actualArrivalTurn = Math.max(0, (arrivalScale / minimumSpeed) - turnModifier);
 
-        for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }
     }
@@ -3758,32 +3816,6 @@ public class AtBDynamicScenarioFactory {
         scenario.setRerolls(tacticsSkill);
     }
 
-    /**
-     * Convenience function to get the standard ground tactical formation size,
-     * based on faction. In
-     * the case of Clan factions, this returns the number of points rather than a
-     * number of units,
-     * as points may be 2 ground vehicles or 5 ProtoMeks.
-     * TODO: conventional infantry typically uses 3 units per formation (company) -
-     * make a separate method
-     *
-     * @param factionCode string with faction short name/lookup key
-     * @return Number of units (points for Clan) in the formation
-     */
-    public static int getLanceSize(String factionCode) {
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-        if (faction != null) {
-            if (faction.isClan() || faction.isMarianHegemony()) {
-                // Clans and the Marian Hegemony use a fundamental unit size of 5.
-                return CLAN_MH_LANCE_SIZE;
-            } else if (faction.isComStarOrWoB()) {
-                // ComStar and WoB use a fundamental unit size of 6.
-                return COMSTAR_LANCE_SIZE;
-            }
-        }
-
-        return IS_LANCE_SIZE;
-    }
 
     /**
      * Worker function to determine the formation size of fixed wing aircraft.
