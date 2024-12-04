@@ -15,7 +15,6 @@ package mekhq.gui;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionRemovedEvent;
@@ -397,7 +396,6 @@ public class StratconTab extends CampaignGuiTab {
      * Refreshes the list of tracks
      */
     private void repopulateTrackList() {
-        final MMLogger logger = MMLogger.create(StratconTab.class);
         int currentTrackIndex = listCurrentTrack.getSelectedIndex();
         listModel.clear();
 
@@ -406,9 +404,7 @@ public class StratconTab extends CampaignGuiTab {
             if (campaignState != null) {
                 for (StratconTrackState track : campaignState.getTracks()) {
                     TrackDropdownItem trackItem = new TrackDropdownItem(contract, track);
-                    logger.info(trackItem);
                     listModel.addElement(trackItem);
-                    logger.info(listModel.toString());
                 }
             }
         }
@@ -419,8 +415,6 @@ public class StratconTab extends CampaignGuiTab {
         if (listCurrentTrack.getSelectedValue() == null) {
             listCurrentTrack.setSelectedIndex(0);
         }
-
-        logger.info(listCurrentTrack.getSelectedValue());
 
         if (listCurrentTrack.getSelectedValue() != null) {
             TrackDropdownItem selectedTrack = listCurrentTrack.getSelectedValue();
