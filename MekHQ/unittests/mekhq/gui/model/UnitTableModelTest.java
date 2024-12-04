@@ -28,10 +28,8 @@ package mekhq.gui.model;
  import org.mockito.Mock;
  import org.mockito.junit.jupiter.MockitoExtension;
 
- import java.util.Collections;
- import java.util.HashSet;
- import java.util.List;
- import java.util.Set;
+ import java.util.*;
+ import java.util.stream.Collectors;
 
  import static org.junit.jupiter.api.Assertions.assertEquals;
  import static org.mockito.Mockito.mock;
@@ -68,7 +66,12 @@ public class UnitTableModelTest {
                          boolean hasNavigator, Entity entity,
                          String expected) {
         List<Person> drivers = Collections.nCopies(driverCount, crewMember);
-        Set<Person> gunners = new HashSet<Person>(Collections.nCopies(gunnerCount, crewMember));
+
+        Set<Person> gunners = new HashSet<>();
+        for(int i = 0; i < gunnerCount; i++){
+            gunners.add(mock(Person.class));
+        }
+
         List<Person> crew = Collections.nCopies(crewCount + drivers.size() + gunners.size()
                 + (hasNavigator ? 1 : 0), crewMember);
 
