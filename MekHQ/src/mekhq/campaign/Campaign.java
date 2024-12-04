@@ -145,15 +145,15 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.convoyFinalMessageDialog;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 /**
  * The main campaign class, keeps track of teams and units
  *

@@ -34,12 +34,6 @@ import org.w3c.dom.Node;
 
 import javax.xml.namespace.QName;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

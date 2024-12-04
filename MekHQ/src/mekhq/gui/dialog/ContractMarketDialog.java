@@ -49,8 +49,8 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.triggerContractStartDialog;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.triggerContractStartDialog;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 /**
