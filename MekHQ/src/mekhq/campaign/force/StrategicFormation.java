@@ -52,6 +52,7 @@ import static megamek.common.Entity.ETYPE_TANK;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
+import static mekhq.campaign.force.FormationLevel.LANCE;
 
 /**
  * Used by Against the Bot &amp; StratCon to track additional information about each force
@@ -64,9 +65,9 @@ import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
 public class StrategicFormation {
     private static final MMLogger logger = MMLogger.create(StrategicFormation.class);
 
-    public static final int STR_IS = 4;
-    public static final int STR_CLAN = 5;
-    public static final int STR_CS = 6;
+    public static final int LANCE_SIZE = 4;
+    public static final int STAR_SIZE = 5;
+    public static final int LEVEL_II_SIZE = 6;
 
     public static final long ETYPE_GROUND = ETYPE_MEK |
             ETYPE_TANK | Entity.ETYPE_INFANTRY | ETYPE_PROTOMEK;
@@ -81,20 +82,51 @@ public class StrategicFormation {
 
     /**
      * Determines the standard size for a given faction. The size varies depending on whether the
+     * faction is a Clan, ComStar/WoB, or others (Inner Sphere). This overloaded method defaults to
+     * Lance/Star/Level II
+     *
+     * @param faction The {@link Faction} object for which the standard force size is to be calculated.
+     * @return The standard force size, at the provided formation level, for the provided faction
+     */
+    public static int getStandardForceSize(Faction faction) {
+        return getStandardForceSize(faction, LANCE.getDepth());
+    }
+
+    /**
+     * Determines the standard size for a given faction. The size varies depending on whether the
      * faction is a Clan, ComStar/WoB, or others (Inner Sphere).
      *
      * @param faction The {@link Faction} object for which the standard force size is to be calculated.
-     * @return The standard force size for the given faction. It returns {@code STR_CLAN} if the
-     * faction is a Clan, {@code STR_CS} if the faction is ComStar or WoB, and {@code STR_IS} otherwise.
+     * @param formationLevelDepth The {@link FormationLevel} {@code Depth} from which the standard
+     *                           force size is to be calculated.
+     * @return The standard force size, at the provided formation level, for the provided faction
      */
-    public static int getStandardForceSize(Faction faction) {
-        if (faction.isClan()) {
-            return STR_CLAN;
+    public static int getStandardForceSize(Faction faction, int formationLevelDepth) {
+        int formationSize;
+        if (faction.isClan() || faction.isMarianHegemony()) {
+            formationSize = STAR_SIZE;
         } else if (faction.isComStarOrWoB()) {
-            return STR_CS;
+            formationSize = LEVEL_II_SIZE;
         } else {
-            return STR_IS;
+            formationSize = LANCE_SIZE;
         }
+
+        if (formationLevelDepth == LANCE.getDepth()) {
+            return formationSize;
+        }
+
+        formationLevelDepth++; // Lance is depth 0, so we need to add +1 to get the number of iterations
+
+        for (int i = 0; i < formationLevelDepth; i++) {
+
+            if (faction.isComStarOrWoB()) {
+                formationSize *= 6;
+            } else {
+                formationSize *= 3;
+            }
+        }
+
+        return formationSize;
     }
 
     /**

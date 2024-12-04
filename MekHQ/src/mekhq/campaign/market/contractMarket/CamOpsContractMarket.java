@@ -43,8 +43,8 @@ import java.util.*;
  */
 public class CamOpsContractMarket extends AbstractContractMarket {
     private static final MMLogger logger = MMLogger.create(CamOpsContractMarket.class);
-    private static int BASE_NEGOTIATION_TARGET = 8;
-    private static int EMPLOYER_NEGOTIATION_SKILL_LEVEL = 5;
+    private static final int BASE_NEGOTIATION_TARGET = 8;
+    private static final int EMPLOYER_NEGOTIATION_SKILL_LEVEL = 5;
 
     public CamOpsContractMarket() {
         super(ContractMarketMethod.CAM_OPS);
@@ -204,7 +204,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
         // Step 7: Determine the number of required lances (Not CamOps RAW)
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract));
+        contract.setRequiredLances(calculateRequiredLances(campaign, contract, false));
         // Step 8: Calculate the payment
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability

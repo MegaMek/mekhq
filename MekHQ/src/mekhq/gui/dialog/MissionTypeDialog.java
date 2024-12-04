@@ -39,6 +39,7 @@ public class MissionTypeDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MissionTypeDialog.class);
 
     private boolean contract;
+    private boolean mission;
 
     public MissionTypeDialog(final JFrame frame, final boolean modal) {
         super(frame, modal);
@@ -60,7 +61,7 @@ public class MissionTypeDialog extends JDialog {
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission");
         btnMission.addActionListener(evt -> {
-            contract = false;
+            mission = true;
             setVisible(false);
         });
         getContentPane().add(btnMission);
@@ -91,5 +92,9 @@ public class MissionTypeDialog extends JDialog {
 
     public boolean isContract() {
         return contract;
+    }
+    
+    public boolean isMission() {
+        return mission;
     }
 }
