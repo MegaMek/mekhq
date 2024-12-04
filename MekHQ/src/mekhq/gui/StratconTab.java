@@ -13,6 +13,7 @@
 */
 package mekhq.gui;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.MissionCompletedEvent;
@@ -48,7 +49,8 @@ public class StratconTab extends CampaignGuiTab {
 
     private StratconPanel stratconPanel;
     private JPanel infoPanel;
-    private JComboBox<TrackDropdownItem> cboCurrentTrack;
+    private DefaultListModel<TrackDropdownItem> listModel = new DefaultListModel<>();
+    private JList<TrackDropdownItem> listCurrentTrack;
     private JLabel infoPanelText;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
@@ -87,7 +89,7 @@ public class StratconTab extends CampaignGuiTab {
         objectiveStatusText.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent me) {
-                TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+                TrackDropdownItem currentTDI = listCurrentTrack.getSelectedValue();
                 StratconCampaignState campaignState = currentTDI.contract.getStratconCampaignState();
                 objectivesCollapsed = !objectivesCollapsed;
                 objectiveStatusText.setText(getStrategicObjectiveText(campaignState));
@@ -116,47 +118,54 @@ public class StratconTab extends CampaignGuiTab {
      * Worker function that sets up the layout of the right-side info panel.
      */
     private void initializeInfoPanel() {
-        infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
+        int gridY = 0;
+        infoPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.gridx = gridY++;
 
-        infoPanel.add(new JLabel("Current Campaign Status:"));
-        infoPanel.add(campaignStatusText);
+        infoPanel.add(new JLabel("Current Campaign Status:"), constraints);
+
+        constraints.gridy = gridY++;
+        infoPanel.add(campaignStatusText, constraints);
 
         JButton btnManageCampaignState = new JButton("Manage SP/CVP");
-        btnManageCampaignState.setHorizontalAlignment(SwingConstants.LEFT);
-        btnManageCampaignState.setVerticalAlignment(SwingConstants.TOP);
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
-        infoPanel.add(btnManageCampaignState);
+        constraints.gridy = gridY++;
+        infoPanel.add(btnManageCampaignState, constraints);
 
         expandedObjectivePanel = new JScrollPaneWithSpeed(objectiveStatusText);
-        expandedObjectivePanel.setMaximumSize(new Dimension(400, 300));
-        expandedObjectivePanel.setAlignmentX(LEFT_ALIGNMENT);
-        infoPanel.add(expandedObjectivePanel);
+        expandedObjectivePanel.setPreferredSize(new Dimension(400, 300));
+        constraints.gridy = gridY++;
+        infoPanel.add(expandedObjectivePanel, constraints);
 
-        JLabel lblCurrentTrack = new JLabel("Current Sector:");
-        infoPanel.add(lblCurrentTrack);
+        JLabel lblCurrentTrack = new JLabel("Assigned Sectors:");
+        constraints.gridy = gridY++;
+        infoPanel.add(lblCurrentTrack, constraints);
 
-        cboCurrentTrack = new JComboBox<>();
-        cboCurrentTrack.setAlignmentX(LEFT_ALIGNMENT);
-        cboCurrentTrack.setMaximumSize(new Dimension(320, 20));
+        listModel = new DefaultListModel<>();
+        listCurrentTrack = new JList<>(listModel);
+        listCurrentTrack.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listCurrentTrack.setFixedCellHeight(UIUtil.scaleForGUI(20));
         repopulateTrackList();
-        cboCurrentTrack.addItemListener(evt -> trackSelectionHandler());
+        listCurrentTrack.addListSelectionListener(evt -> trackSelectionHandler());
 
-        infoPanel.add(cboCurrentTrack);
+        JScrollPane scrollPane = new JScrollPane(listCurrentTrack);
+        scrollPane.setPreferredSize(new Dimension(UIUtil.scaleForGUI(400),
+            listCurrentTrack.getFixedCellHeight() * 10));
+        constraints.gridy = gridY++;
 
-        // have a default selected
-        if (cboCurrentTrack.getItemCount() > 0) {
-            trackSelectionHandler();
-        }
-
-        infoPanel.add(infoPanelText);
+        infoPanel.add(scrollPane, constraints);
+        constraints.gridx = 2;
+        constraints.gridheight = 2;
+        infoPanel.add(infoPanelText, constraints);
     }
 
     /**
      * Worker that handles track selection.
      */
     private void trackSelectionHandler() {
-        TrackDropdownItem tdi = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        TrackDropdownItem tdi = listCurrentTrack.getSelectedValue();
         if (tdi != null) {
             stratconPanel.selectTrack(tdi.contract.getStratconCampaignState(), tdi.track);
             updateCampaignState();
@@ -185,7 +194,7 @@ public class StratconTab extends CampaignGuiTab {
      * with such info as current objective status, VP/SP totals, etc.
      */
     public void updateCampaignState() {
-        if ((cboCurrentTrack == null) || (campaignStatusText == null)) {
+        if ((listCurrentTrack == null) || (campaignStatusText == null)) {
             return;
         }
 
@@ -193,7 +202,7 @@ public class StratconTab extends CampaignGuiTab {
         // list of remaining objectives, percentage remaining
         // current VP
         // current support points
-        TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        TrackDropdownItem currentTDI = listCurrentTrack.getSelectedValue();
         if (currentTDI == null) {
             campaignStatusText.setText("No active contract selected, or contract has not started.");
             expandedObjectivePanel.setVisible(false);
@@ -387,40 +396,38 @@ public class StratconTab extends CampaignGuiTab {
      * Refreshes the list of tracks
      */
     private void repopulateTrackList() {
-        TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
-        cboCurrentTrack.removeAllItems();
+        int currentTrackIndex = listCurrentTrack.getSelectedIndex();
+        listModel.clear();
 
-        // track dropdown is populated with all tracks across all active contracts
         for (AtBContract contract : getCampaignGui().getCampaign().getActiveAtBContracts(true)) {
-            if (contract.getStratconCampaignState() != null) {
-                for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                    TrackDropdownItem tdi = new TrackDropdownItem(contract, track);
-                    cboCurrentTrack.addItem(tdi);
-
-                    if ((currentTDI != null) && currentTDI.equals(tdi)) {
-                        currentTDI = tdi;
-                        cboCurrentTrack.setSelectedItem(tdi);
-                    } else if (currentTDI == null) {
-                        currentTDI = tdi;
-                        cboCurrentTrack.setSelectedItem(tdi);
-                    }
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null) {
+                for (StratconTrackState track : campaignState.getTracks()) {
+                    TrackDropdownItem trackItem = new TrackDropdownItem(contract, track);
+                    listModel.addElement(trackItem);
                 }
             }
         }
 
-        if ((cboCurrentTrack.getItemCount() > 0) && (currentTDI != null) && (currentTDI.contract != null)) {
-            TrackDropdownItem selectedTrack = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        listCurrentTrack.setModel(listModel);
+        listCurrentTrack.setSelectedIndex(currentTrackIndex);
 
-            stratconPanel.selectTrack(selectedTrack.contract.getStratconCampaignState(), currentTDI.track);
+        if (listCurrentTrack.getSelectedValue() == null) {
+            listCurrentTrack.setSelectedIndex(0);
+        }
+
+        if (listCurrentTrack.getSelectedValue() != null) {
+            TrackDropdownItem selectedTrack = listCurrentTrack.getSelectedValue();
+            stratconPanel.selectTrack(selectedTrack.contract.getStratconCampaignState(), selectedTrack.track);
             stratconPanel.setVisible(true);
         } else {
-            infoPanelText.setText("No active sectors");
+            infoPanelText.setText("");
             stratconPanel.setVisible(false);
         }
     }
 
     private void showCampaignStateManagement(ActionEvent e) {
-        TrackDropdownItem selectedTrack = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
+        TrackDropdownItem selectedTrack = listCurrentTrack.getSelectedValue();
         if (selectedTrack == null) {
             return;
         }

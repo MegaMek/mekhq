@@ -13,6 +13,8 @@
 */
 package mekhq.gui.stratcon;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
@@ -30,8 +32,22 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
     @Override
     public Component getListCellRendererComponent(JList<? extends Unit> list, Unit value, int index,
             boolean isSelected, boolean cellHasFocus) {
+        Campaign campaign = value.getCampaign();
 
-        setText(String.format("%s (BV: %d)", value.getName(), value.getEntity().calculateBattleValue()));
+        int valueForceId = value.getForceId();
+        Force force = campaign.getForce(valueForceId);
+
+        String forceName = "";
+        if (force != null) {
+            forceName = force.getFullName();
+            String originNodeName = ", " + campaign.getForce(0).getName();
+            forceName = forceName.replaceAll(originNodeName, "");
+        }
+
+        setText(String.format("<html><b>%s (%s/%s)</b> - %s - Base BV: %d<br><i>%s</i></html>",
+            value.getName(), value.getEntity().getCrew().getGunnery(), value.getEntity().getCrew().getPiloting(),
+            value.getCondition(), value.getEntity().calculateBattleValue(true, true),
+            forceName));
 
         if (isSelected) {
             setBackground(list.getSelectionBackground());

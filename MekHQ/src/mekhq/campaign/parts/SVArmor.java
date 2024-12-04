@@ -18,11 +18,6 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.util.Objects;
-
-import org.w3c.dom.Node;
-
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -33,6 +28,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+
+import java.io.PrintWriter;
+import java.util.Objects;
+
+import static megamek.common.EquipmentType.T_ARMOR_SV_BAR_2;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -107,9 +108,16 @@ public class SVArmor extends Armor {
 
     @Override
     public Money getStickerPrice() {
+        // The value of '< T_ARMOR_SV_BAR_2' means that the armor does not exist at that tech level
+        // (or it is not SV BAR armor).
+        if (bar < T_ARMOR_SV_BAR_2) {
+            return Money.zero();
+        }
+
         // always in 5-ton increments
-        return Money.of(5.0 / ArmorType.svArmor(bar).getSVWeightPerPoint(techRating)
-                * ArmorType.svArmor(bar).getCost());
+        double weightPerPoint = ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
+        double calculatedAmount = 5.0 / weightPerPoint * ArmorType.svArmor(bar).getCost();
+        return Money.of(calculatedAmount);
     }
 
     @Override

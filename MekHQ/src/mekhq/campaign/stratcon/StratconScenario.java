@@ -15,6 +15,7 @@ package mekhq.campaign.stratcon;
 
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
@@ -104,13 +105,14 @@ public class StratconScenario implements IStratconDisplayable {
      * Add an individual unit to the backing scenario, trying to associate it with the given template.
      * Performs house keeping on the unit and scenario and invokes a deployment changed event.
      */
-    public void addUnit(Unit unit, String templateID, boolean useLeadershipPoint) {
+    public void addUnit(Unit unit, String templateID, boolean useLeadership) {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
             backingScenario.addUnit(unit.getId(), templateID);
             unit.setScenarioId(getBackingScenarioID());
 
-            if (useLeadershipPoint) {
-                useLeadershipPoint();
+            if (useLeadership) {
+                int baseBattleValue = unit.getEntity().calculateBattleValue(true, true);
+                leadershipPointsUsed += baseBattleValue;
             }
 
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
@@ -165,10 +167,10 @@ public class StratconScenario implements IStratconDisplayable {
 
     @Override
     public String getInfo() {
-        return getInfo(true);
+        return getInfo(null, true);
     }
 
-    public String getInfo(boolean html) {
+    public String getInfo(@Nullable Campaign campaign, boolean html) {
         StringBuilder stateBuilder = new StringBuilder();
 
         if (isStrategicObjective()) {
@@ -201,20 +203,31 @@ public class StratconScenario implements IStratconDisplayable {
 
         if (deploymentDate != null) {
             stateBuilder.append("Deployment Date: ")
-                .append(deploymentDate.toString())
+                .append(deploymentDate)
                 .append("<br/>");
         }
 
         if (actionDate != null) {
             stateBuilder.append("Battle Date: ")
-                .append(actionDate.toString())
+                .append(actionDate)
                 .append("<br/>");
         }
 
         if (returnDate != null) {
             stateBuilder.append("Return Date: ")
-                .append(returnDate.toString())
+                .append(returnDate)
                 .append("<br/>");
+        }
+
+        if (campaign != null) {
+            AtBDynamicScenario backingScenario = getBackingScenario();
+
+            if (backingScenario != null) {
+                stateBuilder.append(String.format("Hostile BV: %d<br>",
+                    backingScenario.getTeamTotalBattleValue(campaign, false)));
+                stateBuilder.append(String.format("Allied BV: %d",
+                    backingScenario.getTeamTotalBattleValue(campaign, true)));
+            }
         }
 
         stateBuilder.append("</html>");
@@ -353,11 +366,7 @@ public class StratconScenario implements IStratconDisplayable {
         return leadershipPointsUsed;
     }
 
-    public void setLeadershipPointsUsed(int leadershipPointsUsed) {
+    public void setAvailableLeadershipBudget(int leadershipPointsUsed) {
         this.leadershipPointsUsed = leadershipPointsUsed;
-    }
-
-    public void useLeadershipPoint() {
-        leadershipPointsUsed++;
     }
 }
