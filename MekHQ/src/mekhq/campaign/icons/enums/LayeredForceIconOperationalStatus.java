@@ -88,17 +88,11 @@ public enum LayeredForceIconOperationalStatus {
             return NOT_OPERATIONAL;
         }
 
-        switch (unit.getDamageState()) {
-            case Entity.DMG_NONE:
-                return FULLY_OPERATIONAL;
-            case Entity.DMG_LIGHT:
-            case Entity.DMG_MODERATE:
-                return SUBSTANTIALLY_OPERATIONAL;
-            case Entity.DMG_HEAVY:
-            case Entity.DMG_CRIPPLED:
-                return MARGINALLY_OPERATIONAL;
-            default:
-                return NOT_OPERATIONAL;
-        }
+        return switch (unit.getDamageState()) {
+            case Entity.DMG_NONE -> FULLY_OPERATIONAL;
+            case Entity.DMG_LIGHT, Entity.DMG_MODERATE -> SUBSTANTIALLY_OPERATIONAL;
+            case Entity.DMG_HEAVY, Entity.DMG_CRIPPLED -> MARGINALLY_OPERATIONAL;
+            default -> NOT_OPERATIONAL;
+        };
     }
 }
