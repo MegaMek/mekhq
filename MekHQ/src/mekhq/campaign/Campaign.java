@@ -3965,7 +3965,7 @@ public class Campaign implements ITechManager {
         // out of Admin/Transport personnel, or we run out of active contracts
         for (AtBContract contract : sortedContracts) {
             int negoatiatedSupportPoints = 0;
-            int tracks = contract.getStratconCampaignState().getTracks().size();
+            int maximumSupportPointsNegotiated = contract.getRequiredLances();
 
             if (adminTransport.isEmpty()) {
                 break;
@@ -3982,9 +3982,14 @@ public class Campaign implements ITechManager {
 
                 if (roll >= targetNumber) {
                     negoatiatedSupportPoints++;
+
+                    int marginOfSuccess = (roll - targetNumber) / 4;
+
+                    negoatiatedSupportPoints += marginOfSuccess;
                 }
 
-                if (negoatiatedSupportPoints >= tracks) {
+                if (negoatiatedSupportPoints >= maximumSupportPointsNegotiated) {
+                    negoatiatedSupportPoints = maximumSupportPointsNegotiated;
                     break;
                 }
             }
