@@ -186,14 +186,9 @@ public class Force {
      *
      * @param convoyForce {@code true} to mark force as a convoy force, {@code false} to mark force
      *                     as non-convoy.
-     * @param setForSubForces {@code true} to recursively apply convoyForce status to all subforces,
-     *                         {@code false} to only set for this force.
      */
-    public void setConvoyForce(boolean convoyForce, boolean setForSubForces) {
+    public void setConvoyForce(boolean convoyForce) {
         this.convoyForce = convoyForce;
-        if (setForSubForces) {
-            subForces.forEach(force -> force.setConvoyForce(convoyForce, true));
-        }
     }
 
     public boolean isStrategicFormation() {
@@ -760,7 +755,7 @@ public class Force {
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
-                    retVal.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                    retVal.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideStrategicFormation")) {
                     retVal.setOverrideStrategicFormation(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {

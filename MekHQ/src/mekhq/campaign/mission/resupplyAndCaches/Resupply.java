@@ -487,7 +487,7 @@ public class Resupply {
     private double getTotalCargoCapacity(Force convoy) {
         double cargoCapacity = 0;
 
-        for (UUID unitId : convoy.getUnits()) {
+        for (UUID unitId : convoy.getAllUnits(false)) {
             try {
                 Unit unit = campaign.getUnit(unitId);
                 Entity entity = unit.getEntity();
@@ -552,7 +552,7 @@ public class Resupply {
         // such a size that even a blind OpFor will be able to find them.
         double convoyWeight = -200;
         if (playerConvoy != null) {
-            for (UUID unitId : playerConvoy.getUnits()) {
+            for (UUID unitId : playerConvoy.getAllUnits(false)) {
                 try {
                     Unit unit = campaign.getUnit(unitId);
                     Entity entity = unit.getEntity();
@@ -882,7 +882,7 @@ public class Resupply {
      * @param fatigueIncrease How much fatigue should be adjusted.
      */
     private void increaseFatigue(Force playerConvoy, int fatigueIncrease) {
-        for (UUID unitId : playerConvoy.getUnits()) {
+        for (UUID unitId : playerConvoy.getAllUnits(false)) {
             Unit unit = campaign.getUnit(unitId);
 
             if (unit != null) {
@@ -1071,7 +1071,7 @@ public class Resupply {
             return false;
         }
 
-        for (UUID unitId : targetConvoy.getUnits()) {
+        for (UUID unitId : targetConvoy.getAllUnits(false)) {
             try {
                 Unit unit = campaign.getUnit(unitId);
                 Entity entity = unit.getEntity();
@@ -1108,7 +1108,7 @@ public class Resupply {
         int convoySize = 0;
         int vtolCount = 0;
 
-        for (UUID unitId : targetConvoy.getUnits()) {
+        for (UUID unitId : targetConvoy.getAllUnits(false)) {
             try {
                 Unit unit = campaign.getUnit(unitId);
                 Entity entity = unit.getEntity();
@@ -1143,7 +1143,7 @@ public class Resupply {
             return false;
         }
 
-        for (UUID unitId : targetConvoy.getUnits()) {
+        for (UUID unitId : targetConvoy.getAllUnits(false)) {
             try {
                 Unit unit = campaign.getUnit(unitId);
                 Entity entity = unit.getEntity();
@@ -2036,7 +2036,7 @@ public class Resupply {
             double cargoCapacitySubTotal = 0;
             if (force.isConvoyForce()) {
                 boolean hasCargo = false;
-                for (UUID unitId : force.getUnits()) {
+                for (UUID unitId : force.getAllUnits(false)) {
                     try {
                         Unit unit = campaign.getUnit(unitId);
                         Entity entity = unit.getEntity();
@@ -2271,9 +2271,9 @@ public class Resupply {
         double totalCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (force.isConvoyForce()) {
+            if (force.isConvoyForce() && force.isStrategicFormation()) {
                 boolean hasCargo = false;
-                for (UUID unitId : force.getUnits()) {
+                for (UUID unitId : force.getAllUnits(false)) {
                     Unit unit = campaign.getUnit(unitId);
 
                     if (unit != null) {

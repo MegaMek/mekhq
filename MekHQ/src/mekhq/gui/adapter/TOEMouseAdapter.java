@@ -438,7 +438,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             final boolean subforces = command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUSES);
             for (final Force force : forces) {
                 force.setCombatForce(combatForce, subforces);
-                force.setConvoyForce(!combatForce, subforces);
+                force.setConvoyForce(!combatForce);
             }
             gui.getTOETab().refreshForceView();
         } else if (command.contains(TOEMouseAdapter.CHANGE_CONVOY_STATUS)) {
@@ -448,7 +448,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             final boolean convoyForce = !singleForce.isConvoyForce();
             for (final Force force : forces) {
-                force.setConvoyForce(convoyForce, true);
+                force.setConvoyForce(convoyForce);
             }
             gui.getTOETab().refreshForceView();
 
@@ -1070,7 +1070,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
 
                 if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
-                    menuItem = new JMenuItem(!force.isConvoyForce() ? "Make Force and Subforces Resupply Convoys" : "Remove Resupply Convoy Status from Force and Subforces");
+                    menuItem = new JMenuItem(!force.isConvoyForce() ? "Mark force as a Resupply Convoy" : "Remove Resupply Convoy Designation");
                     menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CONVOY_STATUS + forceIds);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
