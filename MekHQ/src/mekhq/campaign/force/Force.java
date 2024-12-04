@@ -192,9 +192,7 @@ public class Force {
     public void setConvoyForce(boolean convoyForce, boolean setForSubForces) {
         this.convoyForce = convoyForce;
         if (setForSubForces) {
-            for (Force force : subForces) {
-                force.setConvoyForce(convoyForce, true);
-            }
+            subForces.forEach(force -> force.setConvoyForce(convoyForce, true));
         }
     }
 
