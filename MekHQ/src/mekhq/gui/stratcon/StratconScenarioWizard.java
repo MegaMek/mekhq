@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.*;
 
 import static java.lang.Math.min;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
@@ -141,6 +142,16 @@ public class StratconScenarioWizard extends JDialog {
         validate();
     }
 
+    /**
+     * Returns a concatenated string of a unit's force hierarchy, in reversed order,
+     * starting from the highest parent Force going down to the given unit's direct Force.
+     * <p>
+     * If the unit does not belong to any Force, an empty string is returned.
+     *
+     * @param unit The Unit whose Force hierarchy names are to be returned.
+     * @return A concatenated string of Force names in reversed order separated by a slash,
+     *         or an empty string if the unit is not assigned to any Force.
+     */
     private String getForceNameReversed(Unit unit) {
         List<String> forceNames = new ArrayList<>();
 
@@ -555,6 +566,8 @@ public class StratconScenarioWizard extends JDialog {
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
             setVisible(false);
         }
+
+        translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
 
         this.getParent().repaint();
     }
