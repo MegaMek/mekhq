@@ -3856,8 +3856,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Processes an abandoned convoy. The player is presented with a defeat dialog,
-     * and if they have independent command rights, it checks each player template force in the scenario
-     * for being a convoy force. If it is a convoy force, its units are treated as abandoned units.
+     * and checks each player template force in the scenario for being a convoy force. If it is a
+     * convoy force, its units are treated as abandoned units.
      * Each crew member of these units is set as either KIA or POW based on a die roll.
      * It finally removes each unit from the campaign.
      *
@@ -3867,30 +3867,42 @@ public class Campaign implements ITechManager {
     private void processAbandonedConvoy(AtBContract contract, AtBDynamicScenario scenario) {
         convoyFinalMessageDialog(this, contract.getEmployerFaction());
 
-        if (contract.getCommandRights().isIndependent()) {
-            for (Integer forceId : scenario.getPlayerTemplateForceIDs()) {
+        for (Integer forceId : scenario.getPlayerTemplateForceIDs()) {
+            try {
                 Force force = getForce(forceId);
 
-                if (force != null && force.isConvoyForce()) {
-                    for (UUID unitID : new ArrayList<>(force.getUnits())) {
+                if (force.isConvoyForce()) {
+                    for (UUID unitID : force.getAllUnits(false)) {
                         Unit unit = getUnit(unitID);
-                        if (unit != null) {
-                            List<Person> crew = new ArrayList<>(unit.getCrew());
-                            for (Person crewMember : crew) {
-                                PersonnelStatus status = KIA;
-                                // We're using the CamOps rules for infantry survival here and
-                                // assuming anyone who isn't dead has been captured.
-                                if (Compute.d6(2) > 7) {
-                                    status = PersonnelStatus.POW;
-                                }
-                                crewMember.changeStatus(this, currentDay, status);
-                            }
+
+                        for (Person crewMember : unit.getCrew()) {
+                            decideCrewMemberFate(crewMember);
                         }
+
                         removeUnit(unitID);
                     }
                 }
+            } catch (Exception ex) {
+                logger.warn(ex.getMessage(), ex);
             }
         }
+    }
+
+    /**
+     * Determines the fate of a given crew member based on a random roll and updates their status
+     * accordingly.
+     * <p>
+     * We're using the CamOps rules for infantry survival here and assuming anyone who isn't dead
+     * has been captured.
+     *
+     * @param person The crew member whose fate will be decided
+     */
+    private void decideCrewMemberFate(Person person) {
+        PersonnelStatus status = KIA;
+        if (Compute.d6(2) > 7) {
+            status = PersonnelStatus.POW;
+        }
+        person.changeStatus(this, currentDay, status);
     }
 
     /**
