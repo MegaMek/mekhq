@@ -1582,9 +1582,8 @@ public class StratconRulesManager {
                     continue;
                 }
 
-                modifier.setAdditionalBriefingText(
-                        "(from " + facility.getDisplayableName() + ") " +
-                                modifier.getAdditionalBriefingText());
+                modifier.setAdditionalBriefingText('(' + facility.getDisplayableName() + ") "
+                    + modifier.getAdditionalBriefingText());
                 scenario.getBackingScenario().addScenarioModifier(modifier);
             }
         }
