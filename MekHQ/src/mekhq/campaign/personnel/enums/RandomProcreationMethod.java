@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
