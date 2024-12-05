@@ -29,7 +29,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.unit.Unit;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Hires a full complement of personnel for a unit.
@@ -155,7 +155,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
                 && unit.getEntity().getWeaponList().stream()
                         .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
                                 && (((WeaponType) weapon.getType()).getDamage() == WeaponType.DAMAGE_ARTILLERY))) {
-            final List<Person> gunners = unit.getGunners();
+            final Set<Person> gunners = unit.getGunners();
             if (!gunners.isEmpty() && gunners.stream().noneMatch(person -> person.getSkills().hasSkill(SkillType.S_ARTILLERY))) {
                 new DefaultSkillGenerator(campaign.getRandomSkillPreferences()).generateArtillerySkill(ObjectUtility.getRandomItem(gunners));
             }
