@@ -52,7 +52,13 @@ public class TheatreOfWarAwards {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();
 
-        String employer = ((Contract) mission).getEmployer();
+        // if the mission isn't an instance of 'AtBContract' we won't have the information we need,
+        // so abort processing.
+        if (!(mission instanceof AtBContract)) {
+            return AutoAwardsController.prepareAwardData(person, eligibleAwards);
+        }
+
+        String employer = ((AtBContract) mission).getEmployerCode();
 
         int contractStartYear = ((Contract) mission).getStartDate().getYear();
         int currentYear = campaign.getGameYear();
@@ -103,10 +109,10 @@ public class TheatreOfWarAwards {
                 }
 
                 if (belligerents.size() == 1) {
-                    if (!processFaction(belligerents.get(0), employer)) {
+                    if (!processFaction(employer, belligerents.get(0))) {
                         continue;
                     }
-                } else if ((campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+                } else if (campaign.getCampaignOptions().isUseAtB()) {
                     String enemy = ((AtBContract) mission).getEnemyCode();
 
                     if (hasLoyalty(employer, attackers)) {

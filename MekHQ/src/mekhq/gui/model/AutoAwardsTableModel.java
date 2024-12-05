@@ -61,11 +61,11 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         if (map.isEmpty()) {
             logger.error("AutoAwardsDialog failed to pass 'data' into AutoAwardsTableModel");
         } else {
-            logger.info("AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
+            logger.debug("AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
         }
 
         data = map;
-        logger.info("Translated data: {}", data);
+        logger.debug("Translated data: {}", data);
     }
 
     @Override
