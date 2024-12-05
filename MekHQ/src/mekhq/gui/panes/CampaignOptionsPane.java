@@ -2510,8 +2510,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         Set<String> spaNames = SpecialAbility.getSpecialAbilities().keySet();
         // We need to create a temporary hash of special abilities that we can modify
-        // without
-        // changing the underlying one in case the user cancels the changes
+        // without changing the underlying one in case the user cancels the changes
         tempSPA = new Hashtable<>();
         for (final String name : spaNames) {
             getCurrentSPA().put(name, SpecialAbility.getAbility(name).clone());

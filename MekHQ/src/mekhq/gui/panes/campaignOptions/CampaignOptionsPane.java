@@ -3,6 +3,7 @@ package mekhq.gui.panes.campaignOptions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
+import mekhq.gui.panes.campaignOptions.AbilitiesTab.AbilityCategory;
 
 import javax.swing.*;
 import java.util.Map;
@@ -155,6 +156,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Experience + Skill Randomization
         AdvancementTab advancementTab = new AdvancementTab(getFrame(), "advancementTab");
         SkillsTab skillsTab = new SkillsTab(getFrame(), "skillsTab");
+        AbilitiesTab abilitiesTab = new AbilitiesTab(getFrame(), "abilitiesTab");
 
         JTabbedPane awardsAndRandomizationContentTabs = createSubTabs(Map.of(
             "xpAwardsTab", advancementTab.xpAwardsTab(),
@@ -164,11 +166,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "combatSkillsTab", skillsTab.createSkillsTab(true),
             "supportSkillsTab", skillsTab.createSkillsTab(false)));
 
+        JTabbedPane abilityContentTabs = createSubTabs(Map.of(
+            "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITIES),
+            "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITIES),
+            "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITIES)));
+
         // Add Tabs
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("awardsAndRandomizationContentTabs.title")), awardsAndRandomizationContentTabs);
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("skillsContentTabs.title")), skillsContentTabs);
+        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("abilityContentTabs.title")), abilityContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("advancementParentTab.title")), advancementParentTab);

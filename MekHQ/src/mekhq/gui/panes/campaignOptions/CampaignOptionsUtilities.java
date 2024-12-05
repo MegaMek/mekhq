@@ -356,7 +356,7 @@ public class CampaignOptionsUtilities {
 
             JLabel lblBody = new JLabel();
             if (includeBodyText) {
-                lblBody = new JLabel(String.format("<html><i><div style='width: %s; text-align:justify;'>%s</div></i></html>",
+                lblBody = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'><i>%s</i></div></html>",
                     UIUtil.scaleForGUI(750),
                     resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
                 lblBody.setName("lbl" + name + "Body");
@@ -543,7 +543,7 @@ public class CampaignOptionsUtilities {
      *                      of the tooltip, or {@code null} if no custom wrap size is specified
      * @return the maximum number of characters on each line of a tooltip
      */
-    private static int processWrapSize(@Nullable Integer customWrapSize) {
+    static int processWrapSize(@Nullable Integer customWrapSize) {
         return customWrapSize == null ? 100 : customWrapSize;
     }
 }
