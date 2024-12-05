@@ -167,54 +167,53 @@ public class StratconScenario implements IStratconDisplayable {
 
     @Override
     public String getInfo() {
-        return getInfo(null, true);
+        return getInfo(null);
     }
 
-    public String getInfo(@Nullable Campaign campaign, boolean html) {
+    public String getInfo(@Nullable Campaign campaign) {
         StringBuilder stateBuilder = new StringBuilder();
 
         if (isStrategicObjective()) {
-            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>Contract objective located</span>")
-                    .append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                .append("'>Contract objective located</span><br/>");
         }
 
-        stateBuilder.append("Scenario: ")
+        stateBuilder.append("<b>Scenario:</b> ")
             .append(backingScenario.getName())
-            .append(html ? "<br/>" : "");
+            .append("<br/>");
 
         if (backingScenario.getTemplate() != null) {
-            stateBuilder.append(backingScenario.getTemplate().shortBriefing)
-                .append(html ? "<br/>" : "");
+            stateBuilder.append("<i>").append(backingScenario.getTemplate().shortBriefing).append("</i>")
+                .append("<br/>");
         }
 
         if (isRequiredScenario()) {
-            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>Deployment required by contract</span>")
-                    .append(html ? "<br/>" : "").append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>-1 VP if lost/ignored; +1 VP if won</span>")
-                    .append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                .append("'>-1 VP if lost/ignored; +1 VP if won</span><br/>");
         }
 
-        stateBuilder.append("Status: ")
+        stateBuilder.append("<b>Status:</b> ")
             .append(currentState.getScenarioStateName())
             .append("<br/>");
 
-        stateBuilder.append("Terrain: ")
+        stateBuilder.append("<b>Terrain:</b> ")
                 .append(backingScenario.getMap())
                 .append("<br/>");
 
         if (deploymentDate != null) {
-            stateBuilder.append("Deployment Date: ")
+            stateBuilder.append("<b>Deployment Date:</b> ")
                 .append(deploymentDate)
                 .append("<br/>");
         }
 
         if (actionDate != null) {
-            stateBuilder.append("Battle Date: ")
+            stateBuilder.append("<b>Battle Date:</b> ")
                 .append(actionDate)
                 .append("<br/>");
         }
 
         if (returnDate != null) {
-            stateBuilder.append("Return Date: ")
+            stateBuilder.append("<b>Return Date:</b> ")
                 .append(returnDate)
                 .append("<br/>");
         }
@@ -223,9 +222,9 @@ public class StratconScenario implements IStratconDisplayable {
             AtBDynamicScenario backingScenario = getBackingScenario();
 
             if (backingScenario != null) {
-                stateBuilder.append(String.format("Hostile BV: %d<br>",
+                stateBuilder.append(String.format("<b>Hostile BV:</b> %d<br>",
                     backingScenario.getTeamTotalBattleValue(campaign, false)));
-                stateBuilder.append(String.format("Allied BV: %d",
+                stateBuilder.append(String.format("<b>Allied BV:</b> %d",
                     backingScenario.getTeamTotalBattleValue(campaign, true)));
             }
         }
