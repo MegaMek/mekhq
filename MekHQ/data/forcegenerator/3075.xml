@@ -9557,7 +9557,7 @@
 			</model>
 		</chassis>
 		<chassis name='Leopard' unitType='Dropship'>
-			<availability>MOC:8CC:7,HL:7,FRR:7,IS:8,Periphery.Deep:7,WOB:4,FS:7,BAN:2,Periphery:8,CS:4,LA:7,FWL:7,NIOPS:4,DC:7</availability>
+			<availability>MOC:8,CC:7,HL:7,FRR:7,IS:8,Periphery.Deep:7,WOB:4,FS:7,BAN:2,Periphery:8,CS:4,LA:7,FWL:7,NIOPS:4,DC:7</availability>
 			<model name='&apos;Pocket Warship&apos;'>
 				<availability>FWL:3,WOB:6</availability>
 			</model>
@@ -10639,7 +10639,7 @@
 			</model>
 		</chassis>
 		<chassis name='Maxim Heavy Hover Transport' unitType='Tank'>
-			<availability>CC:2FRR:4,CLAN:2,IS:2,Periphery.Deep:5,WOB:2-,MERC:2,FS:1,CIR:3,Periphery:2,CS:2-,LA:4,NIOPS:2-</availability>
+			<availability>CC:2,FRR:4,CLAN:2,IS:2,Periphery.Deep:5,WOB:2-,MERC:2,FS:1,CIR:3,Periphery:2,CS:2-,LA:4,NIOPS:2-</availability>
 			<model name=''>
 				<roles>apc</roles>
 				<availability>HL:2-,IS:4-,Periphery.Deep:8,Periphery:4-</availability>

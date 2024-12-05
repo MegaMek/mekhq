@@ -22,13 +22,17 @@ import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.force.StrategicFormation;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
@@ -38,6 +42,11 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.*;
+
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.PlanetOwner;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
@@ -85,6 +94,9 @@ public class AtBDynamicScenario extends AtBScenario {
     private transient Map<Integer, ScenarioForceTemplate> playerForceTemplates;
     private transient Map<UUID, ScenarioForceTemplate> playerUnitTemplates;
     private transient List<AtBScenarioModifier> scenarioModifiers;
+
+    private static final MMLogger logger = MMLogger.create(AtBDynamicScenario.class);
+
 
     public AtBDynamicScenario() {
         super();
@@ -593,5 +605,65 @@ public class AtBDynamicScenario extends AtBScenario {
     @Override
     public String getBattlefieldControlDescription() {
         return "";
+    }
+
+    /**
+     * Returns the total battle value (BV) either for allied forces or opposing forces in
+     * a given contract campaign, as per the parameter {@code isAllied}.
+     * <p>
+     * If {@code isAllied} is {@code true}, the method calculates the total BV for the allied
+     * forces inclusive of player forces. If {@code isAllied} is {@code false}, the total BV for
+     * opposing forces is calculated.
+     * <p>
+     * The calculation is done based on Bot forces attributed to each side. In the case of
+     * PlanetOwner, the alignment of the owner faction is considered to determine the ownership of
+     * Bot forces.
+     *
+     * @param campaign  The campaign in which the forces are participating.
+     * @param isAllied  A boolean value indicating whether to calculate the total BV for
+     *                  allied forces (if true) or opposing forces (if false).
+     * @return          The total battle value (BV) either for the allied forces or
+     *                  opposing forces, as specified by the parameter isAllied.
+     */
+    public int getTeamTotalBattleValue(Campaign campaign, boolean isAllied) {
+        AtBContract contract = getContract(campaign);
+        int totalBattleValue = 0;
+
+        for (BotForce botForce : getBotForces()) {
+            int battleValue = botForce.getTotalBV(campaign);
+
+            int team = botForce.getTeam();
+
+            if (team == PlanetOwner.ordinal()) {
+                String planetOwnerFaction = getPlanetOwnerFaction(contract, campaign.getLocalDate());
+                ForceAlignment forceAlignment = getPlanetOwnerAlignment(contract, planetOwnerFaction, campaign.getLocalDate());
+                team = forceAlignment.ordinal();
+            }
+
+            if (team <= Allied.ordinal()) {
+                if (isAllied) {
+                    totalBattleValue += battleValue;
+                }
+            } else if (!isAllied) {
+                totalBattleValue += battleValue;
+            }
+        }
+
+        if (isAllied) {
+            Force playerForces = this.getForces(campaign);
+
+            for (UUID unitID : playerForces.getAllUnits(false)) {
+                try {
+                    Unit unit = campaign.getUnit(unitID);
+                    Entity entity = unit.getEntity();
+
+                    totalBattleValue += entity.calculateBattleValue();
+                } catch (Exception ex) {
+                    logger.warn(ex.getMessage(), ex);
+                }
+            }
+        }
+
+        return totalBattleValue;
     }
 }
