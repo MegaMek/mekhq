@@ -35,7 +35,6 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.equipment.ArmorType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.weapons.InfantryAttack;
@@ -102,12 +101,17 @@ public class Refit extends Part implements IAcquisitionWork {
 
     private List<Part> oldUnitParts;
     private List<Part> newUnitParts;
+    private List<Part> purchaseParts;
+    private List<Part> ownedParts;
     private List<Part> neededList;
     private List<Part> returnsList;
     private List<Part> oldIntegratedHeatSinks;
     private Set<Part> largeCraftBinsToChange;
 
     private List<RefitStep> stepsList;
+
+    private String oldName;
+    private String newName;
 
     private int armorNeeded;
     private Armor newArmorSupplies;
@@ -121,6 +125,8 @@ public class Refit extends Part implements IAcquisitionWork {
     public Refit() {
         oldUnitParts = new ArrayList<Part>();
         newUnitParts = new ArrayList<Part>();
+        purchaseParts = new ArrayList<Part>();
+        ownedParts = new ArrayList<Part>();
         neededList = new ArrayList<Part>();
         returnsList = new ArrayList<Part>();
         stepsList = new ArrayList<RefitStep>();
@@ -165,6 +171,13 @@ public class Refit extends Part implements IAcquisitionWork {
         figureRefitTime();
 
         optimizeShoppingLists();
+        
+        if(!customJob) {
+            makeRefitKit();
+        }
+        
+        calculateCost();
+
         if (customJob) {
             suggestNewName();
         }
@@ -253,6 +266,9 @@ public class Refit extends Part implements IAcquisitionWork {
     public void analyze() {
         Unit newUnit = new Unit(newEntity, getCampaign());
         newUnit.initializeParts(false);
+
+        oldName = oldUnit.getName();
+        newName = newUnit.getName();
 
         // Lists of parts to go through. The goal is to remove everything from both lists.
         List<Part> oldParts = new ArrayList<Part>(oldUnit.getParts());
@@ -1018,6 +1034,8 @@ public class Refit extends Part implements IAcquisitionWork {
 
 
 
+    // region optimizeShoppingList
+
     /**
      * When this is finished, it wil collapse needed and returned parts into single items of varying
      * quantity, and account for the reuse of parts in add/remove steps if needed.
@@ -1176,9 +1194,22 @@ public class Refit extends Part implements IAcquisitionWork {
         returnsList.addAll(armorReturns.values());
         returnsList.addAll(ammoReturns.values());
         returnsList.addAll(partReturns.values());
-
     }
 
+    public void makeRefitKit() {
+        RefitKit kit = new RefitKit(oldName, newName, campaign);
+        for (Part part : neededList) {
+            kit.addPart(part);
+        }
+        neededList = List.of(kit);
+    }
+
+    public void calculateCost() {
+        cost = Money.of(0);
+        for (Part part : neededList) {
+            cost = cost.plus(part.getActualValue());
+        }
+    }
 
 
     /**
@@ -1229,32 +1260,6 @@ public class Refit extends Part implements IAcquisitionWork {
     }
     
 
-    // -----------------------------------------  =======================================
-    // region ---- -----OLD STUFF
-
-    private void calculateRefurbishment() {
-        // Refurbishment rules (class, time, and cost) are found in SO p189.
-        // FIXME: WeaverThree - This should be its own code path rather than an appendix to the other
-        // refitClass = CLASS_E;
-
-        if (newEntity instanceof Warship || newEntity instanceof SpaceStation) {
-            time = WORKMONTH * 3;
-        } else if (newEntity instanceof Dropship || newEntity instanceof Jumpship) {
-            time = WORKMONTH;
-        } else if (newEntity instanceof Mek || newEntity instanceof Aero) { 
-            // ConvFighter and SmallCraft are derived from Aero
-            time = WORKWEEK * 2; 
-        } else if (newEntity instanceof BattleArmor || newEntity instanceof Tank || newEntity instanceof ProtoMek) {
-            time = WORKWEEK; 
-        } else {
-            time = WORKWEEK * 2; // Default to same as Mek
-            logger.error("Unit " + newEntity.getModel() + " did not set its time correctly.");
-        }
-
-        // The cost is equal to 10 percent of the units base value (not modified for
-        // quality). (SO p189)
-        cost = oldUnit.getBuyCost().multipliedBy(0.1);
-    }
 
     /**
      * Begins the refit after it's been calculated and configured.
@@ -1538,6 +1543,35 @@ public class Refit extends Part implements IAcquisitionWork {
             return false;
         });
     }
+
+    // -----------------------------------------  =======================================
+    // region ---- -----OLD STUFF
+
+    private void calculateRefurbishment() {
+        // Refurbishment rules (class, time, and cost) are found in SO p189.
+        // FIXME: WeaverThree - This should be its own code path rather than an appendix to the other
+        // refitClass = CLASS_E;
+
+        if (newEntity instanceof Warship || newEntity instanceof SpaceStation) {
+            time = WORKMONTH * 3;
+        } else if (newEntity instanceof Dropship || newEntity instanceof Jumpship) {
+            time = WORKMONTH;
+        } else if (newEntity instanceof Mek || newEntity instanceof Aero) { 
+            // ConvFighter and SmallCraft are derived from Aero
+            time = WORKWEEK * 2; 
+        } else if (newEntity instanceof BattleArmor || newEntity instanceof Tank || newEntity instanceof ProtoMek) {
+            time = WORKWEEK; 
+        } else {
+            time = WORKWEEK * 2; // Default to same as Mek
+            logger.error("Unit " + newEntity.getModel() + " did not set its time correctly.");
+        }
+
+        // The cost is equal to 10 percent of the units base value (not modified for
+        // quality). (SO p189)
+        cost = oldUnit.getBuyCost().multipliedBy(0.1);
+    }
+
+
 
     
     /**
