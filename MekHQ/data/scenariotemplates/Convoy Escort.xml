@@ -81,7 +81,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
+                <allowedUnitType>1</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
@@ -110,8 +110,8 @@
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>CIVILIAN</forceRole>
-                    <forceRole>CARGO</forceRole>
                     <forceRole>SUPPORT</forceRole>
+                    <forceRole>CARGO</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
             </value>
