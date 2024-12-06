@@ -1722,8 +1722,8 @@ public class Resupply {
             return;
         }
 
-        if (!isIndependent && usePlayerConvoy) {
-            targetCargoTonnage = targetCargoTonnage * 2;
+        if (usePlayerConvoy) {
+            targetCargoTonnage = targetCargoTonnage * CARGO_MULTIPLIER;
         }
 
         if (!isLoot) {
