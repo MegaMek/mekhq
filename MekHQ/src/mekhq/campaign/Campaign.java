@@ -72,6 +72,7 @@ import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -144,13 +145,15 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.convoyFinalMessageDialog;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 /**
  * The main campaign class, keeps track of teams and units
  *
@@ -3787,6 +3790,10 @@ public class Campaign implements ITechManager {
                         if (stub) {
                             scenario.convertToStub(this, ScenarioStatus.DEFEAT);
                             addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
+
+                            if (scenario.getStratConScenarioType().isResupply()) {
+                                processAbandonedConvoy(contract, (AtBDynamicScenario) scenario);
+                            }
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
@@ -3848,6 +3855,57 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Processes an abandoned convoy. The player is presented with a defeat dialog,
+     * and checks each player template force in the scenario for being a convoy force. If it is a
+     * convoy force, its units are treated as abandoned units.
+     * Each crew member of these units is set as either KIA or POW based on a die roll.
+     * It finally removes each unit from the campaign.
+     *
+     * @param contract The current {@link AtBContract}.
+     * @param scenario The relevant {@link AtBDynamicScenario}.
+     */
+    private void processAbandonedConvoy(AtBContract contract, AtBDynamicScenario scenario) {
+        convoyFinalMessageDialog(this, contract.getEmployerFaction());
+
+        for (Integer forceId : scenario.getPlayerTemplateForceIDs()) {
+            try {
+                Force force = getForce(forceId);
+
+                if (force.isConvoyForce()) {
+                    for (UUID unitID : force.getAllUnits(false)) {
+                        Unit unit = getUnit(unitID);
+
+                        for (Person crewMember : unit.getCrew()) {
+                            decideCrewMemberFate(crewMember);
+                        }
+
+                        removeUnit(unitID);
+                    }
+                }
+            } catch (Exception ex) {
+                logger.warn(ex.getMessage(), ex);
+            }
+        }
+    }
+
+    /**
+     * Determines the fate of a given crew member based on a random roll and updates their status
+     * accordingly.
+     * <p>
+     * We're using the CamOps rules for infantry survival here and assuming anyone who isn't dead
+     * has been captured.
+     *
+     * @param person The crew member whose fate will be decided
+     */
+    private void decideCrewMemberFate(Person person) {
+        PersonnelStatus status = KIA;
+        if (Compute.d6(2) > 7) {
+            status = PersonnelStatus.POW;
+        }
+        person.changeStatus(this, currentDay, status);
+    }
+
+    /**
      * Processes the new day actions for various AtB systems
      * <p>
      * It generates contract offers in the contract market,
@@ -3905,6 +3963,11 @@ public class Campaign implements ITechManager {
 
                 if (!report.isBlank()) {
                     addReport(report);
+                }
+
+                // Resupply
+                if (getLocation().isOnPlanet() && getLocation().getCurrentSystem().equals(contract.getSystem())) {
+                    processResupply(contract);
                 }
             }
         }
@@ -4005,6 +4068,24 @@ public class Campaign implements ITechManager {
                     ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                     CLOSING_SPAN_TAG, contract.getName()));
             }
+        }
+    }
+
+    /**
+     * Processes the resupply operation for a given contract.
+     * <p>
+     * This method checks if the contract type is not Guerrilla Warfare or if a
+     * d6 roll is greater than 4. If any of these conditions is met, it calculates the maximum
+     * resupply size based on the contract's required lances, creates an instance of the
+     * {@link Resupply} class, and initiates a resupply action.
+     *
+     * @param contract The relevant {@link AtBContract}
+     */
+    private void processResupply(AtBContract contract) {
+        if (!contract.getContractType().isGuerrillaWarfare() || Compute.d6(1) > 4) {
+            int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
+            Resupply resupplies = new Resupply(this, contract);
+            resupplies.getResupply(dropCount, false);
         }
     }
 
@@ -6767,57 +6848,6 @@ public class Campaign implements ITechManager {
             return strategicFormations.get(unit.getForceId()).getContract(this);
         }
         return null;
-    }
-
-    /**
-     * AtB: count all available bonus parts
-     *
-     * @return the total <code>int</code> number of bonus parts for all active
-     *         contracts
-     */
-    public int totalBonusParts() {
-        int retVal = 0;
-        if (hasActiveContract()) {
-            for (Contract c : getActiveContracts()) {
-                if (c instanceof AtBContract) {
-                    retVal += ((AtBContract) c).getNumBonusParts();
-                }
-            }
-        }
-        return retVal;
-    }
-
-    public void spendBonusPart(IAcquisitionWork targetWork) {
-        // Can only spend from active contracts, so if there are none we can't spend a
-        // bonus part
-        if (!hasActiveContract()) {
-            return;
-        }
-
-        String report = targetWork.find(0);
-
-        if (report.endsWith("0 days.")) {
-            // First, try to spend from the contact the Acquisition's unit is attached to
-            AtBContract contract = getAttachedAtBContract(targetWork.getUnit());
-
-            if (contract == null) {
-                // Then, just the first free one that is active
-                for (Contract c : getActiveContracts()) {
-                    if (((AtBContract) c).getNumBonusParts() > 0) {
-                        contract = (AtBContract) c;
-                        break;
-                    }
-                }
-            }
-
-            if (contract == null) {
-                logger.error("AtB: used bonus part but no contract has bonus parts available.");
-            } else {
-                addReport(
-                        resources.getString("bonusPartLog.text") + ' ' + targetWork.getAcquisitionPart().getPartName());
-                contract.useBonusPart();
-            }
-        }
     }
 
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {

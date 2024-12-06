@@ -43,6 +43,7 @@ import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -477,10 +478,19 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // resolve bonus parts exchange
+        // exchange remaining support points to Resupplys
+        if (getCampaign().getCampaignOptions().isUseStratCon() && (mission instanceof AtBContract)) {
+            int remainingSupportPoints = ((AtBContract) mission).getStratconCampaignState().getSupportPoints();
+
+            if (remainingSupportPoints > 0) {
+                Resupply supplyDrops = new Resupply(getCampaign(), ((AtBContract) mission));
+                supplyDrops.getResupply(remainingSupportPoints, true, false,
+                    true);
+            }
+        }
+
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
-            bonusPartExchange((AtBContract) mission);
         }
 
         // prompt autoAwards ceremony
@@ -493,7 +503,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
         }
 
-        // prompt enemy prisoner ransom & freeing
+        // prompt enemy prisoner ransom and freeing
         // this should always be placed after autoAwards, so that prisoners are not
         // factored into autoAwards
         if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
@@ -620,37 +630,6 @@ public final class BriefingTab extends CampaignGuiTab {
         };
     }
 
-    /**
-     * Credits the campaign finances with additional funds based on campaign
-     * settings and remaining Bonus Parts.
-     *
-     * @param mission the mission just concluded
-     */
-    private void bonusPartExchange(AtBContract mission) {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale());
-
-        double bonusPartExchangeValue = getCampaign().getCampaignOptions().getBonusPartExchangeValue();
-
-        if (bonusPartExchangeValue != 0.0) {
-            int bonusPartMaxExchangeCount = getCampaign().getCampaignOptions().getBonusPartMaxExchangeCount();
-
-            int spareBonusParts = mission.getNumBonusParts();
-
-            if (bonusPartMaxExchangeCount != 0) {
-                spareBonusParts = Math.min(bonusPartMaxExchangeCount, spareBonusParts);
-            }
-
-            bonusPartExchangeValue *= spareBonusParts;
-
-            getCampaign().getFinances().credit(
-                    TransactionType.BONUS_EXCHANGE,
-                    getCampaign().getLocalDate(),
-                    Money.of(bonusPartExchangeValue),
-                    resourceMap.getString("spareBonusPartExchange.text"));
-        }
-    }
-
     private void deleteMission() {
         final Mission mission = comboMission.getSelectedItem();
         if (mission == null) {
@@ -727,7 +706,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
+        ResolveScenarioWizardDialog resolveDialog =
+            new ResolveScenarioWizardDialog(getCampaign(), getFrame(), true, tracker);
         resolveDialog.setVisible(true);
 
         if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {

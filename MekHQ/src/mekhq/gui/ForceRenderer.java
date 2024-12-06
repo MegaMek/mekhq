@@ -149,16 +149,15 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
 
-            String format;
-            if (force.isStrategicFormation()) {
-                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
-                    "<html><b><u>%s</u></b></html>" : "<html><b>%s</b></html>";
-            } else {
-                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
-                    "<html><u>%s</u></html>" : "%s";
-            }
+            String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
+                force.isStrategicFormation() ? "<b>" : "",
+                force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE ? "<u>" : "",
+                force.getName(),
+                force.isStrategicFormation() ? "</b>" : "",
+                force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE ? "</u>" : "",
+                force.isConvoyForce() ? " &#926;" : force.isCombatForce() ? "" : " &#8709;");
 
-            setText(String.format(format, force.getName()));
+            setText(formattedForceName);
         } else {
             logger.error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));

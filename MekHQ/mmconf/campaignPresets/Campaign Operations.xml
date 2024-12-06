@@ -528,8 +528,6 @@
 		<additionalStrategyDeployment>1</additionalStrategyDeployment>
 		<adjustPaymentForStrategy>false</adjustPaymentForStrategy>
 		<restrictPartsByMission>true</restrictPartsByMission>
-		<bonusPartExchangeValue>500000</bonusPartExchangeValue>
-		<bonusPartMaxExchangeCount>10</bonusPartMaxExchangeCount>
 		<limitLanceWeight>false</limitLanceWeight>
 		<limitLanceNumUnits>false</limitLanceNumUnits>
 		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,12 +21,15 @@ package mekhq.campaign.mission;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.stratcon.StratconRulesManager;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
@@ -201,22 +204,15 @@ public class ScenarioObjectiveProcessor {
     private boolean entityMeetsObjective(Entity entity, ScenarioObjective objective,
             Set<String> objectiveUnitIDs, boolean opponentHasBattlefieldControl) {
         if (objectiveUnitIDs.contains(entity.getExternalIdAsString())) {
-            switch (objective.getObjectiveCriterion()) {
-                case Destroy:
-                    return entityIsDestroyed(entity, opponentHasBattlefieldControl);
-                case ForceWithdraw:
-                    return entityIsForcedWithdrawal(entity);
-                case Capture:
-                    return entityIsCaptured(entity, !opponentHasBattlefieldControl);
-                case PreventReachMapEdge:
-                    return !entityHasReachedDestinationEdge(entity, objective);
-                case Preserve:
-                    return !entityIsDestroyed(entity, opponentHasBattlefieldControl);
-                case ReachMapEdge:
-                    return entityHasReachedDestinationEdge(entity, objective);
-                default:
-                    return false;
-            }
+            return switch (objective.getObjectiveCriterion()) {
+                case Destroy -> entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                case ForceWithdraw -> entityIsForcedWithdrawal(entity);
+                case Capture -> entityIsCaptured(entity, !opponentHasBattlefieldControl);
+                case PreventReachMapEdge -> !entityHasReachedDestinationEdge(entity, objective);
+                case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl);
+                case ReachMapEdge -> entityHasReachedDestinationEdge(entity, objective);
+                default -> false;
+            };
         }
 
         return false;
@@ -313,7 +309,7 @@ public class ScenarioObjectiveProcessor {
      * @param tracker The tracker from which to draw unit data
      * @param dryRun Whether we're actually applying the objectives or just generating a report.
      */
-    public String processObjective(ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
+    public String processObjective(Campaign campaign, ScenarioObjective objective, int qualifyingUnitCount, Boolean completionOverride,
             ResolveScenarioTracker tracker, boolean dryRun) {
         // if we've overridden the objective completion flag, great, otherwise, calculate it here
         boolean objectiveMet = completionOverride == null ? objectiveMet(objective, qualifyingUnitCount) : completionOverride;
@@ -331,7 +327,7 @@ public class ScenarioObjectiveProcessor {
         }
 
         for (ObjectiveEffect effect : objectiveEffects) {
-            sb.append(processObjectiveEffect(effect,
+            sb.append(processObjectiveEffect(campaign, effect,
                     effect.effectScaling == EffectScalingType.Inverted ? numUnitsFailedObjective : qualifyingUnitCount,
                     tracker, dryRun));
             sb.append("\n\t");
@@ -341,12 +337,21 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * Processes an individual objective effect.
-     * @param effect
-     * @param scaleFactor If it's scaled, how much to scale it by
-     * @param tracker
+     * This method processes individual objective effects based on their type.
+     *
+     * @param campaign The current campaign.
+     * @param effect The objective effect that needs to be processed.
+     * @param scaleFactor If the effect is not fixed, the scale factor for how much the effect will
+     *                   influence the outcome.
+     * @param tracker The {@link ResolveScenarioTracker} instance that tracks the resolution of the
+     *               scenario in the current campaign.
+     * @param dryRun If {@code true}, the function will not perform the actual updates on the
+     *              campaign and contract, but will return a {@link String} containing a description
+     *              of what will happen instead.
+     * @return A text description of what actions would be performed if it is a dry run. Empty string
+     * otherwise.
      */
-    private String processObjectiveEffect(ObjectiveEffect effect, int scaleFactor,
+    private String processObjectiveEffect(Campaign campaign, ObjectiveEffect effect, int scaleFactor,
                                           ResolveScenarioTracker tracker, boolean dryRun) {
         switch (effect.effectType) {
             case ScenarioVictory:
@@ -361,9 +366,7 @@ public class ScenarioObjectiveProcessor {
                 break;
             case ContractScoreUpdate:
                 // if atb contract, update contract score by how many units met criterion * scaling
-                if (tracker.getMission() instanceof AtBContract) {
-                    AtBContract contract = (AtBContract) tracker.getMission();
-
+                if (tracker.getMission() instanceof AtBContract contract) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int scoreEffect = effect.howMuch * effectMultiplier;
 
@@ -375,9 +378,7 @@ public class ScenarioObjectiveProcessor {
                 }
                 break;
             case SupportPointUpdate:
-                if (tracker.getMission() instanceof AtBContract) {
-                    AtBContract contract = (AtBContract) tracker.getMission();
-
+                if (tracker.getMission() instanceof AtBContract contract) {
                     if (contract.getStratconCampaignState() != null) {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;
@@ -410,16 +411,24 @@ public class ScenarioObjectiveProcessor {
             case BVBudgetUpdate:
                 break;
             case AtBBonus:
-                if (tracker.getMission() instanceof AtBContract) {
-                    AtBContract contract = (AtBContract) tracker.getMission();
-
+                if (tracker.getMission() instanceof AtBContract contract) {
                     int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                     int numBonuses = effect.howMuch * effectMultiplier;
                     if (dryRun) {
                         return String.format("%d AtB bonus rolls", numBonuses);
                     } else {
+                        int dropSize = 0;
                         for (int x = 0; x < numBonuses; x++) {
-                            contract.doBonusRoll(tracker.getCampaign());
+                            if (contract.doBonusRoll(tracker.getCampaign())) {
+                                dropSize++;
+                            }
+                        }
+
+                        if (dropSize > 0) {
+                            LogManager.getLogger().info("ScenarioObjectiveProcessor.java");
+                            campaign.addReport("Bonus: Captured Supplies");
+                            Resupply supplyDrops = new Resupply(campaign, contract);
+                            supplyDrops.getResupply(1, false, true);
                         }
                     }
                 }

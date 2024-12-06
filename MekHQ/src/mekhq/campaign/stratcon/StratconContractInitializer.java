@@ -224,6 +224,26 @@ public class StratconContractInitializer {
         // Determine starting Support Points
         campaign.negotiateAdditionalSupportPoints();
 
+        // Roll to see if a hidden cache is present
+        if (campaign.getLocalDate().isAfter(LocalDate.of(2900, 1, 1))) {
+//            if (Compute.randomInt(100) == 0) {
+//                ScenarioTemplate template = ScenarioTemplate.Deserialize(
+//                    "data/scenariotemplates/Chasing a Rumor.xml");
+//
+//                if (template != null) {
+//                    StratconScenario hiddenCache = addHiddenExternalScenario(campaign, contract,
+//                        null, template, false);
+//
+//                    if (hiddenCache != null) {
+//                        logger.info(String.format("A secret cache has been spawned for contract %s",
+//                            contract.getName()));
+//                    }
+//                } else {
+//                    logger.error("'Chasing a Rumor' scenario failed to deserialize");
+//                }
+//            }
+        }
+
         // now we're done
     }
 

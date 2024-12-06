@@ -532,8 +532,9 @@ public class MekHQ implements GameListener {
             tracker.setEvent(gve);
             tracker.processGame();
 
-            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
-                    tracker);
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(campaignGUI.getCampaign(), campaignGUI.getFrame(),
+                    true, tracker);
             resolveDialog.setVisible(true);
 
             if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {

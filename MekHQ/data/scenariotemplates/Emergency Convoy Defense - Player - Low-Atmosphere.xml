@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <name>Emergency Convoy Defense</name>
+    <stratConScenarioType>SPECIAL_RESUPPLY</stratConScenarioType>
+    <shortBriefing>Escort DropShip, defeat enemy forces.</shortBriefing>
+    <detailedBriefing>The convoy carrying your resupply has come under attack. Ensure the supplies do not fall into enemy hands by destroying 50% of enemy forces. Preserve 50% of your own forces to secure mission success.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
+    <mapParameters>
+        <allowedTerrainTypes />
+        <allowRotation>true</allowRotation>
+        <baseHeight>17</baseHeight>
+        <baseWidth>50</baseWidth>
+        <heightScalingIncrement>5</heightScalingIncrement>
+        <mapLocation>LowAtmosphere</mapLocation>
+        <useStandardAtBSizing>false</useStandardAtBSizing>
+        <widthScalingIncrement>5</widthScalingIncrement>
+    </mapParameters>
+    <scenarioForces>
+        <entry>
+            <key>Player</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-3</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Player</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>OpFor</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-3</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones />
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>2.0</forceMultiplier>
+                <forceName>OpFor</forceName>
+                <generationMethod>1</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>5</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+    </scenarioForces>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>OpFor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>3</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>3</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
+</ScenarioTemplate>
