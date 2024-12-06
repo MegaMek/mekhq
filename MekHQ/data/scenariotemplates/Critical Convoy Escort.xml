@@ -81,7 +81,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>1</allowedUnitType>
+                <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
