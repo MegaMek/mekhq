@@ -3113,88 +3113,104 @@ public class AtBDynamicScenarioFactory {
         List<Entity> generatedEntities = new ArrayList<>();
 
         // If the number of unit types and number of weight classes don't match,
-        // generate the lower
-        // of the two counts
-        int unitTypeSize = unitTypes.size();
-        if (unitTypeSize > weights.length()) {
+        // generate the lower of the two counts
+        int unitTypeSize = Math.min(unitTypes.size(), weights.length());
+
+        if (unitTypeSize != unitTypes.size()) {
             logger.error(
-                    String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.",
-                            unitTypes.size(),
-                            weights.length()));
-            unitTypeSize = weights.length();
+                String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.",
+                    unitTypes.size(),
+                    weights.length()));
         }
 
-        for (int i = 0; i < unitTypeSize; i++) {
-            Entity newEntity = getNewEntity(faction, skill, quality, unitTypes, weights, rolesByType,
-                campaign, i);
+        for (int unitIndex = 0; unitIndex < unitTypeSize; unitIndex++) {
+            logger.info("IMPORTANT: " + rolesByType);
+            Entity entity = getNewEntity(faction, skill, quality, unitTypes, weights, rolesByType, campaign, unitIndex);
 
-            if (newEntity == null) {
+            if (entity == null) {
                 logger.info(String.format("Failed to generate unit of type %s, weight %s. Beginning substitution.",
-                    getTypeName(unitTypes.get(i)),
-                    EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, i))));
+                    getTypeName(unitTypes.get(unitIndex)),
+                    EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, unitIndex))));
 
-                // If we've failed to get an entity, we start adjusting weight categories to see
-                // if we hit something valid.
-                // We start at lighter weights as, generally, they're less impactful than heavier units.
-                List<Integer> individualType = List.of(unitTypes.get(i));
-
-                Map<Integer, Collection<MissionRole>> individualRole = new HashMap<>();
-                individualRole.put(0, rolesByType.getOrDefault(unitTypes.get(i), List.of()));
-
-                List<String> weightClasses = List.of("UL", "L", "M", "H", "A");
-
-                for (String weight : weightClasses) {
-                    newEntity = getNewEntity(faction, skill, quality, individualType, weight, individualRole, campaign, 0);
-
-                    if (newEntity != null) {
-                        logger.info(String.format("Substitution successful (%s)",
-                            EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, i))));
-                        break;
-                    }
-                }
-
-                // If we still haven't got a valid entity, use hardcoded fallbacks.
-                if (newEntity == null) {
-                    logger.info("Substitution unsuccessful. Using hardcoded fallbacks");
-
-                    if (unitTypes.get(0) == DROPSHIP) {
-                        newEntity = getNewEntity(faction, skill, quality, List.of(DROPSHIP),
-                            weights, Map.of(DROPSHIP, List.of(CIVILIAN)),
-                            campaign, 0);
-
-                        if (newEntity != null) {
-                            logger.info("Substitution successful. Substituted with Civilian DropShip.");
-                        }
-                    } else {
-                        if (scenario.getBoardType() == T_GROUND && allowsTanks) {
-                            newEntity = getNewEntity(faction, skill, quality, List.of(TANK),
-                                weights, null, campaign, 0);
-
-                            if (newEntity != null) {
-                                logger.info("Substitution successful. Substituted with Tank.");
-                            }
-                        } else {
-                            newEntity = getNewEntity(faction, skill, quality, List.of(AEROSPACEFIGHTER),
-                                weights, null, campaign, 0);
-
-                            if (newEntity != null) {
-                                logger.info("Substitution successful. Substituted with Aerospace Fighter.");
-                            }
-                        }
-                    }
-
-                    if (newEntity == null) {
-                        logger.info("Substitution unsuccessful. Abandoning attempts to generate unit.");
-                    }
-                }
+                entity = performSubstitution(faction, skill, quality, unitTypes, weights, rolesByType, campaign, scenario, allowsTanks, unitIndex);
             }
 
-            if (newEntity != null) {
-                generatedEntities.add(newEntity);
+            if (entity != null) {
+                generatedEntities.add(entity);
+            } else {
+                logger.info("All substitution attempts failed, skipping unit.");
             }
         }
 
         return generatedEntities;
+    }
+
+    private static Entity performSubstitution(String faction, SkillLevel skill, int quality,
+                                              List<Integer> unitTypes, String weights,
+                                              Map<Integer, Collection<MissionRole>> rolesByType,
+                                              Campaign campaign, AtBScenario scenario,
+                                              boolean allowsTanks, int unitIndex) {
+        Entity newEntity;
+        // If we've failed to get an entity, we start adjusting weight categories to see
+        // if we hit something valid.
+        // We start at lighter weights as, generally, they're less impactful than heavier units.
+        List<Integer> individualType = List.of(unitTypes.get(unitIndex));
+
+        Map<Integer, Collection<MissionRole>> individualRole = new HashMap<>();
+        individualRole.put(0, rolesByType.getOrDefault(unitTypes.get(unitIndex), List.of()));
+
+        List<String> weightClasses = List.of("UL", "L", "M", "H", "A");
+
+        for (String weight : weightClasses) {
+            newEntity = getNewEntity(faction, skill, quality, individualType, weight,
+                individualRole, campaign, unitIndex);
+
+            if (newEntity != null) {
+                logger.info(String.format("Substitution successful (%s)",
+                    EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, unitIndex))));
+                return newEntity;
+            }
+        }
+
+        // If we still haven't got a valid entity, we default to hardcoded fallbacks.
+        logger.info("Substitution unsuccessful. Using hardcoded fallbacks");
+
+        if (unitTypes.get(0) == DROPSHIP) {
+            newEntity = getNewEntity(faction, skill, quality, List.of(DROPSHIP), weights,
+                Map.of(DROPSHIP, List.of(CIVILIAN)), campaign, 0);
+
+            if (newEntity != null) {
+                logger.info("Substitution successful. Substituted with Civilian DropShip.");
+                return newEntity;
+            }
+        } else {
+            if (scenario.getBoardType() == T_GROUND) {
+                if (allowsTanks) {
+                    newEntity = getNewEntity(faction, skill, quality, List.of(TANK), weights,
+                        individualRole, campaign, 0);
+
+                    if (newEntity != null) {
+                        logger.info("Substitution successful. Substituted with Tank.");
+                        return newEntity;
+                    }
+                } else {
+                    logger.error("Generation does not allow tanks. Unable to use hardcoded fallback.");
+                }
+            } else {
+                newEntity = getNewEntity(faction, skill, quality, List.of(AEROSPACEFIGHTER),
+                    weights, individualRole, campaign, 0);
+
+                if (newEntity != null) {
+                    logger.info("Substitution successful. Substituted with Aerospace Fighter.");
+                    return newEntity;
+                }
+            }
+        }
+
+        // Substitution has failed, try again with relaxed roles
+        individualRole.put(0, List.of());
+        return performSubstitution(faction, skill, quality, unitTypes, weights, individualRole,
+            campaign, scenario, allowsTanks, unitIndex);
     }
 
     /**
@@ -3207,7 +3223,7 @@ public class AtBDynamicScenarioFactory {
      * @param weights       the unit weights string
      * @param rolesByType   the mapping of unit types to mission roles
      * @param campaign      the campaign associated with the entity
-     * @param i             the index of the unit type in the unitTypes list
+     * @param unitIndex             the index of the unit type in the unitTypes list
      *
      * @return a new instance of Entity with the specified parameters
      */
