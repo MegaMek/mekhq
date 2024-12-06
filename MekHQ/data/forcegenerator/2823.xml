@@ -2401,7 +2401,7 @@
 			</model>
 		</chassis>
 		<chassis name='J. Edgar Light Hover Tank' unitType='Tank'>
-			<availability>CC:4IS:5,Periphery.Deep:5,FS:4,Periphery:5,TC:7,CS:4-,FWL:4,NIOPS:4-,DC:7</availability>
+			<availability>CC:4,IS:5,Periphery.Deep:5,FS:4,Periphery:5,TC:7,CS:4-,FWL:4,NIOPS:4-,DC:7</availability>
 			<model name=''>
 				<availability>General:8,Periphery.Deep:8,Periphery:8</availability>
 			</model>
