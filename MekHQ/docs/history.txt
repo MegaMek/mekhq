@@ -44,6 +44,17 @@ MEKHQ VERSION HISTORY:
 + PR #5266: Refactored Morale Calculations and Logging
 + PR #5268: Refactored Strategic Formations
 + Fix #5149: Better error message for null values in contract fields
++ Fix #5060: BriefingTab Fix
++ Fix #4733: Implemented Advanced StratCon Reinforcements
++ PR #5274: Improved Logging for Force Generation Process.
++ Fix #5114: Campaign now uses pickRandomCamouflage when initialized
++ PR #5280: Centralized Formation Size Logic & Adjusted Contract Required Lance Count
++ PR #5281: Refactored Leadership Unit Selection Logic
++ PR #5283: Adjusted Support Points Negotiation Logic
++ Fix #5285: Fixed SVArmor Price Calculation
++ Fix #5288: Added Recalculation of Scenario Objectives when Assigning Forces
++ Fix #5122 & #5084: Adjusted TO&E Menu Option Availability
+
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
