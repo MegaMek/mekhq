@@ -28,6 +28,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
@@ -80,7 +81,6 @@ public class Resupply {
     private final AtBContract contract;
     private final Faction employerFaction;
     private final Faction enemyFaction;
-    private final boolean adHocResupply;
     private final int currentYear;
     private final int employerTechCode;
     private final boolean employerIsClan;
@@ -98,7 +98,7 @@ public class Resupply {
     private int negotiatorSkill;
 
     private static final Money HIGH_VALUE_ITEM = Money.of(250000);
-    private static final int CARGO_MULTIPLIER = 4;
+    private static final int CARGO_MULTIPLIER = 2;
     private static final double INTERCEPTION_LOAD_INFLUENCE = 50;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
@@ -111,20 +111,16 @@ public class Resupply {
      *
      * @param campaign  The campaign this supply drop is part of.
      * @param contract  The relevant contract.
-     * @param adHocResupply  Whether to bypass the influence of the contract's Straight Support
-     *                      value. Usually because the resupply is from loot or from StratCon
-     *                      Support Points.
      */
-    public Resupply(Campaign campaign, AtBContract contract, boolean adHocResupply) {
+    public Resupply(Campaign campaign, AtBContract contract) {
         this.campaign = campaign;
         this.contract = contract;
-        this.adHocResupply = adHocResupply;
         random = new Random();
 
         employerFaction = contract.getEmployerFaction();
         enemyFaction = contract.getEnemy();
         usePlayerConvoy = contract.getCommandRights().isIndependent();
-        targetCargoTonnage = calculateTargetCargoTonnage(campaign, contract, adHocResupply);
+        targetCargoTonnage = calculateTargetCargoTonnage(campaign, contract);
 
         currentYear = campaign.getGameYear();
         employerIsClan = enemyFaction.isClan();
@@ -169,17 +165,18 @@ public class Resupply {
      * <p>
      * @return the total cargo tonnage that will be used as the target value for Resupplies
      */
-    private static double calculateTargetCargoTonnage(Campaign campaign, AtBContract contract,
-                                                      boolean adHocResupply) {
+    private static double calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
         double unitTonnage = 0;
         int unitCount = 0;
 
-        for (Force force : campaign.getAllForces()) {
-            if (!force.isCombatForce()) {
+        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
+            Force force = campaign.getForce(formation.getForceId());
+
+            if (force == null) {
                 continue;
             }
 
-            for (UUID unitId : force.getUnits()) {
+            for (UUID unitId : force.getAllUnits(true)) {
                 try {
                     Unit unit = campaign.getUnit(unitId);
 
@@ -198,15 +195,12 @@ public class Resupply {
             }
         }
 
-        double averageTonnage = (unitTonnage / unitCount) / 2;
+        final int CARGO_DIVIDER = 2;
+        double averageTonnage = (unitTonnage / unitCount) / CARGO_DIVIDER;
 
-        if (adHocResupply) {
-            averageTonnage *= Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-        }
+        double dropCount = (double) contract.getRequiredLances() / 3;
 
-        // We're wanting to round down to the nearest 5 tons.
-        int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-        return Math.floor(averageTonnage / 20.0) * 5.0 * dropCount;
+        return round(averageTonnage / 20.0 * 5.0 * dropCount);
     }
 
     /**
@@ -217,7 +211,7 @@ public class Resupply {
      * @return The estimated cargo requirements in tons as a formatted string, e.g., "50t".
      */
     public static String getEstimatedCargoRequirements(Campaign campaign, AtBContract contract) {
-        double baseCapacity = calculateTargetCargoTonnage(campaign, contract, false);
+        double baseCapacity = calculateTargetCargoTonnage(campaign, contract);
 
         return (baseCapacity * CARGO_MULTIPLIER) + "t";
     }
@@ -378,7 +372,7 @@ public class Resupply {
             // Smuggler deliveries are handled elsewhere
             } else if (!isSmuggler) {
                 if (isUsePlayerConvoy()) {
-                    while (!droppedItems.isEmpty() || !playerConvoys.isEmpty()) {
+                    while (!droppedItems.isEmpty() && !playerConvoys.isEmpty()) {
                         Force chosenConvoy = getRandomConvoy();
                         double cargoCapacity = getTotalCargoCapacity(chosenConvoy);
 
@@ -2056,11 +2050,11 @@ public class Resupply {
 
                         double individualCargo = unit.getCargoCapacity();
 
-                        if (!hasCargo && individualCargo > 0) {
+                        if (individualCargo > 0) {
                             hasCargo = true;
                         }
 
-                        cargoCapacitySubTotal = individualCargo;
+                        cargoCapacitySubTotal += individualCargo;
                     } catch (Exception ignored) {
                         // If we run into an exception, it's because we failed to get Unit or Entity.
                         // In either case, we just ignore that unit.
@@ -2114,7 +2108,7 @@ public class Resupply {
         }
 
         String message = String.format(messageResource, getCommanderTitle(campaign, false),
-            calculateTargetCargoTonnage(campaign, contract, adHocResupply) * CARGO_MULTIPLIER,
+            calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER,
             totalPlayerCargoCapacity, playerConvoys.size(), pluralizer, pluralizer);
 
         // Create a panel to display the icon and the message
