@@ -3119,14 +3119,6 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            entity = substituteEntity(faction, skill, quality, weights, rolesByType,
-                campaign, unitTypes, unitIndex, unitTypes);
-
-            if (entity != null) {
-                generatedEntities.add(entity);
-                continue;
-            }
-
             String role = null;
             Integer type = unitTypes.get(unitIndex);
             if (type != null) {
@@ -3142,6 +3134,14 @@ public class AtBDynamicScenarioFactory {
                 EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, unitIndex)),
                 role != null ? "roles (" + role + ')' : ""));
 
+            entity = substituteEntity(faction, skill, quality, weights, rolesByType,
+                campaign, unitTypes, unitIndex, unitTypes);
+
+            if (entity != null) {
+                generatedEntities.add(entity);
+                continue;
+            }
+
             // fallback unitType list container
             List<Integer> fallbackUnitType = unitTypes;
 
@@ -3151,24 +3151,27 @@ public class AtBDynamicScenarioFactory {
                 entity = substituteEntity(faction, skill, quality, weights, rolesByType,
                     campaign, unitTypes, unitIndex, fallbackUnitType);
             } else if (scenario.getBoardType() == T_GROUND) {
-                if (allowsTanks) {
-                    if (unitTypes.get(unitIndex) != TANK) {
-                        logger.info("Switching unit type to Tank");
-                        fallbackUnitType = List.of(TANK);
+                if (allowsTanks && unitTypes.get(unitIndex) != TANK) {
+                    logger.info("Switching unit type to Tank");
+                    fallbackUnitType = List.of(TANK);
 
-                        entity = substituteEntity(faction, skill, quality, weights, rolesByType,
-                            campaign, unitTypes, unitIndex, fallbackUnitType);
-                    }
+                    entity = substituteEntity(faction, skill, quality, weights, rolesByType,
+                        campaign, unitTypes, unitIndex, fallbackUnitType);
+                }
 
-                    // Abandon attempts to generate
-                    if (entity == null) {
-                        entity = substituteEntity(faction, skill, quality, weights, null,
-                            campaign, unitTypes, unitIndex, fallbackUnitType);
-                    }
-                } else {
-                    logger.info("Unable to generate Tank due to scenario limitations. Aborting" +
-                        " attempt.");
-                    continue;
+                if (unitTypes.get(unitIndex) != MEK) {
+                    logger.info("Switching unit type to Mek");
+                    fallbackUnitType = List.of(MEK);
+
+                    entity = substituteEntity(faction, skill, quality, weights, rolesByType,
+                        campaign, unitTypes, unitIndex, fallbackUnitType);
+                }
+
+                // Abandon attempts to generate by role
+                if (entity == null) {
+                    logger.info("Removing role requirements.");
+                    entity = substituteEntity(faction, skill, quality, weights, null,
+                        campaign, unitTypes, unitIndex, unitTypes);
                 }
             } else {
                 if (unitTypes.get(unitIndex) != AEROSPACEFIGHTER) {
@@ -3179,8 +3182,9 @@ public class AtBDynamicScenarioFactory {
                         campaign, unitTypes, unitIndex, fallbackUnitType);
                 }
 
-                // Abandon attempts to generate
+                // Abandon attempts to generate by role
                 if (entity == null) {
+                    logger.info("Removing role requirements.");
                     entity = substituteEntity(faction, skill, quality, weights, null,
                         campaign, unitTypes, unitIndex, fallbackUnitType);
                 }
@@ -3234,27 +3238,10 @@ public class AtBDynamicScenarioFactory {
         if (entity != null) {
             logger.info("Substitution successful.");
             return entity;
+        } else {
+            logger.info("Unable to substitute entity.");
+            return null;
         }
-
-        logger.info("Substitution unsuccessful. Relaxing role requirements.");
-
-        entity = getNewEntity(faction, skill, quality, fallbackUnitType, weights, rolesByType,
-            campaign, unitIndex);
-
-        if (entity != null) {
-            return entity;
-        }
-
-        logger.info("That helped, cycling weights (final attempt).");
-        entity = attemptSubstitutionViaWeight(faction, skill, quality, weights,
-            null, campaign, unitTypes, unitIndex);
-
-        if (entity != null) {
-            return entity;
-        }
-
-        logger.info("Unable to substitute entity.");
-        return null;
     }
 
     /**
