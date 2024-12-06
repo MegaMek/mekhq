@@ -3260,7 +3260,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         int weight;
-        if (weights.length() == 1) {
+        if (weights.length() == 1 || (weights.charAt(0) == 'U' && weights.length() == 2)) {
             weight = AtBConfiguration.decodeWeightStr(weights, 0);
         } else {
             weight = AtBConfiguration.decodeWeightStr(weights, unitIndex);
