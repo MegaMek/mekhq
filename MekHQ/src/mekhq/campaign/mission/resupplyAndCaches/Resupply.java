@@ -1562,21 +1562,28 @@ public class Resupply {
         for (PartDetails potentialPart : potentialParts.values()) {
             int weight = (int) Math.round(potentialPart.getWeight());
             for (int entry = 0; entry < weight; entry++) {
-                if (potentialPart.getPart() instanceof Armor) {
-                    armorPool.add(preparePart(potentialPart.getPart()));
+                Part part = potentialPart.getPart();
+                Part preparedPart = preparePart(part);
+
+                // We don't need null protection for 'part' as if 'part' is null preparedPart will
+                // just return 'null', which we catch here.
+                if (preparedPart == null) {
                     continue;
                 }
 
-                if (potentialPart.getPart() instanceof AmmoBin) {
-                    ammoBinPool.add(preparePart(potentialPart.getPart()));
+                if (preparedPart instanceof Armor) {
+                    armorPool.add(preparedPart);
                     continue;
                 }
 
-                partsPool.add(preparePart(potentialPart.getPart()));
+                if (preparedPart instanceof AmmoBin) {
+                    ammoBinPool.add(preparedPart);
+                    continue;
+                }
+
+                partsPool.add(preparedPart);
             }
         }
-
-        logger.info(armorPool);
 
         // Make procurement checks for each of the items in the individual pools
         Procurement procurement = new Procurement(negotiatorSkill, currentYear, employerFaction);
@@ -1601,11 +1608,13 @@ public class Resupply {
      * @param originPart The {@link Part} object to clone and modify.
      * @return A cloned {@link Part} object , or {@code null} if cloning fails.
      */
-    private Part preparePart(Part originPart) {
+    private @Nullable Part preparePart(Part originPart) {
         Part clonedPart = originPart.clone();
 
+        // If we failed to clone a part, it's likely because the part doesn't exist.
+        // This means it's been destroyed, and what we're detecting is the absence of a part.
+        // This is a major limitation of cloning parts, and one I've not fathomed a solution to.
         if (clonedPart == null) {
-            logger.error(String.format("Failed to clone part: %s", originPart));
             return null;
         }
 
