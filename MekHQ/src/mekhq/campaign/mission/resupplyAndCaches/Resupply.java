@@ -28,7 +28,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
@@ -2035,10 +2034,9 @@ public class Resupply {
         playerConvoys = new HashMap<>();
         totalPlayerCargoCapacity = 0;
 
-        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
-            Force force = campaign.getForce(formation.getForceId());
+        for (Force force : campaign.getAllForces()) {
 
-            if (force == null) {
+            if (!force.isConvoyForce()) {
                 continue;
             }
 

@@ -438,7 +438,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             final boolean subforces = command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUSES);
             for (final Force force : forces) {
                 force.setCombatForce(combatForce, subforces);
-                force.setConvoyForce(!combatForce);
+                force.setConvoyForce(false);
             }
             gui.getTOETab().refreshForceView();
         } else if (command.contains(TOEMouseAdapter.CHANGE_CONVOY_STATUS)) {
@@ -450,6 +450,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             for (final Force force : forces) {
                 force.setConvoyForce(convoyForce);
             }
+
+            for (Force parentForce : singleForce.getAllParents()) {
+                parentForce.setConvoyForce(false);
+            }
+
+            for (Force childForce : singleForce.getAllSubForces()) {
+                childForce.setConvoyForce(false);
+            }
+
             gui.getTOETab().refreshForceView();
 
             for (Force formation : gui.getCampaign().getAllForces()) {
