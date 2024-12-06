@@ -3176,7 +3176,24 @@ public class AtBDynamicScenarioFactory {
         return generatedEntities;
     }
 
-    private static Entity substituteEntity(String faction, SkillLevel skill, int quality,
+    /**
+     * Attempts to substitute an entity with a fallback unit type in a series of steps.
+     * When the initial entity generation fails, this method makes various changes to the unit type
+     * and weight and tries again until it either successfully generates a new entity
+     * or exhausts all alternatives.
+     *
+     * @param faction      The faction for the new Entity being generated
+     * @param skill        The skill level for the new Entity being generated
+     * @param quality      The quality for the new Entity being generated
+     * @param weights      The weights for the unit types being considered
+     * @param rolesByType  The roles available for each unit type
+     * @param campaign     The campaign to which this Entity will be added
+     * @param unitTypes    The unit types available for substitution
+     * @param unitIndex    The index of the unit being replaced in the unitTypes list
+     * @param fallbackUnitType The fallback unit type to be used if normal generation steps fail
+     * @return The new generated Entity or null if substitution unsuccessful
+     */
+    private static @Nullable Entity substituteEntity(String faction, SkillLevel skill, int quality,
                                            String weights, Map<Integer, Collection<MissionRole>> rolesByType,
                                            Campaign campaign, List<Integer> unitTypes, int unitIndex,
                                            List<Integer> fallbackUnitType) {
@@ -3220,6 +3237,22 @@ public class AtBDynamicScenarioFactory {
         return null;
     }
 
+    /**
+     * Attempts to generate an Entity by substituting weight classes in a specific order.
+     * Starting from the lightest (`UL`) to the heaviest (`A`), each weight class is attempted
+     * until a valid Entity can be generated, or all weight classes have been tried. If a valid
+     * Entity is generated, that Entity is returned; otherwise, the method returns null.
+     *
+     * @param faction      The faction for the new Entity being generated.
+     * @param skill        The SkillLevel for the new Entity being generated.
+     * @param quality      The quality for the new Entity being generated.
+     * @param weights      A String representing the weights for the unit types being considered.
+     * @param rolesByType  The roles available for each unit type. This may be null.
+     * @param campaign     The campaign to which this Entity will be added.
+     * @param individualType The unit types available for substitution.
+     * @param unitIndex    The index of the unit type being replaced in the unitTypes list.
+     * @return             The new Entity generated or null if substitution is unsuccessful.
+     */
     private static @Nullable Entity attemptSubstitutionViaWeight(String faction, SkillLevel skill,
                                                                  int quality, String weights,
                                                                  @Nullable Map<Integer, Collection<MissionRole>> rolesByType,
