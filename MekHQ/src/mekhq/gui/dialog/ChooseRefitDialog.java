@@ -53,6 +53,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -572,6 +573,17 @@ public class ChooseRefitDialog extends JDialog {
                 - inventory.getOrdered());
     }
 
+    public static String getFinalValueNeeded(Part part) {
+        int actualQuantity = getToOrder(part);
+        if (part instanceof Armor) {
+            double pointsPerTon = ((Armor) part).getArmorPointsPerTon();
+            double tons = actualQuantity / pointsPerTon;
+            int armorPackages = (int) Math.ceil(tons / 5);
+            return part.getActualValue().multipliedBy(armorPackages).toAmountAndSymbolString();
+        }
+        return part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
+    }
+
     // region RefitTableModel
     /**
      * A table model for displaying parts - similar to the one in CampaignGUI, but
@@ -766,7 +778,7 @@ public class ChooseRefitDialog extends JDialog {
                 case COL_ORDERED -> campaign.getPartInventory(part).getOrdered();
                 case COL_NEEDED -> getActualQuantity(part);
                 case COL_TOORDER -> "<html><b>" + getToOrder(part) + "</b></html>";
-                case COL_COST -> part.getActualValue().multipliedBy(getToOrder(part)).toAmountAndSymbolString();
+                case COL_COST -> getFinalValueNeeded(part);
                 case COL_TARGET -> campaign.getTargetForAcquisition((part.getAcquisitionWork())).getValueAsString();
                 default -> "?";
             };
