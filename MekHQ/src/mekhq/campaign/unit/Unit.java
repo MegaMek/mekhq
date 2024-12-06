@@ -34,6 +34,10 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
+import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestAero;
+import megamek.common.verifier.TestEntity;
+import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
@@ -69,6 +73,7 @@ import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.List;
@@ -1167,6 +1172,135 @@ public class Unit implements ITechnology {
         }
 
         return heatSinkTypeString;
+    }
+
+    /**
+     * Generates a Part representing the type of heat sink used by the Unit. This can be a HeatSink,
+     * an AeroHeatSink, or, in the case of several of the less common heatsink types, an
+     * EquipmentPart. TODO: Investigate the EquipmentPart issue deeper - WeaverThree
+     * @return a HeatSink, AeroHeatSink, or EquipmentPart, typed as a Part. Note that AeroHeatSinks
+     * are not EquipmentParts...
+     */
+    public Part getHeatSinkExample() {
+         Part toReturn = null;
+
+        // Do we have a Part for the heatsink
+
+        // First, check for non-HeatSink HeatSinks
+        for (Part part : getParts()) { 
+            if ((part instanceof EquipmentPart)) {
+                if (((EquipmentPart) part).getType().hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Fake Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+                if (((EquipmentPart) part).getType().hasFlag(MiscType.F_COMPACT_HEAT_SINK)) {
+                    // Only single CHS are to be used in refits
+                    toReturn = new EquipmentPart(0, MiscType.createIS1CompactHeatSink(), -1, 1.0, false, campaign);
+                    // logger.info("Fake Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+                if (((EquipmentPart) part).getType().hasFlag(MiscType.F_LASER_HEAT_SINK)) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Fake Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+            }       
+        }
+
+        // Now check for actual HeatSinks
+        if (toReturn != null) {
+            for (Part part : getParts()) {
+                if (part instanceof HeatSink) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Easy Heatsink Found - " + toReturn); 
+                    return toReturn;
+                } else if (part instanceof AeroHeatSink) {
+                    toReturn = part.clone();
+                    toReturn.setQuantity(1);
+                    // logger.info("Easy Heatsink Found - " + toReturn); 
+                    return toReturn;
+                }
+            }
+        }
+
+        // If we get here the unit only has engine/untracked heatsinks.
+        if (getEntity() instanceof Mek) {
+            Mek mek = (Mek) getEntity();
+            if (mek.hasLaserHeatSinks()) {
+                toReturn = new EquipmentPart(0, MiscType.createCLLaserHeatSink(), -1, 1.0, false, campaign);
+            } else if (mek.hasCompactHeatSinks()) {
+                toReturn = new EquipmentPart(0, MiscType.createIS1CompactHeatSink(), -1, 1.0, false, campaign);
+            } else if (mek.hasDoubleHeatSinks()) {
+                if (mek.isClan()) { // Is this accurate?
+                    toReturn = new HeatSink(0, MiscType.createCLDoubleHeatSink(), -1, false, campaign);
+                } else {
+                    toReturn = new HeatSink(0, MiscType.createISDoubleHeatSink(), -1, false, campaign);
+                }
+            } else {
+                toReturn = new HeatSink(0, MiscType.createHeatSink(), -1, false, campaign);
+            }
+        } else if (getEntity().getClass() == AeroSpaceFighter.class) { 
+            Aero aero = (Aero) getEntity();
+            toReturn = new AeroHeatSink(0, aero.getHeatType(), false, campaign);
+        } else {
+            // All other units have SHS
+            toReturn = new HeatSink(0, MiscType.createHeatSink(), -1, false, campaign);
+        }
+        // logger.info("CONFUSED unit with heatsink " + toReturn);
+    
+
+        return toReturn;
+    }
+
+    /**
+     * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and
+     * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For
+     * vehicles and conventional fighters this would be heat sinks required by energy weapons. Does
+     * not work on small craft and larger because they hide their heatsinks in an available
+     * Spacecraft Cooling System Part.
+     *
+     * @return The number of heat sinks the unit mounts that are not tracked as parts.
+     */
+    public Part getUntrackedHeatSinks () {
+        Part toReturn = getHeatSinkExample();
+
+        if (getEntity() instanceof Mek) {
+            int count = getEntity().getEngine().integralHeatSinkCapacity(((Mek) getEntity()).hasCompactHeatSinks());
+            if (((EquipmentPart) toReturn).getType().hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE)) {
+                // This unit will have SHS as its untracked HS
+                toReturn = new HeatSink(0, MiscType.createHeatSink(), -1, false, campaign);
+            }
+            toReturn.setQuantity(count);
+            return toReturn;
+
+        } else if (getEntity().getClass() == AeroSpaceFighter.class) { 
+            int count = getEntity().getEngine().getWeightFreeEngineHeatSinks();
+            toReturn.setQuantity(count);
+            return toReturn;
+
+
+        } else {
+            EntityVerifier verifier = EntityVerifier.getInstance(new File("data/mekfiles/UnitVerifierOptions.xml"));
+            TestEntity testEntity;
+            
+            if (getEntity() instanceof Tank) {
+                testEntity = new TestTank((Tank) getEntity(), verifier.tankOption, null);
+                int count = testEntity.getCountHeatSinks();
+                toReturn.setQuantity(count);
+                return toReturn;
+            
+            } else if (getEntity() instanceof ConvFighter) {
+                testEntity = new TestAero((Aero) getEntity(), verifier.aeroOption, null);
+                int count = testEntity.getCountHeatSinks();
+                toReturn.setQuantity(count);
+                return toReturn;
+            }
+        }
+        return null;
     }
 
     public Money getSellValue() {

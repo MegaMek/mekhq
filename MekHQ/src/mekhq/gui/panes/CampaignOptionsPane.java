@@ -195,6 +195,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox allowISPurchasesBox;
     private JCheckBox allowCanonOnlyBox;
     private JCheckBox allowCanonRefitOnlyBox;
+    private JCheckBox allowRefitFromPartsBox;
     private MMComboBox<String> choiceTechLevel;
     private JCheckBox variableTechLevelBox;
     private JCheckBox factionIntroDateBox;
@@ -1619,6 +1620,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panTech.add(allowCanonRefitOnlyBox, gridBagConstraints);
+
+        allowRefitFromPartsBox = new JCheckBox(resources.getString("allowRefitFromPartsBox.text"));
+        allowRefitFromPartsBox.setToolTipText(resources.getString("allowRefitFromPartsBox.toolTipText"));
+        allowRefitFromPartsBox.setName("allowRefitFromPartsBox");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panTech.add(allowRefitFromPartsBox, gridBagConstraints);
 
         JLabel lblTechLevel = new JLabel(resources.getString("lblTechLevel.text"));
         lblTechLevel.setName("lblTechLevel");
@@ -8415,6 +8427,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         allowISPurchasesBox.setSelected(options.isAllowISPurchases());
         allowCanonOnlyBox.setSelected(options.isAllowCanonOnly());
         allowCanonRefitOnlyBox.setSelected(options.isAllowCanonRefitOnly());
+        allowRefitFromPartsBox.setSelected(options.isAllowRefitFromParts());
         choiceTechLevel.setSelectedIndex(options.getTechLevel());
         variableTechLevelBox.setSelected(options.isVariableTechLevel() && options.isLimitByYear());
         factionIntroDateBox.setSelected(options.isFactionIntroDate());
@@ -9122,6 +9135,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setFactionIntroDate(factionIntroDateBox.isSelected());
             campaign.updateTechFactionCode();
             options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
+            options.setAllowRefitFromParts(allowRefitFromPartsBox.isSelected());
             options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
             options.setTechLevel(choiceTechLevel.getSelectedIndex());
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_TECHLEVEL)

@@ -209,7 +209,7 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport) part).isForFighter()
+        return part instanceof AeroLifeSupport && (fighter == ((AeroLifeSupport) part).isForFighter())
                 && (getStickerPrice().equals(part.getStickerPrice()));
     }
 
