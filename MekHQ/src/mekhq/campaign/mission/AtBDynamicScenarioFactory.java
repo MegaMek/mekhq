@@ -3119,6 +3119,14 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
+            entity = substituteEntity(faction, skill, quality, weights, rolesByType,
+                campaign, unitTypes, unitIndex, unitTypes);
+
+            if (entity != null) {
+                generatedEntities.add(entity);
+                continue;
+            }
+
             String role = null;
             Integer type = unitTypes.get(unitIndex);
             if (type != null) {
@@ -3147,10 +3155,16 @@ public class AtBDynamicScenarioFactory {
                     if (unitTypes.get(unitIndex) != TANK) {
                         logger.info("Switching unit type to Tank");
                         fallbackUnitType = List.of(TANK);
+
+                        entity = substituteEntity(faction, skill, quality, weights, rolesByType,
+                            campaign, unitTypes, unitIndex, fallbackUnitType);
                     }
 
-                    entity = substituteEntity(faction, skill, quality, weights, rolesByType,
-                        campaign, unitTypes, unitIndex, fallbackUnitType);
+                    // Abandon attempts to generate
+                    if (entity == null) {
+                        entity = substituteEntity(faction, skill, quality, weights, null,
+                            campaign, unitTypes, unitIndex, fallbackUnitType);
+                    }
                 } else {
                     logger.info("Unable to generate Tank due to scenario limitations. Aborting" +
                         " attempt.");
@@ -3160,10 +3174,16 @@ public class AtBDynamicScenarioFactory {
                 if (unitTypes.get(unitIndex) != AEROSPACEFIGHTER) {
                     logger.info("Switching unit type to Aerospace Fighter");
                     fallbackUnitType = List.of(AEROSPACEFIGHTER);
+
+                    entity = substituteEntity(faction, skill, quality, weights, rolesByType,
+                        campaign, unitTypes, unitIndex, fallbackUnitType);
                 }
 
-                entity = substituteEntity(faction, skill, quality, weights, rolesByType,
-                    campaign, unitTypes, unitIndex, fallbackUnitType);
+                // Abandon attempts to generate
+                if (entity == null) {
+                    entity = substituteEntity(faction, skill, quality, weights, null,
+                        campaign, unitTypes, unitIndex, fallbackUnitType);
+                }
             }
 
             if (entity != null) {
