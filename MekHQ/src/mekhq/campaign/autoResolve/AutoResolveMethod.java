@@ -21,7 +21,6 @@ package mekhq.campaign.autoResolve;
 import mekhq.MekHQ;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.AcsSimpleScenarioResolver;
-import mekhq.campaign.autoResolve.scenarioResolver.unitsMatter.UnitsMatterSimpleScenarioResolver;
 import mekhq.campaign.mission.AtBScenario;
 
 import java.util.Optional;
@@ -35,12 +34,6 @@ public enum AutoResolveMethod {
         @Override
         public ScenarioResolver of(AtBScenario scenario) {
             throw new UnsupportedOperationException("Princess method not implemented");
-        }
-    },
-    UNITS_MATTER("AutoResolveMethod.UNITS_MATTER.text", "AutoResolveMethod.UNITS_MATTER.toolTipText") {
-        @Override
-        public ScenarioResolver of(AtBScenario scenario) {
-            return new UnitsMatterSimpleScenarioResolver(scenario);
         }
     },
     ABSTRACT_COMBAT("AutoResolveMethod.ABSTRACT_COMBAT.text", "AutoResolveMethod.ABSTRACT_COMBAT.toolTipText") {
@@ -78,7 +71,6 @@ public enum AutoResolveMethod {
     public static Optional<AutoResolveMethod> fromString(String method) {
         return switch (method) {
             case "PRINCESS" -> Optional.of(PRINCESS);
-            case "UNITS_MATTER" -> Optional.of(UNITS_MATTER);
             case "ABSTRACT_COMBAT_SYSTEM" -> Optional.of(ABSTRACT_COMBAT);
             default -> Optional.empty();
         };

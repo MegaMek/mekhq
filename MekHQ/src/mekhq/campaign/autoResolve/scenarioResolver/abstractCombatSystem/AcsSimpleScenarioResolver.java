@@ -19,9 +19,7 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem;
 
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.damageHandler.CrewMustSurvive;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
-import mekhq.campaign.autoResolve.damageHandler.EntityMustSurvive;
 import mekhq.campaign.autoResolve.helper.SetupForces;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
@@ -37,30 +35,28 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
 
     private final AcsGameManager gameManager = new AcsGameManager();
 
-
     public AcsSimpleScenarioResolver(AtBScenario scenario) {
         super(scenario);
     }
 
-    private void initializeState(AutoResolveGame game) {
+    private void initializeGameManager(AutoResolveGame game) {
         gameManager.setGame(game);
-        new SetupForces(game.getCampaign(), game.getUnits(), game.getScenario(), game).createForcesOnGame();
         gameManager.addPhaseHandler(new StartingScenarioPhase(gameManager));
         gameManager.addPhaseHandler(new InitiativePhase(gameManager));
         gameManager.addPhaseHandler(new DeploymentPhase(gameManager));
         gameManager.addPhaseHandler(new MovementPhase(gameManager));
         gameManager.addPhaseHandler(new FiringPhase(gameManager));
         gameManager.addPhaseHandler(new EndPhase(gameManager));
-
     }
 
     @Override
-    public AutoResolveConcludedEvent resolveScenario(AutoResolveGame game) {
-        initializeState(game);
+    public AutoResolveConcludedEvent resolveScenario(AutoResolveGame game, SetupForces setupForces) {
+        setupForces.createForcesOnGame(game);
+        initializeGameManager(game);
         gameManager.runGame();
         checkDamageToEntities();
 
-        var playerTeamWon = gameManager.getGame().getVictoryTeam() == gameManager.getGame().getCampaign().getPlayer().getTeam();
+        var playerTeamWon = gameManager.getGame().getVictoryTeam() == gameManager.getGame().getLocalPlayer().getTeam();
 
         return new AutoResolveConcludedEvent(
             playerTeamWon,
@@ -82,7 +78,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
                             percent -= percent * (crits / 11.0);
                             percent = Math.min(0.95, percent);
                             var totalDamage = (int) ((entity.getTotalArmor() + entity.getTotalInternal()) * (1 - percent));
-                            DamageHandlerChooser.chooseHandler(entity, CrewMustSurvive.YES, EntityMustSurvive.YES)
+                            DamageHandlerChooser.chooseHandler(entity, DamageHandlerChooser.EntityFinalState.CREW_AND_ENTITY_MUST_SURVIVE)
                                 .applyDamageInClusters(totalDamage, 5);
                         }
                     }

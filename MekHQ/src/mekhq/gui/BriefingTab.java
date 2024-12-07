@@ -870,7 +870,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         switch(getCampaignOptions().getAutoResolveMethod()) {
-            case ABSTRACT_COMBAT, UNITS_MATTER-> getCampaignGui().getApplication()
+            case ABSTRACT_COMBAT -> getCampaignGui().getApplication()
                 .startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
             case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
         }

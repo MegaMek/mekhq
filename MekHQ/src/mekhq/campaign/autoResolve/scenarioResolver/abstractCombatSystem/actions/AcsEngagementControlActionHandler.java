@@ -48,11 +48,14 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
         setFinished();
     }
 
+    /**
+     * Perform the engagement control action
+     * This changes a little bit the "status quo" during the round, making units do or take less damage or evade specifically one unit
+     */
     private void performEngagementControl() {
         // WARNING: THIS IS NOT UP TO RULES AS WRITTEN
         AcsEngagementControlAction engagementControl = (AcsEngagementControlAction) getAction();
         if (engagementControl.isIllegal()) {
-
             return;
         }
         var attackerOpt = game().getFormation(engagementControl.getEntityId());
@@ -99,11 +102,11 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
         report.add(new SBFRollReportEntry(defenderRoll).noNL().text());
         addReport(report);
 
-        var attackerDelta = attackerRoll.getIntValue() - toHit.getValue();
-        var defenderDelta = defenderRoll.getIntValue() - toHitDefender.getValue();
-
         var engagements = attacker.getMemory().getMemories("engagementControl");
         var targetEngagements = target.getMemory().getMemories("engagementControl");
+
+        var attackerDelta = attackerRoll.getMarginOfSuccess(toHit);
+        var defenderDelta = defenderRoll.getMarginOfSuccess(toHitDefender);
 
         attacker.setEngagementControl(engagementControl.getEngagementControl());
         attacker.setEngagementControlFailed(true);
@@ -119,40 +122,19 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
                     attacker.setEngagementControl(EngagementControl.NONE);
                     break;
                 case FORCED_ENGAGEMENT:
-                    //
                 case EVADE:
-                    // If the Evading Formation wins the Engagement Control Roll, it evades
-                    //the hostile Formation, and it may pay its MP to move into any adjacent
-                    //hex (the evading Formation may continue its moving if it has not
-                    //completed its movement yet this turn). An evading Formation may not
-                    //engage in any combat this turn, including returning fire from an attack.
-                    //However, the hostile Formation gets one free attack (the player of the
-                    //hostile Formation may select which Unit conducts the attack), applying
-                    //+1 to-hit modifier and reducing damage from a successful attack by
-                    //one-quarter (rounding down). This damage applies immediately,
-                    //including the effects of critical hits. This attack does not count against
-                    //the number of attacks the Formation may make in the Combat Phase.
-                    //The evading Formation may still be engaged in combat in subsequent
-                    //hexes. If it becomes engaged, all attacks against the evading Formation
-                    //apply a +1 to-hit modifier and all damage is reduced by one-quarter
-                    //(rounding down).
-                    //If the Evading Formation fails the Engagement Control Roll, both
-                    //Formations become engaged—their movement ends immediately in
-                    //the target hex with the hostile Formation. Attacks against it apply +1
-                    //to-hit modifier and reduce damage by one-quarter (rounding down).
-                    //The evading Formation applies a +2 to-hit modifier to any attacks and
-                    //reduces its damage by half. It also may not use any artillery attacks.
                 case OVERRUN:
-                    // target takes 1/4 of the SHORT range damage, rounded down
                 case STANDARD:
                     attacker.setTargetFormationId(target.getId());
                     target.setEngagementControl(engagementControl.getEngagementControl());
+                    // Adding memory, so the unit can remember that it is engaged with the target
                     engagements.add(Map.of(
                         "targetFormationId", attacker.getId(),
                         "wonEngagementControl", false,
                         "attacker", true,
                         "engagementControl", engagementControl.getEngagementControl()
                     ));
+                    // Adding memory, so the unit can remember that it is engaged with the attacker
                     targetEngagements.add(Map.of(
                         "targetFormationId", attacker.getId(),
                         "wonEngagementControl", false,
@@ -162,12 +144,14 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
             }
         } else {
             addReport(new SBFPublicReportEntry(2205));
+            // Adding memory, so the unit can remember that it is engaged with the target
             engagements.add(Map.of(
                 "targetFormationId", attacker.getId(),
                 "wonEngagementControl", false,
                 "attacker", true,
                 "engagementControl", engagementControl.getEngagementControl()
             ));
+            // Adding memory, so the unit can remember that it is engaged with the attacker
             targetEngagements.add(Map.of(
                 "targetFormationId", attacker.getId(),
                 "wonEngagementControl", false,

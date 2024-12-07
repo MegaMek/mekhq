@@ -42,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  * @author Luana Coppio
  */
@@ -52,9 +51,7 @@ public final class AcsGameManager extends AbstractGameManager {
         .create(PreferenceManager.getClientPreferences().getGameLogFilename())
         .printToConsole();
 
-
     private AutoResolveGame game;
-//    private final SBFFullGameReport gameReport = new SBFFullGameReport();
     private final List<SBFReportEntry> pendingReports = new ArrayList<>();
 
     final AcsPhaseEndManager phaseEndManager = new AcsPhaseEndManager(this);
@@ -63,7 +60,9 @@ public final class AcsGameManager extends AbstractGameManager {
     final AcsInitiativeHelper initiativeHelper = new AcsInitiativeHelper(this);
     final List<PhaseHandler> phaseHandlers = new ArrayList<>();
 
-
+    /**
+     * Iterates through the game phases until the victory condition is met.
+     */
     public void runGame() {
         changePhase(GamePhase.STARTING_SCENARIO);
         while (!game.getPhase().equals(GamePhase.VICTORY)) {
@@ -71,13 +70,8 @@ public final class AcsGameManager extends AbstractGameManager {
         }
     }
 
-
     public AutoResolveGame getGame() {
         return game;
-    }
-
-    public AcsPhasePreparationManager getPhasePreparationManager() {
-        return phasePreparationManager;
     }
 
     public AcsInitiativeHelper getInitiativeHelper() {
@@ -112,8 +106,8 @@ public final class AcsGameManager extends AbstractGameManager {
     }
 
     public void flushPendingReports() {
-        pendingReports.forEach(r -> gameLogger.add(r.text()));
-        pendingReports.clear();
+//        pendingReports.forEach(r -> gameLogger.add(r.text()));
+//        pendingReports.clear();
     }
 
     @Override
@@ -132,11 +126,11 @@ public final class AcsGameManager extends AbstractGameManager {
 
     @Override
     public void addReport(ReportEntry r) {
-        if (r instanceof SBFReportEntry) {
-            pendingReports.add((SBFReportEntry) r);
-        } else {
-            pendingReports.add(new SBFReportEntry(999).add(r.text()));
-        }
+//        if (r instanceof SBFReportEntry) {
+//            pendingReports.add((SBFReportEntry) r);
+//        } else {
+//            pendingReports.add(new SBFReportEntry(999).add(r.text()));
+//        }
     }
 
     @Override
@@ -216,17 +210,11 @@ public final class AcsGameManager extends AbstractGameManager {
         return nextTurn;
     }
 
-    void endCurrentTurn() {
-        changeToNextTurn();
-    }
-
-
     /**
      * Returns true if victory conditions have been met. Victory conditions are
      * when there is only one player left with meks or only one team. will also
      * add some reports to reporting
      */
-
     public boolean checkForVictory() {
         VictoryResult vr = game.getVictoryResult();
         var reports = vr.processVictory(game);
@@ -282,8 +270,5 @@ public final class AcsGameManager extends AbstractGameManager {
     @Override
     public void send(int connId, Packet packet) {
     }
-
-
-
 // endregion not in use
 }

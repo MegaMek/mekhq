@@ -18,7 +18,12 @@
  */
 package mekhq.campaign.autoResolve;
 
+import megamek.common.options.BasicGameOptions;
+import megamek.common.options.GameOptions;
+import megamek.common.options.IGameOptions;
+import megamek.common.options.StaticGameOptions;
 import mekhq.MekHQ;
+import mekhq.campaign.autoResolve.helper.SetupForces;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
@@ -37,10 +42,24 @@ public class AutoResolveEngine {
         this.autoResolveMethod = method;
     }
 
-    public void resolveBattle(MekHQ app, List<Unit> units, AtBScenario scenario, Consumer<AutoResolveConcludedEvent> autoResolveConcludedEvent) {
+    /**
+     * Resolve the battle using the selected method
+     * @param app MekHQ instance
+     * @param units List of units from the player
+     * @param scenario Scenario to resolve
+     * @param autoResolveConcludedEvent Consumer to handle the result of the resolution, usually its a lambda to the method that will
+     *                                  handle the result event
+     */
+    public void resolveBattle(
+        MekHQ app, List<Unit> units, AtBScenario scenario, IGameOptions gameOptions,
+        Consumer<AutoResolveConcludedEvent> autoResolveConcludedEvent)
+    {
         var scenarioSpecificResolutionResolver = autoResolveMethod.of(scenario);
-        var game = new AutoResolveGame(app, units, scenario);
-        var result = scenarioSpecificResolutionResolver.resolveScenario(game);
+
+        var game = new AutoResolveGame(scenario, gameOptions);
+        var setupForces = new SetupForces(app.getCampaign(), units, scenario);
+        var result = scenarioSpecificResolutionResolver.resolveScenario(game, setupForces);
+
         autoResolveConcludedEvent.accept(result);
     }
 

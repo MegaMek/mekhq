@@ -31,9 +31,4 @@ public final class AcsFormationConverter extends BaseFormationConverter<AcsForma
         super(force, game, new AcsFormation());
     }
 
-    @Override
-    public AcsFormation convert() {
-        var formation = super.convert();
-        return formation;
-    }
 }

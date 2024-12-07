@@ -37,7 +37,7 @@ import static mekhq.campaign.autoResolve.helper.RandomUtils.toShuffledList;
 
 public class MovementPhase extends PhaseHandler {
 
-    private static final Map<EngagementControl, Double> normal = Map.of(
+    private static final RandomUtils.WeightedList<EngagementControl> normal = RandomUtils.WeightedList.of(
         EngagementControl.FORCED_ENGAGEMENT, 1.0,
         EngagementControl.EVADE, 0.0,
         EngagementControl.STANDARD, 1.0,
@@ -45,7 +45,7 @@ public class MovementPhase extends PhaseHandler {
         EngagementControl.NONE, 0.0
     );
 
-    private static final Map<EngagementControl, Double> unsteady =  Map.of(
+    private static final RandomUtils.WeightedList<EngagementControl> unsteady =  RandomUtils.WeightedList.of(
         EngagementControl.FORCED_ENGAGEMENT, 0.5,
         EngagementControl.EVADE, 0.02,
         EngagementControl.STANDARD, 1.0,
@@ -53,7 +53,7 @@ public class MovementPhase extends PhaseHandler {
         EngagementControl.NONE, 0.01
     );
 
-    private static final Map<EngagementControl, Double> shaken =  Map.of(
+    private static final RandomUtils.WeightedList<EngagementControl> shaken =  RandomUtils.WeightedList.of(
         EngagementControl.FORCED_ENGAGEMENT, 0.2,
         EngagementControl.EVADE, 0.1,
         EngagementControl.STANDARD, 0.8,
@@ -61,7 +61,7 @@ public class MovementPhase extends PhaseHandler {
         EngagementControl.NONE, 0.01
     );
 
-    private static final Map<EngagementControl, Double> broken = Map.of(
+    private static final RandomUtils.WeightedList<EngagementControl> broken = RandomUtils.WeightedList.of(
         EngagementControl.FORCED_ENGAGEMENT, 0.05,
         EngagementControl.EVADE, 1.0,
         EngagementControl.STANDARD, 0.5,
@@ -69,11 +69,11 @@ public class MovementPhase extends PhaseHandler {
         EngagementControl.NONE, 0.3
     );
 
-    private static final Map<EngagementControl, Double> routed = Map.of(
+    private static final RandomUtils.WeightedList<EngagementControl> routed = RandomUtils.WeightedList.of(
         EngagementControl.NONE, 1.0
     );
 
-    private static final Map<AcsFormation.MoraleStatus, Map<EngagementControl, Double>> engagementControlOptions = Map.of(
+    private static final Map<AcsFormation.MoraleStatus, RandomUtils.WeightedList<EngagementControl>> engagementControlOptions = Map.of(
         AcsFormation.MoraleStatus.NORMAL, normal,
         AcsFormation.MoraleStatus.UNSTEADY, unsteady,
         AcsFormation.MoraleStatus.SHAKEN, shaken,
@@ -117,25 +117,33 @@ public class MovementPhase extends PhaseHandler {
 
     private record EngagementControlRecord(AcsFormation actingFormation, AcsFormation target) { }
 
+    private static Map<Integer, EngagementControl[]> engagementAndControlExceptions = Map.of(
+        0, new EngagementControl[] { EngagementControl.NONE },
+        1, new EngagementControl[] { EngagementControl.FORCED_ENGAGEMENT },
+        2, new EngagementControl[] { EngagementControl.OVERRUN },
+        3, new EngagementControl[] { EngagementControl.OVERRUN, EngagementControl.FORCED_ENGAGEMENT }
+    );
+
+    private static EngagementControl[] EMPTY_EAC = new EngagementControl[0];
+
     private void engagementAndControl(EngagementControlRecord engagement) {
         var eco = engagementControlOptions.get(engagement.target.moraleStatus());
+        var engagementControlExceptions = 0;
 
-        var ecc = new HashMap<>(eco);
         if (engagement.actingFormation.getStdDamage().usesDamage(ASRange.LONG)) {
-            ecc.remove(EngagementControl.FORCED_ENGAGEMENT);
+            engagementControlExceptions += 1;
         }
         if (engagement.actingFormation.getStdDamage().getDamage(ASRange.SHORT).damage < 2) {
-            ecc.remove(EngagementControl.OVERRUN);
+            engagementControlExceptions += 2;
         }
 
-        var engagementControlToSelect = RandomUtils.WeightedList.of(ecc);
-        var engagementControl = engagementControlToSelect.sample();
+        var engagementControl = eco.sample(engagementAndControlExceptions.getOrDefault(engagementControlExceptions, EMPTY_EAC));
 
         getGameManager().addEngagementControl(
             new AcsEngagementControlAction(
                 engagement.actingFormation.getId(),
                 engagement.target.getId(),
-                engagementControl.orElseThrow()),
+                engagementControl.orElse(EngagementControl.NONE)),
             engagement.actingFormation);
     }
 

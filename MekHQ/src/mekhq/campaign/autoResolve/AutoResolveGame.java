@@ -23,11 +23,12 @@ import megamek.common.*;
 import megamek.common.actions.EntityAction;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.GamePhase;
+import megamek.common.enums.SkillLevel;
 import megamek.common.event.GamePhaseChangeEvent;
-import megamek.common.options.BasicGameOptions;
 import megamek.common.options.GameOptions;
+import megamek.common.options.IGameOptions;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.SBFRuleOptions;
+import megamek.common.options.StaticGameOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.strategicBattleSystems.SBFReportEntry;
 import megamek.common.strategicBattleSystems.SBFUnit;
@@ -36,9 +37,7 @@ import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoResolve.damageHandler.CrewMustSurvive;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
-import mekhq.campaign.autoResolve.damageHandler.EntityMustSurvive;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsActionHandler;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
@@ -58,18 +57,17 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     /**
      * Information that is necessary for the setup of the game.
      */
-    private final Campaign campaign;
-    private final List<Unit> units;
     private final AtBScenario scenario;
     private final List<String> forceMustBePreserved = new ArrayList<>();
+
+
     /**
      * Game Phase and rules
      */
-    private final SBFRuleOptions options = new SBFRuleOptions();
     private GamePhase phase = GamePhase.UNKNOWN;
     private GamePhase lastPhase = GamePhase.UNKNOWN;
     private final PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-
+    private final Map<Integer, SkillLevel> playerSkillLevels = new HashMap<>();
     private int lastEntityId;
     /**
      * Report and turnlist
@@ -86,18 +84,18 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * Contains all units that have left the game by any means.
      */
     private Vector<Entity> graveyard = new Vector<>();
-
+    private final IGameOptions options;
     private final Map<String, Object> victoryContext = new HashMap<>();
     private final VictoryHelper victoryHelper = new VictoryHelper(this);
     private int victoryPlayerId = Player.PLAYER_NONE;
     private int victoryTeam = Player.TEAM_NONE;
 
-    public AutoResolveGame(MekHQ app, List<Unit> units, AtBScenario scenario) {
-        setBoard(0, new Board());
-        this.campaign = app.getCampaign();
-        this.units = units;
+    public AutoResolveGame(AtBScenario scenario, IGameOptions gameOptions) {
         this.scenario = scenario;
+        this.options = StaticGameOptions.create(gameOptions);
+
         this.setupScenarioObjectives();
+        setBoard(0, new Board());
     }
 
     private void setupScenarioObjectives() {
@@ -120,10 +118,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         this.mapSettings = mapSettings;
     }
 
-    public List<Unit> getUnits() {
-        return units;
-    }
-
     public void addUnit(InGameObject unit) {
         int id = unit.getId();
         if (inGameObjects.containsKey(id) || isOutOfGame(id) || (Entity.NONE == id)) {
@@ -131,10 +125,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
             unit.setId(id);
         }
         inGameObjects.put(id, unit);
-    }
-
-    public Campaign getCampaign() {
-        return campaign;
     }
 
     public AtBScenario getScenario() {
@@ -178,9 +168,8 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
         // Otherwise, count the entities that meet the selection criteria.
         else {
-            Iterator<Entity> iter = inGameTWEntities().iterator();
-            while (iter.hasNext()) {
-                if (selector.accept(iter.next())) {
+            for (Entity entity : inGameTWEntities()) {
+                if (selector.accept(entity)) {
                     retVal++;
                 }
             }
@@ -257,9 +246,13 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return Collections.unmodifiableList(turnList);
     }
 
+
     @Override
-    public BasicGameOptions getOptions() {
-        return new GameOptions();
+    public IGameOptions getOptions() {
+        if (options != null) {
+            return options;
+        }
+        return StaticGameOptions.empty();
     }
 
     @Override
@@ -705,10 +698,18 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         var ejected = removalCondition == IEntityRemovalConditions.REMOVE_EJECTED;
         var devastated = removalCondition == IEntityRemovalConditions.REMOVE_DEVASTATED;
 
-        var crewMustSurvive = (retreating || captured || ejected) ? CrewMustSurvive.YES : CrewMustSurvive.NO;
-        var entityMustSurvive = devastated ? EntityMustSurvive.NO : EntityMustSurvive.YES;
+        var crewMustSurvive = (retreating || captured || ejected);
+        var entityMustSurvive = !devastated;
 
         DamageHandlerChooser.chooseHandler(entity, crewMustSurvive, entityMustSurvive)
             .applyDamageInClusters(damage, clusterSize);
+    }
+
+    public void setPlayerSkillLevel(int playerId, SkillLevel averageSkillLevel) {
+        playerSkillLevels.put(playerId, averageSkillLevel);
+    }
+
+    public Player getLocalPlayer() {
+        return getPlayer(0);
     }
 }

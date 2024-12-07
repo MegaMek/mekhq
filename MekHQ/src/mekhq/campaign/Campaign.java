@@ -7083,6 +7083,10 @@ public class Campaign implements ITechManager {
         return gameOptions;
     }
 
+    public StaticGameOptions getStaticGameOptions() {
+        return StaticGameOptions.create(gameOptions);
+    }
+
     public Vector<IBasicOption> getGameOptionsVector() {
         Vector<IBasicOption> options = new Vector<>();
         for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i.hasMoreElements();) {

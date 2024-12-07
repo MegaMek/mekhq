@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.autoResolve.helper;
 
 import io.sentry.Sentry;
@@ -22,29 +40,65 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-
+/**
+ * @author Luana Coppio
+ */
 public class SetupForces {
     private static final MMLogger logger = MMLogger.create(SetupForces.class);
 
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
-    private final AutoResolveGame game;
 
-    public SetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, AutoResolveGame game) {
+    public SetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         this.campaign = campaign;
         this.units = units;
         this.scenario = scenario;
-        this.game = game;
     }
 
     // from ATB Game thread
-    public void createForcesOnGame() {
-        setupMapSettings();
-        getPlanetaryConditions();
-        setupPlayerForces(campaign, units, scenario);
+    public void createForcesOnGame(AutoResolveGame game) {
+        game.setMapSettings(setupMapSettings());
+        game.setPlanetaryConditions(getPlanetaryConditions());
+        setupPlayer(game);
+        setupBots(game);
+        convertForcesIntoFormations(game);
+    }
+
+    private static void convertForcesIntoFormations(AutoResolveGame game) {
+        var idOfEntitiesToRemoveFromForces = game.getInGameObjects().stream().map(InGameObject::getId).toList();
+
+        ConsolidateForces.consolidateForces(game);
+
+        // convert forces:
+        for(var force : game.getForces().getTopLevelForces()) {
+            var formation = new AcsFormationConverter(force, game).unsafeConvert();
+            if (formation == null) {
+                logger.error("Error, formation is null for force {}", force.getName());
+            } else {
+                formation.setTargetFormationId(Entity.NONE);
+                game.addUnit(formation);
+                game.getForces().addEntity(formation, force.getId());
+            }
+        }
+
+        for (var id : idOfEntitiesToRemoveFromForces) {
+            game.getForces().removeEntityFromForces(id);
+        }
+    }
+
+    private void setupPlayer(AutoResolveGame game) {
+        var player = getCleanPlayer();
+        game.addPlayer(player.getId(), player);
+        var entities = setupPlayerForces(player);
+        game.setPlayerSkillLevel(player.getId(), campaign.getReputation().getAverageSkillLevel());
+        sendEntities(entities, game);
+    }
+
+    private void setupBots(AutoResolveGame game) {
+        var enemySkill = (scenario.getContract(campaign)).getEnemySkill();
+        var allySkill = (scenario.getContract(campaign)).getAllySkill();
         var localBots = new HashMap<String, Player>();
-        /* Add bots */
         for (int i = 0; i < scenario.getNumBots(); i++) {
             BotForce bf = scenario.getBotForce(i);
             String name = bf.getName();
@@ -58,32 +112,21 @@ public class SetupForces {
             var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
             Player bot = new Player(highestPlayerId + 1, name);
             localBots.put(name, bot);
-            game.addPlayer(bot.getId(), bot);
-            configureBot(bot, bf);
-        }
-        var idOfEntitiesToRemoveFromForces = game.getInGameObjects().stream().map(InGameObject::getId).toList();
-
-        ConsolidateForces.consolidateForces(game);
-
-        // convert forces:
-        for(var force : game.getForces().getTopLevelForces()) {
-            var formation = new AcsFormationConverter(force, game).convert();
-            if (formation == null) {
-                System.out.println("Error, formation is null for force " + force.getName());
+            var playerBot = configureBot(bot, bf);
+            game.addPlayer(playerBot.getId(), bot);
+            if (playerBot.isEnemyOf(campaign.getPlayer())) {
+                game.setPlayerSkillLevel(playerBot.getId(), enemySkill);
             } else {
-                formation.setTargetFormationId(Entity.NONE);
-                game.addUnit(formation);
-                game.getForces().addEntity(formation, force.getId());
+                game.setPlayerSkillLevel(playerBot.getId(), allySkill);
             }
-        }
-
-        for (var id : idOfEntitiesToRemoveFromForces) {
-            game.getForces().removeEntityFromForces(id);
+            var botEntities = setupBotEntities(bot, bf);
+            sendEntities(botEntities, game);
         }
     }
 
-    private void setupPlayerForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
-        var player = campaign.getPlayer();
+    private Player getCleanPlayer() {
+        var campaignPlayer = campaign.getPlayer();
+        var player = new Player(campaignPlayer.getId(), campaignPlayer.getName());
         player.setCamouflage(campaign.getCamouflage().clone());
         player.setColour(campaign.getColour());
         player.setStartingPos(scenario.getStartingPos());
@@ -98,7 +141,11 @@ public class SetupForces {
         player.setNbrMFConventional(scenario.getNumPlayerMinefields(Minefield.TYPE_CONVENTIONAL));
         player.setNbrMFInferno(scenario.getNumPlayerMinefields(Minefield.TYPE_INFERNO));
         player.setNbrMFVibra(scenario.getNumPlayerMinefields(Minefield.TYPE_VIBRABOMB));
-        game.addPlayer(player.getId(), player);
+        player.getTurnInitBonus();
+        return player;
+    }
+
+    private List<Entity> setupPlayerForces(Player player) {
 
         /*
          * If the player is making a combat drop (either required by scenario
@@ -198,23 +245,24 @@ public class SetupForces {
             entities.add(entity);
         }
 
-        sendEntities(entities);
+        return entities;
     }
 
-    public static Crew getNewCrewRef(Crew originalCrew) {
-
+    private static Crew getNewCrewRef(Crew originalCrew) {
         var newCrewRef = new Crew(originalCrew.getCrewType(), originalCrew.getName(), originalCrew.getSize(),
             originalCrew.getGunnery(), originalCrew.getPiloting(), originalCrew.getGender(), originalCrew.isClanPilot(),
             originalCrew.getExtraData());
 
         for (int i = 0; i < originalCrew.getCrewType().getCrewSlots(); i++) {
             newCrewRef.setExternalIdAsString(originalCrew.getExternalIdAsString(i), i);
+            newCrewRef.setHits(originalCrew.getHits(i), i);
+            newCrewRef.setName(originalCrew.getName(i), i);
+            newCrewRef.setNickname(originalCrew.getNickname(i), i);
         }
         return newCrewRef;
     }
 
-    private void setupMapSettings() {
-
+    private MapSettings setupMapSettings() {
         MapSettings mapSettings = MapSettings.getInstance();
         mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
         mapSettings.setMapSize(1, 1);
@@ -254,11 +302,10 @@ public class SetupForces {
             mapSettings.setMapSize(1, 1);
             mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
         }
-
-        game.setMapSettings(mapSettings);
+        return mapSettings;
     }
 
-    private void configureBot(Player bot, BotForce botForce) {
+    private Player configureBot(Player bot, BotForce botForce) {
         bot.setTeam(botForce.getTeam());
         // set deployment
         bot.setStartingPos(botForce.getStartingPos());
@@ -272,12 +319,10 @@ public class SetupForces {
         // set camo
         bot.setCamouflage(botForce.getCamouflage().clone());
         bot.setColour(botForce.getColour());
-
-        game.addPlayer(bot.getId(), bot);
-        setupBotEntities(bot, botForce);
+        return bot;
     }
 
-    private void setupBotEntities(Player bot, BotForce botForce) {
+    private List<Entity> setupBotEntities(Player bot, BotForce botForce) {
         String forceName = bot.getName() + "|1";
         var entities = new ArrayList<Entity>();
         botForce.generateRandomForces(units, campaign);
@@ -300,10 +345,10 @@ public class SetupForces {
             }
             entities.add(entity);
         }
-        sendEntities(entities);
+        return entities;
     }
 
-    private void getPlanetaryConditions() {
+    private PlanetaryConditions getPlanetaryConditions() {
         PlanetaryConditions planetaryConditions = new PlanetaryConditions();
         if (campaign.getCampaignOptions().isUseLightConditions()) {
             planetaryConditions.setLight(scenario.getLight());
@@ -320,10 +365,10 @@ public class SetupForces {
             planetaryConditions.setAtmosphere(scenario.getAtmosphere());
             planetaryConditions.setGravity(scenario.getGravity());
         }
-        game.setPlanetaryConditions(planetaryConditions);
+        return planetaryConditions;
     }
 
-    private void sendEntities(List<Entity> entities) {
+    private void sendEntities(List<Entity> entities, AutoResolveGame game) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
         for (final Entity entity : new ArrayList<>(entities)) {
             if (entity instanceof ProtoMek) {

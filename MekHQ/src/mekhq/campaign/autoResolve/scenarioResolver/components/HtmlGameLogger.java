@@ -28,12 +28,12 @@ import java.util.List;
  */
 public class HtmlGameLogger {
 
-    private GameLog gameLog;
+    private final GameLog gameLog;
     private boolean printToConsole = false;
     /**
      * Creates GameLog named
      *
-     * @param filename
+     * @param filename the name of the file
      */
     private HtmlGameLogger(String filename) {
         gameLog = new GameLog(filename);

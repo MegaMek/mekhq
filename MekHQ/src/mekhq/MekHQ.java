@@ -38,36 +38,32 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
+import megamek.common.options.StaticGameOptions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
-import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.autoResolve.AutoResolveEngine;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.handler.PostScenarioDialogsHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
+import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -471,144 +467,80 @@ public class MekHQ implements GameListener {
         currentScenario = null;
     }
 
-    // MekHQ only needs to hear a few of the game events
-    // So most are not implemented.
-    // Maybe we could make one interface that contains only a very few of the events
-    // that are required for book keeping the results of a scenario.
-    // then we could clean alot of those up.
 
+// region listeners
+    // MekHQ only needs to hear one game event
+    // So most are not implemented.
     @Override
     public void gameBoardChanged(GameBoardChangeEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameBoardNew(GameBoardNewEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameEnd(GameEndEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameEntityChange(GameEntityChangeEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameEntityNew(GameEntityNewEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameEntityNewOffboard(GameEntityNewOffboardEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameEntityRemove(GameEntityRemoveEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameMapQuery(GameMapQueryEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameNewAction(GameNewActionEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gamePhaseChange(GamePhaseChangeEvent e) {
-        // Why Empty?
     }
 
-    // TODO: LUANA
-    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent){
-        try {
-            String message = autoResolveConcludedEvent.controlledScenario() ?
-                "Your forces won the scenario. Did your side control the battlefield at the end of the scenario?" :
-                "Your forces lost the scenario. Do you want to declare your side as controlling the battlefield at the end of the scenario?";
-            String title = autoResolveConcludedEvent.controlledScenario() ? "Victory!" : "Defeat!";
-            boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
-            tracker.setClient(new AutoResolveClient(autoResolveConcludedEvent.getGame(), getCampaign().getPlayer()));
-            tracker.setEvent(autoResolveConcludedEvent);
-            tracker.processGame();
+    @Override
+    public void gamePlayerChange(GamePlayerChangeEvent e) {
+    }
 
-            ResolveScenarioWizardDialog resolveDialog =
-                new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
-                    true, tracker);
-            resolveDialog.setVisible(true);
-            if (resolveDialog.wasAborted()) {
-                for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    Person person = getCampaign().getPerson(personId);
-                    // person.setStatus(PersonnelStatus.ACTIVE);
-                    person.setHits(person.getHitsPrior());
-                }
+    @Override
+    public void gamePlayerChat(GamePlayerChatEvent e) {
+    }
 
-                // should I do something here? Maybe do the trigger?
-                // MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-                return;
-            }
+    @Override
+    public void gamePlayerConnected(GamePlayerConnectedEvent e) {
+    }
 
-            if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                    campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
+    @Override
+    public void gamePlayerDisconnected(GamePlayerDisconnectedEvent e) {
+    }
 
-                if (!rdd.wasAborted()) {
-                    getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-                }
-            }
+    @Override
+    public void gameReport(GameReportEvent e) {
+    }
 
-            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-                HashMap<UUID, Integer> personnel = new HashMap<>();
-                HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
+    @Override
+    public void gameSettingsChange(GameSettingsChangeEvent e) {
+    }
 
-                for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    Person person = getCampaign().getPerson(personId);
-                    PersonStatus status = tracker.getPeopleStatus().get(personId);
-                    int injuryCount = 0;
+    @Override
+    public void gameTurnChange(GameTurnChangeEvent e) {
+    }
 
-                    if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                        if (status.getHits() > person.getHitsPrior()) {
-                            injuryCount = status.getHits() - person.getHitsPrior();
-                        }
-                    }
-
-                    personnel.put(personId, injuryCount);
-                    scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
-                }
-
-                boolean isCivilianHelp = false;
-
-                if (tracker.getScenario() instanceof AtBScenario atbScenario) {
-                    isCivilianHelp = atbScenario.getScenarioType() == AtBScenario.CIVILIANHELP;
-                }
-
-                AutoAwardsController autoAwardsController = new AutoAwardsController();
-                autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
-            }
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-
-                if (person.getStatus() == PersonnelStatus.MIA && !autoResolveConcludedEvent.controlledScenario()) {
-                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
-                        PersonnelStatus.POW);
-                }
-            }
-
-            // we need to trigger ScenarioResolvedEvent before stopping the thread or
-            // currentScenario may become null
-            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-        } catch (Exception ex) {
-            logger.error(ex, "gameVictory()");
-        }
+    @Override
+    public void gameClientFeedbackRequest(GameCFREvent e) {
     }
 
     @Override
@@ -620,68 +552,21 @@ public class MekHQ implements GameListener {
 
         try {
             boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
-                    "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+                "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
             tracker.processGame();
 
             ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
-                    tracker);
+                tracker);
             resolveDialog.setVisible(true);
-
-            if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                        campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
-
-                if (!rdd.wasAborted()) {
-                    getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-                }
+            if (resolveDialog.wasAborted()) {
+                return;
             }
 
-            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-                HashMap<UUID, Integer> personnel = new HashMap<>();
-                HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
-
-                for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    Person person = getCampaign().getPerson(personId);
-                    PersonStatus status = tracker.getPeopleStatus().get(personId);
-                    int injuryCount = 0;
-
-                    if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                        if (status.getHits() > person.getHitsPrior()) {
-                            injuryCount = status.getHits() - person.getHitsPrior();
-                        }
-                    }
-
-                    personnel.put(personId, injuryCount);
-                    scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
-                }
-
-                boolean isCivilianHelp = false;
-
-                if (tracker.getScenario() instanceof AtBScenario) {
-                    isCivilianHelp = ((AtBScenario) tracker.getScenario())
-                            .getScenarioType() == AtBScenario.CIVILIANHELP;
-                }
-
-                AutoAwardsController autoAwardsController = new AutoAwardsController();
-                autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
-            }
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-
-                if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
-                            PersonnelStatus.POW);
-                }
-            }
-
-            // we need to trigger ScenarioResolvedEvent before stopping the thread or
-            // currentScenario may become null
-            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+            PostScenarioDialogsHandler.handle(campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, control);
             gameThread.requestStop();
 
             // MegaMek dumps these in the deployment phase to free memory
@@ -706,44 +591,42 @@ public class MekHQ implements GameListener {
         }
     }
 
-    @Override
-    public void gamePlayerChange(GamePlayerChangeEvent e) {
-        // Why Empty?
-    }
+// endregion listeners
 
-    @Override
-    public void gamePlayerChat(GamePlayerChatEvent e) {
-        // Why Empty?
-    }
+    /**
+     * This method is called when the auto resolve game is over.
+     * @param autoResolveConcludedEvent The event that contains the results of the auto resolve game.
+     */
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent){
+        try {
+            String message = autoResolveConcludedEvent.controlledScenario() ?
+                "Your forces won the scenario. Did your side control the battlefield at the end of the scenario?" :
+                "Your forces lost the scenario. Do you want to declare your side as controlling the battlefield at the end of the scenario?";
+            String title = autoResolveConcludedEvent.controlledScenario() ? "Victory!" : "Defeat!";
+            boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
+            tracker.setClient(new AutoResolveClient(autoResolveConcludedEvent.getGame(), getCampaign().getPlayer()));
+            tracker.setEvent(autoResolveConcludedEvent);
+            tracker.processGame();
 
-    @Override
-    public void gamePlayerConnected(GamePlayerConnectedEvent e) {
-        // Why Empty?
-    }
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
+                    true, tracker);
+            resolveDialog.setVisible(true);
+            if (resolveDialog.wasAborted()) {
+                // I think I can get rid of this, but I'm not sure atm, testing
+//                for (UUID personId : tracker.getPeopleStatus().keySet()) {
+//                    Person person = getCampaign().getPerson(personId);
+//                    person.setHits(person.getHitsPrior());
+//                }
+                return;
+            }
 
-    @Override
-    public void gamePlayerDisconnected(GamePlayerDisconnectedEvent e) {
-        // Why Empty?
-    }
-
-    @Override
-    public void gameReport(GameReportEvent e) {
-        // Why Empty?
-    }
-
-    @Override
-    public void gameSettingsChange(GameSettingsChangeEvent e) {
-        // Why Empty?
-    }
-
-    @Override
-    public void gameTurnChange(GameTurnChangeEvent e) {
-        // Why Empty?
-    }
-
-    @Override
-    public void gameClientFeedbackRequest(GameCFREvent e) {
-        // Why Empty?
+            PostScenarioDialogsHandler.handle(
+                campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, autoResolveConcludedEvent.controlledScenario());
+        } catch (Exception ex) {
+            logger.error("Error during auto resolve concluded", ex);
+        }
     }
 
     public IconPackage getIconPackage() {
@@ -809,20 +692,24 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
         String message = "This will auto resolve the battle. Do you want to proceed?";
         var autoResolveMethod = getCampaign().getCampaignOptions().getAutoResolveMethod();
-        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()
-            // unfortunately UNITS MATTER force creating has a bug that makes it impossible to calculate victory chance without causing
-            // irreversible changes to the campaign
-            && autoResolveMethod.equals(AutoResolveMethod.ABSTRACT_COMBAT)) {
 
-            var percent = calculateVictoryChance(scenario, units);
-            message = "Your chance of victory in this combat is " + percent + "%, do you want to proceed?";
+        var numberOfSimulations = 250;
+        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, scenario, units, autoResolveMethod);
+            stopWatch.stop();
+            message = "Commander, we ran the simulations and our forces came out victorious in " + simulatedVictories + " of "
+                + numberOfSimulations + " scenarios, do you want to proceed? " + stopWatch + " elapsed time. " +
+            "Approximately " + stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors()) + "ms per simulation.";
         }
+
         String title = "Auto Resolve Battle";
         boolean proceed = JOptionPane.showConfirmDialog(campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
 
         if (proceed) {
             new AutoResolveEngine(autoResolveMethod)
-                .resolveBattle(this, units, scenario, this::autoResolveConcluded);
+                .resolveBattle(this, units, scenario, getCampaign().getStaticGameOptions(), this::autoResolveConcluded);
         }
     }
 
@@ -833,16 +720,19 @@ public class MekHQ implements GameListener {
      * @param units the list of units involved in the scenario
      * @return the calculated victory chance as an integer percentage (0 to 100)
      */
-    private int calculateVictoryChance(AtBScenario scenario, List<Unit> units) {
+    private int calculateNumberOfVictories(int numberOfGames, AtBScenario scenario, List<Unit> units, AutoResolveMethod autoResolveMethod) {
         var atomicInt = new AtomicInteger(0);
-        int numTasks = 50;
+        if (numberOfGames <= 0) {
+            return 0;
+        }
+
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Future<?>> futures = new ArrayList<>();
 
-        for (int i = 0; i < numTasks; i++) {
+        for (int i = 0; i < numberOfGames; i++) {
             futures.add(executor.submit(() -> {
-                new AutoResolveEngine(AutoResolveMethod.ABSTRACT_COMBAT)
-                    .resolveBattle(this, units, scenario, r -> {
+                new AutoResolveEngine(autoResolveMethod)
+                    .resolveBattle(this, units, scenario, StaticGameOptions.create(getCampaign().getGameOptions()), r -> {
                         if (r.controlledScenario()) {
                             atomicInt.incrementAndGet();
                         }
@@ -860,7 +750,7 @@ public class MekHQ implements GameListener {
         }
 
         executor.shutdown();
-        return atomicInt.get() * 2;
+        return atomicInt.get();
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

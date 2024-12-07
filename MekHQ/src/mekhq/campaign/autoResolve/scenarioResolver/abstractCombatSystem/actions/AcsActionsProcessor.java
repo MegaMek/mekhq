@@ -33,6 +33,10 @@ public record AcsActionsProcessor(AcsGameManager gameManager) implements AcsGame
         removeFinishedHandlers();
     }
 
+    /**
+     * Add new handlers to the game
+     * Every new type of action has to have its handler registered here, otherwise it won't be processed
+     */
     private void addNewHandlers() {
         for (EntityAction action : game().getActionsVector()) {
             if (action instanceof AcsAttackAction attack && attack.getHandler(gameManager) != null) {

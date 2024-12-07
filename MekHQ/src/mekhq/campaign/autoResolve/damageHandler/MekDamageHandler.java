@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
@@ -9,8 +27,10 @@ import java.util.Objects;
 import static megamek.common.Compute.rollD6;
 import static megamek.common.CriticalSlot.TYPE_SYSTEM;
 
-public record MekDamageHandler(Mek entity, CrewMustSurvive crewMustSurvive,
-                               EntityMustSurvive entityMustSurvive) implements DamageHandler<Mek> {
+/**
+ * @author Luana Coppio
+ */
+public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean entityMustSurvive) implements DamageHandler<Mek> {
 
     @Override
     public HitDetails setupHitDetails(HitData hit, int dmg) {
@@ -65,7 +85,7 @@ public record MekDamageHandler(Mek entity, CrewMustSurvive crewMustSurvive,
 
         var entity = entity();
         var criticalSlots = entity.getCriticalSlots(hit.getLocation()).stream().collect(RandomUtils.toShuffledList());
-        if (entityHasToSurvive() && criticalLocations.contains(hit.getLocation())) {
+        if (entityMustSurvive() && criticalLocations.contains(hit.getLocation())) {
             criticalSlots = criticalSlots.stream().filter(Objects::nonNull)
                 .filter(slot -> !(slot.getType() == TYPE_SYSTEM && criticalSystems.contains(slot.getIndex())))
                 .toList();
@@ -93,7 +113,7 @@ public record MekDamageHandler(Mek entity, CrewMustSurvive crewMustSurvive,
         int currentInternalValue = entity.getInternal(hit);
         int newInternalValue = Math.max(currentInternalValue + hitDetails.setArmorValueTo(), 0);
         entity.setArmor(0, hit);
-        if (entityHasToSurvive() && !canLoseLocation(hit)) {
+        if (entityMustSurvive() && !canLoseLocation(hit)) {
             newInternalValue = Math.max(newInternalValue, Compute.d6());
         }
         entity.setInternal(newInternalValue, hit);
@@ -103,13 +123,9 @@ public record MekDamageHandler(Mek entity, CrewMustSurvive crewMustSurvive,
         }
     }
 
-    private boolean entityHasToSurvive() {
-        return entityMustSurvive() == EntityMustSurvive.YES;
-    }
-
     private boolean canLoseLocation(HitData hitData) {
         var location = hitData.getLocation();
-        if (!entityHasToSurvive()) {
+        if (!entityMustSurvive()) {
             return true;
         }
 

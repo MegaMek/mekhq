@@ -20,7 +20,6 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
 
 /**
  * @author Luana Coppio
@@ -42,7 +41,6 @@ public class AcsEngagementControlToHitData extends TargetRoll {
 
         var attackingFormation = attackingFormationOpt.get();
         var toHit = new AcsEngagementControlToHitData(attackingFormation.getTactics(), "Tactics");
-//        processForceAbilities(toHit, game, engagementControl);
         processFormationModifiers(toHit, game, engagementControl);
         processMorale(toHit, game, engagementControl);
         processSupply(toHit, game, engagementControl);
@@ -83,40 +81,16 @@ public class AcsEngagementControlToHitData extends TargetRoll {
 
         var formationIsInfantryOnly = formation.isInfantry();
         var formationIsVehicleOnly = formation.isVehicle();
-//        var formationIsMercenary = false;
-//        var formationHasSuperiorCombatDoctrine = false;
-//        var formationHasFlawedCombatDoctrine = false;
+
         if (formationIsInfantryOnly) {
             toHit.addModifier(2, "infantry only");
         }
         if (formationIsVehicleOnly) {
             toHit.addModifier(1, "formation is vehicle only");
         }
-//        if (formationIsMercenary) {
-//            toHit.addModifier(-1, "formation is mercenary");
-//        }
-//        if (formationHasSuperiorCombatDoctrine) {
-//            toHit.addModifier(-1, "superior combat doctrine");
-//        }
-//        if (formationHasFlawedCombatDoctrine) {
-//            toHit.addModifier(+1, "flawed combat doctrine");
-//        }
     }
 
-//    private static void processForceAbilities(AcsEngagementControlToHitData toHit, AutoResolveGame game, AcsEngagementControlAction engagementControl) {
-//        //noinspection OptionalGetWithoutIsPresent
-//        AcsFormation formation = game.getFormation(engagementControl.getEntityId()).get();
-//        toHit.addModifier(-1, "Leadership Rating");
-//        toHit.addModifier(-1, "Command Skills");
-//        switch (formation.getLoayalty()) {
-//            case QUESTIONABLE -> toHit.addModifier(-2, "Questionable Loyalty");
-//            case RELIABLE -> toHit.addModifier(0, "Reliable Loyalty");
-//            case FANATICAL -> toHit.addModifier(2, "Fanatical Loyalty");
-//        }
-//    }
-
     private static void processSizeDifference(AcsEngagementControlToHitData toHit, AutoResolveGame game, AcsEngagementControlAction engagementControl) {
-
         var attackerOpt = game.getFormation(engagementControl.getEntityId());
         var targetOpt = game.getFormation(engagementControl.getTargetFormationId());
         if (attackerOpt.isEmpty() || targetOpt.isEmpty()) {

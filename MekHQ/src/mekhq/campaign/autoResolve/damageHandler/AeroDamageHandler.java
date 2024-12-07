@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.Aero;
@@ -10,33 +28,10 @@ import java.util.Random;
 
 import static megamek.common.Compute.randomInt;
 
-public class AeroDamageHandler implements DamageHandler<Aero> {
-
-    private final Aero entity;
-    private final CrewMustSurvive crewMustSurvive;
-    private final EntityMustSurvive entityMustSurvive;
-
-    public AeroDamageHandler(Aero entity, CrewMustSurvive crewMustSurvive, EntityMustSurvive entityMustSurvive) {
-        this.entity = entity;
-        this.crewMustSurvive = crewMustSurvive;
-        this.entityMustSurvive = entityMustSurvive;
-    }
-
-    @Override
-    public Aero entity() {
-        return entity;
-    }
-
-    @Override
-    public CrewMustSurvive crewMustSurvive() {
-        return crewMustSurvive;
-    }
-
-    @Override
-    public EntityMustSurvive entityMustSurvive() {
-        return entityMustSurvive;
-    }
-
+/**
+ * @author Luana Coppio
+ */
+public record AeroDamageHandler(Aero entity, boolean crewMustSurvive, boolean entityMustSurvive) implements DamageHandler<Aero> {
 
     @Override
     public int getHitLocation() {
