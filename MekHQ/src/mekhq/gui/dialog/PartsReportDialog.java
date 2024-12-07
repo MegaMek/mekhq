@@ -25,7 +25,9 @@ import java.awt.Insets;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.*;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -85,6 +87,9 @@ public class PartsReportDialog extends JDialog {
         super(gui.getFrame(), modal);
         this.gui = gui;
         this.campaign = gui.getCampaign();
+        ignoreMothballedCheck.setSelected(campaign.getIgnoreMothballed());
+        topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
+        ignoreSparesUnderQualityCB.setSelectedItem(campaign.getIgnoreSparesUnderQuality());
         initComponents();
         refreshOverviewPartsInUse();
         pack();
@@ -427,5 +432,18 @@ public class PartsReportDialog extends JDialog {
 
        
         return toBuy;
+    }
+
+    public void storePIU() {
+        campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
+        campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
+        campaign.setIgnoreSparesUnderQuality(ignoreSparesUnderQualityCB.getSelectedItem());
+
+        Map<String,Double> stockMap = new LinkedHashMap<>();
+        for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse piu = overviewPartsModel.getPartInUse(row);
+            stockMap.put(piu.getDescription(), piu.getRequestedStock());
+        }
+        campaign.setPiuStockMap(stockMap);
     }
 }

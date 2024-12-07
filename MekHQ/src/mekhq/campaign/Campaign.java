@@ -174,6 +174,8 @@ public class Campaign implements ITechManager {
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
+    private Map<String, Double> piuStockMap = new LinkedHashMap<>(); // This map keeps track of which parts i use are assigned which stock values
+
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
     private int astechPool;
@@ -270,6 +272,10 @@ public class Campaign implements ITechManager {
     private StoryArc storyArc;
     private FameAndInfamyController fameAndInfamy;
     private List<Unit> automatedMothballUnits;
+
+     //options relating to parts in use and restock
+    private boolean ignoreMothballed, topUpWeekly;
+    private String ignoreSparesUnderQuality;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -2315,6 +2321,9 @@ public class Campaign implements ITechManager {
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
             } else {
+                if(piuStockMap.containsKey(partInUse.getDescription())) {
+                    partInUse.setRequestedStock(piuStockMap.get(partInUse.getDescription()));
+                }
                 inUse.put(partInUse, partInUse);
             }
             updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
@@ -2330,6 +2339,9 @@ public class Campaign implements ITechManager {
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
             } else {
+                if(piuStockMap.containsKey(partInUse.getDescription())) {
+                    partInUse.setRequestedStock(piuStockMap.get(partInUse.getDescription()));
+                }
                 inUse.put(partInUse, partInUse);
             }
             partInUse.setPlannedCount(partInUse.getPlannedCount()
@@ -5566,10 +5578,16 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
 
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse")
+        
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partsInUse")
+
+
         if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
             writeCustoms(pw);
         }
 
+      
         // Okay, we're done.
         // Close everything out and be done with it.
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaign");
@@ -8424,4 +8442,52 @@ public class Campaign implements ITechManager {
         return commanderRank;
     }
 
+    //Simple getters and setters for our stock map
+    public Map<String,Double> getPiuStockMap() {
+        return piuStockMap;
+    }
+
+    public void setPiuStockMap(Map<String, Double> piuStockMap) {
+        this.piuStockMap = piuStockMap;
+    }
+
+    public boolean getIgnoreMothballed() {
+        return ignoreMothballed;
+    }
+    public void setIgnoreMothballed(boolean ignoreMothballed) {
+        this.ignoreMothballed = ignoreMothballed;
+    }
+
+    public boolean getTopUpWeekly() {
+        return topUpWeekly;
+    }
+    public void setTopUpWeekly(boolean topUpWeekly) {
+        this.topUpWeekly = topUpWeekly;
+    }
+
+    public String getIgnoreSparesUnderQuality() {
+        return ignoreSparesUnderQuality;
+    }
+    public void setIgnoreSparesUnderQuality(Object ignoreSparesUnderQuality) {
+        this.ignoreSparesUnderQuality = ignoreSparesUnderQuality;
+    }
+    
+
+    public void writePiuToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "piuMap");
+        writePiuMapToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "piuMap");
+    }
+
+    public void writePiuMapToXML(final PrintWriter pw, int indent) {
+        for(String key : piuStockMap.keySet()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "piuMapEntry");
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "piuMapKey", key);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "piuMapVal", piuStockMap.get(key));
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "piuMapEntry");
+        }
+    }
 }
