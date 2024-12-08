@@ -39,12 +39,14 @@ public class AcsToHitData extends TargetRoll {
         if (!attack.isDataValid(game)) {
             return new AcsToHitData(TargetRoll.IMPOSSIBLE, "Invalid attack");
         }
-        AcsFormation attackingFormation = game.getFormation(attack.getEntityId()).orElseThrow();
-        AcsToHitData toHit = new AcsToHitData(attackingFormation.getSkill(), "Skill");
+
+        var attackingFormation = game.getFormation(attack.getEntityId()).orElseThrow();
+        var unit = attackingFormation.getUnits().get(attack.getUnitNumber());
+        var toHit = new AcsToHitData(attackingFormation.getSkill(), "Skill");
 
         processCriticalDamage(toHit, attackingFormation, attack);
         processRange(toHit, attack);
-//        processCombatUnit(toHit, attackingFormation);
+        processCombatUnit(toHit, unit);
         processTMM(toHit, game, attack);
         processJUMP(toHit, game, attack);
         processMorale(toHit, game, attack);
@@ -59,19 +61,19 @@ public class AcsToHitData extends TargetRoll {
         }
     }
 
-//    private static void processCombatUnit(AcsToHitData toHit, AcsFormation formation) {
-//        switch (formation.getSkill()) {
-//            case 7 -> toHit.addModifier(+4, "Wet behind the ears");
-//            case 6 -> toHit.addModifier(+3, "Really Green");
-//            case 5 -> toHit.addModifier(+2, "Green");
-//            case 4 -> toHit.addModifier(+1, "Regular");
-//            case 3 -> toHit.addModifier(0, "Veteran");
-//            case 2 -> toHit.addModifier(-1, "Elite");
-//            case 1 -> toHit.addModifier(-2, "Heroic");
-//            case 0 -> toHit.addModifier(-3, "Legendary");
-//            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, "Invalid skill");
-//        }
-//    }
+    private static void processCombatUnit(AcsToHitData toHit, SBFUnit unit) {
+        switch (unit.getSkill()) {
+            case 7 -> toHit.addModifier(+4, "Wet behind the ears");
+            case 6 -> toHit.addModifier(+3, "Really Green");
+            case 5 -> toHit.addModifier(+2, "Green");
+            case 4 -> toHit.addModifier(+1, "Regular");
+            case 3 -> toHit.addModifier(0, "Veteran");
+            case 2 -> toHit.addModifier(-1, "Elite");
+            case 1 -> toHit.addModifier(-2, "Heroic");
+            case 0 -> toHit.addModifier(-3, "Legendary");
+            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, "Invalid skill");
+        }
+    }
 
     private static void processRange(AcsToHitData toHit, AcsStandardUnitAttack attack) {
         var range = attack.getRange();

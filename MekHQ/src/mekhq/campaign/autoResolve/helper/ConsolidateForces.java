@@ -30,55 +30,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Redistributes entities and subforces in forces to ensure that each force has a maximum of 20 entities and 4 subforces.
+ * Redistributes entities and sub forces in forces to ensure that each force has a maximum of 20 entities and 4 sub forces.
  *
  * @author Luana Coppio
  */
 public class ConsolidateForces {
 
     /**
-     * Consolidates forces by redistributing entities and subforces as needed.
+     * Consolidates forces by redistributing entities and sub forces as needed.
      * @param game The game to consolidate forces for
      */
     public static void consolidateForces(IGame game) {
         Forces forces = game.getForces();
         var allForces = forces.getAllForces();
 
-        // First, process subforces
-        List<Force> subforcesToSplit = new ArrayList<>();
+        // First, process sub forces
+        List<Force> subForcesToSplit = new ArrayList<>();
 
         for (Force force : allForces) {
-            if (force.getParentId() != Force.NO_FORCE) { // It's a subforce
-                // Check if the subforce has subforces of its own
+            if (force.getParentId() != Force.NO_FORCE) { // It's a sub force
+                // Check if the sub force has sub forces of its own
                 ArrayList<Force> subSubForces = forces.getFullSubForces(force);
                 if (!subSubForces.isEmpty()) {
-                    // Flatten the hierarchy by moving sub-subforces to the parent force
+                    // Flatten the hierarchy by moving sub-sub forces to the parent force
                     Force parentForce = forces.getForce(force.getParentId());
 
                     for (Force subSubForce : subSubForces) {
-                        // Attach sub-subforce to the parent force
+                        // Attach sub-sub force to the parent force
                         forces.attachForce(subSubForce, parentForce);
                     }
                 }
 
-                // Check if the subforce has zero entities
+                // Check if the sub force has zero entities
                 List<ForceAssignable> entities = forces.getFullEntities(force);
                 if (entities.isEmpty()) {
-                    // Remove the subforce from its parent
+                    // Remove the sub force from its parent
                     forces.deleteForce(force.getId());
                     continue; // Move to the next force
                 }
 
-                // Check if the subforce has more than 6 entities or mixed unit types
+                // Check if the sub force has more than 6 entities or mixed unit types
                 if (entities.size() > 6 || hasMixedUnitTypes(entities)) {
-                    subforcesToSplit.add(force);
+                    subForcesToSplit.add(force);
                 }
             }
         }
 
-        // Split subforces that need splitting
-        for (Force force : subforcesToSplit) {
-            splitSubforce(force, forces, game);
+        // Split sub forces that need splitting
+        for (Force force : subForcesToSplit) {
+            splitSubForce(force, forces, game);
         }
 
         // Now process top-level forces
@@ -89,14 +89,14 @@ public class ConsolidateForces {
             List<ForceAssignable> entities = forces.getFullEntities(force);
             if (!entities.isEmpty()) {
                 // Entities are directly under the top-level force, which is invalid
-                // We need to create subforces to hold these entities
+                // We need to create sub forces to hold these entities
                 splitTopLevelForceEntities(force, forces, game);
             }
 
-            // After assigning entities to subforces, get the updated list of subforces
+            // After assigning entities to sub forces, get the updated list of sub forces
             ArrayList<Force> subForces = forces.getFullSubForces(force);
 
-            // Check if the force has more than 4 subforces
+            // Check if the force has more than 4 sub forces
             if (subForces.size() > 4) {
                 redistributeSubforces(force, forces, game);
             }
@@ -110,7 +110,7 @@ public class ConsolidateForces {
 
         var forceIds = forces.getAllForces().stream().map(Force::getId).toList();
 
-        // Remove all empty forces and subforces after consolidation
+        // Remove all empty forces and sub forces after consolidation
         for (var forceId : forceIds) {
             var forceToEval = forces.getForce(forceId);
             var entitiesOnForce = forces.getFullEntities(forceToEval);
@@ -124,8 +124,8 @@ public class ConsolidateForces {
         return forces.getFullEntities(force).size();
     }
 
-    private static void splitSubforce(Force force, Forces forces, IGame game) {
-        // Get entities of the subforce
+    private static void splitSubForce(Force force, Forces forces, IGame game) {
+        // Get entities of the sub force
         List<ForceAssignable> entities = forces.getFullEntities(force);
 
         if (entities.size() <= 6 && !hasMixedUnitTypes(entities)) {

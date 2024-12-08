@@ -43,10 +43,19 @@ public class RandomUtils {
         return (Collector<T, ?, List<T>>) SHUFFLER;
     }
 
+    private static Random random = new Random();
 
     @SafeVarargs
     public static <T> Optional<T> sample(T... elements) {
         return Streams.of(elements).collect(toShuffledList()).stream().findFirst();
+    }
+
+    public static <T> Optional<T> fastSample(List<T> list) {
+        var size = list.size();
+        if (size == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(list.get(random.nextInt(size)));
     }
 
     public static <T> Optional<T> sample(List<T> list) {

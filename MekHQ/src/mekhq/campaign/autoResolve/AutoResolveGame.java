@@ -83,7 +83,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     /**
      * Contains all units that have left the game by any means.
      */
-    private Vector<Entity> graveyard = new Vector<>();
+    private final Vector<Entity> graveyard = new Vector<>();
     private final IGameOptions options;
     private final Map<String, Object> victoryContext = new HashMap<>();
     private final VictoryHelper victoryHelper = new VictoryHelper(this);

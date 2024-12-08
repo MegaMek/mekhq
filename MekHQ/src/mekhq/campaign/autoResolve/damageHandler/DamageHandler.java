@@ -19,7 +19,8 @@
 package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
-import mekhq.campaign.autoResolve.helper.RandomUtils;
+import megamek.logging.MMLogger;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +30,10 @@ import java.util.List;
  * @author Luana Coppio
  */
 public interface DamageHandler<E extends Entity> {
+    MMLogger logger = MMLogger.create(AcsGameManager.class);
 
     enum PilotEjected {
-        YES, NO
+        NO, YES
     }
 
     E entity();
@@ -123,11 +125,9 @@ public interface DamageHandler<E extends Entity> {
         HitData hit = hitDetails.hit();
         var entity = entity();
         int currentInternalValue = entity.getInternal(hit);
-        int newInternalValue = Math.max(currentInternalValue + hitDetails.setArmorValueTo(), 0);
+        int newInternalValue = Math.max(currentInternalValue + hitDetails.setArmorValueTo(), entityMustSurvive() ? 1 : 0);
         entity.setArmor(0, hit);
-        if (entityMustSurvive()) {
-            newInternalValue = Math.max(newInternalValue, Compute.d6());
-        }
+        logger.trace("[{}] Damage: {} - Internal at: {}", entity.getDisplayName(), hitDetails.damageToApply(), newInternalValue);
         entity.setInternal(newInternalValue, hit);
         applyDamageToEquipments(hit);
         if (newInternalValue == 0) {
@@ -141,13 +141,11 @@ public interface DamageHandler<E extends Entity> {
      */
     default void destroyLocation(HitData hit) {
         var entity = entity();
+        logger.trace("[{}] Destroying location {}", entity.getDisplayName(), hit.getLocation());
         entity.destroyLocation(hit.getLocation());
         entity.setDestroyed(true);
         tryToDamageCrew(Crew.DEATH);
-        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
-            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-            entity.setSalvage(true);
-        }
+        setEntityDestroyed(entity);
     }
 
     /**
@@ -176,12 +174,19 @@ public interface DamageHandler<E extends Entity> {
         }
 
         crew.setHits(hits, 0);
+        logger.trace("[{}] Crew hit ({} hits)", entity().getDisplayName(), crew.getHits());
         if (crew.isDead()) {
+            logger.trace("[{}] Crew died", entity().getDisplayName());
             entity.setDestroyed(true);
-            if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
-                entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-                entity.setSalvage(true);
-            }
+            setEntityDestroyed(entity);
+        }
+    }
+
+    static <E extends Entity> void setEntityDestroyed(E entity) {
+        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
+            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+            entity.setSalvage(true);
+            logger.trace("[{}] Entity destroyed", entity.getDisplayName());
         }
     }
 
@@ -197,10 +202,8 @@ public interface DamageHandler<E extends Entity> {
         }
         crew.setEjected(true);
         entity.setDestroyed(true);
-        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
-            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-            entity.setSalvage(true);
-        }
+        setEntityDestroyed(entity);
+        logger.trace("[{}] Crew ejected", entity().getDisplayName());
         return PilotEjected.YES;
     }
 
@@ -210,12 +213,13 @@ public interface DamageHandler<E extends Entity> {
      */
     default void applyDamageToEquipments(HitData hit) {
         var entity = entity();
-        var criticalSlots = entity.getCriticalSlots(hit.getLocation()).stream().collect(RandomUtils.toShuffledList());
+        var criticalSlots = entity.getCriticalSlots(hit.getLocation());
+        Collections.shuffle(criticalSlots);
         for (CriticalSlot slot : criticalSlots) {
             if (slot != null && slot.isHittable() && !slot.isHit() && !slot.isDestroyed()) {
                 slot.setHit(true);
                 slot.setDestroyed(true);
-                System.out.println("Equipment destroyed: " + slot);
+                logger.trace("[{}] Equipment destroyed: {}", entity.getDisplayName(), slot);
                 break;
             }
         }
@@ -226,8 +230,9 @@ public interface DamageHandler<E extends Entity> {
      * @param hitDetails the hit details
      */
     default void damageArmor(HitDetails hitDetails) {
-        entity().setArmor(Math.max(hitDetails.setArmorValueTo(), 0), hitDetails.hit());
-        System.out.println("Armor: " + Math.max(hitDetails.setArmorValueTo(), 0));
+        var currentArmorValue = Math.max(hitDetails.setArmorValueTo(), 0);
+        entity().setArmor(currentArmorValue, hitDetails.hit());
+        logger.trace("[{}] Damage: {} - Armor at: {}", entity().getDisplayName(), hitDetails.damageToApply(), currentArmorValue);
     }
 
     /**

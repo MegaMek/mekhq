@@ -30,6 +30,7 @@ import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.componen
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -61,10 +62,10 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
             var target = targetOpt.get();
 
             var attackingUnit = attacker.getUnits().get(attack.getUnitNumber());
-            var targetUnits = target.getUnits();
+            var attackingElements = attackingUnit.getElements();
 
             // Using simplified damage as of Interstellar Operations (BETA) page 241
-            var targetUnitOpt = RandomUtils.sample(targetUnits);
+            var targetUnitOpt = RandomUtils.fastSample(target.getUnits());
             if (targetUnitOpt.isEmpty()) {
                 return;
             }
@@ -91,74 +92,77 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
                     addReport(new SBFPublicReportEntry(2012));
                 } else {
                     addReport(new SBFPublicReportEntry(2013));
-                    int damage = attackingUnit.getCurrentDamage().getDamage(attack.getRange()).damage;
+                    int damage = 0;
                     if (attack.getManueverResult().equals(AcsStandardUnitAttack.ManueverResult.SUCCESS)) {
                         damage += 1;
                     }
 
-                    damage = processDamageByEngagementControl(attacker, target, damage);
-
-                    if (damage > 0) {
-                        int newArmor = Math.max(0, targetUnit.getCurrentArmor() - damage);
-                        addReport(new SBFPublicReportEntry(3100)
-                            .add(targetUnit.getName())
-                            .add(damage)
-                            .add(newArmor));
-
-                        if (newArmor * 2 <= targetUnit.getCurrentArmor()) {
-                            target.setHighStressEpisode(true);
+                    for (var element : attackingElements) {
+                        if (element.getStandardDamage().usesDamage(attack.getRange())) {
+                            damage += element.getStandardDamage().getDamage(attack.getRange()).damage;
                         }
+                    }
 
-                        targetUnit.setCurrentArmor(newArmor);
+                    damage = Math.max(1, processDamageByEngagementControl(attacker, target, damage));
 
-                        if (target.isCrippled() && newArmor > 0) {
-                            addReport(new SBFPublicReportEntry(3091));
-                            target.setHighStressEpisode(true);
-                        }
+                    int newArmor = Math.max(0, targetUnit.getCurrentArmor() - damage);
+                    addReport(new SBFPublicReportEntry(3100)
+                        .add(targetUnit.getName())
+                        .add(damage)
+                        .add(newArmor));
 
-                        if (newArmor == 0) {
+                    if (newArmor * 2 <= targetUnit.getCurrentArmor()) {
+                        target.setHighStressEpisode(true);
+                    }
+
+                    targetUnit.setCurrentArmor(newArmor);
+
+                    if (target.isCrippled() && newArmor > 0) {
+                        addReport(new SBFPublicReportEntry(3091));
+                        target.setHighStressEpisode(true);
+                    }
+
+                    if (newArmor == 0) {
+                        addReport(new SBFPublicReportEntry(3092));
+                        target.setHighStressEpisode(true);
+                        countKill(attackingUnit, targetUnit);
+                    } else {
+                        if (newArmor * 2 < targetUnit.getArmor()) {
+                            var critRoll = Compute.rollD6(2);
                             addReport(new SBFPublicReportEntry(3092));
-                            target.setHighStressEpisode(true);
-                            countKill(attackingUnit, targetUnit);
-                        } else {
-                            if (newArmor * 2 < targetUnit.getArmor()) {
-                                var critRoll = Compute.rollD6(2);
+                            var criticalRollResult = critRoll.getIntValue();
+                            if (criticalRollResult <= 4) {
+                                // Nothing happens
+                                addReport(new SBFPublicReportEntry(3097));
+                            } else if (criticalRollResult <= 7) {
+                                // targeting critical
+                                targetUnit.addTargetingCrit();
+                                addReport(new SBFPublicReportEntry(3094)
+                                    .add(targetUnit.getName())
+                                    .add(targetUnit.getTargetingCrits()));
+                            } else if (criticalRollResult <= 9) {
+                                targetUnit.addDamageCrit();
+                                addReport(new SBFPublicReportEntry(3096)
+                                    .add(targetUnit.getName())
+                                    .add(targetUnit.getDamageCrits()));
+                            } else if (criticalRollResult <= 11) {
+                                targetUnit.addTargetingCrit();
+                                targetUnit.addDamageCrit();
+                                addReport(new SBFPublicReportEntry(3094)
+                                    .add(targetUnit.getName())
+                                    .add(targetUnit.getTargetingCrits()));
+                                addReport(new SBFPublicReportEntry(3096)
+                                    .add(targetUnit.getName())
+                                    .add(targetUnit.getDamageCrits()));
+                            } else {
+                                countKill(attackingUnit, targetUnit);
+                                targetUnit.setCurrentArmor(0);
+                                target.setHighStressEpisode(true);
                                 addReport(new SBFPublicReportEntry(3092));
-                                var criticalRollResult = critRoll.getIntValue();
-                                if (criticalRollResult <= 4) {
-                                    // Nothing happens
-                                    addReport(new SBFPublicReportEntry(3097));
-                                } else if (criticalRollResult <= 7) {
-                                    // targeting critical
-                                    targetUnit.addTargetingCrit();
-                                    addReport(new SBFPublicReportEntry(3094)
-                                        .add(targetUnit.getName())
-                                        .add(targetUnit.getTargetingCrits()));
-                                } else if (criticalRollResult <= 9) {
-                                    targetUnit.addDamageCrit();
-                                    addReport(new SBFPublicReportEntry(3096)
-                                        .add(targetUnit.getName())
-                                        .add(targetUnit.getDamageCrits()));
-                                } else if (criticalRollResult <= 11) {
-                                    targetUnit.addTargetingCrit();
-                                    targetUnit.addDamageCrit();
-                                    addReport(new SBFPublicReportEntry(3094)
-                                        .add(targetUnit.getName())
-                                        .add(targetUnit.getTargetingCrits()));
-                                    addReport(new SBFPublicReportEntry(3096)
-                                        .add(targetUnit.getName())
-                                        .add(targetUnit.getDamageCrits()));
-                                } else {
-                                    countKill(attackingUnit, targetUnit);
-                                    targetUnit.setCurrentArmor(0);
-                                    target.setHighStressEpisode(true);
-                                    addReport(new SBFPublicReportEntry(3092));
-                                }
                             }
                         }
-                    } else {
-                        addReport(new SBFPublicReportEntry(3068));
                     }
+
                 }
             }
         }
@@ -168,11 +172,7 @@ public class AcsStandardUnitAttackHandler extends AbstractAcsActionHandler {
         var killers = attackingUnit.getElements().stream().map(AlphaStrikeElement::getId).map(e -> gameManager().getGame().getEntity(e)).filter(Optional::isPresent).map(Optional::get).toList();
         var targets = targetUnit.getElements().stream().map(AlphaStrikeElement::getId).map(e -> gameManager().getGame().getEntity(e)).filter(Optional::isPresent).map(Optional::get).toList();
         for (var target : targets) {
-            var killer = RandomUtils.sample(killers);
-            if (killer.isEmpty()) {
-                continue;
-            }
-            killer.get().addKill(target);
+            RandomUtils.fastSample(killers).ifPresent(e -> e.addKill(target));
         }
     }
 

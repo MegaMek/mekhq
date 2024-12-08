@@ -21,8 +21,7 @@ package mekhq.campaign.autoResolve.damageHandler;
 import megamek.common.*;
 import mekhq.campaign.autoResolve.helper.RandomUtils;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static megamek.common.Compute.rollD6;
 import static megamek.common.CriticalSlot.TYPE_SYSTEM;
@@ -33,23 +32,39 @@ import static megamek.common.CriticalSlot.TYPE_SYSTEM;
 public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean entityMustSurvive) implements DamageHandler<Mek> {
 
     @Override
+    public int getHitLocation() {
+        var entity = entity();
+        RandomUtils.WeightedList<Integer> weightedLocations = new RandomUtils.WeightedList<>();
+        for (int i = 0; i < entity.locations(); i++) {
+            if (entity.getOArmor(i) <= 0) {
+                continue;
+            }
+            var locationIsNotBlownOff = !entity.isLocationBlownOff(i);
+            var locationIsNotDestroyed = entity.getInternal(i) > 0;
+            var locationIsNotHead = Mek.LOC_HEAD != i;
+            var weight = locationIsNotHead ? 6.0 : 1.0;
+            if (locationIsNotBlownOff && locationIsNotDestroyed) {
+                weightedLocations.addEntry(i, weight);
+            }
+        }
+        return weightedLocations.sample().orElse(-1);
+    }
+
+    @Override
     public HitDetails setupHitDetails(HitData hit, int dmg) {
-        int originalArmor = entity.getOArmor(hit);
-        int damageToApply = Math.max((int) Math.floor((double) originalArmor / 10), dmg);
         int currentArmorValue = entity.getArmor(hit);
-        int setArmorValueTo = currentArmorValue - damageToApply;
+        int setArmorValueTo = currentArmorValue - dmg;
         boolean hitInternal = setArmorValueTo < 0;
-        boolean isHeadHit = (entity.getCockpitType() != Mek.COCKPIT_TORSO_MOUNTED)
-            && (hit.getLocation() == Mek.LOC_HEAD);
+        boolean isHeadHit = (entity.getCockpitType() != Mek.COCKPIT_TORSO_MOUNTED) && (hit.getLocation() == Mek.LOC_HEAD);
         int hitCrew = isHeadHit || hitInternal ? 1 : 0;
 
-        return new HitDetails(hit, damageToApply, setArmorValueTo, hitInternal, hitCrew);
+        return new HitDetails(hit, dmg, setArmorValueTo, hitInternal, hitCrew);
     }
 
     @Override
     public HitData getHitData(int hitLocation) {
         boolean hasRead = hitLocation == Mek.LOC_CT || hitLocation == Mek.LOC_LT || hitLocation == Mek.LOC_RT;
-        boolean isRearHit = hasRead && entity.getArmor(hitLocation, true) > 0 && Compute.d6(2) > 10;
+        boolean isRearHit = hasRead && entity.getArmor(hitLocation, true) > 0 && (Compute.d6(2) > 11);
         return new HitData(hitLocation, isRearHit, HitData.EFFECT_NONE);
     }
 
@@ -67,24 +82,23 @@ public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean enti
                 } else {
                     tryToDamageCrew(Crew.DEATH);
                 }
-                if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
-                    entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-                    entity.setSalvage(true);
-                }
+                DamageHandler.setEntityDestroyed(entity);
             } else {
                 entity.setSalvage(false);
                 entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
+                logger.trace("[{}] Mek devastated!", entity.getDisplayName());
             }
         }
     }
+    private static final Set<Integer> criticalSystems = Set.of(Mek.SYSTEM_ENGINE, Mek.SYSTEM_GYRO, Mek.SYSTEM_LIFE_SUPPORT, Mek.SYSTEM_SENSORS, Mek.SYSTEM_COCKPIT);
+    private static final Set<Integer> criticalLocations = Set.of(Mek.LOC_CT, Mek.LOC_HEAD, Mek.LOC_LT, Mek.LOC_RT);
 
     @Override
     public void applyDamageToEquipments(HitData hit) {
-        final var criticalSystems = List.of(Mek.SYSTEM_ENGINE, Mek.SYSTEM_GYRO, Mek.SYSTEM_LIFE_SUPPORT, Mek.SYSTEM_SENSORS, Mek.SYSTEM_COCKPIT);
-        final var criticalLocations = List.of(Mek.LOC_CT, Mek.LOC_HEAD, Mek.LOC_LT, Mek.LOC_RT);
 
         var entity = entity();
-        var criticalSlots = entity.getCriticalSlots(hit.getLocation()).stream().collect(RandomUtils.toShuffledList());
+        var criticalSlots = entity.getCriticalSlots(hit.getLocation());
+        Collections.shuffle(criticalSlots);
         if (entityMustSurvive() && criticalLocations.contains(hit.getLocation())) {
             criticalSlots = criticalSlots.stream().filter(Objects::nonNull)
                 .filter(slot -> !(slot.getType() == TYPE_SYSTEM && criticalSystems.contains(slot.getIndex())))
@@ -94,7 +108,7 @@ public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean enti
             if (slot != null && slot.isHittable() && !slot.isHit() && !slot.isDestroyed()) {
                 slot.setHit(true);
                 slot.setDestroyed(true);
-                System.out.println("Equipment destroyed: " + slot);
+                logger.trace("[{}] Equipment destroyed: {}", entity.getDisplayName(), slot.getMount().getName());
                 break;
             }
         }

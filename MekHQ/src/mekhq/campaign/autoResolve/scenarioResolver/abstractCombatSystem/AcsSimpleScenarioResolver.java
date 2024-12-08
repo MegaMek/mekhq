@@ -54,7 +54,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         setupForces.createForcesOnGame(game);
         initializeGameManager(game);
         gameManager.runGame();
-        checkDamageToEntities();
+        checkDamageToEntities(gameManager);
 
         var playerTeamWon = gameManager.getGame().getVictoryTeam() == gameManager.getGame().getLocalPlayer().getTeam();
 
@@ -65,7 +65,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
             game);
     }
 
-    private void checkDamageToEntities() {
+    private static void checkDamageToEntities(AcsGameManager gameManager) {
         for (AcsFormation formation : gameManager.getGame().getActiveFormations()) {
             for ( var unit : formation.getUnits()) {
                 if (unit.getCurrentArmor() < unit.getArmor()) {

@@ -48,7 +48,6 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
                 gameManager.changePhase(GamePhase.MOVEMENT);
                 break;
             case MOVEMENT:
-                gameManager.resolveCallSupport();
                 gameManager.actionsProcessor.handleActions();
                 phaseCleanup();
                 gameManager.changePhase(GamePhase.FIRING);

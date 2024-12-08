@@ -709,7 +709,7 @@ public class MekHQ implements GameListener {
 
         if (proceed) {
             new AutoResolveEngine(autoResolveMethod)
-                .resolveBattle(this, units, scenario, getCampaign().getStaticGameOptions(), this::autoResolveConcluded);
+                .resolveBattle(getCampaign(), units, scenario, getCampaign().getStaticGameOptions(), this::autoResolveConcluded);
         }
     }
 
@@ -732,7 +732,7 @@ public class MekHQ implements GameListener {
         for (int i = 0; i < numberOfGames; i++) {
             futures.add(executor.submit(() -> {
                 new AutoResolveEngine(autoResolveMethod)
-                    .resolveBattle(this, units, scenario, StaticGameOptions.create(getCampaign().getGameOptions()), r -> {
+                    .resolveBattle(getCampaign(), units, scenario, StaticGameOptions.create(getCampaign().getGameOptions()), r -> {
                         if (r.controlledScenario()) {
                             atomicInt.incrementAndGet();
                         }

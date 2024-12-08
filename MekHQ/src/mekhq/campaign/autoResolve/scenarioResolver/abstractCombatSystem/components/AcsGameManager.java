@@ -40,16 +40,16 @@ import mekhq.campaign.autoResolve.scenarioResolver.components.HtmlGameLogger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Luana Coppio
  */
 public final class AcsGameManager extends AbstractGameManager {
-    private static final MMLogger logger = MMLogger.create(megamek.server.sbf.SBFGameManager.class);
+    private static final MMLogger logger = MMLogger.create(AcsGameManager.class);
     private final HtmlGameLogger gameLogger = HtmlGameLogger
         .create(PreferenceManager.getClientPreferences().getGameLogFilename())
         .printToConsole();
+    private boolean reportEnabled = false;
 
     private AutoResolveGame game;
     private final List<SBFReportEntry> pendingReports = new ArrayList<>();
@@ -68,6 +68,10 @@ public final class AcsGameManager extends AbstractGameManager {
         while (!game.getPhase().equals(GamePhase.VICTORY)) {
             changePhase(GamePhase.INITIATIVE);
         }
+    }
+
+    public void setReportEnabled(boolean enabled) {
+        reportEnabled = enabled;
     }
 
     public AutoResolveGame getGame() {
@@ -106,15 +110,15 @@ public final class AcsGameManager extends AbstractGameManager {
     }
 
     public void flushPendingReports() {
-//        pendingReports.forEach(r -> gameLogger.add(r.text()));
-//        pendingReports.clear();
+        pendingReports.forEach(r -> gameLogger.add(r.text()));
+        pendingReports.clear();
     }
 
     @Override
     public void setGame(IGame g) {
         if (!(g instanceof AutoResolveGame)) {
-            logger.fatal("Attempted to set game to incorrect class.");
-            return;
+            logger.error("Attempted to set game to incorrect class. Received class {}", g.getClass().getSimpleName());
+            throw new IllegalArgumentException("Attempted to set game to incorrect class.");
         }
         game = (AutoResolveGame) g;
     }
@@ -126,11 +130,13 @@ public final class AcsGameManager extends AbstractGameManager {
 
     @Override
     public void addReport(ReportEntry r) {
-//        if (r instanceof SBFReportEntry) {
-//            pendingReports.add((SBFReportEntry) r);
-//        } else {
-//            pendingReports.add(new SBFReportEntry(999).add(r.text()));
-//        }
+        if (reportEnabled) {
+            if (r instanceof SBFReportEntry) {
+                pendingReports.add((SBFReportEntry) r);
+            } else {
+                pendingReports.add(new SBFReportEntry(999).add(r.text()));
+            }
+        }
     }
 
     @Override
@@ -143,26 +149,22 @@ public final class AcsGameManager extends AbstractGameManager {
         }
     }
 
-    @Override
-    public void sendCurrentInfo(int connId) {
-        // Offline game, no need to send anything
-    }
 
     @Override
     public void endCurrentPhase() {
-        logger.info("Ending phase {}", game.getPhase());
+        logger.debug("Ending phase {}", game.getPhase());
         phaseEndManager.managePhase();
     }
 
     @Override
     public void prepareForCurrentPhase() {
-        logger.info("Preparing phase {}", game.getPhase());
+        logger.debug("Preparing phase {}", game.getPhase());
         phasePreparationManager.managePhase();
     }
 
     @Override
     public void executeCurrentPhase() {
-        logger.info("Executing phase {}", game.getPhase());
+        logger.debug("Executing phase {}", game.getPhase());
         phaseHandlers.forEach(PhaseHandler::execute);
         endCurrentPhase();
     }
@@ -193,21 +195,6 @@ public final class AcsGameManager extends AbstractGameManager {
      */
     public void rollInitiative() {
         TurnOrdered.rollInitiative(game.getTeams(), false);
-    }
-
-    public void changeToNextTurn() {
-        var nextTurn = getNextValidTurn();
-        if (nextTurn.isEmpty()) {
-            endCurrentPhase();
-        }
-    }
-
-    public Optional<AcsTurn> getNextValidTurn() {
-        Optional<AcsTurn> nextTurn = game.changeToNextTurn();
-        while (nextTurn.isPresent() && !nextTurn.get().isValid(game)) {
-            nextTurn = game.changeToNextTurn();
-        }
-        return nextTurn;
     }
 
     /**
@@ -256,15 +243,16 @@ public final class AcsGameManager extends AbstractGameManager {
     public void requestTeamChange(int teamId, Player player) {
     }
 
-    public void resolveCallSupport() {
-    }
-
     @Override
     public void handlePacket(int connId, Packet packet) {
     }
 
     @Override
     public void transmitAllPlayerUpdates() {
+    }
+
+    @Override
+    public void sendCurrentInfo(int connId) {
     }
 
     @Override

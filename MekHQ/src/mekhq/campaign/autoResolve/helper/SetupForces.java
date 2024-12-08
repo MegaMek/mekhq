@@ -112,12 +112,12 @@ public class SetupForces {
             var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
             Player bot = new Player(highestPlayerId + 1, name);
             localBots.put(name, bot);
-            var playerBot = configureBot(bot, bf);
-            game.addPlayer(playerBot.getId(), bot);
-            if (playerBot.isEnemyOf(campaign.getPlayer())) {
-                game.setPlayerSkillLevel(playerBot.getId(), enemySkill);
+            configureBot(bot, bf);
+            game.addPlayer(bot.getId(), bot);
+            if (bot.isEnemyOf(campaign.getPlayer())) {
+                game.setPlayerSkillLevel(bot.getId(), enemySkill);
             } else {
-                game.setPlayerSkillLevel(playerBot.getId(), allySkill);
+                game.setPlayerSkillLevel(bot.getId(), allySkill);
             }
             var botEntities = setupBotEntities(bot, bf);
             sendEntities(botEntities, game);
@@ -146,12 +146,6 @@ public class SetupForces {
     }
 
     private List<Entity> setupPlayerForces(Player player) {
-
-        /*
-         * If the player is making a combat drop (either required by scenario
-         * or player chose to deploy a DropShip), do not use deployment
-         * delay for slower scout units.
-         */
         boolean useDropship = false;
         if (scenario.getLanceRole().isScouting()) {
             for (Entity en : scenario.getAlliesPlayer()) {
@@ -305,7 +299,7 @@ public class SetupForces {
         return mapSettings;
     }
 
-    private Player configureBot(Player bot, BotForce botForce) {
+    private void configureBot(Player bot, BotForce botForce) {
         bot.setTeam(botForce.getTeam());
         // set deployment
         bot.setStartingPos(botForce.getStartingPos());
@@ -319,7 +313,6 @@ public class SetupForces {
         // set camo
         bot.setCamouflage(botForce.getCamouflage().clone());
         bot.setColour(botForce.getColour());
-        return bot;
     }
 
     private List<Entity> setupBotEntities(Player bot, BotForce botForce) {
