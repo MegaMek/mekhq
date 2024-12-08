@@ -103,8 +103,8 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -275,7 +275,7 @@ public class Campaign implements ITechManager {
 
      //options relating to parts in use and restock
     private boolean ignoreMothballed, topUpWeekly;
-    private String ignoreSparesUnderQuality;
+    private PartQuality ignoreSparesUnderQuality;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -344,6 +344,9 @@ public class Campaign implements ITechManager {
         fieldKitchenWithinCapacity = false;
         fameAndInfamy = new FameAndInfamyController();
         automatedMothballUnits = new ArrayList<>();
+        topUpWeekly = false;
+        ignoreMothballed =  false;
+
     }
 
     /**
@@ -2323,6 +2326,8 @@ public class Campaign implements ITechManager {
             } else {
                 if(piuStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(piuStockMap.get(partInUse.getDescription()));
+                } else {
+                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
                 }
                 inUse.put(partInUse, partInUse);
             }
@@ -2341,6 +2346,8 @@ public class Campaign implements ITechManager {
             } else {
                 if(piuStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(piuStockMap.get(partInUse.getDescription()));
+                } else {
+                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
                 }
                 inUse.put(partInUse, partInUse);
             }
@@ -4340,6 +4347,11 @@ public class Campaign implements ITechManager {
             }
         }
 
+        if(topUpWeekly == true && getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, ignoreSparesUnderQuality));
+            addReport("Weekly Stock Check: " + bought + " different kinds of parts are under requested stock levels, orders have been put in to buy them");
+        }
+
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -5578,9 +5590,9 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
 
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse")
-        
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partsInUse")
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
+        writePiuToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partsInUse");
 
 
         if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
@@ -8442,6 +8454,50 @@ public class Campaign implements ITechManager {
         return commanderRank;
     }
 
+    public int stockUpPartsInUse(Set<PartInUse> partsInUse)  {
+        int bought = 0;
+        for(PartInUse piu : partsInUse) {
+            int toBuy = findStockUpAmount(piu);
+            if(toBuy > 0) {
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getShoppingList().addShoppingItem(partToBuy, toBuy, this);
+            }
+            bought += 1;
+        }
+        return bought;
+    }
+
+    public void stockUpPartsInUseGM(Set<PartInUse> partsInUse)  {
+        for(PartInUse piu : partsInUse) {
+            int toBuy = findStockUpAmount(piu);
+            while(toBuy > 0) {
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                -- toBuy;
+            }
+        }
+    }
+
+    private int findStockUpAmount(PartInUse piu) {
+        IAcquisitionWork partToBuy = piu.getPartToBuy();
+        int inventory = piu.getStoreCount() + piu.getTransferCount() + piu.getPlannedCount();
+        int needed = (int)Math.ceil(piu.getRequestedStock()/100.0 * piu.getUseCount());
+        int toBuy = needed-inventory;
+
+        if(piu.getIsBundle() == true) {
+            toBuy = (int)Math.ceil((float)toBuy * piu.getTonnagePerItem() / 5);
+            //special case for ammo, need to track down if there's a way to code this properly
+        }
+
+        if(toBuy > 0) {
+            System.out.println("TPI: " + piu.getTonnagePerItem() + " " + String.format("Inv: %d needed: %d tobuy: %d", inventory, needed, toBuy));
+            System.out.println("||");
+        }
+
+       
+        return toBuy;
+    }
+
     //Simple getters and setters for our stock map
     public Map<String,Double> getPiuStockMap() {
         return piuStockMap;
@@ -8465,10 +8521,10 @@ public class Campaign implements ITechManager {
         this.topUpWeekly = topUpWeekly;
     }
 
-    public String getIgnoreSparesUnderQuality() {
+    public PartQuality getIgnoreSparesUnderQuality() {
         return ignoreSparesUnderQuality;
     }
-    public void setIgnoreSparesUnderQuality(Object ignoreSparesUnderQuality) {
+    public void setIgnoreSparesUnderQuality(PartQuality ignoreSparesUnderQuality) {
         this.ignoreSparesUnderQuality = ignoreSparesUnderQuality;
     }
     
@@ -8476,7 +8532,7 @@ public class Campaign implements ITechManager {
     public void writePiuToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality.toName(campaignOptions.isReverseQualityNames()));
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "piuMap");
         writePiuMapToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "piuMap");

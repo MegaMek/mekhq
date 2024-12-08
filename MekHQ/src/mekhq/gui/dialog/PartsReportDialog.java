@@ -22,12 +22,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.Insets;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.*;
-import java.util.List;
 import java.util.Map.Entry;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -87,13 +86,18 @@ public class PartsReportDialog extends JDialog {
         super(gui.getFrame(), modal);
         this.gui = gui;
         this.campaign = gui.getCampaign();
-        ignoreMothballedCheck.setSelected(campaign.getIgnoreMothballed());
-        topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
-        ignoreSparesUnderQualityCB.setSelectedItem(campaign.getIgnoreSparesUnderQuality());
         initComponents();
         refreshOverviewPartsInUse();
         pack();
         setLocationRelativeTo(gui.getFrame());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Dialog is closing!");
+                onClose(); // Call a custom method
+            }
+        });
     }
 
     private void initComponents() {
@@ -276,9 +280,13 @@ public class PartsReportDialog extends JDialog {
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
+        ignoreMothballedCheck.setSelected(campaign.getIgnoreMothballed());
+
 
         topUpWeeklyCheck = new JCheckBox(resourceMap.getString("chkTopUpWeekly.text"));
-        topUpWeeklyCheck.addActionListener(evt -> topUpWeekly());
+        topUpWeeklyCheck.addActionListener(evt -> refreshOverviewPartsInUse());
+        topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
+
 
         topUpButton = new JButton();
         topUpButton.setText(resourceMap.getString("topUpBtn.text"));
@@ -312,9 +320,18 @@ public class PartsReportDialog extends JDialog {
         ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
         ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
         JLabel ignorePartsUnderLabel = new JLabel(resourceMap.getString("lblIgnoreSparesUnderQuality.text"));
+        if(campaign.getIgnoreSparesUnderQuality() != null) {
+            ignoreSparesUnderQualityCB.setSelectedItem(campaign.getIgnoreSparesUnderQuality());
+        } else {
+            ignoreSparesUnderQualityCB.setSelectedItem(" ");
+        }
+
 
         JButton btnClose = new JButton("Close");
-        btnClose.addActionListener(evt -> setVisible(false));
+        btnClose.addActionListener(evt -> {
+            setVisible(false);
+            onClose();
+        });
         
         layout.setHorizontalGroup(layout.createParallelGroup()
             .addComponent(tableScroll)
@@ -351,6 +368,9 @@ public class PartsReportDialog extends JDialog {
      * @return minimum internal quality level to use
      */
     private PartQuality getMinimumQuality(String rating) {
+        if(rating == null) {
+            rating = " ";
+        }
         if (rating.equals(" ")) {
             // The blank spot always means "everything", so minimum = lowest
             return PartQuality.QUALITY_A;
@@ -385,33 +405,22 @@ public class PartsReportDialog extends JDialog {
         topUpGMButton.setEnabled(campaign.isGM());
     }
 
-    private void topUp() {
+    private Set<PartInUse> getPartsInUseFromTable() {
+        Set<PartInUse> partsInUse = new HashSet<PartInUse>();
         for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
-            PartInUse piu = overviewPartsModel.getPartInUse(row);
-            int toBuy = findTopUpAmount(piu);
-            if(toBuy > 0) {
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                campaign.getShoppingList().addShoppingItem(partToBuy, toBuy, campaign);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
+            partsInUse.add(overviewPartsModel.getPartInUse(row));
         }
+        return partsInUse;
+    }
+
+    private void topUp() {
+        campaign.stockUpPartsInUse(getPartsInUseFromTable());
+        refreshOverviewPartsInUse();
     }
 
     private void topUpGM() {
-        for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
-            PartInUse piu = overviewPartsModel.getPartInUse(row);
-            int toBuy = findTopUpAmount(piu);
-            while(toBuy > 0) {
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
-                -- toBuy;
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        }
-    }
-
-    private void topUpWeekly() {
-
+        campaign.stockUpPartsInUseGM(getPartsInUseFromTable());
+        refreshOverviewPartsInUse();
     }
 
     private int findTopUpAmount(PartInUse piu) {
@@ -437,7 +446,11 @@ public class PartsReportDialog extends JDialog {
     public void storePIU() {
         campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
         campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
-        campaign.setIgnoreSparesUnderQuality(ignoreSparesUnderQualityCB.getSelectedItem());
+        if(ignoreSparesUnderQualityCB == null) {
+            campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
+        } else{
+            campaign.setIgnoreSparesUnderQuality(getMinimumQuality(ignoreSparesUnderQualityCB.getSelectedItem().toString()));
+        }
 
         Map<String,Double> stockMap = new LinkedHashMap<>();
         for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
@@ -446,4 +459,8 @@ public class PartsReportDialog extends JDialog {
         }
         campaign.setPiuStockMap(stockMap);
     }
+
+    private void onClose() {
+        storePIU();
+    }  
 }

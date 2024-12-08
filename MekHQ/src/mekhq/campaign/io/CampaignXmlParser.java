@@ -46,6 +46,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -76,7 +77,6 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
-import javafx.util.pair;
 
 public class CampaignXmlParser {
     private final InputStream is;
@@ -1597,6 +1597,7 @@ public class CampaignXmlParser {
     }
 
     private static void processPartsInUse(Campaign retVal, Node wn) {
+        System.out.println("Processing a PIU list");
         NodeList wList = wn.getChildNodes();
 
         for(int i = 0; i < wList.getLength(); i++) {
@@ -1607,11 +1608,12 @@ public class CampaignXmlParser {
             }
 
             if(wn2.getNodeName().equalsIgnoreCase("ignoreMothBalled")) {
-                retVal.setTopUpWeekly(Boolean.parseBoolean(wn2.getTextContent()));
+                retVal.setIgnoreMothballed(Boolean.parseBoolean(wn2.getTextContent()));
             } else if(wn2.getNodeName().equalsIgnoreCase("topUpWeekly")) {
                 retVal.setTopUpWeekly(Boolean.parseBoolean(wn2.getTextContent()));
             } else if(wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
-                retVal.setIgnoreSparesUnderQuality(wn2.getTextContent());
+                PartQuality ignoreQuality = PartQuality.fromName(wn2.getTextContent(), retVal.getCampaignOptions().isReverseQualityNames());
+                retVal.setIgnoreSparesUnderQuality(ignoreQuality);
             } else if(wn2.getNodeName().equalsIgnoreCase("piuMap")) {
                 processPiuStockMap(retVal, wn2);
             } else {
@@ -1622,6 +1624,7 @@ public class CampaignXmlParser {
     }
 
     private static void processPiuStockMap(Campaign retVal, Node wn) {
+        System.out.println("Processing a PIU map");
         NodeList wList = wn.getChildNodes();
 
         Map<String, Double> piuStockMap = new LinkedHashMap<>();
@@ -1637,7 +1640,7 @@ public class CampaignXmlParser {
                 logger.error("Unkown node tpye not loaded in PiuStockMap nodes: " + wn2.getNodeName());
             }
 
-            processPiuStockMapVal(retVal, wn2, piuStockMap)
+            processPiuStockMapVal(retVal, wn2, piuStockMap);
 
         }
 
@@ -1647,8 +1650,8 @@ public class CampaignXmlParser {
     private static void processPiuStockMapVal(Campaign retVal, Node wn, Map<String, Double> piuStockMap) {
         NodeList wList = wn.getChildNodes();
 
-        String key;
-        double val;
+        String key = null;
+        double val = 0;
 
         for(int i = 0; i < wList.getLength(); i++) {
             Node wn2 = wList.item(i);
