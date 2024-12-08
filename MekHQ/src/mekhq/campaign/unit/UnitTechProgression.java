@@ -45,7 +45,7 @@ public class UnitTechProgression {
 
     private static final UnitTechProgression instance = new UnitTechProgression();
 
-    private Map<Integer, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
+    private final Map<Integer, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
 
     /**
      * Initializes the data for a particular faction
@@ -134,7 +134,7 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            logger.error("", e);
+            logger.error("Execution while calcTechProgression", e);
         }
         return null;
     }
@@ -143,12 +143,12 @@ public class UnitTechProgression {
         try {
             Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
-                logger.error("Entity was null: " + ms.getName());
+                logger.error("Entity was null: {}", ms.getName());
                 return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {
-            logger.error("Exception loading entity " + ms.getName(), ex);
+            logger.error("Exception loading entity {}", ms.getName(), ex);
             return null;
         }
     }
@@ -159,17 +159,12 @@ public class UnitTechProgression {
      * tech level of all the equipment and construction options for a specific
      * faction.
      */
-    private static class BuildMapTask implements Callable<Map<MekSummary, ITechnology>> {
-        private int techFaction;
+    private record BuildMapTask(int techFaction) implements Callable<Map<MekSummary, ITechnology>> {
 
-        BuildMapTask(int techFaction) {
-            this.techFaction = techFaction;
-        }
-
-        // Load all the Entities in the MekSummaryCache and calculate the tech level for
+    // Load all the Entities in the MekSummaryCache and calculate the tech level for
         // the given faction.
         @Override
-        public Map<MekSummary, ITechnology> call() throws Exception {
+        public Map<MekSummary, ITechnology> call() {
             Map<MekSummary, ITechnology> map = new HashMap<>();
             for (MekSummary ms : MekSummaryCache.getInstance().getAllMeks()) {
                 map.put(ms, calcTechProgression(ms, techFaction));

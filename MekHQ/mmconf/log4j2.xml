@@ -22,19 +22,24 @@
     <Loggers>
         <Logger name="megamek.client.bot" level="error" additivity="false">
             <AppenderRef ref="MegaMekLog" />
+            <AppenderRef ref="Console" />
         </Logger>
         <Logger name="megamek" level="info" additivity="false">
             <AppenderRef ref="MegaMekLog" />
+            <AppenderRef ref="Console" />
         </Logger>
         <Logger name="megameklab" level="info" additivity="false">
             <AppenderRef ref="MegaMekLabLog" />
+            <AppenderRef ref="Console" />
         </Logger>
         <Logger name="mekhq" level="info" additivity="false">
             <AppenderRef ref="MekHQLog" />
+            <AppenderRef ref="Console" />
         </Logger>
 
         <Root level="info">
             <AppenderRef ref="MegaMekLog" />
+            <AppenderRef ref="Console" />
         </Root>
     </Loggers>
 </Configuration>

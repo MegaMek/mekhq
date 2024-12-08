@@ -29,6 +29,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.options.GameOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
@@ -140,7 +141,7 @@ public class AtBGameThread extends GameThread {
                 client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
 
                 if (started) {
-                    client.getGame().getOptions().loadOptions();
+                    ((GameOptions) client.getGame().getOptions()).loadOptions();
                     client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
@@ -700,7 +701,7 @@ public class AtBGameThread extends GameThread {
      * Utility function to copy some deployment parameters between source and
      * destination entities
      */
-    private void copyDeploymentParameters(Entity source, Entity destination) {
+    public static void copyDeploymentParameters(Entity source, Entity destination) {
         destination.setDeployRound(source.getDeployRound());
         destination.setStartingPos(source.getStartingPos(false));
         destination.setAltitude(source.getAltitude());
