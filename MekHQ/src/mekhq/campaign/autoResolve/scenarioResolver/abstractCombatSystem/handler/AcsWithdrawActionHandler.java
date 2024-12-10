@@ -16,25 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler;
 
-import megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.Roll;
-import megamek.common.strategicBattleSystems.*;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsEngagementControlAction;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsEngagementControlToHitData;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsWithdrawAction;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsWithdrawReporter;
 
 /**
  * @author Luana Coppio
  */
 public class AcsWithdrawActionHandler extends AbstractAcsActionHandler {
 
+    private final AcsWithdrawReporter reporter;
+
     public AcsWithdrawActionHandler(AcsWithdrawAction action, AcsGameManager gameManager) {
         super(action, gameManager);
+        this.reporter = new AcsWithdrawReporter(gameManager.getGame(), this::addReport);
     }
+
 
     @Override
     public boolean cares() {
@@ -66,21 +71,12 @@ public class AcsWithdrawActionHandler extends AbstractAcsActionHandler {
         if (withdrawFormation.isCrippled()) {
             toHit.addModifier(3, "Crippled");
         }
+
         Roll withdrawRoll = Compute.rollD6(2);
-
-        SBFReportEntry report = new SBFReportEntry(3330).noNL()
-            .add(
-                new SBFFormationReportEntry(withdrawFormation.generalName(), UIUtil.hexColor(SBFInGameObjectTooltip.ownerColor(withdrawFormation, game()))).text()
-            )
-            .add(engagementControl.getEngagementControl().name());
-        addReport(report);
-
-        addReport(new SBFReportEntry(3331).add(toHit.getValue()).noNL());
-
-        report = new SBFReportEntry(3332).noNL();
-        report.add(new SBFPlayerNameReportEntry(game().getPlayer(withdrawFormation.getOwnerId())).text());
-        report.add(new SBFRollReportEntry(withdrawRoll).noNL().text());
-        addReport(report);
+        // Reporting the start of the withdraw attempt
+        reporter.reportStartWithdraw(withdrawFormation, toHit);
+        // Reporting the roll
+        reporter.reportWithdrawRoll(withdrawFormation, withdrawRoll);
 
         if (withdrawRoll.getIntValue() == 12) {
             // successful withdraw
@@ -94,10 +90,10 @@ public class AcsWithdrawActionHandler extends AbstractAcsActionHandler {
                     });
                 }
             }
-            addReport(new SBFPublicReportEntry(3333));
+            reporter.reportSuccessfulWithdraw();
             game().removeFormation(withdrawFormation);
         } else {
-            addReport(new SBFPublicReportEntry(3334));
+            reporter.reportFailedWithdraw();
         }
     }
 }

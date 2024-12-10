@@ -49,7 +49,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.autoResolve.AutoResolveEngine;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.AutoResolveClient;
-import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
+import mekhq.campaign.autoResolve.scenarioResolver.component.AutoResolveConcludedEvent;
 import mekhq.campaign.handler.PostScenarioDialogsHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;

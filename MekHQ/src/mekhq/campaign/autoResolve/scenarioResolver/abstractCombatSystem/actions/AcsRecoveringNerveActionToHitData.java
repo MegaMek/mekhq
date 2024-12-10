@@ -20,7 +20,7 @@ package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
 
 /**
  * @author Luana Coppio

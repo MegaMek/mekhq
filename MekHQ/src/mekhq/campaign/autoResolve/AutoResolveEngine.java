@@ -18,14 +18,10 @@
  */
 package mekhq.campaign.autoResolve;
 
-import megamek.common.options.BasicGameOptions;
-import megamek.common.options.GameOptions;
 import megamek.common.options.IGameOptions;
-import megamek.common.options.StaticGameOptions;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.helper.SetupForces;
-import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
+import mekhq.campaign.autoResolve.scenarioResolver.component.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
 

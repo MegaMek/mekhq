@@ -19,7 +19,9 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
 import megamek.common.IGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsRecoveringNerveActionHandler;
 
 import java.io.Serializable;
 

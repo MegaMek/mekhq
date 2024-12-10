@@ -20,6 +20,9 @@
     </Appenders>
 
     <Loggers>
+        <logger name="java.io.serialization" level="DEBUG" additivity="false">
+            <appender-ref ref="Console" />
+        </logger>
         <Logger name="megamek.client.bot" level="error" additivity="false">
             <AppenderRef ref="MegaMekLog" />
             <AppenderRef ref="Console" />

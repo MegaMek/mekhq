@@ -148,7 +148,8 @@ public class UnitTechProgression {
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {
-            logger.error("Exception loading entity {}", ms.getName(), ex);
+            // TODO Luana
+//            logger.error("Exception loading entity {}", ms.getName(), ex);
             return null;
         }
     }

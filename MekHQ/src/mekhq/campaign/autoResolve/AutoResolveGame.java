@@ -25,7 +25,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.GamePhase;
 import megamek.common.enums.SkillLevel;
 import megamek.common.event.GamePhaseChangeEvent;
-import megamek.common.options.GameOptions;
 import megamek.common.options.IGameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.StaticGameOptions;
@@ -35,16 +34,13 @@ import megamek.common.strategicBattleSystems.SBFUnit;
 import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsActionHandler;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsTurn;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -440,8 +436,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     @Override
     public boolean gameTimerIsExpired() {
-        return getOptions().booleanOption(OptionsConstants.VICTORY_USE_GAME_TURN_LIMIT)
-            && (getRoundCount() == getOptions().intOption(OptionsConstants.VICTORY_GAME_TURN_LIMIT));
+        return getRoundCount() >= 1000;
     }
 
     private int getRoundCount() {
@@ -657,7 +652,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     public void destroyUnits(AcsFormation formation, List<SBFUnit> destroyedUnits) {
-        System.out.println("Destroying units: " + destroyedUnits);
+        logger.debug("Destroying units: {}", destroyedUnits);
         for (SBFUnit unit : destroyedUnits) {
             for (var element : unit.getElements()) {
                 var entityOpt = getEntity(element.getId());

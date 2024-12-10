@@ -16,16 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
 import megamek.common.Entity;
+import megamek.common.alphaStrike.ASDamage;
+import megamek.common.alphaStrike.ASDamageVector;
 import megamek.common.alphaStrike.ASRange;
+import megamek.common.alphaStrike.ASSpecialAbilityCollector;
 import megamek.common.strategicBattleSystems.SBFFormation;
+import megamek.common.strategicBattleSystems.SBFUnit;
 import mekhq.campaign.ai.utility.HasMemory;
 import mekhq.campaign.ai.utility.Memory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static megamek.common.alphaStrike.BattleForceSUA.STD;
 
 /**
  * @author Luana Coppio
@@ -39,6 +45,7 @@ public class AcsFormation extends SBFFormation implements HasMemory {
     private boolean unitIsCrippledLatch = false;
     private final Memory memory = new Memory();
     private boolean clanFormation = false;
+    private ASDamageVector stdDamage;
 
     private Map<Integer, ASRange> rangeAgainstFormations = new HashMap<>();
 
@@ -133,6 +140,18 @@ public class AcsFormation extends SBFFormation implements HasMemory {
         }
 
         return unitIsCrippledLatch;
+    }
+
+    public void setStdDamage(ASDamageVector stdDamage) {
+        this.stdDamage = stdDamage;
+    }
+
+    @Override
+    public ASDamageVector getStdDamage() {
+        if (hasSUA(STD)) {
+            return (ASDamageVector) getSUA(STD);
+        }
+        return stdDamage;
     }
 
     @Override

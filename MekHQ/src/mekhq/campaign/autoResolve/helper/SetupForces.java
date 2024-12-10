@@ -27,7 +27,7 @@ import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationConverter;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationConverter;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -91,7 +91,8 @@ public class SetupForces {
         var player = getCleanPlayer();
         game.addPlayer(player.getId(), player);
         var entities = setupPlayerForces(player);
-        game.setPlayerSkillLevel(player.getId(), campaign.getReputation().getAverageSkillLevel());
+        var playerSkill = campaign.getReputation().getAverageSkillLevel();
+        game.setPlayerSkillLevel(player.getId(), playerSkill);
         sendEntities(entities, game);
     }
 
@@ -111,6 +112,7 @@ public class SetupForces {
             }
             var highestPlayerId = game.getPlayersList().stream().mapToInt(Player::getId).max().orElse(0);
             Player bot = new Player(highestPlayerId + 1, name);
+            bot.setTeam(bf.getTeam());
             localBots.put(name, bot);
             configureBot(bot, bf);
             game.addPlayer(bot.getId(), bot);
@@ -119,7 +121,9 @@ public class SetupForces {
             } else {
                 game.setPlayerSkillLevel(bot.getId(), allySkill);
             }
-            var botEntities = setupBotEntities(bot, bf);
+            bf.generateRandomForces(units, campaign);
+            var entities = bf.getFullEntityList(campaign);
+            var botEntities = setupBotEntities(bot, entities, bf.getDeployRound());
             sendEntities(botEntities, game);
         }
     }
@@ -206,6 +210,9 @@ public class SetupForces {
             var force = campaign.getForceFor(unit);
             if (force != null) {
                 entity.setForceString(force.getFullMMName());
+            } else if (!unit.getEntity().getForceString().isBlank()) {
+                // this was added mostly to make it easier to run tests
+                entity.setForceString(unit.getEntity().getForceString());
             }
             var newCrewRef = getNewCrewRef(unit.getEntity().getCrew());
             entity.setCrew(newCrewRef);
@@ -315,11 +322,11 @@ public class SetupForces {
         bot.setColour(botForce.getColour());
     }
 
-    private List<Entity> setupBotEntities(Player bot, BotForce botForce) {
+    private List<Entity> setupBotEntities(Player bot, List<Entity> originalEntities, int deployRound) {
         String forceName = bot.getName() + "|1";
         var entities = new ArrayList<Entity>();
-        botForce.generateRandomForces(units, campaign);
-        for (Entity originalBotEntity : botForce.getFullEntityList(campaign)) {
+
+        for (Entity originalBotEntity : originalEntities) {
             var entity = ASConverter.getUndamagedEntity(originalBotEntity);
             if (entity == null) {
                 logger.warn("Could not convert entity for bot {} - {}", bot.getName(), originalBotEntity);
@@ -334,7 +341,7 @@ public class SetupForces {
             entity.setCommander(originalBotEntity.isCommander());
 
             if (entity.getDeployRound() == 0) {
-                entity.setDeployRound(botForce.getDeployRound());
+                entity.setDeployRound(deployRound);
             }
             entities.add(entity);
         }

@@ -16,27 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
-import megamek.common.AbstractPlayerTurn;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsReportEntry;
 
 /**
  * @author Luana Coppio
  */
-public abstract class AcsTurn extends AbstractPlayerTurn {
+public interface AcsGameManagerHelper {
 
-    public AcsTurn(int playerId) {
-        super(playerId);
+    AcsGameManager gameManager();
+
+    default AutoResolveGame game() {
+        return gameManager().getGame();
     }
 
-    /**
-     * Returns true when this turn can be played given the current state of the given game. Should
-     * return false when e.g. no valid formation can be found to move for the player or the player or
-     * formation of the turn is null (e.g. because it has previously been destroyed).
-     *
-     * @param game The game object
-     * @return True when the turn can be played, false when it should be skipped
-     */
-    public abstract boolean isValid(AutoResolveGame game);
+    default void addReport(AcsReportEntry reportEntry) {
+        gameManager().addReport(reportEntry);
+    }
+
 }

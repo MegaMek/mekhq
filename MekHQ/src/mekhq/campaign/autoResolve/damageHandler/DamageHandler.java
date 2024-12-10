@@ -20,7 +20,7 @@ package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
 
 import java.util.ArrayList;
 import java.util.Collections;

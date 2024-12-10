@@ -24,12 +24,11 @@ import megamek.common.enums.GamePhase;
 import megamek.common.strategicBattleSystems.SBFFormation;
 import mekhq.campaign.autoResolve.helper.RandomUtils;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsEngagementControlAction;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.EngagementControl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -117,14 +116,16 @@ public class MovementPhase extends PhaseHandler {
 
     private record EngagementControlRecord(AcsFormation actingFormation, AcsFormation target) { }
 
-    private static Map<Integer, EngagementControl[]> engagementAndControlExceptions = Map.of(
+    private static final Map<Integer, EngagementControl[]> engagementAndControlExceptions = Map.of(
         0, new EngagementControl[] { EngagementControl.NONE },
         1, new EngagementControl[] { EngagementControl.FORCED_ENGAGEMENT },
         2, new EngagementControl[] { EngagementControl.OVERRUN },
-        3, new EngagementControl[] { EngagementControl.OVERRUN, EngagementControl.FORCED_ENGAGEMENT }
+        3, new EngagementControl[] { EngagementControl.OVERRUN, EngagementControl.FORCED_ENGAGEMENT },
+        4, new EngagementControl[] { EngagementControl.STANDARD, EngagementControl.OVERRUN, EngagementControl.FORCED_ENGAGEMENT },
+        5, new EngagementControl[] { EngagementControl.STANDARD, EngagementControl.OVERRUN, EngagementControl.FORCED_ENGAGEMENT }
     );
 
-    private static EngagementControl[] EMPTY_EAC = new EngagementControl[0];
+    private static final EngagementControl[] EMPTY_EAC = new EngagementControl[0];
 
     private void engagementAndControl(EngagementControlRecord engagement) {
         var eco = engagementControlOptions.get(engagement.target.moraleStatus());
@@ -134,6 +135,9 @@ public class MovementPhase extends PhaseHandler {
             engagementControlExceptions += 1;
         }
         if (engagement.actingFormation.getStdDamage().getDamage(ASRange.SHORT).damage < 2) {
+            engagementControlExceptions += 2;
+        }
+        if (engagement.actingFormation.isCrippled()) {
             engagementControlExceptions += 2;
         }
 

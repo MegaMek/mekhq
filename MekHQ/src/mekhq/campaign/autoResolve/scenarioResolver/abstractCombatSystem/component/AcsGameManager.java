@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
 import megamek.common.IGame;
 import megamek.common.Player;
@@ -26,7 +26,6 @@ import megamek.common.actions.EntityAction;
 import megamek.common.enums.GamePhase;
 import megamek.common.net.packets.Packet;
 import megamek.common.preference.PreferenceManager;
-import megamek.common.strategicBattleSystems.SBFReportEntry;
 import megamek.logging.MMLogger;
 import megamek.server.AbstractGameManager;
 import megamek.server.Server;
@@ -35,7 +34,8 @@ import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.*;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase.PhaseHandler;
-import mekhq.campaign.autoResolve.scenarioResolver.components.HtmlGameLogger;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsReportEntry;
+import mekhq.campaign.autoResolve.scenarioResolver.component.HtmlGameLogger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,15 +44,13 @@ import java.util.List;
 /**
  * @author Luana Coppio
  */
-public final class AcsGameManager extends AbstractGameManager {
+public class AcsGameManager extends AbstractGameManager {
     private static final MMLogger logger = MMLogger.create(AcsGameManager.class);
     private final HtmlGameLogger gameLogger = HtmlGameLogger
-        .create(PreferenceManager.getClientPreferences().getGameLogFilename())
-        .printToConsole();
-    private boolean reportEnabled = false;
+        .create(PreferenceManager.getClientPreferences().getGameLogFilename());
 
     private AutoResolveGame game;
-    private final List<SBFReportEntry> pendingReports = new ArrayList<>();
+    private final List<AcsReportEntry> pendingReports = new ArrayList<>();
 
     final AcsPhaseEndManager phaseEndManager = new AcsPhaseEndManager(this);
     final AcsPhasePreparationManager phasePreparationManager = new AcsPhasePreparationManager(this);
@@ -68,10 +66,6 @@ public final class AcsGameManager extends AbstractGameManager {
         while (!game.getPhase().equals(GamePhase.VICTORY)) {
             changePhase(GamePhase.INITIATIVE);
         }
-    }
-
-    public void setReportEnabled(boolean enabled) {
-        reportEnabled = enabled;
     }
 
     public AutoResolveGame getGame() {
@@ -130,23 +124,37 @@ public final class AcsGameManager extends AbstractGameManager {
 
     @Override
     public void addReport(ReportEntry r) {
-        if (reportEnabled) {
-            if (r instanceof SBFReportEntry) {
-                pendingReports.add((SBFReportEntry) r);
-            } else {
-                pendingReports.add(new SBFReportEntry(999).add(r.text()));
-            }
+        if (r instanceof AcsReportEntry) {
+            pendingReports.add((AcsReportEntry) r);
+        } else {
+            pendingReports.add(new AcsReportEntry(999).add(r.text()));
         }
     }
 
     @Override
     public void calculatePlayerInitialCounts() {
         for (Player player : game.getPlayersList()) {
-            player.setInitialEntityCount(Math.toIntExact(game.getActiveFormations(player).stream()
-                .filter(entity -> !entity.isRouted()).count()));
-            game.getActiveFormations(player).stream().map(AcsFormation::getPointValue).reduce(Integer::sum)
-                .ifPresent(player::setInitialBV);
+            long count = 0;
+            for (AcsFormation formation : game.getActiveFormations(player)) {
+                if (!formation.isRouted()) {
+                    count++;
+                }
+            }
+            player.setInitialEntityCount(Math.toIntExact(count));
+
+            int totalBV = 0;
+            for (AcsFormation formation : game.getActiveFormations(player)) {
+                totalBV += formation.getPointValue();
+            }
+            player.setInitialBV(totalBV);
         }
+
+//        for (Player player : game.getPlayersList()) {
+//            player.setInitialEntityCount(Math.toIntExact(game.getActiveFormations(player).stream()
+//                .filter(entity -> !entity.isRouted()).count()));
+//            game.getActiveFormations(player).stream().map(AcsFormation::getPointValue).reduce(Integer::sum)
+//                .ifPresent(player::setInitialBV);
+//        }
     }
 
 

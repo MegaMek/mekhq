@@ -19,7 +19,7 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase;
 
 import megamek.common.enums.GamePhase;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
 
 /**
  * @author Luana Coppio

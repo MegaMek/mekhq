@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
 import megamek.common.*;
 import megamek.common.enums.GamePhase;
 import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.strategicBattleSystems.*;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -117,15 +117,15 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
         writeInitiativeRolls();
         writeTurnOrder();
         writeFutureDeployment();
-        writeWeatherReport();
+//        writeWeatherReport();
     }
 
     private void writeTurnOrder() {
-        addReport(new SBFReportEntry(1020));
+        addReport(new AcsReportEntry(1020));
 
         for (AcsTurn turn : game().getTurnsList()) {
             Player player = game().getPlayer(turn.playerId());
-            addReport(new SBFPlayerNameReportEntry(player).indent().addNL());
+            addReport(new AcsPlayerNameReportEntry(player).indent().addNL());
         }
 
     }
@@ -134,39 +134,37 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
         // remaining deployments
         Comparator<Deployable> comp = Comparator.comparingInt(Deployable::getDeployRound);
         List<Deployable> futureDeployments = game().getInGameObjects().stream()
-            .filter(Deployable.class::isInstance)
+            .filter(AcsFormation.class::isInstance)
             .map(Deployable.class::cast)
             .filter(unit -> !unit.isDeployed())
             .sorted(comp)
             .toList();
 
         if (!futureDeployments.isEmpty()) {
-            addReport(new SBFPublicReportEntry(1060));
+            addReport(new AcsPublicReportEntry(1060));
             int round = -1;
-
             for (Deployable deployable : futureDeployments) {
                 if (round != deployable.getDeployRound()) {
                     round = deployable.getDeployRound();
-                    addReport(new SBFPublicReportEntry(1065).add(round));
+                    addReport(new AcsPublicReportEntry(1065).add(round));
                 }
 
-                SBFReportEntry r = new SBFReportEntry(1066).subject(((InGameObject) deployable).getId());
+                var r = new AcsReportEntry(1066).subject(((InGameObject) deployable).getId());
                 r.add(((InGameObject) deployable).generalName());
-                r.add("1");
-                r.add("2");
-                addReport(r);
+                r.add(((InGameObject) deployable).getId());
+                r.add(deployable.getDeployRound());
+                addReport(r.indent());
             }
-            addReport(new SBFPublicReportEntry(1210).newLines(2));
         }
     }
 
     private void writeWeatherReport() {
         PlanetaryConditions conditions = game().getPlanetaryConditions();
-        addReport(new SBFPublicReportEntry(1025).add(conditions.getWindDirection().toString()));
-        addReport(new SBFPublicReportEntry(1030).add(conditions.getWind().toString()));
-        addReport(new SBFPublicReportEntry(1031).add(conditions.getWeather().toString()));
-        addReport(new SBFPublicReportEntry(1032).add(conditions.getLight().toString()));
-        addReport(new SBFPublicReportEntry(1033).add(conditions.getFog().toString()));
+        addReport(new AcsPublicReportEntry(1025).add(conditions.getWindDirection().toString()));
+        addReport(new AcsPublicReportEntry(1030).add(conditions.getWind().toString()));
+        addReport(new AcsPublicReportEntry(1031).add(conditions.getWeather().toString()));
+        addReport(new AcsPublicReportEntry(1032).add(conditions.getLight().toString()));
+        addReport(new AcsPublicReportEntry(1033).add(conditions.getFog().toString()));
     }
 
     private void writeInitiativeRolls() {
@@ -175,21 +173,16 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
             if (team.isObserverTeam()) {
                 continue;
             }
+            addReport(new AcsPublicReportEntry(1015).add(Player.TEAM_NAMES[team.getId()])
+                .add(team.getInitiative().toString()));
 
-            // If there is only one non-observer player, list them as the 'team', and use the team initiative
-            if (team.getNonObserverSize() == 1) {
-                final Player player = team.nonObserverPlayers().get(0);
-                addReport(new SBFPlayerNameReportEntry(player));
-                addReport(new SBFPublicReportEntry(1015).noNL());
-                addReport(new SBFInitiativeRollReportEntry(team.getInitiative()));
-            } else {
-                // Multiple players. List the team, then break it down.
-                SBFReportEntry r = new SBFPublicReportEntry(1015).add(Player.TEAM_NAMES[team.getId()]);
-                r.add(team.getInitiative().toString());
-                addReport(r);
-                for (Player player : team.nonObserverPlayers()) {
-                    addReport(new SBFPublicReportEntry(1015).indent().add(player.getName()).add(player.getInitiative().toString()));
-                }
+            // Multiple players. List the team, then break it down.
+            for (Player player : team.nonObserverPlayers()) {
+                addReport(new AcsPublicReportEntry(2020)
+                    .indent()
+                    .add(player.getName())
+                    .add(player.getInitiative().toString())
+                );
             }
         }
     }
@@ -197,12 +190,13 @@ public record AcsInitiativeHelper(AcsGameManager gameManager) implements AcsGame
     private void writeHeader() {
         if (game().getLastPhase().isDeployment() || game().isDeploymentComplete()
             || !game().shouldDeployThisRound()) {
-            addReport(new SBFReportHeader(1000).add(game().getCurrentRound()));
+            addReport(new AcsReportHeader(1200));
+            addReport(new AcsReportHeader(1000).add(game().getCurrentRound()));
         } else {
             if (game().getCurrentRound() == 0) {
-                addReport(new SBFReportHeader(1005));
+                addReport(new AcsReportHeader(1005));
             } else {
-                addReport(new SBFReportHeader(1010).add(game().getCurrentRound()));
+                addReport(new AcsReportHeader(1000).add(game().getCurrentRound()));
             }
         }
     }

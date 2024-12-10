@@ -16,19 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
-
-import megamek.common.IGame;
-import megamek.common.force.Force;
-import megamek.common.strategicBattleSystems.BaseFormationConverter;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
 /**
  * @author Luana Coppio
  */
-public final class AcsFormationConverter extends BaseFormationConverter<AcsFormation> {
-
-    public AcsFormationConverter(Force force, IGame game) {
-        super(force, game, new AcsFormation());
-    }
-
+public enum EngagementControl {
+    NONE,
+    STANDARD,
+    EVADE,
+    OVERRUN,
+    FORCED_ENGAGEMENT
 }

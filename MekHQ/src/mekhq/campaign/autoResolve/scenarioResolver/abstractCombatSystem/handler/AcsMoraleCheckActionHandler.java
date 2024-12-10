@@ -16,20 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler;
 
 import megamek.common.Compute;
 import megamek.common.Roll;
 import megamek.common.strategicBattleSystems.SBFFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsMoraleCheckAction;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsRecoveringNerveAction;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsRecoveringNerveActionToHitData;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsMoraleReporter;
 
 /**
  * @author Luana Coppio
  */
 public class AcsMoraleCheckActionHandler extends AbstractAcsActionHandler {
 
+    private final AcsMoraleReporter reporter;
+
     public AcsMoraleCheckActionHandler(AcsMoraleCheckAction action, AcsGameManager gameManager) {
         super(action, gameManager);
+        this.reporter = new AcsMoraleReporter(gameManager.getGame(), this::addReport);
     }
 
     @Override
@@ -61,12 +68,22 @@ public class AcsMoraleCheckActionHandler extends AbstractAcsActionHandler {
         var toHit = AcsRecoveringNerveActionToHitData.compileToHit(game(), new AcsRecoveringNerveAction(demoralizedFormation.getId()));
         Roll moraleCheck = Compute.rollD6(2);
 
-        if (!moraleCheck.isTargetRollSuccess(toHit)) {
-            var currentMorale = demoralizedFormation.moraleStatus();
-            if (SBFFormation.MoraleStatus.values().length == currentMorale.ordinal() + 1) {
+        reporter.reportMoraleCheckStart(demoralizedFormation, toHit.getValue());
+        reporter.reportMoraleCheckRoll(demoralizedFormation, moraleCheck);
+
+        if (moraleCheck.isTargetRollSuccess(toHit)) {
+            // Success - no morale worsening
+            reporter.reportMoraleCheckSuccess(demoralizedFormation);
+        } else {
+            // Failure - morale worsens
+            var oldMorale = demoralizedFormation.moraleStatus();
+            if (SBFFormation.MoraleStatus.values().length == oldMorale.ordinal() + 1) {
                 demoralizedFormation.setMoraleStatus(SBFFormation.MoraleStatus.ROUTED);
+                reporter.reportMoraleCheckFailure(demoralizedFormation, oldMorale, SBFFormation.MoraleStatus.ROUTED);
             } else {
-                demoralizedFormation.setMoraleStatus(SBFFormation.MoraleStatus.values()[currentMorale.ordinal() + 1]);
+                var newMorale = SBFFormation.MoraleStatus.values()[oldMorale.ordinal() + 1];
+                demoralizedFormation.setMoraleStatus(newMorale);
+                reporter.reportMoraleCheckFailure(demoralizedFormation, oldMorale, newMorale);
             }
         }
     }

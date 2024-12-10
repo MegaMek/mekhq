@@ -239,6 +239,9 @@ public class AverageExperienceRating {
             skillCount++;
         }
 
+        if (skillCount == 0) {
+            return 0;
+        }
         return (double) skillValue / skillCount;
     }
 }

@@ -27,10 +27,10 @@ import megamek.common.strategicBattleSystems.SBFFormation;
 import mekhq.campaign.autoResolve.helper.RandomUtils;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsManeuverToHitData;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsStandardUnitAttack;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormationTurn;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.EngagementControl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,6 +95,7 @@ public class FiringPhase extends PhaseHandler {
                     ).sampleGet();
                 }
                 manueverModifier = AcsStandardUnitAttack.ManueverResult.SUCCESS;
+                target.setRange(actingFormation.getId(), range);
             } else if (actingFormationMos < targetFormationMos) {
                 range = RandomUtils.WeightedList.of(
                     ASRange.LONG, target.getStdDamage().L.damage,
@@ -102,11 +103,13 @@ public class FiringPhase extends PhaseHandler {
                     ASRange.SHORT, target.getStdDamage().S.damage
                 ).sampleGet();
                 manueverModifier = AcsStandardUnitAttack.ManueverResult.FAILURE;
+                target.setRange(actingFormation.getId(), range);
             }
 
-            target.setRange(actingFormation.getId(), range);
             actingFormation.setRange(target.getId(), range);
         }
+
+        range = actingFormation.getRange(target.getId());
 
         var maxAttacksOnFailure = Math.max(
             Math.round(actingFormation.getUnits().size() / 2.0),

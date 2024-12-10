@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.components;
+package mekhq.campaign.autoResolve.scenarioResolver.component;
 
 import megamek.common.GameLog;
 import megamek.common.Report;
@@ -41,7 +41,9 @@ public class HtmlGameLogger {
     }
 
     private void initializeLog() {
-        add("<HTML><BODY>");
+        add("<html><head>\n" +
+            "    <meta charset=\"UTF-8\">\n" +
+            "</head><body>");
     }
 
     public HtmlGameLogger printToConsole() {
@@ -74,7 +76,7 @@ public class HtmlGameLogger {
     }
 
     public void close() {
-        add("</BODY></HTML>");
+        add("</body></html>");
     }
 
 }

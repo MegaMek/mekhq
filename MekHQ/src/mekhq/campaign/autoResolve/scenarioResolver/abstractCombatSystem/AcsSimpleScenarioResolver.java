@@ -22,10 +22,10 @@ import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
 import mekhq.campaign.autoResolve.helper.SetupForces;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase.*;
-import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
+import mekhq.campaign.autoResolve.scenarioResolver.component.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 
 /**

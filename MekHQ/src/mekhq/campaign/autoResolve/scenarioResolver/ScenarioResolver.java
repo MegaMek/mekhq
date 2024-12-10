@@ -22,7 +22,7 @@ import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.SetupForces;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.AcsSimpleScenarioResolver;
-import mekhq.campaign.autoResolve.scenarioResolver.components.AutoResolveConcludedEvent;
+import mekhq.campaign.autoResolve.scenarioResolver.component.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 
 /**

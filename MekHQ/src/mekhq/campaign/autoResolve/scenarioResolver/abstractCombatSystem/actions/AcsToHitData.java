@@ -22,7 +22,7 @@ import megamek.common.InGameObject;
 import megamek.common.TargetRoll;
 import megamek.common.strategicBattleSystems.SBFUnit;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
 
 import java.util.List;
 

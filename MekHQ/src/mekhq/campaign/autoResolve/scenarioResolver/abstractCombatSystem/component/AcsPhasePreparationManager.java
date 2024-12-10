@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
 import megamek.common.InGameObject;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsPublicReportEntry;
 
 /**
  * @author Luana Coppio

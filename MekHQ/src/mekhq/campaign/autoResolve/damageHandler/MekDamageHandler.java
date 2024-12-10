@@ -108,7 +108,7 @@ public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean enti
             if (slot != null && slot.isHittable() && !slot.isHit() && !slot.isDestroyed()) {
                 slot.setHit(true);
                 slot.setDestroyed(true);
-                logger.trace("[{}] Equipment destroyed: {}", entity.getDisplayName(), slot.getMount().getName());
+                logger.trace("[{}] Slot {} destroyed", entity.getDisplayName(), slot.getIndex());
                 break;
             }
         }

@@ -19,8 +19,10 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
 import megamek.common.IGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsEngagementControlActionHandler;
 
 import java.io.Serializable;
 

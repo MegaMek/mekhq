@@ -19,12 +19,13 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase;
 
 import megamek.common.enums.GamePhase;
+import megamek.server.victory.VictoryResult;
 import mekhq.campaign.ai.utility.Memory;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsMoraleCheckAction;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsRecoveringNerveAction;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsWithdrawAction;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
 
 public class EndPhase extends PhaseHandler {
 
@@ -39,6 +40,22 @@ public class EndPhase extends PhaseHandler {
         checkMorale();
         checkRecoveringNerves();
         forgetEverything();
+        checkVictory();
+    }
+
+    private void checkVictory() {
+        if (getGameManager().checkForVictory()) {
+            var game = getGameManager().getGame();
+            var gameManager = getGameManager();
+            VictoryResult vr = game.getVictoryResult();
+            var reports = vr.processVictory(game);
+
+            if (!reports.isEmpty()) {
+                reports.forEach(gameManager::addReport);
+                vr.setVictory(true);
+                game.setVictoryTeam(vr.getWinningTeam());
+            }
+        }
     }
 
     private void checkUnitDestruction() {
@@ -85,6 +102,9 @@ public class EndPhase extends PhaseHandler {
     }
 
     private void forgetEverything() {
-        getGameManager().getGame().getActiveFormations().stream().map(AcsFormation::getMemory).forEach(Memory::clear);
+        var formations = getGameManager().getGame().getActiveFormations();
+        formations.stream().map(AcsFormation::getMemory).forEach(Memory::clear);
+        formations.forEach(AcsFormation::reset);
+
     }
 }

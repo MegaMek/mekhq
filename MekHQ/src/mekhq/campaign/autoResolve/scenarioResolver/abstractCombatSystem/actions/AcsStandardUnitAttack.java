@@ -22,8 +22,10 @@ import megamek.common.IGame;
 import megamek.common.alphaStrike.ASRange;
 import megamek.logging.MMLogger;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsStandardUnitAttackHandler;
 
 import java.util.Optional;
 

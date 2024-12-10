@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component;
 
 import megamek.common.enums.GamePhase;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsPublicReportEntry;
 
 /**
  * @author Luana Coppio
@@ -28,6 +29,7 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
     void managePhase() {
         switch (gameManager.getGame().getPhase()) {
             case INITIATIVE:
+                gameManager.addReport(new AcsPublicReportEntry(999));
                 gameManager.getGame().setupDeployment();
                 gameManager.resetFormationsDone();
                 gameManager.flushPendingReports();
@@ -38,6 +40,7 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
                 }
                 break;
             case DEPLOYMENT:
+                gameManager.addReport(new AcsPublicReportEntry(999));
                 gameManager.getGame().clearDeploymentThisRound();
                 phaseCleanup();
                 gameManager.changePhase(GamePhase.SBF_DETECTION);
@@ -48,24 +51,30 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
                 gameManager.changePhase(GamePhase.MOVEMENT);
                 break;
             case MOVEMENT:
+                gameManager.addReport(new AcsPublicReportEntry(999));
+                gameManager.addReport(new AcsPublicReportEntry(2201));
                 gameManager.actionsProcessor.handleActions();
                 phaseCleanup();
                 gameManager.changePhase(GamePhase.FIRING);
                 break;
             case FIRING:
+                gameManager.addReport(new AcsPublicReportEntry(999));
+                gameManager.addReport(new AcsPublicReportEntry(2002));
                 gameManager.actionsProcessor.handleActions();
                 phaseCleanup();
                 gameManager.changePhase(GamePhase.END);
                 break;
             case END:
+                gameManager.addReport(new AcsPublicReportEntry(999));
+                gameManager.addReport(new AcsPublicReportEntry(3335));
                 gameManager.actionsProcessor.handleActions();
                 phaseCleanup();
                 if (gameManager.checkForVictory()) {
                     gameManager.changePhase(GamePhase.VICTORY);
                 }
                 break;
-            case STARTING_SCENARIO:
             case VICTORY:
+            case STARTING_SCENARIO:
             default:
                 break;
         }

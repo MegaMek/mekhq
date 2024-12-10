@@ -16,15 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
+package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler;
 
 import megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Compute;
 import megamek.common.Roll;
 import megamek.common.strategicBattleSystems.*;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsEngagementControlAction;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsEngagementControlToHitData;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.EngagementControl;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsEngagementControlReporter;
 
 import java.util.Map;
 
@@ -33,8 +36,11 @@ import java.util.Map;
  */
 public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler {
 
+    private final AcsEngagementControlReporter reporter;
+
     public AcsEngagementControlActionHandler(AcsEngagementControlAction action, AcsGameManager gameManager) {
         super(action, gameManager);
+        this.reporter = new AcsEngagementControlReporter(gameManager.getGame(), this::addReport);
     }
 
     @Override
@@ -75,32 +81,26 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
         }
 
         var target = targetOpt.get();
+
+        // Compute To-Hit
         var toHit = AcsEngagementControlToHitData.compileToHit(game(), engagementControl);
-        var toHitDefender = AcsEngagementControlToHitData.compileToHit(game(), new AcsEngagementControlAction(target.getId(), attacker.getId(), engagementControl.getEngagementControl()));
+        // Compute defender To-Hit as if roles reversed but same control
+        var reverseAction = new AcsEngagementControlAction(target.getId(), attacker.getId(), engagementControl.getEngagementControl());
+        var toHitDefender = AcsEngagementControlToHitData.compileToHit(game(), reverseAction);
 
-        SBFReportEntry report = new SBFReportEntry(2200).noNL()
-            .add(
-                new SBFFormationReportEntry(attacker.generalName(), UIUtil.hexColor(SBFInGameObjectTooltip.ownerColor(attacker, game()))).text()
-            )
-            .add(
-                new SBFFormationReportEntry(target.generalName(), UIUtil.hexColor(SBFInGameObjectTooltip.ownerColor(target, game()))).text()
-            )
-            .add(engagementControl.getEngagementControl().name());
-        addReport(report);
 
-        addReport(new SBFReportEntry(2203).add(toHit.getValue()).noNL());
+        // Report the engagement start
+        reporter.reportEngagementStart(attacker, target, engagementControl.getEngagementControl());
+
+        // Report attacker to-hit
+        reporter.reportAttackerToHitValue(toHit.getValue());
+
         Roll attackerRoll = Compute.rollD6(2);
         Roll defenderRoll = Compute.rollD6(2);
 
-        report = new SBFReportEntry(2202).noNL();
-        report.add(new SBFPlayerNameReportEntry(game().getPlayer(attacker.getOwnerId())).text());
-        report.add(new SBFRollReportEntry(attackerRoll).noNL().text());
-        addReport(report);
-
-        report = new SBFReportEntry(2202).noNL();
-        report.add(new SBFPlayerNameReportEntry(game().getPlayer(target.getOwnerId())).text());
-        report.add(new SBFRollReportEntry(defenderRoll).noNL().text());
-        addReport(report);
+        // Report rolls
+        reporter.reportAttackerRoll(attacker, attackerRoll);
+        reporter.reportDefenderRoll(target, defenderRoll);
 
         var engagements = attacker.getMemory().getMemories("engagementControl");
         var targetEngagements = target.getMemory().getMemories("engagementControl");
@@ -113,10 +113,8 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
 
         if (attackerDelta > defenderDelta) {
             attacker.setEngagementControlFailed(false);
-            addReport(
-                new SBFReportEntry(2204).noNL()
-                    .add(new SBFPlayerNameReportEntry(game().getPlayer(attacker.getOwnerId())).text())
-            );
+            reporter.reportAttackerWin(attacker);
+
             switch (engagementControl.getEngagementControl()) {
                 case NONE:
                     attacker.setEngagementControl(EngagementControl.NONE);
@@ -143,7 +141,8 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
                     ));
             }
         } else {
-            addReport(new SBFPublicReportEntry(2205));
+            // Attacker loses
+            reporter.reportAttackerLose(attacker);
             // Adding memory, so the unit can remember that it is engaged with the target
             engagements.add(Map.of(
                 "targetFormationId", attacker.getId(),
@@ -159,8 +158,5 @@ public class AcsEngagementControlActionHandler extends AbstractAcsActionHandler 
                 "engagementControl", engagementControl.getEngagementControl()
             ));
         }
-
-
     }
-
 }

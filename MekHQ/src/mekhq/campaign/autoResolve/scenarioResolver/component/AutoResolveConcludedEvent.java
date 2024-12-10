@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.autoResolve.scenarioResolver.components;
+package mekhq.campaign.autoResolve.scenarioResolver.component;
 
 import megamek.common.Entity;
 import megamek.common.IEntityRemovalConditions;
@@ -36,7 +36,6 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
     private final List<Entity> survivingEntities;
     private final boolean controlledScenario;
     private final IGame game;
-
 
     public AutoResolveConcludedEvent(boolean controlledScenario, List<Entity> removedEntities, List<Entity> survivingEntities, IGame game) {
         this.controlledScenario = controlledScenario;

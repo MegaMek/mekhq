@@ -19,8 +19,9 @@
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions;
 
 import megamek.common.actions.EntityAction;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManager;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.components.AcsGameManagerHelper;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManagerHelper;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
 
 /**
  * @author Luana Coppio
