@@ -1703,11 +1703,9 @@ public class Campaign implements ITechManager {
         personnel.put(p.getId(), p);
         p.setJoinedCampaign(getLocalDate());
 
-        if (log) {
-            String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner")
-                    : "";
-            addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
-        }
+
+        String formerSurname = p.getSurname();
+
 
         if (p.getPrimaryRole().isAstech()) {
             astechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
@@ -1723,6 +1721,13 @@ public class Campaign implements ITechManager {
             if ((prisonerStatus.isFree()) && (!p.getOriginFaction().isClan()) && (!p.getPrimaryRole().isDependent())) {
                 simulateRelationshipHistory(p);
             }
+        }
+
+        if(log){
+            formerSurname = p.getSurname().equals(formerSurname) ? "" : String.format(" (Formerly %s) ", formerSurname);
+            String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner")
+                : "";
+            addReport(String.format("%s%s has been added to the personnel roster%s.", p.getHyperlinkedName(), formerSurname, add));
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(p));
