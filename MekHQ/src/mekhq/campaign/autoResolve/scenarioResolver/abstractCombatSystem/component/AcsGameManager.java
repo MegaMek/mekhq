@@ -134,27 +134,11 @@ public class AcsGameManager extends AbstractGameManager {
     @Override
     public void calculatePlayerInitialCounts() {
         for (Player player : game.getPlayersList()) {
-            long count = 0;
-            for (AcsFormation formation : game.getActiveFormations(player)) {
-                if (!formation.isRouted()) {
-                    count++;
-                }
-            }
-            player.setInitialEntityCount(Math.toIntExact(count));
-
-            int totalBV = 0;
-            for (AcsFormation formation : game.getActiveFormations(player)) {
-                totalBV += formation.getPointValue();
-            }
-            player.setInitialBV(totalBV);
+            player.setInitialEntityCount(Math.toIntExact(game.getActiveFormations(player).stream()
+                .filter(entity -> !entity.isRouted()).count()));
+            game.getActiveFormations(player).stream().map(AcsFormation::getPointValue).reduce(Integer::sum)
+                .ifPresent(player::setInitialBV);
         }
-
-//        for (Player player : game.getPlayersList()) {
-//            player.setInitialEntityCount(Math.toIntExact(game.getActiveFormations(player).stream()
-//                .filter(entity -> !entity.isRouted()).count()));
-//            game.getActiveFormations(player).stream().map(AcsFormation::getPointValue).reduce(Integer::sum)
-//                .ifPresent(player::setInitialBV);
-//        }
     }
 
 
