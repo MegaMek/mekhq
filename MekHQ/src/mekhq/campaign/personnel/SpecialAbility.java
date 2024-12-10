@@ -645,7 +645,8 @@ public class SpecialAbility {
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities() {
-        return getWeightedSpecialAbilities(getSpecialAbilities().values());
+        var weightedStuff = getWeightedSpecialAbilities(getSpecialAbilities().values());
+        return weightedStuff;
     }
 
     public static List<SpecialAbility> getWeightedSpecialAbilities(Collection<SpecialAbility> source) {
