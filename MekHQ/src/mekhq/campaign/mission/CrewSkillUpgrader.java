@@ -194,12 +194,13 @@ public class CrewSkillUpgrader {
                         }
 
                         // If the option has a name but isn't defined, try another one
-                        try {
-                            entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
+                        var optionOpt = entity.getCrew().getOptions().getOptionOpt(spa.getName());
+                        if (optionOpt.isPresent()) {
+                            optionOpt.get().setValue(spa.getName());
                             return spa.getCost();
-                        } catch (NullPointerException e) {
-                            logger.warn("Attempted to assign SPA '" + spa.getName() + "' but SPA not found.");
+                        } else {
                             // Make sure to remove choices we can't use
+                            logger.debug("Attempted to assign SPA '{}' but SPA not found.", spa.getName());
                             choices.remove(spaIndex);
                             continue;
                         }
