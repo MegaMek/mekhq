@@ -626,13 +626,7 @@ public class Campaign implements ITechManager {
         }
         if (campaignOptions.isUseStaticRATs()) {
             RATManager rm = new RATManager();
-            while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    logger.error("", e);
-                }
-            }
+            RandomUnitGenerator.getInstance();
             rm.setSelectedRATs(campaignOptions.getRATs());
             rm.setIgnoreRatEra(campaignOptions.isIgnoreRATEra());
             unitGenerator = rm;
@@ -2284,11 +2278,11 @@ public class Campaign implements ITechManager {
         if (p instanceof StructuralIntegrity) {
             return null;
         }
-        // Skip out on "not armor" (as in 0 point armer on men or field guns)
+        // Skip out on "not armor" (as in 0 point armor on men or field guns)
         if ((p instanceof Armor) && ((Armor) p).getType() == EquipmentType.T_ARMOR_UNKNOWN) {
             return null;
         }
-        // Makes no sense buying those separately from the chasis
+        // Makes no sense buying those separately from the chassis
         if ((p instanceof EquipmentPart)
                 && ((EquipmentPart) p).getType() != null
                 && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
@@ -2313,11 +2307,13 @@ public class Campaign implements ITechManager {
             boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
 
         if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
+            logger.trace("Ignoring part in mothballed unit: {}", incomingPart);
         } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
             partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
             if (incomingPart.isPresent()) {
                 if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
+                    logger.trace("Ignoring part with quality lower than {}: {}", ignoreSparesUnderQuality, incomingPart);
                 } else {
                     partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
                     partInUse.addSpare(incomingPart);
@@ -7083,6 +7079,10 @@ public class Campaign implements ITechManager {
         return gameOptions;
     }
 
+    public StaticGameOptions getStaticGameOptions() {
+        return StaticGameOptions.create(gameOptions);
+    }
+
     public Vector<IBasicOption> getGameOptionsVector() {
         Vector<IBasicOption> options = new Vector<>();
         for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i.hasMoreElements();) {
@@ -8166,7 +8166,6 @@ public class Campaign implements ITechManager {
             addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName() + ". " + paidString
                     + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId()
                     + "'>Get details</a>]");
-
             u.resetDaysSinceMaintenance();
         }
     }
@@ -8637,14 +8636,6 @@ public class Campaign implements ITechManager {
         return !campaignOptions.isDisallowExtinctStuff();
     }
 
-    public BehaviorSettings getAutoResolveBehaviorSettings() {
-        return autoResolveBehaviorSettings;
-    }
-
-    public void setAutoResolveBehaviorSettings(BehaviorSettings settings) {
-        autoResolveBehaviorSettings = settings;
-    }
-
     /**
      * Gets a string to use for addressing the commander.
      * If no commander is flagged, returns a default address.
@@ -8665,6 +8656,14 @@ public class Campaign implements ITechManager {
         }
 
         return commanderRank;
+    }
+
+    public BehaviorSettings getAutoResolveBehaviorSettings() {
+        return autoResolveBehaviorSettings;
+    }
+
+    public void setAutoResolveBehaviorSettings(BehaviorSettings settings) {
+        autoResolveBehaviorSettings = settings;
     }
 
 }

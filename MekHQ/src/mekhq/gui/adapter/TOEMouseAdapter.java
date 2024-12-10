@@ -1083,9 +1083,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             continue;
                         }
 
-                        if (scenario.getHasTrack()) {
-                            continue;
-                        }
+//                        if (scenario.getHasTrack()) {
+//                            continue;
+//                        }
 
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(
@@ -1102,7 +1102,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Force");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+//                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+                menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
 
@@ -1452,9 +1453,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             continue;
                         }
 
-                        if (scenario.getHasTrack()) {
-                            continue;
-                        }
+//                        if (scenario.getHasTrack()) {
+//                            continue;
+//                        }
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
                                 + scenario.getId() + '|' + unitIds);
@@ -1604,7 +1605,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Unit");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+//                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+                menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
 
