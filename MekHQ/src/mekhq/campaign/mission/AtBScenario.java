@@ -1453,12 +1453,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             // TODO: replace with TeamLoadoutGenerator call once 0.50.1 errata go in
             boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
-
-            TeamLoadOutGenerator.populateAeroBombs(aircraft,
-                    campaign.getGameYear(),
-                    !isAeroMap,
-                    contract.getEnemyQuality(),
-                    contract.getEnemy().isPirate());
+            TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(campaign.getGame());
+            tlg.populateAeroBombs(
+                aircraft,
+                campaign.getGameYear(),
+                !isAeroMap,
+                contract.getEnemyQuality(),
+                contract.getEnemy().isPirate(),
+                contract.getEnemy().getShortName()
+            );
 
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");

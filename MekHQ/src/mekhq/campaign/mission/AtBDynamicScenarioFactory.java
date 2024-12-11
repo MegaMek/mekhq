@@ -726,10 +726,10 @@ public class AtBDynamicScenarioFactory {
                         break;
                 }
 
+                Game cGame = campaign.getGame();
+                TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
                 if (campaign.getCampaignOptions().isAutoConfigMunitions()) {
                     // Configure *all* generated units with appropriate munitions (for BV calcs)
-                    Game cGame = campaign.getGame();
-                    TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(generatedLance);
                     // bin fill ratio will be adjusted by the load out generator based on piracy and
                     // quality
@@ -743,7 +743,14 @@ public class AtBDynamicScenarioFactory {
                     tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
                 } else {
                     // Load the fighters with bombs
-                    TeamLoadOutGenerator.populateAeroBombs(generatedLance, campaign.getGameYear(), onGround, ownerBaseQuality, isPirate);
+                    tlg.populateAeroBombs(
+                        generatedLance,
+                        campaign.getGameYear(),
+                        onGround,
+                        ownerBaseQuality,
+                        isPirate,
+                        faction.getShortName()
+                    );
                 }
             }
 
