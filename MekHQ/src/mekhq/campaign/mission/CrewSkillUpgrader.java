@@ -18,23 +18,15 @@
  */
 package mekhq.campaign.mission;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.UnitType;
-import megamek.common.WeaponType;
+import megamek.common.*;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+
+import java.util.*;
 
 /**
  * This class handles randomly generating SPAs for bot-controlled entities
@@ -194,12 +186,13 @@ public class CrewSkillUpgrader {
                         }
 
                         // If the option has a name but isn't defined, try another one
-                        try {
-                            entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
+                        var optionOpt = entity.getCrew().getOptions().getOptionOpt(spa.getName());
+                        if (optionOpt.isPresent()) {
+                            optionOpt.get().setValue(true);
                             return spa.getCost();
-                        } catch (NullPointerException e) {
-                            logger.warn("Attempted to assign SPA '" + spa.getName() + "' but SPA not found.");
+                        } else {
                             // Make sure to remove choices we can't use
+                            logger.debug("Attempted to assign SPA '{}' but SPA not found.", spa.getName());
                             choices.remove(spaIndex);
                             continue;
                         }

@@ -51,6 +51,7 @@
 /MekHQ/*.blame
 /out/
 /RemoteSystemsTempFiles/
+/tmp/
 /.classpath
 /.metadata
 /.project

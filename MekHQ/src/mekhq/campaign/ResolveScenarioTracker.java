@@ -22,6 +22,7 @@
 package mekhq.campaign;
 
 import megamek.client.Client;
+import megamek.client.IClient;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.PostGameResolution;
@@ -30,6 +31,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.autoResolve.helper.AutoResolveClient;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -89,7 +91,7 @@ public class ResolveScenarioTracker {
     Campaign campaign;
     Scenario scenario;
     Optional<File> unitList = Optional.empty();
-    Client client;
+    IClient client;
     Boolean control;
     private PostGameResolution victoryEvent;
 
@@ -137,6 +139,10 @@ public class ResolveScenarioTracker {
         }
     }
 
+    public boolean isAutoResolve() {
+        return this.client instanceof AutoResolveClient;
+    }
+
     public void findUnitFile() {
         unitList = FileDialogs.openUnits(null);
     }
@@ -145,7 +151,7 @@ public class ResolveScenarioTracker {
         return unitList.map(File::getAbsolutePath).orElse("No file selected");
     }
 
-    public void setClient(Client c) {
+    public void setClient(IClient c) {
         client = c;
     }
 
@@ -183,7 +189,6 @@ public class ResolveScenarioTracker {
     public void processGame() {
         int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
-
         for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements();) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {

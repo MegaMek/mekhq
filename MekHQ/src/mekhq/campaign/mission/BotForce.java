@@ -340,7 +340,7 @@ public class BotForce implements IPlayerSettings {
 
     public List<Entity> getFullEntityList(Campaign c) {
         List<Entity> fullEntities = new ArrayList<>();
-        fullEntities.addAll(fixedEntityList);
+        fullEntities.addAll(getFixedEntityList());
         fullEntities.addAll(generatedEntityList);
         fullEntities.addAll(getTraitorEntities(c));
         return fullEntities;
@@ -399,16 +399,16 @@ public class BotForce implements IPlayerSettings {
     }
 
     public void generateRandomForces(List<Unit> playerUnits, Campaign c) {
-        if (null == bfRandomizer) {
-            return;
-        }
         // reset the generated units
         generatedEntityList = new ArrayList<>();
+        if (null == getBotForceRandomizer()) {
+            return;
+        }
         // get existing units
         List<Entity> existingEntityList = new ArrayList<>();
-        existingEntityList.addAll(fixedEntityList);
+        existingEntityList.addAll(getFixedEntityList());
         existingEntityList.addAll(getTraitorEntities(c));
-        generatedEntityList = bfRandomizer.generateForce(playerUnits, existingEntityList, c);
+        generatedEntityList = getBotForceRandomizer().generateForce(playerUnits, existingEntityList, c);
     }
 
     public List<UUID> getTraitorPersons() {
@@ -422,6 +422,10 @@ public class BotForce implements IPlayerSettings {
      */
     public List<Entity> getTraitorEntities(Campaign campaign) {
         List<Entity> traitorEntities = new ArrayList<>();
+        if (null == traitors) {
+            return traitorEntities;
+        }
+
         for (UUID traitor : traitors) {
             Person p = campaign.getPerson(traitor);
             if ((null != p) && (null != p.getUnit()) && (null != p.getUnit().getEntity())) {

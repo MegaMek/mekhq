@@ -39,6 +39,7 @@ import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.WeaponOrderHandler;
+import megamek.common.options.GameOptions;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -178,7 +179,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
-                    client.getGame().getOptions().loadOptions();
+                    ((GameOptions) client.getGame().getOptions()).loadOptions();
                     client.sendGameOptions(password, app.getCampaign().getGameOptionsVector());
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
                 }
