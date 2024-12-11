@@ -25,7 +25,7 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
 /**

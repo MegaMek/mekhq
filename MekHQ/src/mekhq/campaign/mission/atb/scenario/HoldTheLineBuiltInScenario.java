@@ -79,7 +79,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT,
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT,
                 isAttacker() ? 0 : 4, 0, campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);

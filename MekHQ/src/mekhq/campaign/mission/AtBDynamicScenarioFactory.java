@@ -71,7 +71,7 @@ import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
