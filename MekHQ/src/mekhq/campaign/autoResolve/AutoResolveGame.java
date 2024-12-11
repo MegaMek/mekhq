@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.autoResolve;
 
-import megamek.client.ui.swing.sbf.SelectDirection;
 import megamek.common.*;
 import megamek.common.actions.EntityAction;
 import megamek.common.annotations.Nullable;
@@ -35,10 +34,10 @@ import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationTurn;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioObjective;
 
@@ -54,6 +53,10 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * Information that is necessary for the setup of the game.
      */
     private final AtBScenario scenario;
+
+    /**
+     * Objectives that must be considered during the game
+     */
     private final List<String> forceMustBePreserved = new ArrayList<>();
 
 
@@ -464,10 +467,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return actionHandlers;
     }
 
-    public List<InGameObject> getFullyVisibleUnits(Player viewer) {
-        return getInGameObjects();
-    }
-
     public Optional<AcsTurn> changeToNextTurn() {
         turnIndex++;
         return getCurrentTurn();
@@ -502,15 +501,9 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         planetaryConditions.alterConditions(conditions);
     }
 
-
     public GamePhase getLastPhase() {
         return lastPhase;
     }
-
-    public Optional<Player> getPlayerFor(AcsTurn turn) {
-        return Optional.ofNullable(getPlayer(turn.playerId()));
-    }
-
 
     public void setVictoryContext(Map<String, Object> ctx) {
         victoryContext.clear();
@@ -527,92 +520,10 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         }
     }
 
-    public boolean areHostile(AcsFormation formation, Player player) {
-        return player.isEnemyOf(getPlayer(formation.getOwnerId()));
-    }
-
     // check current turn, phase, formation
     private boolean isEligibleForAction(AcsFormation formation) {
         return (getTurn() instanceof AcsFormationTurn)
             && getTurn().isValidEntity(formation, this);
-    }
-
-    /**
-     * @return the first formation in the list of formations that is alive and
-     *         eligible for the current game phase.
-     */
-    public Optional<AcsFormation> getNextEligibleFormation() {
-        return getNextEligibleFormation(BTObject.NONE);
-    }
-
-    /**
-     * @return the preceding formation in the list of formations that is alive and
-     *         eligible for the current game phase.
-     */
-    public Optional<AcsFormation> getPreviousEligibleFormation() {
-        return getPreviousEligibleFormation(BTObject.NONE);
-    }
-
-    /**
-     * @return the next in the list of formations that is alive and eligible for the
-     *         current game phase,
-     *         counting from the given current formation id. If no matching
-     *         formation can be found for the given id,
-     *         returns the first eligible formation in the list of formations that
-     *         is alive and eligible.
-     */
-    public Optional<AcsFormation> getNextEligibleFormation(int currentFormationID) {
-        return getEligibleFormationImpl(currentFormationID, phase, SelectDirection.NEXT_UNIT);
-    }
-
-    /**
-     * @return the previous in the list of formations that is alive and eligible for
-     *         the current game phase,
-     *         counting from the given current formation id. If no matching
-     *         formation can be found for the given id,
-     *         returns the last eligible formation from the list of formations that
-     *         is alive and eligible.
-     */
-    public Optional<AcsFormation> getPreviousEligibleFormation(int currentFormationID) {
-        return getEligibleFormationImpl(currentFormationID, phase, SelectDirection.PREVIOUS_UNIT);
-    }
-
-    /**
-     * Based on the given search direction, returns the formation that precedes or
-     * follows the given
-     * formation ID in the list of active formations eligible for action in the
-     * given game phase.
-     *
-     * @param currentFormationID the start point of the formation search. Need not
-     *                           match an actual formation
-     * @param phase              the phase to check
-     * @param direction          the selection to seek the next or previous
-     *                           formation
-     * @return the formation that precedes or follows the given formation ID, if one
-     *         can be found
-     */
-    private Optional<AcsFormation> getEligibleFormationImpl(int currentFormationID, GamePhase phase,
-                                                            SelectDirection direction) {
-        var eligibleFormations = getActiveFormations().stream()
-            .filter(this::isEligibleForAction)
-            .toList();
-        if (eligibleFormations.isEmpty()) {
-            return Optional.empty();
-        } else {
-            var currentFormation = getFormation(currentFormationID);
-            int index = currentFormation.map(eligibleFormations::indexOf).orElse(-1);
-            if (index == -1) {
-                // when no current unit is found, the next unit is the first, the previous unit
-                // is the last
-                index = direction.isNextUnit() ? 0 : eligibleFormations.size() - 1;
-            } else {
-                // must add the list size to safely get the previous unit because -1 % 5 == -1
-                // (not 4)
-                index += eligibleFormations.size() + (direction.isNextUnit() ? 1 : -1);
-                index %= eligibleFormations.size();
-            }
-            return Optional.ofNullable(eligibleFormations.get(index));
-        }
     }
 
     /**
@@ -649,55 +560,6 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
 
     public void removeFormation(AcsFormation formation) {
         inGameObjects.remove(formation.getId());
-    }
-
-    public void destroyUnits(AcsFormation formation, List<SBFUnit> destroyedUnits) {
-        logger.debug("Destroying units: {}", destroyedUnits);
-        for (SBFUnit unit : destroyedUnits) {
-            for (var element : unit.getElements()) {
-                var entityOpt = getEntity(element.getId());
-                if (entityOpt.isPresent()) {
-                    var entity = entityOpt.get();
-                    addUnitToGraveyard(entity);
-                    var roll = Compute.rollD6(2);
-                    switch (roll.getIntValue()) {
-                        case 2, 3 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
-                        case 1, 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
-                        default -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-                    }
-                    damageEntity(entity, entity.getRemovalCondition());
-                }
-            }
-
-            formation.removeUnit(unit);
-            if (formation.getUnits().isEmpty()) {
-                removeFormation(formation);
-            }
-        }
-    }
-
-    public void damageEntity(Entity entity, int removalCondition) {
-        double targetDamage = switch (removalCondition) {
-            case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> (double) entity.getTotalOArmor() / Compute.d6();
-            case IEntityRemovalConditions.REMOVE_DEVASTATED -> 1000; // no damage is actually applied
-            case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
-            case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
-            default -> entity.getTotalOArmor() * 0.33;
-        };
-        var numberOfDices = (int) (targetDamage / 6 / 0.6);
-        var damage = Compute.d6(numberOfDices);
-        var clusterSize = 5;
-
-        var retreating = removalCondition == IEntityRemovalConditions.REMOVE_IN_RETREAT;
-        var captured = removalCondition == IEntityRemovalConditions.REMOVE_CAPTURED;
-        var ejected = removalCondition == IEntityRemovalConditions.REMOVE_EJECTED;
-        var devastated = removalCondition == IEntityRemovalConditions.REMOVE_DEVASTATED;
-
-        var crewMustSurvive = (retreating || captured || ejected);
-        var entityMustSurvive = !devastated;
-
-        DamageHandlerChooser.chooseHandler(entity, crewMustSurvive, entityMustSurvive)
-            .applyDamageInClusters(damage, clusterSize);
     }
 
     public void setPlayerSkillLevel(int playerId, SkillLevel averageSkillLevel) {

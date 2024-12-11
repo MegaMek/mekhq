@@ -93,5 +93,27 @@ public class DamageHandlerChooser {
         return new SimpleDamageHandler(entity, crewMustSurvive, entityMustSurvive);
     }
 
+    public static void damageRemovedEntity(Entity entity, int removalCondition) {
+        double targetDamage = switch (removalCondition) {
+            case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> (double) (entity.getTotalOArmor() * (1 / (Compute.d6() + 1)));
+            case IEntityRemovalConditions.REMOVE_DEVASTATED -> -1; // no damage is actually applied
+            case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
+            case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
+            default -> entity.getTotalOArmor() * 0.33;
+        };
+        var numberOfDices = Math.max(1, (int) (targetDamage / 6 / 0.6));
+        var damage = Compute.d6(numberOfDices);
+        var clusterSize = 5;
 
+        var retreating = removalCondition == IEntityRemovalConditions.REMOVE_IN_RETREAT;
+        var captured = removalCondition == IEntityRemovalConditions.REMOVE_CAPTURED;
+        var ejected = removalCondition == IEntityRemovalConditions.REMOVE_EJECTED;
+        var devastated = removalCondition == IEntityRemovalConditions.REMOVE_DEVASTATED;
+
+        var crewMustSurvive = (retreating || captured || ejected);
+        var entityMustSurvive = !devastated;
+
+        DamageHandlerChooser.chooseHandler(entity, crewMustSurvive, entityMustSurvive)
+            .applyDamageInClusters(damage, clusterSize);
+    }
 }

@@ -32,6 +32,7 @@ import megamek.server.Server;
 import megamek.server.commands.ServerCommand;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoResolve.AutoResolveGame;
+import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.*;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase.PhaseHandler;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.AcsReportEntry;
@@ -47,7 +48,7 @@ import java.util.List;
 public class AcsGameManager extends AbstractGameManager {
     private static final MMLogger logger = MMLogger.create(AcsGameManager.class);
     private final HtmlGameLogger gameLogger = HtmlGameLogger
-        .create(PreferenceManager.getClientPreferences().getGameLogFilename());
+        .create(PreferenceManager.getClientPreferences().getAutoResolveGameLogFilename());
 
     private AutoResolveGame game;
     private final List<AcsReportEntry> pendingReports = new ArrayList<>();
@@ -195,6 +196,10 @@ public class AcsGameManager extends AbstractGameManager {
      * add some reports to reporting
      */
     public boolean checkForVictory() {
+        if (game.getVictoryTeam() > 0) {
+            // latch
+            return true;
+        }
         VictoryResult vr = game.getVictoryResult();
         var reports = vr.processVictory(game);
         if (!reports.isEmpty()) {

@@ -47,6 +47,7 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         gameManager.addPhaseHandler(new MovementPhase(gameManager));
         gameManager.addPhaseHandler(new FiringPhase(gameManager));
         gameManager.addPhaseHandler(new EndPhase(gameManager));
+        gameManager.addPhaseHandler(new VictoryPhase(gameManager));
     }
 
     @Override
@@ -54,8 +55,6 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
         setupForces.createForcesOnGame(game);
         initializeGameManager(game);
         gameManager.runGame();
-        checkDamageToEntities(gameManager);
-
         var playerTeamWon = gameManager.getGame().getVictoryTeam() == gameManager.getGame().getLocalPlayer().getTeam();
 
         return new AutoResolveConcludedEvent(
@@ -64,27 +63,4 @@ public class AcsSimpleScenarioResolver extends ScenarioResolver {
             game.inGameTWEntities(),
             game);
     }
-
-    private static void checkDamageToEntities(AcsGameManager gameManager) {
-        for (AcsFormation formation : gameManager.getGame().getActiveFormations()) {
-            for ( var unit : formation.getUnits()) {
-                if (unit.getCurrentArmor() < unit.getArmor()) {
-                    for (var element : unit.getElements()) {
-                        var entityOpt = gameManager.getGame().getEntity(element.getId());
-                        if (entityOpt.isPresent()) {
-                            var entity = entityOpt.get();
-                            var percent = (double) unit.getCurrentArmor() / unit.getArmor();
-                            var crits = Math.min(9, unit.getTargetingCrits() + unit.getMpCrits() + unit.getDamageCrits());
-                            percent -= percent * (crits / 11.0);
-                            percent = Math.min(0.95, percent);
-                            var totalDamage = (int) ((entity.getTotalArmor() + entity.getTotalInternal()) * (1 - percent));
-                            DamageHandlerChooser.chooseHandler(entity, DamageHandlerChooser.EntityFinalState.CREW_AND_ENTITY_MUST_SURVIVE)
-                                .applyDamageInClusters(totalDamage, 5);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }

@@ -24,7 +24,7 @@ public class AcsMoraleReporter {
     public void reportMoraleCheckStart(AcsFormation formation, int toHitValue) {
         // 4500: Start of morale check
         var startReport = new AcsReportEntry(4500)
-            .add(new AcsFormationReportEntry(formation, game).text())
+            .add(new AcsFormationReportEntry(formation, game).reportText())
             .add(toHitValue);
         reportConsumer.accept(startReport);
     }
@@ -32,7 +32,7 @@ public class AcsMoraleReporter {
     public void reportMoraleCheckRoll(AcsFormation formation, Roll roll) {
         // 4501: Roll result
         var rollReport = new AcsReportEntry(4501)
-            .add(new AcsFormationReportEntry(formation, game).text())
+            .add(new AcsFormationReportEntry(formation, game).reportText())
             .add(new AcsRollReportEntry(roll).reportText());
         reportConsumer.accept(rollReport);
     }

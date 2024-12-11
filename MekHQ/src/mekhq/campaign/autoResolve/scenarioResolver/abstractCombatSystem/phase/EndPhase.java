@@ -18,44 +18,41 @@
  */
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.phase;
 
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.IEntityRemovalConditions;
 import megamek.common.enums.GamePhase;
+import megamek.common.strategicBattleSystems.SBFUnit;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.ai.utility.Memory;
+import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsMoraleCheckAction;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsRecoveringNerveAction;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.actions.AcsWithdrawAction;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.EndPhaseReporter;
+
+import java.util.List;
 
 public class EndPhase extends PhaseHandler {
 
+    private EndPhaseReporter reporter;
+
     public EndPhase(AcsGameManager gameManager) {
         super(gameManager, GamePhase.END);
+        reporter = new EndPhaseReporter(gameManager.getGame(), gameManager::addReport);
     }
 
     @Override
     protected void executePhase() {
+        reporter.endPhaseHeader();
         checkUnitDestruction();
         checkWithdrawingForces();
         checkMorale();
         checkRecoveringNerves();
         forgetEverything();
-        checkVictory();
-    }
 
-    private void checkVictory() {
-        if (getGameManager().checkForVictory()) {
-            var game = getGameManager().getGame();
-            var gameManager = getGameManager();
-            VictoryResult vr = game.getVictoryResult();
-            var reports = vr.processVictory(game);
-
-            if (!reports.isEmpty()) {
-                reports.forEach(gameManager::addReport);
-                vr.setVictory(true);
-                game.setVictoryTeam(vr.getWinningTeam());
-            }
-        }
     }
 
     private void checkUnitDestruction() {
@@ -65,12 +62,16 @@ public class EndPhase extends PhaseHandler {
                 .filter(u -> u.getCurrentArmor() <= 0)
                 .toList();
             if (!destroyedUnits.isEmpty()) {
-                getGameManager().getGame().destroyUnits(formation, destroyedUnits);
+                destroyUnits(formation, destroyedUnits);
             }
         }
     }
 
     private void checkWithdrawingForces() {
+        if (getGameManager().checkForVictory()) {
+            // If the game is over, no need to withdraw
+            return;
+        }
         var forcedWithdrawingUnits = getGameManager().getGame().getActiveFormations().stream()
             .filter(f -> f.moraleStatus() == AcsFormation.MoraleStatus.ROUTED || f.isCrippled())
             .toList();
@@ -83,7 +84,6 @@ public class EndPhase extends PhaseHandler {
     private void checkMorale() {
         var formationNeedsMoraleCheck = getGameManager().getGame().getActiveFormations().stream()
             .filter(AcsFormation::hadHighStressEpisode)
-            .filter(f -> f.moraleStatus() != AcsFormation.MoraleStatus.ROUTED)
             .toList();
 
         for (var formation : formationNeedsMoraleCheck) {
@@ -105,6 +105,30 @@ public class EndPhase extends PhaseHandler {
         var formations = getGameManager().getGame().getActiveFormations();
         formations.stream().map(AcsFormation::getMemory).forEach(Memory::clear);
         formations.forEach(AcsFormation::reset);
+    }
 
+    public void destroyUnits(AcsFormation formation, List<SBFUnit> destroyedUnits) {
+        for (var unit : destroyedUnits) {
+            for (var element : unit.getElements()) {
+                var entityOpt = getGameManager().getGame().getEntity(element.getId());
+                if (entityOpt.isPresent()) {
+                    var entity = entityOpt.get();
+                    getGameManager().getGame().addUnitToGraveyard(entity);
+                    var roll = Compute.rollD6(2);
+                    switch (roll.getIntValue()) {
+                        case 3, 4, 10, 11 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
+                        case 2, 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
+                        default -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
+                    }
+                    DamageHandlerChooser.damageRemovedEntity(entity, entity.getRemovalCondition());
+                    reporter.reportUnitDestroyed(entity);
+                }
+            }
+
+            formation.removeUnit(unit);
+            if (formation.getUnits().isEmpty()) {
+                getGameManager().getGame().removeFormation(formation);
+            }
+        }
     }
 }

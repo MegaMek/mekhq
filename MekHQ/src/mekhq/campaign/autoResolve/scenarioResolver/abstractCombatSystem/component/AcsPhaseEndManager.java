@@ -65,8 +65,6 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
                 gameManager.changePhase(GamePhase.END);
                 break;
             case END:
-                gameManager.addReport(new AcsPublicReportEntry(999));
-                gameManager.addReport(new AcsPublicReportEntry(3335));
                 gameManager.actionsProcessor.handleActions();
                 phaseCleanup();
                 if (gameManager.checkForVictory()) {
@@ -74,6 +72,7 @@ public record AcsPhaseEndManager(AcsGameManager gameManager) implements AcsGameM
                 }
                 break;
             case VICTORY:
+                phaseCleanup();
             case STARTING_SCENARIO:
             default:
                 break;

@@ -22,6 +22,7 @@ import megamek.common.MapSettings;
 import megamek.common.enums.GamePhase;
 import megamek.server.ServerBoardHelper;
 import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter.StartingScenarioReporter;
 
 import java.util.HashMap;
 
@@ -30,8 +31,11 @@ import java.util.HashMap;
  */
 public class StartingScenarioPhase extends PhaseHandler {
 
+    private final StartingScenarioReporter reporter;
+
     public StartingScenarioPhase(AcsGameManager gameManager) {
         super(gameManager, GamePhase.STARTING_SCENARIO);
+        this.reporter = new StartingScenarioReporter(gameManager.getGame(), gameManager::addReport);
     }
 
     @Override
@@ -45,5 +49,6 @@ public class StartingScenarioPhase extends PhaseHandler {
         getGameManager().getGame().setVictoryContext(new HashMap<>());
         MapSettings mapSettings = getGameManager().getGame().getMapSettings();
         mapSettings.setBoardsAvailableVector(ServerBoardHelper.scanForBoards(mapSettings));
+        reporter.logHeader();
     }
 }

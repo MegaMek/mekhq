@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.autoResolve;
 
 import megamek.client.ui.swing.util.PlayerColour;
@@ -26,6 +44,7 @@ import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,8 +60,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * @author Luana Coppio
+ */
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAutoResolveEngineScenarios {
+    // The order of the things in this file is atypical, but it is set in a way that makes it easy to find the only two tests
+    // that exists in this file, however those tests do not run since this is an abstract class
+    // instead, if you click "run test" in one of those functions it will ask which implementation class to run
+    // and then run the tests in that class
+    @RepeatedTest(1000)
+    void testAutoResolveMultipleTimes() {
+        resetTrackers();
+        autoResolve(this::postAutoResolveAccumulator);
+    }
+
+    @Test
+    void testAutoResolveOnce() {
+        autoResolve(this::assertGameFinishedWithAWinner);
+    }
 
     // Counters for tracking success across multiple runs
     private static int totalRuns = 0;
@@ -56,6 +93,14 @@ public abstract class AbstractAutoResolveEngineScenarios {
         SAME_BV,
         SAME_BV_SAME_SKILL
     }
+
+    abstract double lowerBoundTeam1();
+    abstract double upperBoundTeam1();
+    abstract double lowerBoundTeam2();
+    abstract double upperBoundTeam2();
+    abstract double lowerBoundDraw();
+    abstract double upperBoundDraw();
+    abstract TeamArrangement getTeamArrangement();
 
     @Mock
     private BotForce botForce;
@@ -77,13 +122,12 @@ public abstract class AbstractAutoResolveEngineScenarios {
         autoResolveEngine = new AutoResolveEngine(AutoResolveMethod.ABSTRACT_COMBAT);
     }
 
-    abstract double lowerBoundTeam1();
-    abstract double upperBoundTeam1();
-    abstract double lowerBoundTeam2();
-    abstract double upperBoundTeam2();
-    abstract double lowerBoundDraw();
-    abstract double upperBoundDraw();
-    abstract TeamArrangement getTeamArrangement();
+    private void resetTrackers() {
+        totalRuns = 0;
+        team1 = 0;
+        team2 = 0;
+        draws = 0;
+    }
 
     AtBScenario createScenario(Campaign campaign) {
 
@@ -278,15 +322,6 @@ public abstract class AbstractAutoResolveEngineScenarios {
         }
         return units;
     }
-    @RepeatedTest(100)
-    void testAutoResolveMultipleTimes() {
-        autoResolve(this::assertAutoResolveConcludedEvent);
-    }
-
-    @Test
-    void testAutoResolveOnce() {
-        autoResolve(this::assertGameFinishedWithAWinner);
-    }
 
     void autoResolve(Consumer<AutoResolveConcludedEvent> autoResolveConcludedEvent) {
         var teamArrangement = getTeamArrangement();
@@ -316,7 +351,7 @@ public abstract class AbstractAutoResolveEngineScenarios {
         assertTrue((0 <= victoryTeam) && (victoryTeam <= 2), "Victory team is not 1 or 2");
     }
 
-    private void assertAutoResolveConcludedEvent(AutoResolveConcludedEvent event) {
+    private void postAutoResolveAccumulator(AutoResolveConcludedEvent event) {
         totalRuns++;
         var victoryTeam = event.getGame().getVictoryTeam();
         switch (victoryTeam) {

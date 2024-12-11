@@ -32,10 +32,6 @@ import java.util.List;
 public interface DamageHandler<E extends Entity> {
     MMLogger logger = MMLogger.create(AcsGameManager.class);
 
-    enum PilotEjected {
-        NO, YES
-    }
-
     E entity();
 
     boolean crewMustSurvive();
@@ -162,16 +158,8 @@ public interface DamageHandler<E extends Entity> {
         if (crew == null || crew.isEjected()) {
             return;
         }
-        var hits = Math.min(crew.getHits() + hitCrew, Crew.DEATH);
-
-        if ((crewMustSurvive()) && (hits == Crew.DEATH)) {
-            var ejectionResult = tryToEjectCrew();
-            if (ejectionResult == PilotEjected.YES) {
-                destroyLocationAfterEjection();
-                return;
-            }
-            hits = Crew.DEATH - 1;
-        }
+        var hits = tryToNotKillTheCrew(hitCrew, crew);
+        if (hits == null) return;
 
         crew.setHits(hits, 0);
         logger.trace("[{}] Crew hit ({} hits)", entity().getDisplayName(), crew.getHits());
@@ -180,6 +168,24 @@ public interface DamageHandler<E extends Entity> {
             entity.setDestroyed(true);
             setEntityDestroyed(entity);
         }
+    }
+
+    private Integer tryToNotKillTheCrew(int hitCrew, Crew crew) {
+        var hits = Math.min(crew.getHits() + hitCrew, Crew.DEATH);
+        if (hits == Crew.DEATH) {
+            if (!Compute.rollD6(2).isTargetRollSuccess(11)) {
+                hits = Crew.DEATH - 1;
+            }
+        }
+
+        if ((crewMustSurvive()) || (hits == Crew.DEATH)) {
+            if (tryToEjectCrew()) {
+                destroyLocationAfterEjection();
+                return null;
+            }
+            hits = Crew.DEATH - 1;
+        }
+        return hits;
     }
 
     static <E extends Entity> void setEntityDestroyed(E entity) {
@@ -194,17 +200,17 @@ public interface DamageHandler<E extends Entity> {
      * Tries to eject the crew of the entity if possible.
      * @return YES if the crew was ejected, NO otherwise
      */
-    default PilotEjected tryToEjectCrew() {
+    default boolean tryToEjectCrew() {
         var entity = entity();
         var crew = entity.getCrew();
         if (crew == null || crew.isEjected() || !entity().isEjectionPossible()) {
-            return PilotEjected.NO;
+            return false;
         }
         crew.setEjected(true);
         entity.setDestroyed(true);
         setEntityDestroyed(entity);
         logger.trace("[{}] Crew ejected", entity().getDisplayName());
-        return PilotEjected.YES;
+        return true;
     }
 
     /**
@@ -247,12 +253,10 @@ public interface DamageHandler<E extends Entity> {
     /**
      * Sets up the hit details for the given hit and damage.
      * @param hit the hit data
-     * @param dmg the damage to apply
+     * @param damageToApply the damage to apply
      * @return the hit details
      */
-    default HitDetails setupHitDetails(HitData hit, int dmg) {
-        int originalArmor = entity().getOArmor(hit);
-        int damageToApply = Math.max((int) Math.floor((double) originalArmor / 10), dmg);
+    default HitDetails setupHitDetails(HitData hit, int damageToApply) {
         int currentArmorValue = entity().getArmor(hit);
         int setArmorValueTo = currentArmorValue - damageToApply;
         boolean hitInternal = setArmorValueTo < 0;

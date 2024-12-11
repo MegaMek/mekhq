@@ -18,29 +18,32 @@
  */
 package mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.reporter;
 
-import megamek.client.ui.swing.tooltip.SBFInGameObjectTooltip;
+import megamek.client.ui.swing.util.PlayerColour;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.IGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
+import megamek.common.Entity;
 
-public class AcsFormationReportEntry extends AcsReportEntry {
+public class AcsEntityNameReportEntry extends AcsReportEntry {
 
-    private final String formationName;
+    private final String name;
     private final String playerColorHex;
+    private final String playerTeam;
 
-    public AcsFormationReportEntry(String formationName, String playerColorHex) {
-        super(0);
-        this.formationName = formationName;
-        this.playerColorHex = playerColorHex;
-        noNL();
+    public AcsEntityNameReportEntry(Entity entity) {
+        this(entity.getDisplayName(), entity.getOwner().getColour(), entity.getOwner().getTeam());
+
     }
 
-    public AcsFormationReportEntry(AcsFormation formation, IGame game) {
-        this(formation.getName(), UIUtil.hexColor(SBFInGameObjectTooltip.ownerColor(formation, game)));
+    public AcsEntityNameReportEntry(String name, PlayerColour color, int playerTeam) {
+        super(0);
+        this.name = name;
+        this.playerColorHex = UIUtil.hexColor(color.getColour());
+        this.playerTeam = playerTeam + "";
+        noNL();
     }
 
     @Override
     protected String reportText() {
-        return "<span style='color:" + playerColorHex + ";'>" + formationName + "</span>";
+        return "<span style='color:" + playerColorHex + ";'>" + name + "[Team " + playerTeam + "]</span>";
     }
+
 }
