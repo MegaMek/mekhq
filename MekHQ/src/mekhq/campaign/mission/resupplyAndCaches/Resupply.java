@@ -208,7 +208,7 @@ public class Resupply {
         double tonnageAllowance = meanTonnage * Math.min(unitAllowance, unitCount);
 
         // This divider gives us our target value of 5t per average IS Company
-        final int CARGO_DIVIDER = 250;
+        final int CARGO_DIVIDER = 300;
 
         double adjustedTonnage = tonnageAllowance / CARGO_DIVIDER;
 
