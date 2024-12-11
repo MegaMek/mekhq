@@ -28,6 +28,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.procurement.Procurement;
@@ -64,6 +65,7 @@ import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
+import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
@@ -94,7 +96,7 @@ public class Resupply {
     private boolean usePlayerConvoy;
     private Map<Force, Double> playerConvoys;
     private double totalPlayerCargoCapacity;
-    private double targetCargoTonnage;
+    private int targetCargoTonnage;
     private int negotiatorSkill;
 
     private static final Money HIGH_VALUE_ITEM = Money.of(250000);
@@ -165,7 +167,7 @@ public class Resupply {
      * <p>
      * @return the total cargo tonnage that will be used as the target value for Resupplies
      */
-    private static double calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
+    private static int calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
         double unitTonnage = 0;
         int unitCount = 0;
 
@@ -195,12 +197,24 @@ public class Resupply {
             }
         }
 
-        final int CARGO_DIVIDER = 2;
-        double averageTonnage = (unitTonnage / unitCount) / CARGO_DIVIDER;
+        double meanTonnage = unitTonnage / unitCount;
+
+        // We multiply the mean tonnage of parsed units by the expected formation size for the campaign faction.
+        // We derive tonnage allowance by multiplying this value by the number of required 'lances'
+        // or the total parsed unit count (whichever is smaller)
+        int standardSize = getStandardForceSize(campaign.getFaction(), FormationLevel.LANCE.getDepth());
+        int unitAllowance = standardSize * contract.getRequiredLances();
+
+        double tonnageAllowance = meanTonnage * Math.min(unitAllowance, unitCount);
+
+        // This divider gives us our target value of 5t per average IS Company
+        final int CARGO_DIVIDER = 250;
+
+        double adjustedTonnage = tonnageAllowance / CARGO_DIVIDER;
 
         double dropCount = (double) contract.getRequiredLances() / 3;
 
-        return round(averageTonnage / 20.0 * 5.0 * dropCount);
+        return (int) round(adjustedTonnage / dropCount);
     }
 
     /**
@@ -211,7 +225,7 @@ public class Resupply {
      * @return The estimated cargo requirements in tons as a formatted string, e.g., "50t".
      */
     public static String getEstimatedCargoRequirements(Campaign campaign, AtBContract contract) {
-        double baseCapacity = calculateTargetCargoTonnage(campaign, contract);
+        int baseCapacity = calculateTargetCargoTonnage(campaign, contract);
 
         return (baseCapacity * CARGO_MULTIPLIER) + "t";
     }
