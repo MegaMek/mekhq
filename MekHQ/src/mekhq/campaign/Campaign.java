@@ -4156,7 +4156,7 @@ public class Campaign implements ITechManager {
     private void processWeeklyRelationshipEvents(Person person) {
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             getDivorce().processNewWeek(this, getLocalDate(), person, false);
-            getMarriage().processNewWeek(this, getLocalDate(), person);
+            getMarriage().processNewWeek(this, getLocalDate(), person, false);
             getProcreation().processNewWeek(this, getLocalDate(), person);
 
             if (person.getGender().isFemale()) {
