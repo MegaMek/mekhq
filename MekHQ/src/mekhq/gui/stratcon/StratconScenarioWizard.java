@@ -193,7 +193,7 @@ public class StratconScenarioWizard extends JDialog {
         if (currentTrackState.isGmRevealed()
                 || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords()) ||
                 (currentScenario.getDeploymentDate() != null)) {
-            labelBuilder.append(currentScenario.getInfo(campaign, true));
+            labelBuilder.append(currentScenario.getInfo(campaign));
         }
 
         if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
