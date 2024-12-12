@@ -392,7 +392,7 @@ public abstract class AbstractMarriage {
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().minusYears(difference));
         } else if (externalSpouseAge > externalSpouseMaxAge) {
-            int difference = externalSpouseMaxAge - externalSpouseAge;
+            int difference = externalSpouseAge - externalSpouseMaxAge;
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().plusYears(difference));
         }
