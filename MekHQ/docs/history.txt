@@ -63,6 +63,7 @@ MEKHQ VERSION HISTORY:
 + Fix #5302: Improved Unit Substitution
 + Fix #5311: Fixed Marriage Announcements Not Appearing in Daily Activity Log
 + Fix #5318: Corrected Calculation of Age Difference When Marrying Personnel
++ Fix #5333: Show Hired personnel's name change
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
