@@ -28,7 +28,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.market.procurement.Procurement;
@@ -61,6 +60,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
@@ -154,27 +154,37 @@ public class Resupply {
     }
 
     /**
-     * Calculate the target cargo tonnage for the Resupply.
+     * Calculates the target cargo tonnage for a resupply.
+     * The calculation considers the total tonnage of combat units in the campaign,
+     * compared with the tonnage cap defined by the employer.
      * <p>
-     * This method iterates over all forces in the campaign.
-     * For each combat force, it includes the weight of each unit (that is not of a prohibited type)
-     * in the total tonnage and also counts the unit.
-     * The target cargo tonnage is calculated as the average unit tonnage, rounded down to the
-     * nearest 5 tons.
+     * A 'combat unit' is defined as any unit not flagged as non-combat, that is in a Combat
+     * Team and not in a Force flagged as non-combat. The tonnage cap is the maximum tonnage
+     * the employer is willing to support, calculated based on the required number of lances
+     * for the contract and a set tonnage allowance per unit.
      * <p>
-     * If a getter method returns null during this process, the exception is silently
-     * caught and ignored, effectively excluding the current unit from the results.
-     * <p>
-     * @return the total cargo tonnage that will be used as the target value for Resupplies
+     * The final target cargo tonnage is calculated as the minimum of the total unit tonnage
+     * and the tonnage cap, divided by 100, and then multiplied by required lances divided by 3.
+     * This total is then rounded to the nearest integer.
+     *
+     * @param  campaign  The current campaign.
+     * @param  contract  The relevant {@link AtBContract} for which the cargo tonnage is being calculated.
+     * @return The calculated target cargo tonnage.
      */
     private static int calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
         double unitTonnage = 0;
-        int unitCount = 0;
 
+        // First, calculate the total tonnage across all combat units in the campaign.
+        // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
+        // Team and not in a Force flagged as non-combat
         for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
+                continue;
+            }
+
+            if (!force.isCombatForce()) {
                 continue;
             }
 
@@ -189,7 +199,6 @@ public class Resupply {
                     }
 
                     unitTonnage += entity.getWeight();
-                    unitCount++;
                 } catch (Exception ignored) {
                     // If we get an exception, it's because one of the getters returned null,
                     // at which point we'd just continue anyway, so we might as well just ignore the exception.
@@ -197,24 +206,22 @@ public class Resupply {
             }
         }
 
-        double meanTonnage = unitTonnage / unitCount;
+        // Next, we determine the tonnage cap. This is the maximum tonnage the employer is willing to support.
+        final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
+        final int formationSize = getStandardForceSize(campaign.getFaction());
+        final int tonnageCap = contract.getRequiredLances() * formationSize * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
-        // We multiply the mean tonnage of parsed units by the expected formation size for the campaign faction.
-        // We derive tonnage allowance by multiplying this value by the number of required 'lances'
-        // or the total parsed unit count (whichever is smaller)
-        int standardSize = getStandardForceSize(campaign.getFaction(), FormationLevel.LANCE.getDepth());
-        int unitAllowance = standardSize * contract.getRequiredLances();
+        // Then we determine the size of each individual 'drop'. This uses the lowest of
+        // unitTonnage and tonnageCap and divides that by 100
+        final double baseTonnage = min(unitTonnage, tonnageCap);
 
-        double tonnageAllowance = meanTonnage * Math.min(unitAllowance, unitCount);
+        final int TONNAGE_DIVIDER = 100;
+        final double dropSize = baseTonnage / TONNAGE_DIVIDER;
 
-        // This divider gives us our target value of 5t per average IS Company
-        final int CARGO_DIVIDER = 300;
+        // Finally, we calculate the total convoy size. This is dropSize multiplied by dropCount
+        final double dropCount = (double) contract.getRequiredLances() / 3;
 
-        double adjustedTonnage = tonnageAllowance / CARGO_DIVIDER;
-
-        double dropCount = (double) contract.getRequiredLances() / 3;
-
-        return (int) round(adjustedTonnage / dropCount);
+        return (int) round(dropSize * dropCount);
     }
 
     /**
