@@ -144,13 +144,13 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 /**
  * The main campaign class, keeps track of teams and units
  *
@@ -491,22 +491,24 @@ public class Campaign implements ITechManager {
         // returning the hashtable. In theory, this shouldn't be necessary, however, having this
         // sanitizing step should remove the need for isEligible() checks whenever we fetch the
         // hashtable.
-        List<Integer> formationsToSanitize = new ArrayList<>();
-        for (StrategicFormation strategicFormation : strategicFormations.values()) {
-            if (!strategicFormation.isEligible(this)) {
-                formationsToSanitize.add(strategicFormation.getForceId());
-                try {
-                    Force force = getForce(strategicFormation.getForceId());
-                    force.setStrategicFormation(false);
-                } catch (Exception ex) {
-                    // We're not too worried if we can't find the associated Force,
-                    // as this just means it has been deleted at some point and not removed correctly.
+        for (Force force : getAllForces()) {
+            int forceId = force.getId();
+            if (strategicFormations.containsKey(forceId)) {
+                StrategicFormation combatTeam = strategicFormations.get(forceId);
+
+                if (combatTeam.isEligible(this)) {
+                    continue;
+                }
+            } else {
+                StrategicFormation combatTeam = new StrategicFormation(forceId, this);
+
+                if (combatTeam.isEligible(this)) {
+                    strategicFormations.put(forceId, combatTeam);
+                    continue;
                 }
             }
-        }
 
-        for (int id : formationsToSanitize) {
-            strategicFormations.remove(id);
+            strategicFormations.remove(forceId);
         }
 
         return strategicFormations;

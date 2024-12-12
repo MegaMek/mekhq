@@ -709,7 +709,7 @@ public class StratconRulesManager {
 
                     // if it's the right type of unit and is around
                     if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
-                            sft.getAllowedUnitType(), false) &&
+                            sft.getAllowedUnitType()) &&
                             unit.isAvailable() && unit.isFunctional()) {
 
                         // add the unit to the scenario and bench the appropriate bot unit if one is
@@ -999,30 +999,35 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        if (campaign.getStrategicFormationsTable().get(forceID).getRole().isScouting()) {
-            for (int direction = 0; direction < 6; direction++) {
-                StratconCoords checkCoords = coords.translate(direction);
+        StrategicFormation combatTeam = campaign.getStrategicFormationsTable().get(forceID);
 
-                facility = track.getFacility(checkCoords);
-                if (facility != null) {
-                    facility.setVisible(true);
+        // This may return null if we're deploying a force that isn't a Combat Team for whatever reason
+        if (combatTeam != null) {
+            if (combatTeam.getRole().isScouting()) {
+                for (int direction = 0; direction < 6; direction++) {
+                    StratconCoords checkCoords = coords.translate(direction);
+
+                    facility = track.getFacility(checkCoords);
+                    if (facility != null) {
+                        facility.setVisible(true);
+                    }
+
+                    scenario = track.getScenario(checkCoords);
+                    // if we've revealed a scenario and it's "cloaked"
+                    // we have to activate it
+                    if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
+                        scenario.getBackingScenario().setCloaked(false);
+                        setScenarioDates(0, track, campaign, scenario);
+                        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
+                    }
+
+                    if ((!track.getRevealedCoords().contains(checkCoords)) && (!hasFatigueIncreased)) {
+                        increaseFatigue(forceID, campaign);
+                        hasFatigueIncreased = true;
+                    }
+
+                    track.getRevealedCoords().add(coords.translate(direction));
                 }
-
-                scenario = track.getScenario(checkCoords);
-                // if we've revealed a scenario and it's "cloaked"
-                // we have to activate it
-                if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
-                    scenario.getBackingScenario().setCloaked(false);
-                    setScenarioDates(0, track, campaign, scenario);
-                    MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
-                }
-
-                if ((!track.getRevealedCoords().contains(checkCoords)) && (!hasFatigueIncreased)) {
-                    increaseFatigue(forceID, campaign);
-                    hasFatigueIncreased = true;
-                }
-
-                track.getRevealedCoords().add(coords.translate(direction));
             }
         }
 
@@ -1737,21 +1742,12 @@ public class StratconRulesManager {
      *
      * @return Whether or not the unit types match.
      */
-    public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType,
-            boolean reinforcements) {
-        // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit
-        // types
+    public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType) {
+        // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
         if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
-            // "AtB mix" is usually ground units, but air units can sub in
-            return (primaryUnitType == UnitType.MEK) || (primaryUnitType == UnitType.TANK)
-                    || (primaryUnitType == UnitType.INFANTRY)
-                    || (primaryUnitType == UnitType.BATTLE_ARMOR)
-                    || (primaryUnitType == UnitType.PROTOMEK)
-                    || (primaryUnitType == UnitType.VTOL)
-                    || (primaryUnitType == UnitType.AEROSPACEFIGHTER) && reinforcements
-                    || (primaryUnitType == UnitType.CONV_FIGHTER) && reinforcements;
+            return primaryUnitType < UnitType.JUMPSHIP;
         } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            return (primaryUnitType == UnitType.AEROSPACEFIGHTER) || (primaryUnitType == UnitType.CONV_FIGHTER);
+            return primaryUnitType >= UnitType.CONV_FIGHTER;
         } else {
             return primaryUnitType == unitType;
         }
@@ -1822,7 +1818,7 @@ public class StratconRulesManager {
             if ((force.getScenarioId() <= 0)
                 && !force.getAllUnits(true).isEmpty()
                 && !forcesInTracks.contains(force.getId())
-                && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType, reinforcements)
+                && forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType)
                 && noReinforcementRestriction
                 && !subElementsOrSelfDeployed(force, campaign)) {
 
@@ -1930,7 +1926,7 @@ public class StratconRulesManager {
             // the general idea is that we want something that can be deployed to the scenario -
             // e.g., no infantry on air scenarios etc.
             boolean validUnitType = (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
-                        generalUnitType, true));
+                        generalUnitType));
 
             if (validUnitType
                 && !unit.isDeployed()

@@ -21,7 +21,10 @@
  */
 package mekhq.campaign.force;
 
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -330,24 +333,6 @@ public class StrategicFormation {
             return false;
         }
 
-        boolean hasGround = false;
-        for (UUID id : force.getUnits()) {
-            Unit unit = campaign.getUnit(id);
-            if (unit != null) {
-                Entity entity = unit.getEntity();
-
-                if (entity != null) {
-                    if (entity.getUnitType() >= UnitType.JUMPSHIP) {
-                        force.setStrategicFormation(false);
-                        return false;
-                    }
-                    if ((entity.getEntityType() & ETYPE_GROUND) != 0) {
-                        hasGround = true;
-                    }
-                }
-            }
-        }
-
         int isOverridden = force.getOverrideStrategicFormation();
         if (isOverridden != STRATEGIC_FORMATION_OVERRIDE_NONE) {
             boolean overrideState = isOverridden == STRATEGIC_FORMATION_OVERRIDE_TRUE;
@@ -363,29 +348,31 @@ public class StrategicFormation {
             return overrideState;
         }
 
-        if (hasGround) {
-            List<Force> childForces = force.getAllSubForces();
+        if (force.getUnits().isEmpty()) {
+            force.setStrategicFormation(false);
+            return false;
+        }
 
-            for (Force childForce : childForces) {
-                if (childForce.isStrategicFormation()) {
-                    force.setStrategicFormation(false);
-                    return false;
-                }
-            }
+        List<Force> childForces = force.getAllSubForces();
 
-            List<Force> parentForces = force.getAllParents();
-
-            for (Force parentForce : parentForces) {
-                if (parentForce.isStrategicFormation()) {
-                    force.setStrategicFormation(false);
-                    return false;
-                }
+        for (Force childForce : childForces) {
+            if (childForce.isStrategicFormation()) {
+                force.setStrategicFormation(false);
+                return false;
             }
         }
 
-        force.setStrategicFormation(hasGround);
+        List<Force> parentForces = force.getAllParents();
 
-        return hasGround;
+        for (Force parentForce : parentForces) {
+            if (parentForce.isStrategicFormation()) {
+                force.setStrategicFormation(false);
+                return false;
+            }
+        }
+
+        force.setStrategicFormation(true);
+        return true;
     }
 
     /* Code to find unit commander from ForceViewPanel */
