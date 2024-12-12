@@ -3370,7 +3370,7 @@ public class Campaign implements ITechManager {
             theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
             report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
-            int daysLeft = (int) Math.ceil(theRefit.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() / (double) tech.getDailyAvailableTechTime());
             if (daysLeft == 1) {
                 report += " tomorrow.</b>";
             } else {
@@ -3411,7 +3411,7 @@ public class Campaign implements ITechManager {
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
                         report += " Completion ";
-                        int daysLeft = (int) Math.ceil(theRefit.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+                        int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() / (double) tech.getDailyAvailableTechTime());
                         if (daysLeft == 1) {
                             report += " tomorrow.</b>";
                         } else {
@@ -3553,7 +3553,7 @@ public class Campaign implements ITechManager {
                 report += " minutes left. Work";
                 if ((minutesUsed > 0) && (tech.getDailyAvailableTechTime() > 0)) {
                     report += " will be finished ";
-                    int daysLeft = (int) Math.ceil(partWork.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+                    int daysLeft = (int) Math.ceil((double) partWork.getTimeLeft() / (double)tech.getDailyAvailableTechTime());
                     if (daysLeft == 1) {
                         report += " tomorrow.</b>";
                     } else {
