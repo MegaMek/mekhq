@@ -27,7 +27,9 @@ import megamek.common.force.Forces;
 import megamek.common.icons.Camouflage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Redistributes entities and sub forces in forces to ensure that each force has a maximum of 20 entities and 4 sub forces.
@@ -36,380 +38,68 @@ import java.util.List;
  */
 public class ConsolidateForces {
 
+    private static final int MAX_ENTITIES_PER_FORCE = 24;
+    private static final int MAX_SUB_FORCES_PER_FORCE = 4;
+    private static final int MAX_ENTITIES_PER_SUB_FORCE = 6;
+
     /**
      * Consolidates forces by redistributing entities and sub forces as needed.
+     * It will balance the forces by team, ensuring that each force has a maximum of 20 entities and 4 sub forces.
      * @param game The game to consolidate forces for
      */
     public static void consolidateForces(IGame game) {
         Forces forces = game.getForces();
-        var allForces = forces.getAllForces();
+        var teamByPlayer = game.getTeamByPlayer();
+        var forceNameByPlayer = new HashMap<Integer, String>();
+        for (var force : forces.getAllForces()) {
+            if (!forceNameByPlayer.containsKey(force.getOwnerId())) {
+                forceNameByPlayer.put(force.getOwnerId(), force.getName());
+            }
+        }
+        var representativeOwnerForForce = new HashMap<Integer, List<Player>>();
+        for (var force : forces.getAllForces()) {
+            representativeOwnerForForce.computeIfAbsent(teamByPlayer.get(force.getOwnerId()), k -> new ArrayList<>()).add(game.getPlayer(force.getOwnerId()));
+        }
 
-        // First, process sub forces
-        List<Force> subForcesToSplit = new ArrayList<>();
+        var forceRepresentation = getForceRepresentations(forces, teamByPlayer);
+        var balancedConsolidateForces = BalancedConsolidateForces.balancedLists(forceRepresentation);
 
-        for (Force force : allForces) {
-            if (force.getParentId() != Force.NO_FORCE) { // It's a sub force
-                // Check if the sub force has sub forces of its own
-                ArrayList<Force> subSubForces = forces.getFullSubForces(force);
-                if (!subSubForces.isEmpty()) {
-                    // Flatten the hierarchy by moving sub-sub forces to the parent force
-                    Force parentForce = forces.getForce(force.getParentId());
+        clearAllForces(forces);
 
-                    for (Force subSubForce : subSubForces) {
-                        // Attach sub-sub force to the parent force
-                        forces.attachForce(subSubForce, parentForce);
-                    }
-                }
-
-                // Check if the sub force has zero entities
-                List<ForceAssignable> entities = forces.getFullEntities(force);
-                if (entities.isEmpty()) {
-                    // Remove the sub force from its parent
-                    forces.deleteForce(force.getId());
-                    continue; // Move to the next force
-                }
-
-                // Check if the sub force has more than 6 entities or mixed unit types
-                if (entities.size() > 6 || hasMixedUnitTypes(entities)) {
-                    subForcesToSplit.add(force);
+        for (var forceRep : balancedConsolidateForces) {
+            var player = representativeOwnerForForce.get(forceRep.teamId()).get(0);
+            var parentForceId = forces.addTopLevelForce(
+                new Force("[Team " + forceRep.teamId()  + "] Formation " + forceNameByPlayer.get(player.getId()), -1, new Camouflage(), player), player);
+            for (var subForce : forceRep.subs()) {
+                var subForceId = forces.addSubForce(
+                    new Force("[Team " + forceRep.teamId()  + "] Unit " + subForce.uid(), -1, new Camouflage(), player), forces.getForce(parentForceId));
+                for (var entityId : subForce.entities()) {
+                    forces.addEntity((Entity) game.getEntityFromAllSources(entityId), subForceId);
                 }
             }
         }
+    }
 
-        // Split sub forces that need splitting
-        for (Force force : subForcesToSplit) {
-            splitSubForce(force, forces, game);
-        }
-
-        // Now process top-level forces
-        List<Force> topLevelForces = forces.getTopLevelForces();
-
-        for (Force force : topLevelForces) {
-            // Handle top-level forces that have entities directly
-            List<ForceAssignable> entities = forces.getFullEntities(force);
-            if (!entities.isEmpty()) {
-                // Entities are directly under the top-level force, which is invalid
-                // We need to create sub forces to hold these entities
-                splitTopLevelForceEntities(force, forces, game);
-            }
-
-            // After assigning entities to sub forces, get the updated list of sub forces
-            ArrayList<Force> subForces = forces.getFullSubForces(force);
-
-            // Check if the force has more than 4 sub forces
-            if (subForces.size() > 4) {
-                redistributeSubforces(force, forces, game);
-            }
-
-            // Check if the total number of entities exceeds 20
-            int totalEntities = getTotalEntities(force, forces);
-            if (totalEntities > 20) {
-                redistributeEntities(force, forces, game);
-            }
-        }
-
-        var forceIds = forces.getAllForces().stream().map(Force::getId).toList();
-
+    private static void clearAllForces(Forces forces) {
         // Remove all empty forces and sub forces after consolidation
-        for (var forceId : forceIds) {
-            var forceToEval = forces.getForce(forceId);
-            var entitiesOnForce = forces.getFullEntities(forceToEval);
-            if (entitiesOnForce.isEmpty()) {
-                forces.deleteForce(forceId);
-            }
-        }
+        forces.deleteForces(forces.getAllForces());
+
     }
 
-    private static int getTotalEntities(Force force, Forces forces) {
-        return forces.getFullEntities(force).size();
-    }
-
-    private static void splitSubForce(Force force, Forces forces, IGame game) {
-        // Get entities of the sub force
-        List<ForceAssignable> entities = forces.getFullEntities(force);
-
-        if (entities.size() <= 6 && !hasMixedUnitTypes(entities)) {
-            // No need to split
-            return;
+    /**
+     * Converts the forces into a list of ForceRepresentations. It is an intermediary representation of a force, in a way that makes it very
+     * lightweight to manipulate and balance. It only contains the representation of the force top-level, and the list of entities in it.
+     * @param forces The forces to convert
+     * @param teamByPlayer A map of player IDs to team IDs
+     * @return A list of ForceRepresentations
+     */
+    private static List<BalancedConsolidateForces.ForceRepresentation> getForceRepresentations(Forces forces, Map<Integer, Integer> teamByPlayer) {
+        List<BalancedConsolidateForces.ForceRepresentation> forceRepresentations = new ArrayList<>();
+        for (Force force : forces.getTopLevelForces()) {
+            int[] entityIds = forces.getFullEntities(force).stream().mapToInt(ForceAssignable::getId).toArray();
+            forceRepresentations.add(new BalancedConsolidateForces.ForceRepresentation(force.getId(), teamByPlayer.get(force.getOwnerId()), entityIds, new int[0]));
         }
-
-        // Separate entities by unit type
-        List<ForceAssignable> groundEntities = new ArrayList<>();
-        List<ForceAssignable> aerospaceEntities = new ArrayList<>();
-
-        for (ForceAssignable entity : entities) {
-            if (isAerospaceUnit(entity)) {
-                aerospaceEntities.add(entity);
-            } else {
-                groundEntities.add(entity);
-            }
-        }
-
-        // Remove all entities from the original subforce
-        for (ForceAssignable entity : entities) {
-            forces.removeEntityFromForces(entity.getId());
-        }
-
-        // Parent force
-        Force parentForce = forces.getForce(force.getParentId());
-        Player player = game.getPlayer(forces.getOwnerId(parentForce));
-
-        // Reassign ground entities to subforces under the parent force
-        assignEntitiesToSubforces(groundEntities, parentForce, forces, player, force.getName());
-
-        // If there are aerospace entities, create a new top-level force (Wing)
-        if (!aerospaceEntities.isEmpty()) {
-            Force wingForce = createWingForce(parentForce.getName(), forces, player);
-            assignEntitiesToSubforces(aerospaceEntities, wingForce, forces, player, "Wing");
-        }
-    }
-
-    private static void splitTopLevelForceEntities(Force force, Forces forces, IGame game) {
-        List<ForceAssignable> entities = forces.getFullEntities(force);
-
-        if (entities.isEmpty()) {
-            return;
-        }
-
-        // Separate entities by unit type
-        List<ForceAssignable> groundEntities = new ArrayList<>();
-        List<ForceAssignable> aerospaceEntities = new ArrayList<>();
-
-        for (ForceAssignable entity : entities) {
-            if (isAerospaceUnit(entity)) {
-                aerospaceEntities.add(entity);
-            } else {
-                groundEntities.add(entity);
-            }
-        }
-
-        // Remove all entities from the top-level force
-        for (ForceAssignable entity : entities) {
-            forces.removeEntityFromForces(entity.getId());
-        }
-
-        Player player = game.getPlayer(forces.getOwnerId(force));
-
-        // Reassign ground entities to subforces under the original top-level force
-        assignEntitiesToSubforces(groundEntities, force, forces, player, force.getName());
-
-        // If there are aerospace entities, create a new top-level force (Wing)
-        if (!aerospaceEntities.isEmpty()) {
-            Force wingForce = createWingForce(force.getName(), forces, player);
-            assignEntitiesToSubforces(aerospaceEntities, wingForce, forces, player, "Wing");
-        }
-    }
-
-
-    private static void assignEntitiesToSubforces(List<ForceAssignable> entities, Force parentForce, Forces forces, Player player, String baseName) {
-        int entitiesRemaining = entities.size();
-        int entityIndex = 0;
-        int subforceCount = 1;
-
-        while (entitiesRemaining > 0) {
-            // Create a new subforce
-            Force newSubForce = new Force(
-                baseName + " Subforce " + subforceCount++,
-                -1,
-                new Camouflage(),
-                player
-            );
-
-            // Add newSubForce to the parent force
-            int subForceId = forces.addSubForce(newSubForce, parentForce);
-
-            // Add up to 6 entities to the new subforce
-            int entitiesToAdd = Math.min(6, entitiesRemaining);
-            for (int i = 0; i < entitiesToAdd; i++) {
-                ForceAssignable entity = entities.get(entityIndex++);
-                forces.addEntity(entity, subForceId);
-            }
-
-            entitiesRemaining -= entitiesToAdd;
-        }
-    }
-
-
-    private static Force createWingForce(String baseName, Forces forces, Player player) {
-        // Create a new top-level force for aerospace units
-        Force wingForce = new Force(
-            baseName + " Wing",
-            -1,
-            new Camouflage(),
-            player
-        );
-
-        var wingForceId = forces.addTopLevelForce(wingForce, player);
-        return forces.getForce(wingForceId);
-    }
-
-
-    private static boolean isAerospaceUnit(ForceAssignable entity) {
-        if (entity instanceof Entity e) {
-            return e.isAero() || e.isAerospace() || e.isAerospaceFighter() || e.isSmallCraft();
-        }
-        return false;
-    }
-
-    private static boolean hasMixedUnitTypes(List<ForceAssignable> entities) {
-        boolean hasGroundUnits = false;
-        boolean hasAerospaceUnits = false;
-
-        for (ForceAssignable entity : entities) {
-            if (isAerospaceUnit(entity)) {
-                hasAerospaceUnits = true;
-            } else {
-                hasGroundUnits = true;
-            }
-
-            if (hasGroundUnits && hasAerospaceUnits) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static void redistributeSubforces(Force force, Forces forces, IGame game) {
-        List<Force> subForces = new ArrayList<>(forces.getFullSubForces(force));
-        Player player = game.getPlayer(forces.getOwnerId(force));
-
-        if (subForces.size() <= 4) {
-            // No need to redistribute
-            return;
-        }
-
-        int totalSubForces = subForces.size();
-        int index = 4; // Start redistributing from the 5th subforce
-
-        while (index < totalSubForces) {
-            Force subForce = subForces.get(index++);
-
-            // If the subForce contains only aerospace units, attach it to a wing force
-            List<ForceAssignable> entities = forces.getFullEntities(subForce);
-            if (!entities.isEmpty() && isAerospaceUnit(entities.get(0))) {
-                // Create or get the wing force
-                Force wingForce = getOrCreateWingForce(force.getName(), forces, player);
-                forces.attachForce(subForce, wingForce);
-            } else {
-                // Create a new top-level force
-                Force newTopForce = new Force(
-                    force.getName() + " Extra",
-                    -1,
-                    new Camouflage(),
-                    player
-                );
-                forces.addTopLevelForce(newTopForce, player);
-                forces.attachForce(subForce, newTopForce);
-            }
-        }
-    }
-
-
-    private static Force getOrCreateWingForce(String baseName, Forces forces, Player player) {
-        // Check if a wing force already exists
-        for (Force topLevelForce : forces.getTopLevelForces()) {
-            if (topLevelForce.getName().equals(baseName + " Wing")) {
-                return topLevelForce;
-            }
-        }
-        // Create a new wing force
-        return createWingForce(baseName, forces, player);
-    }
-
-
-    private static void redistributeEntities(Force force, Forces forces, IGame game) {
-        int totalEntities = forces.getFullEntities(force).size();
-
-        if (totalEntities <= 20) {
-            // No need to redistribute
-            return;
-        }
-
-        // Collect all entities from the force's subforces
-        List<ForceAssignable> allEntities = new ArrayList<>();
-        ArrayList<Force> subForces = forces.getFullSubForces(force);
-
-        for (Force subForce : subForces) {
-            allEntities.addAll(forces.getFullEntities(subForce));
-            forces.deleteForce(subForce.getId());
-        }
-
-        Player player = game.getPlayer(forces.getOwnerId(force));
-
-        // Separate entities by unit type
-        List<ForceAssignable> groundEntities = new ArrayList<>();
-        List<ForceAssignable> aerospaceEntities = new ArrayList<>();
-
-        for (ForceAssignable entity : allEntities) {
-            if (isAerospaceUnit(entity)) {
-                aerospaceEntities.add(entity);
-            } else {
-                groundEntities.add(entity);
-            }
-        }
-
-        // Reassign ground entities back to the original force
-        int entitiesAssigned = 0;
-        if (!groundEntities.isEmpty()) {
-            entitiesAssigned = assignEntitiesToForce(force, forces, player, groundEntities, 0, Math.min(20, groundEntities.size()));
-        }
-
-        // If there are remaining ground entities, create new top-level forces
-        int groundEntitiesRemaining = groundEntities.size() - entitiesAssigned;
-        int groundEntityIndex = entitiesAssigned;
-
-        while (groundEntitiesRemaining > 0) {
-            // Create a new top-level force
-            Force newTopForce = new Force(
-                force.getName() + " Extra",
-                -1,
-                new Camouflage(),
-                player
-            );
-            forces.addTopLevelForce(newTopForce, player);
-
-            // Assign up to 20 entities to the new top-level force
-            int entitiesToAssign = Math.min(20, groundEntitiesRemaining);
-            assignEntitiesToForce(newTopForce, forces, player, groundEntities, groundEntityIndex, entitiesToAssign);
-            groundEntityIndex += entitiesToAssign;
-            groundEntitiesRemaining -= entitiesToAssign;
-        }
-
-        // Handle aerospace entities by creating wing forces
-        if (!aerospaceEntities.isEmpty()) {
-            Force wingForce = createWingForce(force.getName(), forces, player);
-            assignEntitiesToForce(wingForce, forces, player, aerospaceEntities, 0, aerospaceEntities.size());
-        }
-    }
-
-
-    private static int assignEntitiesToForce(Force force, Forces forces, Player player, List<ForceAssignable> entities, int startIndex, int numEntities) {
-        int entitiesAssigned = 0;
-        int entityIndex = startIndex;
-        int entitiesRemaining = numEntities;
-
-        while (entitiesRemaining > 0) {
-            // Create a new subforce
-            Force newSubForce = new Force(
-                force.getName() + " Subforce " + (forces.getFullSubForces(force).size() + 1),
-                -1,
-                new Camouflage(),
-                player
-            );
-            int subForceId = forces.addSubForce(newSubForce, force);
-
-            // Add up to 6 entities to the new subforce
-            int entitiesToAdd = Math.min(6, entitiesRemaining);
-            for (int i = 0; i < entitiesToAdd; i++) {
-                ForceAssignable entity = entities.get(entityIndex++);
-                forces.addEntity(entity, subForceId);
-                entitiesAssigned++;
-            }
-
-            entitiesRemaining -= entitiesToAdd;
-        }
-
-        return entitiesAssigned;
+        return forceRepresentations;
     }
 
 }

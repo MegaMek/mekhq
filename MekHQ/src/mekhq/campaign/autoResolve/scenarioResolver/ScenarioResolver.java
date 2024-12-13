@@ -21,7 +21,7 @@ package mekhq.campaign.autoResolve.scenarioResolver;
 import mekhq.campaign.autoResolve.AutoResolveGame;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.autoResolve.helper.SetupForces;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.AcsSimpleScenarioResolver;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.AcSimpleScenarioResolver;
 import mekhq.campaign.autoResolve.scenarioResolver.component.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 
@@ -39,7 +39,7 @@ public abstract class ScenarioResolver {
     public static ScenarioResolver of(AutoResolveMethod method, AtBScenario scenario) {
         return switch (method) {
             case PRINCESS -> throw new UnsupportedOperationException("Princess method is not run here!");
-            case ABSTRACT_COMBAT -> new AcsSimpleScenarioResolver(scenario);
+            case ABSTRACT_COMBAT -> new AcSimpleScenarioResolver(scenario);
         };
     }
 

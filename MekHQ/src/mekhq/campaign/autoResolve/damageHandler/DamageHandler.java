@@ -20,7 +20,7 @@ package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsGameManager;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.component.AcGameManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Luana Coppio
  */
 public interface DamageHandler<E extends Entity> {
-    MMLogger logger = MMLogger.create(AcsGameManager.class);
+    MMLogger logger = MMLogger.create(AcGameManager.class);
 
     E entity();
 

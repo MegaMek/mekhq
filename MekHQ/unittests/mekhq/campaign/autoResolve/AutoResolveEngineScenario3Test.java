@@ -34,32 +34,32 @@ public class AutoResolveEngineScenario3Test extends AbstractAutoResolveEngineSce
      */
     @Override
     double lowerBoundTeam1() {
-        return 0.57;
+        return 0.60;
     }
 
     @Override
     double upperBoundTeam1() {
-        return 0.64;
+        return 0.68;
     }
 
     @Override
     double lowerBoundTeam2() {
-        return 0.30;
+        return 0.24;
     }
 
     @Override
     double upperBoundTeam2() {
-        return 0.40;
+        return 0.30;
     }
 
     @Override
     double lowerBoundDraw() {
-        return 0.03;
+        return 0.07;
     }
 
     @Override
     double upperBoundDraw() {
-        return 0.09;
+        return 0.11;
     }
 
     @Override

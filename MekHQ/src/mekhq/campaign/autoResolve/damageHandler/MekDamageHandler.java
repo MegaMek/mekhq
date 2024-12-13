@@ -19,9 +19,11 @@
 package mekhq.campaign.autoResolve.damageHandler;
 
 import megamek.common.*;
-import mekhq.campaign.autoResolve.helper.RandomUtils;
+import megamek.common.util.weightedMaps.WeightedDoubleMap;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
 
 import static megamek.common.Compute.rollD6;
 import static megamek.common.CriticalSlot.TYPE_SYSTEM;
@@ -34,7 +36,7 @@ public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean enti
     @Override
     public int getHitLocation() {
         var entity = entity();
-        RandomUtils.WeightedList<Integer> weightedLocations = new RandomUtils.WeightedList<>();
+        WeightedDoubleMap<Integer> weightedDoubleMap = new WeightedDoubleMap<>();
         for (int i = 0; i < entity.locations(); i++) {
             if (entity.getOArmor(i) <= 0) {
                 continue;
@@ -44,10 +46,10 @@ public record MekDamageHandler(Mek entity, boolean crewMustSurvive, boolean enti
             var locationIsNotHead = Mek.LOC_HEAD != i;
             var weight = locationIsNotHead ? 6.0 : 1.0;
             if (locationIsNotBlownOff && locationIsNotDestroyed) {
-                weightedLocations.addEntry(i, weight);
+                weightedDoubleMap.add(weight, i);
             }
         }
-        return weightedLocations.sample().orElse(-1);
+        return weightedDoubleMap.randomOptionalItem().orElse(-1);
     }
 
     @Override

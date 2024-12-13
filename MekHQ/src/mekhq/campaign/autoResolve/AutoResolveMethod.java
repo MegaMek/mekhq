@@ -20,7 +20,7 @@ package mekhq.campaign.autoResolve;
 
 import mekhq.MekHQ;
 import mekhq.campaign.autoResolve.scenarioResolver.ScenarioResolver;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.AcsSimpleScenarioResolver;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.AcSimpleScenarioResolver;
 import mekhq.campaign.mission.AtBScenario;
 
 import java.util.Optional;
@@ -39,7 +39,7 @@ public enum AutoResolveMethod {
     ABSTRACT_COMBAT("AutoResolveMethod.ABSTRACT_COMBAT.text", "AutoResolveMethod.ABSTRACT_COMBAT.toolTipText") {
         @Override
         public ScenarioResolver of(AtBScenario scenario) {
-            return new AcsSimpleScenarioResolver(scenario);
+            return new AcSimpleScenarioResolver(scenario);
         }
     };
 

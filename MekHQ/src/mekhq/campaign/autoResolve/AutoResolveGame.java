@@ -29,15 +29,13 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.options.StaticGameOptions;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.strategicBattleSystems.SBFReportEntry;
-import megamek.common.strategicBattleSystems.SBFUnit;
 import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryHelper;
 import megamek.server.victory.VictoryResult;
-import mekhq.campaign.autoResolve.damageHandler.DamageHandlerChooser;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormation;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationTurn;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsTurn;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.handler.AcsActionHandler;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.component.AcFormation;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.component.AcFormationTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.component.AcTurn;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.handler.AcActionHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioObjective;
 
@@ -71,12 +69,12 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     /**
      * Report and turnlist
      */
-    private final List<AcsTurn> turnList = new ArrayList<>();
+    private final List<AcTurn> turnList = new ArrayList<>();
 
     /**
      * Tools for the game
      */
-    private final List<AcsActionHandler> actionHandlers = new ArrayList<>();
+    private final List<AcActionHandler> actionHandlers = new ArrayList<>();
     private MapSettings mapSettings;
 
     /**
@@ -148,7 +146,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     protected List<Deployable> deployableInGameObjects() {
         return inGameObjects.values().stream()
             .filter(unit -> unit instanceof Deployable)
-            .filter(unit -> unit instanceof AcsFormation)
+            .filter(unit -> unit instanceof AcFormation)
             .map(unit -> (Deployable) unit)
             .collect(Collectors.toList());
     }
@@ -241,7 +239,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     @Override
-    public List<AcsTurn> getTurnsList() {
+    public List<AcTurn> getTurnsList() {
         return Collections.unmodifiableList(turnList);
     }
 
@@ -259,7 +257,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return phase;
     }
 
-    public void addActionHandler(AcsActionHandler handler) {
+    public void addActionHandler(AcActionHandler handler) {
         if (actionHandlers.contains(handler)) {
             logger.error("Tried to re-add action handler {}!", handler);
         } else {
@@ -268,14 +266,14 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     @Override
-    public AcsTurn getTurn() {
+    public AcTurn getTurn() {
         if ((turnIndex < 0) || (turnIndex >= turnList.size())) {
             return null;
         }
         return turnList.get(turnIndex);
     }
 
-    public Optional<AcsTurn> getCurrentTurn() {
+    public Optional<AcTurn> getCurrentTurn() {
         if ((turnIndex < 0) || (turnIndex >= turnList.size())) {
             return Optional.empty();
         }
@@ -287,7 +285,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return getTurnsList().size() > turnIndex + 1;
     }
 
-    public void setTurns(List<AcsTurn> turns) {
+    public void setTurns(List<AcTurn> turns) {
         this.turnList.clear();
         this.turnList.addAll(turns);
     }
@@ -400,7 +398,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     @Override
     public int getLiveDeployedEntitiesOwnedBy(Player player) {
         var res = getActiveFormations(player).stream()
-            .filter(AcsFormation::isDeployed)
+            .filter(AcFormation::isDeployed)
             .count();
 
         return (int) res;
@@ -463,16 +461,16 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         return Optional.empty();
     }
 
-    public List<AcsActionHandler> getActionHandlers() {
+    public List<AcActionHandler> getActionHandlers() {
         return actionHandlers;
     }
 
-    public Optional<AcsTurn> changeToNextTurn() {
+    public Optional<AcTurn> changeToNextTurn() {
         turnIndex++;
         return getCurrentTurn();
     }
 
-    public boolean hasEligibleFormation(AcsFormationTurn turn) {
+    public boolean hasEligibleFormation(AcFormationTurn turn) {
         return (turn != null) && getActiveFormations().stream().anyMatch(f -> turn.isValidEntity(f, this));
     }
 
@@ -482,9 +480,9 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      * @param formationID the ID to look for
      * @return The formation or an empty Optional
      */
-    public Optional<AcsFormation> getFormation(int formationID) {
+    public Optional<AcFormation> getFormation(int formationID) {
         Optional<InGameObject> unit = getInGameObject(formationID);
-        if (unit.isPresent() && unit.get() instanceof AcsFormation formation) {
+        if (unit.isPresent() && unit.get() instanceof AcFormation formation) {
             return Optional.of(formation);
         } else {
             return Optional.empty();
@@ -521,8 +519,8 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
     }
 
     // check current turn, phase, formation
-    private boolean isEligibleForAction(AcsFormation formation) {
-        return (getTurn() instanceof AcsFormationTurn)
+    private boolean isEligibleForAction(AcFormation formation) {
+        return (getTurn() instanceof AcFormationTurn)
             && getTurn().isValidEntity(formation, this);
     }
 
@@ -533,14 +531,14 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
      *
      * @return The currently active formations
      */
-    public List<AcsFormation> getActiveFormations() {
+    public List<AcFormation> getActiveFormations() {
         return inGameObjects.values().stream()
-            .filter(u -> u instanceof AcsFormation)
-            .map(u -> (AcsFormation) u)
+            .filter(u -> u instanceof AcFormation)
+            .map(u -> (AcFormation) u)
             .toList();
     }
 
-    public List<AcsFormation> getActiveFormations(Player player) {
+    public List<AcFormation> getActiveFormations(Player player) {
         return getActiveFormations().stream()
             .filter(f -> f.getOwnerId() == player.getId())
             .toList();
@@ -558,7 +556,7 @@ public class AutoResolveGame extends AbstractGame implements PlanetaryConditions
         }
     }
 
-    public void removeFormation(AcsFormation formation) {
+    public void removeFormation(AcFormation formation) {
         inGameObjects.remove(formation.getId());
     }
 

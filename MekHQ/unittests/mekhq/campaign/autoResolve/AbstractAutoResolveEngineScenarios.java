@@ -72,7 +72,6 @@ public abstract class AbstractAutoResolveEngineScenarios {
     // and then run the tests in that class
     @RepeatedTest(1000)
     void testAutoResolveMultipleTimes() {
-        resetTrackers();
         autoResolve(this::postAutoResolveAccumulator);
     }
 

@@ -27,7 +27,7 @@ import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.autoResolve.AutoResolveGame;
-import mekhq.campaign.autoResolve.scenarioResolver.abstractCombatSystem.component.AcsFormationConverter;
+import mekhq.campaign.autoResolve.scenarioResolver.abstractCombat.component.AcFormationConverter;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -56,37 +56,52 @@ public class SetupForces {
         this.scenario = scenario;
     }
 
-    // from ATB Game thread
+    /**
+     * Create the forces for the game object, using the campaign, units and scenario
+     * @param game The game object to setup the forces in
+     */
     public void createForcesOnGame(AutoResolveGame game) {
         game.setMapSettings(setupMapSettings());
         game.setPlanetaryConditions(getPlanetaryConditions());
         setupPlayer(game);
         setupBots(game);
+        ConsolidateForces.consolidateForces(game);
         convertForcesIntoFormations(game);
     }
 
-    private static void convertForcesIntoFormations(AutoResolveGame game) {
-        var idOfEntitiesToRemoveFromForces = game.getInGameObjects().stream().map(InGameObject::getId).toList();
-
-        ConsolidateForces.consolidateForces(game);
-
-        // convert forces:
-        for(var force : game.getForces().getTopLevelForces()) {
-            var formation = new AcsFormationConverter(force, game).unsafeConvert();
-            if (formation == null) {
-                logger.error("Error, formation is null for force {}", force.getName());
-            } else {
-                formation.setTargetFormationId(Entity.NONE);
-                game.addUnit(formation);
-                game.getForces().addEntity(formation, force.getId());
-            }
-        }
-
-        for (var id : idOfEntitiesToRemoveFromForces) {
-            game.getForces().removeEntityFromForces(id);
+    private static class FailedToConvertForceToFormationException extends RuntimeException {
+        public FailedToConvertForceToFormationException(Throwable cause) {
+            super(cause);
         }
     }
 
+    /**
+     * Convert the forces in the game to formations, this is the most important step in the setup of the game,
+     * it converts every top level force into a single formation, and those formations are then added to the game
+     * and used in the auto resolve in place of the original entities
+     * @param game The game object to convert the forces in
+     */
+    private static void convertForcesIntoFormations(AutoResolveGame game) {
+        for(var force : game.getForces().getTopLevelForces()) {
+            try {
+                var formation = new AcFormationConverter(force, game).unsafeConvert();
+                formation.setTargetFormationId(Entity.NONE);
+                game.addUnit(formation);
+                game.getForces().addEntity(formation, force.getId());
+            } catch (Exception e) {
+                Sentry.captureException(e);
+                var entities = game.getForces().getFullEntities(force).stream().filter(Entity.class::isInstance)
+                    .map(Entity.class::cast).toList();
+                logger.error("Error converting force to formation {} - {}", force, entities, e);
+                throw new FailedToConvertForceToFormationException(e);
+            }
+        }
+    }
+
+    /**
+     * Setup the player, its forces and entities in the game, it also sets the player skill level.
+     * @param game The game object to setup the player in
+     */
     private void setupPlayer(AutoResolveGame game) {
         var player = getCleanPlayer();
         game.addPlayer(player.getId(), player);
@@ -96,6 +111,10 @@ public class SetupForces {
         sendEntities(entities, game);
     }
 
+    /**
+     * Setup the bots, their forces and entities in the game, it also sets the player skill level.
+     * @param game The game object to setup the bots in
+     */
     private void setupBots(AutoResolveGame game) {
         var enemySkill = (scenario.getContract(campaign)).getEnemySkill();
         var allySkill = (scenario.getContract(campaign)).getAllySkill();
@@ -128,6 +147,10 @@ public class SetupForces {
         }
     }
 
+    /**
+     * Create a player object from the campaign and scenario wichi doesnt have a reference to the original player
+     * @return The clean player object
+     */
     private Player getCleanPlayer() {
         var campaignPlayer = campaign.getPlayer();
         var player = new Player(campaignPlayer.getId(), campaignPlayer.getName());
@@ -149,6 +172,11 @@ public class SetupForces {
         return player;
     }
 
+    /**
+     * Setup the player forces and entities for the game
+     * @param player The player object to setup the forces for
+     * @return A list of entities for the player
+     */
     private List<Entity> setupPlayerForces(Player player) {
         boolean useDropship = false;
         if (scenario.getLanceRole().isScouting()) {
@@ -249,6 +277,11 @@ public class SetupForces {
         return entities;
     }
 
+    /**
+     * Breaks the reference to the original crew object and creates a new one
+     * @param originalCrew The original crew object
+     * @return A new crew object
+     */
     private static Crew getNewCrewRef(Crew originalCrew) {
         var newCrewRef = new Crew(originalCrew.getCrewType(), originalCrew.getName(), originalCrew.getSize(),
             originalCrew.getGunnery(), originalCrew.getPiloting(), originalCrew.getGender(), originalCrew.isClanPilot(),
@@ -263,6 +296,10 @@ public class SetupForces {
         return newCrewRef;
     }
 
+    /**
+     * Setup the map settings for the game, not relevant at the moment, as the map settings are not used in the autoresolve currently
+     * @return The map settings object
+     */
     private MapSettings setupMapSettings() {
         MapSettings mapSettings = MapSettings.getInstance();
         mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
@@ -306,6 +343,11 @@ public class SetupForces {
         return mapSettings;
     }
 
+    /**
+     * Configure the bot player object with the bot force data
+     * @param bot The bot player object
+     * @param botForce The bot force data
+     */
     private void configureBot(Player bot, BotForce botForce) {
         bot.setTeam(botForce.getTeam());
         // set deployment
@@ -322,6 +364,13 @@ public class SetupForces {
         bot.setColour(botForce.getColour());
     }
 
+    /**
+     * Setup the bot entities for the game
+     * @param bot The bot player object
+     * @param originalEntities The original entities for the bot
+     * @param deployRound The deployment round for the bot
+     * @return A list of entities for the bot
+     */
     private List<Entity> setupBotEntities(Player bot, List<Entity> originalEntities, int deployRound) {
         String forceName = bot.getName() + "|1";
         var entities = new ArrayList<Entity>();
@@ -348,6 +397,10 @@ public class SetupForces {
         return entities;
     }
 
+    /**
+     * Get the planetary conditions for the game, not used at the moment in the auto resolve
+     * @return The planetary conditions object
+     */
     private PlanetaryConditions getPlanetaryConditions() {
         PlanetaryConditions planetaryConditions = new PlanetaryConditions();
         if (campaign.getCampaignOptions().isUseLightConditions()) {
@@ -368,6 +421,11 @@ public class SetupForces {
         return planetaryConditions;
     }
 
+    /**
+     * Send the entities to the game object
+     * @param entities The entities to send
+     * @param game the game object to send the entities to
+     */
     private void sendEntities(List<Entity> entities, AutoResolveGame game) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
         for (final Entity entity : new ArrayList<>(entities)) {
