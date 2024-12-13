@@ -54,7 +54,16 @@ MEKHQ VERSION HISTORY:
 + Fix #5285: Fixed SVArmor Price Calculation
 + Fix #5288: Added Recalculation of Scenario Objectives when Assigning Forces
 + Fix #5122 & #5084: Adjusted TO&E Menu Option Availability
-
++ Fix #5195: Made completion/finished by day calculation unambiguous
++ Fix #5256: Refactored MekHQ Unit's Gunners to be Set to ensure gunners are unique
++ PR #5294: Fixed Typo in 'Fourth Succession War' Naming
++ PR #5296: Simplified Modifier Briefing Text in AtBScenarioModifier
++ PR #5297: Enhanced Formatting in StratCon Scenario Information
++ Fix #5301: Fixed Theatre of War Faction Checks
++ Fix #5302: Improved Unit Substitution
++ Fix #5311: Fixed Marriage Announcements Not Appearing in Daily Activity Log
++ Fix #5318: Corrected Calculation of Age Difference When Marrying Personnel
++ Fix #5333: Show Hired personnel's name change
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

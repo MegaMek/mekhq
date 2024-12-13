@@ -127,7 +127,7 @@ public class Unit implements ITechnology {
     protected int scenarioId;
 
     private List<Person> drivers;
-    private List<Person> gunners;
+    private Set<Person> gunners;
     private List<Person> vesselCrew;
     // Contains unique Id of each Infantry/BA Entity assigned to this unit as
     // marines
@@ -182,7 +182,7 @@ public class Unit implements ITechnology {
         this.parts = new ArrayList<>();
         this.podSpace = new ArrayList<>();
         this.drivers = new ArrayList<>();
-        this.gunners = new ArrayList<>();
+        this.gunners = new HashSet<>();
         this.vesselCrew = new ArrayList<>();
         forceId = Force.FORCE_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
@@ -4719,8 +4719,8 @@ public class Unit implements ITechnology {
         return Collections.unmodifiableList(drivers);
     }
 
-    public List<Person> getGunners() {
-        return Collections.unmodifiableList(gunners);
+    public Set<Person> getGunners() {
+        return Collections.unmodifiableSet(gunners);
     }
 
     public List<Person> getVesselCrew() {
@@ -5874,18 +5874,23 @@ public class Unit implements ITechnology {
                 }
             }
         }
-        for (int ii = gunners.size() - 1; ii >= 0; --ii) {
-            Person gunner = gunners.get(ii);
+        Set<Person> gunnersToRemove = new HashSet<>();
+        for(Person gunner : gunners){
             if (gunner instanceof UnitPersonRef) {
-                gunners.set(ii, campaign.getPerson(gunner.getId()));
-                if (gunners.get(ii) == null) {
+                gunnersToRemove.add(gunner);
+                Person updatedGunner = campaign.getPerson(gunner.getId());
+                if(updatedGunner != null){
+                    gunners.add(updatedGunner);
+                }
+                else{
                     logger.error(
-                            String.format("Unit %s ('%s') references missing gunner %s",
-                                    getId(), getName(), gunner.getId()));
-                    gunners.remove(ii);
+                        String.format("Unit %s ('%s') references missing gunner %s",
+                            getId(), getName(), gunner.getId()));
                 }
             }
         }
+        gunners.removeAll(gunnersToRemove);
+
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof UnitPersonRef) {

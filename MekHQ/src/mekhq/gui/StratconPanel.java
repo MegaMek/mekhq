@@ -855,10 +855,10 @@ public class StratconPanel extends JPanel implements ActionListener {
         StringBuilder infoBuilder = new StringBuilder();
         infoBuilder.append("<html><br/>");
 
-        infoBuilder.append("Average Temperature: ");
+        infoBuilder.append("<b>Average Temperature:</b> ");
         infoBuilder.append(currentTrack.getTemperature());
         infoBuilder.append("&deg;C<br/>");
-        infoBuilder.append("Terrain Type: ");
+        infoBuilder.append("<b>Terrain Type:</b> ");
         infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
         infoBuilder.append("<br/>");
 
@@ -866,7 +866,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 || currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
             infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
-                .append("'>Recon Complete</span><br/>");
+                .append("'><i>Recon Complete</i></span><br/>");
         }
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
@@ -875,13 +875,13 @@ public class StratconPanel extends JPanel implements ActionListener {
                 infoBuilder.append(force.getName()).append(" assigned");
 
                 if (currentTrack.getStickyForces().contains(forceID)) {
-                    infoBuilder.append(" - remain deployed");
+                    infoBuilder.append("<i> - remain deployed</i>");
                 }
 
                 infoBuilder.append("<br/>")
-                        .append("Returns on ")
+                        .append("<i>Returns on ")
                         .append(currentTrack.getAssignedForceReturnDates().get(forceID))
-                        .append("<br/>");
+                        .append("</i><br/>");
             }
         }
 
@@ -913,14 +913,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         } else {
             infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegative())
-                    .append("'>Recon Incomplete</span>");
+                    .append("'><i>Recon Incomplete</i></span>");
         }
         infoBuilder.append("<br/>");
 
         StratconScenario selectedScenario = getSelectedScenario();
         if ((selectedScenario != null) &&
                 ((selectedScenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
-            infoBuilder.append(selectedScenario.getInfo(campaign, true));
+            infoBuilder.append(selectedScenario.getInfo(campaign));
         }
 
         infoBuilder.append("</html>");
