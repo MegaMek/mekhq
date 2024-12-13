@@ -66,6 +66,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
 import static megamek.common.Compute.randomInt;
@@ -1367,8 +1368,7 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Scale the scenario's objective time limits, if called for, by the number of
-     * units
-     * that have associated force templates that "contribute to the unit count".
+     * units that have associated force templates that "contribute to the unit count".
      */
     private static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
         int primaryUnitCount = 0;
@@ -1387,9 +1387,23 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
+        // We want a minimum value here, to avoid situations where we spawn scenarios with only a
+        // single turn requirement.
+        // This effectively treats any player-aligned forces less than 6 as 6.
+        primaryUnitCount = max(primaryUnitCount, 6);
+
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
             if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
-                objective.setTimeLimit(primaryUnitCount * objective.getTimeLimitScaleFactor());
+                Integer scaleFactor = objective.getTimeLimitScaleFactor();
+
+                // If we fail to fetch scaleFactor, log it and use a placeholder value of 1
+                if (scaleFactor == null) {
+                    logger.error(String.format("Failed to fetch scaleFactor for scenario template %s. Using fallback value of 1",
+                        scenario.getTemplate().name));
+                    scaleFactor = 1;
+                }
+
+                objective.setTimeLimit(primaryUnitCount * scaleFactor);
             }
         }
     }
@@ -1969,7 +1983,7 @@ public class AtBDynamicScenarioFactory {
             if (bay instanceof InfantryCompartment) {
 
                 double bayCapacity = bay.getUnused();
-                int remainingCount = (int) Math.max(1, Math.floor(bayCapacity / IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT));
+                int remainingCount = (int) max(1, Math.floor(bayCapacity / IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT));
                 while (remainingCount > 0) {
 
                     // Set base random generation parameters
@@ -2378,7 +2392,7 @@ public class AtBDynamicScenarioFactory {
         int skillRoll = Compute.d6(1);
 
         if (skillRoll == 1) {
-            skillValue = Math.max(1, skillValue - 1);
+            skillValue = max(1, skillValue - 1);
         } else if (skillRoll == 6) {
             skillValue = Math.min(7, skillValue + 1);
         }
@@ -2587,11 +2601,11 @@ public class AtBDynamicScenarioFactory {
                         vehicleLanceWeight++;
                     } else {
                         mekLanceWeight++;
-                        mixedLanceWeight = Math.max(0, mixedLanceWeight - 1);
-                        vehicleLanceWeight = Math.max(0, vehicleLanceWeight - 1);
+                        mixedLanceWeight = max(0, mixedLanceWeight - 1);
+                        vehicleLanceWeight = max(0, vehicleLanceWeight - 1);
                     }
                 } else if (faction.isMinorPower() || faction.isPirate()) {
-                    mekLanceWeight = Math.max(0, mekLanceWeight - 1);
+                    mekLanceWeight = max(0, mekLanceWeight - 1);
                     mixedLanceWeight++;
                     vehicleLanceWeight++;
                 }
@@ -2679,9 +2693,9 @@ public class AtBDynamicScenarioFactory {
                 if (faction.isClan()) {
                     aeroFlightWeight += 2;
                     mixedFlightWeight = 0;
-                    conventionalLanceWeight = Math.max(0, conventionalLanceWeight - 2);
+                    conventionalLanceWeight = max(0, conventionalLanceWeight - 2);
                 } else if (faction.isMinorPower() || faction.isPirate()) {
-                    aeroFlightWeight = Math.max(0, aeroFlightWeight - 1);
+                    aeroFlightWeight = max(0, aeroFlightWeight - 1);
                     mixedFlightWeight++;
                     conventionalLanceWeight++;
                 }
@@ -3645,7 +3659,7 @@ public class AtBDynamicScenarioFactory {
 
             // since we're iterating through the same unchanged collection, we can use
             // implicit indexing.
-            entity.setDeployRound(Math.max(0, maxWalkMP - entityWalkMPs.get(x) - actualTurnModifier));
+            entity.setDeployRound(max(0, maxWalkMP - entityWalkMPs.get(x) - actualTurnModifier));
         }
     }
 
@@ -3711,7 +3725,7 @@ public class AtBDynamicScenarioFactory {
             // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
             // we then subtract the passed-in turn modifier, which is usually the
             // commander's strategy skill level.
-            int actualArrivalTurn = Math.max(0, (arrivalScale / minimumSpeed) - turnModifier);
+            int actualArrivalTurn = max(0, (arrivalScale / minimumSpeed) - turnModifier);
 
             entity.setDeployRound(actualArrivalTurn);
         }
