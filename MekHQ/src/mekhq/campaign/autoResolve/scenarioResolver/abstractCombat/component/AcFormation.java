@@ -44,7 +44,7 @@ public class AcFormation extends SBFFormation implements HasMemory {
     private boolean clanFormation = false;
     private ASDamageVector stdDamage;
 
-    private Map<Integer, ASRange> rangeAgainstFormations = new HashMap<>();
+    private final Map<Integer, ASRange> rangeAgainstFormations = new HashMap<>();
 
     public EngagementControl getEngagementControl() {
         return engagementControl;

@@ -391,7 +391,7 @@ public abstract class AbstractAutoResolveEngineScenarios {
             () -> assertTrue(drawRate <= upperBoundDraw(),
                 "Draw rate (" + drawRate + ") is above upper bound " + upperBoundDraw() + ". Deviation: " + (drawRate - upperBoundDraw()))
         );
-
+        resetTrackers();
     }
 
 }
