@@ -1112,7 +1112,19 @@ public class CampaignGUI extends JPanel {
         String padding = "       ";
         JButton btnAdvanceDay = new JButton(padding + resourceMap.getString("btnAdvanceDay.text") + padding);
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
-        btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
+        btnAdvanceDay.addActionListener(evt -> {
+            // We disable the button here, as we don't want the user to be able to advance day
+            // again, until after Advance Day has completed.
+            btnAdvanceDay.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    getCampaignController().advanceDay();
+                } finally {
+                    btnAdvanceDay.setEnabled(true);
+                }
+            });
+        });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -1623,21 +1635,8 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                StringBuilder nameBuilder = new StringBuilder(128);
-                nameBuilder.append("<html>")
-                    .append(tech.getFullName())
-                    .append(", <b>")
-                    .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
-                    .append("</b> ")
-                    .append(tech.getPrimaryRoleDesc())
-                    .append(" (")
-                    .append(getCampaign().getTargetFor(r, tech).getValueAsString())
-                    .append("+), ")
-                    .append(tech.getMinutesLeft())
-                    .append('/')
-                    .append(tech.getDailyAvailableTechTime())
-                    .append(" minutes</html>");
-                name = nameBuilder.toString();
+                String nameBuilder = "<html>" + tech.getFullName() + ", <b>" + SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) + "</b> " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), " + tech.getMinutesLeft() + '/' + tech.getDailyAvailableTechTime() + " minutes</html>";
+                name = nameBuilder;
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
