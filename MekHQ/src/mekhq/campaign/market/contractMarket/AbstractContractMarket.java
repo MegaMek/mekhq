@@ -213,12 +213,12 @@ public abstract class AbstractContractMarket {
         // Otherwise, we roll to determine the amount we divide availableForces by
         int roll = d6(2);
         double varianceFactor = switch (roll) {
-            case 2 -> 6;
-            case 3 -> 5;
-            case 4 -> 4;
-            case 10 -> 2;
-            case 11 -> 1;
-            case 12 -> 0;
+            case 2 -> 4.5;
+            case 3 -> 4;
+            case 4 -> 3.5;
+            case 10 -> 2.5;
+            case 11 -> 2;
+            case 12 -> 1.5;
             default -> 3;
         };
 
