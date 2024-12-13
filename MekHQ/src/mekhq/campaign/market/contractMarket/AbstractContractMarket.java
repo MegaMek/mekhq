@@ -21,10 +21,12 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.util.*;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
@@ -182,42 +184,66 @@ public abstract class AbstractContractMarket {
      * Determines the number of required lances to be deployed for a contract. For Mercenary subcontracts
      * this defaults to 1; otherwise, the number is based on the number of combat units in the
      * campaign. Modified by a 2d6 roll if {@code bypassVariance} is {@code false}.
+     *
      * @param campaign the current campaign
      * @param contract the relevant contract
      * @param bypassVariance if {@code true} requirements will not be semi-randomized.
      * @return The number of lances required to be deployed.
      */
     public int calculateRequiredLances(Campaign campaign, AtBContract contract, boolean bypassVariance) {
-        int maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
         if (contract.isSubcontract()) {
             return 1;
-        } else {
-            int formationSize = getStandardForceSize(campaign.getFaction());
-            int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
+        }
 
-            // We allow for one reserve force per 3 depth 0 forces (lances, etc)
-            availableForces -= max((int) floor((double) availableForces / 3), 1);
+        int maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
+        int formationSize = getStandardForceSize(campaign.getFaction());
+        int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
 
-            if (!bypassVariance) {
-                int roll = d6(2);
+        // Base required forces
+        availableForces -= max((int) floor((double) availableForces / 3), 1);
 
-                if (roll == 2) {
-                    availableForces = (int) round((double) availableForces * 0.25);
-                } else if (roll == 3) {
-                    availableForces = (int) round((double) availableForces * 0.5);
-                } else if (roll < 5) {
-                    availableForces = (int) round((double) availableForces * 0.75);
-                } else if (roll == 12) {
-                    availableForces = (int) round((double) availableForces * 1.75);
-                } else if (roll == 11) {
-                    availableForces = (int) round((double) availableForces * 1.5);
-                } else if (roll > 9) {
-                    availableForces = (int) round((double) availableForces * 1.25);
-                }
-            }
-
+        // If we're bypassing variance, we can early exit here
+        if (bypassVariance) {
             return MathUtility.clamp(availableForces, 1, maxDeployedLances);
         }
+
+        // We use a 2d6 roll here, instead of a pure randomInt call, as this gives us more control
+        // over the results; ensuring that in most cases required lances will equal the value of
+        // availableForces (calculated above)
+        int roll = d6(2);
+        double varianceFactor = switch (roll) {
+            case 2 -> -0.75;
+            case 3 -> -0.5;
+            case 4 -> -0.25;
+            case 10 -> 0.25;
+            case 11 -> 0.5;
+            case 12 -> 0.75;
+            default -> 0;
+        };
+
+        int variance = getRequiredLanceVariance(availableForces, varianceFactor);
+
+        if (variance > 0) {
+            availableForces += randomInt(variance);
+        }
+
+        if (variance < 0) {
+            // The value in randomInt must be positive
+            availableForces -= randomInt(abs(variance));
+        }
+
+        return MathUtility.clamp(availableForces, 1, maxDeployedLances);
+    }
+
+    /**
+     * Calculates the required lance variance for a new contract
+     *
+     * @param  availableForces  The number of available forces to be adjusted.
+     * @param  factor           The factor by which the available forces should be adjusted.
+     * @return An integer representing the calculated variance.
+     */
+    private int getRequiredLanceVariance(int availableForces, double factor) {
+        return (int) round((double) availableForces * factor);
     }
 
     /**
