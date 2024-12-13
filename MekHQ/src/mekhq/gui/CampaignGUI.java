@@ -1635,8 +1635,21 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                String nameBuilder = "<html>" + tech.getFullName() + ", <b>" + SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) + "</b> " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), " + tech.getMinutesLeft() + '/' + tech.getDailyAvailableTechTime() + " minutes</html>";
-                name = nameBuilder;
+                StringBuilder nameBuilder = new StringBuilder(128);
+                nameBuilder.append("<html>")
+                    .append(tech.getFullName())
+                    .append(", <b>")
+                    .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
+                    .append("</b> ")
+                    .append(tech.getPrimaryRoleDesc())
+                    .append(" (")
+                    .append(getCampaign().getTargetFor(r, tech).getValueAsString())
+                    .append("+), ")
+                    .append(tech.getMinutesLeft())
+                    .append('/')
+                    .append(tech.getDailyAvailableTechTime())
+                    .append(" minutes</html>");
+                name = nameBuilder.toString();
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
