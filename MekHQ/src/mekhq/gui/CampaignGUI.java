@@ -1061,6 +1061,11 @@ public class CampaignGUI extends JPanel {
      * </p>
      */
     private void handleInAppNewCampaign() {
+        int decision = new NewCampaignConfirmationDialog().YesNoOption();
+        if (decision != JOptionPane.YES_OPTION) {
+            return;
+        }
+
         // Prompt the user to save
         int savePrompt = JOptionPane.showConfirmDialog(null,
             resourceMap.getString("savePrompt.text"),
