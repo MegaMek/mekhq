@@ -218,10 +218,7 @@ public class Resupply {
         final int TONNAGE_DIVIDER = 100;
         final double dropSize = baseTonnage / TONNAGE_DIVIDER;
 
-        // Finally, we calculate the total convoy size. This is dropSize multiplied by dropCount
-        final double dropCount = (double) contract.getRequiredLances() / 3;
-
-        return (int) round(dropSize * dropCount);
+        return (int) round(dropSize);
     }
 
     /**
@@ -479,7 +476,6 @@ public class Resupply {
 
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        dialog.setResizable(false);
         dialog.pack();
         dialog.setModal(true);
         dialog.setLocationRelativeTo(null);
