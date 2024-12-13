@@ -45,6 +45,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
     private final boolean startup;
+    private final MekHQ application;
     private CampaignOptionsPane campaignOptionsPane;
     //endregion Variable Declarations
 
@@ -55,18 +56,21 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;
+        this.application = null;
         initialize();
     }
 
     /**
      * Allows dialog to be constructed with an owner being another dialog
      */
-    public CampaignOptionsDialog(final JDialog owner, final JFrame frame, final Campaign campaign, final boolean startup) {
+    public CampaignOptionsDialog(final JDialog owner, final JFrame frame, final Campaign campaign,
+                                 final boolean startup, @Nullable final MekHQ application) {
         super(owner, frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
                         MekHQ.getMHQOptions().getLocale()),
                 "CampaignOptionsDialog", "CampaignOptionsDialog.title");
         this.campaign = campaign;
         this.startup = startup;
+        this.application = application;
         initialize();
     }
     //endregion Constructors
@@ -116,7 +120,12 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
         }));
 
         panel.add(new MMButton("btnCancel", resources, "Cancel.text", "Cancel.toolTipText",
-                this::cancelActionPerformed));
+                evt -> {
+            if (application != null) {
+                application.exit(false);
+            } else {
+                cancelActionPerformed(evt);
+            }}));
 
         return panel;
     }
