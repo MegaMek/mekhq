@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.TargetRollModifier;
@@ -57,6 +56,7 @@ import java.util.stream.Collectors;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
+import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.Coords.ALL_DIRECTIONS;
@@ -273,7 +273,7 @@ public class StratconRulesManager {
             StratconTrackState track = campaignState.getTracks().get(0);
 
             if (tracks.size() > 1) {
-                track = ObjectUtility.getRandomItem(tracks);
+                track = getRandomItem(tracks);
             }
 
             if (autoAssignLances && availableForceIDs.isEmpty()) {
@@ -793,9 +793,35 @@ public class StratconRulesManager {
     }
 
     /**
-     * Deploys a force to the given coordinates on the given track as a result of
-     * explicit player
-     * action.
+     * Deploys a force to a specified coordinate within the provided track and processes the
+     * deployment accordingly.
+     *
+     * <p>The following actions are performed during force deployment:
+     * <ol>
+     *     <li>Processes the force deployment, which may reveal the fog of war in or around the
+     *     coordinates depending on the force's role.</li>
+     *     <li>If the target coordinates contain a hostile facility, a corresponding facility
+     *     scenario is created.</li>
+     *     <li>If the target coordinates are empty, there is a chance that a scenario may be created.</li>
+     *     <li>If a scenario is revealed at the target coordinates, the force is assigned to it, and
+     *     the scenario is finalized.</li>
+     *     <li>If the target coordinates contain a non-allied facility or an empty coordinate that
+     *     qualifies for a new scenario:
+     *         <ul>
+     *             <li>If the deploying force is performing a scouting role, the scenario is moved
+     *             to an unoccupied adjacent coordinate, if available.</li>
+     *         </ul>
+     *     </li>
+     * </ol>
+     *
+     * @param coords   the coordinates to deploy the force to
+     * @param forceID  the identifier of the force being deployed
+     * @param campaign the campaign in which the deployment is occurring
+     * @param contract the contract associated with the current campaign
+     * @param track    the track state containing information about scenarios, facilities, and
+     *                 strategic details
+     * @param sticky   whether the deployment is considered "sticky" (forces stay in position
+     *                without auto-updates)
      */
     public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign,
                                            AtBContract contract, StratconTrackState track, boolean sticky) {
@@ -831,7 +857,7 @@ public class StratconRulesManager {
                 StrategicFormation combatTeam = campaign.getStrategicFormationsTable().get(forceID);
 
                 if (combatTeam != null && combatTeam.getRole().isScouting()) {
-                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track, false);
+                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
 
                     if (newCoords != null) {
                         coords = newCoords;
@@ -857,25 +883,25 @@ public class StratconRulesManager {
     }
 
     /**
-     * Searches for and returns a suitable adjacent coordinate to the given origin coordinates on
-     * the provided {@link StratconTrackState}.
-     * The method checks all the possible directions and considers a coordinate suitable if it
-     * doesn't contain a scenario and if it either doesn't contain a facility or contains a
-     * player-allied one.
-     * If there are multiple suitable coordinates, one is chosen at random.
+     * Finds an unoccupied coordinates adjacent to the given origin coordinates.
      *
-     * @param originCoords the {@link StratconCoords} around which to search for a suitable coordinate
-     * @param trackState   the {@link StratconTrackState} on which to perform the search
-     * @param weightPlayerForces whether to place greater emphasis on player-allied forces and facilities.
-     * @return a {@link StratconCoords} object representing the coordinates of a suitable adjacent
-     * location, or {code null} if no suitable location was found.
+     * <p>Adjacent coordinates are determined based on all possible directions defined by {@code ALL_DIRECTIONS}.
+     * A coordinate is considered "unoccupied" if the following conditions are met:
+     * <ul>
+     *     <li>No scenario is assigned to the coordinate (using {@link StratconTrackState#getScenario})</li>
+     *     <li>No facility exists at the coordinate (using {@link StratconTrackState#getFacility})</li>
+     *     <li>The coordinate is not occupied by any assigned forces (using {@link StratconTrackState#getAssignedForceCoords})</li>
+     * </ul>
+     * If multiple suitable coordinates are found, one is selected at random and returned.
+     * If no suitable coordinates are available, the method returns {@code null}.
+     *
+     * @param originCoords the coordinate from which to search for unoccupied adjacent ones
+     * @param trackState   the state of the track containing information about scenarios, facilities, and forces
+     * @return a randomly selected unoccupied adjacent coordinate, or {@code null} if none are available
      */
-    public static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
-                                                                       StratconTrackState trackState,
-                                                                       boolean weightPlayerForces) {
+    private static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
+                                                                       StratconTrackState trackState) {
         List<StratconCoords> suitableCoords = new ArrayList<>();
-        List<StratconCoords> playerForceCoords = new ArrayList<>();
-        List<StratconCoords> playerFacilityCoords = new ArrayList<>();
 
         for (int direction : ALL_DIRECTIONS) {
             StratconCoords newCoords = originCoords.translate(direction);
@@ -884,44 +910,22 @@ public class StratconRulesManager {
                 continue;
             }
 
-            if (trackState.getFacility(newCoords) == null) {
-                suitableCoords.add(newCoords);
+            if (trackState.getFacility(newCoords) != null) {
                 continue;
             }
 
-            if (trackState.getFacility(newCoords).getOwner() != ForceAlignment.Opposing) {
-                suitableCoords.add(newCoords);
-
-                if (weightPlayerForces) {
-                    playerFacilityCoords.add(newCoords);
-                }
-            }
-
             if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
-                playerForceCoords.add(newCoords);
+                continue;
             }
+
+            suitableCoords.add(newCoords);
         }
 
         if (suitableCoords.isEmpty()) {
             return null;
         }
 
-        Random random = new Random();
-
-        if (weightPlayerForces) {
-            if (!playerFacilityCoords.isEmpty()) {
-                int randomIndex = random.nextInt(playerFacilityCoords.size());
-                return playerFacilityCoords.get(randomIndex);
-            }
-
-            if (!playerForceCoords.isEmpty()) {
-                int randomIndex = random.nextInt(playerForceCoords.size());
-                return playerForceCoords.get(randomIndex);
-            }
-        }
-
-        int randomIndex = random.nextInt(suitableCoords.size());
-        return suitableCoords.get(randomIndex);
+        return getRandomItem(suitableCoords);
     }
 
     /**
