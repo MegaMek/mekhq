@@ -144,13 +144,13 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 /**
  * The main campaign class, keeps track of teams and units
  *
@@ -3876,11 +3876,23 @@ public class Campaign implements ITechManager {
             processShipSearch();
 
             // Training Experience - Award to eligible training Strategic Formations on active contracts
-            getStrategicFormationsTable().values().stream()
-                    .filter(strategicFormation -> strategicFormation.getRole().isTraining()
-                            && (strategicFormation.getContract(this) != null) && strategicFormation.isEligible(this)
-                            && strategicFormation.getContract(this).isActiveOn(getLocalDate(), true))
-                    .forEach(this::awardTrainingXP);
+            for (StrategicFormation strategicFormation : getStrategicFormationsTable().values()) {
+                if (!strategicFormation.getRole().isTraining()) {
+                    continue;
+                }
+
+                AtBContract contract = strategicFormation.getContract(this);
+                if (contract == null || !contract.isActiveOn(getLocalDate(), true)) {
+                    continue;
+                }
+
+                if (getCampaignOptions().isUseStratCon()
+                    && !contract.getStratconCampaignState().isForceDeployedHere(strategicFormation.getForceId())) {
+                    continue;
+                }
+
+                awardTrainingXP(strategicFormation);
+            }
         }
 
         if (getLocalDate().getDayOfMonth() == 1) {
