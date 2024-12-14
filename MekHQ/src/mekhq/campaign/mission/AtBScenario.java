@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.

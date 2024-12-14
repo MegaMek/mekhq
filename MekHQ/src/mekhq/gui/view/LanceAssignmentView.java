@@ -2,6 +2,7 @@
  * LanceAssignmentView.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
