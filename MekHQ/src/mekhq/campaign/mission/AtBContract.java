@@ -52,7 +52,6 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -671,36 +670,6 @@ public class AtBContract extends Contract {
             && BatchallFactions.usesBatchalls(enemyCode)) {
             setBatchallAccepted(initiateBatchall(campaign));
         }
-    }
-
-    /**
-     * Retrieves the repair location based on the unit rating and contract type.
-     *
-     * @param unitRating The rating of the unit.
-     * @return The repair location.
-     */
-    public int getRepairLocation(final int unitRating) {
-        int repairLocation = Unit.SITE_FACILITY_BASIC;
-
-        AtBContractType contractType = getContractType();
-
-        if (contractType.isGuerrillaWarfare()) {
-            repairLocation = Unit.SITE_IMPROVISED;
-        } else if (contractType.isRaidType()) {
-            repairLocation = Unit.SITE_FIELD_WORKSHOP;
-        } else if (contractType.isGarrisonType()) {
-            repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
-        }
-
-        if (unitRating >= DRAGOON_B) {
-            repairLocation++;
-        }
-
-        return Math.min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
-    }
-
-    public void addMoraleMod(int mod) {
-        moraleMod += mod;
     }
 
     public int getScore() {

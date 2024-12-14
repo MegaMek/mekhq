@@ -33,6 +33,7 @@ import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -50,6 +51,10 @@ import mekhq.gui.FileDialogs;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.mission.RepairLocation.determineRepairLocation;
+import static mekhq.campaign.mission.RepairLocation.determineSimplifiedRepairLocation;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -1724,12 +1729,31 @@ public class ResolveScenarioTracker {
         }
 
         if (campaign.getCampaignOptions().isUseAtB() && isAtBContract) {
-            final int unitRatingMod = campaign.getAtBUnitRatingMod();
+            List<Force> forces = new ArrayList<>();
+            List<Unit> unitsWithoutAForce = new ArrayList<>();
+
             for (Unit unit : getUnits()) {
-                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
+                int forceId = unit.getForceId();
+
+                if (forceId != FORCE_NONE) {
+                    Force force = campaign.getForce(forceId);
+
+                    if (force != null) {
+                        forces.add(force);
+                        continue;
+                    }
+                }
+
+                unitsWithoutAForce.add(unit);
             }
-            for (Unit unit : getActualSalvage()) {
-                unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
+
+            unitsWithoutAForce.addAll(getActualSalvage());
+            if (!unitsWithoutAForce.isEmpty()) {
+                determineSimplifiedRepairLocation(campaign, (AtBContract) mission, unitsWithoutAForce);
+            }
+
+            for (Force force : forces) {
+                determineRepairLocation(campaign, (AtBContract) mission, force);
             }
         }
 
