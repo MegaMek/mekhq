@@ -208,7 +208,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public AtBScenario() {
         super();
         strategicFormationId = -1;
-        lanceRole = AtBLanceRole.UNASSIGNED;
+        lanceRole = AtBLanceRole.IN_RESERVE;
         alliesPlayer = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
@@ -237,7 +237,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (null == lance) {
             strategicFormationId = -1;
-            lanceRole = AtBLanceRole.UNASSIGNED;
+            lanceRole = AtBLanceRole.IN_RESERVE;
         } else {
             this.strategicFormationId = lance.getForceId();
             lanceRole = lance.getRole();

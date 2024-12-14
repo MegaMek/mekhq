@@ -213,7 +213,7 @@ public enum AtBContractType {
             case RECON_RAID:
                 return AtBLanceRole.SCOUTING;
             default:
-                return AtBLanceRole.UNASSIGNED;
+                return AtBLanceRole.IN_RESERVE;
         }
     }
 

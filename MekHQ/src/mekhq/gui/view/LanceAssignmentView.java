@@ -349,7 +349,7 @@ class RequiredLancesTableModel extends DataTableModel {
                 int t = 0;
                 for (StrategicFormation strategicFormation : campaign.getAllStrategicFormations()) {
                     if (data.get(row).equals(strategicFormation.getContract(campaign))
-                            && (strategicFormation.getRole() != AtBLanceRole.UNASSIGNED)
+                            && (strategicFormation.getRole() != AtBLanceRole.IN_RESERVE)
                             && strategicFormation.isEligible(campaign)) {
                         t++;
                     }
