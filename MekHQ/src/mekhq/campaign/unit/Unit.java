@@ -5843,22 +5843,26 @@ public class Unit implements ITechnology {
                 }
             }
         }
-        Set<Person> gunnersToRemove = new HashSet<>();
-        for(Person gunner : gunners){
+        for (Person gunner : new HashSet<>(gunners)) {
             if (gunner instanceof UnitPersonRef) {
-                gunnersToRemove.add(gunner);
                 Person updatedGunner = campaign.getPerson(gunner.getId());
-                if(updatedGunner != null){
-                    gunners.add(updatedGunner);
+                if (updatedGunner != null) {
+                    if (!gunners.remove(gunner)) { //Remove gunner person ref & log if it fails
+                        logger.warn(String.format("Unit %s ('%s') could not remove person ref %s",
+                            getId(), getName(), gunner.getId()));
+                    }
+                    if (!gunners.add(updatedGunner)) { //Add gunner person & log if it fails
+                        logger.warn(String.format("Unit %s ('%s') could not add person %s",
+                            getId(), getName(), updatedGunner.getId()));
+                    }
                 }
-                else{
+                else {
                     logger.error(
                         String.format("Unit %s ('%s') references missing gunner %s",
                             getId(), getName(), gunner.getId()));
                 }
             }
         }
-        gunners.removeAll(gunnersToRemove);
 
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
