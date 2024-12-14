@@ -1757,31 +1757,64 @@ public class StratconRulesManager {
     }
 
     /**
-     * This is a set of all force IDs for forces that can be deployed to a scenario.
+     * Retrieves a list of force IDs for all combat teams that are both available and suitable for deployment.
      *
-     * @param campaign Current campaign
-     * @return List of available force IDs.
+     * <p>This method filters out formations that are already deployed to a track or are in reserve.
+     * It performs the following steps:
+     * <ol>
+     *   <li>Builds a list of all combat teams in the campaign, returning an empty list if no teams exist.</li>
+     *   <li>Compiles a list of active campaign states from all active contracts in the campaign.</li>
+     *   <li>Evaluates each combat team to determine its suitability:
+     *       <ul>
+     *         <li>A combat team is deemed unsuitable if it is already deployed to a track.</li>
+     *         <li>A combat team must also have a role other than "in reserve".</li>
+     *       </ul>
+     *   </li>
+     * </ol>
+     *
+     * @param campaign The {@link Campaign} object containing all contracts, formations, and states.
+     * @return A {@link List} of IDs ({@link Integer}) for all suitable strategic formations ready for deployment.
      */
     public static List<Integer> getAvailableForceIDs(Campaign campaign) {
-        // first, we gather a set of all forces that are already deployed to a track so
-        // we eliminate those later
-        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
-                .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
-                .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
-                .collect(Collectors.toSet());
+        // First, build a list of all combat teams in the campaign
+        ArrayList<StrategicFormation> combatTeams = campaign.getAllStrategicFormations();
 
-        // now, we get all the forces that qualify as "lances", and filter out those
-        // that are
-        // deployed to a scenario and not in a track already
+        if (combatTeams.isEmpty()) {
+            // If we don't have any combat teams, there is no point in continuing, so we exit early
+            return Collections.emptyList();
+        }
 
-        return campaign.getStrategicFormationsTable().keySet().stream()
-                .mapToInt(key -> key)
-                .mapToObj(campaign::getForce).filter(force -> (force != null)
-                        && !force.isDeployed()
-                        && force.isCombatForce()
-                        && !forcesInTracks.contains(force.getId()))
-                .map(Force::getId)
-                .collect(Collectors.toList());
+        // Next, build a list of the available campaign states.
+        // This is so we don't need to rebuild this list each loop.
+        List<StratconCampaignState> campaignStates = new ArrayList<>();
+
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+            if (campaignState != null) {
+                campaignStates.add(campaignState);
+            }
+        }
+
+        // Finally, loop through the available combat teams adding those found to be suitable to
+        // the appropriate list.
+        List<Integer> suitableForces = new ArrayList<>();
+        for (StrategicFormation combatTeam : combatTeams) {
+            boolean isSuitable = true;
+            // Is the combat team already deployed to a Track?
+            for (StratconCampaignState campaignState : campaignStates) {
+                if (campaignState.isForceDeployedHere(combatTeam.getForceId())) {
+                    isSuitable = false;
+                    break;
+                }
+            }
+
+            if (isSuitable && !combatTeam.getRole().isUnassigned()) {
+                suitableForces.add(combatTeam.getForceId());
+            }
+        }
+
+        return suitableForces;
     }
 
     /**
