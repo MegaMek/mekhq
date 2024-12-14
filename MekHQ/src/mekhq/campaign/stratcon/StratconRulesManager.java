@@ -161,7 +161,7 @@ public class StratconRulesManager {
                                                  AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
 
         int scenarioRolls = track.getRequiredLanceCount();
 
@@ -222,7 +222,7 @@ public class StratconRulesManager {
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
         // get this list just so we have it available
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
 
         // Build the available force pool - this ensures operational forces have an increased
         // chance of being picked
@@ -381,7 +381,7 @@ public class StratconRulesManager {
          boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
          // Grab the available lances and sort them by map type
-         List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
          Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
          // Select the target coords.
@@ -1757,25 +1757,21 @@ public class StratconRulesManager {
     }
 
     /**
-     * Retrieves a list of force IDs for all combat teams that are both available and suitable for deployment.
+     * Retrieves a list of force IDs for all combat teams that are both available and suitable for
+     * deployment under a specific contract.
      *
-     * <p>This method filters out formations that are already deployed to a track or are in reserve.
-     * It performs the following steps:
-     * <ol>
-     *   <li>Builds a list of all combat teams in the campaign, returning an empty list if no teams exist.</li>
-     *   <li>Compiles a list of active campaign states from all active contracts in the campaign.</li>
-     *   <li>Evaluates each combat team to determine its suitability:
-     *       <ul>
-     *         <li>A combat team is deemed unsuitable if it is already deployed to a track.</li>
-     *         <li>A combat team must also have a role other than "in reserve".</li>
-     *       </ul>
-     *   </li>
-     * </ol>
+     * <p>This method filters out combat teams that do not meet the following criteria:
+     * <ul>
+     *   <li>The combat team must be assigned to the specified contract.</li>
+     *   <li>The combat team must not currently be deployed.</li>
+     *   <li>The combat team must have a role other than "In Reserve".</li>
+     * </ul>
      *
      * @param campaign The {@link Campaign} object containing all contracts, formations, and states.
-     * @return A {@link List} of IDs ({@link Integer}) for all suitable strategic formations ready for deployment.
+     * @param contract The {@link AtBContract} under which the combat teams are evaluated for deployment.
+     * @return A {@link List} of force IDs ({@link Integer}) corresponding to all suitable combat teams ready for deployment.
      */
-    public static List<Integer> getAvailableForceIDs(Campaign campaign) {
+    public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract) {
         // First, build a list of all combat teams in the campaign
         ArrayList<StrategicFormation> combatTeams = campaign.getAllStrategicFormations();
 
@@ -1784,32 +1780,24 @@ public class StratconRulesManager {
             return Collections.emptyList();
         }
 
-        // Next, build a list of the available campaign states.
-        // This is so we don't need to rebuild this list each loop.
-        List<StratconCampaignState> campaignStates = new ArrayList<>();
-
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
-
-            if (campaignState != null) {
-                campaignStates.add(campaignState);
-            }
-        }
-
         // Finally, loop through the available combat teams adding those found to be suitable to
         // the appropriate list.
         List<Integer> suitableForces = new ArrayList<>();
         for (StrategicFormation combatTeam : combatTeams) {
-            boolean isSuitable = true;
-            // Is the combat team already deployed to a Track?
-            for (StratconCampaignState campaignState : campaignStates) {
-                if (campaignState.isForceDeployedHere(combatTeam.getForceId())) {
-                    isSuitable = false;
-                    break;
-                }
+            // If the combat team isn't assigned to the current contract, it isn't eligible to be deployed
+            if (!Objects.equals(contract, combatTeam.getContract(campaign))) {
+                continue;
             }
 
-            if (isSuitable && !combatTeam.getRole().isUnassigned()) {
+            // If the combat team is currently deployed, they aren't eligible to be deployed
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+            if (campaignState.isForceDeployedHere(combatTeam.getForceId())) {
+                continue;
+            }
+
+            // So long as the combat team isn't In Reserve, they are eligible to be deployed
+            if (!combatTeam.getRole().isUnassigned()) {
                 suitableForces.add(combatTeam.getForceId());
             }
         }
