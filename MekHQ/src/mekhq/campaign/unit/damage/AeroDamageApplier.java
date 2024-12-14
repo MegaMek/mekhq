@@ -28,6 +28,13 @@ import java.util.List;
 
 import static megamek.common.Compute.randomInt;
 
+/**
+ * Applies damage to an Aero entity.
+ * @param entity Aero entity
+ * @param crewMustSurvive Whether the crew must survive
+ * @param entityMustSurvive Whether the entity must survive
+ * @author Luana Coppio
+ */
 public record AeroDamageApplier(Aero entity, boolean crewMustSurvive, boolean entityMustSurvive) implements DamageApplier<Aero> {
 
     @Override

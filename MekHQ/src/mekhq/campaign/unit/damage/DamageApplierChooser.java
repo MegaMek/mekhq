@@ -91,9 +91,27 @@ public class DamageApplierChooser {
         return new SimpleDamageApplier(entity, crewMustSurvive, entityMustSurvive);
     }
 
-
-
-    public static void damageRemovedEntity(Entity entity, int removalCondition) {
+    /**
+     * Automatically applies damage to the entity based on the "removal condition" provided.
+     * The damage is calculated as being a percentage of the total armor of the unit, then it is transformed in a roll of dices
+     * which the average roll is that amount, then the total damage is calculated and applied in clusters of 5 damage. It rolls a minimum of
+     * 1 dice of damage.
+     * The removal condition is a code that indicates why the entity is being removed from the game.
+     * It will decide if the unit or entity must survive based on the type of removal condition.
+     * The removal conditions are:
+     *      * RETREAT: crew must survive, entity must survive, 80% of the total armor is applied as damage
+     *      * SALVAGEABLE: crew may die, entity must be destroyed, 75% of the total armor is applied as damage
+     *      * CAPTURED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
+     *      * EJECTED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
+     *      * DEVASTATED: crew may survive, entity must be destroyed, no damage applied
+     *      * OTHER: crew may die, entity may be destroyed, 33% of the total armor applied as damage
+     * The amount of damage applied present right now was decided arbitrarily and can be changed later, maybe even make it follow
+     * a config file, client settings, etc.
+     * @param entity the entity to choose the handler for
+     * @param removalCondition the reason why the entity is being removed
+     * @return the total amount of damage applied to the entity
+     */
+    public static int damageRemovedEntity(Entity entity, int removalCondition) {
         double targetDamage = switch (removalCondition) {
             case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> (double) (entity.getTotalOArmor() * (1 / (Compute.d6() + 1)));
             case IEntityRemovalConditions.REMOVE_DEVASTATED -> -1; // no damage is actually applied
@@ -109,11 +127,12 @@ public class DamageApplierChooser {
         var captured = removalCondition == IEntityRemovalConditions.REMOVE_CAPTURED;
         var ejected = removalCondition == IEntityRemovalConditions.REMOVE_EJECTED;
         var devastated = removalCondition == IEntityRemovalConditions.REMOVE_DEVASTATED;
+        var salvageable = removalCondition == IEntityRemovalConditions.REMOVE_SALVAGEABLE;
 
-        var crewMustSurvive = (retreating || captured || ejected);
-        var entityMustSurvive = !devastated;
+        var crewMustSurvive = retreating || captured || ejected;
+        var entityMustSurvive = !devastated && !salvageable && !ejected;
 
-        DamageApplierChooser.choose(entity, crewMustSurvive, entityMustSurvive)
+        return DamageApplierChooser.choose(entity, crewMustSurvive, entityMustSurvive)
             .applyDamageInClusters(damage, clusterSize);
     }
 

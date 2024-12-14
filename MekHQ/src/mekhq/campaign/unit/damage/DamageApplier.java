@@ -50,8 +50,9 @@ public interface DamageApplier<E extends Entity> {
      * @param dmg         the total damage to apply
      * @param clusterSize the size of the clusters
      */
-    default void applyDamageInClusters(int dmg, int clusterSize) {
+    default int applyDamageInClusters(int dmg, int clusterSize) {
         int totalDamage = dmg;
+        int damageApplied = 0;
         while (totalDamage > 0) {
             if (entity().getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED) {
                 // devastated units don't need to take any damage
@@ -60,7 +61,9 @@ public interface DamageApplier<E extends Entity> {
             var clusterDamage = Math.min(totalDamage, clusterSize);
             applyDamage(clusterDamage);
             totalDamage -= clusterDamage;
+            damageApplied += clusterDamage;
         }
+        return damageApplied;
     }
 
     /**
