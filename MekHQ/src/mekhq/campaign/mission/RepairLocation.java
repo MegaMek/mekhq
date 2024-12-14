@@ -151,7 +151,7 @@ public class RepairLocation {
      * it assigns all eligible units to that location. Aerospace units are defaulted to a
      * basic facility if the unit type exceeds the threshold for DropShips.
      * <p>
-     * This is primarily intended for salvaged units or units not present in a user's TO&E.
+     * This is primarily intended for salvaged units or units not present in a user's TOE.
      *
      * @param campaign   The current campaign.
      * @param contract   The relevant contract.
