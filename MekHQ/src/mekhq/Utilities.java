@@ -208,6 +208,7 @@ public class Utilities {
         return choice;
     }
 
+    @SuppressWarnings("unused")
     public static File[] getAllFiles(String dir, FilenameFilter filter) {
         File fl = new File(dir);
         return fl.listFiles(filter);
@@ -883,6 +884,7 @@ public class Utilities {
         return joiner.toString();
     }
 
+    @SuppressWarnings("unused")
     public static Money[] readMoneyArray(Node node) {
         return readMoneyArray(node, 0);
     }
@@ -957,7 +959,7 @@ public class Utilities {
 
         String report;
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns))) {
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.Builder.create().setHeader(columns).build())) {
             for (int i = 0; i < model.getRowCount(); i++) {
                 Object[] toWrite = new String[model.getColumnCount()];
                 for (int j = 0; j < model.getColumnCount(); j++) {
@@ -1323,8 +1325,8 @@ public class Utilities {
 
     /**
      * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
-     * @throws EntityLoadingException
-     */    
+     * @throws EntityLoadingException if the entity cannot be loaded
+     */
     public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
         MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);
 
