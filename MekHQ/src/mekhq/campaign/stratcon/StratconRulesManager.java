@@ -59,6 +59,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -796,14 +797,13 @@ public class StratconRulesManager {
      * explicit player
      * action.
      */
-    public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract,
-            StratconTrackState track, boolean sticky) {
+    public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign,
+                                           AtBContract contract, StratconTrackState track, boolean sticky) {
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around
         // the coords, depending on force role
         // 2. if coords are a hostile facility, we get a facility scenario
         // 3. if coords are empty, we *may* get a scenario
-
         processForceDeployment(coords, forceID, campaign, track, sticky);
 
         // we may stumble on a fixed objective scenario - in that case assign the force
@@ -825,20 +825,103 @@ public class StratconRulesManager {
         boolean spawnScenario = (facility == null) && (randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
+            // If the force is scouting, and we're placing a new scenario down,
+            // place it in an unoccupied adjacent hex, instead.
+            if (!isNonAlliedFacility) {
+                StrategicFormation combatTeam = campaign.getStrategicFormationsTable().get(forceID);
+
+                if (combatTeam != null && combatTeam.getRole().isScouting()) {
+                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track, false);
+
+                    if (newCoords != null) {
+                        coords = newCoords;
+                    }
+                }
+            }
+
+            // Once we've processed any coord changes, begin setting up the scenario
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             setScenarioParametersFromBiome(track, scenario);
 
-            // if we wound up with a field scenario, we may sub in dropships carrying
+            // if we wound up with a field scenario, we may sub in DropShips carrying
             // units of the force in question
-            if (spawnScenario && !isNonAlliedFacility) {
+            if (spawnScenario) {
                 swapInPlayerUnits(scenario, campaign, forceID);
             }
 
             commitPrimaryForces(campaign, scenario, track);
         }
+    }
+
+    /**
+     * Searches for and returns a suitable adjacent coordinate to the given origin coordinates on
+     * the provided {@link StratconTrackState}.
+     * The method checks all the possible directions and considers a coordinate suitable if it
+     * doesn't contain a scenario and if it either doesn't contain a facility or contains a
+     * player-allied one.
+     * If there are multiple suitable coordinates, one is chosen at random.
+     *
+     * @param originCoords the {@link StratconCoords} around which to search for a suitable coordinate
+     * @param trackState   the {@link StratconTrackState} on which to perform the search
+     * @param weightPlayerForces whether to place greater emphasis on player-allied forces and facilities.
+     * @return a {@link StratconCoords} object representing the coordinates of a suitable adjacent
+     * location, or {code null} if no suitable location was found.
+     */
+    public static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
+                                                                       StratconTrackState trackState,
+                                                                       boolean weightPlayerForces) {
+        List<StratconCoords> suitableCoords = new ArrayList<>();
+        List<StratconCoords> playerForceCoords = new ArrayList<>();
+        List<StratconCoords> playerFacilityCoords = new ArrayList<>();
+
+        for (int direction : ALL_DIRECTIONS) {
+            StratconCoords newCoords = originCoords.translate(direction);
+
+            if (trackState.getScenario(newCoords) != null) {
+                continue;
+            }
+
+            if (trackState.getFacility(newCoords) == null) {
+                suitableCoords.add(newCoords);
+                continue;
+            }
+
+            if (trackState.getFacility(newCoords).getOwner() != ForceAlignment.Opposing) {
+                suitableCoords.add(newCoords);
+
+                if (weightPlayerForces) {
+                    playerFacilityCoords.add(newCoords);
+                }
+            }
+
+            if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
+                playerForceCoords.add(newCoords);
+            }
+        }
+
+        if (suitableCoords.isEmpty()) {
+            return null;
+        }
+
+        Random random = new Random();
+
+        if (weightPlayerForces) {
+            if (!playerFacilityCoords.isEmpty()) {
+                int randomIndex = random.nextInt(playerFacilityCoords.size());
+                return playerFacilityCoords.get(randomIndex);
+            }
+
+            if (!playerForceCoords.isEmpty()) {
+                int randomIndex = random.nextInt(playerForceCoords.size());
+                return playerForceCoords.get(randomIndex);
+            }
+        }
+
+        int randomIndex = random.nextInt(suitableCoords.size());
+        return suitableCoords.get(randomIndex);
     }
 
     /**
@@ -968,12 +1051,9 @@ public class StratconRulesManager {
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
             StratconTrackState track, boolean sticky) {
         // plan of action:
-        // increase fatigue if the coordinates are not currently unrevealed
-        // reveal deployed coordinates
-        // reveal facility in deployed coordinates (and all adjacent coordinates for
-        // scout lances)
-        // reveal scenario in deployed coordinates (and all adjacent coordinates for
-        // scout lances)
+        // increase fatigue if the coordinates are not currently unrevealed reveal deployed coordinates
+        // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
+        // reveal scenarios in deployed coordinates (and all adjacent coordinates for scout lances)
 
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
@@ -991,8 +1071,7 @@ public class StratconRulesManager {
         }
 
         StratconScenario scenario = track.getScenario(coords);
-        // if we're deploying on top of a scenario and it's "cloaked"
-        // then we have to activate it
+        // if we're deploying on top of a scenario, and it's "cloaked" then we have to activate it
         if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
             scenario.getBackingScenario().setCloaked(false);
             setScenarioDates(0, track, campaign, scenario); // must be called before commitPrimaryForces
@@ -1009,8 +1088,7 @@ public class StratconRulesManager {
                 }
 
                 scenario = track.getScenario(checkCoords);
-                // if we've revealed a scenario and it's "cloaked"
-                // we have to activate it
+                // if we've revealed a scenario and it's "cloaked" we have to activate it
                 if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
                     scenario.getBackingScenario().setCloaked(false);
                     setScenarioDates(0, track, campaign, scenario);
