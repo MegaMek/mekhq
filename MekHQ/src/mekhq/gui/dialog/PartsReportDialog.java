@@ -414,11 +414,13 @@ public class PartsReportDialog extends JDialog {
 
     private void topUp() {
         campaign.stockUpPartsInUse(getPartsInUseFromTable());
+        storePartInUseRequestedStockMap(); // This is nescessary to prevent request stock values from resetting when topping up
         refreshOverviewPartsInUse();
     }
 
     private void topUpGM() {
         campaign.stockUpPartsInUseGM(getPartsInUseFromTable());
+        storePartInUseRequestedStockMap(); // This is nescessary to prevent request stock values from resetting when topping up
         refreshOverviewPartsInUse();
     }
 
