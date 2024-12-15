@@ -45,6 +45,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.List;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
@@ -115,29 +116,58 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         MegaMekButton btnNewCampaign = new MegaMekButton(resources.getString("btnNewCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
-        btnNewCampaign.addActionListener(evt -> startCampaign(null));
+        btnNewCampaign.addActionListener(evt -> {
+            btnNewCampaign.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    startCampaign(null);
+                } finally {
+                    btnNewCampaign.setEnabled(true);
+                }
+            });
+        });
 
         MegaMekButton btnLoadCampaign = new MegaMekButton(resources.getString("btnLoadCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadCampaign.addActionListener(evt -> {
-            final File file = selectCampaignFile();
-            if (file != null) {
-                startCampaign(file);
-            }
+            btnLoadCampaign.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    final File file = selectCampaignFile();
+                    if (file != null) {
+                        startCampaign(file);
+                    }
+                } finally {
+                    btnLoadCampaign.setEnabled(true);
+                }
+            });
         });
 
         MegaMekButton btnLoadLastCampaign = new MegaMekButton(resources.getString("btnLoadLastCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadLastCampaign.setEnabled(lastSaveFile != null);
-        btnLoadLastCampaign.addActionListener(evt -> startCampaign(lastSaveFile));
+        btnLoadLastCampaign.addActionListener(evt -> {
+            btnLoadLastCampaign.setEnabled(false);
+            startCampaign(lastSaveFile);
+        });
 
         MegaMekButton btnLoadStoryArc = new MegaMekButton(resources.getString("btnLoadStoryArc.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadStoryArc.addActionListener(evt -> {
-            StoryArcStub storyArcStub = selectStoryArc();
-            if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
-                startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
-            }
+            btnLoadStoryArc.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    StoryArcStub storyArcStub = selectStoryArc();
+                    if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
+                        startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
+                    }
+                } finally {
+                    btnLoadStoryArc.setEnabled(true);
+                }
+            });
         });
         MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
