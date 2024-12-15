@@ -150,11 +150,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
 
             String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
-                force.isStrategicFormation() ? "<b>" : "",
-                force.getOverrideStrategicFormation() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+                force.isCombatTeam() ? "<b>" : "",
+                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
                 force.getName(),
-                force.isStrategicFormation() ? "</b>" : "",
-                force.getOverrideStrategicFormation() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+                force.isCombatTeam() ? "</b>" : "",
+                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
                 force.isConvoyForce() ? " &#926;" : force.isCombatForce() ? "" : " &#8709;");
 
             setText(formattedForceName);

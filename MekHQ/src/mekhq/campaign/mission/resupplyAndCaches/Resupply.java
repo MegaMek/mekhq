@@ -6,8 +6,8 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.*;
@@ -25,7 +25,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -360,7 +360,7 @@ public class Resupply {
         // First, calculate the total tonnage across all combat units in the campaign.
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
-        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
+        for (CombatTeam formation : campaign.getCombatTeamsTable().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
