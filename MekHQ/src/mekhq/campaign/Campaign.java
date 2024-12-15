@@ -8145,7 +8145,7 @@ public class Campaign implements ITechManager {
                         + " to " + quality.toName(reverse));
             } else if (quality.toNumeric() < qualityOrig.toNumeric()) {
                 qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
                     "Overall quality declines from " + qualityOrig.toName(reverse)
                     + " to " + quality.toName(reverse));
             } else {
