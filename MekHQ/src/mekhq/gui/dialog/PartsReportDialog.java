@@ -94,7 +94,6 @@ public class PartsReportDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                System.out.println("Dialog is closing!");
                 onClose(); // Call a custom method
             }
         });
@@ -423,32 +422,12 @@ public class PartsReportDialog extends JDialog {
         refreshOverviewPartsInUse();
     }
 
-    private int findTopUpAmount(PartInUse partInUse) {
-        IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-        int inventory = partInUse.getStoreCount() + partInUse.getTransferCount() + partInUse.getPlannedCount();
-        int needed = (int)Math.ceil(partInUse.getRequestedStock()/100.0 * partInUse.getUseCount());
-        int toBuy = needed-inventory;
-
-        if (partInUse.getIsBundle() == true) {
-            toBuy = (int)Math.ceil((float)toBuy * partInUse.getTonnagePerItem() / 5);
-            //special case for ammo, need to track down if there's a way to code this properly
-        }
-
-        if (toBuy > 0) {
-            System.out.println("TPI: " + partInUse.getTonnagePerItem() + " " + String.format("Inv: %d needed: %d tobuy: %d", inventory, needed, toBuy));
-            System.out.println("||");
-        }
-
-       
-        return toBuy;
-    }
-
-    public void storePartInUse() {
+    public void storePartInUseRequestedStockMap() {
         campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
         campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
         if (ignoreSparesUnderQualityCB == null) {
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
-        } else{
+        } else {
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(ignoreSparesUnderQualityCB.getSelectedItem().toString()));
         }
 
@@ -461,6 +440,6 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void onClose() {
-        storePartInUse();
+        storePartInUseRequestedStockMap();
     }  
 }

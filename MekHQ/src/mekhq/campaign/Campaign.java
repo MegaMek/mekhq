@@ -8489,13 +8489,9 @@ public class Campaign implements ITechManager {
 
         if (PartInUse.getIsBundle() == true) {
             toBuy = (int)Math.ceil((float)toBuy * PartInUse.getTonnagePerItem() / 5);
-            //special case for ammo, need to track down if there's a way to code this properly
+            //special case for armor only, as it's bought in 5 ton blocks. Armor is the only kind of item that's assigned isBundle()
         }
 
-        if (toBuy > 0) {
-            System.out.println("TPI: " + PartInUse.getTonnagePerItem() + " " + String.format("Inv: %d needed: %d tobuy: %d", inventory, needed, toBuy));
-            System.out.println("||");
-        }
         return toBuy;
     }
 

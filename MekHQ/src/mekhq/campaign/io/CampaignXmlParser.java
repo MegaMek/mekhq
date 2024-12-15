@@ -1597,7 +1597,6 @@ public class CampaignXmlParser {
     }
 
     private static void processPartsInUse(Campaign retVal, Node wn) {
-        System.out.println("Processing a partInUse list");
         NodeList wList = wn.getChildNodes();
 
         for (int i = 0; i < wList.getLength(); i++) {
