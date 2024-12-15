@@ -457,7 +457,7 @@ public class PartsReportDialog extends JDialog {
             PartInUse piu = overviewPartsModel.getPartInUse(row);
             stockMap.put(piu.getDescription(), piu.getRequestedStock());
         }
-        campaign.setPiuStockMap(stockMap);
+        campaign.setPartsInUseRequestedStockMap(stockMap);
     }
 
     private void onClose() {

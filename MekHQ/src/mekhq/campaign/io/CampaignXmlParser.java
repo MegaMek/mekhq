@@ -775,7 +775,7 @@ public class CampaignXmlParser {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("lance")) {
-                // Error condition of [sorts]!
+                // Error condition of sorts!
                 // Errr, what should we do here?
                 logger.error("Unknown node type not loaded in Lance nodes: " + wn2.getNodeName());
                 continue;
@@ -1597,7 +1597,7 @@ public class CampaignXmlParser {
     }
 
     private static void processPartsInUse(Campaign retVal, Node wn) {
-        System.out.println("Processing a PIU list");
+        System.out.println("Processing a partInUse list");
         NodeList wList = wn.getChildNodes();
 
         for(int i = 0; i < wList.getLength(); i++) {
@@ -1614,8 +1614,8 @@ public class CampaignXmlParser {
             } else if(wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
                 PartQuality ignoreQuality = PartQuality.fromName(wn2.getTextContent(), retVal.getCampaignOptions().isReverseQualityNames());
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
-            } else if(wn2.getNodeName().equalsIgnoreCase("piuMap")) {
-                processPiuStockMap(retVal, wn2);
+            } else if(wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
+                processPartsInUseRequestedStockMap(retVal, wn2);
             } else {
                 logger.error("Unkown node type not loaded in PartInUse nodes: " + wn2.getNodeName());
                 continue;
@@ -1623,11 +1623,10 @@ public class CampaignXmlParser {
         }
     }
 
-    private static void processPiuStockMap(Campaign retVal, Node wn) {
-        System.out.println("Processing a PIU map");
+    private static void processPartsInUseRequestedStockMap(Campaign retVal, Node wn) {
         NodeList wList = wn.getChildNodes();
 
-        Map<String, Double> piuStockMap = new LinkedHashMap<>();
+        Map<String, Double> partInUseStockMap = new LinkedHashMap<>();
 
         for(int i = 0; i < wList.getLength(); i++) {
             Node wn2 = wList.item(i);
@@ -1636,18 +1635,18 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            if(!wn2.getNodeName().equalsIgnoreCase("piuMapEntry")) {
-                logger.error("Unkown node tpye not loaded in PiuStockMap nodes: " + wn2.getNodeName());
+            if(!wn2.getNodeName().equalsIgnoreCase("partInUseMapEntry")) {
+                logger.error("Unkown node tpye not loaded in PartInUseStockMap nodes: " + wn2.getNodeName());
             }
 
-            processPiuStockMapVal(retVal, wn2, piuStockMap);
+            processPartsInUseRequestedStockMapVal(retVal, wn2, partInUseStockMap);
 
         }
 
-        retVal.setPiuStockMap(piuStockMap);
+        retVal.setPartsInUseRequestedStockMap(partInUseStockMap);
     }
 
-    private static void processPiuStockMapVal(Campaign retVal, Node wn, Map<String, Double> piuStockMap) {
+    private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn, Map<String, Double> partsInUseRequestedStockMap) {
         NodeList wList = wn.getChildNodes();
 
         String key = null;
@@ -1660,14 +1659,14 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            if(wn2.getNodeName().equalsIgnoreCase("piuMapKey")) {
+            if(wn2.getNodeName().equalsIgnoreCase("partInUseMapKey")) {
                 key = wn2.getTextContent();
-            } else if(wn2.getNodeName().equalsIgnoreCase("piuMapVal")) {
+            } else if(wn2.getNodeName().equalsIgnoreCase("partInUseMapVal")) {
                 val = Double.parseDouble(wn2.getTextContent());
             }
         }
         if(key != null) {
-            piuStockMap.put(key, val);
+            partsInUseRequestedStockMap.put(key, val);
         }
     }
 
