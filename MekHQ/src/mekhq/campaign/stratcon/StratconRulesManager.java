@@ -1852,7 +1852,7 @@ public class StratconRulesManager {
      */
     public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract) {
         // First, build a list of all combat teams in the campaign
-        ArrayList<StrategicFormation> combatTeams = campaign.getAllStrategicFormations();
+        ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
 
         if (combatTeams.isEmpty()) {
             // If we don't have any combat teams, there is no point in continuing, so we exit early
@@ -1862,7 +1862,7 @@ public class StratconRulesManager {
         // Finally, loop through the available combat teams adding those found to be suitable to
         // the appropriate list.
         List<Integer> suitableForces = new ArrayList<>();
-        for (StrategicFormation combatTeam : combatTeams) {
+        for (CombatTeam combatTeam : combatTeams) {
             // If the combat team isn't assigned to the current contract, it isn't eligible to be deployed
             if (!Objects.equals(contract, combatTeam.getContract(campaign))) {
                 continue;
@@ -1876,7 +1876,7 @@ public class StratconRulesManager {
             }
 
             // So long as the combat team isn't In Reserve, they are eligible to be deployed
-            if (!combatTeam.getRole().isUnassigned()) {
+            if (!combatTeam.getRole().isInReserve()) {
                 suitableForces.add(combatTeam.getForceId());
             }
         }
