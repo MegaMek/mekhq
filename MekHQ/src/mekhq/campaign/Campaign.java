@@ -4079,7 +4079,7 @@ public class Campaign implements ITechManager {
             // apply for support personnel - combat troops reset with each new mm game
             processWeeklyEdgeResets(person);
 
-            processMonthlyIdleXP(person);
+            processMonthlyVocationalXp(person);
 
             // Anniversaries
             processAnniversaries(person);
@@ -4139,14 +4139,35 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Process monthly idle XP for a given person.
-     * This method checks if the person is eligible to gain idle XP based on campaign options and current status.
-     * If the person meets the criteria, they may gain XP and an associated report will be added.
+     * Processes monthly vocational experience (XP) for a given person, awarding XP if certain
+     * conditions are met.
      *
-     * @param person The person for whom to process monthly idle XP.
+     * <p>The method evaluates eligibility for XP gain based on the following criteria:
+     * <ul>
+     *     <li>The person must be active (e.g., not retired, deceased, or in edcuation).</li>
+     *     <li>The person must not be a child at the current date.</li>
+     *     <li>The person must not be a dependent.</li>
+     *     <li>The campaign must have idle XP enabled, and it must be the first day of the month.</li>
+     *     <li>The person must not currently have the status of a prisoner (Bondsmen, however, are eligible for XP).</li>
+     * </ul>
+     *
+     * <p>If all conditions are met, the person accumulates idle months.
+     * Once the accumulated idle months reach the threshold defined in the campaign options, the
+     * person is eligible for an idle XP roll using a 2d6 check. If the roll meets or exceeds
+     * the target threshold, XP is awarded to the person, and their idle month count is reset.</p>
+     *
+     * @param person the {@link Person} whose monthly vocational XP gain is being processed.
      */
-    private void processMonthlyIdleXP(Person person) {
+    private void processMonthlyVocationalXp(Person person) {
         if (!person.getStatus().isActive()) {
+            return;
+        }
+
+        if (person.isChild(currentDay)) {
+            return;
+        }
+
+        if (person.isDependent()) {
             return;
         }
 
