@@ -161,6 +161,9 @@
                 <syncDeploymentType>SameEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>ESCORT</forceRole>
+                </roleChoices>
             </value>
         </entry>
         <entry>

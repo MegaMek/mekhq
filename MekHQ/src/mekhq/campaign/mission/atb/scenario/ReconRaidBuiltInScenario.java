@@ -76,7 +76,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign),
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign),
                 isAttacker() ? EntityWeightClass.WEIGHT_ASSAULT : EntityWeightClass.WEIGHT_MEDIUM, 0, 0, campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);

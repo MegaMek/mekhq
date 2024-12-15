@@ -98,7 +98,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
          * Ally deploys 2 lances of a lighter weight class than the player,
          * minimum light
          */
-        int allyForceWeight = Math.max(getStrategicFormation(campaign).getWeightClass(campaign) - 1, EntityWeightClass.WEIGHT_LIGHT);
+        int allyForceWeight = Math.max(getCombatTeamById(campaign).getWeightClass(campaign) - 1, EntityWeightClass.WEIGHT_LIGHT);
         addLance(allyEntities, getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
                 getContract(campaign).getAllyQuality(), allyForceWeight, campaign);
         addLance(allyEntities, getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
@@ -138,14 +138,14 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         addBotForce(new BotForce(BASE_TURRET_FORCE_ID, isAttacker() ? 2 : 1, defenderStart, defenderHome, turretForce), campaign);
 
         /* Roll 2x on bot lances roll */
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
         // the "second" enemy force will either flee in the same direction as
         // the first enemy force in case of the player being the attacker
         // or where it came from in case of player being defender
         ArrayList<Entity> secondBotEntities = new ArrayList<>();
-        addEnemyForce(secondBotEntities, getStrategicFormation(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(secondBotEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
         BotForce secondBotForce = getEnemyBotForce(getContract(campaign),
                 isAttacker() ? enemyStart : secondAttackerForceStart,
                 isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);

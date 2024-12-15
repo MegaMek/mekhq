@@ -19,8 +19,8 @@
 package mekhq.gui.stratcon;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +50,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setForeground(foreground);
         setBackground(background);
 
-        StrategicFormation lance = campaign.getStrategicFormationsTable().get(value.getId());
+        CombatTeam lance = campaign.getCombatTeamsTable().get(value.getId());
         String roleString = "";
         if (lance != null) {
             roleString = lance.getRole().toString() + ", ";

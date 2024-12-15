@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Heavy Recon Evasion</name>
     <shortBriefing>Evade patrols while scanning enemy heavies.</shortBriefing>
-    <detailedBriefing>Enemy patrols are active, and your mission is to scan the enemy’s heavy units. Survive for the duration of the scan without being detected. Preserve at least 50% of your forces until the turn limit is reached to ensure mission success.</detailedBriefing>
+    <detailedBriefing>Enemy patrols are active, and your mission is to scan the enemy’s heavy units. Survive for the duration of the scan. Preserve at least 50% of your forces until the turn limit is reached to ensure mission success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

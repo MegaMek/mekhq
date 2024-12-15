@@ -55,10 +55,10 @@ import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_FALSE;
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
-import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
@@ -448,26 +448,26 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 return;
             }
 
-            boolean formationState = singleForce.isStrategicFormation();
-            singleForce.setStrategicFormation(!formationState);
-            singleForce.setOverrideStrategicFormation(formationState ? STRATEGIC_FORMATION_OVERRIDE_FALSE : STRATEGIC_FORMATION_OVERRIDE_TRUE);
+            boolean formationState = singleForce.isCombatTeam();
+            singleForce.setCombatTeamStatus(!formationState);
+            singleForce.setOverrideCombatTeam(formationState ? COMBAT_TEAM_OVERRIDE_FALSE : COMBAT_TEAM_OVERRIDE_TRUE);
 
             for (Force childForce : singleForce.getAllSubForces()) {
-                childForce.setOverrideStrategicFormation(STRATEGIC_FORMATION_OVERRIDE_NONE);
+                childForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
             }
 
             for (Force parentForce : singleForce.getAllParents()) {
-                parentForce.setOverrideStrategicFormation(STRATEGIC_FORMATION_OVERRIDE_NONE);
+                parentForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
             }
 
-            recalculateStrategicFormations(gui.getCampaign());
+            recalculateCombatTeams(gui.getCampaign());
         } else if (command.contains(REMOVE_STRATEGIC_FORCE_OVERRIDE)) {
             if (singleForce == null) {
                 return;
             }
 
-            singleForce.setOverrideStrategicFormation(STRATEGIC_FORMATION_OVERRIDE_NONE);
-            recalculateStrategicFormations(gui.getCampaign());
+            singleForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            recalculateCombatTeams(gui.getCampaign());
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Force force : forces) {
                 if (null != force && null != force.getParentForce()) {
@@ -1057,16 +1057,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
 
-                JMenuItem optionStrategicForceOverride = new JMenuItem((force.isStrategicFormation() ?
-                    "Never" : "Always") + " Consider Force a Strategic Formation");
+                JMenuItem optionStrategicForceOverride = new JMenuItem((force.isCombatTeam() ?
+                    "Never" : "Always") + " Consider Force a Combat Team");
                 optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionStrategicForceOverride.addActionListener(this);
                 popup.add(optionStrategicForceOverride);
 
-                JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Strategic Force Override");
+                JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Combat Team Override");
                 optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
                 optionRemoveStrategicForceOverride.addActionListener(this);
-                optionRemoveStrategicForceOverride.setVisible(force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE);
+                optionRemoveStrategicForceOverride.setVisible(force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE);
                 popup.add(optionRemoveStrategicForceOverride);
             }
 

@@ -24,8 +24,8 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
@@ -172,8 +172,8 @@ public class LanceAssignmentView extends JPanel {
         RowFilter<LanceAssignmentTableModel, Integer> laFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends LanceAssignmentTableModel, ? extends Integer> entry) {
-                StrategicFormation strategicFormation = entry.getModel().getRow(entry.getIdentifier());
-                return strategicFormation.isEligible(campaign);
+                CombatTeam combatTeam = entry.getModel().getRow(entry.getIdentifier());
+                return combatTeam.isEligible(campaign);
             }
         };
         final NaturalOrderComparator noc = new NaturalOrderComparator();
@@ -226,14 +226,14 @@ public class LanceAssignmentView extends JPanel {
             cbContract.addItem(contract);
         }
         AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
-        for (StrategicFormation strategicFormation : campaign.getStrategicFormationsTable().values()) {
-            if ((strategicFormation.getContract(campaign) == null)
-                    || !strategicFormation.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
-                strategicFormation.setContract(defaultContract);
+        for (CombatTeam combatTeam : campaign.getCombatTeamsTable().values()) {
+            if ((combatTeam.getContract(campaign) == null)
+                    || !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
+                combatTeam.setContract(defaultContract);
             }
         }
         ((DataTableModel) tblRequiredLances.getModel()).setData(activeContracts);
-        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getAllStrategicFormations());
+        ((DataTableModel) tblAssignments.getModel()).setData(campaign.getAllCombatTeams());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
     }
 
@@ -347,10 +347,10 @@ class RequiredLancesTableModel extends DataTableModel {
         if (data.get(row) instanceof AtBContract contract) {
             if (column == COL_TOTAL) {
                 int t = 0;
-                for (StrategicFormation strategicFormation : campaign.getAllStrategicFormations()) {
-                    if (data.get(row).equals(strategicFormation.getContract(campaign))
-                            && (strategicFormation.getRole() != AtBLanceRole.UNASSIGNED)
-                            && strategicFormation.isEligible(campaign)) {
+                for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+                    if (data.get(row).equals(combatTeam.getContract(campaign))
+                            && (combatTeam.getRole() != AtBLanceRole.UNASSIGNED)
+                            && combatTeam.isEligible(campaign)) {
                         t++;
                     }
                 }
@@ -360,10 +360,10 @@ class RequiredLancesTableModel extends DataTableModel {
                 return Integer.toString(contract.getRequiredLances());
             } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
                 int t = 0;
-                for (StrategicFormation strategicFormation : campaign.getAllStrategicFormations()) {
-                    if (data.get(row).equals(strategicFormation.getContract(campaign))
-                            && (strategicFormation.getRole() == strategicFormation.getContract(campaign).getContractType().getRequiredLanceRole())
-                            && strategicFormation.isEligible(campaign)) {
+                for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
+                    if (data.get(row).equals(combatTeam.getContract(campaign))
+                            && (combatTeam.getRole() == combatTeam.getContract(campaign).getContractType().getRequiredLanceRole())
+                            && combatTeam.isEligible(campaign)) {
                         t++;
                     }
                 }
@@ -426,8 +426,8 @@ class LanceAssignmentTableModel extends DataTableModel {
         return col > COL_WEIGHT_CLASS;
     }
 
-    public StrategicFormation getRow(int row) {
-        return (StrategicFormation) data.get(row);
+    public CombatTeam getRow(int row) {
+        return (CombatTeam) data.get(row);
     }
 
     @Override
@@ -438,10 +438,10 @@ class LanceAssignmentTableModel extends DataTableModel {
             return "";
         }
         return switch (column) {
-            case COL_FORCE -> campaign.getForce(((StrategicFormation) data.get(row)).getForceId());
-            case COL_WEIGHT_CLASS -> WEIGHT_CODES[((StrategicFormation) data.get(row)).getWeightClass(campaign)];
-            case COL_CONTRACT -> campaign.getMission(((StrategicFormation) data.get(row)).getMissionId());
-            case COL_ROLE -> ((StrategicFormation) data.get(row)).getRole();
+            case COL_FORCE -> campaign.getForce(((CombatTeam) data.get(row)).getForceId());
+            case COL_WEIGHT_CLASS -> WEIGHT_CODES[((CombatTeam) data.get(row)).getWeightClass(campaign)];
+            case COL_CONTRACT -> campaign.getMission(((CombatTeam) data.get(row)).getMissionId());
+            case COL_ROLE -> ((CombatTeam) data.get(row)).getRole();
             default -> "?";
         };
     }
@@ -449,10 +449,10 @@ class LanceAssignmentTableModel extends DataTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_CONTRACT) {
-            ((StrategicFormation) data.get(row)).setContract((AtBContract) value);
+            ((CombatTeam) data.get(row)).setContract((AtBContract) value);
         } else if (col == COL_ROLE) {
             if (value instanceof AtBLanceRole) {
-                ((StrategicFormation) data.get(row)).setRole((AtBLanceRole) value);
+                ((CombatTeam) data.get(row)).setRole((AtBLanceRole) value);
             }
         }
         fireTableDataChanged();
