@@ -105,8 +105,8 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -177,6 +177,10 @@ public class Campaign implements ITechManager {
     private final TreeMap<Integer, Mission> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
+
+    // This maps PartInUse ToString() results to doubles, representing a mapping 
+    // of parts in use to their requested stock percentages to make these values persistent
+    private Map<String, Double> partsInUseRequestedStockMap = new LinkedHashMap<>();
 
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
@@ -278,6 +282,11 @@ public class Campaign implements ITechManager {
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
 
+     //options relating to parts in use and restock
+    private boolean ignoreMothballed;
+    private boolean topUpWeekly;
+    private PartQuality ignoreSparesUnderQuality;
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
 
@@ -348,6 +357,9 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
+        topUpWeekly = false;
+        ignoreMothballed =  false;
+
     }
 
     /**
@@ -2284,26 +2296,27 @@ public class Campaign implements ITechManager {
         return (p.getUnit() != null) ? 1 : p.getQuantity();
     }
 
-    private PartInUse getPartInUse(Part p) {
+    private PartInUse getPartInUse(Part part) {
         // SI isn't a proper "part"
-        if (p instanceof StructuralIntegrity) {
+        if (part instanceof StructuralIntegrity) {
             return null;
         }
         // Skip out on "not armor" (as in 0 point armer on men or field guns)
-        if ((p instanceof Armor) && ((Armor) p).getType() == EquipmentType.T_ARMOR_UNKNOWN) {
+        if ((part instanceof Armor) && ((Armor) part).getType() == EquipmentType.T_ARMOR_UNKNOWN) {
             return null;
         }
         // Makes no sense buying those separately from the chasis
-        if ((p instanceof EquipmentPart)
-                && ((EquipmentPart) p).getType() != null
-                && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
+        if ((part instanceof EquipmentPart)
+                && ((EquipmentPart) part).getType() != null
+                && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
             return null;
         }
         // Replace a "missing" part with a corresponding "new" one.
-        if (p instanceof MissingPart) {
-            p = ((MissingPart) p).getNewPart();
+        if (part instanceof MissingPart) {
+            part = ((MissingPart) part).getNewPart();
         }
-        PartInUse result = new PartInUse(p);
+        PartInUse result = new PartInUse(part);
+        result.setRequestedStock(getCampaignOptions().getDefaultStockPercent());
         return (null != result.getPartToBuy()) ? result : null;
     }
 
@@ -2346,15 +2359,15 @@ public class Campaign implements ITechManager {
         partInUse.setTransferCount(0);
         partInUse.setPlannedCount(0);
         getWarehouse().forEachPart(incomingPart -> {
-            PartInUse newPiu = getPartInUse(incomingPart);
-            if (partInUse.equals(newPiu)) {
+            PartInUse newPartInUse = getPartInUse(incomingPart);
+            if (partInUse.equals(newPartInUse)) {
                 updatePartInUseData(partInUse, incomingPart,
                     ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
-            PartInUse newPiu = getPartInUse((Part) maybePart);
-            if (partInUse.equals(newPiu)) {
+            PartInUse newPartInUse = getPartInUse((Part) maybePart);
+            if (partInUse.equals(newPartInUse)) {
                 partInUse.setPlannedCount(partInUse.getPlannedCount()
                         + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
@@ -2382,6 +2395,11 @@ public class Campaign implements ITechManager {
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
             } else {
+                if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
+                } else {
+                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                }
                 inUse.put(partInUse, partInUse);
             }
             updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
@@ -2397,6 +2415,11 @@ public class Campaign implements ITechManager {
             if (inUse.containsKey(partInUse)) {
                 partInUse = inUse.get(partInUse);
             } else {
+                if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
+                    partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
+                } else {
+                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                }
                 inUse.put(partInUse, partInUse);
             }
             partInUse.setPlannedCount(partInUse.getPlannedCount()
@@ -4567,6 +4590,11 @@ public class Campaign implements ITechManager {
             }
         }
 
+        if (topUpWeekly == true && getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, ignoreSparesUnderQuality));
+            addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
+        }
+
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -5839,10 +5867,16 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
 
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
+        writePartInUseToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partsInUse");
+
+
         if (MekHQ.getMHQOptions().getWriteCustomsToXML()) {
             writeCustoms(pw);
         }
 
+      
         // Okay, we're done.
         // Close everything out and be done with it.
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaign");
@@ -8705,4 +8739,90 @@ public class Campaign implements ITechManager {
         return commanderRank;
     }
 
+    public int stockUpPartsInUse(Set<PartInUse> partsInUse)  {
+        int bought = 0;
+        for(PartInUse partInUse : partsInUse) {
+            int toBuy = findStockUpAmount(partInUse);
+            if (toBuy > 0) {
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
+                getShoppingList().addShoppingItem(partToBuy, toBuy, this);
+            }
+            bought += 1;
+        }
+        return bought;
+    }
+
+    public void stockUpPartsInUseGM(Set<PartInUse> partsInUse)  {
+        for(PartInUse partInUse : partsInUse) {
+            int toBuy = findStockUpAmount(partInUse);
+            while (toBuy > 0) {
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
+                getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
+                -- toBuy;
+            }
+        }
+    }
+
+    private int findStockUpAmount(PartInUse PartInUse) {
+        IAcquisitionWork partToBuy = PartInUse.getPartToBuy();
+        int inventory = PartInUse.getStoreCount() + PartInUse.getTransferCount() + PartInUse.getPlannedCount();
+        int needed = (int)Math.ceil(PartInUse.getRequestedStock()/100.0 * PartInUse.getUseCount());
+        int toBuy = needed-inventory;
+
+        if (PartInUse.getIsBundle() == true) {
+            toBuy = (int)Math.ceil((float)toBuy * PartInUse.getTonnagePerItem() / 5);
+            //special case for armor only, as it's bought in 5 ton blocks. Armor is the only kind of item that's assigned isBundle()
+        }
+
+        return toBuy;
+    }
+
+    //Simple getters and setters for our stock map
+    public Map<String,Double> getPartsInUseRequestedStockMap() {
+        return partsInUseRequestedStockMap;
+    }
+
+    public void setPartsInUseRequestedStockMap(Map<String, Double> partsInUseRequestedStockMap) {
+        this.partsInUseRequestedStockMap = partsInUseRequestedStockMap;
+    }
+
+    public boolean getIgnoreMothballed() {
+        return ignoreMothballed;
+    }
+    public void setIgnoreMothballed(boolean ignoreMothballed) {
+        this.ignoreMothballed = ignoreMothballed;
+    }
+
+    public boolean getTopUpWeekly() {
+        return topUpWeekly;
+    }
+    public void setTopUpWeekly(boolean topUpWeekly) {
+        this.topUpWeekly = topUpWeekly;
+    }
+
+    public PartQuality getIgnoreSparesUnderQuality() {
+        return ignoreSparesUnderQuality;
+    }
+    public void setIgnoreSparesUnderQuality(PartQuality ignoreSparesUnderQuality) {
+        this.ignoreSparesUnderQuality = ignoreSparesUnderQuality;
+    }
+    
+
+    public void writePartInUseToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality.toName(campaignOptions.isReverseQualityNames()));
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMap");
+        writePartInUseMapToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMap");
+    }
+
+    public void writePartInUseMapToXML(final PrintWriter pw, int indent) {
+        for(String key : partsInUseRequestedStockMap.keySet()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMapEntry");
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapKey", key);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapVal", partsInUseRequestedStockMap.get(key));
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
+        }
+    }
 }
