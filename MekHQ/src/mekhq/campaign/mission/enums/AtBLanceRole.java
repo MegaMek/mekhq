@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.mission.enums;
 
-import java.util.ResourceBundle;
-
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum AtBLanceRole {
     // region Enum Declarations
@@ -29,7 +29,7 @@ public enum AtBLanceRole {
     DEFENCE("AtBLanceRole.DEFENCE.text", "AtBLanceRole.DEFENCE.toolTipText"),
     SCOUTING("AtBLanceRole.SCOUTING.text", "AtBLanceRole.SCOUTING.toolTipText"),
     TRAINING("AtBLanceRole.TRAINING.text", "AtBLanceRole.TRAINING.toolTipText"),
-    UNASSIGNED("AtBLanceRole.UNASSIGNED.text", "AtBLanceRole.UNASSIGNED.toolTipText");
+    IN_RESERVE("AtBLanceRole.IN_RESERVE.text", "AtBLanceRole.IN_RESERVE.toolTipText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -69,8 +69,8 @@ public enum AtBLanceRole {
         return this == TRAINING;
     }
 
-    public boolean isUnassigned() {
-        return this == UNASSIGNED;
+    public boolean isInReserve() {
+        return this == IN_RESERVE;
     }
     // endregion Boolean Comparison Methods
 
@@ -85,7 +85,7 @@ public enum AtBLanceRole {
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
-                    return UNASSIGNED;
+                    return IN_RESERVE;
                 case 1:
                     return FIGHTING;
                 case 2:

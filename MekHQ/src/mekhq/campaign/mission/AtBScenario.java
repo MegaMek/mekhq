@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -208,7 +208,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public AtBScenario() {
         super();
         combatTeamId = -1;
-        lanceRole = AtBLanceRole.UNASSIGNED;
+        lanceRole = AtBLanceRole.IN_RESERVE;
         alliesPlayer = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
@@ -237,7 +237,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (null == lance) {
             combatTeamId = -1;
-            lanceRole = AtBLanceRole.UNASSIGNED;
+            lanceRole = AtBLanceRole.IN_RESERVE;
         } else {
             this.combatTeamId = lance.getForceId();
             lanceRole = lance.getRole();

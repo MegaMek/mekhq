@@ -2,6 +2,7 @@
  * LanceAssignmentView.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -349,7 +350,7 @@ class RequiredLancesTableModel extends DataTableModel {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
                     if (data.get(row).equals(combatTeam.getContract(campaign))
-                            && (combatTeam.getRole() != AtBLanceRole.UNASSIGNED)
+                            && (combatTeam.getRole() != AtBLanceRole.IN_RESERVE)
                             && combatTeam.isEligible(campaign)) {
                         t++;
                     }

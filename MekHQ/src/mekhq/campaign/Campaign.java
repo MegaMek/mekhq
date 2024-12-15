@@ -3720,7 +3720,7 @@ public class Campaign implements ITechManager {
 
         final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (CombatTeam combatTeam : combatTeams.values()) {
-            if (!combatTeam.getRole().isUnassigned() && (combatTeam.getMissionId() == contract.getId())) {
+            if (!combatTeam.getRole().isInReserve() && (combatTeam.getMissionId() == contract.getId())) {
                 total++;
                 if (combatTeam.getRole() == requiredLanceRole) {
                     role++;
