@@ -52,8 +52,8 @@ import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -142,15 +142,15 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 /**
  * The main campaign class, keeps track of teams and units
  *
@@ -203,7 +203,7 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private Hashtable<Integer, StrategicFormation> strategicFormations; // AtB
+    private Hashtable<Integer, CombatTeam> combatTeams; // AtB
 
     private Faction faction;
     private int techFactionCode;
@@ -318,7 +318,7 @@ public class Campaign implements ITechManager {
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
-        strategicFormations = new Hashtable<>();
+        combatTeams = new Hashtable<>();
         finances = new Finances();
         astechPool = 0;
         medicPool = 0;
@@ -459,45 +459,45 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Adds a {@link StrategicFormation} to the {@code strategicFormations} {@link Hashtable} using
+     * Adds a {@link CombatTeam} to the {@code combatTeams} {@link Hashtable} using
      * {@code forceId} as the key.
      *
-     * @param strategicFormation the {@link StrategicFormation} to be added to the {@link Hashtable}
+     * @param combatTeam the {@link CombatTeam} to be added to the {@link Hashtable}
      */
-    public void addStrategicFormation(StrategicFormation strategicFormation) {
-        strategicFormations.put(strategicFormation.getForceId(), strategicFormation);
+    public void addCombatTeam(CombatTeam combatTeam) {
+        combatTeams.put(combatTeam.getForceId(), combatTeam);
     }
 
     /**
-     * Removes a {@link StrategicFormation} from the {@code strategicFormations} {@link Hashtable}
-     * using {@code forceId} as they key.
+     * Removes a {@link CombatTeam} from the {@code combatTeams} {@link Hashtable} using
+     * {@code forceId} as the key.
      *
-     * @param forceId the key of the {@link StrategicFormation} to be removed from the {@link Hashtable}
+     * @param forceId the key of the {@link CombatTeam} to be removed from the {@link Hashtable}
      */
-    public void removeStrategicFormation(final int forceId) {
-        this.strategicFormations.remove(forceId);
+    public void removeCombatTeam(final int forceId) {
+        this.combatTeams.remove(forceId);
     }
 
     /**
-     * Returns the {@link Hashtable} containing all the {@link StrategicFormation} objects after
+     * Returns the {@link Hashtable} containing all the {@link CombatTeam} objects after
      * removing the ineligible ones. Although sanitization might not be necessary, it ensures that
      * there is no need for {@code isEligible()} checks when fetching the {@link Hashtable}.
      *
-     * @return the sanitized {@link Hashtable} of {@link StrategicFormation} objects stored in the
+     * @return the sanitized {@link Hashtable} of {@link CombatTeam} objects stored in the
      * current campaign.
      */
-    public Hashtable<Integer, StrategicFormation> getStrategicFormationsTable() {
+    public Hashtable<Integer, CombatTeam> getCombatTeamsTable() {
         // Here we sanitize the list, ensuring ineligible formations have been removed before
         // returning the hashtable. In theory, this shouldn't be necessary, however, having this
         // sanitizing step should remove the need for isEligible() checks whenever we fetch the
         // hashtable.
         List<Integer> formationsToSanitize = new ArrayList<>();
-        for (StrategicFormation strategicFormation : strategicFormations.values()) {
-            if (!strategicFormation.isEligible(this)) {
-                formationsToSanitize.add(strategicFormation.getForceId());
+        for (CombatTeam combatTeam : combatTeams.values()) {
+            if (!combatTeam.isEligible(this)) {
+                formationsToSanitize.add(combatTeam.getForceId());
                 try {
-                    Force force = getForce(strategicFormation.getForceId());
-                    force.setStrategicFormation(false);
+                    Force force = getForce(combatTeam.getForceId());
+                    force.setCombatTeamStatus(false);
                 } catch (Exception ex) {
                     // We're not too worried if we can't find the associated Force,
                     // as this just means it has been deleted at some point and not removed correctly.
@@ -506,27 +506,27 @@ public class Campaign implements ITechManager {
         }
 
         for (int id : formationsToSanitize) {
-            strategicFormations.remove(id);
+            combatTeams.remove(id);
         }
 
-        return strategicFormations;
+        return combatTeams;
     }
 
     /**
-     * Returns an {@link ArrayList} of all {@link StrategicFormation} objects in the
-     * {@code strategicFormations} {@link Hashtable}.
-     * Calls the {@code getStrategicFormationsTable()} method to sanitize the {@link Hashtable}
+     * Returns an {@link ArrayList} of all {@link CombatTeam} objects in the
+     * {@code combatTeams} {@link Hashtable}.
+     * Calls the {@code getCombatTeamsTable()} method to sanitize the {@link Hashtable}
      * before conversion to {@link ArrayList}.
      *
-     * @return an {@link ArrayList} of all the {@link StrategicFormation} objects in the
-     * {@code strategicFormations} {@link Hashtable}
+     * @return an {@link ArrayList} of all the {@link CombatTeam} objects in the
+     * {@code combatTeams} {@link Hashtable}
      */
-    public ArrayList<StrategicFormation> getAllStrategicFormations() {
-        // This call allows us to utilize the self-sanitizing feature of getStrategicFormationsTable(),
+    public ArrayList<CombatTeam> getAllCombatTeams() {
+        // This call allows us to utilize the self-sanitizing feature of getCombatTeamsTable(),
         // without needing to directly include the code here, too.
-        strategicFormations = getStrategicFormationsTable();
+        combatTeams = getCombatTeamsTable();
 
-        return strategicFormations.values().stream()
+        return combatTeams.values().stream()
                 .filter(l -> forceIds.containsKey(l.getForceId()))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -975,7 +975,7 @@ public class Campaign implements ITechManager {
         force.updateCommander(this);
 
         if (campaignOptions.isUseAtB()) {
-            recalculateStrategicFormations(this);
+            recalculateCombatTeams(this);
         }
     }
 
@@ -1069,18 +1069,18 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.isUseAtB()) {
-            recalculateStrategicFormations(this);
+            recalculateCombatTeams(this);
         }
     }
 
     /**
-     * Adds force and all its subforces to the AtB lance table
+     * Adds force and all its subforces to the Combat Teams table
      */
-    private void addAllStrategicFormations(Force force) {
-        recalculateStrategicFormations(this);
+    private void addAllCombatTeams(Force force) {
+        recalculateCombatTeams(this);
 
         for (Force subForce : force.getSubForces()) {
-            addAllStrategicFormations(subForce);
+            addAllCombatTeams(subForce);
         }
     }
 
@@ -3717,7 +3717,7 @@ public class Campaign implements ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
-        for (StrategicFormation l : strategicFormations.values()) {
+        for (CombatTeam l : combatTeams.values()) {
             if (!l.getRole().isUnassigned() && (l.getMissionId() == contract.getId())) {
                 total++;
                 if (l.getRole() == requiredLanceRole) {
@@ -3816,8 +3816,8 @@ public class Campaign implements ITechManager {
             // If there is a standard battle set for today, deploy the lance.
             for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
                 if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = s.getStrategicFormationId();
-                    if ((strategicFormations.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
+                    int forceId = s.getCombatTeamId();
+                    if ((combatTeams.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
@@ -3875,11 +3875,11 @@ public class Campaign implements ITechManager {
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
 
-            // Training Experience - Award to eligible training Strategic Formations on active contracts
-            getStrategicFormationsTable().values().stream()
-                    .filter(strategicFormation -> strategicFormation.getRole().isTraining()
-                            && (strategicFormation.getContract(this) != null) && strategicFormation.isEligible(this)
-                            && strategicFormation.getContract(this).isActiveOn(getLocalDate(), true))
+            // Training Experience - Award to eligible training Combat Teams on active contracts
+            getCombatTeamsTable().values().stream()
+                    .filter(combatTeam -> combatTeam.getRole().isTraining()
+                            && (combatTeam.getContract(this) != null) && combatTeam.isEligible(this)
+                            && combatTeam.getContract(this).isActiveOn(getLocalDate(), true))
                     .forEach(this::awardTrainingXP);
         }
 
@@ -4407,7 +4407,7 @@ public class Campaign implements ITechManager {
     private void processNewDayForces() {
         // update formation levels
         Force.populateFormationLevelsFromOrigin(this);
-        recalculateStrategicFormations(this);
+        recalculateCombatTeams(this);
 
         // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
@@ -4984,9 +4984,9 @@ public class Campaign implements ITechManager {
      * commanding officer and
      * the minimum experience level of the unit's members.
      *
-     * @param l The {@link StrategicFormation} to calculate XP to award for training.
+     * @param l The {@link CombatTeam} to calculate XP to award for training.
      */
-    private void awardTrainingXP(final StrategicFormation l) {
+    private void awardTrainingXP(final CombatTeam l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getHangar().getUnit(trainerId);
 
@@ -5123,7 +5123,7 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.isUseAtB()) {
-            recalculateStrategicFormations(this);
+            recalculateCombatTeams(this);
         }
     }
 
@@ -5157,7 +5157,7 @@ public class Campaign implements ITechManager {
             }
 
             if (campaignOptions.isUseAtB() && force.getUnits().isEmpty()) {
-                strategicFormations.remove(force.getId());
+                combatTeams.remove(force.getId());
             }
         }
     }
@@ -5733,14 +5733,14 @@ public class Campaign implements ITechManager {
             // CAW: implicit DEPENDS-ON to the <missions> node, do not move this above it
             contractMarket.writeToXML(pw, indent);
 
-            if (!strategicFormations.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "strategicFormations");
-                for (StrategicFormation l : strategicFormations.values()) {
+            if (!combatTeams.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatTeams");
+                for (CombatTeam l : combatTeams.values()) {
                     if (forceIds.containsKey(l.getForceId())) {
                         l.writeToXML(pw, indent);
                     }
                 }
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "strategicFormations");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "combatTeams");
             }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
@@ -6766,8 +6766,8 @@ public class Campaign implements ITechManager {
     }
 
     public @Nullable AtBContract getAttachedAtBContract(Unit unit) {
-        if (null != unit && null != strategicFormations.get(unit.getForceId())) {
-            return strategicFormations.get(unit.getForceId()).getContract(this);
+        if (null != unit && null != combatTeams.get(unit.getForceId())) {
+            return combatTeams.get(unit.getForceId()).getContract(this);
         }
         return null;
     }
@@ -8413,7 +8413,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            addAllStrategicFormations(this.forces);
+            addAllCombatTeams(this.forces);
 
             // Determine whether or not there is an active contract
             setHasActiveContract();

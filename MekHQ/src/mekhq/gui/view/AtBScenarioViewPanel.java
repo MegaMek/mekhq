@@ -292,8 +292,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(lblForce, gridBagConstraints);
 
-            if (null != scenario.getStrategicFormation(campaign)) {
-                lblForceDesc.setText(campaign.getForce(scenario.getStrategicFormationId()).getFullName());
+            if (null != scenario.getCombatTeamById(campaign)) {
+                lblForceDesc.setText(campaign.getForce(scenario.getCombatTeamId()).getFullName());
             } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
