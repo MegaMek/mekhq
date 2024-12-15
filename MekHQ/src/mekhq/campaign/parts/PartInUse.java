@@ -37,6 +37,8 @@ public class PartInUse {
     private int plannedCount;
     private Money cost = Money.zero();
     private List<Part> spares = new ArrayList<>();
+    private double requestedStock;
+    private boolean isBundle;
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -58,6 +60,7 @@ public class PartInUse {
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
+        this.isBundle = false;
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if (partToBuy instanceof AmmoStorage) {
@@ -75,10 +78,19 @@ public class PartInUse {
         if (part instanceof Armor) {
             // Armor needs different tonnage values
             this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
+            this.isBundle = true;
         }
         if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
+            String descString = partToBuy.getAcquisitionName();
+            descString = descString.split(",")[0];
+            descString = descString.split("<")[0];
+            if(descString.equals("Turret")) {
+                descString += " " + part.getTonnage() + " tons";
+            }
+            this.description = descString;
         }
+        this.requestedStock = 0;
     }
 
     public String getDescription() {
@@ -167,6 +179,26 @@ public class PartInUse {
 
     public Money getCost() {
         return cost;
+    }
+
+    public double getRequestedStock() {
+        return requestedStock;
+    }
+
+    public void setRequestedStock(double requestedStock) {
+        this.requestedStock = requestedStock;
+    }
+
+    public boolean getIsBundle() {
+        return isBundle;
+    }
+
+    public void setIsBundle(boolean isBundle) {
+        this.isBundle = isBundle;
+    }
+
+    public double getTonnagePerItem() {
+        return tonnagePerItem;
     }
 
     @Override
