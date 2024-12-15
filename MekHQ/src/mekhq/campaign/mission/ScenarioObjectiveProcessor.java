@@ -28,10 +28,13 @@ import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
+
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 
 /**
  * Handles processing for objectives for a scenario that has them
@@ -427,8 +430,8 @@ public class ScenarioObjectiveProcessor {
                         if (dropSize > 0) {
                             LogManager.getLogger().info("ScenarioObjectiveProcessor.java");
                             campaign.addReport("Bonus: Captured Supplies");
-                            Resupply supplyDrops = new Resupply(campaign, contract);
-                            supplyDrops.getResupply(1, false, true);
+                            Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_LOOT);
+                            performResupply(resupply, contract, dropSize);
                         }
                     }
                 }

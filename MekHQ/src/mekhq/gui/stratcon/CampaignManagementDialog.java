@@ -23,6 +23,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -31,6 +32,8 @@ import mekhq.gui.StratconTab;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 
 /**
  * This class handles the UI for campaign VP/SP management
@@ -133,10 +136,8 @@ public class CampaignManagementDialog extends JDialog {
             supplyDropDialog();
         } else {
             AtBContract contract = currentCampaignState.getContract();
-            Resupply supplyDrops = new Resupply(campaign, contract);
-            supplyDrops.getResupply(1, false);
-
-            currentCampaignState.useSupportPoint();
+            Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
+            performResupply(resupply, contract, 1);
         }
 
         btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
@@ -177,8 +178,9 @@ public class CampaignManagementDialog extends JDialog {
             dialog.dispose();
 
             AtBContract contract = currentCampaignState.getContract();
-            Resupply supplyDrops = new Resupply(campaign, contract);
-            supplyDrops.getResupply((int) numberModel.getValue(), false);
+            Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
+            performResupply(resupply, contract, 1);
+
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });
 

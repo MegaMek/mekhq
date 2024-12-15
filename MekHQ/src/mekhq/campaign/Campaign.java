@@ -73,6 +73,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -146,13 +147,14 @@ import java.util.stream.Collectors;
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.convoyFinalMessageDialog;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 /**
  * The main campaign class, keeps track of teams and units
@@ -3795,7 +3797,7 @@ public class Campaign implements ITechManager {
                             addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
 
                             if (scenario.getStratConScenarioType().isResupply()) {
-                                processAbandonedConvoy(contract, (AtBDynamicScenario) scenario);
+                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
@@ -3855,57 +3857,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-    }
-
-    /**
-     * Processes an abandoned convoy. The player is presented with a defeat dialog,
-     * and checks each player template force in the scenario for being a convoy force. If it is a
-     * convoy force, its units are treated as abandoned units.
-     * Each crew member of these units is set as either KIA or POW based on a die roll.
-     * It finally removes each unit from the campaign.
-     *
-     * @param contract The current {@link AtBContract}.
-     * @param scenario The relevant {@link AtBDynamicScenario}.
-     */
-    private void processAbandonedConvoy(AtBContract contract, AtBDynamicScenario scenario) {
-        convoyFinalMessageDialog(this, contract.getEmployerFaction());
-
-        for (Integer forceId : scenario.getPlayerTemplateForceIDs()) {
-            try {
-                Force force = getForce(forceId);
-
-                if (force.isConvoyForce()) {
-                    for (UUID unitID : force.getAllUnits(false)) {
-                        Unit unit = getUnit(unitID);
-
-                        for (Person crewMember : unit.getCrew()) {
-                            decideCrewMemberFate(crewMember);
-                        }
-
-                        removeUnit(unitID);
-                    }
-                }
-            } catch (Exception ex) {
-                logger.warn(ex.getMessage(), ex);
-            }
-        }
-    }
-
-    /**
-     * Determines the fate of a given crew member based on a random roll and updates their status
-     * accordingly.
-     * <p>
-     * We're using the CamOps rules for infantry survival here and assuming anyone who isn't dead
-     * has been captured.
-     *
-     * @param person The crew member whose fate will be decided
-     */
-    private void decideCrewMemberFate(Person person) {
-        PersonnelStatus status = KIA;
-        if (Compute.d6(2) > 7) {
-            status = PersonnelStatus.POW;
-        }
-        person.changeStatus(this, currentDay, status);
     }
 
     /**
@@ -3969,8 +3920,10 @@ public class Campaign implements ITechManager {
                 }
 
                 // Resupply
-                if (getLocation().isOnPlanet() && getLocation().getCurrentSystem().equals(contract.getSystem())) {
-                    processResupply(contract);
+                if (getCampaignOptions().isUseStratCon()) {
+                    if (getLocation().isOnPlanet() && getLocation().getCurrentSystem().equals(contract.getSystem())) {
+                        processResupply(contract);
+                    }
                 }
             }
         }
@@ -4085,10 +4038,14 @@ public class Campaign implements ITechManager {
      * @param contract The relevant {@link AtBContract}
      */
     private void processResupply(AtBContract contract) {
-        if (!contract.getContractType().isGuerrillaWarfare() || Compute.d6(1) > 4) {
-            int dropCount = (int) Math.max(1, Math.floor((double) contract.getRequiredLances() / 3));
-            Resupply resupplies = new Resupply(this, contract);
-            resupplies.getResupply(dropCount, false);
+        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+
+        if (!isGuerrilla || Compute.d6(1) > 4) {
+            double dropCount = (double) contract.getRequiredLances() / 3;
+
+            ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
+            Resupply resupply = new Resupply(this, contract, resupplyType);
+            performResupply(resupply, contract, dropCount);
         }
     }
 
@@ -8679,25 +8636,68 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets a string to use for addressing the commander.
-     * If no commander is flagged, returns a default address.
+     * Retrieves the address or title for the commanding officer, either in a formal or informal format.
      *
-     * @return The title of the commander, or a default string if no commander.
+     * <p>This method checks for the presence of a flagged commander. If no commander is found,
+     * a general fallback address is returned based on the specified formality. If a commander is
+     * present, it further tailors the address based on the gender of the commander (for informal styles)
+     * or their rank and surname (for formal styles).</p>
+     *
+     * @param isInformal A boolean flag indicating whether the address should be informal
+     *                   (true for informal, false for formal).
+     * @return A {@link String} representing the appropriate address for the commander,
+     *         either formal or informal.
      */
-    public String getCommanderAddress() {
+    public String getCommanderAddress(boolean isInformal) {
         Person commander = getFlaggedCommander();
 
         if (commander == null) {
-            return resources.getString("generalFallbackAddress.text");
+            if (isInformal) {
+                return resources.getString("generalFallbackAddressInformal.text");
+            } else {
+                return resources.getString("generalFallbackAddress.text");
+            }
+        }
+
+        if (isInformal) {
+            Gender commanderGender = commander.getGender();
+
+            return switch (commanderGender) {
+                case MALE -> resources.getString("informalAddressMale.text");
+                case FEMALE -> resources.getString("informalAddressFemale.text");
+                case OTHER_MALE, OTHER_FEMALE, RANDOMIZE ->
+                    resources.getString("generalFallbackAddressInformal.text");
+            };
         }
 
         String commanderRank = commander.getRankName();
 
-        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
-            return commander.getFullName();
+        if (commanderRank.equalsIgnoreCase("None")
+            || commanderRank.equalsIgnoreCase("-")
+            || commanderRank.isBlank()) {
+            return resources.getString("generalFallbackAddress.text");
         }
 
         return commanderRank;
     }
 
+    /**
+     * Retrieves the campaign faction icon for the specified {@link Campaign}.
+     * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
+     * Otherwise, a default faction logo is fetched based on the campaign's faction short name.
+     *
+     * @return An {@link ImageIcon} representing the faction icon for the given campaign.
+     */
+    public ImageIcon getCampaignFactionIcon() {
+        ImageIcon icon;
+        StandardForceIcon campaignIcon = getUnitIcon();
+
+        if (campaignIcon.getFilename() == null) {
+            icon = getFactionLogo(this, getFaction().getShortName(),
+                true);
+        } else {
+            icon = new ImageIcon(campaignIcon.getFilename());
+        }
+        return icon;
+    }
 }

@@ -61,9 +61,6 @@ import static megamek.common.UnitType.MEK;
 import static megamek.common.UnitType.TANK;
 import static mekhq.campaign.finances.enums.TransactionType.MISCELLANEOUS;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getCommanderTitle;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getDropWeight;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.scaleImageIconToWidth;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 
@@ -180,8 +177,8 @@ public class StarLeagueCache {
                     }
 
                     Pair<Unit, Part> pair = new Pair<>(unit, part);
-                    int weight = getDropWeight(pair.getValue());
-                    partsPool.merge(part, weight, Integer::sum);
+//                    int weight = getDropWeight(pair.getValue());
+//                    partsPool.merge(part, weight, Integer::sum);
                 }
             }
         } catch (Exception exception) {
@@ -423,20 +420,20 @@ public class StarLeagueCache {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         ImageIcon speakerIcon = getSpeakerIcon(false);
-        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+//        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
-        JLabel description = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
-        description.setHorizontalAlignment(JLabel.CENTER);
+//        JLabel description = new JLabel(
+//            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+//                UIUtil.scaleForGUI(DIALOG_WIDTH), getDudDialogText(track, stratconCoords)));
+//        description.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
             String.format(resources.getString("dialogBorderTitle.text"), "PLACEHOLDER")));
-        descriptionPanel.add(description);
+//        descriptionPanel.add(description);
         dialog.add(descriptionPanel, BorderLayout.CENTER);
 
         // Prepares and adds the confirm button
@@ -485,21 +482,21 @@ public class StarLeagueCache {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         ImageIcon speakerIcon = getSpeakerIcon(true);
-        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+//        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
 
         // Prepares and adds the description
-        JLabel description = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), getProposalText(proposal)));
-        description.setHorizontalAlignment(JLabel.CENTER);
+//        JLabel description = new JLabel(
+//            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+//                UIUtil.scaleForGUI(DIALOG_WIDTH), getProposalText(proposal)));
+//        description.setHorizontalAlignment(JLabel.CENTER);
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
             String.format(resources.getString("dialogBorderTitle.text"),
                 resources.getString("senderUnknown.text"))));
-        descriptionPanel.add(description);
+//        descriptionPanel.add(description);
         dialog.add(descriptionPanel, BorderLayout.CENTER);
 
         // Prepares and adds the accept button
@@ -558,7 +555,7 @@ public class StarLeagueCache {
         iconLabel.setHorizontalAlignment(JLabel.CENTER);
 
         ImageIcon speakerIcon = getSpeakerIcon(true);
-        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
+//        speakerIcon = scaleImageIconToWidth(speakerIcon, UIUtil.scaleForGUI(100));
         iconLabel.setIcon(speakerIcon);
         dialog.add(iconLabel, BorderLayout.NORTH);
 
@@ -606,31 +603,31 @@ public class StarLeagueCache {
         return Money.of(roundedValue);
     }
 
-    private String getProposalText(Money proposal) {
-        String commanderTitle = getCommanderTitle(campaign, true);
+//    private String getProposalText(Money proposal) {
+//        String commanderTitle = getCommanderTitle(campaign, true);
+//
+//        return String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"),
+//            commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"),
+//            proposal.toAmountAndSymbolString());
+//    }
 
-        return String.format(resources.getString("proposition" + Compute.randomInt(100) + ".text"),
-            commanderTitle) + "<br><br>" + String.format(resources.getString("propositionValue.text"),
-            proposal.toAmountAndSymbolString());
-    }
-
-    private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
-        final String DUD_FORWARD = "dud";
-        final String DUD_AFTERWARD = ".text";
-
-        String commanderTitle = getCommanderTitle(campaign, false);
-        String gridReference = track.toString() + '-' + stratconCoords.toBTString();
-
-        int roll = Compute.d6(1);
-        if ((roll <= 2) || !(Objects.equals(originFaction.getShortName(), "SL"))) {
-            return String.format(resources.getString(DUD_FORWARD + "Generic" +
-                Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference,
-                originFaction.getFullName(campaign.getGameYear()));
-        } else {
-            return String.format(resources.getString(DUD_FORWARD + "StarLeague"
-                + Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference);
-        }
-    }
+//    private String getDudDialogText(StratconTrackState track, StratconCoords stratconCoords) {
+//        final String DUD_FORWARD = "dud";
+//        final String DUD_AFTERWARD = ".text";
+//
+//        String commanderTitle = getCommanderTitle(campaign, false);
+//        String gridReference = track.toString() + '-' + stratconCoords.toBTString();
+//
+//        int roll = Compute.d6(1);
+//        if ((roll <= 2) || !(Objects.equals(originFaction.getShortName(), "SL"))) {
+//            return String.format(resources.getString(DUD_FORWARD + "Generic" +
+//                Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference,
+//                originFaction.getFullName(campaign.getGameYear()));
+//        } else {
+//            return String.format(resources.getString(DUD_FORWARD + "StarLeague"
+//                + Compute.randomInt(100) + DUD_AFTERWARD), commanderTitle, gridReference);
+//        }
+//    }
 
     @Nullable
     private ImageIcon getSpeakerIcon(boolean isAnon) {

@@ -45,6 +45,7 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -91,6 +92,7 @@ import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
@@ -903,8 +905,8 @@ public class AtBContract extends Contract {
                     campaign.addReport("<b>Special Event:</b> ");
                     if (doBonusRoll(campaign)) {
                         campaign.addReport("Bonus: Captured Supplies");
-                        Resupply supplyDrops = new Resupply(campaign, this);
-                        supplyDrops.getResupply(1, true, true);
+                        Resupply resupply = new Resupply(campaign, this, ResupplyType.RESUPPLY_LOOT);
+                        performResupply(resupply, this, 1);
                     }
 
                     break;

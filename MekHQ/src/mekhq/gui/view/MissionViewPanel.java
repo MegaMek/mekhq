@@ -36,7 +36,7 @@ import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.getEstimatedCargoRequirements;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -995,7 +995,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblCargoRequirement, gridBagConstraints);
 
             txtCargoRequirement.setName("txtCargoRequirement");
-            txtCargoRequirement.setText(getEstimatedCargoRequirements(campaign, contract));
+            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t");
             txtCargoRequirement.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;

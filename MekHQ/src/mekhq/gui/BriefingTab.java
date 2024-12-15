@@ -44,6 +44,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -73,6 +74,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -483,9 +485,9 @@ public final class BriefingTab extends CampaignGuiTab {
             int remainingSupportPoints = ((AtBContract) mission).getStratconCampaignState().getSupportPoints();
 
             if (remainingSupportPoints > 0) {
-                Resupply supplyDrops = new Resupply(getCampaign(), ((AtBContract) mission));
-                supplyDrops.getResupply(remainingSupportPoints, true, false,
-                    true);
+                Resupply resupply = new Resupply(getCampaign(), ((AtBContract) mission),
+                    ResupplyType.RESUPPLY_CONTRACT_END);
+                performResupply(resupply, ((AtBContract) mission), remainingSupportPoints);
             }
         }
 
