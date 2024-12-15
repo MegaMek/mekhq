@@ -1676,56 +1676,59 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @param p              the person being added
+     * @param person              the person being added
      * @param prisonerStatus the person's prisoner status upon recruitment
      * @param gmAdd          false means that they need to pay to hire this person,
      *                       true means it is added without paying
      * @param log            whether or not to write to logs
      * @return true if the person is hired successfully, otherwise false
      */
-    public boolean recruitPerson(Person p, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log) {
-        if (p == null) {
+    public boolean recruitPerson(Person person, PrisonerStatus prisonerStatus, boolean gmAdd, boolean log) {
+        if (person == null) {
             return false;
         }
 
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
-        if (getCampaignOptions().isPayForRecruitment() && !p.getPrimaryRole().isDependent()
+        if (getCampaignOptions().isPayForRecruitment() && !person.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
-                    p.getSalary(this).multipliedBy(2), "Recruitment of " + p.getFullName())) {
-                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>Insufficient funds to recruit "
-                        + p.getFullName() + "</b></font>");
+                    person.getSalary(this).multipliedBy(2), String.format(resources.getString("personnelRecruitmentFinancesReason.text"),person.getFullName()))) {
+                addReport(String.format(resources.getString("personnelRecruitmentInsufficientFunds.text"), MekHQ.getMHQOptions().getFontColorNegativeHexColor(), person.getFullName()));
                 return false;
             }
         }
 
-        personnel.put(p.getId(), p);
-        p.setJoinedCampaign(getLocalDate());
+        personnel.put(person.getId(), person);
+        person.setJoinedCampaign(getLocalDate());
 
-        if (log) {
-            String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner")
-                    : "";
-            addReport(String.format("%s has been added to the personnel roster%s.", p.getHyperlinkedName(), add));
-        }
 
-        if (p.getPrimaryRole().isAstech()) {
+        String formerSurname = person.getSurname();
+
+
+        if (person.getPrimaryRole().isAstech()) {
             astechPoolMinutes += Person.PRIMARY_ROLE_SUPPORT_TIME;
             astechPoolOvertime += Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
-        } else if (p.getSecondaryRole().isAstech()) {
+        } else if (person.getSecondaryRole().isAstech()) {
             astechPoolMinutes += Person.SECONDARY_ROLE_SUPPORT_TIME;
             astechPoolOvertime += Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME;
         }
 
-        p.setPrisonerStatus(this, prisonerStatus, log);
+        person.setPrisonerStatus(this, prisonerStatus, log);
 
         if (getCampaignOptions().isUseSimulatedRelationships()) {
-            if ((prisonerStatus.isFree()) && (!p.getOriginFaction().isClan()) && (!p.getPrimaryRole().isDependent())) {
-                simulateRelationshipHistory(p);
+            if ((prisonerStatus.isFree()) && (!person.getOriginFaction().isClan()) && (!person.getPrimaryRole().isDependent())) {
+                simulateRelationshipHistory(person);
             }
         }
 
-        MekHQ.triggerEvent(new PersonNewEvent(p));
+        if (log) {
+            formerSurname = person.getSurname().equals(formerSurname) ? "" : ' ' + String.format(resources.getString("personnelRecruitmentFormerSurname.text") + ' ', formerSurname);
+            String add = !prisonerStatus.isFree() ? (' ' + resources.getString(prisonerStatus.isBondsman() ? "personnelRecruitmentBondsman.text" : "personnelRecruitmentPrisoner.text"))
+                : "";
+            addReport(String.format(resources.getString("personnelRecruitmentAddedToRoster.text"), person.getHyperlinkedName(), formerSurname, add));
+        }
+
+        MekHQ.triggerEvent(new PersonNewEvent(person));
         return true;
     }
 
@@ -3370,7 +3373,7 @@ public class Campaign implements ITechManager {
             theRefit.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
             report = report + ", " + theRefit.getTimeLeft() + " minutes left. Completion ";
-            int daysLeft = (int) Math.ceil(theRefit.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+            int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() / (double) tech.getDailyAvailableTechTime());
             if (daysLeft == 1) {
                 report += " tomorrow.</b>";
             } else {
@@ -3411,7 +3414,7 @@ public class Campaign implements ITechManager {
                     if (!theRefit.isBeingRefurbished()) {
                         refit(theRefit);
                         report += " Completion ";
-                        int daysLeft = (int) Math.ceil(theRefit.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+                        int daysLeft = (int) Math.ceil((double) theRefit.getTimeLeft() / (double) tech.getDailyAvailableTechTime());
                         if (daysLeft == 1) {
                             report += " tomorrow.</b>";
                         } else {
@@ -3553,7 +3556,7 @@ public class Campaign implements ITechManager {
                 report += " minutes left. Work";
                 if ((minutesUsed > 0) && (tech.getDailyAvailableTechTime() > 0)) {
                     report += " will be finished ";
-                    int daysLeft = (int) Math.ceil(partWork.getTimeLeft() / tech.getDailyAvailableTechTime()) + 1;
+                    int daysLeft = (int) Math.ceil((double) partWork.getTimeLeft() / (double)tech.getDailyAvailableTechTime());
                     if (daysLeft == 1) {
                         report += " tomorrow.</b>";
                     } else {
@@ -4156,7 +4159,7 @@ public class Campaign implements ITechManager {
     private void processWeeklyRelationshipEvents(Person person) {
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             getDivorce().processNewWeek(this, getLocalDate(), person, false);
-            getMarriage().processNewWeek(this, getLocalDate(), person);
+            getMarriage().processNewWeek(this, getLocalDate(), person, false);
             getProcreation().processNewWeek(this, getLocalDate(), person);
 
             if (person.getGender().isFemale()) {

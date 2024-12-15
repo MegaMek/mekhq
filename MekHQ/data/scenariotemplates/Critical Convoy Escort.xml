@@ -110,8 +110,12 @@
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>CIVILIAN</forceRole>
-                    <forceRole>CARGO</forceRole>
                     <forceRole>SUPPORT</forceRole>
+                    <forceRole>SUPPORT</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>APC</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
             </value>
