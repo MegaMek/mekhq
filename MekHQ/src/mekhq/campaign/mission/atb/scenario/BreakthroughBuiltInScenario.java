@@ -92,7 +92,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
             addBotForce(allyEntitiesForce, campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
         BotForce botForce = getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities);
 
         try {

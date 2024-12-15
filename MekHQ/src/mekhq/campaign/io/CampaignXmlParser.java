@@ -35,8 +35,8 @@ import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -78,7 +78,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 
@@ -284,8 +284,8 @@ public class CampaignXmlParser {
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     retVal.getUnitMarket().fillFromXML(wn, retVal, version);
                     foundUnitMarket = true;
-                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("strategicFormations")) {
-                    processStrategicFormationNodes(retVal, wn);
+                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("combatTeams")) {
+                    processCombatTeamNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
@@ -355,10 +355,10 @@ public class CampaignXmlParser {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, StrategicFormation> lances = retVal.getStrategicFormationsTable();
+            Hashtable<Integer, CombatTeam> lances = retVal.getCombatTeamsTable();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
-                    lances.put(f.getId(), new StrategicFormation(f.getId(), retVal));
+                    lances.put(f.getId(), new CombatTeam(f.getId(), retVal));
                     logger.warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
@@ -773,7 +773,7 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static void processStrategicFormationNodes(Campaign campaign, Node workingNode) {
+    private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
         NodeList workingNodes = workingNode.getChildNodes();
 
         // Okay, let's iterate through the children, eh?
@@ -786,17 +786,17 @@ public class CampaignXmlParser {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("lance")
-                && !wn2.getNodeName().equalsIgnoreCase("strategicFormations")) {
+                && !wn2.getNodeName().equalsIgnoreCase("combatTeam")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger.error("Unknown node type not loaded in strategicFormations nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in combatTeam nodes: " + wn2.getNodeName());
                 continue;
             }
 
-            StrategicFormation strategicFormation = StrategicFormation.generateInstanceFromXML(wn2);
+            CombatTeam combatTeam = CombatTeam.generateInstanceFromXML(wn2);
 
-            if (strategicFormation != null) {
-                campaign.addStrategicFormation(strategicFormation);
+            if (combatTeam != null) {
+                campaign.addCombatTeam(combatTeam);
             }
         }
     }
@@ -857,7 +857,7 @@ public class CampaignXmlParser {
             }
         }
 
-        recalculateStrategicFormations(retVal);
+        recalculateCombatTeams(retVal);
         logger.info("Load of Force Organization complete!");
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -62,8 +62,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         public boolean accept(File dir, String name) {
             // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
             // files
-            List<String> toReject = Arrays.asList(
-                    PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
+            List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
             return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
                     || name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
         }
@@ -260,7 +259,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     }
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
-        new DataLoadingDialog(getFrame(), app, file, storyArcStub).setVisible(true);
+        new DataLoadingDialog(getFrame(), app, file, storyArcStub, false).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {
