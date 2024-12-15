@@ -79,7 +79,7 @@ public class Procurement {
             }
         }
 
-        logger.warn("Unable to retrieve Tech Faction. Using fallback.");
+        logger.info("Unable to retrieve Tech Faction. Using fallback.");
 
         if (faction.isClan()) {
             logger.info("Returning: Clan");
@@ -112,7 +112,7 @@ public class Procurement {
             }
         }
 
-        logger.info(successfulParts.toString());
+        logger.info(successfulParts);
 
         return successfulParts;
     }

@@ -40,15 +40,14 @@ public enum ScenarioType {
     }
 
     public static ScenarioType fromOrdinal(int ordinal) {
-        for (ScenarioType scenarioType : values()) {
-            if (scenarioType.ordinal() == ordinal) {
-                return scenarioType;
-            }
-        }
-
         final MMLogger logger = MMLogger.create(ScenarioType.class);
-        logger.error(String.format("Unknown Scenario Type ordinal: %s - returning NONE.", ordinal));
 
-        return NONE;
+        try {
+            return ScenarioType.values()[ordinal];
+        }  catch (IndexOutOfBoundsException e) {
+            logger.warn("Unknown scenario type {}, valid scenario types are {}",
+                ordinal, ScenarioType.values());
+            return ScenarioType.NONE;
+        }
     }
 }

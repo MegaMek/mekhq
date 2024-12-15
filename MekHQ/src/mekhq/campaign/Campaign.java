@@ -3922,7 +3922,10 @@ public class Campaign implements ITechManager {
 
                 // Resupply
                 if (getCampaignOptions().isUseStratCon()) {
-                    if (getLocation().isOnPlanet() && getLocation().getCurrentSystem().equals(contract.getSystem())) {
+                    boolean inLocation = location.isOnPlanet()
+                        && location.getCurrentSystem().equals(contract.getSystem());
+
+                    if (inLocation) {
                         processResupply(contract);
                     }
                 }

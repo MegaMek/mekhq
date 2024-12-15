@@ -340,19 +340,30 @@ public class ScenarioObjectiveProcessor {
     }
 
     /**
-     * This method processes individual objective effects based on their type.
+     * Processes the specified objective effect during a scenario and applies the corresponding
+     * changes to the campaign or contract. This method determines the type of effect and executes
+     * its logic accordingly, supporting both dry-run and active execution modes.
      *
-     * @param campaign The current campaign.
-     * @param effect The objective effect that needs to be processed.
-     * @param scaleFactor If the effect is not fixed, the scale factor for how much the effect will
-     *                   influence the outcome.
-     * @param tracker The {@link ResolveScenarioTracker} instance that tracks the resolution of the
-     *               scenario in the current campaign.
-     * @param dryRun If {@code true}, the function will not perform the actual updates on the
-     *              campaign and contract, but will return a {@link String} containing a description
-     *              of what will happen instead.
-     * @return A text description of what actions would be performed if it is a dry run. Empty string
-     * otherwise.
+     * <p>Effect types supported include (but are not limited to):
+     * <ul>
+     *     <li>Scenario victory or defeat point adjustments.</li>
+     *     <li>Updates to contract scores, morale, or support points.</li>
+     *     <li>Triggering contract victory or defeat conditions.</li>
+     *     <li>Handling AtB-specific bonuses, such as bonus resupply points or resource drops.</li>
+     *     <li>Updating the status of strategic facilities (e.g., capturing/destroying facilities).</li>
+     * </ul>
+     *
+     * <p>When run in dry-run mode, the method simply returns a description of the effect without
+     * applying any changes to the campaign or contract. In active mode, the effect is applied to
+     * the appropriate {@link Campaign}, {@link AtBContract}, or scenario entities.</p>
+     *
+     * @param campaign   the {@link Campaign} instance being updated.
+     * @param effect     the {@link ObjectiveEffect} defining the effect type and its further details.
+     * @param scaleFactor the factor by which the objective effect is scaled (used for value calculations).
+     * @param tracker    the {@link ResolveScenarioTracker} providing context about the scenario, mission, and contract.
+     * @param dryRun     a {@code boolean} flag indicating if the method should process in dry-run mode
+     *                   ({@code true}) or actively apply the effect ({@code false}).
+     * @return a {@link String} describing the effect, used during dry-run mode; otherwise an empty string is returned.
      */
     private String processObjectiveEffect(Campaign campaign, ObjectiveEffect effect, int scaleFactor,
                                           ResolveScenarioTracker tracker, boolean dryRun) {

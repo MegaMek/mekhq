@@ -736,7 +736,9 @@ public class Scenario implements IPlayerSettings {
         }
         // also make sure that the crew's external id does not match a traitor in
         // case of ejected pilots
-        return (null != en.getCrew()) && !"-1".equals(en.getCrew().getExternalIdAsString()) && isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()));
+        return (null != en.getCrew())
+            && !"-1".equals(en.getCrew().getExternalIdAsString())
+            && isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()));
     }
 
     /**
