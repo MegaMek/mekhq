@@ -162,7 +162,7 @@ public class StratconRulesManager {
                                                  AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
 
         int scenarioRolls = track.getRequiredLanceCount();
 
@@ -223,7 +223,7 @@ public class StratconRulesManager {
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
         // get this list just so we have it available
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
 
         // Build the available force pool - this ensures operational forces have an increased
         // chance of being picked
@@ -382,7 +382,7 @@ public class StratconRulesManager {
          boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
          // Grab the available lances and sort them by map type
-         List<Integer> availableForceIDs = getAvailableForceIDs(campaign);
+         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
          Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
          // Select the target coords.
@@ -1836,31 +1836,52 @@ public class StratconRulesManager {
     }
 
     /**
-     * This is a set of all force IDs for forces that can be deployed to a scenario.
+     * Retrieves a list of force IDs for all combat teams that are both available and suitable for
+     * deployment under a specific contract.
      *
-     * @param campaign Current campaign
-     * @return List of available force IDs.
+     * <p>This method filters out combat teams that do not meet the following criteria:
+     * <ul>
+     *   <li>The combat team must be assigned to the specified contract.</li>
+     *   <li>The combat team must not currently be deployed.</li>
+     *   <li>The combat team must have a role other than "In Reserve".</li>
+     * </ul>
+     *
+     * @param campaign The {@link Campaign} object containing all contracts, formations, and states.
+     * @param contract The {@link AtBContract} under which the combat teams are evaluated for deployment.
+     * @return A {@link List} of force IDs ({@link Integer}) corresponding to all suitable combat teams ready for deployment.
      */
-    public static List<Integer> getAvailableForceIDs(Campaign campaign) {
-        // first, we gather a set of all forces that are already deployed to a track so
-        // we eliminate those later
-        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
-                .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
-                .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
-                .collect(Collectors.toSet());
+    public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract) {
+        // First, build a list of all combat teams in the campaign
+        ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
 
-        // now, we get all the forces that qualify as "lances", and filter out those
-        // that are
-        // deployed to a scenario and not in a track already
+        if (combatTeams.isEmpty()) {
+            // If we don't have any combat teams, there is no point in continuing, so we exit early
+            return Collections.emptyList();
+        }
 
-        return campaign.getCombatTeamsTable().keySet().stream()
-                .mapToInt(key -> key)
-                .mapToObj(campaign::getForce).filter(force -> (force != null)
-                        && !force.isDeployed()
-                        && force.isCombatForce()
-                        && !forcesInTracks.contains(force.getId()))
-                .map(Force::getId)
-                .collect(Collectors.toList());
+        // Finally, loop through the available combat teams adding those found to be suitable to
+        // the appropriate list.
+        List<Integer> suitableForces = new ArrayList<>();
+        for (CombatTeam combatTeam : combatTeams) {
+            // If the combat team isn't assigned to the current contract, it isn't eligible to be deployed
+            if (!Objects.equals(contract, combatTeam.getContract(campaign))) {
+                continue;
+            }
+
+            // If the combat team is currently deployed, they aren't eligible to be deployed
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+            if (campaignState.isForceDeployedHere(combatTeam.getForceId())) {
+                continue;
+            }
+
+            // So long as the combat team isn't In Reserve, they are eligible to be deployed
+            if (!combatTeam.getRole().isInReserve()) {
+                suitableForces.add(combatTeam.getForceId());
+            }
+        }
+
+        return suitableForces;
     }
 
     /**
