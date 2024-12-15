@@ -64,7 +64,7 @@ public class StandUpBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), getEnemyHome(), getEnemyHome(), enemyEntities), campaign);
     }
 

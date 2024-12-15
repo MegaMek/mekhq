@@ -44,7 +44,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units
@@ -267,8 +267,8 @@ public class AtBGameThread extends GameThread {
                         // Set scenario type-specific delay
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                        if (scenario.getLanceRole().isScouting() && (scenario.getStrategicFormation(campaign) != null)
-                                && (scenario.getStrategicFormation(campaign).getForceId() == scenario.getStrategicFormationId())
+                        if (scenario.getLanceRole().isScouting() && (scenario.getCombatTeamById(campaign) != null)
+                                && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
                                 && !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
@@ -336,7 +336,7 @@ public class AtBGameThread extends GameThread {
                         }
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         if (!useDropship && scenario.getLanceRole().isScouting()
-                                && (scenario.getStrategicFormation(campaign).getForceId() == scenario.getStrategicFormationId())) {
+                                && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
