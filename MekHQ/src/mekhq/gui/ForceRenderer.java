@@ -53,7 +53,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
-            if (((Unit) value).getEntity() instanceof GunEmplacement) {
+            if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
             String c3network = "";
