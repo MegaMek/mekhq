@@ -3877,12 +3877,24 @@ public class Campaign implements ITechManager {
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
 
-            // Training Experience - Award to eligible training Combat Teams on active contracts
-            getCombatTeamsTable().values().stream()
-                    .filter(combatTeam -> combatTeam.getRole().isTraining()
-                            && (combatTeam.getContract(this) != null) && combatTeam.isEligible(this)
-                            && combatTeam.getContract(this).isActiveOn(getLocalDate(), true))
-                    .forEach(this::awardTrainingXP);
+            // Training Experience - Award to eligible training Strategic Formations on active contracts
+            for (CombatTeam combatTeam : getCombatTeamsTable().values()) {
+                if (!combatTeam.getRole().isTraining()) {
+                    continue;
+                }
+
+                AtBContract contract = combatTeam.getContract(this);
+                if (contract == null || !contract.isActiveOn(getLocalDate(), true)) {
+                    continue;
+                }
+
+                if (getCampaignOptions().isUseStratCon()
+                    && !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
+                    continue;
+                }
+
+                awardTrainingXP(combatTeam);
+            }
         }
 
         if (getLocalDate().getDayOfMonth() == 1) {
