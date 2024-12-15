@@ -98,7 +98,7 @@ public class PerformResupply {
      * @param dropCount the number of supply drops planned for this resupply operation. If zero,
      *                  the method exits early.
      */
-    public static void performResupply(Resupply resupply, AtBContract contract, double dropCount) {
+    public static void performResupply(Resupply resupply, AtBContract contract, int dropCount) {
         // These early exits should only occur if the player literally has no units.
         if (dropCount == 0) {
             logger.info("Resupply exited early, as DropCount is 0");

@@ -144,6 +144,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
@@ -4041,7 +4042,7 @@ public class Campaign implements ITechManager {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
 
         if (!isGuerrilla || Compute.d6(1) > 4) {
-            double dropCount = (double) contract.getRequiredLances() / 3;
+            int dropCount = (int) round((double) contract.getRequiredLances() / 3);
 
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
