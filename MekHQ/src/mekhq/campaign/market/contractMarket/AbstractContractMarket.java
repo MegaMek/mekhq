@@ -23,7 +23,7 @@ import java.util.*;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static java.lang.Math.round;
+import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
@@ -182,42 +182,49 @@ public abstract class AbstractContractMarket {
      * Determines the number of required lances to be deployed for a contract. For Mercenary subcontracts
      * this defaults to 1; otherwise, the number is based on the number of combat units in the
      * campaign. Modified by a 2d6 roll if {@code bypassVariance} is {@code false}.
+     *
      * @param campaign the current campaign
      * @param contract the relevant contract
      * @param bypassVariance if {@code true} requirements will not be semi-randomized.
      * @return The number of lances required to be deployed.
      */
     public int calculateRequiredLances(Campaign campaign, AtBContract contract, boolean bypassVariance) {
-        int maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
         if (contract.isSubcontract()) {
             return 1;
-        } else {
-            int formationSize = getStandardForceSize(campaign.getFaction());
-            int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
-
-            // We allow for one reserve force per 3 depth 0 forces (lances, etc)
-            availableForces -= max((int) floor((double) availableForces / 3), 1);
-
-            if (!bypassVariance) {
-                int roll = d6(2);
-
-                if (roll == 2) {
-                    availableForces = (int) round((double) availableForces * 0.25);
-                } else if (roll == 3) {
-                    availableForces = (int) round((double) availableForces * 0.5);
-                } else if (roll < 5) {
-                    availableForces = (int) round((double) availableForces * 0.75);
-                } else if (roll == 12) {
-                    availableForces = (int) round((double) availableForces * 1.75);
-                } else if (roll == 11) {
-                    availableForces = (int) round((double) availableForces * 1.5);
-                } else if (roll > 9) {
-                    availableForces = (int) round((double) availableForces * 1.25);
-                }
-            }
-
-            return MathUtility.clamp(availableForces, 1, maxDeployedLances);
         }
+
+        int formationSize = getStandardForceSize(campaign.getFaction());
+        int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
+        int maxDeployedLances = availableForces;
+
+        if (campaign.getCampaignOptions().isUseStrategy()) {
+            maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
+        }
+
+        availableForces = min(availableForces, maxDeployedLances);
+
+        // If we're bypassing variance, we can early exit here
+        if (bypassVariance) {
+            availableForces -= (int) floor((double) availableForces / 3);
+
+            return max(availableForces, 1);
+        }
+
+        // Otherwise, we roll to determine the amount we divide availableForces by
+        int roll = d6(2);
+        double varianceFactor = switch (roll) {
+            case 2 -> 4.5;
+            case 3 -> 4;
+            case 4 -> 3.5;
+            case 10 -> 2.5;
+            case 11 -> 2;
+            case 12 -> 1.5;
+            default -> 3;
+        };
+
+        availableForces -= (int) floor((double) availableForces / varianceFactor);
+
+        return max(availableForces, 1);
     }
 
     /**
@@ -273,7 +280,7 @@ public abstract class AbstractContractMarket {
 
     protected void rollSalvageClause(AtBContract contract, int mod, int contractMaxSalvagePercentage) {
         contract.setSalvageExchange(false);
-        int roll = Math.min(d6(2) + mod, 13);
+        int roll = min(d6(2) + mod, 13);
         if (roll < 2) {
             contract.setSalvagePct(0);
         } else if (roll < 4) {
@@ -282,9 +289,9 @@ public abstract class AbstractContractMarket {
             do {
                 r = d6(2);
             } while (r < 4);
-            contract.setSalvagePct(Math.min((r - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePct(min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(Math.min((roll - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePct(min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
@@ -299,7 +306,7 @@ public abstract class AbstractContractMarket {
         } else if (roll == 8) {
             contract.setBattleLossComp(10);
         } else {
-            contract.setBattleLossComp(Math.min((roll - 8) * 20, 100));
+            contract.setBattleLossComp(min((roll - 8) * 20, 100));
         }
     }
 
