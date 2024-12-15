@@ -67,6 +67,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -385,7 +386,16 @@ public final class BriefingTab extends CampaignGuiTab {
         int xpAward = getMissionXpAward(cmd.getStatus(), mission);
 
         if (xpAward > 0) {
+            LocalDate today = getCampaign().getLocalDate();
             for (Person person : getCampaign().getActivePersonnel()) {
+                if (person.isChild(today)) {
+                    continue;
+                }
+
+                if (person.isDependent()) {
+                    continue;
+                }
+
                 person.awardXP(getCampaign(), xpAward);
             }
         }
