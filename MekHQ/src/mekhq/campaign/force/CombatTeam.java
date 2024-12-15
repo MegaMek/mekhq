@@ -349,15 +349,15 @@ public class CombatTeam {
         }
 
         if (force.getUnits().isEmpty()) {
-            force.setStrategicFormation(false);
+            force.setCombatTeamStatus(false);
             return false;
         }
 
         List<Force> childForces = force.getAllSubForces();
 
         for (Force childForce : childForces) {
-            if (childForce.isStrategicFormation()) {
-                force.setStrategicFormation(false);
+            if (childForce.isCombatTeam()) {
+                force.setCombatTeamStatus(false);
                 return false;
             }
         }
@@ -365,13 +365,13 @@ public class CombatTeam {
         List<Force> parentForces = force.getAllParents();
 
         for (Force parentForce : parentForces) {
-            if (parentForce.isStrategicFormation()) {
-                force.setStrategicFormation(false);
+            if (parentForce.isCombatTeam()) {
+                force.setCombatTeamStatus(false);
                 return false;
             }
         }
 
-        force.setStrategicFormation(true);
+        force.setCombatTeamStatus(true);
         return true;
     }
 

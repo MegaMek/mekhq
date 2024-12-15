@@ -854,7 +854,7 @@ public class StratconRulesManager {
             // If the force is scouting, and we're placing a new scenario down,
             // place it in an unoccupied adjacent hex, instead.
             if (!isNonAlliedFacility) {
-                StrategicFormation combatTeam = campaign.getStrategicFormationsTable().get(forceID);
+                CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
 
                 if (combatTeam != null && combatTeam.getRole().isScouting()) {
                     StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
@@ -1082,7 +1082,7 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        StrategicFormation combatTeam = campaign.getStrategicFormationsTable().get(forceID);
+        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
 
         // This may return null if we're deploying a force that isn't a Combat Team for whatever reason
         if (combatTeam != null) {

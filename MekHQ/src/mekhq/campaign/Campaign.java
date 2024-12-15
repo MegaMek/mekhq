@@ -494,7 +494,7 @@ public class Campaign implements ITechManager {
         for (Force force : getAllForces()) {
             int forceId = force.getId();
             if (combatTeams.containsKey(forceId)) {
-                CombatTeam combatTeam = strategicFormations.get(forceId);
+                CombatTeam combatTeam = combatTeams.get(forceId);
 
                 if (combatTeam.isEligible(this)) {
                     continue;
@@ -508,7 +508,6 @@ public class Campaign implements ITechManager {
                 }
             }
 
-        for (int id : formationsToSanitize) {
             combatTeams.remove(forceId);
         }
 
@@ -5010,7 +5009,7 @@ public class Campaign implements ITechManager {
                 if (commanderExperience > SkillType.EXP_REGULAR) {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
-                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits(true)) {
+                    for (UUID traineeId : forceIds.get(combatTeam.getForceId()).getAllUnits(true)) {
                         Unit traineeUnit = getHangar().getUnit(traineeId);
 
                         if (traineeUnit == null) {
