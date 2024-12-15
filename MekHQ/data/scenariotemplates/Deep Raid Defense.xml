@@ -178,6 +178,13 @@
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>ARTILLERY</forceRole>
+                    <forceRole>MISSILE_ARTILLERY</forceRole>
+                    <forceRole>MIXED_ARTILLERY</forceRole>
+                    <forceRole>FIRE_SUPPORT</forceRole>
+                    <forceRole>SR_FIRE_SUPPORT</forceRole>
+                </roleChoices>
             </value>
         </entry>
         <entry>

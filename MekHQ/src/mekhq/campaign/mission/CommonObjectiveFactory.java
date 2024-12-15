@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
 /**
  * This class contains code for the creation of some common objectives for an AtB scenario
@@ -230,8 +230,8 @@ public class CommonObjectiveFactory {
 
         // some scenarios have a lance assigned
         // some scenarios have individual units assigned
-        if (scenario.getStrategicFormationId() != AtBScenario.NO_LANCE) {
-            objective.addForce(campaign.getForce(scenario.getStrategicFormationId()).getName());
+        if (scenario.getCombatTeamId() != AtBScenario.NO_LANCE) {
+            objective.addForce(campaign.getForce(scenario.getCombatTeamId()).getName());
         } else {
             int unitCount = 0;
 

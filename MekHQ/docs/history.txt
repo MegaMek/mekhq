@@ -64,6 +64,20 @@ MEKHQ VERSION HISTORY:
 + Fix #5311: Fixed Marriage Announcements Not Appearing in Daily Activity Log
 + Fix #5318: Corrected Calculation of Age Difference When Marrying Personnel
 + Fix #5333: Show Hired personnel's name change
++ Fix #5323: Removed VIP Capture Scenarios, Added Role Templates, Fixed Objectives
++ Fix #5324: Refactored Cargo Capacity Calculations and Reporting
++ PR #5340: Renamed Strategic Formations to Combat Teams
++ PR #5351: Refactored Required Lances Calculation Logic
++ Fix #5348: Refactored Objective Time Scaling to Handle Edge Cases
++ Fix #5350: Corrected Briefing Room Unit Editing Menu Condition
++ Fix #5345: Reassigned StratCon Force Assignment Picker as Modal
++ PR #5357: Fixed Multiple-Nag Bug by Refactoring in-app New Campaign Handling (Possible fix for #4767)
++ PR #5359: Simplified Splash Screen Button Text
++ PR #5361: Refactored StratCon Tab Layout and Improved UI Design
++ PR #5362: Refactored StratCon Scenario Deployment to Support Scout Role Behavior
++ Fix #5322: Fixed Incorrect Color Usage for Quality Decline Messages
++ PR #5368: Env var mm.profile=dev makes log print on console
+
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

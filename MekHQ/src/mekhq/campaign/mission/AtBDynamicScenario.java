@@ -24,8 +24,8 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -393,11 +393,11 @@ public class AtBDynamicScenario extends AtBScenario {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }
 
-        StrategicFormation strategicFormation = campaign.getStrategicFormationsTable().get(getForceIDs().get(0));
+        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(getForceIDs().get(0));
 
-        if (strategicFormation != null) {
-            strategicFormation.refreshCommander(campaign);
-            return strategicFormation.getCommander(campaign);
+        if (combatTeam != null) {
+            combatTeam.refreshCommander(campaign);
+            return combatTeam.getCommander(campaign);
         } else {
             return null;
         }
