@@ -40,7 +40,7 @@ import mekhq.campaign.universe.Factions;
 
 import java.util.UUID;
 
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.generateForce;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.randomForceWeight;
 
