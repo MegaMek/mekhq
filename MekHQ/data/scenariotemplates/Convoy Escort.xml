@@ -74,6 +74,10 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Convoy</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
             </value>
         </entry>
         <entry>
@@ -110,8 +114,12 @@
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>CIVILIAN</forceRole>
-                    <forceRole>CARGO</forceRole>
                     <forceRole>SUPPORT</forceRole>
+                    <forceRole>SUPPORT</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>APC</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
             </value>

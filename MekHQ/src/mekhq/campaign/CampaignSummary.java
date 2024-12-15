@@ -32,6 +32,8 @@ import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -274,31 +276,44 @@ public class CampaignSummary {
     }
 
     /**
-     * A report that gives capacity and existing tonnage of all cargo
+     * Generates an HTML report about the current and maximum cargo capacity.
+     * The current cargo capacity (cargoTons) and maximum cargo capacity (cargoCapacity) are
+     * rounded to 1 decimal place. The comparison between the current and maximum cargo capacity
+     * determines the font's color in the report.
+     * - If the current cargo exceeds the maximum capacity, the color is set to MHQ's defined negative color.
+     * - If the current cargo equals the maximum capacity, the color is set to MHQ's defined warning color.
+     * - In other cases, the regular color is used.
      *
-     * @return a <code>String</code> of the report
+     * @return A {@link StringBuilder} object containing the HTML formatted report of cargo usage
+     * against capacity.
      */
     public StringBuilder getCargoCapacityReport() {
-        int cargoTonsRounded = (int) Math.round(cargoTons);
-        int cargoCapacityRounded = (int) Math.round(cargoCapacity);
+        BigDecimal roundedCargo = new BigDecimal(Double.toString(cargoTons));
+        roundedCargo = roundedCargo.setScale(1, RoundingMode.HALF_UP);
+
+        BigDecimal roundedCapacity = new BigDecimal(Double.toString(cargoCapacity));
+        roundedCapacity = roundedCapacity.setScale(1, RoundingMode.HALF_UP);
+
+        int comparison = roundedCargo.compareTo(roundedCapacity);
+
         StringBuilder report = new StringBuilder("<html>");
 
-        if (cargoTonsRounded > cargoCapacityRounded) {
+        if (comparison > 0) {
             report.append("<font color='")
                     .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
                     .append("'>");
-        } else if (cargoTonsRounded == cargoCapacityRounded) {
+        } else if (comparison == 0) {
             report.append("<font color='")
                     .append(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                     .append("'>");
         }
 
-        report.append(cargoTonsRounded)
+        report.append(roundedCargo)
                 .append(" tons (")
-                .append(cargoCapacityRounded)
+                .append(roundedCapacity)
                 .append(" tons capacity)");
 
-        if (!report.toString().equals(cargoTonsRounded + " tons (" + cargoCapacityRounded + " tons capacity)")) {
+        if (!report.toString().equals(roundedCargo + " tons (" + roundedCapacity + " tons capacity)")) {
             report.append("</font></html>");
         } else {
             report.append("</html>");

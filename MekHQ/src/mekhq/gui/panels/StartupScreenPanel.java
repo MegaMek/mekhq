@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -17,25 +17,6 @@
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.panels;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.UIManager;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.widget.MegaMekButton;
@@ -57,6 +38,15 @@ import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.List;
+
 public class StartupScreenPanel extends AbstractMHQPanel {
     private static final MMLogger logger = MMLogger.create(StartupScreenPanel.class);
 
@@ -71,8 +61,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         public boolean accept(File dir, String name) {
             // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
             // files
-            List<String> toReject = Arrays.asList(
-                    PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
+            List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());
             return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
                     || name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
         }
@@ -240,7 +229,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     }
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
-        new DataLoadingDialog(getFrame(), app, file, storyArcStub).setVisible(true);
+        new DataLoadingDialog(getFrame(), app, file, storyArcStub, false).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {

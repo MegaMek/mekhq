@@ -108,10 +108,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         }
 
         if (isAttacker()) {
-            addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign),
+            addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign),
                     EntityWeightClass.WEIGHT_ASSAULT, 2, 0, campaign);
         } else {
-            addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign),
+            addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign),
                     EntityWeightClass.WEIGHT_HEAVY, 0, 0, campaign);
         }
 

@@ -75,6 +75,8 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.parts.enums.PartQuality.*;
@@ -125,7 +127,7 @@ public class Unit implements ITechnology {
     protected int scenarioId;
 
     private List<Person> drivers;
-    private List<Person> gunners;
+    private Set<Person> gunners;
     private List<Person> vesselCrew;
     // Contains unique Id of each Infantry/BA Entity assigned to this unit as
     // marines
@@ -180,7 +182,7 @@ public class Unit implements ITechnology {
         this.parts = new ArrayList<>();
         this.podSpace = new ArrayList<>();
         this.drivers = new ArrayList<>();
-        this.gunners = new ArrayList<>();
+        this.gunners = new HashSet<>();
         this.vesselCrew = new ArrayList<>();
         forceId = Force.FORCE_NONE;
         scenarioId = Scenario.S_DEFAULT_ID;
@@ -1282,19 +1284,48 @@ public class Unit implements ITechnology {
         return partsValue;
     }
 
+    /**
+     * Calculates and returns the total cargo capacity of a fully crewed entity.
+     * If the entity is not fully crewed, the cargo capacity will be returned as 0.
+     * The capacity is calculated based on the sum capacity of CargoBay and
+     * StandardSeatCargoBay type Bays in the entity, and from non-damaged
+     * EquipmentParts (with the 'part name' following the pattern "Cargo (X ton)" or
+     * "Cargo (X tons)"). Any erroneous cases are logged.
+     *
+     * @return The total cargo capacity of the fully crewed entity,
+     *         or 0 if the entity is not fully crewed.
+     * @throws NumberFormatException If the equipment part named "Cargo (X ton)" or
+     *         "Cargo (X tons)" does not contain a valid number for X.
+     */
     public double getCargoCapacity() {
+        if (!isFullyCrewed()) {
+            return 0;
+        }
+
         double capacity = 0;
         for (Bay bay : entity.getTransportBays()) {
-            if (bay instanceof CargoBay) {
-                capacity += bay.getCapacity();
-            }
-            if (bay instanceof PillionSeatCargoBay) {
-                capacity += bay.getCapacity();
-            }
-            if (bay instanceof StandardSeatCargoBay) {
+            if (bay instanceof CargoBay || bay instanceof StandardSeatCargoBay) {
                 capacity += bay.getCapacity();
             }
         }
+
+        Pattern cargoPattern = Pattern.compile("Cargo \\((.*) ton(s)?\\)");
+
+        for (Part part : getParts()) {
+            if (part instanceof EquipmentPart && !(part.needsFixing() || part.isMountedOnDestroyedLocation())) {
+                Matcher matcher = cargoPattern.matcher(part.getName());
+
+                if (matcher.find()) {
+                    try {
+                        double partCapacity = Double.parseDouble(matcher.group(1));
+                        capacity += partCapacity;
+                    } catch (NumberFormatException e) {
+                        logger.error(String.format("Failed to parse %s as double", matcher.group(1)));
+                    }
+                }
+            }
+        }
+
         return capacity;
     }
 
@@ -4688,8 +4719,8 @@ public class Unit implements ITechnology {
         return Collections.unmodifiableList(drivers);
     }
 
-    public List<Person> getGunners() {
-        return Collections.unmodifiableList(gunners);
+    public Set<Person> getGunners() {
+        return Collections.unmodifiableSet(gunners);
     }
 
     public List<Person> getVesselCrew() {
@@ -5843,18 +5874,27 @@ public class Unit implements ITechnology {
                 }
             }
         }
-        for (int ii = gunners.size() - 1; ii >= 0; --ii) {
-            Person gunner = gunners.get(ii);
+        for (Person gunner : new HashSet<>(gunners)) {
             if (gunner instanceof UnitPersonRef) {
-                gunners.set(ii, campaign.getPerson(gunner.getId()));
-                if (gunners.get(ii) == null) {
+                Person updatedGunner = campaign.getPerson(gunner.getId());
+                if (updatedGunner != null) {
+                    if (!gunners.remove(gunner)) { //Remove gunner person ref & log if it fails
+                        logger.warn(String.format("Unit %s ('%s') could not remove person ref %s",
+                            getId(), getName(), gunner.getId()));
+                    }
+                    if (!gunners.add(updatedGunner)) { //Add gunner person & log if it fails
+                        logger.warn(String.format("Unit %s ('%s') could not add person %s",
+                            getId(), getName(), updatedGunner.getId()));
+                    }
+                }
+                else {
                     logger.error(
-                            String.format("Unit %s ('%s') references missing gunner %s",
-                                    getId(), getName(), gunner.getId()));
-                    gunners.remove(ii);
+                        String.format("Unit %s ('%s') references missing gunner %s",
+                            getId(), getName(), gunner.getId()));
                 }
             }
         }
+
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof UnitPersonRef) {

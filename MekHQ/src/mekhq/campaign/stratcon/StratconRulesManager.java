@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.TargetRollModifier;
@@ -33,8 +32,8 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -57,8 +56,10 @@ import java.util.stream.Collectors;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
+import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -272,7 +273,7 @@ public class StratconRulesManager {
             StratconTrackState track = campaignState.getTracks().get(0);
 
             if (tracks.size() > 1) {
-                track = ObjectUtility.getRandomItem(tracks);
+                track = getRandomItem(tracks);
             }
 
             if (autoAssignLances && availableForceIDs.isEmpty()) {
@@ -792,18 +793,43 @@ public class StratconRulesManager {
     }
 
     /**
-     * Deploys a force to the given coordinates on the given track as a result of
-     * explicit player
-     * action.
+     * Deploys a force to a specified coordinate within the provided track and processes the
+     * deployment accordingly.
+     *
+     * <p>The following actions are performed during force deployment:
+     * <ol>
+     *     <li>Processes the force deployment, which may reveal the fog of war in or around the
+     *     coordinates depending on the force's role.</li>
+     *     <li>If the target coordinates contain a hostile facility, a corresponding facility
+     *     scenario is created.</li>
+     *     <li>If the target coordinates are empty, there is a chance that a scenario may be created.</li>
+     *     <li>If a scenario is revealed at the target coordinates, the force is assigned to it, and
+     *     the scenario is finalized.</li>
+     *     <li>If the target coordinates contain a non-allied facility or an empty coordinate that
+     *     qualifies for a new scenario:
+     *         <ul>
+     *             <li>If the deploying force is performing a scouting role, the scenario is moved
+     *             to an unoccupied adjacent coordinate, if available.</li>
+     *         </ul>
+     *     </li>
+     * </ol>
+     *
+     * @param coords   the coordinates to deploy the force to
+     * @param forceID  the identifier of the force being deployed
+     * @param campaign the campaign in which the deployment is occurring
+     * @param contract the contract associated with the current campaign
+     * @param track    the track state containing information about scenarios, facilities, and
+     *                 strategic details
+     * @param sticky   whether the deployment is considered "sticky" (forces stay in position
+     *                without auto-updates)
      */
-    public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign, AtBContract contract,
-            StratconTrackState track, boolean sticky) {
+    public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign,
+                                           AtBContract contract, StratconTrackState track, boolean sticky) {
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around
         // the coords, depending on force role
         // 2. if coords are a hostile facility, we get a facility scenario
         // 3. if coords are empty, we *may* get a scenario
-
         processForceDeployment(coords, forceID, campaign, track, sticky);
 
         // we may stumble on a fixed objective scenario - in that case assign the force
@@ -825,20 +851,81 @@ public class StratconRulesManager {
         boolean spawnScenario = (facility == null) && (randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
+            // If the force is scouting, and we're placing a new scenario down,
+            // place it in an unoccupied adjacent hex, instead.
+            if (!isNonAlliedFacility) {
+                StrategicFormation combatTeam = campaign.getStrategicFormationsTable().get(forceID);
+
+                if (combatTeam != null && combatTeam.getRole().isScouting()) {
+                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
+
+                    if (newCoords != null) {
+                        coords = newCoords;
+                    }
+                }
+            }
+
+            // Once we've processed any coord changes, begin setting up the scenario
             StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
             setScenarioParametersFromBiome(track, scenario);
 
-            // if we wound up with a field scenario, we may sub in dropships carrying
+            // if we wound up with a field scenario, we may sub in DropShips carrying
             // units of the force in question
-            if (spawnScenario && !isNonAlliedFacility) {
+            if (spawnScenario) {
                 swapInPlayerUnits(scenario, campaign, forceID);
             }
 
             commitPrimaryForces(campaign, scenario, track);
         }
+    }
+
+    /**
+     * Finds an unoccupied coordinates adjacent to the given origin coordinates.
+     *
+     * <p>Adjacent coordinates are determined based on all possible directions defined by {@code ALL_DIRECTIONS}.
+     * A coordinate is considered "unoccupied" if the following conditions are met:
+     * <ul>
+     *     <li>No scenario is assigned to the coordinate (using {@link StratconTrackState#getScenario})</li>
+     *     <li>No facility exists at the coordinate (using {@link StratconTrackState#getFacility})</li>
+     *     <li>The coordinate is not occupied by any assigned forces (using {@link StratconTrackState#getAssignedForceCoords})</li>
+     * </ul>
+     * If multiple suitable coordinates are found, one is selected at random and returned.
+     * If no suitable coordinates are available, the method returns {@code null}.
+     *
+     * @param originCoords the coordinate from which to search for unoccupied adjacent ones
+     * @param trackState   the state of the track containing information about scenarios, facilities, and forces
+     * @return a randomly selected unoccupied adjacent coordinate, or {@code null} if none are available
+     */
+    private static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
+                                                                       StratconTrackState trackState) {
+        List<StratconCoords> suitableCoords = new ArrayList<>();
+
+        for (int direction : ALL_DIRECTIONS) {
+            StratconCoords newCoords = originCoords.translate(direction);
+
+            if (trackState.getScenario(newCoords) != null) {
+                continue;
+            }
+
+            if (trackState.getFacility(newCoords) != null) {
+                continue;
+            }
+
+            if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
+                continue;
+            }
+
+            suitableCoords.add(newCoords);
+        }
+
+        if (suitableCoords.isEmpty()) {
+            return null;
+        }
+
+        return getRandomItem(suitableCoords);
     }
 
     /**
@@ -968,12 +1055,9 @@ public class StratconRulesManager {
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
             StratconTrackState track, boolean sticky) {
         // plan of action:
-        // increase fatigue if the coordinates are not currently unrevealed
-        // reveal deployed coordinates
-        // reveal facility in deployed coordinates (and all adjacent coordinates for
-        // scout lances)
-        // reveal scenario in deployed coordinates (and all adjacent coordinates for
-        // scout lances)
+        // increase fatigue if the coordinates are not currently unrevealed reveal deployed coordinates
+        // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
+        // reveal scenarios in deployed coordinates (and all adjacent coordinates for scout lances)
 
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
@@ -991,8 +1075,7 @@ public class StratconRulesManager {
         }
 
         StratconScenario scenario = track.getScenario(coords);
-        // if we're deploying on top of a scenario and it's "cloaked"
-        // then we have to activate it
+        // if we're deploying on top of a scenario, and it's "cloaked" then we have to activate it
         if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
             scenario.getBackingScenario().setCloaked(false);
             setScenarioDates(0, track, campaign, scenario); // must be called before commitPrimaryForces
@@ -1408,7 +1491,7 @@ public class StratconRulesManager {
         if (lanceCommander != null){
             Unit commanderUnit = lanceCommander.getUnit();
             if (commanderUnit != null) {
-                StrategicFormation lance = campaign.getStrategicFormationsTable().get(commanderUnit.getForceId());
+                CombatTeam lance = campaign.getCombatTeamsTable().get(commanderUnit.getForceId());
 
                 return (lance != null) && lance.getRole().isDefence();
             }
@@ -1587,9 +1670,8 @@ public class StratconRulesManager {
                     continue;
                 }
 
-                modifier.setAdditionalBriefingText(
-                        "(from " + facility.getDisplayableName() + ") " +
-                                modifier.getAdditionalBriefingText());
+                modifier.setAdditionalBriefingText('(' + facility.getDisplayableName() + ") "
+                    + modifier.getAdditionalBriefingText());
                 scenario.getBackingScenario().addScenarioModifier(modifier);
             }
         }
@@ -1771,7 +1853,7 @@ public class StratconRulesManager {
         // that are
         // deployed to a scenario and not in a track already
 
-        return campaign.getStrategicFormationsTable().keySet().stream()
+        return campaign.getCombatTeamsTable().keySet().stream()
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
@@ -1804,7 +1886,7 @@ public class StratconRulesManager {
             forcesInTracks.addAll(currentScenario.getFailedReinforcements());
         }
 
-        for (StrategicFormation formation : campaign.getStrategicFormationsTable().values()) {
+        for (CombatTeam formation : campaign.getCombatTeamsTable().values()) {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
@@ -2009,9 +2091,9 @@ public class StratconRulesManager {
         // it can deploy "for free" (ReinforcementEligibilityType.ChainedScenario)
 
         // if the force is in 'fight' stance, it'll be able to deploy using 'fight lance' rules
-        if (campaign.getStrategicFormationsTable().containsKey(forceID)) {
-            Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
-            StrategicFormation formation = strategicFormations.get(forceID);
+        if (campaign.getCombatTeamsTable().containsKey(forceID)) {
+            Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+            CombatTeam formation = combatTeamsTable.get(forceID);
 
             if (formation == null) {
                 return ReinforcementEligibilityType.NONE;

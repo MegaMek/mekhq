@@ -53,20 +53,20 @@ import static megamek.common.Entity.ETYPE_MEK;
 import static megamek.common.Entity.ETYPE_PROTOMEK;
 import static megamek.common.Entity.ETYPE_TANK;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_TRUE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 import static mekhq.campaign.force.FormationLevel.LANCE;
 
 /**
  * Used by Against the Bot &amp; StratCon to track additional information about each force
  * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
- * the force counts as a Strategic Formation eligible for assignment to a scenario role
+ * the force counts as a Combat Team eligible for assignment to a scenario role
  * and what the assignment is on which contract.
  *
  * @author Neoancient
  */
-public class StrategicFormation {
-    private static final MMLogger logger = MMLogger.create(StrategicFormation.class);
+public class CombatTeam {
+    private static final MMLogger logger = MMLogger.create(CombatTeam.class);
 
     public static final int LANCE_SIZE = 4;
     public static final int STAR_SIZE = 5;
@@ -135,9 +135,9 @@ public class StrategicFormation {
     /**
      * Default constructor
      */
-    public StrategicFormation() {}
+    public CombatTeam() {}
 
-    public StrategicFormation(int forceId, Campaign campaign) {
+    public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
         role = AtBLanceRole.UNASSIGNED;
         missionId = -1;
@@ -311,7 +311,7 @@ public class StrategicFormation {
         }
 
         if (!force.isCombatForce()) {
-            force.setStrategicFormation(false);
+            force.setCombatTeamStatus(false);
             return false;
         }
 
@@ -322,27 +322,27 @@ public class StrategicFormation {
             int size = getSize(campaign);
             if (size < getStandardForceSize(campaign.getFaction()) - 1 ||
                     size > getStandardForceSize(campaign.getFaction()) + 2) {
-                force.setStrategicFormation(false);
+                force.setCombatTeamStatus(false);
                 return false;
             }
         }
 
         if (campaign.getCampaignOptions().isLimitLanceWeight() &&
                 getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
-            force.setStrategicFormation(false);
+            force.setCombatTeamStatus(false);
             return false;
         }
 
-        int isOverridden = force.getOverrideStrategicFormation();
-        if (isOverridden != STRATEGIC_FORMATION_OVERRIDE_NONE) {
-            boolean overrideState = isOverridden == STRATEGIC_FORMATION_OVERRIDE_TRUE;
-            force.setStrategicFormation(overrideState);
+        int isOverridden = force.getOverrideCombatTeam();
+        if (isOverridden != COMBAT_TEAM_OVERRIDE_NONE) {
+            boolean overrideState = isOverridden == COMBAT_TEAM_OVERRIDE_TRUE;
+            force.setCombatTeamStatus(overrideState);
 
             List<Force> associatedForces = force.getAllParents();
             associatedForces.addAll(force.getAllSubForces());
 
             for (Force associatedForce : associatedForces) {
-                associatedForce.setStrategicFormation(false);
+                associatedForce.setCombatTeamStatus(false);
             }
 
             return overrideState;
@@ -579,13 +579,13 @@ public class StrategicFormation {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lance");
     }
 
-    public static StrategicFormation generateInstanceFromXML(Node wn) {
-        StrategicFormation retVal = null;
+    public static CombatTeam generateInstanceFromXML(Node wn) {
+        CombatTeam retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
         try {
-            retVal = (StrategicFormation) Class.forName(className).newInstance();
+            retVal = (CombatTeam) Class.forName(className).newInstance();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -649,49 +649,49 @@ public class StrategicFormation {
     }
 
     /**
-     * This static method updates the strategic formations across the campaign.
-     * It starts at the top level force, and calculates the strategic formations for each sub-force.
-     * It keeps only the eligible strategic formations and imports them into the campaign.
+     * This static method updates the combat teams across the campaign.
+     * It starts at the top level force, and calculates the combat teams for each sub-force.
+     * It keeps only the eligible combat teams and imports them into the campaign.
      * After every formation is processed, an 'OrganizationChangedEvent' is triggered by that force.
      *
      * @param campaign the current campaign.
      */
-    public static void recalculateStrategicFormations(Campaign campaign) {
-        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
-        StrategicFormation strategicFormation = strategicFormations.get(0); // This is the origin node
+    public static void recalculateCombatTeams(Campaign campaign) {
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
+        CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
         Force force = campaign.getForce(0);
 
         // Does the force already exist in our hashtable? If so, update it accordingly
-        if (strategicFormation != null) {
-            boolean isEligible = strategicFormation.isEligible(campaign);
+        if (combatTeam != null) {
+            boolean isEligible = combatTeam.isEligible(campaign);
 
             if (!isEligible) {
-                campaign.removeStrategicFormation(0);
+                campaign.removeCombatTeam(0);
             }
 
-            force.setStrategicFormation(isEligible);
+            force.setCombatTeamStatus(isEligible);
         // Otherwise, create a new formation and then add it to the table, if appropriate
         } else {
-            strategicFormation = new StrategicFormation(0, campaign);
-            boolean isEligible = strategicFormation.isEligible(campaign);
+            combatTeam = new CombatTeam(0, campaign);
+            boolean isEligible = combatTeam.isEligible(campaign);
 
             if (isEligible) {
-                campaign.addStrategicFormation(strategicFormation);
+                campaign.addCombatTeam(combatTeam);
             }
 
-            force.setStrategicFormation(isEligible);
+            force.setCombatTeamStatus(isEligible);
         }
 
         // Update the TO&E and then begin recursively walking it
         MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-        recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
+        recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
     }
 
     /**
-     * This method is used to update the strategic formations for the campaign working downwards
+     * This method is used to update the combat teams for the campaign working downwards
      * from a specified node, through all of its sub-forces.
-     * It creates a new {@link StrategicFormation} for each sub-force and checks its eligibility.
-     * Eligible formations are imported into the campaign, and the strategic formation status of
+     * It creates a new {@link CombatTeam} for each sub-force and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the combat team status of
      * the respective force is set to {@code true}.
      * After every force is processed, an 'OrganizationChangedEvent' is triggered.
      * This function runs recursively on each sub-force, effectively traversing the complete TO&E.
@@ -700,37 +700,38 @@ public class StrategicFormation {
      * @param workingNode the {@link Force} node from which the method starts working down through
      *                   all its sub-forces.
      */
-    private static void recalculateSubForceStrategicStatus(Campaign campaign, Hashtable<Integer,
-        StrategicFormation> strategicFormations, Force workingNode) {
+    private static void recalculateSubForceStrategicStatus(Campaign campaign,
+                                                           Hashtable<Integer, CombatTeam> combatTeamsTable,
+                                                           Force workingNode) {
 
         for (Force force : workingNode.getSubForces()) {
             int forceId = force.getId();
-            StrategicFormation strategicFormation = strategicFormations.get(forceId);
+            CombatTeam combatTeam = combatTeamsTable.get(forceId);
 
             // Does the force already exist in our hashtable? If so, update it accordingly
-            if (strategicFormation != null) {
-                boolean isEligible = strategicFormation.isEligible(campaign);
+            if (combatTeam != null) {
+                boolean isEligible = combatTeam.isEligible(campaign);
 
                 if (!isEligible) {
-                    campaign.removeStrategicFormation(forceId);
+                    campaign.removeCombatTeam(forceId);
                 }
 
-                force.setStrategicFormation(isEligible);
+                force.setCombatTeamStatus(isEligible);
             // Otherwise, create a new formation and then add it to the table, if appropriate
             } else {
-                strategicFormation = new StrategicFormation(forceId, campaign);
-                boolean isEligible = strategicFormation.isEligible(campaign);
+                combatTeam = new CombatTeam(forceId, campaign);
+                boolean isEligible = combatTeam.isEligible(campaign);
 
                 if (isEligible) {
-                    campaign.addStrategicFormation(strategicFormation);
+                    campaign.addCombatTeam(combatTeam);
                 }
 
-                force.setStrategicFormation(isEligible);
+                force.setCombatTeamStatus(isEligible);
             }
 
             // Update the TO&E and then continue recursively walking it
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
-            recalculateSubForceStrategicStatus(campaign, campaign.getStrategicFormationsTable(), force);
+            recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
         }
     }
 }
