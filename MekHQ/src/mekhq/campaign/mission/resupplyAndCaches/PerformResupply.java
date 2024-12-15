@@ -464,7 +464,7 @@ public class PerformResupply {
      * Determines if a convoy only contains aerial units, such as aerospace or conventional fighters.
      *
      * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param targetConvoy   the {@link Force} representing the convoy to check.
+     * @param convoy   the {@link Force} representing the convoy to check.
      * @return {@code true} if the convoy only contains aerial units, {@code false} otherwise.
      */
     private static boolean forceContainsOnlyAerialForces(Campaign campaign, Force convoy) {
