@@ -64,10 +64,8 @@ public class ResupplyUtilities {
      * <ul>
      *     <li>Identifies the player's convoy force from the scenario's template force IDs.</li>
      *     <li>Resolves each unit and its crew within the convoy:</li>
-     *         <ul>
-     *             <li>Determines each crew member's fate, either captured or killed in action.</li>
-     *             <li>Removes units from the campaign force.</li>
-     *         </ul>
+     *     <li>- Determines each crew member's fate, either captured or killed in action.</li>
+     *     <li>- Removes units from the campaign force.</li>
      *     <li>Displays a dialog about the abandoned convoy.</li>
      * </ul>
      *
