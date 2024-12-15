@@ -3923,7 +3923,7 @@ public class Person {
     public boolean isTechExpanded() {
         return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
     }
-    
+
     public boolean isTechLargeVessel() {
         boolean hasSkill = hasSkill(SkillType.S_TECH_VESSEL);
         return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
@@ -3955,6 +3955,10 @@ public class Person {
 
     public boolean isDoctor() {
         return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+    }
+
+    public boolean isDependent() {
+        return (getPrimaryRole().isDependent() || getSecondaryRole().isDependent());
     }
 
     public boolean isTaskOvertime(final IPartWork partWork) {

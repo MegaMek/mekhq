@@ -68,7 +68,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
-    private static String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
 
@@ -734,7 +734,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 4 -> {
-                turningPoints = List.of("ThirdSuccessionWarEnds", "ForthSuccessionWar", "FRRFounded",
+                turningPoints = List.of("ThirdSuccessionWarEnds", "FourthSuccessionWar", "FRRFounded",
                     "WarOf3039");
                 turningPointDates = List.of(
                     LocalDate.of(3025, 1, 1),

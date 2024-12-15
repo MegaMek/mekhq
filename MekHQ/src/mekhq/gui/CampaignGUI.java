@@ -289,7 +289,7 @@ public class CampaignGUI extends JPanel {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent evt) {
-                getApplication().exit();
+                getApplication().exit(true);
             }
         });
 
@@ -362,12 +362,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
         menuNew.setMnemonic(KeyEvent.VK_N);
         menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
-        menuNew.addActionListener(evt -> {
-            int decision = new NewCampaignConfirmationDialog().YesNoOption();
-            if (decision == JOptionPane.YES_OPTION) {
-                new DataLoadingDialog(frame, app, null).setVisible(true);
-            }
-        });
+        menuNew.addActionListener(evt -> handleInAppNewCampaign());
         menuFile.add(menuNew);
 
         // region menuImport
@@ -696,7 +691,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
         menuExitItem.setMnemonic(KeyEvent.VK_E);
         menuExitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK));
-        menuExitItem.addActionListener(evt -> getApplication().exit());
+        menuExitItem.addActionListener(evt -> getApplication().exit(true));
         menuFile.add(menuExitItem);
 
         menuBar.add(menuFile);
@@ -1051,6 +1046,58 @@ public class CampaignGUI extends JPanel {
         // endregion Help Menu
     }
 
+    /**
+     * Handles a new campaign event triggered from within an existing campaign.
+     * <p>
+     * This method performs the following actions in sequence:
+     * <ul>
+     * <li>Prompts the user to save any current progress through a confirmation dialog.</li>
+     * <li>If the user chooses to cancel or closes the dialog, the operation is aborted.</li>
+     * <li>If the user agrees to save and the save operation fails, the operation is aborted.</li>
+     * <li>Unregisters all event handlers associated with the current campaign, including those
+     *     in the CampaignGUI and tabs.</li>
+     * <li>Starts a new campaign by displaying a data loading dialog.</li>
+     * </ul>
+     * </p>
+     */
+    private void handleInAppNewCampaign() {
+        int decision = new NewCampaignConfirmationDialog().YesNoOption();
+        if (decision != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        // Prompt the user to save
+        int savePrompt = JOptionPane.showConfirmDialog(null,
+            resourceMap.getString("savePrompt.text"),
+            resourceMap.getString("savePrompt.title"),
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+
+        // Abort if the user cancels, closes the dialog, or fails to save
+        if (savePrompt == JOptionPane.CANCEL_OPTION || savePrompt == JOptionPane.CLOSED_OPTION ||
+            (savePrompt == JOptionPane.YES_OPTION && !app.getCampaigngui().saveCampaign(null))) {
+            return;
+        }
+
+        // Unregister handlers for campaign tabs
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            Component tab = tabMain.getComponentAt(i);
+            if (tab instanceof CampaignGuiTab) {
+                ((CampaignGuiTab) tab).disposeTab();
+            }
+        }
+
+        // Unregister other handlers
+        MekHQ.unregisterHandler(this);
+
+        if (getCampaign().getStoryArc() != null) {
+            MekHQ.unregisterHandler(getCampaign().getStoryArc());
+        }
+
+        // Start a new campaign
+        new DataLoadingDialog(frame, app, null, null, true).setVisible(true);
+    }
+
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 4));
         statusPanel.getAccessibleContext().setAccessibleName("Status Bar");
@@ -1112,7 +1159,19 @@ public class CampaignGUI extends JPanel {
         String padding = "       ";
         JButton btnAdvanceDay = new JButton(padding + resourceMap.getString("btnAdvanceDay.text") + padding);
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
-        btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
+        btnAdvanceDay.addActionListener(evt -> {
+            // We disable the button here, as we don't want the user to be able to advance day
+            // again, until after Advance Day has completed.
+            btnAdvanceDay.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    getCampaignController().advanceDay();
+                } finally {
+                    btnAdvanceDay.setEnabled(true);
+                }
+            });
+        });
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -1623,21 +1682,8 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                StringBuilder nameBuilder = new StringBuilder(128);
-                nameBuilder.append("<html>")
-                    .append(tech.getFullName())
-                    .append(", <b>")
-                    .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
-                    .append("</b> ")
-                    .append(tech.getPrimaryRoleDesc())
-                    .append(" (")
-                    .append(getCampaign().getTargetFor(r, tech).getValueAsString())
-                    .append("+), ")
-                    .append(tech.getMinutesLeft())
-                    .append('/')
-                    .append(tech.getDailyAvailableTechTime())
-                    .append(" minutes</html>");
-                name = nameBuilder.toString();
+                String nameBuilder = "<html>" + tech.getFullName() + ", <b>" + SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)) + "</b> " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), " + tech.getMinutesLeft() + '/' + tech.getDailyAvailableTechTime() + " minutes</html>";
+                name = nameBuilder;
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);

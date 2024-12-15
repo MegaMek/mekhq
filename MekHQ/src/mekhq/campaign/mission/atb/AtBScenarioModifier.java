@@ -18,16 +18,6 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -46,6 +36,15 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.utilities.MHQXMLUtility;
+
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data structure representing a scenario modifier for dynamic AtB scenarios
@@ -367,7 +366,7 @@ public class AtBScenarioModifier implements Cloneable {
         if (eventTiming == getEventTiming()) {
             if ((getAdditionalBriefingText() != null) && !getAdditionalBriefingText().isBlank()) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario,
-                        String.format("%s: %s", getModifierName(), getAdditionalBriefingText()));
+                        getAdditionalBriefingText());
             }
 
             if (getForceDefinition() != null) {

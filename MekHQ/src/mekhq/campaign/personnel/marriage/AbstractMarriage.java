@@ -255,8 +255,9 @@ public abstract class AbstractMarriage {
      * @param campaign the campaign to process
      * @param today the current day
      * @param person the person to process
+     * @param isBackground whether the marriage occurred in a character's background
      */
-    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person, boolean isBackground) {
         if (canMarry(today, person, true) != null) {
             return;
         }
@@ -282,7 +283,7 @@ public abstract class AbstractMarriage {
                 isInterUnit = true;
             }
 
-            marryRandomSpouse(campaign, today, person, isSameSex, isInterUnit, true);
+            marryRandomSpouse(campaign, today, person, isSameSex, isInterUnit, isBackground);
         }
     }
 
@@ -391,7 +392,7 @@ public abstract class AbstractMarriage {
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().minusYears(difference));
         } else if (externalSpouseAge > externalSpouseMaxAge) {
-            int difference = externalSpouseMaxAge - externalSpouseAge;
+            int difference = externalSpouseAge - externalSpouseMaxAge;
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().plusYears(difference));
         }

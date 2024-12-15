@@ -98,7 +98,7 @@ import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 
 /**
  * @author Justin 'Windchild' Bowen
@@ -9570,7 +9570,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             campaign.setCampaignOptions(options);
 
-            recalculateStrategicFormations(campaign);
+            recalculateCombatTeams(campaign);
 
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
         } catch (Exception ex) {
