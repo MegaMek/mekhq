@@ -3878,22 +3878,22 @@ public class Campaign implements ITechManager {
             processShipSearch();
 
             // Training Experience - Award to eligible training Strategic Formations on active contracts
-            for (StrategicFormation strategicFormation : getStrategicFormationsTable().values()) {
-                if (!strategicFormation.getRole().isTraining()) {
+            for (CombatTeam combatTeam : getCombatTeamsTable().values()) {
+                if (!combatTeam.getRole().isTraining()) {
                     continue;
                 }
 
-                AtBContract contract = strategicFormation.getContract(this);
+                AtBContract contract = combatTeam.getContract(this);
                 if (contract == null || !contract.isActiveOn(getLocalDate(), true)) {
                     continue;
                 }
 
                 if (getCampaignOptions().isUseStratCon()
-                    && !contract.getStratconCampaignState().isForceDeployedHere(strategicFormation.getForceId())) {
+                    && !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
                     continue;
                 }
 
-                awardTrainingXP(strategicFormation);
+                awardTrainingXP(combatTeam);
             }
         }
 
