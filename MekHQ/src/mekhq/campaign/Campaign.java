@@ -491,22 +491,24 @@ public class Campaign implements ITechManager {
         // returning the hashtable. In theory, this shouldn't be necessary, however, having this
         // sanitizing step should remove the need for isEligible() checks whenever we fetch the
         // hashtable.
-        List<Integer> formationsToSanitize = new ArrayList<>();
-        for (CombatTeam combatTeam : combatTeams.values()) {
-            if (!combatTeam.isEligible(this)) {
-                formationsToSanitize.add(combatTeam.getForceId());
-                try {
-                    Force force = getForce(combatTeam.getForceId());
-                    force.setCombatTeamStatus(false);
-                } catch (Exception ex) {
-                    // We're not too worried if we can't find the associated Force,
-                    // as this just means it has been deleted at some point and not removed correctly.
+        for (Force force : getAllForces()) {
+            int forceId = force.getId();
+            if (combatTeams.containsKey(forceId)) {
+                CombatTeam combatTeam = combatTeams.get(forceId);
+
+                if (combatTeam.isEligible(this)) {
+                    continue;
+                }
+            } else {
+                CombatTeam combatTeam = new CombatTeam(forceId, this);
+
+                if (combatTeam.isEligible(this)) {
+                    combatTeams.put(forceId, combatTeam);
+                    continue;
                 }
             }
-        }
 
-        for (int id : formationsToSanitize) {
-            combatTeams.remove(id);
+            combatTeams.remove(forceId);
         }
 
         return combatTeams;
@@ -3717,10 +3719,10 @@ public class Campaign implements ITechManager {
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
         final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
-        for (CombatTeam l : combatTeams.values()) {
-            if (!l.getRole().isUnassigned() && (l.getMissionId() == contract.getId())) {
+        for (CombatTeam combatTeam : combatTeams.values()) {
+            if (!combatTeam.getRole().isUnassigned() && (combatTeam.getMissionId() == contract.getId())) {
                 total++;
-                if (l.getRole() == requiredLanceRole) {
+                if (combatTeam.getRole() == requiredLanceRole) {
                     role++;
                 }
             }
@@ -4986,8 +4988,8 @@ public class Campaign implements ITechManager {
      *
      * @param l The {@link CombatTeam} to calculate XP to award for training.
      */
-    private void awardTrainingXP(final CombatTeam l) {
-        for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits(true)) {
+    private void awardTrainingXP(final CombatTeam combatTeam) {
+        for (UUID trainerId : forceIds.get(combatTeam.getForceId()).getAllUnits(true)) {
             Unit trainerUnit = getHangar().getUnit(trainerId);
 
             // not sure how this occurs, but it probably shouldn't halt processing of a new
@@ -5007,7 +5009,7 @@ public class Campaign implements ITechManager {
                 if (commanderExperience > SkillType.EXP_REGULAR) {
                     // ...and if the commander is better than a veteran, find all of
                     // the personnel under their command...
-                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits(true)) {
+                    for (UUID traineeId : forceIds.get(combatTeam.getForceId()).getAllUnits(true)) {
                         Unit traineeUnit = getHangar().getUnit(traineeId);
 
                         if (traineeUnit == null) {
@@ -5735,9 +5737,9 @@ public class Campaign implements ITechManager {
 
             if (!combatTeams.isEmpty()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatTeams");
-                for (CombatTeam l : combatTeams.values()) {
-                    if (forceIds.containsKey(l.getForceId())) {
-                        l.writeToXML(pw, indent);
+                for (CombatTeam combatTeam : combatTeams.values()) {
+                    if (forceIds.containsKey(combatTeam.getForceId())) {
+                        combatTeam.writeToXML(pw, indent);
                     }
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "combatTeams");
