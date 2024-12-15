@@ -175,7 +175,7 @@ public class Campaign implements ITechManager {
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
     // This maps PartInUse ToString() results to doubles, representing a mapping 
-    //of parts in use to their requested stock percentages to make these values persistent
+    // of parts in use to their requested stock percentages to make these values persistent
     private Map<String, Double> partsInUseRequestedStockMap = new LinkedHashMap<>();
 
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
