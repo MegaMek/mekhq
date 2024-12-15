@@ -30,8 +30,8 @@ import mekhq.gui.stratcon.CampaignManagementDialog;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
-import java.awt.Dialog.ModalityType;
 import java.awt.*;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -55,7 +55,7 @@ public class StratconTab extends CampaignGuiTab {
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
     private JScrollPane expandedObjectivePanel;
-    private boolean objectivesCollapsed = true;
+    private boolean objectivesCollapsed = false;
 
     CampaignManagementDialog cmd;
 
@@ -96,12 +96,12 @@ public class StratconTab extends CampaignGuiTab {
               }
             });
 
-        setLayout(new GridLayout());
+        setLayout(new BorderLayout());
         stratconPanel = new StratconPanel(getCampaignGui(), infoPanelText);
         JScrollPane scrollPane = new JScrollPane(stratconPanel);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(StratconPanel.HEX_X_RADIUS);
         scrollPane.getVerticalScrollBar().setUnitIncrement(StratconPanel.HEX_Y_RADIUS);
-        this.add(scrollPane);
+        this.add(scrollPane, BorderLayout.CENTER);
 
         // TODO: lance role assignment UI here?
 
@@ -109,8 +109,8 @@ public class StratconTab extends CampaignGuiTab {
         cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new JScrollPaneWithSpeed(infoPanel);
-        this.add(infoScrollPane);
-
+        infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600), infoScrollPane.getHeight())));
+        this.add(infoScrollPane, BorderLayout.EAST);
         MekHQ.registerHandler(this);
     }
 
@@ -121,28 +121,43 @@ public class StratconTab extends CampaignGuiTab {
         int gridY = 0;
         infoPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.gridx = gridY++;
 
-        infoPanel.add(new JLabel("Current Campaign Status:"), constraints);
+        // Default settings for left-aligned components
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
+        constraints.weighty = 0.0;
+        constraints.insets = new Insets(5, 5, 5, 5);
+        constraints.gridx = 0;
 
+        // Add campaign status text
         constraints.gridy = gridY++;
         infoPanel.add(campaignStatusText, constraints);
 
+        // Add "Manage Campaign State" button
         JButton btnManageCampaignState = new JButton("Manage SP/CVP");
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
         constraints.gridy = gridY++;
         infoPanel.add(btnManageCampaignState, constraints);
 
+        // Add an expanded objective panel (scrollable)
         expandedObjectivePanel = new JScrollPaneWithSpeed(objectiveStatusText);
-        expandedObjectivePanel.setPreferredSize(new Dimension(400, 300));
+        expandedObjectivePanel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(550, 300)));
         constraints.gridy = gridY++;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
         infoPanel.add(expandedObjectivePanel, constraints);
 
+        // Reset horizontal fill for subsequent components
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
+
+        // Add "Assigned Sectors" label
         JLabel lblCurrentTrack = new JLabel("Assigned Sectors:");
         constraints.gridy = gridY++;
         infoPanel.add(lblCurrentTrack, constraints);
 
+        // Add track list wrapped in a scroll pane
         listModel = new DefaultListModel<>();
         listCurrentTrack = new JList<>(listModel);
         listCurrentTrack.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -151,14 +166,27 @@ public class StratconTab extends CampaignGuiTab {
         listCurrentTrack.addListSelectionListener(evt -> trackSelectionHandler());
 
         JScrollPane scrollPane = new JScrollPane(listCurrentTrack);
-        scrollPane.setPreferredSize(new Dimension(UIUtil.scaleForGUI(400),
-            listCurrentTrack.getFixedCellHeight() * 10));
         constraints.gridy = gridY++;
-
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
         infoPanel.add(scrollPane, constraints);
-        constraints.gridx = 2;
-        constraints.gridheight = 2;
+
+        // Reset horizontal fill again
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
+
+        // Add additional info panel text or components
+        constraints.gridx = 0;
+        constraints.gridy = gridY++;
+        constraints.gridheight = 3;
         infoPanel.add(infoPanelText, constraints);
+
+        // Add a spacer to push all components upward (top alignment)
+        constraints.gridx = 0;
+        constraints.gridy = gridY++;
+        constraints.weighty = 1.0;
+        constraints.fill = GridBagConstraints.VERTICAL;
+        infoPanel.add(new JPanel(), constraints); // Invisible filler component
     }
 
     /**
@@ -222,18 +250,17 @@ public class StratconTab extends CampaignGuiTab {
         expandedObjectivePanel.setVisible(true);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<html>")
-            .append(currentContract.getContractType()).append(": ").append(currentContract.getName())
-            .append("<br/>")
-            .append(campaignState.getBriefingText());
+        sb.append("<html><b>").append(currentContract.getContractType()).append(":</b> ")
+            .append(currentContract.getName()).append("<br/>")
+            .append("<i>").append(campaignState.getBriefingText()).append("</i>");
 
         if (currentContract.getEndingDate().isBefore(currentDate)) {
             sb.append("<br/>Contract term has expired!");
         }
 
-        sb.append("<br/>Campaign Victory Points: ").append(campaignState.getVictoryPoints())
-            .append("<br/>Support Points: ").append(campaignState.getSupportPoints())
-            .append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime())
+        sb.append("<br/><b>Campaign Victory Points:</b> ").append(campaignState.getVictoryPoints())
+            .append("<br/><b>Support Points:</b> ").append(campaignState.getSupportPoints())
+            .append("<br/><b>Deployment Period:</b> ").append(currentTDI.track.getDeploymentTime())
             .append(" days")
             .append("</html>");
 

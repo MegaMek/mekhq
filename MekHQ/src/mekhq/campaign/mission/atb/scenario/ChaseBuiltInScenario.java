@@ -80,9 +80,9 @@ public class ChaseBuiltInScenario extends AtBScenario {
             addBotForce(allyEntitiesForce, campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
                 -1, campaign);
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
                 -1, campaign);
 
         BotForce botForce = getEnemyBotForce(getContract(campaign), startEdge, getEnemyHome(), enemyEntities);

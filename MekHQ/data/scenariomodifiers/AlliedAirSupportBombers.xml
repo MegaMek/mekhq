@@ -26,5 +26,8 @@
 		<syncDeploymentType>SameEdge</syncDeploymentType>
 		<syncedForceName>Player</syncedForceName>
 		<useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>BOMBER</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

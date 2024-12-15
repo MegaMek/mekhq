@@ -32,7 +32,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -150,11 +150,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
 
             String format;
-            if (force.isStrategicFormation()) {
-                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
+            if (force.isCombatTeam()) {
+                format = (force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE) ?
                     "<html><b><u>%s</u></b></html>" : "<html><b>%s</b></html>";
             } else {
-                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
+                format = (force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE) ?
                     "<html><u>%s</u></html>" : "%s";
             }
 
