@@ -239,14 +239,17 @@ public class MekHQ implements GameListener {
         }
     }
 
-    public void exit() {
-        int savePrompt = JOptionPane.showConfirmDialog(null, "Do you want to save the game before quitting MekHQ?",
-                "Save First?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-        if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
-            return;
-        } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
-            // When the user did not actually save the game, don't close MHQ
-            return;
+    public void exit(boolean includeSavePrompt) {
+        if (includeSavePrompt) {
+            int savePrompt = JOptionPane.showConfirmDialog(null,
+                "Do you want to save the game before quitting MekHQ?",
+                    "Save First?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
+                return;
+            } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
+                // When the user did not actually save the game, don't close MHQ
+                return;
+            }
         }
 
         // Actually close MHQ

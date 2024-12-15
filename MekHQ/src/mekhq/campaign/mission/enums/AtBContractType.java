@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -213,7 +213,7 @@ public enum AtBContractType {
             case RECON_RAID:
                 return AtBLanceRole.SCOUTING;
             default:
-                return AtBLanceRole.UNASSIGNED;
+                return AtBLanceRole.IN_RESERVE;
         }
     }
 

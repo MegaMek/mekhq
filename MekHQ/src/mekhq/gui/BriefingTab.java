@@ -39,7 +39,7 @@ import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.StrategicFormation;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -69,6 +69,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -388,7 +389,16 @@ public final class BriefingTab extends CampaignGuiTab {
         int xpAward = getMissionXpAward(cmd.getStatus(), mission);
 
         if (xpAward > 0) {
+            LocalDate today = getCampaign().getLocalDate();
             for (Person person : getCampaign().getActivePersonnel()) {
+                if (person.isChild(today)) {
+                    continue;
+                }
+
+                if (person.isDependent()) {
+                    continue;
+                }
+
                 person.awardXP(getCampaign(), xpAward);
             }
         }
@@ -890,11 +900,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
-            StrategicFormation assignedLance = ((AtBScenario) scenario).getStrategicFormation(getCampaign());
+            CombatTeam assignedLance = ((AtBScenario) scenario).getCombatTeamById(getCampaign());
             if (assignedLance != null) {
                 int assignedForceId = assignedLance.getForceId();
                 int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(StrategicFormation.findCommander(assignedForceId, getCampaign()));
+                Person commander = getCampaign().getPerson(CombatTeam.findCommander(assignedForceId, getCampaign()));
                 if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
