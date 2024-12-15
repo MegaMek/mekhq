@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import java.util.ResourceBundle;
-
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -27,6 +25,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
+
+import java.util.ResourceBundle;
 
 public enum AtBContractType {
     // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
@@ -213,7 +213,7 @@ public enum AtBContractType {
             case RECON_RAID:
                 return AtBLanceRole.SCOUTING;
             default:
-                return AtBLanceRole.UNASSIGNED;
+                return AtBLanceRole.IN_RESERVE;
         }
     }
 

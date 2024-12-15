@@ -15,6 +15,7 @@ package mekhq.campaign.stratcon;
 
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
@@ -104,13 +105,14 @@ public class StratconScenario implements IStratconDisplayable {
      * Add an individual unit to the backing scenario, trying to associate it with the given template.
      * Performs house keeping on the unit and scenario and invokes a deployment changed event.
      */
-    public void addUnit(Unit unit, String templateID, boolean useLeadershipPoint) {
+    public void addUnit(Unit unit, String templateID, boolean useLeadership) {
         if (!backingScenario.containsPlayerUnit(unit.getId())) {
             backingScenario.addUnit(unit.getId(), templateID);
             unit.setScenarioId(getBackingScenarioID());
 
-            if (useLeadershipPoint) {
-                useLeadershipPoint();
+            if (useLeadership) {
+                int baseBattleValue = unit.getEntity().calculateBattleValue(true, true);
+                leadershipPointsUsed += baseBattleValue;
             }
 
             MekHQ.triggerEvent(new DeploymentChangedEvent(unit, getBackingScenario()));
@@ -165,56 +167,66 @@ public class StratconScenario implements IStratconDisplayable {
 
     @Override
     public String getInfo() {
-        return getInfo(true);
+        return getInfo(null);
     }
 
-    public String getInfo(boolean html) {
+    public String getInfo(@Nullable Campaign campaign) {
         StringBuilder stateBuilder = new StringBuilder();
 
         if (isStrategicObjective()) {
-            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>Contract objective located</span>")
-                    .append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                .append("'>Contract objective located</span><br/>");
         }
 
-        stateBuilder.append("Scenario: ")
+        stateBuilder.append("<b>Scenario:</b> ")
             .append(backingScenario.getName())
-            .append(html ? "<br/>" : "");
+            .append("<br/>");
 
         if (backingScenario.getTemplate() != null) {
-            stateBuilder.append(backingScenario.getTemplate().shortBriefing)
-                .append(html ? "<br/>" : "");
+            stateBuilder.append("<i>").append(backingScenario.getTemplate().shortBriefing).append("</i>")
+                .append("<br/>");
         }
 
         if (isRequiredScenario()) {
-            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>Deployment required by contract</span>")
-                    .append(html ? "<br/>" : "").append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>-1 VP if lost/ignored; +1 VP if won</span>")
-                    .append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                .append("'>-1 VP if lost/ignored; +1 VP if won</span><br/>");
         }
 
-        stateBuilder.append("Status: ")
+        stateBuilder.append("<b>Status:</b> ")
             .append(currentState.getScenarioStateName())
             .append("<br/>");
 
-        stateBuilder.append("Terrain: ")
+        stateBuilder.append("<b>Terrain:</b> ")
                 .append(backingScenario.getMap())
                 .append("<br/>");
 
         if (deploymentDate != null) {
-            stateBuilder.append("Deployment Date: ")
-                .append(deploymentDate.toString())
+            stateBuilder.append("<b>Deployment Date:</b> ")
+                .append(deploymentDate)
                 .append("<br/>");
         }
 
         if (actionDate != null) {
-            stateBuilder.append("Battle Date: ")
-                .append(actionDate.toString())
+            stateBuilder.append("<b>Battle Date:</b> ")
+                .append(actionDate)
                 .append("<br/>");
         }
 
         if (returnDate != null) {
-            stateBuilder.append("Return Date: ")
-                .append(returnDate.toString())
+            stateBuilder.append("<b>Return Date:</b> ")
+                .append(returnDate)
                 .append("<br/>");
+        }
+
+        if (campaign != null) {
+            AtBDynamicScenario backingScenario = getBackingScenario();
+
+            if (backingScenario != null) {
+                stateBuilder.append(String.format("<b>Hostile BV:</b> %d<br>",
+                    backingScenario.getTeamTotalBattleValue(campaign, false)));
+                stateBuilder.append(String.format("<b>Allied BV:</b> %d",
+                    backingScenario.getTeamTotalBattleValue(campaign, true)));
+            }
         }
 
         stateBuilder.append("</html>");
@@ -353,11 +365,7 @@ public class StratconScenario implements IStratconDisplayable {
         return leadershipPointsUsed;
     }
 
-    public void setLeadershipPointsUsed(int leadershipPointsUsed) {
+    public void setAvailableLeadershipBudget(int leadershipPointsUsed) {
         this.leadershipPointsUsed = leadershipPointsUsed;
-    }
-
-    public void useLeadershipPoint() {
-        leadershipPointsUsed++;
     }
 }

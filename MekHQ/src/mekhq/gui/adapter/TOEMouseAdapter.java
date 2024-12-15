@@ -18,24 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
@@ -67,6 +49,16 @@ import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.*;
+
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
@@ -136,6 +128,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String CHANGE_NAME = "CHANGE_NAME";
     private static final String CHANGE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS";
     private static final String CHANGE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES";
+    private static final String CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE";
+    private static final String REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE";
 
     private static final String COMMAND_CHANGE_FORCE_CAMO = "CHANGE_CAMO|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_DESC = "CHANGE_DESC|FORCE|empty|";
@@ -146,6 +140,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES|FORCE|empty|";
+    private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
+    private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
 
     private static final String COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL = "OVERRIDE_FORMATION_LEVEL|FORCE|FORMATION_LEVEL|";
 
@@ -443,6 +439,35 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
             gui.undeployForces(forces);
             gui.getTOETab().refreshForceView();
+
+            for (Force formation : gui.getCampaign().getAllForces()) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            }
+        } else if (command.contains(CHANGE_STRATEGIC_FORCE_OVERRIDE)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            boolean formationState = singleForce.isCombatTeam();
+            singleForce.setCombatTeamStatus(!formationState);
+            singleForce.setOverrideCombatTeam(formationState ? COMBAT_TEAM_OVERRIDE_FALSE : COMBAT_TEAM_OVERRIDE_TRUE);
+
+            for (Force childForce : singleForce.getAllSubForces()) {
+                childForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            }
+
+            for (Force parentForce : singleForce.getAllParents()) {
+                parentForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            }
+
+            recalculateCombatTeams(gui.getCampaign());
+        } else if (command.contains(REMOVE_STRATEGIC_FORCE_OVERRIDE)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            singleForce.setOverrideCombatTeam(COMBAT_TEAM_OVERRIDE_NONE);
+            recalculateCombatTeams(gui.getCampaign());
         } else if (command.contains(TOEMouseAdapter.REMOVE_FORCE)) {
             for (Force force : forces) {
                 if (null != force && null != force.getParentForce()) {
@@ -1020,16 +1045,30 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            menuItem = new JMenuItem(force.isCombatForce() ? "Make Non-Combat Force" : "Make Combat Force");
-            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUS + forceIds);
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
+            if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
+                menuItem = new JMenuItem(force.isCombatForce() ? "Make Non-Combat Force" : "Make Combat Force");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUS + forceIds);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
 
-            menuItem = new JMenuItem(force.isCombatForce() ? "Make Force and Subforces Non-Combat Forces"
-                    : "Make Force and Subforces Combat Forces");
-            menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
-            menuItem.addActionListener(this);
-            popup.add(menuItem);
+                menuItem = new JMenuItem(force.isCombatForce() ?
+                    "Make Force and Subforces Non-Combat Forces" : "Make Force and Subforces Combat Forces");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+
+                JMenuItem optionStrategicForceOverride = new JMenuItem((force.isCombatTeam() ?
+                    "Never" : "Always") + " Consider Force a Combat Team");
+                optionStrategicForceOverride.setActionCommand(COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE + forceIds);
+                optionStrategicForceOverride.addActionListener(this);
+                popup.add(optionStrategicForceOverride);
+
+                JMenuItem optionRemoveStrategicForceOverride = new JMenuItem("Remove Combat Team Override");
+                optionRemoveStrategicForceOverride.setActionCommand(COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE + forceIds);
+                optionRemoveStrategicForceOverride.addActionListener(this);
+                optionRemoveStrategicForceOverride.setVisible(force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE);
+                popup.add(optionRemoveStrategicForceOverride);
+            }
 
             if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces)
                     && StaticChecks.areAllCombatForces(forces)) {
@@ -1043,6 +1082,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 || !scenario.canDeployForces(forces, gui.getCampaign())) {
                             continue;
                         }
+
+                        if (scenario.getHasTrack()) {
+                            continue;
+                        }
+
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(
                                 TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + '|' + forceIds);
@@ -1058,10 +1102,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Force");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
+                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
                 popup.add(menuItem);
             }
 
             menuItem = new JMenuItem("Remove Force");
+
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
             menuItem.setEnabled(
@@ -1405,6 +1451,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 !scenario.canDeployUnits(units, gui.getCampaign())) {
                             continue;
                         }
+
+                        if (scenario.getHasTrack()) {
+                            continue;
+                        }
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
                                 + scenario.getId() + '|' + unitIds);
@@ -1554,11 +1604,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Unit");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
+                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
                 popup.add(menuItem);
             }
 
-            if (StaticChecks.areAllUnitsTransported(units)) {
+            if (StaticChecks.areAllUnitsTransported(units) && !StaticChecks.areAnyUnitsDeployed(units)) {
                 menuItem = new JMenuItem("Unassign Unit from Transport Ship");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP + unitIds);
                 menuItem.addActionListener(this);

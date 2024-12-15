@@ -4482,7 +4482,7 @@ public class CampaignOptions {
             return 0;
         }
 
-        return role.isUnassigned() ? 0 : atbBattleChance[role.ordinal()];
+        return role.isInReserve() ? 0 : atbBattleChance[role.ordinal()];
     }
 
     /**

@@ -85,6 +85,11 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RECON</forceRole>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
@@ -140,8 +145,9 @@
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>

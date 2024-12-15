@@ -18,46 +18,33 @@
  */
 package mekhq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.swing.JOptionPane;
-
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
+import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.Princess;
+import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.common.Entity;
-import megamek.common.IAero;
-import megamek.common.Infantry;
-import megamek.common.MapSettings;
-import megamek.common.Minefield;
-import megamek.common.UnitType;
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units
@@ -69,16 +56,34 @@ public class AtBGameThread extends GameThread {
     private static final MMLogger logger = MMLogger.create(AtBGameThread.class);
 
     private final AtBScenario scenario;
+    private final BehaviorSettings autoResolveBehaviorSettings;
 
-    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
-            AtBScenario scenario) {
-        this(name, password, c, app, units, scenario, true);
+    /**
+     * Constructor for AtBGameThread
+     *
+     * <p>
+     *     This constructor creates a new AtBGameThread with the given name, password, client, MekHQ application, list of
+     *     units, scenario, and auto resolve behavior settings. The game thread is started by default.
+     * </p>
+     *
+     * @param name                        The name of the player
+     * @param password                    The password for the game
+     * @param client                      The client
+     * @param app                         The MekHQ application
+     * @param units                       The list of units to import into the game
+     * @param scenario                    The scenario to use for this game
+     * @param autoResolveBehaviorSettings The behavior settings for the auto resolve bot
+     */
+    public AtBGameThread(String name, String password, Client client, MekHQ app, List<Unit> units,
+                         AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings) {
+        this(name, password, client, app, units, scenario, autoResolveBehaviorSettings, true);
     }
 
-    public AtBGameThread(String name, String password, Client c, MekHQ app, List<Unit> units,
-            AtBScenario scenario, boolean started) {
-        super(name, password, c, app, units, scenario, started);
+    public AtBGameThread(String name, String password, Client client, MekHQ app, List<Unit> units,
+            AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings, boolean started) {
+        super(name, password, client, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
+        this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
     }
 
     // String tokens for dialog boxes used for transport loading
@@ -118,7 +123,7 @@ public class AtBGameThread extends GameThread {
             while (client.getLocalPlayer() == null) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
             }
-
+            var player = client.getLocalPlayer();
             // if game is running, shouldn't do the following, so detect the phase
             for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
                     && client.getGame().getPhase().isUnknown(); i++) {
@@ -132,6 +137,7 @@ public class AtBGameThread extends GameThread {
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
+                client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
@@ -185,23 +191,7 @@ public class AtBGameThread extends GameThread {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-                if (campaign.getCampaignOptions().isUseLightConditions()) {
-                    planetaryConditions.setLight(scenario.getLight());
-                }
-                if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-                    planetaryConditions.setWeather(scenario.getWeather());
-                    planetaryConditions.setWind(scenario.getWind());
-                    planetaryConditions.setFog(scenario.getFog());
-                    planetaryConditions.setEMI(scenario.getEMI());
-                    planetaryConditions.setBlowingSand(scenario.getBlowingSand());
-                    planetaryConditions.setTemperature(scenario.getModifiedTemperature());
-                }
-                if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
-                    planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                    planetaryConditions.setGravity(scenario.getGravity());
-                }
-                client.sendPlanetaryConditions(planetaryConditions);
+                client.sendPlanetaryConditions(getPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 // set player deployment
@@ -259,7 +249,7 @@ public class AtBGameThread extends GameThread {
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
                     if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
-                        entity.setNCrew(unit.getActiveCrew().size());
+                        entity.setNCrew(unit.getActiveCrew().size() + entity.getBayPersonnel()); //We don't track bay personnel currently.
                         // TODO : Change this when marines are fully implemented
                         entity.setNMarines(unit.getMarineCount());
                     }
@@ -277,8 +267,8 @@ public class AtBGameThread extends GameThread {
                         // Set scenario type-specific delay
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                        if (scenario.getLanceRole().isScouting() && (scenario.getLance(campaign) != null)
-                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
+                        if (scenario.getLanceRole().isScouting() && (scenario.getCombatTeamById(campaign) != null)
+                                && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
                                 && !useDropship) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
@@ -346,7 +336,7 @@ public class AtBGameThread extends GameThread {
                         }
                         deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                         if (!useDropship && scenario.getLanceRole().isScouting()
-                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())) {
+                                && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                             deploymentRound = Math.max(deploymentRound, 6 - speed);
                         }
                     }
@@ -392,7 +382,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 // All player and bot units have been added to the lobby
-                // Prompt the player to auto load units into transports
+                // Prompt the player to autoload units into transports
                 if (!scenario.getPlayerTransportLinkages().isEmpty()) {
                     for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
                         boolean loadDropShips = false;
@@ -454,6 +444,14 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                 }
+
+
+                // if AtB was loaded with the auto resolve bot behavior settings then it loads a new bot,
+                // set to the players team
+                // and then moves all the player forces under this new bot
+                if (Objects.nonNull(autoResolveBehaviorSettings)) {
+                    setupPlayerBotForAutoResolve(player);
+                }
             }
 
             while (!stop) {
@@ -469,6 +467,74 @@ public class AtBGameThread extends GameThread {
             swingGui = null;
             controller = null;
         }
+    }
+
+    private void setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
+        var botName = player.getName() + ":AI";
+
+        Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        var botClient = new Princess(botName, client.getHost(), client.getPort());
+        botClient.setBehaviorSettings(autoResolveBehaviorSettings.getCopy());
+        try {
+            botClient.connect();
+            Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        } catch (Exception e) {
+            Sentry.captureException(e);
+            logger.error(String.format("Could not connect with Bot name %s", botName),
+                e);
+        }
+        swingGui.getLocalBots().put(botName, botClient);
+
+        var retryCount = MekHQ.getMHQOptions().getStartGameBotClientRetryCount();
+        while (botClient.getLocalPlayer() == null) {
+            Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+            retryCount--;
+            if (retryCount <= 0) {
+                break;
+            }
+        }
+        if (retryCount <= 0) {
+            logger.error(String.format("Could not connect with Bot name %s", botName));
+        }
+        botClient.getLocalPlayer().setName(botName);
+        botClient.getLocalPlayer().setStartingPos(player.getStartingPos());
+        botClient.getLocalPlayer().setStartOffset(player.getStartOffset());
+        botClient.getLocalPlayer().setStartWidth(player.getStartWidth());
+        botClient.getLocalPlayer().setStartingAnyNWx(player.getStartingAnyNWx());
+        botClient.getLocalPlayer().setStartingAnyNWy(player.getStartingAnyNWy());
+        botClient.getLocalPlayer().setStartingAnySEx(player.getStartingAnySEx());
+        botClient.getLocalPlayer().setStartingAnySEy(player.getStartingAnySEy());
+        botClient.getLocalPlayer().setCamouflage(player.getCamouflage().clone());
+        botClient.getLocalPlayer().setColour(player.getColour());
+        botClient.getLocalPlayer().setTeam(player.getTeam());
+        botClient.sendPlayerInfo();
+        Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+
+        var playerEntities = client.getEntitiesVector().stream()
+            .filter(entity -> entity.getOwnerId() == player.getId())
+            .collect(Collectors.toList());
+        botClient.sendChangeOwner(playerEntities, botClient.getLocalPlayer().getId());
+        Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+    }
+
+    private PlanetaryConditions getPlanetaryConditions() {
+        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+        if (campaign.getCampaignOptions().isUseLightConditions()) {
+            planetaryConditions.setLight(scenario.getLight());
+        }
+        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
+            planetaryConditions.setWeather(scenario.getWeather());
+            planetaryConditions.setWind(scenario.getWind());
+            planetaryConditions.setFog(scenario.getFog());
+            planetaryConditions.setEMI(scenario.getEMI());
+            planetaryConditions.setBlowingSand(scenario.getBlowingSand());
+            planetaryConditions.setTemperature(scenario.getModifiedTemperature());
+        }
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
+            planetaryConditions.setAtmosphere(scenario.getAtmosphere());
+            planetaryConditions.setGravity(scenario.getGravity());
+        }
+        return planetaryConditions;
     }
 
     /**
@@ -537,12 +603,12 @@ public class AtBGameThread extends GameThread {
         int lanceSize;
 
         if (botForce.getTeam() == 2) {
-            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+            lanceSize = getStandardForceSize(contract.getEnemy());
         } else {
-            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+            lanceSize = getStandardForceSize(contract.getEmployerFaction());
         }
 
-        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> Entity.getEntityMajorTypeName(e.getEntityType())));
         comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
@@ -553,13 +619,13 @@ public class AtBGameThread extends GameThread {
             }
 
             if ((i != 0)
-                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                    && !lastType.equals(Entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 forceIdLance++;
                 lanceName = RCG.generate();
                 i = forceIdLance * lanceSize;
             }
 
-            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            lastType = Entity.getEntityMajorTypeName(entity.getEntityType());
             entity.setOwner(botClient.getLocalPlayer());
             String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);

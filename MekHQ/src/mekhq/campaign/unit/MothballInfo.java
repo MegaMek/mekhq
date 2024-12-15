@@ -38,7 +38,7 @@ import mekhq.utilities.MHQXMLUtility;
  * This class is used to store information about a particular unit that is
  * lost when a unit is mothballed, so that it may be restored to as close to
  * its prior state as possible when the unit is reactivated.
- * 
+ *
  * @author NickAragua
  */
 public class MothballInfo {
@@ -62,8 +62,16 @@ public class MothballInfo {
     }
 
     /**
+     * Who was the original tech of this vessel?
+     * @return The original tech
+     */
+    public Person getTech() {
+        return tech;
+    }
+
+    /**
      * Creates a set of mothball info for a given unit
-     * 
+     *
      * @param unit The unit to work with
      */
     public MothballInfo(Unit unit) {
@@ -78,7 +86,7 @@ public class MothballInfo {
 
     /**
      * Restore a unit's pilot, assigned tech and force, to the best of our ability
-     * 
+     *
      * @param unit     The unit to restore
      * @param campaign The campaign in which this is happening
      */
@@ -158,7 +166,7 @@ public class MothballInfo {
 
     /**
      * Deserializer method implemented in standard MekHQ pattern.
-     * 
+     *
      * @return Instance of MothballInfo
      */
     public static MothballInfo generateInstanceFromXML(Node wn, Version version) {

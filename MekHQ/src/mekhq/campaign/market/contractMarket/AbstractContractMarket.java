@@ -2,7 +2,6 @@ package mekhq.campaign.market.contractMarket;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -21,6 +20,13 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.*;
+
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
 /**
  * Abstract base class for various Contract Market types in AtB/Stratcon. Responsible for generation
@@ -174,19 +180,51 @@ public abstract class AbstractContractMarket {
 
     /**
      * Determines the number of required lances to be deployed for a contract. For Mercenary subcontracts
-     * this defaults to 1; otherwise the number is based on the number of combat units in the campaign.
-     * @param campaign
-     * @param contract
+     * this defaults to 1; otherwise, the number is based on the number of combat units in the
+     * campaign. Modified by a 2d6 roll if {@code bypassVariance} is {@code false}.
+     *
+     * @param campaign the current campaign
+     * @param contract the relevant contract
+     * @param bypassVariance if {@code true} requirements will not be semi-randomized.
      * @return The number of lances required to be deployed.
      */
-    public int calculateRequiredLances(Campaign campaign, AtBContract contract) {
-        int maxDeployedLances = calculateMaxDeployedLances(campaign);
+    public int calculateRequiredLances(Campaign campaign, AtBContract contract, boolean bypassVariance) {
         if (contract.isSubcontract()) {
             return 1;
-        } else {
-            int requiredLances = Math.max(AtBContract.getEffectiveNumUnits(campaign) / 6, 1);
-            return Math.min(requiredLances, maxDeployedLances);
         }
+
+        int formationSize = getStandardForceSize(campaign.getFaction());
+        int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
+        int maxDeployedLances = availableForces;
+
+        if (campaign.getCampaignOptions().isUseStrategy()) {
+            maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
+        }
+
+        availableForces = min(availableForces, maxDeployedLances);
+
+        // If we're bypassing variance, we can early exit here
+        if (bypassVariance) {
+            availableForces -= (int) floor((double) availableForces / 3);
+
+            return max(availableForces, 1);
+        }
+
+        // Otherwise, we roll to determine the amount we divide availableForces by
+        int roll = d6(2);
+        double varianceFactor = switch (roll) {
+            case 2 -> 4.5;
+            case 3 -> 4;
+            case 4 -> 3.5;
+            case 10 -> 2.5;
+            case 11 -> 2;
+            case 12 -> 1.5;
+            default -> 3;
+        };
+
+        availableForces -= (int) floor((double) availableForces / varianceFactor);
+
+        return max(availableForces, 1);
     }
 
     /**
@@ -228,7 +266,7 @@ public abstract class AbstractContractMarket {
     }
 
     protected void rollCommandClause(final Contract contract, final int modifier) {
-        final int roll = Compute.d6(2) + modifier;
+        final int roll = d6(2) + modifier;
         if (roll < 3) {
             contract.setCommandRights(ContractCommandRights.INTEGRATED);
         } else if (roll < 8) {
@@ -242,23 +280,23 @@ public abstract class AbstractContractMarket {
 
     protected void rollSalvageClause(AtBContract contract, int mod, int contractMaxSalvagePercentage) {
         contract.setSalvageExchange(false);
-        int roll = Math.min(Compute.d6(2) + mod, 13);
+        int roll = min(d6(2) + mod, 13);
         if (roll < 2) {
             contract.setSalvagePct(0);
         } else if (roll < 4) {
             contract.setSalvageExchange(true);
             int r;
             do {
-                r = Compute.d6(2);
+                r = d6(2);
             } while (r < 4);
-            contract.setSalvagePct(Math.min((r - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePct(min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(Math.min((roll - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePct(min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
     protected void rollSupportClause(AtBContract contract, int mod) {
-        int roll = Compute.d6(2) + mod;
+        int roll = d6(2) + mod;
         contract.setStraightSupport(0);
         contract.setBattleLossComp(0);
         if (roll < 3) {
@@ -268,12 +306,12 @@ public abstract class AbstractContractMarket {
         } else if (roll == 8) {
             contract.setBattleLossComp(10);
         } else {
-            contract.setBattleLossComp(Math.min((roll - 8) * 20, 100));
+            contract.setBattleLossComp(min((roll - 8) * 20, 100));
         }
     }
 
     protected void rollTransportClause(AtBContract contract, int mod) {
-        int roll = Compute.d6(2) + mod;
+        int roll = d6(2) + mod;
         if (roll < 2) {
             contract.setTransportComp(0);
         } else if (roll < 6) {
@@ -299,7 +337,7 @@ public abstract class AbstractContractMarket {
                 AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
                 AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID }
         };
-        int roll = MathUtility.clamp(Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
+        int roll = MathUtility.clamp(d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
         return table[majorPower ? 0 : 1][roll - 2];
     }
 
@@ -316,7 +354,7 @@ public abstract class AbstractContractMarket {
 
     protected void setAttacker(AtBContract contract) {
         boolean isAttacker = !contract.getContractType().isGarrisonType()
-            || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
+            || (contract.getContractType().isReliefDuty() && (d6() < 4))
             || contract.getEnemy().isRebel();
         contract.setAttacker(isAttacker);
     }
@@ -372,12 +410,12 @@ public abstract class AbstractContractMarket {
             // facing front-line units
             mod += 1;
         }
-        contract.setAllySkill(getSkillRating(Compute.d6(2) + mod));
+        contract.setAllySkill(getSkillRating(d6(2) + mod));
         if (year > 2950 && year < 3039 &&
             !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
             mod -= 1;
         }
-        contract.setAllyQuality(getQualityRating(Compute.d6(2) + mod));
+        contract.setAllyQuality(getQualityRating(d6(2) + mod));
     }
 
     protected void setEnemyRating(AtBContract contract, int year) {
@@ -397,12 +435,12 @@ public abstract class AbstractContractMarket {
         if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
             mod += contract.isAttacker() ? 2 : 4;
         }
-        contract.setEnemySkill(getSkillRating(Compute.d6(2) + mod));
+        contract.setEnemySkill(getSkillRating(d6(2) + mod));
         if (year > 2950 && year < 3039 &&
             !Factions.getInstance().getFaction(contract.getEnemyCode()).isClan()) {
             mod -= 1;
         }
-        contract.setEnemyQuality(getQualityRating(Compute.d6(2) + mod));
+        contract.setEnemyQuality(getQualityRating(d6(2) + mod));
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -475,8 +513,7 @@ public abstract class AbstractContractMarket {
 
             // Restore any parent contract references
             for (Contract contract : retVal.contracts) {
-                if (contract instanceof AtBContract) {
-                    final AtBContract atbContract = (AtBContract) contract;
+                if (contract instanceof AtBContract atbContract) {
                     atbContract.restore(c);
                 }
             }

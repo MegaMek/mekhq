@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Recon Evasion</name>
     <shortBriefing>Evade patrols until scan is complete.</shortBriefing>
-    <detailedBriefing>Enemy patrols are sweeping the area, and your forces need to evade detection until scans of the enemy are complete. Survive for the turn limit while preserving at least 50% of your forces to ensure success.</detailedBriefing>
+    <detailedBriefing>Enemy patrols are sweeping the area, and your forces need to evade until scans of the enemy are complete. Survive for the turn limit while preserving at least 50% of your forces to ensure success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -85,6 +85,11 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RECON</forceRole>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
@@ -114,7 +119,7 @@
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>1</timeLimitScaleFactor>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>

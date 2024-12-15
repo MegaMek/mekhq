@@ -292,8 +292,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(lblForce, gridBagConstraints);
 
-            if (null != scenario.getLance(campaign)) {
-                lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
+            if (null != scenario.getCombatTeamById(campaign)) {
+                lblForceDesc.setText(campaign.getForce(scenario.getCombatTeamId()).getFullName());
             } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");
@@ -376,12 +376,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectiveBuilder.append(objective.getDescription());
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
 
             for (String forceName : objective.getAssociatedForceNames()) {
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(forceName);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
             for (String associatedUnitID : objective.getAssociatedUnitIDs()) {
@@ -399,22 +399,22 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 if (associatedUnitName.isBlank()) {
                     continue;
                 }
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(associatedUnitName);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
-            objectiveBuilder.append("\t");
+            objectiveBuilder.append('\t');
             objectiveBuilder.append(objective.getTimeLimitString());
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
 
             for (String detail : objective.getDetails()) {
-                objectiveBuilder.append("\t");
+                objectiveBuilder.append('\t');
                 objectiveBuilder.append(detail);
-                objectiveBuilder.append("\n");
+                objectiveBuilder.append('\n');
             }
 
-            objectiveBuilder.append("\n");
+            objectiveBuilder.append('\n');
         }
 
         objectiveBuilder.append(scenario.getBattlefieldControlDescription());
@@ -927,11 +927,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
         private JTree tree;
-        int index;
+        int forceIndex;
 
-        public TreeMouseAdapter(JTree tree, int index) {
+        public TreeMouseAdapter(JTree tree, int forceIndex) {
             this.tree = tree;
-            this.index = index;
+            this.forceIndex = forceIndex;
         }
 
         @Override
@@ -941,21 +941,20 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             if (command.equalsIgnoreCase("CONFIG_BOT")) {
                 BotConfigDialog pbd = new BotConfigDialog(frame,
                         null,
-                        scenario.getBotForce(index).getBehaviorSettings(),
+                        scenario.getBotForce(forceIndex).getBehaviorSettings(),
                         null);
-                pbd.setBotName(scenario.getBotForce(index).getName());
+                pbd.setBotName(scenario.getBotForce(forceIndex).getName());
                 pbd.setVisible(true);
                 if (!pbd.getResult().isCancelled()) {
-                    scenario.getBotForce(index).setBehaviorSettings(pbd.getBehaviorSettings());
-                    scenario.getBotForce(index).setName(pbd.getBotName());
+                    scenario.getBotForce(forceIndex).setBehaviorSettings(pbd.getBehaviorSettings());
+                    scenario.getBotForce(forceIndex).setName(pbd.getBotName());
                 }
             } else if (command.equalsIgnoreCase("EDIT_UNIT")) {
                 if ((tree.getSelectionCount() > 0) && (tree.getSelectionRows() != null)) {
-                    // row 0 is root node
-                    int i = tree.getSelectionRows()[0] - 1;
-                    UnitEditorDialog med = new UnitEditorDialog(frame,
-                            scenario.getBotForce(index).getFullEntityList(campaign).get(i));
-                    med.setVisible(true);
+                    int unitIndex = tree.getSelectionRows()[0] - 1;
+                    UnitEditorDialog editorDialog = new UnitEditorDialog(frame,
+                            scenario.getBotForce(this.forceIndex).getFullEntityList(campaign).get(unitIndex));
+                    editorDialog.setVisible(true);
                 }
             }
         }
@@ -979,7 +978,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 }
 
                 JMenuItem menuItem;
-                if (path.getPathCount() > 1) {
+                if ((path.getPathCount() > 1) && (tree.getSelectionRows() != null)
+                    && (tree.getSelectionRows()[0] != 0)) {
                     menuItem = new JMenuItem("Edit Unit...");
                     menuItem.setActionCommand("EDIT_UNIT");
                     menuItem.addActionListener(this);

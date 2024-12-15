@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -75,21 +75,23 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
     private JLabel splash;
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
+    private boolean isInAppNewCampaign;
 
     // endregion Variable Declarations
 
     // region Constructors
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
             final @Nullable File campaignFile) {
-        this(frame, application, campaignFile, null);
+        this(frame, application, campaignFile, null, false);
     }
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
-            final @Nullable File campaignFile, StoryArcStub stub) {
+            final @Nullable File campaignFile, StoryArcStub stub, final boolean isInAppNewCampaign) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
         this.storyArcStub = stub;
+        this.isInAppNewCampaign = isInAppNewCampaign;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
@@ -289,12 +291,15 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // Campaign Preset
                 final SelectPresetDialog presetSelectionDialog =
-                    new SelectPresetDialog(getFrame(), false, true);
+                    new SelectPresetDialog(getFrame(), true, true);
                 CampaignPreset preset;
                 boolean isSelect = false;
 
                 switch (presetSelectionDialog.getReturnState()) {
                     case PRESET_SELECTION_CANCELLED -> {
+                        if (isInAppNewCampaign) {
+                            application.exit(false);
+                        }
                         return null;
                     }
                     case PRESET_SELECTION_SELECT -> {
@@ -338,7 +343,8 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
+                    CampaignOptionsDialog optionsDialog =
+                        new CampaignOptionsDialog(dialog, getFrame(), campaign, true, application);
                     optionsDialog.setLocationRelativeTo(getFrame());
                     optionsDialog.applyPreset(preset);
                     if (optionsDialog.showDialog().isCancelled()) {

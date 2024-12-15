@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -21,42 +21,27 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.*;
-
-import megamek.common.*;
-import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.utilities.BoardClassifier;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.BlowingSand;
-import megamek.common.planetaryconditions.EMI;
-import megamek.common.planetaryconditions.Fog;
-import megamek.common.planetaryconditions.Light;
-import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.planetaryconditions.Weather;
-import megamek.common.planetaryconditions.Wind;
+import megamek.common.planetaryconditions.*;
+import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
+import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
@@ -66,12 +51,16 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.*;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * @author Neoancient
@@ -154,7 +143,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public static final int NO_LANCE = -1;
 
     private boolean attacker;
-    private int lanceForceId; // -1 if scenario is not generated for a specific lance (special scenario, big
+    private int combatTeamId; // -1 if scenario is not generated for a specific lance (special scenario, big
                               // battle)
     private AtBLanceRole lanceRole; /*
                                      * set when scenario is created in case it is changed for the next week before
@@ -203,7 +192,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     // key-value pairs linking transports and the units loaded onto them.
     private Map<String, List<String>> transportLinkages;
 
-    private Map<Integer, Integer> numPlayerMinefields;
+    private final Map<Integer, Integer> numPlayerMinefields;
 
     private String terrainType;
 
@@ -218,8 +207,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public AtBScenario() {
         super();
-        lanceForceId = -1;
-        lanceRole = AtBLanceRole.UNASSIGNED;
+        combatTeamId = -1;
+        lanceRole = AtBLanceRole.IN_RESERVE;
         alliesPlayer = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
@@ -235,7 +224,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         SB = StratconBiomeManifest.getInstance();
     }
 
-    public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
+    public void initialize(Campaign c, CombatTeam lance, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
         alliesPlayer = new ArrayList<>();
@@ -247,10 +236,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         entityIds = new HashMap<>();
 
         if (null == lance) {
-            lanceForceId = -1;
-            lanceRole = AtBLanceRole.UNASSIGNED;
+            combatTeamId = -1;
+            lanceRole = AtBLanceRole.IN_RESERVE;
         } else {
-            this.lanceForceId = lance.getForceId();
+            this.combatTeamId = lance.getForceId();
             lanceRole = lance.getRole();
             setMissionId(lance.getMissionId());
 
@@ -337,10 +326,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             lanceCount = 2;
         }
 
-        if (null != getLance(campaign)) {
-            getLance(campaign).refreshCommander(campaign);
-            if (null != getLance(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS)) {
-                rerollsRemaining = getLance(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS).getLevel();
+        if (null != getCombatTeamById(campaign)) {
+            getCombatTeamById(campaign).refreshCommander(campaign);
+            if (null != getCombatTeamById(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS)) {
+                rerollsRemaining = getCombatTeamById(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS).getLevel();
             }
         }
     }
@@ -899,7 +888,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities), campaign);
     }
 
@@ -1464,12 +1453,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             // TODO: replace with TeamLoadoutGenerator call once 0.50.1 errata go in
             boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
-
-            TeamLoadOutGenerator.populateAeroBombs(aircraft,
-                    campaign.getGameYear(),
-                    !isAeroMap,
-                    contract.getEnemyQuality(),
-                    contract.getEnemy().isPirate());
+            TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(campaign.getGame());
+            tlg.populateAeroBombs(
+                aircraft,
+                campaign.getGameYear(),
+                !isAeroMap,
+                contract.getEnemyQuality(),
+                contract.getEnemy().isPirate(),
+                contract.getEnemy().getShortName()
+            );
 
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");
@@ -1651,7 +1643,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceForceId", lanceForceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceForceId", combatTeamId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceRole", lanceRole.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
@@ -1745,7 +1737,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 if (wn2.getNodeName().equalsIgnoreCase("attacker")) {
                     setAttacker(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
-                    lanceForceId = Integer.parseInt(wn2.getTextContent());
+                    combatTeamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
                     lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
@@ -1973,20 +1965,20 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return retVal;
     }
 
-    public int getLanceForceId() {
-        return lanceForceId;
+    public int getCombatTeamId() {
+        return combatTeamId;
     }
 
     public AtBLanceRole getLanceRole() {
         return lanceRole;
     }
 
-    public Lance getLance(Campaign c) {
-        return c.getLances().get(lanceForceId);
+    public CombatTeam getCombatTeamById(Campaign campaign) {
+        return campaign.getCombatTeamsTable().get(combatTeamId);
     }
 
-    public void setLance(Lance l) {
-        lanceForceId = l.getForceId();
+    public void setCombatTeam(CombatTeam combatTeam) {
+        combatTeamId = combatTeam.getForceId();
     }
 
     /**

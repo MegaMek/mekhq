@@ -19,6 +19,7 @@
 package mekhq.campaign.io;
 
 import megamek.Version;
+import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
@@ -34,8 +35,8 @@ import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -77,6 +78,10 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
+
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+
 
 public class CampaignXmlParser {
     private final InputStream is;
@@ -280,8 +285,8 @@ public class CampaignXmlParser {
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     retVal.getUnitMarket().fillFromXML(wn, retVal, version);
                     foundUnitMarket = true;
-                } else if (xn.equalsIgnoreCase("lances")) {
-                    processLanceNodes(retVal, wn);
+                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("combatTeams")) {
+                    processCombatTeamNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
@@ -295,6 +300,11 @@ public class CampaignXmlParser {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
                     retVal.setShipSearchExpiration(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
+                } else if (xn.equalsIgnoreCase("autoResolveBehaviorSettings")) {
+                    retVal.setAutoResolveBehaviorSettings(
+                        firstNonNull(BehaviorSettingsFactory.getInstance().getBehavior(wn.getTextContent()),
+                            BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR)
+                        );
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 } else if (xn.equalsIgnoreCase("partsInUse")) {
@@ -348,10 +358,10 @@ public class CampaignXmlParser {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, Lance> lances = retVal.getLances();
+            Hashtable<Integer, CombatTeam> lances = retVal.getCombatTeamsTable();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
-                    lances.put(f.getId(), new Lance(f.getId(), retVal));
+                    lances.put(f.getId(), new CombatTeam(f.getId(), retVal));
                     logger.warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
@@ -691,6 +701,10 @@ public class CampaignXmlParser {
                     retVal.setRetainerStartDate(LocalDate.parse(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("crimeRating")) {
                     retVal.setCrimeRating(Integer.parseInt(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("initiativeBonus")) {
+                    retVal.setInitiativeBonus(Integer.parseInt(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("initiativeMaxBonus")) {
+                    retVal.setInitiativeMaxBonus(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("crimePirateModifier")) {
                     retVal.setCrimePirateModifier(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("dateOfLastCrime")) {
@@ -762,29 +776,30 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static void processLanceNodes(Campaign retVal, Node wn) {
-        NodeList wList = wn.getChildNodes();
+    private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
+        NodeList workingNodes = workingNode.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Okay, let's iterate through the children, eh?
+        for (int x = 0; x < workingNodes.getLength(); x++) {
+            Node wn2 = workingNodes.item(x);
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if (!wn2.getNodeName().equalsIgnoreCase("lance")) {
+            if (!wn2.getNodeName().equalsIgnoreCase("lance")
+                && !wn2.getNodeName().equalsIgnoreCase("combatTeam")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger.error("Unknown node type not loaded in Lance nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in combatTeam nodes: " + wn2.getNodeName());
                 continue;
             }
 
-            Lance l = Lance.generateInstanceFromXML(wn2);
+            CombatTeam combatTeam = CombatTeam.generateInstanceFromXML(wn2);
 
-            if (l != null) {
-                retVal.importLance(l);
+            if (combatTeam != null) {
+                campaign.addCombatTeam(combatTeam);
             }
         }
     }
@@ -845,6 +860,7 @@ public class CampaignXmlParser {
             }
         }
 
+        recalculateCombatTeams(retVal);
         logger.info("Load of Force Organization complete!");
     }
 

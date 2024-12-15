@@ -195,7 +195,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>2.0</forceMultiplier>
                 <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
@@ -207,6 +207,9 @@
                 <syncDeploymentType>SameEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>INTERCEPTOR</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>

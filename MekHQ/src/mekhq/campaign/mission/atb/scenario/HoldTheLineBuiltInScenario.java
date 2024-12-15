@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -30,6 +28,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class HoldTheLineBuiltInScenario extends AtBScenario {
@@ -79,7 +79,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT,
+        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT,
                 isAttacker() ? 0 : 4, 0, campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);

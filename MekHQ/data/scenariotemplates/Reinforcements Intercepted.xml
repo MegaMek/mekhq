@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>VIP Capture</name>
-    <shortBriefing>Capture VIP, disable or force ejection.</shortBriefing>
-    <detailedBriefing>The objective is to capture a high-value target by disabling their unit or forcing an ejection, then securing the ejected individual. The target must remain alive and cannot escape the battlefield. Preserve 50% of your forces, and destroy at least 50% of the VIP’s bodyguards.</detailedBriefing>
+    <name>Reinforcements Intercepted</name>
+    <shortBriefing>Destroy hostile forces.</shortBriefing>
+    <detailedBriefing>Hostile units have intercepted your reinforcements. Destroy at least 50% of the enemy force while preserving 50% of your own units.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -75,126 +75,74 @@
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
+                <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-        <entry>
-            <key>VIP</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones />
-                <destinationZone>5</destinationZone>
-                <fixedUnitCount>1</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>VIP</forceName>
-                <generationMethod>3</generationMethod>
-                <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>3</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <subjectToRandomRemoval>false</subjectToRandomRemoval>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
-                <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RECON</forceRole>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>VIP</associatedForceName>
+                <associatedForceName>OpFor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Capture the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Capture</objectiveCriterion>
-            <percentage>100</percentage>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
-    <scenarioObjective>
-        <associatedForceNames>
-            <associatedForceName>OpFor</associatedForceName>
-        </associatedForceNames>
-        <associatedUnitIDs />
-        <successEffects>
-            <successEffect>
-                <effectType>ScenarioVictory</effectType>
-                <effectScaling>Fixed</effectScaling>
-                <howMuch>1</howMuch>
-            </successEffect>
-        </successEffects>
-        <failureEffects>
-            <failureEffect>
-                <effectType>ScenarioDefeat</effectType>
-                <effectScaling>Fixed</effectScaling>
-                <howMuch>1</howMuch>
-            </failureEffect>
-        </failureEffects>
-        <additionalDetails />
-        <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
-        <destinationEdge>NONE</destinationEdge>
-        <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-        <percentage>50</percentage>
-        <timeLimitAtMost>true</timeLimitAtMost>
-        <timeLimitType>None</timeLimitType>
-    </scenarioObjective>
-    <scenarioObjective>
-        <associatedForceNames>
-            <associatedForceName>Player</associatedForceName>
-        </associatedForceNames>
-        <associatedUnitIDs />
-        <successEffects>
-            <successEffect>
-                <effectType>ScenarioVictory</effectType>
-                <effectScaling>Fixed</effectScaling>
-                <howMuch>1</howMuch>
-            </successEffect>
-        </successEffects>
-        <failureEffects>
-            <failureEffect>
-                <effectType>ScenarioDefeat</effectType>
-                <effectScaling>Fixed</effectScaling>
-                <howMuch>1</howMuch>
-            </failureEffect>
-        </failureEffects>
-        <additionalDetails />
-        <description>Preserve 50% of the following force(s) and unit(s):</description>
-        <destinationEdge>NONE</destinationEdge>
-        <objectiveCriterion>Preserve</objectiveCriterion>
-        <percentage>50</percentage>
-        <timeLimitAtMost>true</timeLimitAtMost>
-        <timeLimitType>None</timeLimitType>
-    </scenarioObjective>
 </ScenarioTemplate>
