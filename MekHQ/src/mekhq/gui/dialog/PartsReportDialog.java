@@ -154,10 +154,10 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 campaign.getShoppingList().addShoppingItem(partToBuy, 1, campaign);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
 
@@ -165,19 +165,19 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1,
+                        "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                         CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 if (quantity <= 0) {
                     return;
                 }
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
 
@@ -239,29 +239,29 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
         Action addInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1,
+                        "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                         CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 while (quantity > 0) {
                     campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
                     --quantity;
                 }
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
 
@@ -320,7 +320,7 @@ public class PartsReportDialog extends JDialog {
         ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
         ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
         JLabel ignorePartsUnderLabel = new JLabel(resourceMap.getString("lblIgnoreSparesUnderQuality.text"));
-        if(campaign.getIgnoreSparesUnderQuality() != null) {
+        if (campaign.getIgnoreSparesUnderQuality() != null) {
             ignoreSparesUnderQualityCB.setSelectedItem(campaign.getIgnoreSparesUnderQuality());
         } else {
             ignoreSparesUnderQualityCB.setSelectedItem(" ");
@@ -368,7 +368,7 @@ public class PartsReportDialog extends JDialog {
      * @return minimum internal quality level to use
      */
     private PartQuality getMinimumQuality(String rating) {
-        if(rating == null) {
+        if (rating == null) {
             rating = " ";
         }
         if (rating.equals(" ")) {
@@ -379,10 +379,10 @@ public class PartsReportDialog extends JDialog {
         }
     }
 
-    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
-        if (piu.equals(new PartInUse((Part) newPart))) {
+    private void refreshOverviewSpecificPart(int row, PartInUse partInUse, IAcquisitionWork newPart) {
+        if (partInUse.equals(new PartInUse((Part) newPart))) {
             // Simple update
-            campaign.updatePartInUse(piu, ignoreMothballedCheck.isSelected(),
+            campaign.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
                     getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem()));
             overviewPartsModel.fireTableRowsUpdated(row, row);
         } else {
@@ -407,7 +407,7 @@ public class PartsReportDialog extends JDialog {
 
     private Set<PartInUse> getPartsInUseFromTable() {
         Set<PartInUse> partsInUse = new HashSet<PartInUse>();
-        for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
             partsInUse.add(overviewPartsModel.getPartInUse(row));
         }
         return partsInUse;
@@ -423,19 +423,19 @@ public class PartsReportDialog extends JDialog {
         refreshOverviewPartsInUse();
     }
 
-    private int findTopUpAmount(PartInUse piu) {
-        IAcquisitionWork partToBuy = piu.getPartToBuy();
-        int inventory = piu.getStoreCount() + piu.getTransferCount() + piu.getPlannedCount();
-        int needed = (int)Math.ceil(piu.getRequestedStock()/100.0 * piu.getUseCount());
+    private int findTopUpAmount(PartInUse partInUse) {
+        IAcquisitionWork partToBuy = partInUse.getPartToBuy();
+        int inventory = partInUse.getStoreCount() + partInUse.getTransferCount() + partInUse.getPlannedCount();
+        int needed = (int)Math.ceil(partInUse.getRequestedStock()/100.0 * partInUse.getUseCount());
         int toBuy = needed-inventory;
 
-        if(piu.getIsBundle() == true) {
-            toBuy = (int)Math.ceil((float)toBuy * piu.getTonnagePerItem() / 5);
+        if (partInUse.getIsBundle() == true) {
+            toBuy = (int)Math.ceil((float)toBuy * partInUse.getTonnagePerItem() / 5);
             //special case for ammo, need to track down if there's a way to code this properly
         }
 
-        if(toBuy > 0) {
-            System.out.println("TPI: " + piu.getTonnagePerItem() + " " + String.format("Inv: %d needed: %d tobuy: %d", inventory, needed, toBuy));
+        if (toBuy > 0) {
+            System.out.println("TPI: " + partInUse.getTonnagePerItem() + " " + String.format("Inv: %d needed: %d tobuy: %d", inventory, needed, toBuy));
             System.out.println("||");
         }
 
@@ -443,24 +443,24 @@ public class PartsReportDialog extends JDialog {
         return toBuy;
     }
 
-    public void storePIU() {
+    public void storePartInUse() {
         campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
         campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
-        if(ignoreSparesUnderQualityCB == null) {
+        if (ignoreSparesUnderQualityCB == null) {
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
         } else{
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(ignoreSparesUnderQualityCB.getSelectedItem().toString()));
         }
 
         Map<String,Double> stockMap = new LinkedHashMap<>();
-        for(int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
-            PartInUse piu = overviewPartsModel.getPartInUse(row);
-            stockMap.put(piu.getDescription(), piu.getRequestedStock());
+        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
         }
         campaign.setPartsInUseRequestedStockMap(stockMap);
     }
 
     private void onClose() {
-        storePIU();
+        storePartInUse();
     }  
 }

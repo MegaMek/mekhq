@@ -107,27 +107,27 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        PartInUse piu = getPartInUse(row);
+        PartInUse partInUse = getPartInUse(row);
         switch (column) {
             case COL_PART:
-                return piu.getDescription();
+                return partInUse.getDescription();
             case COL_IN_USE:
-                return FORMATTER.format(piu.getUseCount());
+                return FORMATTER.format(partInUse.getUseCount());
             case COL_STORED:
-                return (piu.getStoreCount() > 0) ? FORMATTER.format(piu.getStoreCount()) : EMPTY_CELL;
+                return (partInUse.getStoreCount() > 0) ? FORMATTER.format(partInUse.getStoreCount()) : EMPTY_CELL;
             case COL_TONNAGE:
-                return (piu.getStoreTonnage() > 0) ? FORMATTER.format(piu.getStoreTonnage()) : EMPTY_CELL;
+                return (partInUse.getStoreTonnage() > 0) ? FORMATTER.format(partInUse.getStoreTonnage()) : EMPTY_CELL;
             case COL_IN_TRANSFER:
-                if (piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0) {
-                    return FORMATTER.format(piu.getTransferCount());
-                } else if (piu.getPlannedCount() > 0) {
+                if (partInUse.getTransferCount() > 0 && partInUse.getPlannedCount() <= 0) {
+                    return FORMATTER.format(partInUse.getTransferCount());
+                } else if (partInUse.getPlannedCount() > 0) {
                     return String.format("%s [+%s]",
-                            FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
+                            FORMATTER.format(partInUse.getTransferCount()), FORMATTER.format(partInUse.getPlannedCount()));
                 } else {
                     return EMPTY_CELL;
                 }
             case COL_COST:
-                return piu.getCost().toAmountAndSymbolString();
+                return partInUse.getCost().toAmountAndSymbolString();
             case COL_BUTTON_BUY:
                 return resourceMap.getString("buy.text");
             case COL_BUTTON_BUY_BULK:
@@ -141,7 +141,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_BUTTON_GMADD_BULK:
                 return resourceMap.getString("addInBulk.text");
             case COL_REQUSTED_STOCK:
-                return piu.getRequestedStock() + "%";
+                return partInUse.getRequestedStock() + "%";
             default:
                 return EMPTY_CELL;
         }
@@ -173,8 +173,8 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     @SuppressWarnings("unchecked")
-    public void updateRow(int row, PartInUse piu) {
-        ((ArrayList<PartInUse>) data).set(row, piu);
+    public void updateRow(int row, PartInUse partInUse) {
+        ((ArrayList<PartInUse>) data).set(row, partInUse);
         fireTableRowsUpdated(row, row);
     }
 
@@ -412,13 +412,13 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        if(columnIndex == COL_REQUSTED_STOCK) {
+        if (columnIndex == COL_REQUSTED_STOCK) {
             try {
                 //Quick String parsing here, we ignore anything that isn't a number or a . so that a user can input a % symbol or not, it's added regardless
                 double newVal = Double.parseDouble(value.toString().replaceAll("[^0-9.]", ""));
-                PartInUse piu = getPartInUse(rowIndex);
-                if(piu != null) {
-                    piu.setRequestedStock(newVal);
+                PartInUse partInUse = getPartInUse(rowIndex);
+                if (partInUse != null) {
+                    partInUse.setRequestedStock(newVal);
                     fireTableCellUpdated(rowIndex, columnIndex);
                 }
             } catch (NumberFormatException e) {

@@ -297,7 +297,7 @@ public class CampaignXmlParser {
                     retVal.setShipSearchExpiration(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
-                } else if(xn.equalsIgnoreCase("partsInUse")) {
+                } else if (xn.equalsIgnoreCase("partsInUse")) {
                     processPartsInUse(retVal, wn);
                 }
             } else {
@@ -1600,21 +1600,21 @@ public class CampaignXmlParser {
         System.out.println("Processing a partInUse list");
         NodeList wList = wn.getChildNodes();
 
-        for(int i = 0; i < wList.getLength(); i++) {
+        for (int i = 0; i < wList.getLength(); i++) {
             Node wn2 = wList.item(i);
 
-            if(wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if(wn2.getNodeName().equalsIgnoreCase("ignoreMothBalled")) {
+            if (wn2.getNodeName().equalsIgnoreCase("ignoreMothBalled")) {
                 retVal.setIgnoreMothballed(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if(wn2.getNodeName().equalsIgnoreCase("topUpWeekly")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("topUpWeekly")) {
                 retVal.setTopUpWeekly(Boolean.parseBoolean(wn2.getTextContent()));
-            } else if(wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
                 PartQuality ignoreQuality = PartQuality.fromName(wn2.getTextContent(), retVal.getCampaignOptions().isReverseQualityNames());
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
-            } else if(wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
                 processPartsInUseRequestedStockMap(retVal, wn2);
             } else {
                 logger.error("Unkown node type not loaded in PartInUse nodes: " + wn2.getNodeName());
@@ -1628,14 +1628,14 @@ public class CampaignXmlParser {
 
         Map<String, Double> partInUseStockMap = new LinkedHashMap<>();
 
-        for(int i = 0; i < wList.getLength(); i++) {
+        for (int i = 0; i < wList.getLength(); i++) {
             Node wn2 = wList.item(i);
 
-            if(wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if(!wn2.getNodeName().equalsIgnoreCase("partInUseMapEntry")) {
+            if (!wn2.getNodeName().equalsIgnoreCase("partInUseMapEntry")) {
                 logger.error("Unkown node tpye not loaded in PartInUseStockMap nodes: " + wn2.getNodeName());
             }
 
@@ -1655,17 +1655,17 @@ public class CampaignXmlParser {
         for(int i = 0; i < wList.getLength(); i++) {
             Node wn2 = wList.item(i);
 
-            if(wn2.getNodeType() != Node.ELEMENT_NODE) {
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
 
-            if(wn2.getNodeName().equalsIgnoreCase("partInUseMapKey")) {
+            if (wn2.getNodeName().equalsIgnoreCase("partInUseMapKey")) {
                 key = wn2.getTextContent();
-            } else if(wn2.getNodeName().equalsIgnoreCase("partInUseMapVal")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMapVal")) {
                 val = Double.parseDouble(wn2.getTextContent());
             }
         }
-        if(key != null) {
+        if (key != null) {
             partsInUseRequestedStockMap.put(key, val);
         }
     }
