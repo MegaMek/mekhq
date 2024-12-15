@@ -862,8 +862,27 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(null);
     }
 
+
+    /**
+     * Auto-resolve the selected scenario.
+     * Can run both the auto resolve using princess or using the ACS engine
+     */
     private void autoResolveScenario() {
-        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        Scenario scenario = getSelectedScenario();
+        if (scenario == null) {
+            return;
+        }
+        switch(getCampaignOptions().getAutoResolveMethod()) {
+            case ABSTRACT_COMBAT ->
+            case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        }
+    }
+    private Scenario getSelectedScenario() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
     private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {

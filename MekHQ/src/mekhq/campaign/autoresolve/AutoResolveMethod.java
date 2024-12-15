@@ -19,8 +19,53 @@
 package mekhq.campaign.autoresolve;
 
 
+import mekhq.MekHQ;
+
+import java.util.Optional;
+import java.util.ResourceBundle;
+
 /**
  * @author Luana Coppio
  */
-public class AutoResolveMethod {
+public enum AutoResolveMethod {
+    PRINCESS("AutoResolveMethod.PRINCESS.text", "AutoResolveMethod.PRINCESS.toolTipText"),
+    ABSTRACT_COMBAT("AutoResolveMethod.ABSTRACT_COMBAT.text", "AutoResolveMethod.ABSTRACT_COMBAT.toolTipText");
+
+    private final String name;
+    private final String toolTipText;
+
+    AutoResolveMethod(final String name, final String toolTipText) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoResolveMethod",
+            MekHQ.getMHQOptions().getLocale());
+        this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
+    }
+
+    public String getToolTipText() {
+        return toolTipText;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static Optional<AutoResolveMethod> fromIntSafe(int index) {
+        if (index < 0 || index >= values().length) {
+            return Optional.empty();
+        }
+        return Optional.of(values()[index]);
+    }
+
+    public static Optional<AutoResolveMethod> fromStringSafe(String method) {
+        return switch (method.toUpperCase()) {
+            case "PRINCESS" -> Optional.of(PRINCESS);
+            case "ABSTRACT_COMBAT" -> Optional.of(ABSTRACT_COMBAT);
+            default -> Optional.empty();
+        };
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
