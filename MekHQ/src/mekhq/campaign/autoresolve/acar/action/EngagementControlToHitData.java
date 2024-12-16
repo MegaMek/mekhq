@@ -21,6 +21,7 @@ package mekhq.campaign.autoresolve.acar.action;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
+import mekhq.campaign.autoresolve.component.Formation;
 
 public class EngagementControlToHitData extends TargetRoll {
 
@@ -43,6 +44,7 @@ public class EngagementControlToHitData extends TargetRoll {
         processMorale(toHit, game, engagementControl);
         processEngagementAndControlChosen(toHit, game, engagementControl);
         processSizeDifference(toHit, game, engagementControl);
+        processPlayerSkill(toHit, game, attackingFormation);
         return toHit;
     }
 
@@ -59,6 +61,19 @@ public class EngagementControlToHitData extends TargetRoll {
                 break;
             default:
                 break;
+        }
+    }
+
+    private static void processPlayerSkill(EngagementControlToHitData toHit, SimulationContext game, Formation formation) {
+        switch (game.getPlayerSkill(formation.getOwnerId())) {
+            case NONE -> toHit.addModifier(4, "No player skill");
+            case ULTRA_GREEN -> toHit.addModifier(3, "Ultra green player");
+            case GREEN -> toHit.addModifier(2, "Green player");
+            case REGULAR -> toHit.addModifier(1, "Regular player");
+            case VETERAN -> toHit.addModifier(0, "Veteran player");
+            case ELITE -> toHit.addModifier(-1, "Elite player");
+            case HEROIC -> toHit.addModifier(-2, "Heroic player");
+            case LEGENDARY -> toHit.addModifier(-3, "Legendary player");
         }
     }
 

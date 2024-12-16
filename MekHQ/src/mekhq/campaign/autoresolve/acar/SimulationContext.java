@@ -61,7 +61,6 @@ public class SimulationContext implements IGame {
     * Objectives that must be considered during the game
     */
     private static final int AWAITING_FIRST_TURN = -1;
-    private final List<String> forceMustBePreserved = new ArrayList<>();
     private final List<Action> pendingActions = new ArrayList<>();
 
     /**
@@ -107,18 +106,8 @@ public class SimulationContext implements IGame {
     public SimulationContext(AtBScenario scenario, SimulationOptions gameOptions, SetupForces setupForces) {
         this.options = gameOptions;
         this.scenario = scenario;
-        this.setupScenarioObjectives();
         setBoard(0, new Board());
         setupForces.createForcesOnGame(this);
-    }
-
-    private void setupScenarioObjectives() {
-        forceMustBePreserved.clear();
-        scenario.getScenarioObjectives().forEach(objective -> {
-            if (objective.getObjectiveCriterion().equals(ScenarioObjective.ObjectiveCriterion.Preserve)) {
-                forceMustBePreserved.addAll(objective.getAssociatedForceNames());
-            }
-        });
     }
 
     public AtBScenario getScenario() {
@@ -185,6 +174,10 @@ public class SimulationContext implements IGame {
 
         // Return the number of selected entities.
         return retVal;
+    }
+
+    public SkillLevel getPlayerSkill(int playerId) {
+        return playerSkillLevels.getOrDefault(playerId, SkillLevel.ULTRA_GREEN);
     }
 
     @Override

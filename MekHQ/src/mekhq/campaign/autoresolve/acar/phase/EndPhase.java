@@ -116,7 +116,6 @@ public class EndPhase extends PhaseHandler {
                 var entityOpt = getContext().getEntity(element.getId());
                 if (entityOpt.isPresent()) {
                     var entity = entityOpt.get();
-                    getContext().addUnitToGraveyard(entity);
                     var roll = Compute.rollD6(2);
                     switch (roll.getIntValue()) {
                         case 3, 4, 10, 11 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
@@ -125,13 +124,13 @@ public class EndPhase extends PhaseHandler {
                     }
                     DamageApplierChooser.damageRemovedEntity(entity, entity.getRemovalCondition());
                     reporter.reportUnitDestroyed(entity);
-                    getSimulationManager().getGame().addUnitToGraveyard(entity);
+                    getContext().addUnitToGraveyard(entity);
                 }
             }
 
             formation.removeUnit(unit);
             if (formation.getUnits().isEmpty()) {
-                getSimulationManager().getGame().removeFormation(formation);
+                getContext().removeFormation(formation);
             }
         }
     }
