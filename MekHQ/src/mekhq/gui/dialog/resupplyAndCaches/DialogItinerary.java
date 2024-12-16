@@ -143,13 +143,18 @@ public class DialogItinerary {
         descriptionPanel.setBorder(BorderFactory.createTitledBorder(
             String.format(resources.getString("dialogBorderTitle.text"), speakerName)));
         descriptionPanel.add(description);
-        dialog.add(descriptionPanel, BorderLayout.CENTER);
 
-        // Create a panel to display the icon and the message
+        // Create the main panel to hold the description and image
         JPanel panel = new JPanel(new BorderLayout());
         JLabel imageLabel = new JLabel(speakerIcon);
         panel.add(imageLabel, BorderLayout.CENTER);
         panel.add(descriptionPanel, BorderLayout.SOUTH);
+
+        // Wrap the main content panel (panel) in a JScrollPane for scrolling
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Create the buttons and add their action listeners.
         JButton confirmButton = new JButton(resources.getString("confirmAccept.text"));
@@ -189,8 +194,8 @@ public class DialogItinerary {
             case RESUPPLY_LOOT -> buttonPanel.add(okButton);
         }
 
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
+        // Add the scroll pane for content and button panel to the dialog
+        dialog.add(scrollPane, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.pack();
