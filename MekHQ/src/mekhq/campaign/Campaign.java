@@ -148,6 +148,7 @@ import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
@@ -365,6 +366,7 @@ public class Campaign implements ITechManager {
         automatedMothballUnits = new ArrayList<>();
         topUpWeekly = false;
         ignoreMothballed =  false;
+        ignoreSparesUnderQuality = QUALITY_A;
 
     }
 
@@ -8826,7 +8828,8 @@ public class Campaign implements ITechManager {
     public void writePartInUseToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality.toName(campaignOptions.isReverseQualityNames()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality",
+            ignoreSparesUnderQuality.toName(campaignOptions.isReverseQualityNames()));
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMap");
         writePartInUseMapToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMap");
