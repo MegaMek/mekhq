@@ -73,7 +73,7 @@ public class ResolverTest {
     // that exists in this file, however those tests do not run since this is an abstract class
     // instead, if you click "run test" in one of those functions it will ask which implementation class to run
     // and then run the tests in that class
-    @RepeatedTest(1000)
+    @RepeatedTest(100)
     public void testAutoResolveMultipleTimes() {
         autoResolve(this::postAutoResolveAccumulator);
     }

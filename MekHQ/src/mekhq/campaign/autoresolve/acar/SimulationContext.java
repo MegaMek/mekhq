@@ -121,13 +121,6 @@ public class SimulationContext implements IGame {
         });
     }
 
-    public MapSettings getMapSettings() {
-        if (mapSettings == null) {
-            mapSettings = MapSettings.getInstance();
-        }
-        return mapSettings;
-    }
-
     public AtBScenario getScenario() {
         return scenario;
     }
@@ -192,21 +185,6 @@ public class SimulationContext implements IGame {
 
         // Return the number of selected entities.
         return retVal;
-    }
-
-    /**
-     * Returns an enumeration of salvageable entities.
-     */
-    public List<Entity> getGraveyardEntities() {
-        List<Entity> destroyed = new ArrayList<>();
-        for (Entity entity : this.graveyard) {
-            if ((entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
-                || (entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)) {
-                destroyed.add(entity);
-            }
-        }
-
-        return destroyed;
     }
 
     @Override
@@ -396,7 +374,15 @@ public class SimulationContext implements IGame {
 
     @Override
     public List<InGameObject> getGraveyard() {
-        return List.of();
+        List<InGameObject> destroyed = new ArrayList<>();
+        for (Entity entity : this.graveyard) {
+            if ((entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
+                || (entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)) {
+                destroyed.add(entity);
+            }
+        }
+
+        return destroyed;
     }
 
     @Override

@@ -23,6 +23,7 @@ import megamek.common.Entity;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.IGame;
 import megamek.common.event.PostGameResolution;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -58,7 +59,7 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
         Vector<Entity> entities = new Vector<>();
         survivingEntities.forEach(entities::addElement);
         removedEntities.stream()
-            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_CAPTURED)
+            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_NEVER_JOINED)
             .forEach(entities::addElement);
         return entities.elements();
     }
@@ -83,14 +84,16 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
         Vector<Entity> graveyard = new Vector<>();
         removedEntities.stream()
             .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE
-                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)
+                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED
+                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_CAPTURED
+                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_PUSHED)
             .forEach(graveyard::addElement);
         return graveyard.elements();
     }
 
     @Override
     public Enumeration<Entity> getWreckedEntities() {
-        return null;
+        throw new NotImplementedException("Method not implemented");
     }
 
     @Override

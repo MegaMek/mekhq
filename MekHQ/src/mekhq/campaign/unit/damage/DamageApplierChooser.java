@@ -103,7 +103,7 @@ public class DamageApplierChooser {
      *      * SALVAGEABLE: crew may die, entity must be destroyed, 75% of the total armor is applied as damage
      *      * CAPTURED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
      *      * EJECTED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
-     *      * DEVASTATED: crew may survive, entity must be destroyed, no damage applied
+     *      * DEVASTATED: crew may survive, entity must be destroyed, 500% of the total armor is applied as damage
      *      * OTHER: crew may die, entity may be destroyed, 33% of the total armor applied as damage
      * The amount of damage applied present right now was decided arbitrarily and can be changed later, maybe even make it follow
      * a config file, client settings, etc.
@@ -114,7 +114,7 @@ public class DamageApplierChooser {
     public static int damageRemovedEntity(Entity entity, int removalCondition) {
         double targetDamage = switch (removalCondition) {
             case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> (double) (entity.getTotalOArmor() * (1 / (Compute.d6() + 1)));
-            case IEntityRemovalConditions.REMOVE_DEVASTATED -> -1; // no damage is actually applied
+            case IEntityRemovalConditions.REMOVE_DEVASTATED -> entity.getTotalOArmor() * 5; // no damage is actually applied
             case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
             case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
             default -> entity.getTotalOArmor() * 0.33;

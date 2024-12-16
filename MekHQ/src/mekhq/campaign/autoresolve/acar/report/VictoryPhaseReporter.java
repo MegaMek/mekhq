@@ -84,5 +84,22 @@ public class VictoryPhaseReporter {
                 .add(((Entity) entity).getCrew().getHits())
                 .indent(2));
         }
+
+        var deadEntities = game.getGraveyard().stream()
+            .filter(e -> e.getOwnerId() == player.getId())
+            .filter(Entity.class::isInstance).toList();
+
+        reportConsumer.accept(new PublicReportEntry(5006).add(new PlayerNameReportEntry(player).reportText())
+            .add(deadEntities.size()).indent());
+
+        for (var entity : deadEntities) {
+            reportConsumer.accept(new PublicReportEntry(5004)
+                .add(new EntityNameReportEntry((Entity) entity).reportText())
+                .add(String.format("%.2f%%", ((Entity) entity).getArmorRemainingPercent() * 100))
+                .add(String.format("%.2f%%", ((Entity) entity).getInternalRemainingPercent() * 100))
+                .add(((Entity) entity).getCrew().getName())
+                .add(((Entity) entity).getCrew().getHits())
+                .indent(2));
+        }
     }
 }

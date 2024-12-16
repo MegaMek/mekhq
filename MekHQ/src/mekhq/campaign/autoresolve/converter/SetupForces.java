@@ -649,7 +649,8 @@ public class SetupForces {
                     topLevel = false;
                 }
                 entity.setForceString("");
-                entity.setGame(stdGame);
+//                entity.setGame(stdGame);
+                entity.setIGame(game);
                 game.addEntity(entity);
                 game.getForces().addEntity(entity, realId);
             }
