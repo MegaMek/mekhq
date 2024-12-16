@@ -145,6 +145,7 @@ import java.util.stream.Collectors;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -359,6 +360,7 @@ public class Campaign implements ITechManager {
         automatedMothballUnits = new ArrayList<>();
         topUpWeekly = false;
         ignoreMothballed =  false;
+        ignoreSparesUnderQuality = QUALITY_A;
 
     }
 
