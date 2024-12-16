@@ -805,22 +805,19 @@ public class StratconRulesManager {
      *     that facility is created.</li>
      *     <li>If the deployment coordinates are empty, a chance-based scenario may be created depending
      *     on the scenario odds.</li>
-     *     <li>If a scenario is revealed (either from the facility or randomly):
+     *     <li>If a scenario is revealed (either from the facility or randomly):</li>
      *         <li>- The deployed force is assigned to that scenario.</li>
      *         <li>- The scenario is finalized and parameters are adjusted accordingly.</li>
-     *     </li>
-     *     <li>If a deploying force is performing a scouting mission:
+     *     <li>If a deploying force is performing a scouting mission:</li>
      *         <li>- The target coordinates may be shifted to an unoccupied adjacent coordinate if available.</li>
-     *     </li>
      *     <li>If the coordinates contain a non-allied facility or qualify for a new scenario, a
-     *     scenario is generated:
+     *     scenario is generated:</li>
      *         <li>- If forces are already deployed at the location, generate a scenario involving
      *         these forces.</li>
      *         <li>- If no forces are present, assign available forces from the campaign or randomly
      *         select a suitable combat team for the scenario.</li>
      *         <li>- If applicable, determine whether the scenario is under liaison command based on
      *             contract command rights, and update the scenario requirements.</li>
-     *     </li>
      * </ol>
      *
      * @param coords   the {@link StratconCoords} representing the deployment coordinates.
