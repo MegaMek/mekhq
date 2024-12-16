@@ -25,6 +25,7 @@ import megamek.common.IGame;
 import megamek.common.event.PostGameResolution;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -120,5 +121,18 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
     @Override
     public Enumeration<Entity> getDevastatedEntities() {
         return devastated.elements();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+            .append("game", game)
+            .append("controlledScenario", controlledScenario)
+            .append("survived", survived)
+            .append("retreated", retreated)
+            .append("graveyard", graveyard)
+            .append("devastated", devastated)
+            .append("wrecked", wrecked)
+            .toString();
     }
 }
