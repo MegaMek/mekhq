@@ -102,6 +102,7 @@ import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -4006,11 +4007,18 @@ public class Campaign implements ITechManager {
         // Loop through available contracts, rolling for additional Support Points until we run
         // out of Admin/Transport personnel, or we run out of active contracts
         for (AtBContract contract : sortedContracts) {
-            int negoatiatedSupportPoints = 0;
-            int maximumSupportPointsNegotiated = contract.getRequiredLances();
-
             if (adminTransport.isEmpty()) {
                 break;
+            }
+
+            int negoatiatedSupportPoints = 0;
+            int maximumSupportPointsNegotiated = 1;
+
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null) {
+                List<StratconTrackState> tracks = campaignState.getTracks();
+
+                maximumSupportPointsNegotiated = tracks.isEmpty() ? 1 : tracks.size();
             }
 
             int availableAdmins = adminTransport.size();
