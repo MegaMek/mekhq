@@ -8829,7 +8829,7 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality",
-            ignoreSparesUnderQuality.toName(campaignOptions.isReverseQualityNames()));
+            ignoreSparesUnderQuality.name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMap");
         writePartInUseMapToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMap");
@@ -8839,7 +8839,8 @@ public class Campaign implements ITechManager {
         for(String key : partsInUseRequestedStockMap.keySet()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMapEntry");
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapKey", key);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapVal", partsInUseRequestedStockMap.get(key));
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapVal",
+                partsInUseRequestedStockMap.get(key));
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
     }
