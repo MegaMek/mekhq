@@ -222,6 +222,7 @@ public class PerformResupply {
      * @param resupply the {@link Resupply} instance containing convoy and mission-specific data.
      */
     public static void loadPlayerConvoys(Resupply resupply) {
+        final Campaign campaign = resupply.getCampaign();
         final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
 
         // Sort the player's available convoys according to cargo space, largest -> smallest
@@ -248,18 +249,39 @@ public class PerformResupply {
             Double cargoCapacity = playerConvoys.get(convoy);
             List<Part> convoyItems = new ArrayList<>();
 
+            // It is technically possible to end up with one or more items that won't fit,
+            // we need an early break to avoid situations where we infinite loop due to a
+            // particularly large item.
             while (!convoyContents.isEmpty() && cargoCapacity > 0) {
-                for (Part part : convoyContents) {
+                boolean partAdded = false; // Ensure at least one part is removed per iteration
+
+                // Iterate over parts to find what can fit
+                Iterator<Part> iterator = convoyContents.iterator();
+                while (iterator.hasNext()) {
+                    Part part = iterator.next();
                     if (cargoCapacity - part.getTonnage() >= 0) {
                         convoyItems.add(part);
                         cargoCapacity -= part.getTonnage();
+                        iterator.remove(); // Remove directly during iteration
+                        partAdded = true;
                     }
                 }
 
-                convoyContents.removeAll(convoyItems);
+                // Break the loop if no part was added in this iteration to avoid infinite looping
+                if (!partAdded) {
+                    break;
+                }
             }
 
             processConvoy(resupply, convoyItems, convoy);
+        }
+
+        if (!convoyContents.isEmpty()) {
+            campaign.addReport(String.format(resources.getString("convoyInsufficientSize.text")));
+
+            for (Part part : convoyContents) {
+                campaign.addReport("- " + part.getName());
+            }
         }
     }
 
