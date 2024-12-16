@@ -105,8 +105,8 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -178,7 +178,7 @@ public class Campaign implements ITechManager {
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    // This maps PartInUse ToString() results to doubles, representing a mapping 
+    // This maps PartInUse ToString() results to doubles, representing a mapping
     // of parts in use to their requested stock percentages to make these values persistent
     private Map<String, Double> partsInUseRequestedStockMap = new LinkedHashMap<>();
 
@@ -5876,7 +5876,7 @@ public class Campaign implements ITechManager {
             writeCustoms(pw);
         }
 
-      
+
         // Okay, we're done.
         // Close everything out and be done with it.
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaign");
@@ -8806,12 +8806,13 @@ public class Campaign implements ITechManager {
     public void setIgnoreSparesUnderQuality(PartQuality ignoreSparesUnderQuality) {
         this.ignoreSparesUnderQuality = ignoreSparesUnderQuality;
     }
-    
+
 
     public void writePartInUseToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality.toName(campaignOptions.isReverseQualityNames()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality",
+            ignoreSparesUnderQuality.name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMap");
         writePartInUseMapToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMap");
@@ -8821,7 +8822,8 @@ public class Campaign implements ITechManager {
         for(String key : partsInUseRequestedStockMap.keySet()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMapEntry");
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapKey", key);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapVal", partsInUseRequestedStockMap.get(key));
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapVal",
+                partsInUseRequestedStockMap.get(key));
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
     }

@@ -1627,7 +1627,7 @@ public class CampaignXmlParser {
             } else if (wn2.getNodeName().equalsIgnoreCase("topUpWeekly")) {
                 retVal.setTopUpWeekly(Boolean.parseBoolean(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
-                PartQuality ignoreQuality = PartQuality.fromName(wn2.getTextContent(), retVal.getCampaignOptions().isReverseQualityNames());
+                PartQuality ignoreQuality = PartQuality.valueOf(wn2.getTextContent());
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
             } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
                 processPartsInUseRequestedStockMap(retVal, wn2);
