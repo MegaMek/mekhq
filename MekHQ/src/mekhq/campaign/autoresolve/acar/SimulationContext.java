@@ -29,8 +29,6 @@ import megamek.common.event.GameListener;
 import megamek.common.force.Forces;
 import megamek.logging.MMLogger;
 import megamek.server.scriptedevent.TriggeredEvent;
-import megamek.server.victory.VictoryHelper;
-import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoresolve.acar.action.Action;
 import mekhq.campaign.autoresolve.acar.action.ActionHandler;
 import mekhq.campaign.autoresolve.acar.report.PublicReportEntry;
@@ -38,7 +36,6 @@ import mekhq.campaign.autoresolve.component.AcTurn;
 import mekhq.campaign.autoresolve.component.Formation;
 import mekhq.campaign.autoresolve.component.FormationTurn;
 import mekhq.campaign.autoresolve.converter.SetupForces;
-import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioObjective;
 import org.apache.commons.lang3.NotImplementedException;
@@ -81,27 +78,18 @@ public class SimulationContext implements IGame {
 
     protected Forces forces = new Forces(this);
     private final Map<Integer, List<Deployable>> deploymentTable = new HashMap<>();
-
     protected int currentRound = -1;
-
     protected int turnIndex = AWAITING_FIRST_TURN;
-
 
     /**
      * Tools for the game
      */
     private final List<ActionHandler> actionHandlers = new ArrayList<>();
-    private MapSettings mapSettings;
 
     /**
      * Contains all units that have left the game by any means.
      */
     private final Vector<Entity> graveyard = new Vector<>();
-    private final Map<String, Object> victoryContext = new HashMap<>();
-    private final VictoryHelper victoryHelper = new VictoryHelper(this);
-    private int victoryPlayerId = Player.PLAYER_NONE;
-    private int victoryTeam = Player.TEAM_NONE;
-
 
     public SimulationContext(AtBScenario scenario, SimulationOptions gameOptions, SetupForces setupForces) {
         this.options = gameOptions;
@@ -112,17 +100,6 @@ public class SimulationContext implements IGame {
 
     public AtBScenario getScenario() {
         return scenario;
-    }
-
-    public AutoResolveConcludedEvent getConclusionEvent() {
-
-        var playerTeamWon = this.getVictoryTeam() == this.getLocalPlayer().getTeam();
-
-        return new AutoResolveConcludedEvent(
-            playerTeamWon,
-            this.getGraveyard().stream().filter(Entity.class::isInstance).map(Entity.class::cast).toList(),
-            this.getInGameObjects().stream().filter(Entity.class::isInstance).map(Entity.class::cast).toList(),
-            this);
     }
 
     public void addUnit(InGameObject unit) {
@@ -378,7 +355,6 @@ public class SimulationContext implements IGame {
         return destroyed;
     }
 
-    @Override
     public int getLiveDeployedEntitiesOwnedBy(Player player) {
         var res = getActiveFormations(player).stream()
             .filter(Formation::isDeployed)
@@ -397,61 +373,12 @@ public class SimulationContext implements IGame {
         return List.of();
     }
 
-    @Override
-    public void addScriptedEvent(TriggeredEvent event) {
-
-    }
-
-    @Override
-    public void setVictoryPlayerId(int victoryPlayerId) {
-        this.victoryPlayerId = victoryPlayerId;
-    }
-
-    @Override
-    public void setVictoryTeam(int victoryTeam) {
-        this.victoryTeam = victoryTeam;
-    }
-
-    @Override
-    public void cancelVictory() {
-        this.victoryPlayerId = Player.PLAYER_NONE;
-        this.victoryTeam = Player.TEAM_NONE;
-    }
-
-    @Override
-    public int getVictoryPlayerId() {
-        return victoryPlayerId;
-    }
-
-    @Override
-    public int getVictoryTeam() {
-        return victoryTeam;
-    }
-
-    @Override
     public boolean gameTimerIsExpired() {
         return getRoundCount() >= 1000;
     }
 
     private int getRoundCount() {
         return currentRound;
-    }
-
-    @Override
-    public int getLiveCommandersOwnedBy(Player player) {
-        return 0;
-    }
-
-    @Override
-    public Optional<Player> playerForPlayername(String playerName) {
-        // not implemented
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Integer> idForPlayername(String playerName) {
-        // not implemented
-        return Optional.empty();
     }
 
     public List<ActionHandler> getActionHandlers() {
@@ -486,11 +413,6 @@ public class SimulationContext implements IGame {
         return lastPhase;
     }
 
-    public void setVictoryContext(Map<String, Object> ctx) {
-        victoryContext.clear();
-        victoryContext.putAll(ctx);
-    }
-
     // check current turn, phase, formation
     private boolean isEligibleForAction(Formation formation) {
         return (getTurn() instanceof FormationTurn)
@@ -515,10 +437,6 @@ public class SimulationContext implements IGame {
         return getActiveFormations().stream()
             .filter(f -> f.getOwnerId() == player.getId())
             .toList();
-    }
-
-    public VictoryResult getVictoryResult() {
-        return victoryHelper.checkForVictory(this, victoryContext);
     }
 
     public void addUnitToGraveyard(Entity entity) {

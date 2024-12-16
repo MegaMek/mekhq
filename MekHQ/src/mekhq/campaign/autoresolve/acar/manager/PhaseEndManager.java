@@ -66,7 +66,7 @@ public record PhaseEndManager(SimulationManager simulationManager) implements Si
             case END:
                 simulationManager.actionsProcessor.handleActions();
                 phaseCleanup();
-                if (simulationManager.checkForVictory()) {
+                if (simulationManager.isVictory()) {
                     simulationManager.changePhase(GamePhase.VICTORY);
                 }
                 break;

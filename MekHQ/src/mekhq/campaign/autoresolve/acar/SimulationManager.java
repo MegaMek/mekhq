@@ -32,14 +32,12 @@ import megamek.server.Server;
 import megamek.server.commands.ServerCommand;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoresolve.acar.action.*;
-import mekhq.campaign.autoresolve.acar.manager.ActionsProcessor;
-import mekhq.campaign.autoresolve.acar.manager.InitiativeHelper;
-import mekhq.campaign.autoresolve.acar.manager.PhaseEndManager;
-import mekhq.campaign.autoresolve.acar.manager.PhasePreparationManager;
+import mekhq.campaign.autoresolve.acar.manager.*;
 import mekhq.campaign.autoresolve.acar.phase.PhaseHandler;
 import mekhq.campaign.autoresolve.acar.report.HtmlGameLogger;
 import mekhq.campaign.autoresolve.acar.report.PublicReportEntry;
 import mekhq.campaign.autoresolve.component.Formation;
+import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +55,7 @@ public class SimulationManager extends AbstractGameManager {
     public final ActionsProcessor actionsProcessor = new ActionsProcessor(this);
     public final InitiativeHelper initiativeHelper = new InitiativeHelper(this);
     final List<PhaseHandler> phaseHandlers = new ArrayList<>();
+    private final VictoryHelper victoryHelper = new VictoryHelper(this);
 
     private SimulationContext simulationContext;
 
@@ -69,6 +68,13 @@ public class SimulationManager extends AbstractGameManager {
 
     public void addPhaseHandler(PhaseHandler phaseHandler) {
         phaseHandlers.add(phaseHandler);
+    }
+
+    public AutoResolveConcludedEvent getConclusionEvent() {
+        return new AutoResolveConcludedEvent(
+            getGame(),
+            getCurrentVictoryResult()
+        );
     }
 
     @Override
@@ -113,23 +119,14 @@ public class SimulationManager extends AbstractGameManager {
     }
 
     /**
-     * Returns true if victory conditions have been met. Victory conditions are
-     * when there is only one player left with meks or only one team. will also
-     * add some reports to reporting
+     * Returns the victory result.
      */
-    public boolean checkForVictory() {
-        if (getGame().getVictoryTeam() > 0) {
-            // latch
-            return true;
-        }
-        VictoryResult vr = getGame().getVictoryResult();
-        var reports = vr.processVictory(getGame());
-        if (!reports.isEmpty()) {
-            reports.forEach(this::addReport);
-            vr.setVictory(true);
-            getGame().setVictoryTeam(vr.getWinningTeam());
-        }
-        return vr.isVictory();
+    public VictoryResult getCurrentVictoryResult() {
+        return victoryHelper.getVictoryResult();
+    }
+
+    public boolean isVictory() {
+        return getCurrentVictoryResult().isVictory();
     }
 
     @Override
@@ -163,11 +160,11 @@ public class SimulationManager extends AbstractGameManager {
         formation.setDone(true);
     }
 
-    public void addNerveRecovery(RecoveringNerveAction recoveringNerveAction, Formation formation) {
+    public void addNerveRecovery(RecoveringNerveAction recoveringNerveAction) {
         getGame().addAction(recoveringNerveAction);
     }
 
-    public void addWithdraw(WithdrawAction acsWithdrawAction, Formation formation) {
+    public void addWithdraw(WithdrawAction acsWithdrawAction) {
         getGame().addAction(acsWithdrawAction);
     }
 
@@ -260,5 +257,4 @@ public class SimulationManager extends AbstractGameManager {
     public void send(int connId, Packet p) {
         // DO NOTHING
     }
-
 }

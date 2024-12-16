@@ -20,7 +20,6 @@
 package mekhq.campaign.autoresolve.acar.phase;
 
 import megamek.common.enums.GamePhase;
-import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
 import mekhq.campaign.autoresolve.acar.report.VictoryPhaseReporter;
 import mekhq.campaign.unit.damage.DamageApplierChooser;
@@ -36,18 +35,9 @@ public class VictoryPhase extends PhaseHandler {
 
     @Override
     protected void executePhase() {
-        checkVictory();
-    }
-
-    private void checkVictory() {
         // Nobody is left unscathed
         applyDamageToRemainingUnits(getSimulationManager());
-
         victoryPhaseReporter.victoryHeader();
-        var game = getSimulationManager().getGame();
-        VictoryResult vr = game.getVictoryResult();
-        vr.setVictory(true);
-        game.setVictoryTeam(vr.getWinningTeam());
         victoryPhaseReporter.victoryResult(getSimulationManager());
     }
 

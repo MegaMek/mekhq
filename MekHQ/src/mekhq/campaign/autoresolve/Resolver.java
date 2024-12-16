@@ -61,7 +61,7 @@ public class Resolver {
         SimulationManager simulationManager = new SimulationManager();
         initializeGameManager(simulationManager, context);
         simulationManager.execute();
-        autoResolveConcludedEvent.accept(context.getConclusionEvent());
+        autoResolveConcludedEvent.accept(simulationManager.getConclusionEvent());
     }
 
     private void initializeGameManager(SimulationManager simulationManager, SimulationContext context) {

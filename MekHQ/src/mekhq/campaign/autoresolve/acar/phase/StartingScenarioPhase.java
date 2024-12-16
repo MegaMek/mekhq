@@ -22,8 +22,6 @@ package mekhq.campaign.autoresolve.acar.phase;
 import megamek.common.enums.GamePhase;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
 
-import java.util.HashMap;
-
 public class StartingScenarioPhase extends PhaseHandler {
 
     public StartingScenarioPhase(SimulationManager gameManager) {
@@ -37,6 +35,5 @@ public class StartingScenarioPhase extends PhaseHandler {
         getSimulationManager().calculatePlayerInitialCounts();
         getSimulationManager().getGame().setupTeams();
         getSimulationManager().getGame().setupDeployment();
-        getSimulationManager().getGame().setVictoryContext(new HashMap<>());
     }
 }

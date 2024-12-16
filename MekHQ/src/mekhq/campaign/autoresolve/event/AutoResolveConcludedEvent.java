@@ -23,10 +23,10 @@ import megamek.common.Entity;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.IGame;
 import megamek.common.event.PostGameResolution;
-import org.apache.commons.lang3.NotImplementedException;
+import megamek.server.victory.VictoryResult;
+import mekhq.campaign.autoresolve.acar.SimulationContext;
 
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -34,16 +34,54 @@ import java.util.Vector;
  */
 public class AutoResolveConcludedEvent implements PostGameResolution {
 
-    private final List<Entity> removedEntities;
-    private final List<Entity> survivingEntities;
-    private final boolean controlledScenario;
     private final IGame game;
+    private final boolean controlledScenario;
 
-    public AutoResolveConcludedEvent(boolean controlledScenario, List<Entity> removedEntities, List<Entity> survivingEntities, IGame game) {
-        this.controlledScenario = controlledScenario;
-        this.removedEntities = removedEntities;
-        this.survivingEntities = survivingEntities;
+    private final Vector<Entity> survived = new Vector<>();
+    private final Vector<Entity> retreated = new Vector<>();
+    private final Vector<Entity> graveyard = new Vector<>();
+    private final Vector<Entity> devastated = new Vector<>();
+    private final Vector<Entity> wrecked = new Vector<>();
+
+
+    public AutoResolveConcludedEvent(SimulationContext game, VictoryResult victoryResult) {
+        this.controlledScenario = (game.getLocalPlayer().getTeam() == victoryResult.getWinningTeam());
         this.game = game;
+
+        game.getInGameObjects().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
+            .forEach(survived::addElement);
+
+        game.getGraveyard().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
+            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE ||
+                entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)
+            .forEach(graveyard::addElement);
+
+        game.getGraveyard().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
+            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_NEVER_JOINED ||
+                entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_IN_RETREAT ||
+                entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_CAPTURED ||
+                entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_PUSHED)
+            .forEach(retreated::addElement);
+
+        game.getGraveyard().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
+            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED)
+            .forEach(devastated::addElement);
+
+        game.getGraveyard().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
+            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED ||
+                entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED ||
+                entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
+            .forEach(wrecked::addElement);
     }
 
     public IGame getGame() {
@@ -56,61 +94,31 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
 
     @Override
     public Enumeration<Entity> getEntities() {
-        Vector<Entity> entities = new Vector<>();
-        survivingEntities.forEach(entities::addElement);
-        removedEntities.stream()
-            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_NEVER_JOINED)
-            .forEach(entities::addElement);
-        return entities.elements();
+        return survived.elements();
     }
 
     @Override
     public Entity getEntity(int id) {
-        for (Entity entity : survivingEntities) {
-            if (entity.getId() == id) {
-                return entity;
-            }
-        }
-        for (Entity entity : removedEntities) {
-            if (entity.getId() == id) {
-                return entity;
-            }
-        }
-        return null;
+        return (Entity) game.getEntityFromAllSources(id);
     }
 
     @Override
     public Enumeration<Entity> getGraveyardEntities() {
-        Vector<Entity> graveyard = new Vector<>();
-        removedEntities.stream()
-            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE
-                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED
-                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_CAPTURED
-                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_PUSHED)
-            .forEach(graveyard::addElement);
         return graveyard.elements();
     }
 
     @Override
     public Enumeration<Entity> getWreckedEntities() {
-        throw new NotImplementedException("Method not implemented");
+        return wrecked.elements();
     }
 
     @Override
     public Enumeration<Entity> getRetreatedEntities() {
-        Vector<Entity> retreatedEntities = new Vector<>();
-        removedEntities.stream()
-            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_IN_RETREAT)
-            .forEach(retreatedEntities::addElement);
-        return retreatedEntities.elements();
+        return retreated.elements();
     }
 
     @Override
     public Enumeration<Entity> getDevastatedEntities() {
-        Vector<Entity> devastated = new Vector<>();
-        removedEntities.stream()
-            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED)
-            .forEach(devastated::addElement);
         return devastated.elements();
     }
 }

@@ -56,7 +56,6 @@ public class VictoryPhaseReporter {
             teamMap.get(team).add(player);
         }
 
-
         for (var team : teamMap.keySet()) {
             var teamPlayers = teamMap.get(team);
             var teamReport = new PublicReportEntry(5002).add(team);

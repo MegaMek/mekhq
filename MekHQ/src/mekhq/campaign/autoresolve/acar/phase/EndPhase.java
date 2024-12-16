@@ -71,7 +71,7 @@ public class EndPhase extends PhaseHandler {
     }
 
     private void checkWithdrawingForces() {
-        if (getSimulationManager().checkForVictory()) {
+        if (getSimulationManager().isVictory()) {
             // If the game is over, no need to withdraw
             return;
         }
@@ -80,7 +80,7 @@ public class EndPhase extends PhaseHandler {
             .toList();
 
         for (var formation : forcedWithdrawingUnits) {
-            getSimulationManager().addWithdraw(new WithdrawAction(formation.getId()), formation);
+            getSimulationManager().addWithdraw(new WithdrawAction(formation.getId()));
         }
     }
 
@@ -100,7 +100,7 @@ public class EndPhase extends PhaseHandler {
             .toList();
 
         for (var formation : recoveringNerves) {
-            getSimulationManager().addNerveRecovery(new RecoveringNerveAction(formation.getId()), formation);
+            getSimulationManager().addNerveRecovery(new RecoveringNerveAction(formation.getId()));
         }
     }
 
