@@ -53,6 +53,7 @@ public class SetupForces {
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
+    private final Game stdGame = new Game();
 
     /**
     * BalancedConsolidateForces is a helper class that redistribute entities and forces
@@ -278,6 +279,7 @@ public class SetupForces {
             try {
                 var formation = new ForceToFormationConverter(force, game).convert();
                 formation.setTargetFormationId(Entity.NONE);
+                formation.setOwnerId(force.getOwnerId());
                 game.addUnit(formation);
                 game.getForces().addEntity(formation, force.getId());
             } catch (Exception e) {
@@ -420,8 +422,8 @@ public class SetupForces {
                 // Set scenario type-specific delay
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                if (scenario.getLanceRole().isScouting() && (scenario.getStrategicFormation(campaign) != null)
-                    && (scenario.getStrategicFormation(campaign).getForceId() == scenario.getStrategicFormationId())
+                if (scenario.getLanceRole().isScouting() && (scenario.getCombatTeamById(campaign) != null)
+                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
                     && !useDropship) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
                 }
@@ -457,7 +459,7 @@ public class SetupForces {
                 }
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 if (!useDropship && scenario.getLanceRole().isScouting()
-                    && (scenario.getStrategicFormation(campaign).getForceId() == scenario.getStrategicFormationId())) {
+                    && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
                 }
             }
@@ -557,7 +559,7 @@ public class SetupForces {
 
             entity.setOwner(bot);
             entity.setForceString(forceName);
-            entity.setCrew(getNewCrewRef(entity.getCrew()));
+            entity.setCrew(new CrewRefBreak(entity.getCrew()).copy());
             entity.setId(originalBotEntity.getId());
             entity.setExternalIdAsString(originalBotEntity.getExternalIdAsString());
             entity.setCommander(originalBotEntity.isCommander());
@@ -647,7 +649,7 @@ public class SetupForces {
                     topLevel = false;
                 }
                 entity.setForceString("");
-
+                entity.setGame(stdGame);
                 game.addEntity(entity);
                 game.getForces().addEntity(entity, realId);
             }

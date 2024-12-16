@@ -191,9 +191,9 @@ public record InitiativeHelper(SimulationManager simulationManager) implements S
     }
 
     private void writeHeader() {
+        addReport(new ReportHeader(1200));
         if (game().getLastPhase().isDeployment() || game().isDeploymentComplete()
             || !game().shouldDeployThisRound()) {
-            addReport(new ReportHeader(1200));
             addReport(new ReportHeader(1000).add(game().getCurrentRound()));
         } else {
             if (game().getCurrentRound() == 0) {

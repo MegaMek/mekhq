@@ -51,10 +51,14 @@ public class EndPhase extends PhaseHandler {
         checkMorale();
         checkRecoveringNerves();
         forgetEverything();
-
     }
 
     private void checkUnitDestruction() {
+        var areThereUnitsToDestroy = getContext().getActiveFormations().stream()
+            .flatMap(f -> f.getUnits().stream()).anyMatch(u -> u.getCurrentArmor() <= 0);
+        if (areThereUnitsToDestroy) {
+            reporter.destroyedUnitsHeader();
+        }
         var allFormations = getContext().getActiveFormations();
         for (var formation : allFormations) {
             var destroyedUnits = formation.getUnits().stream()
@@ -121,6 +125,7 @@ public class EndPhase extends PhaseHandler {
                     }
                     DamageApplierChooser.damageRemovedEntity(entity, entity.getRemovalCondition());
                     reporter.reportUnitDestroyed(entity);
+                    getSimulationManager().getGame().addUnitToGraveyard(entity);
                 }
             }
 

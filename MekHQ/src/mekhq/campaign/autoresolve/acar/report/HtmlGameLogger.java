@@ -22,6 +22,7 @@ package mekhq.campaign.autoresolve.acar.report;
 import megamek.common.GameLog;
 import megamek.common.Report;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,41 +31,47 @@ import java.util.List;
 public class HtmlGameLogger {
 
     private final GameLog gameLog;
-    private boolean titleIsSet = false;
+
+    private static class LocalGameLog extends GameLog {
+
+        /**
+         * Creates GameLog named
+         *
+         * @param filename the name of the file
+         */
+        public LocalGameLog(String filename) {
+            super(filename);
+        }
+
+        @Override
+        protected void initialize() {
+            appendRaw("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Simulation Game Log</title>
+                <meta charset="UTF-8">
+            """);
+            appendRaw("""
+                <!-- CSS -->
+                <style>
+                </style>
+            </head>
+            <body>
+            """
+            );
+            appendRaw("<h1>Log file opened " + LocalDateTime.now() + "</h1>");
+        }
+
+    }
+
     /**
      * Creates GameLog named
      *
      * @param filename the name of the file
      */
     private HtmlGameLogger(String filename) {
-        gameLog = new GameLog(filename);
-        initializeLog();
-    }
-
-    private void initializeLog() {
-        add("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-            <meta charset="UTF-8">
-            """);
-        addStyle();
-    }
-
-    private void addStyle() {
-        add("""
-            <!-- CSS -->
-            <style>
-
-            </style>
-            """);
-    }
-
-    public void setTitle(String title) {
-        this.titleIsSet = true;
-        add("<title>%s</title>".formatted(title));
-        add("</head>");
-        add("<body>");
+        gameLog = new LocalGameLog(filename);
     }
 
     public static HtmlGameLogger create(String filename) {
@@ -83,16 +90,18 @@ public class HtmlGameLogger {
         return this;
     }
 
+    public HtmlGameLogger addRaw(String message) {
+        gameLog.appendRaw(message);
+        return this;
+    }
+
     public HtmlGameLogger add(String message) {
-        if (!titleIsSet) {
-            setTitle("AutoResolve Game Log");
-        }
         gameLog.append(message);
         return this;
     }
 
     public void close() {
-        add("</body></html>");
+        addRaw("</body></html>");
     }
 
 }

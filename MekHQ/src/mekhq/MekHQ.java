@@ -678,15 +678,18 @@ public class MekHQ implements GameListener {
             stopWatch.start();
             var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, scenario, units);
             stopWatch.stop();
-
-            message = "Commander, we ran " + simulatedVictories.getRuns() + " simulated combat scenarios and our forces came out victorious"
-                + " in " + simulatedVictories.getVictories() + ", lost " + simulatedVictories.getLosses() + ", and drew "
-                + simulatedVictories.getDraws() + " times. This gives us a "
-                + (simulatedVictories.getVictories() * 100 / simulatedVictories.getRuns()) + "% chance of victory."
-                + " Do you want to proceed?\n\t" + stopWatch + " elapsed time.\n\t"
-                + "Approximately "
-                + stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors())
-                + "ms per simulation.";
+            if (simulatedVictories.getRuns() == 0) {
+                message = "Commander, we were unable to simulate any combat scenarios. Do you want to proceed?";
+            } else {
+                message = "Commander, we ran " + simulatedVictories.getRuns() + " simulated combat scenarios and our forces came out victorious"
+                    + " in " + simulatedVictories.getVictories() + ", lost " + simulatedVictories.getLosses() + ", and drew "
+                    + simulatedVictories.getDraws() + " times. This gives us a "
+                    + (simulatedVictories.getVictories() * 100 / simulatedVictories.getRuns()) + "% chance of victory."
+                    + " Do you want to proceed?\n\t" + stopWatch + " elapsed time.\n\t"
+                    + "Approximately "
+                    + stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors())
+                    + "ms per simulation.";
+            }
         }
 
         String title = "Auto Resolve Battle";
@@ -694,7 +697,8 @@ public class MekHQ implements GameListener {
             campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
 
         if (proceed) {
-            new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()), this::autoResolveConcluded);
+            new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()), this::autoResolveConcluded)
+                .resolveSimulation();
         }
     }
 
@@ -797,7 +801,8 @@ public class MekHQ implements GameListener {
         List<Future<?>> futures = new ArrayList<>();
         for (int i = 0; i < numberOfGames; i++) {
             futures.add(executor.submit(() -> {
-                new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()), simulationScore::addResult);
+                new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()), simulationScore::addResult)
+                    .resolveSimulation();
             }));
         }
 

@@ -22,11 +22,9 @@ package mekhq.campaign.autoresolve.acar.handler;
 import megamek.common.Compute;
 import megamek.common.IEntityRemovalConditions;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
-import mekhq.campaign.autoresolve.acar.action.EngagementControlAction;
-import mekhq.campaign.autoresolve.acar.action.EngagementControlToHitData;
 import mekhq.campaign.autoresolve.acar.action.WithdrawAction;
+import mekhq.campaign.autoresolve.acar.action.WithdrawToHitData;
 import mekhq.campaign.autoresolve.acar.report.WithdrawReporter;
-import mekhq.campaign.autoresolve.component.EngagementControl;
 import mekhq.campaign.unit.damage.DamageApplierChooser;
 
 public class WithdrawActionHandler extends AbstractActionHandler {
@@ -44,23 +42,14 @@ public class WithdrawActionHandler extends AbstractActionHandler {
         return game().getPhase().isEnd();
     }
 
-    @Override
-    public void handle() {
-        performWithdraw();
-        setFinished();
-    }
-
     /**
      * This is not up to rules as written, the intention was to create a play experience that is more challenging and engaging.
      * The rules as written allow for a very simple withdraw mechanic that in this situation is very easy to exploit and would
      * create too many games which result in no losses.
      */
-    private void performWithdraw() {
+    @Override
+    public void execute() {
         var withdraw = (WithdrawAction) getAction();
-        if (withdraw.isInvalid(game())) {
-            return;
-        }
-
         var withdrawOpt = game().getFormation(withdraw.getEntityId());
 
         if (withdrawOpt.isEmpty()) {
@@ -68,8 +57,7 @@ public class WithdrawActionHandler extends AbstractActionHandler {
         }
 
         var withdrawFormation = withdrawOpt.get();
-        var engagementControl = new EngagementControlAction(withdrawFormation.getId(), withdrawFormation.getTargetFormationId(), EngagementControl.NONE);
-        var toHit = EngagementControlToHitData.compileToHit(game(), engagementControl);
+        var toHit = WithdrawToHitData.compileToHit(game(), withdrawFormation);
         if (withdrawFormation.isCrippled()) {
             toHit.addModifier(3, "Crippled");
         }
@@ -89,6 +77,7 @@ public class WithdrawActionHandler extends AbstractActionHandler {
                         entity.setDeployed(false);
                         entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
                         DamageApplierChooser.damageRemovedEntity(entity, entity.getRemovalCondition());
+                        game().addUnitToGraveyard(entity);
                     });
                 }
             }

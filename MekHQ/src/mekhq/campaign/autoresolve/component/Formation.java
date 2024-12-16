@@ -24,9 +24,7 @@ import megamek.common.Entity;
 import megamek.common.alphaStrike.ASDamageVector;
 import megamek.common.alphaStrike.ASRange;
 import megamek.common.strategicBattleSystems.SBFFormation;
-
-import java.util.HashMap;
-import java.util.Map;
+import megamek.common.strategicBattleSystems.SBFUnit;
 
 
 public class Formation extends SBFFormation {
@@ -144,4 +142,60 @@ public class Formation extends SBFFormation {
     public ASDamageVector getStdDamage() {
         return stdDamage;
     }
+
+    @Override
+    public int getSize() {
+        if (getUnits().isEmpty()) {
+            return 0;
+        }
+        return getUnits().stream().mapToInt(SBFUnit::getSize).sum() / getUnits().size();
+    }
+
+    @Override
+    public int getTmm() {
+        if (getUnits().isEmpty()) {
+            return 0;
+        }
+        return getUnits().stream().mapToInt(SBFUnit::getTmm).min().orElse(0);
+    }
+
+    @Override
+    public int getSkill() {
+        if (getUnits().isEmpty()) {
+            return 0;
+        }
+        return getUnits().stream().mapToInt(SBFUnit::getSkill).sum() / getUnits().size();
+    }
+
+    @Override
+    public int getTactics() {
+        if (getUnits().isEmpty()) {
+            return 0;
+        }
+        var movement = getMovement();
+        var skill = getSkill();
+        var tactics = Math.max(0, 10 - movement + skill - 4);
+        return tactics;
+    }
+
+    @Override
+    public int getMovement() {
+        if (getUnits().isEmpty()) {
+            return 0;
+        }
+        return getUnits().stream().mapToInt(SBFUnit::getMovement).min().orElse(0);
+    }
+
+    @Override
+    public int getPointValue() {
+        return getUnits().stream().mapToInt(SBFUnit::getPointValue).sum();
+    }
+
+    @Override
+    public String toString() {
+        return "[Formation] " + getName() + ": " + getType() + "; SZ" + getSize() + "; TMM" + getTmm() + "; M" + getMovement()
+            + "; T" + getTactics() + "; M " + moraleStatus() + "; " + getPointValue() + "@" + getSkill() + "; " + getUnits().size() + " units"
+            + "; " + getSpecialAbilities().getSpecialsDisplayString(this);
+    }
+
 }

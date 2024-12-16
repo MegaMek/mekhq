@@ -24,6 +24,7 @@ import megamek.common.Player;
 import megamek.common.ReportEntry;
 import megamek.common.TurnOrdered;
 import megamek.common.enums.GamePhase;
+import megamek.common.net.packets.Packet;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import megamek.server.AbstractGameManager;
@@ -181,6 +182,11 @@ public class SimulationManager extends AbstractGameManager {
     }
 
     @Override
+    protected void sendPhaseChange() {
+        // DO NOTHING
+    }
+
+    @Override
     public List<ServerCommand> getCommandList(Server server) {
         return Collections.emptyList();
     }
@@ -205,39 +211,54 @@ public class SimulationManager extends AbstractGameManager {
     }
 
     @Override
+    public void requestTeamChangeForPlayer(int teamID, Player player) {
+        // DO NOTHING
+    }
+
+    @Override
     public void removeAllEntitiesOwnedBy(Player player) {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
     }
 
     @Override
     public void resetGame() {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
     }
 
     // not to be implemented methods
     @Override
     public void disconnect(Player player) {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
     }
 
     @Override
     public void sendCurrentInfo(int connId) {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
     }
 
     @Override
     public void handleCfrPacket(Server.ReceivedPacket rp) {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
     }
 
     @Override
     public void requestGameMaster(Player player) {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
     }
 
     @Override
     public void requestTeamChange(int teamId, Player player) {
-        throw new UnsupportedOperationException("Not implemented");
+        // DO NOTHING
+    }
+
+    @Override
+    public void send(Packet packet) {
+        // DO NOTHING
+    }
+
+    @Override
+    public void send(int connId, Packet p) {
+        // DO NOTHING
     }
 
 }

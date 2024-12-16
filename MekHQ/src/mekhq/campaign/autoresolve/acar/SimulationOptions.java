@@ -47,7 +47,15 @@ public class SimulationOptions extends AbstractOptions  {
 
     @Override
     protected AbstractOptionsInfo getOptionsInfoImp() {
-        throw new UnsupportedOperationException("Not supported in this class.");
+        return SimulationOptionsInfo.instance;
+    }
+
+    private static class SimulationOptionsInfo extends AbstractOptionsInfo {
+        private static final AbstractOptionsInfo instance = new SimulationOptionsInfo();
+
+        protected SimulationOptionsInfo() {
+            super("SimulationOptions");
+        }
     }
 
 

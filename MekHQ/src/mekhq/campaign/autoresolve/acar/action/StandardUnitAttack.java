@@ -25,6 +25,7 @@ import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
 import mekhq.campaign.autoresolve.acar.handler.StandardUnitAttackHandler;
 import mekhq.campaign.autoresolve.component.Formation;
+import mekhq.utilities.RandomUtils;
 
 import java.util.Optional;
 
@@ -93,8 +94,10 @@ public class StandardUnitAttack extends AbstractAttackAction {
         } else if ((getUnitNumber() >= possibleAttacker.get().getUnits().size())
             || (getUnitNumber() < 0)) {
             return false;
+        } else if (possibleTarget.get().getUnits().isEmpty()) {
+            return false;
         }
 
-        return !possibleTarget.get().getUnits().isEmpty();
+        return true;
     }
 }

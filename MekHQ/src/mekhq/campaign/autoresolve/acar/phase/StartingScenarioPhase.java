@@ -21,17 +21,13 @@ package mekhq.campaign.autoresolve.acar.phase;
 
 import megamek.common.enums.GamePhase;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
-import mekhq.campaign.autoresolve.acar.report.StartingScenarioReporter;
 
 import java.util.HashMap;
 
 public class StartingScenarioPhase extends PhaseHandler {
 
-    private final StartingScenarioReporter reporter;
-
     public StartingScenarioPhase(SimulationManager gameManager) {
         super(gameManager, GamePhase.STARTING_SCENARIO);
-        this.reporter = new StartingScenarioReporter(gameManager.getGame(), gameManager::addReport);
     }
 
     @Override
@@ -42,6 +38,5 @@ public class StartingScenarioPhase extends PhaseHandler {
         getSimulationManager().getGame().setupTeams();
         getSimulationManager().getGame().setupDeployment();
         getSimulationManager().getGame().setVictoryContext(new HashMap<>());
-        reporter.logHeader();
     }
 }

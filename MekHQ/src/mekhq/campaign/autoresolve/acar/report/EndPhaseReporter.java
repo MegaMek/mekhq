@@ -59,7 +59,11 @@ public class EndPhaseReporter {
             .add(new PublicReportEntry(crewMessageId)
                 .add(entity.getCrew().getName())
                 .add(entity.getCrew().getHits())
-                .reportText())
+                .reportText()).indent()
         );
+    }
+
+    public void destroyedUnitsHeader() {
+        reportConsumer.accept(new PublicReportEntry(3298).indent());
     }
 }

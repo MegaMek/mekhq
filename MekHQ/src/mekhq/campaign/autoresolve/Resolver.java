@@ -56,7 +56,7 @@ public class Resolver {
         this.setupForces = new SetupForces(campaign, units, scenario);
     }
 
-    private void resolveSimulation() {
+    public void resolveSimulation() {
         SimulationContext context = new SimulationContext(scenario, options, setupForces);
         SimulationManager simulationManager = new SimulationManager();
         initializeGameManager(simulationManager, context);

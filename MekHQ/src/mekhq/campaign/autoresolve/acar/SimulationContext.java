@@ -109,6 +109,7 @@ public class SimulationContext implements IGame {
         this.scenario = scenario;
         this.setupScenarioObjectives();
         setBoard(0, new Board());
+        setupForces.createForcesOnGame(this);
     }
 
     private void setupScenarioObjectives() {
@@ -129,10 +130,6 @@ public class SimulationContext implements IGame {
 
     public AtBScenario getScenario() {
         return scenario;
-    }
-
-    public void setup(SetupForces setupForces) {
-        // TODO IMPLEMENT
     }
 
     public AutoResolveConcludedEvent getConclusionEvent() {
@@ -548,13 +545,9 @@ public class SimulationContext implements IGame {
     public void addUnitToGraveyard(Entity entity) {
         var entityInGame = getEntity(entity.getId());
         if (entityInGame.isPresent()) {
-            getInGameObjects().remove(entity.getId());
+            removeEntity(entity);
             graveyard.add(entity);
         }
-    }
-
-    public void removeFormation(Formation formation) {
-        getInGameObjects().remove(formation.getId());
     }
 
     public void setPlayerSkillLevel(int playerId, SkillLevel averageSkillLevel) {
@@ -572,7 +565,11 @@ public class SimulationContext implements IGame {
 
     @Override
     public Player getPlayer(int id) {
-        return players.get(id);
+        var player = players.get(id);
+        if (player == null) {
+            throw new IllegalArgumentException("No player with ID " + id + " found.");
+        }
+        return player;
     }
 
     @Override
@@ -605,6 +602,14 @@ public class SimulationContext implements IGame {
     @Override
     public List<InGameObject> getInGameObjects() {
         return new ArrayList<>(inGameObjects.values());
+    }
+
+    public void removeFormation(Formation formation) {
+        inGameObjects.remove(formation.getId());
+    }
+
+    public void removeEntity(Entity entity) {
+        inGameObjects.remove(entity.getId());
     }
 
     @Override

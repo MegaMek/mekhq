@@ -46,25 +46,26 @@ public class WithdrawReporter {
                 withdrawingFormation.generalName(),
                 UIUtil.hexColor(ownerColor(withdrawingFormation, game))
             ).text())
-            .add(withdrawingFormation.moraleStatus().name().toLowerCase()).indent();
+            .add(withdrawingFormation.moraleStatus().name().toLowerCase())
+            .indent();
         reportConsumer.accept(report);
 
         // To-Hit Value
-        reportConsumer.accept(new PublicReportEntry(3331).add(toHitData.getValue()).add(toHitData.toString()).indent());
+        reportConsumer.accept(new PublicReportEntry(3331).add(toHitData.getValue()).add(toHitData.toString()).indent(2));
     }
 
     public void reportWithdrawRoll(Formation withdrawingFormation, Roll withdrawRoll) {
         var report = new PublicReportEntry(3332).noNL();
         report.add(new PlayerNameReportEntry(game.getPlayer(withdrawingFormation.getOwnerId())).text());
-        report.add(new RollReportEntry(withdrawRoll).reportText()).indent();
+        report.add(new RollReportEntry(withdrawRoll).reportText()).indent(2);
         reportConsumer.accept(report);
     }
 
     public void reportSuccessfulWithdraw() {
-        reportConsumer.accept(new PublicReportEntry(3333).indent());
+        reportConsumer.accept(new PublicReportEntry(3333).indent(3));
     }
 
     public void reportFailedWithdraw() {
-        reportConsumer.accept(new PublicReportEntry(3334).indent());
+        reportConsumer.accept(new PublicReportEntry(3334).indent(3));
     }
 }

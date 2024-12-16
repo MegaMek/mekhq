@@ -34,5 +34,6 @@ public class InitiativePhase  extends PhaseHandler {
         getSimulationManager().resetPlayersDone();
         getSimulationManager().rollInitiative();
         getSimulationManager().incrementAndSendGameRound();
+        getSimulationManager().getInitiativeHelper().writeInitiativeReport();
     }
 }

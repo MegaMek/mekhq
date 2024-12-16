@@ -228,10 +228,4 @@ public class StandardUnitAttackHandler extends AbstractActionHandler {
         }
         return (int) damage;
     }
-
-    @Override
-    public void handle() {
-        execute();
-        setFinished();
-    }
 }

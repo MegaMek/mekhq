@@ -35,10 +35,10 @@ public enum AutoResolveMethod {
     private final String toolTipText;
 
     AutoResolveMethod(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoResolveMethod",
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AutoResolveMethod",
             MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.name = resourceMap.getString(name);
+        this.toolTipText = resourceMap.getString(toolTipText);
     }
 
     public String getToolTipText() {
