@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Isolated DropShip Defense</name>
     <shortBriefing>Defend isolated DropShip from interception.</shortBriefing>
-    <detailedBriefing>A DropShip has been intercepted shortly after landing and is isolated behind enemy lines. Defend it for 30 turns until it can lift off, preventing it from being crippled. Defeat at least 50% of the attacking forces while preserving 50% of your own units during the engagement.</detailedBriefing>
+    <detailedBriefing>A DropShip has been intercepted shortly after landing and is isolated behind enemy lines. Defend it until it can lift off, preventing it from being crippled. Defeat at least 50% of the attacking forces while preserving 50% of your own units during the engagement.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
