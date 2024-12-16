@@ -21,16 +21,23 @@ package mekhq.campaign.autoresolve.acar;
 
 import megamek.common.options.AbstractOptions;
 import megamek.common.options.AbstractOptionsInfo;
+import megamek.common.options.OptionsConstants;
 
 /**
  * @author Luana Coppio
  */
 public class SimulationOptions extends AbstractOptions  {
 
-    public static final SimulationOptions empty = new SimulationOptions(null);
+    public static final SimulationOptions EMPTY = empty();
+
+    public static SimulationOptions empty() {
+        return new SimulationOptions(null);
+    }
 
     public SimulationOptions(AbstractOptions abstractOptions) {
-
+        if (abstractOptions != null) {
+            this.optionsHash.putAll(abstractOptions.getOptionMap());
+        }
     }
 
     @Override
@@ -42,4 +49,43 @@ public class SimulationOptions extends AbstractOptions  {
     protected AbstractOptionsInfo getOptionsInfoImp() {
         throw new UnsupportedOperationException("Not supported in this class.");
     }
+
+
+    @Override
+    public int count() {
+        return optionsHash.size();
+    }
+
+    @Override
+    public int count(String groupKey) {
+        return optionsHash.size();
+    }
+
+    @Override
+    public int intOption(String name) {
+        var option = this.getOption(name);
+
+        if (option != null) {
+            option.intValue();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean booleanOption(String name) {
+        var option = this.getOption(name);
+
+        if (option != null) {
+            option.booleanValue();
+        }
+
+        return switch (name) {
+            case OptionsConstants.VICTORY_USE_BV_DESTROYED,
+                 OptionsConstants.VICTORY_USE_BV_RATIO,
+                 OptionsConstants.VICTORY_USE_KILL_COUNT,
+                 OptionsConstants.VICTORY_COMMANDER_KILLED -> false;
+            default -> true;
+        };
+    }
+
 }

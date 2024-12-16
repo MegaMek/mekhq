@@ -93,5 +93,4 @@ public class SimulatedClient implements IClient {
 
     @Override
     public void die() {}
-
 }

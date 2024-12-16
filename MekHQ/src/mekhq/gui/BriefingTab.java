@@ -869,14 +869,38 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private void autoResolveScenario() {
         Scenario scenario = getSelectedScenario();
-        if (scenario == null) {
+        if (!(scenario instanceof AtBScenario atBScenario)) {
             return;
         }
+
         switch(getCampaignOptions().getAutoResolveMethod()) {
-            case ABSTRACT_COMBAT ->
+            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve(atBScenario, playerUnits(scenario, new StringBuilder()));
             case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
         }
     }
+
+    private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        if (uids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Unit> chosen = new ArrayList<>();
+        for (UUID uid : uids) {
+            Unit u = getCampaign().getUnit(uid);
+
+            if ((null != u) && (null != u.getEntity())) {
+                if (null == u.checkDeployment()) {
+                    // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+                    chosen.add(u);
+                } else {
+                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
+                }
+            }
+        }
+        return chosen;
+    }
+
     private Scenario getSelectedScenario() {
         int row = scenarioTable.getSelectedRow();
         if (row < 0) {

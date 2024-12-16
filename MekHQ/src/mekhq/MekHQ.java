@@ -35,6 +35,7 @@ import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.IGame;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
@@ -47,7 +48,12 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.autoresolve.Resolver;
+import mekhq.campaign.autoresolve.acar.SimulatedClient;
+import mekhq.campaign.autoresolve.acar.SimulationOptions;
+import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
@@ -64,6 +70,7 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
+import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -75,9 +82,15 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -652,6 +665,153 @@ public class MekHQ implements GameListener {
 
     public IconPackage getIconPackage() {
         return iconPackage;
+    }
+
+
+    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
+        currentScenario = scenario;
+        String message = "This will auto resolve the battle. Do you want to proceed?";
+
+        var numberOfSimulations = 250;
+        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, scenario, units);
+            stopWatch.stop();
+
+            message = "Commander, we ran " + simulatedVictories.getRuns() + " simulated combat scenarios and our forces came out victorious"
+                + " in " + simulatedVictories.getVictories() + ", lost " + simulatedVictories.getLosses() + ", and drew "
+                + simulatedVictories.getDraws() + " times. This gives us a "
+                + (simulatedVictories.getVictories() * 100 / simulatedVictories.getRuns()) + "% chance of victory."
+                + " Do you want to proceed?\n\t" + stopWatch + " elapsed time.\n\t"
+                + "Approximately "
+                + stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors())
+                + "ms per simulation.";
+        }
+
+        String title = "Auto Resolve Battle";
+        boolean proceed = JOptionPane.showConfirmDialog(
+            campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+
+        if (proceed) {
+            new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()), this::autoResolveConcluded);
+        }
+    }
+
+    /**
+     * This method is called when the auto resolve game is over.
+     * @param autoResolveConcludedEvent The event that contains the results of the auto resolve game.
+     */
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent) {
+        try {
+            String message = autoResolveConcludedEvent.controlledScenario() ?
+                "Your forces won the scenario. Did your side control the battlefield at the end of the scenario?" :
+                "Your forces lost the scenario. Do you want to declare your side as controlling the battlefield at the end of the scenario?";
+            String title = autoResolveConcludedEvent.controlledScenario() ? "Victory!" : "Defeat!";
+            boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(), message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
+            tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame(), getCampaign().getPlayer()));
+            tracker.setEvent(autoResolveConcludedEvent);
+            tracker.processGame();
+
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
+                    true, tracker);
+            resolveDialog.setVisible(true);
+            if (resolveDialog.wasAborted()) {
+                // I think I can get rid of this, but I'm not sure atm, testing
+//                for (UUID personId : tracker.getPeopleStatus().keySet()) {
+//                    Person person = getCampaign().getPerson(personId);
+//                    person.setHits(person.getHitsPrior());
+//                }
+                return;
+            }
+            PostScenarioDialogHandler.handle(
+                campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, autoResolveConcludedEvent.controlledScenario());
+        } catch (Exception ex) {
+            logger.error("Error during auto resolve concluded", ex);
+        }
+    }
+
+
+    private static class SimulationScore {
+        private final AtomicInteger victories;
+        private final AtomicInteger losses;
+        private final AtomicInteger draws;
+        private final AtomicInteger gamesRun;
+
+        public SimulationScore() {
+            this.victories = new AtomicInteger(0);
+            this.losses = new AtomicInteger(0);
+            this.draws = new AtomicInteger(0);
+            this.gamesRun = new AtomicInteger(0);
+        }
+
+        public void addResult(AutoResolveConcludedEvent event) {
+            this.addResult(event.getGame());
+        }
+
+        public void addResult(IGame game) {
+            if (game.getVictoryTeam() == 1) {
+                victories.incrementAndGet();
+            } else if (game.getVictoryTeam() == 2) {
+                losses.incrementAndGet();
+            } else {
+                draws.incrementAndGet();
+            }
+            gamesRun.incrementAndGet();
+        }
+
+        public int getVictories() {
+            return victories.get();
+        }
+
+        public int getRuns() {
+            return gamesRun.get();
+        }
+
+        public int getLosses() {
+            return losses.get();
+        }
+
+        public int getDraws() {
+            return draws.get();
+        }
+    }
+
+    /**
+     * Calculates the victory chance for a given scenario and list of units by running multiple auto resolve scenarios in parallel.
+     *
+     * @param scenario the scenario to resolve
+     * @param units the list of units involved in the scenario
+     * @return the calculated victory chance as an integer percentage (0 to 100)
+     */
+    private SimulationScore calculateNumberOfVictories(int numberOfGames, AtBScenario scenario, List<Unit> units) {
+        var simulationScore = new SimulationScore();
+
+        if (numberOfGames <= 0) {
+            return simulationScore;
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Future<?>> futures = new ArrayList<>();
+        for (int i = 0; i < numberOfGames; i++) {
+            futures.add(executor.submit(() -> {
+                new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()), simulationScore::addResult);
+            }));
+        }
+
+        // Wait for all tasks to complete
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Error in parallel execution", e);
+            }
+        }
+
+        executor.shutdown();
+        return simulationScore;
     }
 
     /*

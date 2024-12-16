@@ -274,7 +274,7 @@ public class SimulationContext implements IGame {
         if (options != null) {
             return options;
         }
-        return SimulationOptions.empty;
+        return SimulationOptions.EMPTY;
     }
 
     @Override
@@ -402,6 +402,7 @@ public class SimulationContext implements IGame {
         return List.of();
     }
 
+    @Override
     public int getLiveDeployedEntitiesOwnedBy(Player player) {
         var res = getActiveFormations(player).stream()
             .filter(Formation::isDeployed)
@@ -563,7 +564,7 @@ public class SimulationContext implements IGame {
     public Player getLocalPlayer() {
         return getPlayer(0);
     }
-    
+
     @Override
     public Forces getForces() {
         return forces;
