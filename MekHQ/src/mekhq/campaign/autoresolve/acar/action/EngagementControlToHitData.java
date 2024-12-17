@@ -22,7 +22,7 @@ package mekhq.campaign.autoresolve.acar.action;
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.component.Formation;
-import mekhq.utilities.I18n;
+import mekhq.utilities.Internationalization;
 
 public class EngagementControlToHitData extends TargetRoll {
 
@@ -32,15 +32,15 @@ public class EngagementControlToHitData extends TargetRoll {
 
     public static EngagementControlToHitData compileToHit(SimulationContext game, EngagementControlAction engagementControl) {
         if (engagementControl.isInvalid(game)) {
-            return new EngagementControlToHitData(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_engagement_control"));
+            return new EngagementControlToHitData(TargetRoll.IMPOSSIBLE, Internationalization.getText("acar.invalid_engagement_control"));
         }
         var attackingFormationOpt = game.getFormation(engagementControl.getEntityId());
         if (attackingFormationOpt.isEmpty()) {
-            return new EngagementControlToHitData(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_attacking_formation"));
+            return new EngagementControlToHitData(TargetRoll.IMPOSSIBLE, Internationalization.getText("acar.invalid_attacking_formation"));
         }
 
         var attackingFormation = attackingFormationOpt.get();
-        var toHit = new EngagementControlToHitData(attackingFormation.getTactics(), I18n.t("acar.formation_tactics"));
+        var toHit = new EngagementControlToHitData(attackingFormation.getTactics(), Internationalization.getText("acar.formation_tactics"));
         processFormationModifiers(toHit, game, engagementControl);
         processMorale(toHit, game, engagementControl);
         processEngagementAndControlChosen(toHit, game, engagementControl);
@@ -53,10 +53,10 @@ public class EngagementControlToHitData extends TargetRoll {
         EngagementControlToHitData toHit, SimulationContext game, EngagementControlAction engagementControl) {
         switch (engagementControl.getEngagementControl()) {
             case FORCED_ENGAGEMENT:
-                toHit.addModifier(-3, I18n.t("acar.force_engagement"));
+                toHit.addModifier(-3, Internationalization.getText("acar.force_engagement"));
                 break;
             case EVADE:
-                toHit.addModifier(-3, I18n.t("acar.evade"));
+                toHit.addModifier(-3, Internationalization.getText("acar.evade"));
                 break;
             case OVERRUN:
                 processSizeDifference(toHit, game, engagementControl);
@@ -68,14 +68,14 @@ public class EngagementControlToHitData extends TargetRoll {
 
     private static void processPlayerSkill(EngagementControlToHitData toHit, SimulationContext game, Formation formation) {
         switch (game.getPlayerSkill(formation.getOwnerId())) {
-            case NONE -> toHit.addModifier(4, I18n.t("acar.skill_7"));
-            case ULTRA_GREEN -> toHit.addModifier(3, I18n.t("acar.skill_6"));
-            case GREEN -> toHit.addModifier(2, I18n.t("acar.skill_5"));
-            case REGULAR -> toHit.addModifier(1, I18n.t("acar.skill_4"));
-            case VETERAN -> toHit.addModifier(0, I18n.t("acar.skill_3"));
-            case ELITE -> toHit.addModifier(-1, I18n.t("acar.skill_2"));
-            case HEROIC -> toHit.addModifier(-2, I18n.t("acar.skill_1"));
-            case LEGENDARY -> toHit.addModifier(-3, I18n.t("acar.skill_0"));
+            case NONE -> toHit.addModifier(4, Internationalization.getText("acar.skill_7"));
+            case ULTRA_GREEN -> toHit.addModifier(3, Internationalization.getText("acar.skill_6"));
+            case GREEN -> toHit.addModifier(2, Internationalization.getText("acar.skill_5"));
+            case REGULAR -> toHit.addModifier(1, Internationalization.getText("acar.skill_4"));
+            case VETERAN -> toHit.addModifier(0, Internationalization.getText("acar.skill_3"));
+            case ELITE -> toHit.addModifier(-1, Internationalization.getText("acar.skill_2"));
+            case HEROIC -> toHit.addModifier(-2, Internationalization.getText("acar.skill_1"));
+            case LEGENDARY -> toHit.addModifier(-3, Internationalization.getText("acar.skill_0"));
         }
     }
 
@@ -91,10 +91,10 @@ public class EngagementControlToHitData extends TargetRoll {
         var formationIsVehicleOnly = formation.isVehicle();
 
         if (formationIsInfantryOnly) {
-            toHit.addModifier(2, I18n.t("acar.formation_is_infantry_only"));
+            toHit.addModifier(2, Internationalization.getText("acar.formation_is_infantry_only"));
         }
         if (formationIsVehicleOnly) {
-            toHit.addModifier(1, I18n.t("acar.formation_is_vehicle_only"));
+            toHit.addModifier(1, Internationalization.getText("acar.formation_is_vehicle_only"));
         }
     }
 
@@ -106,7 +106,7 @@ public class EngagementControlToHitData extends TargetRoll {
             return;
         }
         int sizeDifference = attackerOpt.get().getSize() - targetOpt.get().getSize();
-        toHit.addModifier(sizeDifference, I18n.t("acar.size_difference"));
+        toHit.addModifier(sizeDifference, Internationalization.getText("acar.size_difference"));
     }
 
     private static void processMorale(EngagementControlToHitData toHit, SimulationContext game, EngagementControlAction engagementControl) {
@@ -115,10 +115,10 @@ public class EngagementControlToHitData extends TargetRoll {
             return;
         }
         switch (targetOpt.get().moraleStatus()) {
-            case SHAKEN -> toHit.addModifier(+1, I18n.t("acar.shaken_morale"));
-            case UNSTEADY -> toHit.addModifier(+2, I18n.t("acar.unsteady_morale"));
-            case BROKEN -> toHit.addModifier(+3, I18n.t("acar.broken_morale"));
-            case ROUTED -> toHit.addModifier(TargetRoll.AUTOMATIC_FAIL, I18n.t("acar.routed_morale"));
+            case SHAKEN -> toHit.addModifier(+1, Internationalization.getText("acar.shaken_morale"));
+            case UNSTEADY -> toHit.addModifier(+2, Internationalization.getText("acar.unsteady_morale"));
+            case BROKEN -> toHit.addModifier(+3, Internationalization.getText("acar.broken_morale"));
+            case ROUTED -> toHit.addModifier(TargetRoll.AUTOMATIC_FAIL, Internationalization.getText("acar.routed_morale"));
         }
     }
 }
