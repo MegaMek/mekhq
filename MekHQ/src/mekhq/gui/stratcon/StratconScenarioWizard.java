@@ -42,7 +42,6 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
-import static java.lang.Math.min;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
@@ -70,6 +69,7 @@ public class StratconScenarioWizard extends JDialog {
     private JList<Unit> availableInfantryUnits = new JList<>();
     private JList<Unit> availableLeadershipUnits = new JList<>();
 
+    private JPanel contentPanel;
     private JButton btnCommit;
 
     private static final MMLogger logger = MMLogger.create(StratconScenarioWizard.class);
@@ -100,12 +100,16 @@ public class StratconScenarioWizard extends JDialog {
         setTitle("Scenario Setup Wizard");
         getContentPane().removeAll();
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        getContentPane().setLayout(new GridBagLayout());
+        // Create a new panel to hold all components
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new GridBagLayout());
 
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
+
+        // Add components to the new panel instead of directly to the content pane
         setInstructions(gbc);
 
         if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
@@ -137,6 +141,15 @@ public class StratconScenarioWizard extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         setNavigationButtons(gbc);
+
+        // Wrap the contentPanel in a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        // Add the scrollPane to the content pane of the dialog
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
 
         pack();
         validate();
@@ -191,8 +204,8 @@ public class StratconScenarioWizard extends JDialog {
         labelBuilder.append("<html>");
 
         if (currentTrackState.isGmRevealed()
-                || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords()) ||
-                (currentScenario.getDeploymentDate() != null)) {
+            || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords())
+            || (currentScenario.getDeploymentDate() != null)) {
             labelBuilder.append(currentScenario.getInfo(campaign));
         }
 
@@ -204,30 +217,31 @@ public class StratconScenarioWizard extends JDialog {
 
         labelBuilder.append("<br/>");
         lblInfo.setText(labelBuilder.toString());
-        getContentPane().add(lblInfo, gbc);
+
+        contentPanel.add(lblInfo, gbc);
     }
 
     /**
      * Worker function that sets up the "assign forces to scenario" UI elements.
      */
     private void setAssignForcesUI(GridBagConstraints gbc, boolean reinforcements) {
-        // generate a lance selector with the following parameters:
-        // all forces assigned to the current track that aren't already assigned
-        // elsewhere max number of items that can be selected = current scenario required lances
+        // Get eligible templates depending on reinforcement status
         List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements
-                ? currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces()
-                : currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
+            ? currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces()
+            : currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
 
         for (ScenarioForceTemplate forceTemplate : eligibleForceTemplates) {
+            // Create a panel for each force template
             JPanel forcePanel = new JPanel();
             forcePanel.setLayout(new GridBagLayout());
             GridBagConstraints localGbc = new GridBagConstraints();
             localGbc.gridx = 0;
             localGbc.gridy = 0;
 
-            String reinforcementMessage = currentCampaignState.getSupportPoints() > 0 ?
-                resourceMap.getString("selectReinforcementsForTemplate.Text") :
-                resourceMap.getString("selectReinforcementsForTemplateNoSupportPoints.Text");
+            // Add instructions for assigning forces
+            String reinforcementMessage = currentCampaignState.getSupportPoints() > 0
+                ? resourceMap.getString("selectReinforcementsForTemplate.Text")
+                : resourceMap.getString("selectReinforcementsForTemplateNoSupportPoints.Text");
 
             String labelText = reinforcements ? reinforcementMessage
                 : resourceMap.getString("selectForceForTemplate.Text");
@@ -235,71 +249,83 @@ public class StratconScenarioWizard extends JDialog {
             JLabel assignForceListInstructions = new JLabel(labelText);
             forcePanel.add(assignForceListInstructions, localGbc);
 
+            // Add a list to display available forces
             localGbc.gridy = 1;
             JLabel selectedForceInfo = new JLabel();
             JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
 
+            // Add a listener to handle changes to the selected force
             availableForceList
                     .addListSelectionListener(e -> {
                         availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
                         btnCommit.setEnabled(true);
                     });
 
+            // Store the list in the map for later reference
             availableForceLists.put(forceTemplate.getForceName(), availableForceList);
 
+            // Add the selected force info to the panel
             localGbc.gridx = 1;
             forcePanel.add(selectedForceInfo, localGbc);
 
-            getContentPane().add(forcePanel, gbc);
+            // Add the forcePanel to contentPanel (not getContentPane)
+            contentPanel.add(forcePanel, gbc);
             gbc.gridy++;
         }
     }
 
     /**
-     * Set up the UI for "defensive elements", such as infantry, gun emplacements,
-     * minefields, etc.
+     * Sets up the UI for "defensive elements", such as infantry, gun emplacements, minefields, etc.
+     *
+     * @param gbc GridBagConstraints for layout positioning.
      */
     private void setDefensiveUI(GridBagConstraints gbc) {
+        // Label with defensive posture instructions
         gbc.anchor = GridBagConstraints.WEST;
         JLabel lblDefensivePostureInstructions = new JLabel(
-                resourceMap.getString("lblDefensivePostureInstructions.Text"));
-        getContentPane().add(lblDefensivePostureInstructions, gbc);
+            resourceMap.getString("lblDefensivePostureInstructions.Text"));
+        contentPanel.add(lblDefensivePostureInstructions, gbc);
 
         gbc.gridy++;
 
+        // Obtain eligible infantry units
         List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleDefensiveUnits(campaign);
         eligibleInfantryUnits.sort(Comparator.comparing(Unit::getName));
 
-        availableInfantryUnits = addIndividualUnitSelector(eligibleInfantryUnits, gbc,
-                currentScenario.getNumDefensivePoints(), false);
+        // Add a unit selector for infantry units
+        availableInfantryUnits = addIndividualUnitSelector(
+            eligibleInfantryUnits, gbc, currentScenario.getNumDefensivePoints(), false);
 
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
 
+        // Label to display the minefield count
         JLabel lblDefensiveMinefieldCount = new JLabel(
-                String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"),
-                        currentScenario.getNumDefensivePoints()));
+            String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"),
+                currentScenario.getNumDefensivePoints()));
 
-        availableInfantryUnits
-                .addListSelectionListener(e -> availableInfantrySelectorChanged(lblDefensiveMinefieldCount));
+        // Add a listener to update the minefield count label when infantry units are selected
+        availableInfantryUnits.addListSelectionListener(
+            e -> availableInfantrySelectorChanged(lblDefensiveMinefieldCount));
 
-        getContentPane().add(lblDefensiveMinefieldCount, gbc);
+        contentPanel.add(lblDefensiveMinefieldCount, gbc);
     }
 
     private void setLeadershipUI(GridBagConstraints gbc, List<Unit> eligibleUnits, int leadershipSkill) {
         // Leadership budget is capped at 5 levels
-        int leadershipBudget = min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
+        int leadershipBudget = Math.min(BASE_LEADERSHIP_BUDGET * leadershipSkill, BASE_LEADERSHIP_BUDGET * 5);
         int maxSelectionSize = leadershipBudget - currentScenario.getLeadershipPointsUsed();
 
         gbc.anchor = GridBagConstraints.WEST;
 
-        JLabel lblLeadershipInstructions = new JLabel(String.format(resourceMap.getString("lblLeadershipInstructions.Text"),
-            maxSelectionSize));
-        getContentPane().add(lblLeadershipInstructions, gbc);
+        JLabel lblLeadershipInstructions = new JLabel(
+            String.format(resourceMap.getString("lblLeadershipInstructions.Text"), maxSelectionSize));
+        contentPanel.add(lblLeadershipInstructions, gbc);
 
         gbc.gridy++;
 
-        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize, true);
+        availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize,
+            true);
     }
 
     /**
@@ -325,58 +351,62 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Adds an individual unit selector, given a list of individual units, a global
-     * grid bag constraint set
+     * Adds an individual unit selector, given a list of individual units, a global grid bag constraint set,
      * and a maximum selection size.
      *
      * @param units            The list of units to use as a data source.
-     * @param gridBagConstraints              Gridbag constraints to indicate where the control will go
-     * @param maxSelectionSize Maximum number of units that can be selected
+     * @param gridBagConstraints GridBagConstraints object to position the selector panel.
+     * @param maxSelectionSize Maximum number of units that can be selected.
+     * @param usesBV           Whether to track the Battle Value (BV) of selected items or simply count.
+     * @return A JList of units that can be selected.
      */
     private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gridBagConstraints,
                                                   int maxSelectionSize, boolean usesBV) {
+        // Create the panel for the individual unit selector
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridBagLayout());
-        GridBagConstraints localGridBagConstraints = new GridBagConstraints();
 
-        localGridBagConstraints.gridx = 0;
-        localGridBagConstraints.gridy = 0;
-        localGridBagConstraints.anchor = GridBagConstraints.WEST;
-        JLabel instructions = new JLabel();
-        instructions.setText(String.format(resourceMap.getString("lblSelectIndividualUnits.text"),
-                maxSelectionSize));
-        unitPanel.add(instructions);
+        GridBagConstraints localGbc = new GridBagConstraints();
+        localGbc.gridx = 0;
+        localGbc.gridy = 0;
+        localGbc.anchor = GridBagConstraints.WEST;
 
-        localGridBagConstraints.gridy++;
+        // Instructions for selecting units
+        JLabel instructions = new JLabel(
+            String.format(resourceMap.getString("lblSelectIndividualUnits.text"), maxSelectionSize));
+        unitPanel.add(instructions, localGbc);
+
+        localGbc.gridy++;
         DefaultListModel<Unit> availableModel = new DefaultListModel<>();
         availableModel.addAll(units);
 
+        // Add labels for unit selection details
         JLabel unitStatusLabel = new JLabel();
+        JLabel unitSelectionLabel = new JLabel("0 selected");
 
-        // add the # units selected control
-        JLabel unitSelectionLabel = new JLabel();
-        unitSelectionLabel.setText("0 selected");
+        // Add the "# units selected" label
+        localGbc.gridy++;
+        unitPanel.add(unitSelectionLabel, localGbc);
 
-        localGridBagConstraints.gridy++;
-        unitPanel.add(unitSelectionLabel, localGridBagConstraints);
-
-        JList<Unit> availableUnits = new JList<>();
-        availableUnits.setModel(availableModel);
+        // Create the unit selection list
+        JList<Unit> availableUnits = new JList<>(availableModel);
         availableUnits.setCellRenderer(new ScenarioWizardUnitRenderer());
         availableUnits.addListSelectionListener(
-                e -> availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize, usesBV));
+            e -> availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel,
+                maxSelectionSize, usesBV));
 
-        JScrollPane infantryContainer = new JScrollPaneWithSpeed();
-        infantryContainer.setViewportView(availableUnits);
-        localGridBagConstraints.gridy++;
-        unitPanel.add(infantryContainer, localGridBagConstraints);
+        // Scroll pane for the unit selection list
+        JScrollPane unitScrollPane = new JScrollPane(availableUnits);
+        localGbc.gridy++;
+        unitPanel.add(unitScrollPane, localGbc);
 
-        // add the 'status display' control
-        localGridBagConstraints.gridx++;
-        localGridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        unitPanel.add(unitStatusLabel, localGridBagConstraints);
+        // Add the 'unit status' label
+        localGbc.gridx++;
+        localGbc.anchor = GridBagConstraints.NORTHWEST;
+        unitPanel.add(unitStatusLabel, localGbc);
 
-        getContentPane().add(unitPanel, gridBagConstraints);
+        // Add the unitPanel to the contentPanel
+        contentPanel.add(unitPanel, gridBagConstraints);
 
         return availableUnits;
     }
@@ -457,22 +487,24 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Sets the navigation buttons - commit, cancel, etc.
+     * Sets the navigation button - commit.
+     *
+     * @param gbc GridBagConstraints for layout positioning.
      */
     private void setNavigationButtons(GridBagConstraints gbc) {
-        // you're on one of two screens:
-        // the 'primary force selection' screen
-        // the 'reinforcement selection' screen
+        // Create the commit button
         btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
         btnCommit.addActionListener(this::btnCommitClicked);
         btnCommit.setEnabled(Objects.requireNonNull(currentScenario.getCurrentState()) != ScenarioState.UNRESOLVED);
 
+        // Configure layout constraints for the button
         gbc.gridheight = GridBagConstraints.REMAINDER;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.anchor = GridBagConstraints.CENTER;
 
-        getContentPane().add(btnCommit, gbc);
+        // Add the commit button to the content panel
+        contentPanel.add(btnCommit, gbc);
     }
 
     /**
