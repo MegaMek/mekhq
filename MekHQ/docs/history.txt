@@ -87,6 +87,18 @@ MEKHQ VERSION HISTORY:
 + PR #5382: Establishment of a Requested Stock % feature, and automating weekly checks to keep spare parts in stock
 + Fix #5383: Fixed save bug
 + PR #5389: Abstract Combat Auto Resolve
++ Fix #5304: Fixed Force Commanders Changing on Load
++ Fix #5390: Adjusted Dependent Addition & Removal Logic
++ Fix #5391: Refactored StratconScenarioWizard to use a Scroll Pane
++ Fix #5392: Updated StratCon Deployment Mechanics
++ PR #5393: Fixed Experience Rating Parsing to Handle Invalid Character
++ Fix #5394: Corrected Scenario Briefings by Removing Explicit Turn Limits
++ PR #5397: Prevent Reserved Formations from Being Deployed to StratCon
++ PR #5399: Capped Negotiated StratCon Support Points at Sector Count
++ PR #5400: Removed Contract Breach References in Scenario and Loan Events
++ PR #5401: Set Default Maintenance Multiplier for Salvaged Units
++ PR #5403: Disabled Commit Forces Button when No Forces Selected
+
 
 
 0.50.01 (2024-11-10 1800 UTC)
