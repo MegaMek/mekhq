@@ -18,16 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import mekhq.MekHQ;
 import mekhq.campaign.event.LoanRemovedEvent;
 import mekhq.campaign.event.PartRemovedEvent;
@@ -36,6 +26,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.model.LoanTableModel;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.UUID;
 
 public class LoanTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;
@@ -69,7 +64,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
             if (0 == JOptionPane
                     .showConfirmDialog(
                             null,
-                            "Defaulting on this loan will affect your unit rating the same as a contract breach.\nDo you wish to proceed?",
+                            "Defaulting on this loan will affect your unit rating.\nDo you wish to proceed?",
                             "Default on " + selectedLoan + "?", JOptionPane.YES_NO_OPTION)) {
                 PayCollateralDialog pcd = new PayCollateralDialog(
                         gui.getFrame(), true, gui.getCampaign(), selectedLoan);
