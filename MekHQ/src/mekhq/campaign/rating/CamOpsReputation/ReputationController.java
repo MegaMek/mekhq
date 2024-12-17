@@ -615,7 +615,8 @@ public class ReputationController {
                 if (workingNode2.getNodeName().equalsIgnoreCase("averageSkillLevel")) {
                     this.averageSkillLevel = SkillLevel.valueOf(workingNode2.getTextContent().toUpperCase());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
-                    this.averageExperienceRating = Integer.parseInt(workingNode2.getTextContent());
+                    this.averageExperienceRating = Integer.parseInt(
+                        workingNode2.getTextContent().replaceAll("-", "_"));
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("atbModifier")) {
                     this.atbModifier = Integer.parseInt(workingNode2.getTextContent());
                 } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderMap")) {

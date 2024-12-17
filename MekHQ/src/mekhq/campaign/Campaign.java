@@ -102,6 +102,7 @@ import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -142,6 +143,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
@@ -1363,6 +1365,7 @@ public class Campaign implements ITechManager {
         unit.getEntity().setOwner(player);
         unit.getEntity().setGame(game);
         unit.getEntity().setExternalIdAsString(unit.getId().toString());
+        unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
 
         // now lets grab the parts from the test unit and set them up with this unit
         for (Part p : tu.getParts()) {
@@ -4006,11 +4009,18 @@ public class Campaign implements ITechManager {
         // Loop through available contracts, rolling for additional Support Points until we run
         // out of Admin/Transport personnel, or we run out of active contracts
         for (AtBContract contract : sortedContracts) {
-            int negoatiatedSupportPoints = 0;
-            int maximumSupportPointsNegotiated = contract.getRequiredLances();
-
             if (adminTransport.isEmpty()) {
                 break;
+            }
+
+            int negoatiatedSupportPoints = 0;
+            int maximumSupportPointsNegotiated = 1;
+
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+            if (campaignState != null) {
+                List<StratconTrackState> tracks = campaignState.getTracks();
+
+                maximumSupportPointsNegotiated = tracks.isEmpty() ? 1 : tracks.size();
             }
 
             int availableAdmins = adminTransport.size();
@@ -4674,38 +4684,52 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This method processes the random dependents for a campaign. It shuffles the active dependents list and performs
-     * actions based on the campaign options and unit rating modifiers.
-     * <p>
-     * First, it determines the dependent capacity based on 20% of the active personnel count. Then, it calculates
-     * the number of dependents currently in the list.
-     * <p>
-     * If the campaign options allow random dependent removal, it iterates over each dependent and determines if they
-     * should leave the force based on a lower roll value. If the roll value is less than or equal to 4 minus the unit
-     * rating modifier, the dependent is removed from the force.
-     * <p>
-     * If the campaign options allow random dependent addition and the number of dependents is less than the dependent
-     * capacity, it iterates a number of times equal to the difference between the dependent capacity and the number of
-     * dependents. It determines if a lower roll value is less than or equal to the unit rating modifier multiplied by 2.
-     * If true, it recruits a new dependent and adds a report indicating the dependent has joined the force.
+     * Processes the random addition and removal of dependents, adjusting the active dependents
+     * list based on campaign options, active personnel, and unit rating modifiers.
+     *
+     * <p>This method operates in the following steps:
+     * <ol>
+     *     <li>Filters active personnel into dependents and non-dependents. Dependents without a family
+     *     (i.e., an empty genealogy) are added to the list of active dependents, while eligible non-dependents
+     *     are counted to determine the dependent capacity.</li>
+     *     <li>Calculates the dependent capacity as 5% of active non-dependents, with a minimum
+     *     value of 1.</li>
+     *     <li>Randomly removes dependents from the active list based on campaign options and a roll
+     *     compared to the unit rating modifier.</li>
+     *     <li>Randomly adds new dependents, if allowed, ensuring the total number of dependents does not exceed
+     *     the dependent capacity. The addition is based on a roll relative to the unit rating modifier.</li>
+     * </ol>
+     *
+     * <p>The method ensures that the number of dependents is managed dynamically and reflects the
+     * current status of the campaign, its personnel, and relevant modifiers.
      */
-    void processRandomDependents() {
-        List<Person> dependents = getActiveDependents();
-        Collections.shuffle(dependents);
+    private void processRandomDependents() {
+        int activeNonDependents = 0;
+        List<Person> activeDependents = new ArrayList<>();
 
-        // we use this value a lot, so might as well store it for easier retrieval
-        LocalDate currentDate = getLocalDate();
+        for (Person person : getActivePersonnel()) {
+            if (!person.getPrisonerStatus().isFreeOrBondsman()) {
+                continue;
+            }
+            if (person.isChild(currentDay)) {
+                continue;
+            }
+            if (person.isDependent()) {
+                if (person.getGenealogy().familyIsEmpty()) {
+                    activeDependents.add(person);
+                }
+                continue;
+            }
 
-        // we don't want to include Dependents or children when determining capacity
-        List<Person> activeNonDependents = getActivePersonnel().stream()
-                .filter(person -> !person.getPrimaryRole().isDependent())
-                .filter(person -> !person.isChild(currentDate))
-                .toList();
+            activeNonDependents++;
+        }
 
-        int dependentCapacity = (int) Math.max(1, (activeNonDependents.size() * 0.05));
+        // Prepare the data
+        int dependentCapacity = Math.max(1, (int) round(activeNonDependents * 0.05));
+        Collections.shuffle(activeDependents);
 
         // roll for random removal
-        int dependentCount = dependentsRollForRemoval(dependents, currentDate, dependentCapacity);
+        int dependentCount = dependentsRollForRemoval(activeDependents, dependentCapacity);
 
         // then roll for random addition
         dependentsAddNew(dependentCount, dependentCapacity);
@@ -4716,14 +4740,13 @@ public class Campaign implements ITechManager {
      * dependent removal.
      *
      * @param dependents The list of dependents.
-     * @param currentDate The current date.
      * @param dependentCapacity The maximum number of dependents allowed.
      * @return The updated number of dependents.
      */
-    int dependentsRollForRemoval(List<Person> dependents, LocalDate currentDate, int dependentCapacity) {
+    int dependentsRollForRemoval(List<Person> dependents, int dependentCapacity) {
         if (getCampaignOptions().isUseRandomDependentRemoval()) {
             for (Person dependent : dependents) {
-                if (!isRemovalEligible(dependent, currentDate)) {
+                if (!isRemovalEligible(dependent, currentDay)) {
                     continue;
                 }
 

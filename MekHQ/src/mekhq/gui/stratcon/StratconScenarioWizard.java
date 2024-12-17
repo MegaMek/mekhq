@@ -255,8 +255,11 @@ public class StratconScenarioWizard extends JDialog {
             JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
 
             // Add a listener to handle changes to the selected force
-            availableForceList.addListSelectionListener(
-                e -> availableForceSelectorChanged(e, selectedForceInfo, reinforcements));
+            availableForceList
+                    .addListSelectionListener(e -> {
+                        availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
+                        btnCommit.setEnabled(true);
+                    });
 
             // Store the list in the map for later reference
             availableForceLists.put(forceTemplate.getForceName(), availableForceList);
@@ -493,6 +496,7 @@ public class StratconScenarioWizard extends JDialog {
         btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
         btnCommit.addActionListener(this::btnCommitClicked);
+        btnCommit.setEnabled(Objects.requireNonNull(currentScenario.getCurrentState()) != ScenarioState.UNRESOLVED);
 
         // Configure layout constraints for the button
         gbc.gridheight = GridBagConstraints.REMAINDER;

@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>DropShip Raid</name>
     <shortBriefing>Destroy or cripple DropShip.</shortBriefing>
-    <detailedBriefing>A DropShip has been intercepted shortly after landing. You have 30 turns to destroy or cripple it before it can lift off. The defenders are not the priority. Preserve 50% of your forces to ensure mission success.</detailedBriefing>
+    <detailedBriefing>A DropShip has been intercepted shortly after landing. Destroy or cripple it before it can lift off. The defenders are not the priority. Preserve 50% of your forces to ensure mission success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
