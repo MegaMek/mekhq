@@ -19,6 +19,8 @@
 
 package mekhq.campaign.handler;
 
+import megamek.client.generator.RandomNameGenerator;
+import megamek.client.generator.RandomUnitGenerator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
@@ -31,9 +33,11 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * @author Luana Coppio
@@ -41,8 +45,7 @@ import java.util.UUID;
 public class PostScenarioDialogHandler {
 
     /**
-     * Post game resolution checks, dialogs and actions, those are all the things that happen after a mission is concluded, like
-     * retirement, awards, etc.
+     * Post game resolution checks, dialogs and actions.
      * @param tracker The tracker that contains all the information about the scenario resolution.
      * @param control Whether the player controlled the battlefield at the end of the scenario.
      */
@@ -50,11 +53,34 @@ public class PostScenarioDialogHandler {
         CampaignGUI campaignGUI, Campaign campaign, AtBScenario currentScenario, ResolveScenarioTracker tracker, boolean control) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
-        postCombatMissingInActionToPrisonerOfWarStatus(campaignGUI, campaign, tracker, control);
-
+        postCombatMissingInActionToPrisonerOfWarStatus(campaign, tracker, control);
+        restartRats(campaign);
+        cleanupTempImageFiles();
         // we need to trigger ScenarioResolvedEvent before stopping the thread or
         // currentScenario may become null
         MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
+    }
+
+    private static void restartRats(Campaign campaign) {
+        if (campaign.getCampaignOptions().isUseAtB()) {
+            RandomUnitGenerator.getInstance();
+            RandomNameGenerator.getInstance();
+        }
+    }
+
+    private static void cleanupTempImageFiles() {
+        final File tempImageDirectory = new File("data/images/temp");
+        if (tempImageDirectory.isDirectory()) {
+            var listFiles = tempImageDirectory.listFiles();
+            if (listFiles == null) {
+                // This may happen if the directory is not accessible or if someone creates a file which the name collides
+                // with the folder
+                return;
+            }
+            // This can't be null because of the above
+            Stream.of(listFiles).filter(file -> file.getName().endsWith(".png"))
+                .forEach(File::delete);
+        }
     }
 
     private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign, AtBScenario currentScenario) {
@@ -99,14 +125,12 @@ public class PostScenarioDialogHandler {
         }
     }
 
-    private static void postCombatMissingInActionToPrisonerOfWarStatus(
-        CampaignGUI campaignGUI, Campaign campaign, ResolveScenarioTracker tracker, boolean control) {
+    private static void postCombatMissingInActionToPrisonerOfWarStatus(Campaign campaign, ResolveScenarioTracker tracker, boolean control) {
         for (UUID personId : tracker.getPeopleStatus().keySet()) {
             Person person = campaign.getPerson(personId);
 
             if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
-                    PersonnelStatus.POW);
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.POW);
             }
         }
     }

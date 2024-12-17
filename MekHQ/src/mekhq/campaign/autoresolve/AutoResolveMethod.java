@@ -19,10 +19,9 @@
 package mekhq.campaign.autoresolve;
 
 
-import mekhq.MekHQ;
+import mekhq.utilities.I18n;
 
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 /**
  * @author Luana Coppio
@@ -35,10 +34,8 @@ public enum AutoResolveMethod {
     private final String toolTipText;
 
     AutoResolveMethod(final String name, final String toolTipText) {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AutoResolveMethod",
-            MekHQ.getMHQOptions().getLocale());
-        this.name = resourceMap.getString(name);
-        this.toolTipText = resourceMap.getString(toolTipText);
+        this.name = I18n.t("AutoResolveMethod", name);
+        this.toolTipText = I18n.t("AutoResolveMethod", toolTipText);
     }
 
     public String getToolTipText() {

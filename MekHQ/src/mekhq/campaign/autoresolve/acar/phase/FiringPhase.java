@@ -49,10 +49,12 @@ public class FiringPhase extends PhaseHandler {
         while (getSimulationManager().getGame().hasMoreTurns()) {
 
             var optTurn = getSimulationManager().getGame().changeToNextTurn();
+
             if (optTurn.isEmpty()) {
                 break;
             }
             var turn = optTurn.get();
+
 
             if (turn instanceof FormationTurn formationTurn) {
                 var player = getSimulationManager().getGame().getPlayer(formationTurn.playerId());

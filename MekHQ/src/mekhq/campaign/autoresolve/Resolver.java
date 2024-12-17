@@ -40,32 +40,28 @@ import java.util.function.Consumer;
 public class Resolver {
 
     private final AtBScenario scenario;
-    private final Consumer<AutoResolveConcludedEvent> autoResolveConcludedEvent;
     private final SimulationOptions options;
     private final SetupForces setupForces;
 
     public Resolver(Campaign campaign,
                     List<Unit> units,
                     AtBScenario scenario,
-                    AbstractOptions gameOptions,
-                    Consumer<AutoResolveConcludedEvent> autoResolveConcludedEvent) {
+                    AbstractOptions gameOptions) {
 
         this.scenario = scenario;
-        this.autoResolveConcludedEvent = autoResolveConcludedEvent;
         this.options = new SimulationOptions(gameOptions);
         this.setupForces = new SetupForces(campaign, units, scenario);
     }
 
-    public void resolveSimulation() {
+    public AutoResolveConcludedEvent resolveSimulation() {
         SimulationContext context = new SimulationContext(scenario, options, setupForces);
-        SimulationManager simulationManager = new SimulationManager();
-        initializeGameManager(simulationManager, context);
+        SimulationManager simulationManager = new SimulationManager(context);
+        initializeGameManager(simulationManager);
         simulationManager.execute();
-        autoResolveConcludedEvent.accept(simulationManager.getConclusionEvent());
+        return simulationManager.getConclusionEvent();
     }
 
-    private void initializeGameManager(SimulationManager simulationManager, SimulationContext context) {
-        simulationManager.setSimulationContext(context);
+    private void initializeGameManager(SimulationManager simulationManager) {
         simulationManager.addPhaseHandler(new StartingScenarioPhase(simulationManager));
         simulationManager.addPhaseHandler(new InitiativePhase(simulationManager));
         simulationManager.addPhaseHandler(new DeploymentPhase(simulationManager));

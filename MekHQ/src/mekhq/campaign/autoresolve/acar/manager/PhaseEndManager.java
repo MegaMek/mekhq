@@ -45,26 +45,26 @@ public record PhaseEndManager(SimulationManager simulationManager) implements Si
                 simulationManager.changePhase(GamePhase.SBF_DETECTION);
                 break;
             case SBF_DETECTION:
-                simulationManager.actionsProcessor.handleActions();
+                simulationManager.getActionsProcessor().handleActions();
                 phaseCleanup();
                 simulationManager.changePhase(GamePhase.MOVEMENT);
                 break;
             case MOVEMENT:
                 simulationManager.addReport(new PublicReportEntry(999));
                 simulationManager.addReport(new PublicReportEntry(2201));
-                simulationManager.actionsProcessor.handleActions();
+                simulationManager.getActionsProcessor().handleActions();
                 phaseCleanup();
                 simulationManager.changePhase(GamePhase.FIRING);
                 break;
             case FIRING:
                 simulationManager.addReport(new PublicReportEntry(999));
                 simulationManager.addReport(new PublicReportEntry(2002));
-                simulationManager.actionsProcessor.handleActions();
+                simulationManager.getActionsProcessor().handleActions();
                 phaseCleanup();
                 simulationManager.changePhase(GamePhase.END);
                 break;
             case END:
-                simulationManager.actionsProcessor.handleActions();
+                simulationManager.getActionsProcessor().handleActions();
                 phaseCleanup();
                 if (simulationManager.isVictory()) {
                     simulationManager.changePhase(GamePhase.VICTORY);

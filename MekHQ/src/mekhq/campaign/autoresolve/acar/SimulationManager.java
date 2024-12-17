@@ -49,15 +49,17 @@ public class SimulationManager extends AbstractGameManager {
         .create(PreferenceManager.getClientPreferences().getAutoResolveGameLogFilename());
 
     private final List<ReportEntry> pendingReports = new ArrayList<>();
-
-    final PhaseEndManager phaseEndManager = new PhaseEndManager(this);
-    final PhasePreparationManager phasePreparationManager = new PhasePreparationManager(this);
-    public final ActionsProcessor actionsProcessor = new ActionsProcessor(this);
-    public final InitiativeHelper initiativeHelper = new InitiativeHelper(this);
-    final List<PhaseHandler> phaseHandlers = new ArrayList<>();
+    private final List<PhaseHandler> phaseHandlers = new ArrayList<>();
+    private final PhaseEndManager phaseEndManager = new PhaseEndManager(this);
+    private final PhasePreparationManager phasePreparationManager = new PhasePreparationManager(this);
+    private  final ActionsProcessor actionsProcessor = new ActionsProcessor(this);
+    private  final InitiativeHelper initiativeHelper = new InitiativeHelper(this);
     private final VictoryHelper victoryHelper = new VictoryHelper(this);
+    private final SimulationContext simulationContext;
 
-    private SimulationContext simulationContext;
+    public SimulationManager(SimulationContext simulationContext) {
+        this.simulationContext = simulationContext;
+    }
 
     public void execute() {
         changePhase(GamePhase.STARTING_SCENARIO);
@@ -134,20 +136,17 @@ public class SimulationManager extends AbstractGameManager {
         return simulationContext;
     }
 
-    public void setSimulationContext(SimulationContext simulationContext) {
-        setGame(simulationContext);
-    }
-
     @Override
     public void setGame(IGame game) {
-        if (!(game instanceof SimulationContext)) {
-            throw new IllegalArgumentException("SimulationManager can only manage Simulation games");
-        }
-        this.simulationContext = (SimulationContext) game;
+        throw new UnsupportedOperationException("Cannot set game in SimulationManager");
     }
 
     public InitiativeHelper getInitiativeHelper() {
         return initiativeHelper;
+    }
+
+    public ActionsProcessor getActionsProcessor() {
+        return actionsProcessor;
     }
 
     public void addMoraleCheck(MoraleCheckAction acsMoraleCheckAction, Formation formation) {

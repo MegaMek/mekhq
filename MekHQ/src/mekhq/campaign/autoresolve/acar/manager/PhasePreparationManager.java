@@ -31,7 +31,7 @@ public record PhasePreparationManager(SimulationManager simulationManager) imple
             case MOVEMENT:
             case FIRING:
                 resetEntityPhase();
-                simulationManager.initiativeHelper.determineTurnOrder(game().getPhase());
+                simulationManager.getInitiativeHelper().determineTurnOrder(game().getPhase());
             case INITIATIVE:
                 clearActions();
                 break;

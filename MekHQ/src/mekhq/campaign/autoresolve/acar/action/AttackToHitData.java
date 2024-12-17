@@ -24,6 +24,7 @@ import megamek.common.TargetRoll;
 import megamek.common.strategicBattleSystems.SBFUnit;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.component.Formation;
+import mekhq.utilities.I18n;
 
 import java.util.List;
 
@@ -35,12 +36,12 @@ public class AttackToHitData extends TargetRoll {
 
     public static AttackToHitData compileToHit(SimulationContext game, StandardUnitAttack attack) {
         if (!attack.isDataValid(game)) {
-            return new AttackToHitData(TargetRoll.IMPOSSIBLE, "Invalid attack");
+            return new AttackToHitData(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_attack"));
         }
 
         var attackingFormation = game.getFormation(attack.getEntityId()).orElseThrow();
         var unit = attackingFormation.getUnits().get(attack.getUnitNumber());
-        var toHit = new AttackToHitData(attackingFormation.getSkill(), "Skill");
+        var toHit = new AttackToHitData(attackingFormation.getSkill(), I18n.t("acar.skill"));
 
         processCriticalDamage(toHit, attackingFormation, attack);
         processRange(toHit, attack);
@@ -55,38 +56,38 @@ public class AttackToHitData extends TargetRoll {
     private static void processCriticalDamage(AttackToHitData toHit, Formation formation, StandardUnitAttack attack) {
         SBFUnit combatUnit = formation.getUnits().get(attack.getUnitNumber());
         if (combatUnit.getTargetingCrits() > 0) {
-            toHit.addModifier(combatUnit.getTargetingCrits(), "Critical Target Damage");
+            toHit.addModifier(combatUnit.getTargetingCrits(), I18n.t("acar.critical_target_damage"));
         }
     }
 
     private static void processCombatUnit(AttackToHitData toHit, SBFUnit unit) {
         switch (unit.getSkill()) {
-            case 7 -> toHit.addModifier(+4, "Wet behind the ears");
-            case 6 -> toHit.addModifier(+3, "Really Green");
-            case 5 -> toHit.addModifier(+2, "Green");
-            case 4 -> toHit.addModifier(+1, "Regular");
-            case 3 -> toHit.addModifier(0, "Veteran");
-            case 2 -> toHit.addModifier(-1, "Elite");
-            case 1 -> toHit.addModifier(-2, "Heroic");
-            case 0 -> toHit.addModifier(-3, "Legendary");
-            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, "Invalid skill");
+            case 7 -> toHit.addModifier(+4, I18n.t("acar.skill_7"));
+            case 6 -> toHit.addModifier(+3, I18n.t("acar.skill_6"));
+            case 5 -> toHit.addModifier(+2, I18n.t("acar.skill_5"));
+            case 4 -> toHit.addModifier(+1, I18n.t("acar.skill_4"));
+            case 3 -> toHit.addModifier(0, I18n.t("acar.skill_3"));
+            case 2 -> toHit.addModifier(-1, I18n.t("acar.skill_2"));
+            case 1 -> toHit.addModifier(-2, I18n.t("acar.skill_1"));
+            case 0 -> toHit.addModifier(-3, I18n.t("acar.skill_0"));
+            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_skill"));
         }
     }
 
     private static void processRange(AttackToHitData toHit, StandardUnitAttack attack) {
         var range = attack.getRange();
         switch (range) {
-            case SHORT -> toHit.addModifier(-1, "short range");
-            case MEDIUM -> toHit.addModifier(+2, "medium range");
-            case LONG -> toHit.addModifier(+4, "long range");
-            case EXTREME -> toHit.addModifier(TargetRoll.IMPOSSIBLE, "extreme range");
+            case SHORT -> toHit.addModifier(-1, I18n.t( "acar.short_range"));
+            case MEDIUM -> toHit.addModifier(+2, I18n.t("acar.medium_range"));
+            case LONG -> toHit.addModifier(+4, I18n.t("acar.long_range"));
+            case EXTREME -> toHit.addModifier(TargetRoll.IMPOSSIBLE, I18n.t( "acar.extreme_range"));
         }
     }
 
     private static void processTMM(AttackToHitData toHit, SimulationContext game, StandardUnitAttack attack) {
         var target = game.getFormation(attack.getTargetId()).orElseThrow();
         if (target.getTmm() > 0) {
-            toHit.addModifier(target.getTmm(), "TMM");
+            toHit.addModifier(target.getTmm(), I18n.t( "acar.TMM"));
         }
     }
 
@@ -94,29 +95,29 @@ public class AttackToHitData extends TargetRoll {
         var attacker = game.getFormation(attack.getEntityId()).orElseThrow();
         var target = game.getFormation(attack.getTargetId()).orElseThrow();
         if (attacker.getJumpUsedThisTurn() > 0) {
-            toHit.addModifier(attacker.getJumpUsedThisTurn(), "attacker JUMP");
+            toHit.addModifier(attacker.getJumpUsedThisTurn(), I18n.t("acar.attacker_JUMP"));
         }
         if (target.getJumpUsedThisTurn() > 0) {
-            toHit.addModifier(attacker.getJumpUsedThisTurn(), "target JUMP");
+            toHit.addModifier(attacker.getJumpUsedThisTurn(), I18n.t("acar.target_JUMP"));
         }
     }
 
     private static void processMorale(AttackToHitData toHit, SimulationContext game, StandardUnitAttack attack) {
         var target = game.getFormation(attack.getTargetId()).orElseThrow();
         switch (target.moraleStatus()) {
-            case SHAKEN -> toHit.addModifier(1, "shaken");
-            case UNSTEADY -> toHit.addModifier(2, "unsteady");
-            case BROKEN -> toHit.addModifier(3, "broken");
-            case ROUTED -> toHit.addModifier(4, "routed");
+            case SHAKEN -> toHit.addModifier(1, I18n.t("acar.shaken"));
+            case UNSTEADY -> toHit.addModifier(2, I18n.t("acar.unsteady"));
+            case BROKEN -> toHit.addModifier(3, I18n.t("acar.broken"));
+            case ROUTED -> toHit.addModifier(4, I18n.t("acar.routed"));
         }
     }
 
     private static void processSecondaryTarget(AttackToHitData toHit, SimulationContext game, StandardUnitAttack attack) {
         var attacker = game.getFormation(attack.getEntityId()).orElseThrow();
         if (targetsOfFormation(attacker, game).size() > 2) {
-            toHit.addModifier(TargetRoll.IMPOSSIBLE, "too many targets");
+            toHit.addModifier(TargetRoll.IMPOSSIBLE, I18n.t("acar.more_than_two_targets"));
         } else if (targetsOfFormation(attacker, game).size() == 2) {
-            toHit.addModifier(+1, "two targets");
+            toHit.addModifier(+1, I18n.t("acar.two_targets"));
         }
     }
 

@@ -352,18 +352,18 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        resolver = new Resolver(campaign, units, scenario, SimulationOptions.empty(), autoResolveConcludedEvent);
-        resolver.resolveSimulation();
+        resolver = new Resolver(campaign, units, scenario, SimulationOptions.empty());
+        autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 
     private void assertGameFinishedWithAWinner(AutoResolveConcludedEvent event) {
-        var victoryTeam = event.getGame().getVictoryTeam();
+        var victoryTeam = event.getVictoryResult().getWinningTeam();
         assertTrue((0 <= victoryTeam) && (victoryTeam <= 2), "Victory team is not 1 or 2");
     }
 
     private void postAutoResolveAccumulator(AutoResolveConcludedEvent event) {
         totalRuns++;
-        var victoryTeam = event.getGame().getVictoryTeam();
+        var victoryTeam = event.getVictoryResult().getWinningTeam();
         switch (victoryTeam) {
             case 1 -> team1++;
             case 2 -> team2++;

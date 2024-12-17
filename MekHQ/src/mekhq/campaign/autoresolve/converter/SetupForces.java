@@ -22,9 +22,7 @@ package mekhq.campaign.autoresolve.converter;
 import io.sentry.Sentry;
 import megamek.common.*;
 import megamek.common.alphaStrike.conversion.ASConverter;
-import megamek.common.force.Force;
 import megamek.common.force.Forces;
-import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
@@ -42,7 +40,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Luana Coppio
@@ -53,197 +50,6 @@ public class SetupForces {
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
-    private final Game stdGame = new Game();
-
-    /**
-    * BalancedConsolidateForces is a helper class that redistribute entities and forces
-    * in a way to consolidate then into valid forces to build Formations out of them.
-    * @author Luana Coppio
-    */
-    public static class BalancedConsolidateForces {
-
-        public static final int MAX_ENTITIES_IN_SUB_FORCE = 6;
-        public static final int MAX_ENTITIES_IN_TOP_LEVEL_FORCE = 20;
-
-        public record Container(int uid, int teamId, int[] entities, Container[] subs) {
-            public boolean isLeaf() {
-                return subs.length == 0 && entities.length > 0;
-            }
-
-            public boolean isTop() {
-                return subs.length > 0 && entities.length == 0;
-            }
-
-            public String toString() {
-                return "Container(uid=" + uid + ", team=" + teamId + ", ent=" + Arrays.toString(entities) + ", subs=" + Arrays.toString(subs) + ")";
-            }
-        }
-
-        public record ForceRepresentation(int uid, int teamId, int[] entities, int[] subForces) {
-            public boolean isLeaf() {
-                return subForces.length == 0 && entities.length > 0;
-            }
-
-            public boolean isTop() {
-                return subForces.length > 0 && entities.length == 0;
-            }
-        }
-
-        /**
-         * Balances the forces by team, tries to ensure that every team has the same number of top level forces, each within the ACS parameters
-         * of a maximum of 20 entities and 4 sub forces. It also aggregates the entities by team instead of keeping segregated by player.
-         * See the test cases for examples on how it works.
-         * @param forces List of Forces to balance
-         * @return List of Trees representing the balanced forces
-         */
-        public static List<Container> balancedLists(List<ForceRepresentation> forces) {
-            Map<Integer, Set<Integer>> entitiesByTeam = new HashMap<>();
-            for (ForceRepresentation c : forces) {
-                entitiesByTeam.computeIfAbsent(c.teamId(), k -> new HashSet<>()).addAll(Arrays.stream(c.entities()).boxed().toList());
-            }
-
-            // Find the number of top-level containers for each team
-            Map<Integer, Integer> numOfEntitiesByTeam = entitiesByTeam.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size()));
-
-            int maxEntities = numOfEntitiesByTeam.values().stream().max(Integer::compareTo).orElse(0);
-            int topCount = (int) Math.ceil((double) maxEntities / MAX_ENTITIES_IN_TOP_LEVEL_FORCE);
-
-            Map<Integer, Container> balancedForces = new HashMap<>();
-
-            for (int team : entitiesByTeam.keySet()) {
-                createTopLevelForTeam(balancedForces, team, new ArrayList<>(entitiesByTeam.get(team)), topCount);
-            }
-
-            return new ArrayList<>(balancedForces.values());
-        }
-
-        private static void createTopLevelForTeam(Map<Integer, Container> cmap, int team, List<Integer> allEnt, int topCount) {
-            int maxId = cmap.keySet().stream().max(Integer::compareTo).orElse(0) + 1;
-
-            int perTop = (int) Math.min(Math.ceil((double) allEnt.size() / topCount), MAX_ENTITIES_IN_TOP_LEVEL_FORCE);
-
-            int idx = 0;
-
-            for (int i = 0; i < topCount; i++) {
-                int end = Math.min(idx + perTop, allEnt.size());
-                List<Integer> part = allEnt.subList(idx, end);
-                idx = end;
-                // split part into sub containers of up to 6 entities
-                List<Container> subs = new ArrayList<>();
-                int step = Math.min(part.size(), MAX_ENTITIES_IN_SUB_FORCE);
-                for (int start = 0; start < part.size(); start += step) {
-                    var subForceSize = Math.min(part.size(), start + step);
-                    Container leaf = new Container(
-                        maxId++,
-                        team,
-                        part.subList(start, subForceSize).stream().mapToInt(Integer::intValue).toArray(),
-                        new Container[0]);
-                    subs.add(leaf);
-                }
-
-                if (subs.isEmpty()) {
-                    // no entities? skip creating top-level
-                    break;
-                }
-
-                var containers = new Container[subs.size()];
-                for (int k = 0; k < containers.length; k++) {
-                    containers[k] = subs.get(k);
-                }
-
-                Container top = new Container(maxId++, team, new int[0], containers);
-                cmap.put(top.uid(), top);
-            }
-        }
-
-        public static boolean isBalanced(List<BalancedConsolidateForces.Container> postBalanceForces) {
-            if (postBalanceForces.isEmpty()) {
-                return false;
-            }
-            Map<Integer, List<BalancedConsolidateForces.Container>> resMap = new HashMap<>();
-            for (BalancedConsolidateForces.Container c : postBalanceForces) {
-                if (c.isTop()) resMap.computeIfAbsent(c.teamId(), k -> new ArrayList<>()).add(c);
-            }
-
-            List<Integer> counts = resMap.values().stream().map(List::size).toList();
-            int min = Collections.min(counts), max = Collections.max(counts);
-            return max - min <= 1;
-        }
-    }
-
-    private static class ConsolidateForces {
-
-        /**
-         * Consolidates forces by redistributing entities and sub forces as needed.
-         * It will balance the forces by team, ensuring that each force has a maximum of 20 entities and 4 sub forces.
-         * @param game The game to consolidate forces for
-         */
-        public static void consolidateForces(IGame game) {
-            Forces forces = game.getForces();
-            var teamByPlayer = game.getTeamByPlayer();
-            var forceNameByPlayer = new HashMap<Integer, String>();
-            for (var force : forces.getAllForces()) {
-                if (!forceNameByPlayer.containsKey(force.getOwnerId())) {
-                    forceNameByPlayer.put(force.getOwnerId(), force.getName());
-                }
-            }
-            var representativeOwnerForForce = new HashMap<Integer, List<Player>>();
-            for (var force : forces.getAllForces()) {
-                representativeOwnerForForce.computeIfAbsent(teamByPlayer.get(force.getOwnerId()), k -> new ArrayList<>()).add(game.getPlayer(force.getOwnerId()));
-            }
-
-            var forceRepresentation = getForceRepresentations(forces, teamByPlayer);
-            var balancedConsolidateForces = BalancedConsolidateForces.balancedLists(forceRepresentation);
-
-            clearAllForces(forces);
-
-            for (var forceRep : balancedConsolidateForces) {
-                var player = representativeOwnerForForce.get(forceRep.teamId()).get(0);
-                var parentForceId = forces.addTopLevelForce(
-                    new Force(
-                        "[Team " + forceRep.teamId()  + "] "+ forceNameByPlayer.get(player.getId()) + " Formation",
-                        -1,
-                        new Camouflage(),
-                        player),
-                    player);
-                for (var subForce : forceRep.subs()) {
-                    var subForceId = forces.addSubForce(
-                        new Force(
-                            "[Team " + forceRep.teamId()  + "] " + subForce.uid() + " Unit",
-                            -1,
-                            new Camouflage(),
-                            player),
-                        forces.getForce(parentForceId));
-                    for (var entityId : subForce.entities()) {
-                        forces.addEntity((Entity) game.getEntityFromAllSources(entityId), subForceId);
-                    }
-                }
-            }
-        }
-
-        private static void clearAllForces(Forces forces) {
-            // Remove all empty forces and sub forces after consolidation
-            forces.deleteForces(forces.getAllForces());
-
-        }
-
-        /**
-         * Converts the forces into a list of ForceRepresentations. It is an intermediary representation of a force, in a way that makes it very
-         * lightweight to manipulate and balance. It only contains the representation of the force top-level, and the list of entities in it.
-         * @param forces The forces to convert
-         * @param teamByPlayer A map of player IDs to team IDs
-         * @return A list of ForceRepresentations
-         */
-        private static List<BalancedConsolidateForces.ForceRepresentation> getForceRepresentations(Forces forces, Map<Integer, Integer> teamByPlayer) {
-            List<BalancedConsolidateForces.ForceRepresentation> forceRepresentations = new ArrayList<>();
-            for (Force force : forces.getTopLevelForces()) {
-                int[] entityIds = forces.getFullEntities(force).stream().mapToInt(ForceAssignable::getId).toArray();
-                forceRepresentations.add(new BalancedConsolidateForces.ForceRepresentation(force.getId(), teamByPlayer.get(force.getOwnerId()), entityIds, new int[0]));
-            }
-            return forceRepresentations;
-        }
-
-    }
 
     public SetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         this.campaign = campaign;
@@ -573,7 +379,7 @@ public class SetupForces {
     }
 
     /**
-     * Get the planetary conditions for the game, not used at the moment in the auto resolve
+     * Get the planetary conditions for the game, not used at the moment in the auto resolve, but planed for the future
      * @return The planetary conditions object
      */
     private PlanetaryConditions getPlanetaryConditions() {

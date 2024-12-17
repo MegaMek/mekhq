@@ -25,7 +25,6 @@ import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
 import mekhq.campaign.autoresolve.acar.handler.StandardUnitAttackHandler;
 import mekhq.campaign.autoresolve.component.Formation;
-import mekhq.utilities.RandomUtils;
 
 import java.util.Optional;
 

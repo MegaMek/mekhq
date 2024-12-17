@@ -43,10 +43,11 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
     private final Vector<Entity> graveyard = new Vector<>();
     private final Vector<Entity> devastated = new Vector<>();
     private final Vector<Entity> wrecked = new Vector<>();
-
+    private final VictoryResult victoryResult;
 
     public AutoResolveConcludedEvent(SimulationContext game, VictoryResult victoryResult) {
         this.controlledScenario = (game.getLocalPlayer().getTeam() == victoryResult.getWinningTeam());
+        this.victoryResult = victoryResult;
         this.game = game;
 
         game.getInGameObjects().stream()
@@ -83,6 +84,10 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
                 entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED ||
                 entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
             .forEach(wrecked::addElement);
+    }
+
+    public VictoryResult getVictoryResult() {
+        return victoryResult;
     }
 
     public IGame getGame() {

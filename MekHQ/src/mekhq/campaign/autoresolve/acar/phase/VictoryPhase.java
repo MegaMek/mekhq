@@ -35,7 +35,6 @@ public class VictoryPhase extends PhaseHandler {
 
     @Override
     protected void executePhase() {
-        // Nobody is left unscathed
         applyDamageToRemainingUnits(getSimulationManager());
         victoryPhaseReporter.victoryHeader();
         victoryPhaseReporter.victoryResult(getSimulationManager());

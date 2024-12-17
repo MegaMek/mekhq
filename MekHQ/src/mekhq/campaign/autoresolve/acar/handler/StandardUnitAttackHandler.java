@@ -129,35 +129,33 @@ public class StandardUnitAttackHandler extends AbstractActionHandler {
     }
 
     private void handleCrits(Formation target, SBFUnit targetUnit, int criticalRollResult, SBFUnit attackingUnit) {
-        if (criticalRollResult <= 4) {
-            // No crit
-            reporter.reportNoCrit();
-        } else if (criticalRollResult <= 7) {
-            // targeting critical
-            targetUnit.addTargetingCrit();
-            reporter.reportTargetingCrit(targetUnit);
-        } else if (criticalRollResult <= 9) {
-            // Damage crit
-            targetUnit.addDamageCrit();
-            reporter.reportDamageCrit(targetUnit);
-        } else if (criticalRollResult <= 11) {
-            // Both targeting and damage crit
-            targetUnit.addTargetingCrit();
-            targetUnit.addDamageCrit();
-            reporter.reportTargetingCrit(targetUnit);
-            reporter.reportDamageCrit(targetUnit);
-        } else {
-            // Destroyed
-            countKill(attackingUnit, targetUnit);
-            targetUnit.setCurrentArmor(0);
-            target.setHighStressEpisode();
-            reporter.reportUnitDestroyed();
+        switch (criticalRollResult) {
+            case 2, 3, 4 -> reporter.reportNoCrit();
+            case 5, 6, 7 -> {
+                targetUnit.addTargetingCrit();
+                reporter.reportTargetingCrit(targetUnit);
+            }
+            case 8, 9 -> {
+                targetUnit.addDamageCrit();
+                reporter.reportDamageCrit(targetUnit);
+            }
+            case 10, 11 -> {
+                targetUnit.addTargetingCrit();
+                targetUnit.addDamageCrit();
+                reporter.reportTargetingCrit(targetUnit);
+                reporter.reportDamageCrit(targetUnit);
+            }
+            default -> {
+                countKill(attackingUnit, targetUnit);
+                targetUnit.setCurrentArmor(0);
+                target.setHighStressEpisode();
+                reporter.reportUnitDestroyed();
+            }
         }
     }
 
 
     private void countKill(SBFUnit attackingUnit, SBFUnit targetUnit) {
-
         var killers = attackingUnit.getElements().stream().map(AlphaStrikeElement::getId)
             .map(e -> simulationManager().getGame().getEntity(e)).filter(Optional::isPresent).map(Optional::get).toList();
         var targets = targetUnit.getElements().stream().map(AlphaStrikeElement::getId)
@@ -193,39 +191,17 @@ public class StandardUnitAttackHandler extends AbstractActionHandler {
     }
 
     private int processDamageEngagementControlDefeat(EngagementControl engagementControl, double damage) {
-        switch(engagementControl) {
-            case NONE:
-                // nothing happens
-                break;
-            case OVERRUN:
-                break;
-            case STANDARD:
-                break;
-            case EVADE:
-                damage = damage * 0.5;
-                break;
-            case FORCED_ENGAGEMENT:
-                break;
+        if (engagementControl == EngagementControl.EVADE) {
+            return (int) (damage * 0.5);
         }
         return (int) damage;
     }
 
     private int processDamageEngagementControlVictory(EngagementControl engagementControl, double damage) {
-        switch(engagementControl) {
-            case NONE:
-                // nothing happens
-                break;
-            case OVERRUN:
-                damage = damage * 0.25;
-                break;
-            case STANDARD:
-                break;
-            case EVADE:
-                break;
-            case FORCED_ENGAGEMENT:
-                damage = damage * 0.5;
-                break;
-        }
-        return (int) damage;
+        return (int) switch(engagementControl) {
+            case OVERRUN -> damage * 0.25;
+            case FORCED_ENGAGEMENT -> damage * 0.5;
+            default -> damage;
+        };
     }
 }

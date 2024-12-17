@@ -37,7 +37,6 @@ import mekhq.campaign.autoresolve.component.Formation;
 import mekhq.campaign.autoresolve.component.FormationTurn;
 import mekhq.campaign.autoresolve.converter.SetupForces;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.ScenarioObjective;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;

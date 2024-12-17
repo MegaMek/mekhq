@@ -22,6 +22,7 @@ package mekhq.campaign.autoresolve.acar.action;
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.component.Formation;
+import mekhq.utilities.I18n;
 
 public class WithdrawToHitData extends TargetRoll {
 
@@ -30,7 +31,7 @@ public class WithdrawToHitData extends TargetRoll {
     }
 
     public static WithdrawToHitData compileToHit(SimulationContext game, Formation formation) {
-        var toHit = new WithdrawToHitData(formation.getTactics(), "Tactics");
+        var toHit = new WithdrawToHitData(formation.getTactics(), I18n.t("acar.formation_tactics"));
         processFormationModifiers(toHit, formation);
         processMorale(toHit, formation);
         return toHit;
@@ -41,19 +42,19 @@ public class WithdrawToHitData extends TargetRoll {
         var formationIsVehicleOnly = formation.isVehicle();
 
         if (formationIsInfantryOnly) {
-            toHit.addModifier(2, "Formation is infantry only");
+            toHit.addModifier(2, I18n.t("acar.formation_is_infantry_only"));
         }
         if (formationIsVehicleOnly) {
-            toHit.addModifier(1, "Formation is vehicle only");
+            toHit.addModifier(1, I18n.t("acar.formation_is_vehicle_only"));
         }
     }
 
     private static void processMorale(WithdrawToHitData toHit, Formation formation) {
         switch (formation.moraleStatus()) {
-            case SHAKEN -> toHit.addModifier(+1, "Shaken morale");
-            case UNSTEADY -> toHit.addModifier(+2, "Unsteady morale");
-            case BROKEN -> toHit.addModifier(+3, "Broken morale");
-            case ROUTED -> toHit.addModifier(TargetRoll.AUTOMATIC_FAIL, "Routed morale");
+            case SHAKEN -> toHit.addModifier(+1, I18n.t("acar.shaken_morale"));
+            case UNSTEADY -> toHit.addModifier(+2, I18n.t("acar.unsteady_morale"));
+            case BROKEN -> toHit.addModifier(+3, I18n.t("acar.broken_morale"));
+            case ROUTED -> toHit.addModifier(TargetRoll.AUTOMATIC_FAIL, I18n.t("acar.routed_morale"));
         }
     }
 }

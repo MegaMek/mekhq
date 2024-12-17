@@ -34,7 +34,7 @@ public class VictoryHelper {
     }
 
     public VictoryResult getVictoryResult() {
-        if (!this.result.isVictory()) {
+        if (this.result == null || !this.result.isVictory()) {
             this.result = new BattlefieldControlVictory().checkVictory(manager.getGame());
         }
         return this.result;

@@ -40,6 +40,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -266,7 +267,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         btnResolveScenario = new JButton(resourceMap.getString("btnResolveScenario.text"));
         btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText"));
-        btnResolveScenario.addActionListener(ev -> resolveScenario());
+        btnResolveScenario.addActionListener(ev -> getCampaign().getApp().resolveScenario());
         btnResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnResolveScenario);
 
@@ -720,74 +721,35 @@ public final class BriefingTab extends CampaignGuiTab {
             scenario.clearAllForcesAndPersonnel(getCampaign());
         }
     }
-
-    private void resolveScenario() {
-        int row = scenarioTable.getSelectedRow();
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        if (null == scenario) {
-            return;
-        }
-        boolean control = JOptionPane.showConfirmDialog(getFrame(),
-                "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
-        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
-        chooseFilesDialog.setVisible(true);
-        if (chooseFilesDialog.wasCancelled()) {
-            return;
-        }
-        // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
-        resolveDialog.setVisible(true);
-
-        if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            RetirementDefectionDialog dialog = new RetirementDefectionDialog(getCampaignGui(),
-                    getCampaign().getMission(scenario.getMissionId()), false);
-
-            if (!dialog.wasAborted()) {
-                getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
-            }
-        }
-
-        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-            HashMap<UUID, Integer> personnel = new HashMap<>();
-            HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-                PersonStatus status = tracker.getPeopleStatus().get(personId);
-                int injuryCount = 0;
-
-                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                    if (status.getHits() > person.getHitsPrior()) {
-                        injuryCount = status.getHits() - person.getHitsPrior();
-                    }
-                }
-
-                personnel.put(personId, injuryCount);
-                scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
-            }
-
-            boolean isCivilianHelp = false;
-
-            if (tracker.getScenario() instanceof AtBScenario) {
-                isCivilianHelp = ((AtBScenario) tracker.getScenario()).getScenarioType() == AtBScenario.CIVILIANHELP;
-            }
-
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
-        }
-
-        for (UUID personId : tracker.getPeopleStatus().keySet()) {
-            Person person = getCampaign().getPerson(personId);
-
-            if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.POW);
-            }
-        }
-
-        MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
-    }
+//
+//    private void resolveScenario() {
+//        int row = scenarioTable.getSelectedRow();
+//        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+//        if (null == scenario) {
+//            return;
+//        }
+//        boolean control = JOptionPane.showConfirmDialog(getFrame(),
+//                "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
+//                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+//        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
+//        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
+//        chooseFilesDialog.setVisible(true);
+//        if (chooseFilesDialog.wasCancelled()) {
+//            return;
+//        }
+//
+//        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
+//        resolveDialog.setVisible(true);
+//
+//        if (resolveDialog.wasAborted()) {
+//            // Should we run this again?
+//            MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
+//            return;
+//        }
+//
+//        PostScenarioDialogHandler.handle(
+//            getCampaignGui(), getCampaign(), (AtBScenario) getSelectedScenario(), tracker, control);
+//    }
 
     private void printRecordSheets() {
         final int row = scenarioTable.getSelectedRow();
@@ -869,12 +831,11 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private void autoResolveScenario() {
         Scenario scenario = getSelectedScenario();
-        if (!(scenario instanceof AtBScenario atBScenario)) {
+        if (null == scenario) {
             return;
         }
-
         switch(getCampaignOptions().getAutoResolveMethod()) {
-            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve(atBScenario, playerUnits(scenario, new StringBuilder()));
+            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve(playerUnits(scenario, new StringBuilder()));
             case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
         }
     }

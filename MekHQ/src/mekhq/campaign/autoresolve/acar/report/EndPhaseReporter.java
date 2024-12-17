@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 public class EndPhaseReporter {
 
     private final Consumer<PublicReportEntry> reportConsumer;
-    private static final Map<Integer, Integer> unitDestroyedMessageMap = Map.of(
+    private static final Map<Integer, Integer> reportIdForEachRemovalCondition = Map.of(
         IEntityRemovalConditions.REMOVE_DEVASTATED, 3337,
         IEntityRemovalConditions.REMOVE_EJECTED, 3338,
         IEntityRemovalConditions.REMOVE_PUSHED, 3339,
@@ -52,9 +52,9 @@ public class EndPhaseReporter {
     public void reportUnitDestroyed(Entity entity) {
         var crewMessageId = entity.getCrew().isDead() ? 3335 : 3336;
         var removalCondition = entity.getRemovalCondition();
-        var messageId = unitDestroyedMessageMap.getOrDefault(removalCondition, MSG_ID_UNIT_DESTROYED_UNKNOWINGLY);
+        var reportId = reportIdForEachRemovalCondition.getOrDefault(removalCondition, MSG_ID_UNIT_DESTROYED_UNKNOWINGLY);
 
-        var r = new PublicReportEntry(messageId)
+        var r = new PublicReportEntry(reportId)
             .add(new EntityNameReportEntry(entity).reportText())
             .add(new PublicReportEntry(crewMessageId)
                 .add(entity.getCrew().getName())
