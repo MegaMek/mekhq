@@ -1365,6 +1365,7 @@ public class Campaign implements ITechManager {
         unit.getEntity().setOwner(player);
         unit.getEntity().setGame(game);
         unit.getEntity().setExternalIdAsString(unit.getId().toString());
+        unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
 
         // now lets grab the parts from the test unit and set them up with this unit
         for (Part p : tu.getParts()) {
