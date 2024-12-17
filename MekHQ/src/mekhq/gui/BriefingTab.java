@@ -40,6 +40,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -721,74 +722,6 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
-    private void resolveScenario() {
-        int row = scenarioTable.getSelectedRow();
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        if (null == scenario) {
-            return;
-        }
-        boolean control = JOptionPane.showConfirmDialog(getFrame(),
-                "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
-        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
-        chooseFilesDialog.setVisible(true);
-        if (chooseFilesDialog.wasCancelled()) {
-            return;
-        }
-        // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
-        resolveDialog.setVisible(true);
-
-        if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            RetirementDefectionDialog dialog = new RetirementDefectionDialog(getCampaignGui(),
-                    getCampaign().getMission(scenario.getMissionId()), false);
-
-            if (!dialog.wasAborted()) {
-                getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
-            }
-        }
-
-        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-            HashMap<UUID, Integer> personnel = new HashMap<>();
-            HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-                PersonStatus status = tracker.getPeopleStatus().get(personId);
-                int injuryCount = 0;
-
-                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                    if (status.getHits() > person.getHitsPrior()) {
-                        injuryCount = status.getHits() - person.getHitsPrior();
-                    }
-                }
-
-                personnel.put(personId, injuryCount);
-                scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
-            }
-
-            boolean isCivilianHelp = false;
-
-            if (tracker.getScenario() instanceof AtBScenario) {
-                isCivilianHelp = ((AtBScenario) tracker.getScenario()).getScenarioType() == AtBScenario.CIVILIANHELP;
-            }
-
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
-        }
-
-        for (UUID personId : tracker.getPeopleStatus().keySet()) {
-            Person person = getCampaign().getPerson(personId);
-
-            if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.POW);
-            }
-        }
-
-        MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
-    }
-
     private void printRecordSheets() {
         final int row = scenarioTable.getSelectedRow();
         if (row < 0) {
@@ -862,8 +795,61 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(null);
     }
 
+
+    /**
+     * Resolve the selected scenario by proving a MUL file
+     */
+    private void resolveScenario() {
+        Scenario scenario = getSelectedScenario();
+        if (null == scenario) {
+            return;
+        }
+        getCampaign().getApp().resolveScenario(scenario);
+    }
+
+    /**
+     * Auto-resolve the selected scenario.
+     * Can run both the auto resolve using princess or using the ACS engine
+     */
     private void autoResolveScenario() {
-        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        Scenario scenario = getSelectedScenario();
+        if (null == scenario) {
+            return;
+        }
+        switch(getCampaignOptions().getAutoResolveMethod()) {
+            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
+            case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        }
+    }
+
+    private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        if (uids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Unit> chosen = new ArrayList<>();
+        for (UUID uid : uids) {
+            Unit u = getCampaign().getUnit(uid);
+
+            if ((null != u) && (null != u.getEntity())) {
+                if (null == u.checkDeployment()) {
+                    // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+                    chosen.add(u);
+                } else {
+                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
+                }
+            }
+        }
+        return chosen;
+    }
+
+    private Scenario getSelectedScenario() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
     private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {

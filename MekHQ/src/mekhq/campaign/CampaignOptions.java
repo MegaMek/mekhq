@@ -27,6 +27,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -601,6 +602,8 @@ public class CampaignOptions {
     private int scenarioModChance;
     private int scenarioModBV;
     private boolean autoConfigMunitions;
+    private AutoResolveMethod autoResolveMethod;
+    private boolean autoResolveVictoryChanceEnabled;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1132,10 +1135,6 @@ public class CampaignOptions {
         phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
         phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
-
-        // Remove Milestone after 0.49.19
-        phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = 95;
-        phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         // endregion Skill Randomization Tab
 
         // region Rank System Tab
@@ -1192,6 +1191,8 @@ public class CampaignOptions {
         useAtB = false;
         useStratCon = false;
         setSkillLevel(SkillLevel.REGULAR);
+        autoResolveMethod = AutoResolveMethod.PRINCESS;
+        autoResolveVictoryChanceEnabled = false;
 
         // Unit Administration
         useAero = false;
@@ -5172,6 +5173,8 @@ public class CampaignOptions {
 
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", getAutoResolveMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -5244,7 +5247,7 @@ public class CampaignOptions {
                 continue;
             }
 
-            logger.debug("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent());
+            logger.debug("{}\n\t{}", wn2.getNodeName(), wn2.getTextContent());
             try {
                 // region Repair and Maintenance Tab
                 if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -6158,6 +6161,10 @@ public class CampaignOptions {
                     // region AtB Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                     retVal.setSkillLevel(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveMethod")) {
+                    retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
+                    retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6432,4 +6439,19 @@ public class CampaignOptions {
         }
     }
     // endregion File IO
+    public AutoResolveMethod getAutoResolveMethod() {
+        return autoResolveMethod;
+    }
+
+    public void setAutoResolveMethod(final AutoResolveMethod autoResolveMethod) {
+        this.autoResolveMethod = autoResolveMethod;
+    }
+
+    public boolean isAutoResolveVictoryChanceEnabled() {
+        return autoResolveVictoryChanceEnabled;
+    }
+
+    public void setAutoResolveVictoryChanceEnabled(final boolean autoResolveVictoryChanceEnabled) {
+        this.autoResolveVictoryChanceEnabled = autoResolveVictoryChanceEnabled;
+    }
 }
