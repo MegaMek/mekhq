@@ -105,7 +105,9 @@ public record MekDamageApplier(Mek entity, boolean crewMustSurvive, boolean enti
                 var toHit = new ToHitData();
                 toHit.addModifier(4, "Ejection");
                 if (rollD6(2).isTargetRollSuccess(toHit)) {
-                    tryToEjectCrew();
+                    if (!tryToEjectCrew()) {
+                        tryToDamageCrew(Compute.randomRealIntInclusive(5));
+                    }
                 } else {
                     tryToDamageCrew(Crew.DEATH);
                 }

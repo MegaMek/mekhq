@@ -700,7 +700,9 @@ public class MekHQ implements GameListener {
                 I18n.t("AutoResolveDialog.victory") :
                 I18n.t("AutoResolveDialog.defeat");
             boolean control = yourSideControlsTheBattlefieldDialogAsk(message, title);
-            ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
+            var scenario = autoResolveConcludedEvent.getScenario();
+
+            ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
             tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame(), getCampaign().getPlayer()));
             tracker.setEvent(autoResolveConcludedEvent);
             tracker.processGame();
@@ -717,7 +719,7 @@ public class MekHQ implements GameListener {
                 return;
             }
             PostScenarioDialogHandler.handle(
-                campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, autoResolveConcludedEvent.controlledScenario());
+                campaignGUI, getCampaign(), scenario, tracker, autoResolveConcludedEvent.controlledScenario());
         } catch (Exception ex) {
             logger.error("Error during auto resolve concluded", ex);
         }

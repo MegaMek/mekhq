@@ -25,6 +25,7 @@ import megamek.common.IGame;
 import megamek.common.event.PostGameResolution;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
+import mekhq.campaign.mission.AtBScenario;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Enumeration;
@@ -37,7 +38,7 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
 
     private final IGame game;
     private final boolean controlledScenario;
-
+    private final AtBScenario scenario;
     private final Vector<Entity> survived = new Vector<>();
     private final Vector<Entity> retreated = new Vector<>();
     private final Vector<Entity> graveyard = new Vector<>();
@@ -49,6 +50,7 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
         this.controlledScenario = (game.getLocalPlayer().getTeam() == victoryResult.getWinningTeam());
         this.victoryResult = victoryResult;
         this.game = game;
+        this.scenario = game.getScenario();
 
         game.getInGameObjects().stream()
             .filter(Entity.class::isInstance)
@@ -84,6 +86,10 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
                 entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED ||
                 entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
             .forEach(wrecked::addElement);
+    }
+
+    public AtBScenario getScenario() {
+        return scenario;
     }
 
     public VictoryResult getVictoryResult() {

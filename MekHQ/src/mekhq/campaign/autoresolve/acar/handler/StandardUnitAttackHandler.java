@@ -19,18 +19,18 @@
 
 package mekhq.campaign.autoresolve.acar.handler;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Roll;
 import megamek.common.alphaStrike.AlphaStrikeElement;
 import megamek.common.strategicBattleSystems.SBFUnit;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
-import mekhq.campaign.autoresolve.acar.action.StandardUnitAttack;
 import mekhq.campaign.autoresolve.acar.action.AttackToHitData;
+import mekhq.campaign.autoresolve.acar.action.StandardUnitAttack;
 import mekhq.campaign.autoresolve.acar.report.AttackReporter;
 import mekhq.campaign.autoresolve.component.EngagementControl;
 import mekhq.campaign.autoresolve.component.Formation;
-import mekhq.utilities.RandomUtils;
 
 import java.util.Optional;
 
@@ -57,7 +57,7 @@ public class StandardUnitAttackHandler extends AbstractActionHandler {
         var target = targetOpt.orElseThrow();
 
         // Using simplified damage as of Interstellar Operations (BETA) page 241
-        var targetUnitOpt = RandomUtils.fastSample(target.getUnits());
+        var targetUnitOpt = ObjectUtility.getRandomItemSafe(target.getUnits());
         var targetUnit = targetUnitOpt.orElseThrow();
         resolveAttack(attacker, attack, target, targetUnit);
     }
@@ -161,7 +161,7 @@ public class StandardUnitAttackHandler extends AbstractActionHandler {
         var targets = targetUnit.getElements().stream().map(AlphaStrikeElement::getId)
             .map(e -> simulationManager().getGame().getEntity(e)).filter(Optional::isPresent).map(Optional::get).toList();
         for (var target : targets) {
-            RandomUtils.fastSample(killers).ifPresent(e -> e.addKill(target));
+            ObjectUtility.getRandomItemSafe(killers).ifPresent(e -> e.addKill(target));
         }
     }
 

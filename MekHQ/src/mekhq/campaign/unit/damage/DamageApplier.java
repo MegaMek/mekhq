@@ -206,8 +206,8 @@ public interface DamageApplier<E extends Entity> {
     private Integer tryToNotKillTheCrew(int hitCrew, Crew crew) {
         var hits = Math.min(crew.getHits() + hitCrew, Crew.DEATH);
         if (hits == Crew.DEATH) {
-            if (!Compute.rollD6(2).isTargetRollSuccess(11)) {
-                hits = Crew.DEATH - 1;
+            if (Compute.rollD6(2).isTargetRollSuccess(3)) {
+                hits = Compute.randomIntInclusive(Crew.DEATH);
             }
         }
 
@@ -235,6 +235,19 @@ public interface DamageApplier<E extends Entity> {
     }
 
     /**
+     * Sets the entity as destroyed by ejection if possible.
+     * @param entity entity to be set as destroyed
+     * @param <E> the type of the entity
+     */
+    static <E extends Entity> void setEntityDestroyedByEjection(E entity) {
+        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED) {
+            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
+            entity.setSalvage(true);
+            logger.trace("[{}] Entity destroyed by ejection", entity.getDisplayName());
+        }
+    }
+
+    /**
      * Tries to eject the crew of the entity if possible.
      *
      * @return true if the crew was ejected
@@ -242,12 +255,12 @@ public interface DamageApplier<E extends Entity> {
     default boolean tryToEjectCrew() {
         var entity = entity();
         var crew = entity.getCrew();
-        if (crew == null || crew.isEjected() || !entity().isEjectionPossible()) {
+        if (crew == null || crew.isEjected() || !entity().isEjectionPossible() || entityMustSurvive()) {
             return false;
         }
         crew.setEjected(true);
         entity.setDestroyed(true);
-        setEntityDestroyed(entity);
+        setEntityDestroyedByEjection(entity);
         logger.trace("[{}] Crew ejected", entity().getDisplayName());
         return true;
     }
