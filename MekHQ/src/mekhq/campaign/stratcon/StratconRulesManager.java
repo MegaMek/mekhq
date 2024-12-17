@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.stratcon;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.TargetRollModifier;
@@ -262,7 +263,6 @@ public class StratconRulesManager {
             Collections.shuffle(availableForcePool);
             availableForceIDs = availableForcePool;
         }
-
 
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
@@ -795,48 +795,66 @@ public class StratconRulesManager {
     }
 
     /**
-     * Deploys a force to a specified coordinate within the provided track and processes the
-     * deployment accordingly.
+     * Deploys a combat team (force) to a specified coordinate within the strategic track and performs the
+     * associated deployment activities, including handling scenarios, facilities, scouting behavior,
+     * and fog of war updates.
      *
-     * <p>The following actions are performed during force deployment:
+     * <p>The method processes the deployment as follows:
      * <ol>
-     *     <li>Processes the force deployment, which may reveal the fog of war in or around the
-     *     coordinates depending on the force's role.</li>
-     *     <li>If the target coordinates contain a hostile facility, a corresponding facility
-     *     scenario is created.</li>
-     *     <li>If the target coordinates are empty, there is a chance that a scenario may be created.</li>
-     *     <li>If a scenario is revealed at the target coordinates, the force is assigned to it, and
-     *     the scenario is finalized.</li>
-     *     <li>If the target coordinates contain a non-allied facility or an empty coordinate that
-     *     qualifies for a new scenario:
-     *         <ul>
-     *             <li>If the deploying force is performing a scouting role, the scenario is moved
-     *             to an unoccupied adjacent coordinate, if available.</li>
-     *         </ul>
-     *     </li>
+     *     <li>Reveals the fog of war at or near the deployment coordinates based on the force's role, using
+     *     {@code processForceDeployment}.</li>
+     *     <li>If the deployment coordinates contain an existing hostile facility, a scenario involving
+     *     that facility is created.</li>
+     *     <li>If the deployment coordinates are empty, a chance-based scenario may be created depending
+     *     on the scenario odds.</li>
+     *     <li>If a scenario is revealed (either from the facility or randomly):</li>
+     *         <li>- The deployed force is assigned to that scenario.</li>
+     *         <li>- The scenario is finalized and parameters are adjusted accordingly.</li>
+     *     <li>If a deploying force is performing a scouting mission:</li>
+     *         <li>- The target coordinates may be shifted to an unoccupied adjacent coordinate if available.</li>
+     *     <li>If the coordinates contain a non-allied facility or qualify for a new scenario, a
+     *     scenario is generated:</li>
+     *         <li>- If forces are already deployed at the location, generate a scenario involving
+     *         these forces.</li>
+     *         <li>- If no forces are present, assign available forces from the campaign or randomly
+     *         select a suitable combat team for the scenario.</li>
+     *         <li>- If applicable, determine whether the scenario is under liaison command based on
+     *             contract command rights, and update the scenario requirements.</li>
      * </ol>
      *
-     * @param coords   the coordinates to deploy the force to
-     * @param forceID  the identifier of the force being deployed
-     * @param campaign the campaign in which the deployment is occurring
-     * @param contract the contract associated with the current campaign
-     * @param track    the track state containing information about scenarios, facilities, and
-     *                 strategic details
-     * @param sticky   whether the deployment is considered "sticky" (forces stay in position
-     *                without auto-updates)
+     * @param coords   the {@link StratconCoords} representing the deployment coordinates.
+     * @param forceID  the unique identifier of the combat team (force) being deployed.
+     * @param campaign the current {@link Campaign} context, which provides access to combat teams, facilities,
+     *                 and other campaign-level data.
+     * @param contract the {@link AtBContract} associated with the campaign, which determines rules
+     *                 and command rights for the deployment.
+     * @param track    the {@link StratconTrackState} representing the strategic track, including details
+     *                 about scenarios, facilities, and force assignments.
+     * @param sticky   a {@code boolean} flag indicating whether the deployment is "sticky," meaning
+     *                 the forces remain at the deployment location without automatically updating
+     *                 their position.
      */
     public static void deployForceToCoords(StratconCoords coords, int forceID, Campaign campaign,
                                            AtBContract contract, StratconTrackState track, boolean sticky) {
+        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+
+        // This shouldn't be possible, but never hurts to have a little insurance
+        if (combatTeam == null) {
+            return;
+        }
+
+        boolean isScouting = combatTeam.getRole().isScouting();
+
         // the following things should happen:
-        // 1. call to "process force deployment", which reveals fog of war in or around
-        // the coords, depending on force role
+        // 1. call to "process force deployment", which reveals fog of war in or around the coords,
+        // depending on force role
         // 2. if coords are a hostile facility, we get a facility scenario
         // 3. if coords are empty, we *may* get a scenario
         processForceDeployment(coords, forceID, campaign, track, sticky);
 
         // we may stumble on a fixed objective scenario - in that case assign the force
-        // to it and finalize
-        // we also will not be encountering any of the other stuff so bug out afterwards
+        // to it and finalize we also will not be encountering any of the other stuff so bug out
+        // afterward
         StratconScenario revealedScenario = track.getScenario(coords);
         if (revealedScenario != null) {
             revealedScenario.addPrimaryForce(forceID);
@@ -846,41 +864,61 @@ public class StratconRulesManager {
             return;
         }
 
+        if (isScouting) {
+            StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
+
+            if (newCoords != null) {
+                coords = newCoords;
+            }
+        }
+
         // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
+
         int targetNum = calculateScenarioOdds(track, contract, true);
         boolean spawnScenario = (facility == null) && (randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
-            // If the force is scouting, and we're placing a new scenario down,
-            // place it in an unoccupied adjacent hex, instead.
-            if (!isNonAlliedFacility) {
-                CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+            StratconScenario scenario;
+            boolean autoAssignLances = !isScouting;
 
-                if (combatTeam != null && combatTeam.getRole().isScouting()) {
-                    StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
+            Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
 
-                    if (newCoords != null) {
-                        coords = newCoords;
+            // Do we already have forces deployed to the target coordinates?
+            // If so, assign them to the scenario.
+            if (preDeployedForce != null && !preDeployedForce.isEmpty()) {
+                scenario = generateScenarioForExistingForces(coords,
+                    track.getAssignedCoordForces().get(coords), contract, campaign, track);
+            // Otherwise, pick a random force from those available
+            } else {
+                List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
+                Collections.shuffle(availableForceIDs);
+
+                // If the player doesn't have any available forces, we grab a force at random to
+                // seed the scenario
+                if (availableForceIDs.isEmpty()) {
+                    ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
+                    if (!combatTeams.isEmpty()) {
+                        combatTeam = ObjectUtility.getRandomItem(combatTeams);
+
+                        forceID = combatTeam.getForceId();
+                    } else {
+                        // If the player doesn't have any combat teams (somehow), they get a free pass
+                        return;
                     }
                 }
+
+                scenario = setupScenario(coords, forceID, campaign, contract, track);
             }
 
-            // Once we've processed any coord changes, begin setting up the scenario
-            StratconScenario scenario = setupScenario(coords, forceID, campaign, contract, track);
-            // we deploy immediately in this case, since we deployed the force manually
-            setScenarioDates(0, track, campaign, scenario);
-            AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
-            setScenarioParametersFromBiome(track, scenario);
-
-            // if we wound up with a field scenario, we may sub in DropShips carrying
-            // units of the force in question
-            if (spawnScenario) {
-                swapInPlayerUnits(scenario, campaign, forceID);
+            // if under liaison command, randomly determine if this is a Liason scenario
+            if (contract.getCommandRights().isLiaison() && (randomInt(4) == 0)) {
+                scenario.setRequiredScenario(true);
+                setAttachedUnitsModifier(scenario, contract);
             }
 
-            commitPrimaryForces(campaign, scenario, track);
+            finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
         }
     }
 
