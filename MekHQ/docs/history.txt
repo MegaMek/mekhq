@@ -98,6 +98,9 @@ MEKHQ VERSION HISTORY:
 + PR #5400: Removed Contract Breach References in Scenario and Loan Events
 + PR #5401: Set Default Maintenance Multiplier for Salvaged Units
 + PR #5403: Disabled Commit Forces Button when No Forces Selected
++ PR #5158: Implemented Resupply Module
++ PR #5407: Updated Name of I18n Class
++ PR #5411: Updated Damage Application in ACAR
 
 
 
