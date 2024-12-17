@@ -26,7 +26,7 @@ import mekhq.campaign.autoresolve.acar.action.WithdrawAction;
 import mekhq.campaign.autoresolve.acar.action.WithdrawToHitData;
 import mekhq.campaign.autoresolve.acar.report.WithdrawReporter;
 import mekhq.campaign.unit.damage.DamageApplierChooser;
-import mekhq.utilities.I18n;
+import mekhq.utilities.Internationalization;
 
 public class WithdrawActionHandler extends AbstractActionHandler {
 
@@ -60,7 +60,7 @@ public class WithdrawActionHandler extends AbstractActionHandler {
         var withdrawFormation = withdrawOpt.get();
         var toHit = WithdrawToHitData.compileToHit(game(), withdrawFormation);
         if (withdrawFormation.isCrippled()) {
-            toHit.addModifier(3, I18n.t("acar.withdraw.crippled"));
+            toHit.addModifier(3, Internationalization.getText("acar.withdraw.crippled"));
         }
 
         var withdrawRoll = Compute.rollD6(2);

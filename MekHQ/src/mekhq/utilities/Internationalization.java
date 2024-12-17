@@ -26,20 +26,20 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * I18n class to handle internationalization
+ * Class to handle internationalization (you will find online material on that looking for i18n)
  * It makes use of some short names to make it easier to use since it is used in many places
  */
-public class I18n {
+public class Internationalization {
 
     private static final String PREFIX = "mekhq.resources.";
-    private static final String DEFAULT = "messages";
+    protected static final String DEFAULT = "messages";
     private final ConcurrentHashMap<String, ResourceBundle> resourceBundles = new ConcurrentHashMap<>();
-    private static final I18n instance = new I18n();
+    private static final Internationalization instance = new Internationalization();
 
-    private I18n() {
+    protected Internationalization() {
     }
 
-    public static I18n getInstance() {
+    public static Internationalization getInstance() {
         return instance;
     }
 
@@ -54,21 +54,11 @@ public class I18n {
      * @param key the key of the string
      * @return the localized string
      */
-    public static String getLocalizedText(String bundleName, String key) {
-        if (I18n.getInstance().getResourceBundle(bundleName).containsKey(key)) {
-            return I18n.getInstance().getResourceBundle(bundleName).getString(key);
+    public static String getTextAt(String bundleName, String key) {
+        if (Internationalization.getInstance().getResourceBundle(bundleName).containsKey(key)) {
+            return Internationalization.getInstance().getResourceBundle(bundleName).getString(key);
         }
         return "!" + key + "!";
-    }
-
-    /**
-     * Get a localized string from a specific bundle
-     * @param bundleName the name of the bundle
-     * @param key the key of the string
-     * @return the localized string
-     */
-    public static String t(String bundleName, String key) {
-        return getLocalizedText(bundleName, key);
     }
 
     /**
@@ -76,31 +66,19 @@ public class I18n {
      * @param key the key of the string
      * @return the localized string
      */
-    public static String t(String key) {
-        return getLocalizedText(DEFAULT, key);
+    public static String getText(String key) {
+        return getTextAt(DEFAULT, key);
     }
-    
+
     /**
      * Get a formatted localized string from the default bundle
      * @param key the key of the string
      * @param args the arguments to format the string
      * @return the localized string
      */
-    public static String ft(String key, Object... args) {
-        return MessageFormat.format(getFormattedLocalizedText(DEFAULT, key), args);
+    public static String getFormattedText(String key, Object... args) {
+        return MessageFormat.format(getFormattedTextAt(DEFAULT, key), args);
     }
-
-    /**
-     * Get a formatted localized string from a bundle
-     * @param bundleName the name of the bundle
-     * @param key the key of the string
-     * @param args the arguments to format the string
-     * @return the localized string
-     */
-    public static String flt(String bundleName, String key, Object... args) {
-        return MessageFormat.format(getFormattedLocalizedText(bundleName, key), args);
-    }
-
 
     /**
      * Get a formatted localized string from the default bundle
@@ -109,8 +87,9 @@ public class I18n {
      * @param args the arguments to format the string
      * @return the localized string
      */
-    public static String getFormattedLocalizedText(String bundleName, String key, Object... args) {
-        return MessageFormat.format(getLocalizedText(bundleName, key), args);
+    public static String getFormattedTextAt(String bundleName, String key, Object... args) {
+        return MessageFormat.format(getTextAt(bundleName, key), args);
     }
+
 
 }
