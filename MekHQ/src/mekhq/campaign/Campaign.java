@@ -72,6 +72,8 @@ import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -146,12 +148,15 @@ import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 /**
  * The main campaign class, keeps track of teams and units
@@ -3819,6 +3824,10 @@ public class Campaign implements ITechManager {
                         if (stub) {
                             scenario.convertToStub(this, ScenarioStatus.DEFEAT);
                             addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
+
+                            if (scenario.getStratConScenarioType().isResupply()) {
+                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            }
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
@@ -3950,6 +3959,16 @@ public class Campaign implements ITechManager {
                 if (!report.isBlank()) {
                     addReport(report);
                 }
+
+                // Resupply
+                if (getCampaignOptions().isUseStratCon()) {
+                    boolean inLocation = location.isOnPlanet()
+                        && location.getCurrentSystem().equals(contract.getSystem());
+
+                    if (inLocation) {
+                        processResupply(contract);
+                    }
+                }
             }
         }
 
@@ -4049,6 +4068,28 @@ public class Campaign implements ITechManager {
                     ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                     CLOSING_SPAN_TAG, contract.getName()));
             }
+        }
+    }
+
+    /**
+     * Processes the resupply operation for a given contract.
+     * <p>
+     * This method checks if the contract type is not Guerrilla Warfare or if a
+     * d6 roll is greater than 4. If any of these conditions is met, it calculates the maximum
+     * resupply size based on the contract's required lances, creates an instance of the
+     * {@link Resupply} class, and initiates a resupply action.
+     *
+     * @param contract The relevant {@link AtBContract}
+     */
+    private void processResupply(AtBContract contract) {
+        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+
+        if (!isGuerrilla || Compute.d6(1) > 4) {
+            int dropCount = (int) round((double) contract.getRequiredLances() / 3);
+
+            ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
+            Resupply resupply = new Resupply(this, contract, resupplyType);
+            performResupply(resupply, contract, dropCount);
         }
     }
 
@@ -6858,57 +6899,6 @@ public class Campaign implements ITechManager {
         return null;
     }
 
-    /**
-     * AtB: count all available bonus parts
-     *
-     * @return the total <code>int</code> number of bonus parts for all active
-     *         contracts
-     */
-    public int totalBonusParts() {
-        int retVal = 0;
-        if (hasActiveContract()) {
-            for (Contract c : getActiveContracts()) {
-                if (c instanceof AtBContract) {
-                    retVal += ((AtBContract) c).getNumBonusParts();
-                }
-            }
-        }
-        return retVal;
-    }
-
-    public void spendBonusPart(IAcquisitionWork targetWork) {
-        // Can only spend from active contracts, so if there are none we can't spend a
-        // bonus part
-        if (!hasActiveContract()) {
-            return;
-        }
-
-        String report = targetWork.find(0);
-
-        if (report.endsWith("0 days.")) {
-            // First, try to spend from the contact the Acquisition's unit is attached to
-            AtBContract contract = getAttachedAtBContract(targetWork.getUnit());
-
-            if (contract == null) {
-                // Then, just the first free one that is active
-                for (Contract c : getActiveContracts()) {
-                    if (((AtBContract) c).getNumBonusParts() > 0) {
-                        contract = (AtBContract) c;
-                        break;
-                    }
-                }
-            }
-
-            if (contract == null) {
-                logger.error("AtB: used bonus part but no contract has bonus parts available.");
-            } else {
-                addReport(
-                        resources.getString("bonusPartLog.text") + ' ' + targetWork.getAcquisitionPart().getPartName());
-                contract.useBonusPart();
-            }
-        }
-    }
-
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
         AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
 
@@ -8735,22 +8725,46 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets a string to use for addressing the commander.
-     * If no commander is flagged, returns a default address.
+     * Retrieves the address or title for the commanding officer, either in a formal or informal format.
      *
-     * @return The title of the commander, or a default string if no commander.
+     * <p>This method checks for the presence of a flagged commander. If no commander is found,
+     * a general fallback address is returned based on the specified formality. If a commander is
+     * present, it further tailors the address based on the gender of the commander (for informal styles)
+     * or their rank and surname (for formal styles).</p>
+     *
+     * @param isInformal A boolean flag indicating whether the address should be informal
+     *                   (true for informal, false for formal).
+     * @return A {@link String} representing the appropriate address for the commander,
+     *         either formal or informal.
      */
-    public String getCommanderAddress() {
+    public String getCommanderAddress(boolean isInformal) {
         Person commander = getFlaggedCommander();
 
         if (commander == null) {
-            return resources.getString("generalFallbackAddress.text");
+            if (isInformal) {
+                return resources.getString("generalFallbackAddressInformal.text");
+            } else {
+                return resources.getString("generalFallbackAddress.text");
+            }
+        }
+
+        if (isInformal) {
+            Gender commanderGender = commander.getGender();
+
+            return switch (commanderGender) {
+                case MALE -> resources.getString("informalAddressMale.text");
+                case FEMALE -> resources.getString("informalAddressFemale.text");
+                case OTHER_MALE, OTHER_FEMALE, RANDOMIZE ->
+                    resources.getString("generalFallbackAddressInformal.text");
+            };
         }
 
         String commanderRank = commander.getRankName();
 
-        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
-            return commander.getFullName();
+        if (commanderRank.equalsIgnoreCase("None")
+            || commanderRank.equalsIgnoreCase("-")
+            || commanderRank.isBlank()) {
+            return resources.getString("generalFallbackAddress.text");
         }
 
         return commanderRank;
@@ -8843,5 +8857,24 @@ public class Campaign implements ITechManager {
                 partsInUseRequestedStockMap.get(key));
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
+    }
+    /**
+     * Retrieves the campaign faction icon for the specified {@link Campaign}.
+     * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
+     * Otherwise, a default faction logo is fetched based on the campaign's faction short name.
+     *
+     * @return An {@link ImageIcon} representing the faction icon for the given campaign.
+     */
+    public ImageIcon getCampaignFactionIcon() {
+        ImageIcon icon;
+        StandardForceIcon campaignIcon = getUnitIcon();
+
+        if (campaignIcon.getFilename() == null) {
+            icon = getFactionLogo(this, getFaction().getShortName(),
+                true);
+        } else {
+            icon = new ImageIcon(campaignIcon.getFilename());
+        }
+        return icon;
     }
 }

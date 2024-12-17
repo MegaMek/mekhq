@@ -120,6 +120,7 @@ public class AtBDynamicScenarioFactory {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
 
         scenario.setName(template.name);
+        scenario.setStratConScenarioType(template.getStratConScenarioType());
         scenario.setDesc(template.detailedBriefing);
         scenario.setTemplate(template);
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());

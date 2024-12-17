@@ -77,6 +77,7 @@ public class Force {
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
+    private boolean convoyForce;
     private boolean isCombatTeam;
     private int overrideCombatTeam;
     private FormationLevel formationLevel;
@@ -100,6 +101,7 @@ public class Force {
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
+        this.convoyForce = false;
         this.isCombatTeam = false;
         this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
@@ -159,7 +161,7 @@ public class Force {
     }
 
     public boolean isCombatForce() {
-        return combatForce;
+        return combatForce && !convoyForce;
     }
 
     public void setCombatForce(boolean combatForce, boolean setForSubForces) {
@@ -173,6 +175,24 @@ public class Force {
 
     public boolean isCombatTeam() {
         return isCombatTeam;
+    }
+
+    /**
+     * @return {@code true} if this is a convoy force, {@code false} otherwise.
+     */
+    public boolean isConvoyForce() {
+        return convoyForce;
+    }
+
+    /**
+     * Sets the status of the force as a convoy force. If requested, propagate this status to all
+     * sub-forces recursively.
+     *
+     * @param convoyForce {@code true} to mark force as a convoy force, {@code false} to mark force
+     *                     as non-convoy.
+     */
+    public void setConvoyForce(boolean convoyForce) {
+        this.convoyForce = convoyForce;
     }
 
     public void setCombatTeamStatus(final boolean isCombatTeam) {
@@ -390,7 +410,7 @@ public class Force {
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
         Vector<UUID> allUnits;
 
-        if (combatForcesOnly && !isCombatForce()) {
+        if (combatForcesOnly && !isCombatForce() && !isConvoyForce()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
@@ -685,6 +705,7 @@ public class Force {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "convoyForce", convoyForce);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
@@ -733,6 +754,8 @@ public class Force {
                     force.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     force.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
+                    force.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
                     force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {

@@ -19,20 +19,6 @@
 
 package mekhq.campaign.mission;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-
-import org.w3c.dom.Node;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -44,7 +30,20 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This is the root data structure for organizing information related to a
@@ -60,6 +59,7 @@ public class ScenarioTemplate implements Cloneable {
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 
     public String name;
+    private ScenarioType stratConScenarioType;
     public String shortBriefing;
     public String detailedBriefing;
 
@@ -77,27 +77,32 @@ public class ScenarioTemplate implements Cloneable {
 
     @Override
     public ScenarioTemplate clone() {
-        ScenarioTemplate st = new ScenarioTemplate();
-        st.name = this.name;
-        st.shortBriefing = this.shortBriefing;
-        st.detailedBriefing = this.detailedBriefing;
-        st.isHostileFacility = this.isHostileFacility;
-        st.isAlliedFacility = this.isAlliedFacility;
+        ScenarioTemplate template = new ScenarioTemplate();
+        template.name = this.name;
+        template.stratConScenarioType = getStratConScenarioType();
+        template.shortBriefing = this.shortBriefing;
+        template.detailedBriefing = this.detailedBriefing;
+        template.isHostileFacility = this.isHostileFacility;
+        template.isAlliedFacility = this.isAlliedFacility;
         for (ScenarioForceTemplate sft : scenarioForces.values()) {
-            st.scenarioForces.put(sft.getForceName(), sft.clone());
+            template.scenarioForces.put(sft.getForceName(), sft.clone());
         }
 
         for (String mod : scenarioModifiers) {
-            st.scenarioModifiers.add(mod);
+            template.scenarioModifiers.add(mod);
         }
 
         for (ScenarioObjective obj : scenarioObjectives) {
-            st.scenarioObjectives.add(new ScenarioObjective(obj));
+            template.scenarioObjectives.add(new ScenarioObjective(obj));
         }
 
-        st.mapParameters = (ScenarioMapParameters) mapParameters.clone();
+        template.mapParameters = mapParameters.clone();
 
-        return st;
+        return template;
+    }
+
+    public ScenarioType getStratConScenarioType() {
+        return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
     }
 
     /**

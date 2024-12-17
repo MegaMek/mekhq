@@ -458,7 +458,8 @@ public class StratconTab extends CampaignGuiTab {
         if (selectedTrack == null) {
             return;
         }
-        cmd.display(selectedTrack.contract.getStratconCampaignState(), selectedTrack.track, getCampaign().isGM());
+        cmd.display(getCampaign(), selectedTrack.contract.getStratconCampaignState(),
+            selectedTrack.track, getCampaign().isGM());
         cmd.setModalityType(ModalityType.APPLICATION_MODAL);
         cmd.setVisible(true);
     }
