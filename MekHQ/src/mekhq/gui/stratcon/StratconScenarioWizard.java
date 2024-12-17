@@ -213,9 +213,7 @@ public class StratconScenarioWizard extends JDialog {
     private void setAssignForcesUI(GridBagConstraints gbc, boolean reinforcements) {
         // generate a lance selector with the following parameters:
         // all forces assigned to the current track that aren't already assigned
-        // elsewhere
-        // max number of items that can be selected = current scenario required lances
-
+        // elsewhere max number of items that can be selected = current scenario required lances
         List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements
                 ? currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces()
                 : currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
@@ -242,7 +240,10 @@ public class StratconScenarioWizard extends JDialog {
             JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
 
             availableForceList
-                    .addListSelectionListener(e -> availableForceSelectorChanged(e, selectedForceInfo, reinforcements));
+                    .addListSelectionListener(e -> {
+                        availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
+                        btnCommit.setEnabled(true);
+                    });
 
             availableForceLists.put(forceTemplate.getForceName(), availableForceList);
 
@@ -465,6 +466,7 @@ public class StratconScenarioWizard extends JDialog {
         btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
         btnCommit.addActionListener(this::btnCommitClicked);
+        btnCommit.setEnabled(Objects.requireNonNull(currentScenario.getCurrentState()) != ScenarioState.UNRESOLVED);
 
         gbc.gridheight = GridBagConstraints.REMAINDER;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
