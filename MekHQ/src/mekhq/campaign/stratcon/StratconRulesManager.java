@@ -1954,6 +1954,10 @@ public class StratconRulesManager {
                 continue;
             }
 
+            if (formation.getRole().isInReserve()) {
+                continue;
+            }
+
             int primaryUnitType = force.getPrimaryUnitType(campaign);
             boolean noReinforcementRestriction = !reinforcements ||
                 (getReinforcementType(force.getId(), currentTrack, campaign, campaignState) != ReinforcementEligibilityType.NONE);
