@@ -565,15 +565,15 @@ public class MekHQ implements GameListener {
     /**
      * This method is called when player wants to manually resolve the scenario providing MUL files.
      */
-    public void resolveScenario() {
-        if (null == currentScenario) {
+    public void resolveScenario(Scenario selectedScenario) {
+        if (null == selectedScenario) {
             return;
         }
         boolean control = yourSideControlsTheBattlefieldDialogAsk(
             I18n.t("ResolveDialog.control.message"),
             I18n.t("ResolveDialog.control.title"));
 
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
+        ResolveScenarioTracker tracker = new ResolveScenarioTracker(selectedScenario, getCampaign(), control);
 
         ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(campaignGUI.getFrame(), true, tracker);
         chooseFilesDialog.setVisible(true);
@@ -589,7 +589,7 @@ public class MekHQ implements GameListener {
         }
 
         PostScenarioDialogHandler.handle(
-            campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, control);
+            campaignGUI, getCampaign(), (AtBScenario) selectedScenario, tracker, control);
     }
 
     private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
@@ -644,14 +644,14 @@ public class MekHQ implements GameListener {
      * This method is called when the player wants to auto resolve the scenario using ACAR method
      * @param units The list of player units involved in the scenario
      */
-    public void startAutoResolve(List<Unit> units) {
+    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
         String message = I18n.t("AutoResolveDialog.message");
 
         var numberOfSimulations = NUMBER_OF_COMBAT_SIMULATIONS;
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, (AtBScenario) currentScenario, units);
+            var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, scenario, units);
             stopWatch.stop();
             if (simulatedVictories.getRuns() == 0 && simulatedVictories.getRuns() < numberOfSimulations) {
                 message = I18n.t("AutoResolveDialog.messageFailedCalc");
@@ -681,7 +681,7 @@ public class MekHQ implements GameListener {
             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
 
         if (proceed) {
-            var event = new Resolver(getCampaign(), units, (AtBScenario) currentScenario, new SimulationOptions(getCampaign().getGameOptions()))
+            var event = new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()))
                 .resolveSimulation();
             autoResolveConcluded(event);
         }

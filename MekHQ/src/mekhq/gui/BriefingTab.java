@@ -267,7 +267,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         btnResolveScenario = new JButton(resourceMap.getString("btnResolveScenario.text"));
         btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText"));
-        btnResolveScenario.addActionListener(ev -> getCampaign().getApp().resolveScenario());
+        btnResolveScenario.addActionListener(ev -> resolveScenario());
         btnResolveScenario.setEnabled(false);
         panScenarioButtons.add(btnResolveScenario);
 
@@ -721,35 +721,6 @@ public final class BriefingTab extends CampaignGuiTab {
             scenario.clearAllForcesAndPersonnel(getCampaign());
         }
     }
-//
-//    private void resolveScenario() {
-//        int row = scenarioTable.getSelectedRow();
-//        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-//        if (null == scenario) {
-//            return;
-//        }
-//        boolean control = JOptionPane.showConfirmDialog(getFrame(),
-//                "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
-//                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-//        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
-//        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
-//        chooseFilesDialog.setVisible(true);
-//        if (chooseFilesDialog.wasCancelled()) {
-//            return;
-//        }
-//
-//        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
-//        resolveDialog.setVisible(true);
-//
-//        if (resolveDialog.wasAborted()) {
-//            // Should we run this again?
-//            MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
-//            return;
-//        }
-//
-//        PostScenarioDialogHandler.handle(
-//            getCampaignGui(), getCampaign(), (AtBScenario) getSelectedScenario(), tracker, control);
-//    }
 
     private void printRecordSheets() {
         final int row = scenarioTable.getSelectedRow();
@@ -826,6 +797,17 @@ public final class BriefingTab extends CampaignGuiTab {
 
 
     /**
+     * Resolve the selected scenario by proving a MUL file
+     */
+    private void resolveScenario() {
+        Scenario scenario = getSelectedScenario();
+        if (null == scenario) {
+            return;
+        }
+        getCampaign().getApp().resolveScenario(scenario);
+    }
+
+    /**
      * Auto-resolve the selected scenario.
      * Can run both the auto resolve using princess or using the ACS engine
      */
@@ -835,7 +817,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         switch(getCampaignOptions().getAutoResolveMethod()) {
-            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve(playerUnits(scenario, new StringBuilder()));
+            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
             case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
         }
     }
