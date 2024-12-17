@@ -4586,7 +4586,7 @@ public class Unit implements ITechnology {
         Objects.requireNonNull(person);
         if (getCampaign().getPerson(person.getId()) == null) {
             getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false);
-            logger.warn(String.format("The person %s added this unit %s, was not in the campaign.",
+            logger.debug(String.format("The person %s added this unit %s, was not in the campaign.",
                     person.getFullName(), getName()));
         }
     }

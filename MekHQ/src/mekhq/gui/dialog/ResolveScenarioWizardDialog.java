@@ -174,6 +174,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JTextArea txtSalvage;
     private JTextArea txtRewards;
     //endregion Preview Panel components
+    private boolean aborted = true;
 
     private static final MMLogger logger = MMLogger.create(ResolveScenarioWizardDialog.class);
 
@@ -213,14 +214,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
-
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-        // Adding Escape Mnemonic
-        getRootPane().registerKeyboardAction(e -> dispose(),
+        if (!tracker.isAutoResolve()) {
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
-
+        } else {
+            this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        }
         setName("Form");
 
         getContentPane().setLayout(new GridBagLayout());
@@ -552,8 +553,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridy = gridy++;
             pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
 
-            String salvageUsed = "<html>" + ((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())) + currentSalvagePct + '%' + ((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG) + "<span>(max " + maxSalvagePct + "%)</span></html>";
-            lblSalvagePct2 = new JLabel(salvageUsed);
+            StringBuilder salvageUsed = new StringBuilder();
+            salvageUsed.append("<html>")
+                .append((currentSalvagePct <= maxSalvagePct) ? "" :
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+                .append(currentSalvagePct).append("%")
+                .append((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG)
+                .append("<span>(max ").append(maxSalvagePct).append("%)</span></html>");
+            lblSalvagePct2 = new JLabel(salvageUsed.toString());
             gridBagConstraints.gridx = gridx--;
             pnlSalvageValue.add(lblSalvagePct2, gridBagConstraints);
 
@@ -1590,7 +1597,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         StratconRulesManager.processScenarioCompletion(tracker);
-
+        aborted = false;
         this.setVisible(false);
     }
 
@@ -1607,10 +1614,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void setEnabledTabs() {
         for( int i = 0; i < tabMain.getTabCount(); i++ ) {
             boolean enable = switch (tabMain.getTitleAt(i)) {
-                case UNITSPANEL -> !tracker.getUnitsStatus().keySet().isEmpty();
+                case UNITSPANEL -> !tracker.getUnitsStatus().isEmpty();
                 case OBJECTIVEPANEL -> tracker.getScenario().hasObjectives();
-                case PILOTPANEL -> !tracker.getPeopleStatus().keySet().isEmpty();
-                case PRISONERPANEL -> !tracker.getOppositionPersonnel().keySet().isEmpty();
+                case PILOTPANEL -> !tracker.getPeopleStatus().isEmpty();
+                case PRISONERPANEL -> !tracker.getOppositionPersonnel().isEmpty();
                 case SALVAGEPANEL -> !tracker.getPotentialSalvage().isEmpty()
                         && (!(tracker.getMission() instanceof Contract)
                         || ((Contract) tracker.getMission()).canSalvage());
@@ -1783,7 +1790,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         String salvageUsed = "<html>" + ((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())) + currentSalvagePct + '%' + ((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG) + "<span>(max " + maxSalvagePct + "%)</span></html>";
 
-        lblSalvagePct2.setText(salvageUsed);
+        salvageUsed.append("<html>")
+            .append((currentSalvagePct <= maxSalvagePct) ? "" :
+                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+            .append(currentSalvagePct).append("%")
+            .append((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG)
+            .append("<span>(max ").append(maxSalvagePct).append("%)</span></html>");
+
+        lblSalvagePct2.setText(salvageUsed.toString());
     }
 
 
@@ -1901,6 +1915,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         label.setForeground(objectiveProcessor.objectiveMet(objective, qualifyingUnitCount)
                 ? Color.green.darker() : Color.RED);
+    }
+
+    public boolean wasAborted() {
+        return aborted;
     }
 
     private class CheckTotalListener implements ItemListener {
