@@ -582,7 +582,8 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true, tracker);
+        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getCampaign(),
+            campaignGUI.getFrame(), true, tracker);
         resolveDialog.setVisible(true);
 
         if (resolveDialog.wasAborted()) {
@@ -709,7 +710,7 @@ public class MekHQ implements GameListener {
             tracker.processGame();
 
             ResolveScenarioWizardDialog resolveDialog =
-                new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
+                new ResolveScenarioWizardDialog(getCampaign(), campaignGUI.getFrame(),
                     true, tracker);
             resolveDialog.setVisible(true);
             if (resolveDialog.wasAborted()) {

@@ -1788,12 +1788,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
 
-        String salvageUsed = "<html>" + ((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())) + currentSalvagePct + '%' + ((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG) + "<span>(max " + maxSalvagePct + "%)</span></html>";
-
+        StringBuilder salvageUsed = new StringBuilder();
         salvageUsed.append("<html>")
-            .append((currentSalvagePct <= maxSalvagePct) ? "" :
-                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
-            .append(currentSalvagePct).append("%")
+            .append((currentSalvagePct <= maxSalvagePct) ? ""
+                : ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+            .append(currentSalvagePct).append('%')
             .append((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG)
             .append("<span>(max ").append(maxSalvagePct).append("%)</span></html>");
 
