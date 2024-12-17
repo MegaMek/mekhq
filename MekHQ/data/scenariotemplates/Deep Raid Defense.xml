@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Deep Raid Defense</name>
     <shortBriefing>Defend grounded DropShip from raid.</shortBriefing>
-    <detailedBriefing>An enemy raid deep behind friendly lines is targeting a grounded DropShip. Protect it for 30 turns until liftoff, ensuring it does not become crippled. Defeat at least 50% of the enemy raiders while preserving 50% of your forces during the defense.</detailedBriefing>
+    <detailedBriefing>An enemy raid deep behind friendly lines is targeting a grounded DropShip. Protect it until liftoff, ensuring it does not become crippled. Defeat at least 50% of the enemy raiders while preserving 50% of your forces during the defense.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
