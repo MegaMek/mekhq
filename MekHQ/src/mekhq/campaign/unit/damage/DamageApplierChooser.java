@@ -26,20 +26,6 @@ import megamek.common.*;
  */
 public class DamageApplierChooser {
 
-    public enum EntityFinalState {
-        ANY(false, false),
-        CREW_MUST_SURVIVE(true, false),
-        ENTITY_MUST_SURVIVE(false, true),
-        CREW_AND_ENTITY_MUST_SURVIVE(true, true);
-
-        final boolean crewMustSurvive;
-        final boolean entityMustSurvive;
-
-        EntityFinalState(boolean crewMustSurvive, boolean entityMustSurvive) {
-            this.crewMustSurvive = crewMustSurvive;
-            this.entityMustSurvive = entityMustSurvive;
-        }
-    }
 
     /**
      * Choose the correct DamageHandler for the given entity.
