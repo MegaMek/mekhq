@@ -730,46 +730,46 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "force");
     }
 
-    public static @Nullable Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        Force retVal = new Force("");
-        NamedNodeMap attrs = wn.getAttributes();
-        Node idNameNode = attrs.getNamedItem("id");
+    public static @Nullable Force generateInstanceFromXML(Node workingNode, Campaign campaign, Version version) {
+        Force force = new Force("");
+        NamedNodeMap attributes = workingNode.getAttributes();
+        Node idNameNode = attributes.getNamedItem("id");
         String idString = idNameNode.getTextContent();
 
         try {
-            NodeList nl = wn.getChildNodes();
-            retVal.id = Integer.parseInt(idString);
+            NodeList childNodes = workingNode.getChildNodes();
+            force.id = Integer.parseInt(idString);
 
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            for (int x = 0; x < childNodes.getLength(); x++) {
+                Node wn2 = childNodes.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.setName(wn2.getTextContent().trim());
+                    force.setName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
-                    retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
+                    force.setForceIcon(StandardForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
-                    retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
+                    force.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
-                    retVal.setCamouflage(Camouflage.parseFromXML(wn2));
+                    force.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.setDescription(wn2.getTextContent().trim());
+                    force.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
-                    retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                    force.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
-                    retVal.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    force.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
-                    retVal.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
+                    force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
-                    retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                    force.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
-                    retVal.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                    force.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
-                    retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
+                    force.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
-                    retVal.techId = UUID.fromString(wn2.getTextContent());
+                    force.techId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
-                    retVal.forceCommanderID = UUID.fromString(wn2.getTextContent());
+                    force.forceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
-                    processUnitNodes(retVal, wn2, version);
+                    processUnitNodes(force, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -786,19 +786,17 @@ public class Force {
                             continue;
                         }
 
-                        retVal.addSubForce(generateInstanceFromXML(wn3, c, version), true);
+                        force.addSubForce(generateInstanceFromXML(wn3, campaign, version), true);
                     }
                 }
             }
-            c.importForce(retVal);
+            campaign.importForce(force);
         } catch (Exception ex) {
             logger.error("", ex);
             return null;
         }
 
-        retVal.updateCommander(c);
-
-        return retVal;
+        return force;
     }
 
     private static void processUnitNodes(Force retVal, Node wn, Version version) {
