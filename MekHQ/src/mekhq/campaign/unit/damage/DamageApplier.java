@@ -55,7 +55,7 @@ public interface DamageApplier<E extends Entity> {
         int damageApplied = 0;
         while (totalDamage > 0) {
             if (entity().isCrippled() && entity().getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED) {
-                // devastated units don't need to take any damage
+                // devastated units don't need to take any damage anymore
                 break;
             }
             var clusterDamage = Math.min(totalDamage, clusterSize);
