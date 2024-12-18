@@ -46,6 +46,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -73,7 +74,8 @@ public class ResolverTest {
     // that exists in this file, however those tests do not run since this is an abstract class
     // instead, if you click "run test" in one of those functions it will ask which implementation class to run
     // and then run the tests in that class
-    @RepeatedTest(100)
+    @EnabledIfEnvironmentVariable(named = "mm.test_auto_resolve_multiple_times", matches = "true")
+    @RepeatedTest(1000)
     public void testAutoResolveMultipleTimes() {
         autoResolve(this::postAutoResolveAccumulator);
     }
