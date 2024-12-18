@@ -13,6 +13,8 @@
 */
 package mekhq.campaign.stratcon;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
@@ -78,7 +80,7 @@ public class StratconScenario implements IStratconDisplayable {
     private boolean ignoreForceAutoAssignment;
     private int leadershipPointsUsed;
     private Set<Integer> failedReinforcements = new HashSet<>();
-    private Set<Integer> primaryForceIDs = new HashSet<>();
+    private ArrayList<Integer> primaryForceIDs = new ArrayList<>();
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the scenario template.
@@ -136,11 +138,13 @@ public class StratconScenario implements IStratconDisplayable {
      * These are all the "primary" force IDs, meaning forces that have been used
      * by the scenario to drive the generation of the OpFor.
      */
-    public Set<Integer> getPrimaryForceIDs() {
+    @XmlElementWrapper(name = "primaryForceIDs")
+    @XmlElement(name = "primaryForceID")
+    public ArrayList<Integer> getPrimaryForceIDs() {
         return primaryForceIDs;
     }
 
-    public void setPrimaryForceIDs(Set<Integer> primaryForceIDs) {
+    public void setPrimaryForceIDs(ArrayList<Integer> primaryForceIDs) {
         this.primaryForceIDs = primaryForceIDs;
     }
 

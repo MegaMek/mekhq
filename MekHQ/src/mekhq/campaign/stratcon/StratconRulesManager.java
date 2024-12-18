@@ -2041,7 +2041,8 @@ public class StratconRulesManager {
      *
      * @return List of unit IDs.
      */
-    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, Set<Integer> forceIDs, int leadershipSkill) {
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, ArrayList<Integer> forceIDs,
+                                                        int leadershipSkill) {
         List<Unit> eligibleUnits = new ArrayList<>();
 
         // If there is no leadership skill, we shouldn't continue
@@ -2107,7 +2108,7 @@ public class StratconRulesManager {
     /**
      * Calculates the majority unit type for the forces given the IDs.
      */
-    private static int getPrimaryUnitType(Campaign campaign, Set<Integer> forceIDs) {
+    private static int getPrimaryUnitType(Campaign campaign, ArrayList<Integer> forceIDs) {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
