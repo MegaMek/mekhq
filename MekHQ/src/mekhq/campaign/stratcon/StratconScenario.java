@@ -178,50 +178,49 @@ public class StratconScenario implements IStratconDisplayable {
                 .append("'>Contract objective located</span><br/>");
         }
 
-        stateBuilder.append("<b>Scenario:</b> ")
-            .append(backingScenario.getName())
-            .append("<br/>");
-
-        if (backingScenario.getTemplate() != null) {
-            stateBuilder.append("<i>").append(backingScenario.getTemplate().shortBriefing).append("</i>")
-                .append("<br/>");
-        }
-
-        if (isRequiredScenario()) {
-            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                .append("'>-1 VP if lost/ignored; +1 VP if won</span><br/>");
-        }
-
-        stateBuilder.append("<b>Status:</b> ")
-            .append(currentState.getScenarioStateName())
-            .append("<br/>");
-
-        stateBuilder.append("<b>Terrain:</b> ")
-                .append(backingScenario.getMap())
+        if (backingScenario != null) {
+            stateBuilder.append("<b>Scenario:</b> ")
+                .append(backingScenario.getName())
                 .append("<br/>");
 
-        if (deploymentDate != null) {
-            stateBuilder.append("<b>Deployment Date:</b> ")
-                .append(deploymentDate)
+            if (backingScenario.getTemplate() != null) {
+                stateBuilder.append("<i>").append(backingScenario.getTemplate().shortBriefing).append("</i>")
+                    .append("<br/>");
+            }
+
+            if (isRequiredScenario()) {
+                stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                    .append("'>-1 VP if lost/ignored; +1 VP if won</span><br/>");
+            }
+
+            stateBuilder.append("<b>Status:</b> ")
+                .append(currentState.getScenarioStateName())
                 .append("<br/>");
-        }
 
-        if (actionDate != null) {
-            stateBuilder.append("<b>Battle Date:</b> ")
-                .append(actionDate)
-                .append("<br/>");
-        }
 
-        if (returnDate != null) {
-            stateBuilder.append("<b>Return Date:</b> ")
-                .append(returnDate)
-                .append("<br/>");
-        }
+                stateBuilder.append("<b>Terrain:</b> ")
+                    .append(backingScenario.getMap())
+                    .append("<br/>");
 
-        if (campaign != null) {
-            AtBDynamicScenario backingScenario = getBackingScenario();
+            if (deploymentDate != null) {
+                stateBuilder.append("<b>Deployment Date:</b> ")
+                    .append(deploymentDate)
+                    .append("<br/>");
+            }
 
-            if (backingScenario != null) {
+            if (actionDate != null) {
+                stateBuilder.append("<b>Battle Date:</b> ")
+                    .append(actionDate)
+                    .append("<br/>");
+            }
+
+            if (returnDate != null) {
+                stateBuilder.append("<b>Return Date:</b> ")
+                    .append(returnDate)
+                    .append("<br/>");
+            }
+
+            if (campaign != null) {
                 stateBuilder.append(String.format("<b>Hostile BV:</b> %d<br>",
                     backingScenario.getTeamTotalBattleValue(campaign, false)));
                 stateBuilder.append(String.format("<b>Allied BV:</b> %d",
