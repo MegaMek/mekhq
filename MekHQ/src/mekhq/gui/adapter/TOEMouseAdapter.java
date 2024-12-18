@@ -1067,13 +1067,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
-                menuItem = new JMenuItem(force.isCombatForce() ? "Make Non-Combat Force" : "Make Combat Force");
+                menuItem = new JMenuItem(force.isCombatForce() ? "Make Support Force" : "Make Combat Force");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUS + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
 
                 menuItem = new JMenuItem(force.isCombatForce() ?
-                    "Make Force and Subforces Non-Combat Forces" : "Make Force and Subforces Combat Forces");
+                    "Make All Forces Support Forces" : "Make All Forces Combat Forces");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
