@@ -101,6 +101,7 @@ MEKHQ VERSION HISTORY:
 + PR #5158: Implemented Resupply Module
 + PR #5407: Updated Name of I18n Class
 + PR #5411: Updated Damage Application in ACAR
++ PR #5415: Fixed Resolve Unit Test to Only Run when Asked
 
 
 
