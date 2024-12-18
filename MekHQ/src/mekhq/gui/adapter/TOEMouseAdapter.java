@@ -1067,19 +1067,20 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
-                menuItem = new JMenuItem(force.isCombatForce() ? "Make Support Force" : "Make Combat Force");
+                menuItem = new JMenuItem(force.isCombatForce() ? "Make Support Force" : "Remove Support Designation");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUS + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
 
                 menuItem = new JMenuItem(force.isCombatForce() ?
-                    "Make All Forces Support Forces" : "Make All Forces Combat Forces");
+                    "Mark All Forces as Support Forces" : "Remove Support Designation from All Forces");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
 
                 if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
-                    menuItem = new JMenuItem(!force.isConvoyForce() ? "Mark force as a Resupply Convoy" : "Remove Resupply Convoy Designation");
+                    menuItem = new JMenuItem(!force.isConvoyForce() ?
+                        "Mark force as a Resupply Convoy" : "Remove Resupply Convoy Designation");
                     menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CONVOY_STATUS + forceIds);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
