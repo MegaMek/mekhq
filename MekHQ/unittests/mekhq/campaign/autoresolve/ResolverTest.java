@@ -77,7 +77,7 @@ public class ResolverTest {
     @EnabledIfEnvironmentVariable(named = "mm.test_auto_resolve_multiple_times", matches = "true")
     @RepeatedTest(1000)
     public void testAutoResolveMultipleTimes() {
-         autoResolve(this::postAutoResolveAccumulator);
+        autoResolve(this::postAutoResolveAccumulator);
     }
 
     @Test
