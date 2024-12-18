@@ -98,6 +98,9 @@ MEKHQ VERSION HISTORY:
 + PR #5400: Removed Contract Breach References in Scenario and Loan Events
 + PR #5401: Set Default Maintenance Multiplier for Salvaged Units
 + PR #5403: Disabled Commit Forces Button when No Forces Selected
++ PR #5158: Implemented Resupply Module
++ PR #5407: Updated Name of I18n Class
++ PR #5411: Updated Damage Application in ACAR
 
 
 
@@ -289,6 +292,7 @@ MEKHQ VERSION HISTORY:
 + PR #5176: Temporarily Removed CAM_OPS from Contract Market Method ComboBox
 + PR #5179: Fix Perm. Injury showing as Injury on Personnel tabel
 + PR #5180: Show refitting techs and fix refit countdown
++ PR #5412: Rolled Back #5399
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)

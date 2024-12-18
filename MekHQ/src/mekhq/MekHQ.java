@@ -63,7 +63,7 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import mekhq.utilities.I18n;
+import mekhq.utilities.Internationalization;
 import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
@@ -538,15 +538,16 @@ public class MekHQ implements GameListener {
 
         try {
             boolean control = yourSideControlsTheBattlefieldDialogAsk(
-                I18n.t("ResolveDialog.control.message"),
-                I18n.t("ResolveDialog.control.title"));
+                Internationalization.getText("ResolveDialog.control.message"),
+                Internationalization.getText("ResolveDialog.control.title"));
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
             tracker.processGame();
 
-            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
-                    tracker);
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(campaignGUI.getCampaign(), campaignGUI.getFrame(),
+                    true, tracker);
             resolveDialog.setVisible(true);
 
             if (resolveDialog.wasAborted()) {
@@ -570,8 +571,8 @@ public class MekHQ implements GameListener {
             return;
         }
         boolean control = yourSideControlsTheBattlefieldDialogAsk(
-            I18n.t("ResolveDialog.control.message"),
-            I18n.t("ResolveDialog.control.title"));
+            Internationalization.getText("ResolveDialog.control.message"),
+            Internationalization.getText("ResolveDialog.control.title"));
 
         ResolveScenarioTracker tracker = new ResolveScenarioTracker(selectedScenario, getCampaign(), control);
 
@@ -581,7 +582,8 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true, tracker);
+        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getCampaign(),
+            campaignGUI.getFrame(), true, tracker);
         resolveDialog.setVisible(true);
 
         if (resolveDialog.wasAborted()) {
@@ -645,7 +647,7 @@ public class MekHQ implements GameListener {
      * @param units The list of player units involved in the scenario
      */
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
-        String message = I18n.t("AutoResolveDialog.message");
+        String message = Internationalization.getText("AutoResolveDialog.message");
 
         var numberOfSimulations = NUMBER_OF_COMBAT_SIMULATIONS;
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
@@ -654,7 +656,7 @@ public class MekHQ implements GameListener {
             var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, scenario, units);
             stopWatch.stop();
             if (simulatedVictories.getRuns() == 0 && simulatedVictories.getRuns() < numberOfSimulations) {
-                message = I18n.t("AutoResolveDialog.messageFailedCalc");
+                message = Internationalization.getText("AutoResolveDialog.messageFailedCalc");
                 logger.debug("No combat scenarios were simulated, possible error!");
             } else {
                 var timePerRun = stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors());
@@ -666,7 +668,7 @@ public class MekHQ implements GameListener {
                     timePerRun,
                     stopWatch.toString());
 
-                message = I18n.ft("AutoResolveDialog.messageSimulated",
+                message = Internationalization.getFormattedText("AutoResolveDialog.messageSimulated",
                     simulatedVictories.getRuns(),
                     simulatedVictories.getVictories(),
                     simulatedVictories.getLosses(),
@@ -675,7 +677,7 @@ public class MekHQ implements GameListener {
             }
         }
 
-        String title = I18n.t("AutoResolveDialog.title");
+        String title = Internationalization.getText("AutoResolveDialog.title");
         boolean proceed =  JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
             message, title,
             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
@@ -694,11 +696,11 @@ public class MekHQ implements GameListener {
     public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent) {
         try {
             String message = autoResolveConcludedEvent.controlledScenario() ?
-                I18n.t("AutoResolveDialog.message.victory") :
-                I18n.t("AutoResolveDialog.message.defeat");
+                Internationalization.getText("AutoResolveDialog.message.victory") :
+                Internationalization.getText("AutoResolveDialog.message.defeat");
             String title = autoResolveConcludedEvent.controlledScenario() ?
-                I18n.t("AutoResolveDialog.victory") :
-                I18n.t("AutoResolveDialog.defeat");
+                Internationalization.getText("AutoResolveDialog.victory") :
+                Internationalization.getText("AutoResolveDialog.defeat");
             boolean control = yourSideControlsTheBattlefieldDialogAsk(message, title);
             var scenario = autoResolveConcludedEvent.getScenario();
 
@@ -708,7 +710,7 @@ public class MekHQ implements GameListener {
             tracker.processGame();
 
             ResolveScenarioWizardDialog resolveDialog =
-                new ResolveScenarioWizardDialog(campaignGUI.getFrame(),
+                new ResolveScenarioWizardDialog(getCampaign(), campaignGUI.getFrame(),
                     true, tracker);
             resolveDialog.setVisible(true);
             if (resolveDialog.wasAborted()) {

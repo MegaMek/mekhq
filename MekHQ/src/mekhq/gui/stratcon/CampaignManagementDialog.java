@@ -19,6 +19,11 @@
 
 package mekhq.gui.stratcon;
 
+import megamek.client.ui.swing.util.UIUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -28,15 +33,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+
 /**
  * This class handles the UI for campaign VP/SP management
  * @author NickAragua
  */
 public class CampaignManagementDialog extends JDialog {
+    private Campaign campaign;
     private StratconCampaignState currentCampaignState;
     private final StratconTab parent;
     private JButton btnRemoveCVP;
-    private JButton btnConvertSPtoBonusPart;
+    private JButton btnRequestResupply;
     private JButton btnGMAddVP;
     private JButton btnGMAddSP;
     private JLabel lblTrackScenarioOdds;
@@ -50,19 +58,23 @@ public class CampaignManagementDialog extends JDialog {
     /**
      * Show the dialog for a given campaign state, and whether GM mode is on or not
      */
-    public void display(StratconCampaignState campaignState, StratconTrackState currentTrack, boolean gmMode) {
+    public void display(Campaign campaign, StratconCampaignState campaignState,
+                        StratconTrackState currentTrack, boolean gmMode) {
         currentCampaignState = campaignState;
 
         btnRemoveCVP.setEnabled(currentCampaignState.getVictoryPoints() > 0);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         btnGMAddVP.setEnabled(gmMode);
         btnGMAddSP.setEnabled(gmMode);
 
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
             lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%",
-                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(), false)));
+                    StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
+                        false)));
         }
+
+        this.campaign = campaign;
     }
 
     /**
@@ -83,10 +95,10 @@ public class CampaignManagementDialog extends JDialog {
         btnRemoveCVP.addActionListener(this::removeCVP);
         getContentPane().add(btnRemoveCVP);
 
-        btnConvertSPtoBonusPart = new JButton();
-        btnConvertSPtoBonusPart.setText("Convert SP to bonus part");
-        btnConvertSPtoBonusPart.addActionListener(this::convertSPtoBonusPartHandler);
-        getContentPane().add(btnConvertSPtoBonusPart);
+        btnRequestResupply = new JButton();
+        btnRequestResupply.setText("Request Resupply");
+        btnRequestResupply.addActionListener(this::requestResupply);
+        getContentPane().add(btnRequestResupply);
 
         btnGMAddVP = new JButton();
         btnGMAddVP.setText("Add CVP (GM)");
@@ -110,11 +122,73 @@ public class CampaignManagementDialog extends JDialog {
         parent.updateCampaignState();
     }
 
-    private void convertSPtoBonusPartHandler(ActionEvent e) {
-        currentCampaignState.useSupportPoint();
-        currentCampaignState.getContract().addBonusParts(1);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+    /**
+     * Requests resupply. If there are more than one available support points, it triggers a dialog
+     * to specify how many points to use for the resupply.
+     * If there is exactly one support point, it automatically uses this one point to resupply.
+     * It also updates the button state based on the remaining support points and updates the parent
+     * campaign state.
+     *
+     * @param event The triggering ActionEvent (not used in this method).
+     */
+    private void requestResupply(ActionEvent event) {
+        if (currentCampaignState.getSupportPoints() > 1) {
+            supplyDropDialog();
+        } else {
+            AtBContract contract = currentCampaignState.getContract();
+            Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
+            performResupply(resupply, contract, 1);
+        }
+
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
+    }
+
+    public void supplyDropDialog() {
+        final JDialog dialog = new JDialog();
+        dialog.setLayout(new GridBagLayout());
+        dialog.setTitle("Requesting Resupply");
+        dialog.setSize(400, 200);
+        dialog.setLocationRelativeTo(null);
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        JLabel description = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                UIUtil.scaleForGUI(500), "How many Support Points would you like to spend?"));
+        description.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dialog.add(description, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        SpinnerNumberModel numberModel = new SpinnerNumberModel(1, 1,
+            currentCampaignState.getSupportPoints(), 1);
+        JSpinner spinner = new JSpinner(numberModel);
+        dialog.add(spinner, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.anchor = GridBagConstraints.SOUTH;
+        JButton btnConfirm = new JButton("Confirm");
+        btnConfirm.addActionListener( e-> {
+            dialog.dispose();
+
+            AtBContract contract = currentCampaignState.getContract();
+            Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
+            performResupply(resupply, contract, 1);
+
+            currentCampaignState.useSupportPoints((int) numberModel.getValue());
+        });
+
+        dialog.add(btnConfirm, constraints);
+
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setVisible(true);
     }
 
     private void gmAddVPHandler(ActionEvent e) {
@@ -125,7 +199,7 @@ public class CampaignManagementDialog extends JDialog {
 
     private void gmAddSPHandler(ActionEvent e) {
         currentCampaignState.addSupportPoints(1);
-        btnConvertSPtoBonusPart.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }
 }

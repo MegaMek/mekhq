@@ -44,6 +44,8 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -90,6 +92,7 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
@@ -156,7 +159,6 @@ public class AtBContract extends Contract {
     protected int contractScoreArbitraryModifier;
 
     protected int moraleMod = 0;
-    protected int numBonusParts;
 
     /* lasts for a month, then removed at next events roll */
     protected boolean priorLogisticsFailure;
@@ -226,7 +228,6 @@ public class AtBContract extends Contract {
         batchallAccepted = true;
         setMoraleLevel(AtBMoraleLevel.STALEMATE);
         routEnd = null;
-        numBonusParts = 0;
         priorLogisticsFailure = false;
         specialEventScenarioDate = null;
         battleTypeMod = 0;
@@ -760,46 +761,66 @@ public class AtBContract extends Contract {
         return contractScoreArbitraryModifier;
     }
 
-    public void doBonusRoll(Campaign campaign) {
+    /**
+     * Performs a bonus roll with varying outcomes based on the roll results.
+     *
+     * <p>The outcomes are as follows:
+     * <ul>
+     *     <li>1: Adds 1 - 6 (randomized) new dependents to the campaign, if the campaign options allow.
+     *     Otherwise this result is identical to 3</li>
+     *     <li>2: Recruits a new Ronin for the campaign.</li>
+     *     <li>3: Returns {@code true} (indicating a supply drop).</li>
+     *     <li>4: Adds a new tank unit to the campaign.</li>
+     *     <li>5: Adds a new aerospace fighter unit to the campaign.</li>
+     *     <li>6: Adds a new MEK unit to the campaign.</li>
+     * </ul>
+     *
+     * @param campaign the campaign to modify based on the bonus roll.
+     * @return {@code true} if the bonus roll result is a Resupply, otherwise {@code false}.
+     * @throws IllegalStateException if the bonus roll result is not between 1 and 6 (inclusive).
+     */
+    public boolean doBonusRoll(Campaign campaign) {
         int number;
         int roll = d6();
 
         switch (roll) {
-            case 1: /* 1d6 dependents */
+            case 1 -> { /* 1d6 dependents */
                 if (campaign.getCampaignOptions().isUseRandomDependentAddition()) {
                     number = d6();
                     campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
-                        Person p = campaign.newDependent(Gender.RANDOMIZE);
-                        campaign.recruitPerson(p);
+                        Person person = campaign.newDependent(Gender.RANDOMIZE);
+                        campaign.recruitPerson(person);
                     }
+                } else {
+                    return true;
                 }
-                break;
-            case 2:
+            }
+            case 2 -> {
                 campaign.addReport("Bonus: Ronin");
                 recruitRonin(campaign);
-                break;
-            case 3:
-                numBonusParts++;
-                campaign.addReport("Bonus: Part");
-                break;
-            case 4:
+            }
+            case 3 -> { // Resupply
+                return true;
+            }
+            case 4 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, UnitType.TANK);
-                break;
-            case 5:
+            }
+            case 5 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
-                break;
-            case 6:
+            }
+            case 6 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, MEK);
-                break;
-            default:
-                throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
+            }
+            default -> throw new IllegalStateException(
+                "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
         }
+
+        return false;
     }
 
     /**
@@ -868,12 +889,12 @@ public class AtBContract extends Contract {
         this.isAttacker = isAttacker;
     }
 
-    public void checkEvents(Campaign c) {
-        if (c.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+    public void checkEvents(Campaign campaign) {
+        if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             nextWeekBattleTypeMod = 0;
         }
 
-        if (c.getLocalDate().getDayOfMonth() == 1) {
+        if (campaign.getLocalDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
                 partsAvailabilityLevel++;
                 priorLogisticsFailure = false;
@@ -881,25 +902,30 @@ public class AtBContract extends Contract {
 
             switch (getContractType().generateEventType()) {
                 case EVT_BONUSROLL:
-                    c.addReport("<b>Special Event:</b> ");
-                    doBonusRoll(c);
+                    campaign.addReport("<b>Special Event:</b> ");
+                    if (doBonusRoll(campaign)) {
+                        campaign.addReport("Bonus: Captured Supplies");
+                        Resupply resupply = new Resupply(campaign, this, ResupplyType.RESUPPLY_LOOT);
+                        performResupply(resupply, this, 1);
+                    }
+
                     break;
                 case EVT_SPECIAL_SCENARIO:
-                    c.addReport("<b>Special Event:</b> Special scenario this month");
-                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                    specialEventScenarioType = getContractType().generateSpecialScenarioType(c);
+                    campaign.addReport("<b>Special Event:</b> Special scenario this month");
+                    specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
+                    specialEventScenarioType = getContractType().generateSpecialScenarioType(campaign);
                     break;
                 case EVT_CIVILDISTURBANCE:
-                    c.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
+                    campaign.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
                     moraleMod++;
                     break;
                 case EVT_SPORADICUPRISINGS:
-                    c.addReport("<b>Special Event:</b> Sporadic uprisings<br />+2 to next enemy morale roll");
+                    campaign.addReport("<b>Special Event:</b> Sporadic uprisings<br />+2 to next enemy morale roll");
                     moraleMod += 2;
                     break;
                 case EVT_REBELLION:
-                    c.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
-                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    campaign.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
+                    specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                     specialEventScenarioType = AtBScenario.CIVILIANRIOT;
                     break;
                 case EVT_BETRAYAL:
@@ -928,22 +954,22 @@ public class AtBContract extends Contract {
                             break;
                     }
                     employerMinorBreaches++;
-                    c.addReport(text);
+                    campaign.addReport(text);
                     break;
                 case EVT_TREACHERY:
-                    c.addReport(
+                    campaign.addReport(
                             "<b>Special Event:</b> Treachery<br />Bad information from employer. Next Enemy Morale roll gets +1. Employer minor breach.");
                     moraleMod++;
                     employerMinorBreaches++;
                     break;
                 case EVT_LOGISTICSFAILURE:
-                    c.addReport(
+                    campaign.addReport(
                             "<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
                     partsAvailabilityLevel--;
                     priorLogisticsFailure = true;
                     break;
                 case EVT_REINFORCEMENTS:
-                    c.addReport("<b>Special Event:</b> Reinforcements<br />The next Enemy Morale roll gets a -1.");
+                    campaign.addReport("<b>Special Event:</b> Reinforcements<br />The next Enemy Morale roll gets a -1.");
                     moraleMod--;
                     break;
                 case EVT_SPECIALEVENTS:
@@ -955,7 +981,7 @@ public class AtBContract extends Contract {
                             break;
                         case 2:
                             text += "Internal Dissension";
-                            specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                            specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                             specialEventScenarioType = AtBScenario.AMBUSH;
                             break;
                         case 3:
@@ -971,7 +997,7 @@ public class AtBContract extends Contract {
                             partsAvailabilityLevel++;
                             break;
                         case 6:
-                            final String unitName = c.getUnitMarket().addSingleUnit(c,
+                            final String unitName = campaign.getUnitMarket().addSingleUnit(campaign,
                                     UnitMarketType.EMPLOYER, MEK, getEmployerFaction(),
                                     DRAGOON_F, 50);
                             if (unitName != null) {
@@ -981,11 +1007,11 @@ public class AtBContract extends Contract {
                             }
                             break;
                     }
-                    c.addReport(text);
+                    campaign.addReport(text);
                     break;
                 case EVT_BIGBATTLE:
-                    c.addReport("<b>Special Event:</b> Big battle this month");
-                    specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
+                    campaign.addReport("<b>Special Event:</b> Big battle this month");
+                    specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                     specialEventScenarioType = getContractType().generateBigBattleType();
                     break;
             }
@@ -999,19 +1025,19 @@ public class AtBContract extends Contract {
          * or big battle event is rolled.
          */
         if ((specialEventScenarioDate != null)
-                && !specialEventScenarioDate.isBefore(c.getLocalDate())) {
-            LocalDate nextMonday = c.getLocalDate().plusDays(8 - c.getLocalDate().getDayOfWeek().getValue());
+                && !specialEventScenarioDate.isBefore(campaign.getLocalDate())) {
+            LocalDate nextMonday = campaign.getLocalDate().plusDays(8 - campaign.getLocalDate().getDayOfWeek().getValue());
 
             if (specialEventScenarioDate.isBefore(nextMonday)) {
-                AtBScenario s = AtBScenarioFactory.createScenario(c, null,
+                AtBScenario s = AtBScenarioFactory.createScenario(campaign, null,
                         specialEventScenarioType, false,
                         specialEventScenarioDate);
 
-                c.addScenario(s, this);
-                if (c.getCampaignOptions().isUsePlanetaryConditions()) {
-                    s.setPlanetaryConditions(this, c);
+                campaign.addScenario(s, this);
+                if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
+                    s.setPlanetaryConditions(this, campaign);
                 }
-                s.setForces(c);
+                s.setForces(campaign);
                 specialEventScenarioDate = null;
             }
         }
@@ -1108,7 +1134,6 @@ public class AtBContract extends Contract {
         if (routEnd != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "numBonusParts", getNumBonusParts());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
@@ -1193,8 +1218,6 @@ public class AtBContract extends Contract {
                     sharesPct = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("batchallAccepted")) {
                     batchallAccepted = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("numBonusParts")) {
-                    numBonusParts = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
                     playerMinorBreaches = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
@@ -1478,18 +1501,6 @@ public class AtBContract extends Contract {
 
     public void setContractScoreArbitraryModifier(int newModifier) {
         contractScoreArbitraryModifier = newModifier;
-    }
-
-    public int getNumBonusParts() {
-        return numBonusParts;
-    }
-
-    public void addBonusParts(int num) {
-        numBonusParts += num;
-    }
-
-    public void useBonusPart() {
-        numBonusParts--;
     }
 
     public int getBattleTypeMod() {
