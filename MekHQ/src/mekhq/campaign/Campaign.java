@@ -4122,44 +4122,29 @@ public class Campaign implements ITechManager {
      * Note: This method uses several other methods to perform the specific actions for each task.
      */
     public void processNewDayPersonnel() {
-        List<Person> personnelForRelationshipProcessing = new ArrayList<>();
+        // These lists
+        List<Person> personnel = new ArrayList<>(getPersonnel());
 
-        for (Person person : getPersonnel()) {
+        for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
 
-            personnelForRelationshipProcessing.add(person);
-
-            // Death
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
 
+            processWeeklyRelationshipEvents(person);
+
             person.resetMinutesLeft();
-            // Reset acquisitions made to 0
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
-
-            // Reset edge points to the purchased value each week. This should only
-            // apply for support personnel - combat troops reset with each new mm game
             processWeeklyEdgeResets(person);
-
             processMonthlyVocationalXp(person);
-
-            // Anniversaries
             processAnniversaries(person);
-
-            // autoAwards
             processMonthlyAutoAwards(person);
-        }
-
-        // Divorce, Marriage
-        // This has to be processed separately to avoid a ConcurrentModificationException
-        for (Person person : personnelForRelationshipProcessing) {
-            processWeeklyRelationshipEvents(person);
         }
     }
 
