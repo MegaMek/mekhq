@@ -158,6 +158,12 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         StratconScenario scenario = getSelectedScenario();
 
+        if (campaignState.getContract().getCommandRights().isIntegrated()) {
+            menuItemManageForceAssignments = new JMenuItem();
+            menuItemManageForceAssignments.setText("Unable to Deploy: Integrated Command");
+            rightClickMenu.add(menuItemManageForceAssignments);
+        }
+
         // display "Manage Force Assignment" if there is not a force already on the hex
         // except if there is already a non-cloaked scenario here.
         if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
