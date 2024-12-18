@@ -97,9 +97,6 @@ public class CampaignManagementDialog extends JDialog {
         gbc.insets = new Insets(insertSize, insertSize, insertSize, insertSize);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Row and column counters
-        int row = 0;
-
         // Add the "Track Scenario Odds" label
         lblTrackScenarioOdds = new JLabel();
         gbc.gridx = 0;
