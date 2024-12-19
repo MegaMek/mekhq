@@ -348,7 +348,9 @@ public class CombatTeam {
             return overrideState;
         }
 
-        if (force.getAllUnits(true).isEmpty()) {
+        // This should never be getAllUnits() as otherwise parent nodes will be assessed as being
+        // automatically eligible to be Combat Teams preventing child nodes from being Combat Teams
+        if (force.getUnits().isEmpty()) {
             force.setCombatTeamStatus(false);
             return false;
         }
