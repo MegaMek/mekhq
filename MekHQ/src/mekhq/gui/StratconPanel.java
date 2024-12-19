@@ -18,6 +18,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.stratcon.*;
 import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
 import mekhq.gui.stratcon.StratconScenarioWizard;
@@ -168,14 +169,17 @@ public class StratconPanel extends JPanel implements ActionListener {
             rightClickMenu.add(menuItemManageForceAssignments);
         }
 
-        // display "Manage Scenario" if
-        // there is already a visible scenario on the hex
-        if ((scenario != null) && !scenario.getBackingScenario().isCloaked()) {
-            menuItemManageScenario = new JMenuItem();
-            menuItemManageScenario.setText("Manage Scenario");
-            menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
-            menuItemManageScenario.addActionListener(this);
-            rightClickMenu.add(menuItemManageScenario);
+        // display "Manage Scenario" if there is already a visible scenario on the hex
+        if (scenario != null) {
+            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+            if (backingScenario != null && !backingScenario.isCloaked()) {
+                menuItemManageScenario = new JMenuItem();
+                menuItemManageScenario.setText("Manage Scenario");
+                menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
+                menuItemManageScenario.addActionListener(this);
+                rightClickMenu.add(menuItemManageScenario);
+            }
         }
 
         if ((currentTrack != null) && currentTrack.getAssignedCoordForces().containsKey(coords)) {
