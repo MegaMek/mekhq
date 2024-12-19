@@ -49,7 +49,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
     @Override
     public int getMapX() {
-        return 18 + getLanceCount();
+        return 18 + getForceCount();
     }
 
     @Override

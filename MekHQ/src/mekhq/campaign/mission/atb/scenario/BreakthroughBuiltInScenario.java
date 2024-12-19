@@ -52,7 +52,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
     @Override
     public int getMapX() {
         // make it a little wider for bigger scenarios
-        return 18 + this.getLanceCount();
+        return 18 + this.getForceCount();
     }
 
     @Override
