@@ -4471,15 +4471,35 @@ public class CampaignOptions {
     }
 
     /**
-     * @param role the {@link CombatRole} to get the battle chance for
-     * @return the chance of having a battle for the specified role, or {@code 0} if StratCon is enabled
+     * Retrieves the chance of having a battle for the specified {@link CombatRole}.
+     * <p>
+     * This method calculates the battle chance percentage for the provided combat role based on
+     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled, the
+     * method immediately returns {@code 0}.
+     * Roles marked as {@link CombatRole#IN_RESERVE} or as {@link CombatRole#AUXILIARY} are not
+     * eligible for battles and also return {@code 0}.
+     * </p>
+     *
+     * @param role the {@link CombatRole} to evaluate the battle chance for.
+     * @return the chance of having a battle for the specified role. Returns:
+     *         <ul>
+     *           <li>{@code 0} if StratCon is enabled.</li>
+     *           <li>{@code 0} if the role is {@link CombatRole#IN_RESERVE} or
+     *           {@link CombatRole#AUXILIARY}.</li>
+     *           <li>A non-zero value from the {@code atbBattleChance} array corresponding to the
+     *           role otherwise.</li>
+     *         </ul>
      */
-    public int getAtBBattleChance(final CombatRole role) {
+    public int getAtBBattleChance(CombatRole role) {
         if (useStratCon) {
             return 0;
         }
 
-        return role.isInReserve() ? 0 : atbBattleChance[role.ordinal()];
+        if (role.isInReserve() || role.isAuxiliary()) {
+            return 0;
+        }
+
+        return atbBattleChance[role.ordinal()];
     }
 
     /**
