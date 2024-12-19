@@ -1378,6 +1378,7 @@ public class AtBDynamicScenarioFactory {
      * units that have associated force templates that "contribute to the unit count".
      */
     private static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
+        final int DEFAULT_TIME_LIMIT = 6;
         int primaryUnitCount = 0;
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
@@ -1397,9 +1398,13 @@ public class AtBDynamicScenarioFactory {
         // We want a minimum value here, to avoid situations where we spawn scenarios with only a
         // single turn requirement.
         // This effectively treats any player-aligned forces less than 6 as 6.
-        primaryUnitCount = max(primaryUnitCount, 6);
+        primaryUnitCount = max(DEFAULT_TIME_LIMIT, 6);
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            // We set a default time to protect against instances where setting time limit fails
+            // for some reason.
+            objective.setTimeLimit(DEFAULT_TIME_LIMIT);
+
             if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
                 Integer scaleFactor = objective.getTimeLimitScaleFactor();
 
