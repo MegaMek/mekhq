@@ -913,7 +913,7 @@ public class AtBDynamicScenarioFactory {
                             }
 
                             List<Entity> generatedLance = generateLance(factionCode, skill, quality,
-                                conventionalAircraft, null, campaign);
+                                conventionalAircraft, new HashMap<>(), campaign);
 
                             generatedEntities.addAll(generatedLance);
                         }
