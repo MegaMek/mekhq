@@ -211,7 +211,7 @@ public class AtBDynamicScenarioFactory {
         int generatedLanceCount = generateForces(scenario, contract, campaign);
 
         // approximate estimate, anyway.
-        scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
+        scenario.setForceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
         scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
         setDeploymentZones(scenario);
@@ -1648,8 +1648,8 @@ public class AtBDynamicScenarioFactory {
         }
 
         // increment map size by template-specified increments
-        mapSizeX += template.mapParameters.getWidthScalingIncrement() * scenario.getLanceCount();
-        mapSizeY += template.mapParameters.getHeightScalingIncrement() * scenario.getLanceCount();
+        mapSizeX += template.mapParameters.getWidthScalingIncrement() * scenario.getForceCount();
+        mapSizeY += template.mapParameters.getHeightScalingIncrement() * scenario.getForceCount();
 
         // 50/50 odds to rotate the map 90 degrees if specified.
         if (template.mapParameters.isAllowRotation()) {

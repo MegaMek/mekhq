@@ -34,7 +34,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -60,7 +60,9 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -175,7 +177,7 @@ public class ResolverTest {
         when(scenario.getBlowingSand()).thenReturn(BlowingSand.BLOWING_SAND_NONE);
 
         // Lance setup
-        when(scenario.getLanceRole()).thenReturn(AtBLanceRole.FIGHTING);
+        when(scenario.getCombatRole()).thenReturn(CombatRole.FIGHTING);
         when(scenario.getId()).thenReturn(11);
 
         // Bots setup

@@ -474,8 +474,8 @@ public class StratconScenarioWizard extends JDialog {
             case CHAINED_SCENARIO:
                 costBuilder.append(resourceMap.getString("fromChainedScenario.text"));
                 break;
-            case FIGHT_LANCE:
-                costBuilder.append(resourceMap.getString("lanceInFightRole.text"));
+            case AUXILIARY:
+                costBuilder.append(resourceMap.getString("auxiliary.text"));
                 break;
             default:
                 costBuilder.append("Error: Invalid Reinforcement Type");

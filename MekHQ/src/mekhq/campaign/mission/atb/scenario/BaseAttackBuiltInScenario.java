@@ -27,7 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 
 import java.util.ArrayList;
 
@@ -179,7 +179,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             // while completing this scenario on others just puts the morale to
             // Rout for a while
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
-            final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
+            final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
             if (requiredLanceRole.isFighting() || requiredLanceRole.isScouting()) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
                 destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
