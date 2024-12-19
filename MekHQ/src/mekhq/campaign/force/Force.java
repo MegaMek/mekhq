@@ -404,7 +404,7 @@ public class Force {
 
     /**
      * @param combatForcesOnly to only include combat forces or to also include
-     *                         non-combat forces
+     *                         support forces
      * @return all the unit ids in this force and all of its subforces
      */
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
