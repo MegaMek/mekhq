@@ -1644,9 +1644,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceForceId", combatTeamId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceRole", combatRole.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatRole", combatRole.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", forceCount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceCount", forceCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "modifiedTemperature", modifiedTemperature);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
@@ -1739,7 +1739,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
                     combatTeamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatRole")) {
-                    combatRole = CombatRole.parseFromInt(wn2.getTextContent().trim());
+                    combatRole = CombatRole.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {

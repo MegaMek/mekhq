@@ -596,7 +596,7 @@ public class CombatTeam {
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
                     retVal.missionId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
-                    retVal.setRole(CombatRole.parseFromInt(wn2.getTextContent().trim()));
+                    retVal.setRole(CombatRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
                     retVal.commanderId = UUID.fromString(wn2.getTextContent());
                 }

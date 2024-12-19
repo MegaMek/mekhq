@@ -81,21 +81,31 @@ public enum CombatRole {
 
     // region File I/O
     /**
-     * Parses an integer into a {@link CombatRole} enum value.
+     * Parses a {@link String} into a {@link CombatRole} enum value.
      * <p>
-     * This method attempts to map an integer to the corresponding {@link CombatRole} value
-     * based on the ordinal index. If the parsing fails (e.g., if the integer is out of bounds
-     * or an exception occurs), it logs an error and returns the default value {@code IN_RESERVE}.
+     * This method first attempts to interpret the input string as an integer and then maps it
+     * to the corresponding {@link CombatRole} based on its ordinal index. If that fails, it
+     * attempts to match the string to the name of a {@link CombatRole} using {@code Enum.valueOf(String)}.
+     * If both parsing approaches fail, it logs an error and returns the default value {@code IN_RESERVE}.
      * </p>
      *
-     * @param text the value representing the ordinal of the {@link CombatRole}.
-     * @return the corresponding {@link CombatRole} if the integer is valid;
+     * @param text the string to be parsed into a {@link CombatRole}.
+     *             The string can represent either:
+     *             <ul>
+     *               <li>An integer corresponding to the ordinal index of a {@link CombatRole}.</li>
+     *               <li>The name of a {@link CombatRole}.</li>
+     *             </ul>
+     * @return the corresponding {@link CombatRole} if the input is valid;
      *         otherwise, returns {@code IN_RESERVE}.
      */
-    public static CombatRole parseFromInt(final String text) {
+    public static CombatRole parseFromString(final String text) {
         try {
             int value = Integer.parseInt(text);
             return values()[value];
+        } catch (Exception ignored) {}
+
+        try {
+            return valueOf(text);
         } catch (Exception ignored) {}
 
         MMLogger.create(CombatRole.class)
