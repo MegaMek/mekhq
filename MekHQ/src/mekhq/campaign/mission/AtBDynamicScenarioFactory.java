@@ -52,8 +52,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
@@ -3607,17 +3606,28 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign in which the scenario is occurring.
      */
     public static void setPlayerDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
-        // make note of battle commander strategy
+        ArrayList<Integer> primaryForceIDs = new ArrayList<>();
+
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            AtBContract contract = scenario.getContract(campaign);
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+            for (StratconTrackState track : campaignState.getTracks()) {
+                StratconScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
+                primaryForceIDs = stratconScenario.getPrimaryForceIDs();
+            }
+        }
+
+        // Make note of battle commander strategy
         int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
 
-        // for player forces where there's an associated force template, we can set the
-        // deployment turn explicitly
-        // or use a stagger algorithm.
-        // for player forces where there's not an associated force template, we
-        // calculate the deployment turn
-        // as if they were reinforcements
+        // For player forces where there's an associated force template, we can set the
+        // deployment turn explicitly or use a stagger algorithm.
+        // For player forces where there's not an associated force template, we calculate the
+        // deployment turn as if they were reinforcements
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
 
@@ -3629,14 +3639,39 @@ public class AtBDynamicScenarioFactory {
             }
 
             // now, attempt to set deployment turns
-            // if the force has a template, then use the appropriate algorithm
-            // otherwise, treat it as reinforcements
+            // if the force has a template, then use the appropriate algorithm otherwise, treat it
+            // as reinforcements
             if (forceTemplate != null) {
                 int deployRound = forceTemplate.getArrivalTurn();
 
+                // Override to ensure we're treating primary forces correctly.
+                // This is to resolve a very annoying bug with StratCon where force templates are
+                // not stored when saving, so cannot be fetched later. At the time of writing,
+                // we've not been able to track down the origin of that bug. Though, from my own
+                // searching, it looks like the issue might be with the Scenario class and fixing
+                // it there would likely break things for non-StratCon users. -- Illiani
+                Collection<ScenarioForceTemplate> templates = scenario.getPlayerForceTemplates().values();
+                for (ScenarioForceTemplate template : templates) {
+                    if (Objects.equals(template.getForceName(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID)) {
+                        if (primaryForceIDs.contains(forceID)) {
+                            deployRound = template.getArrivalTurn();
+                        } else {
+                            deployRound = ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS;
+                        }
+                        break;
+                    }
+                }
+
+                // After we're overwritten the template, as necessary, continue
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+                    logger.info(String.format("We're using staggered deployment turn calculation for %s",
+                        playerForce.getName()));
+
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+                    logger.info(String.format("We're using reinforcement deployment turn calculation for %s",
+                        playerForce.getName()));
+
                     setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
 
                     // Here we selectively overwrite the earlier entries
@@ -3661,11 +3696,16 @@ public class AtBDynamicScenarioFactory {
                         }
                     }
                 } else {
+                    logger.info(String.format("We're using normal deployment turn calculation for %s",
+                        playerForce.getName()));
+
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
                     }
                 }
             } else {
+                logger.info(String.format("We're using a fallback deployment turn calculation for %s",
+                    playerForce.getName()));
                 setDeploymentTurnsForReinforcements(forceEntities, strategy);
             }
         }
