@@ -39,8 +39,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
@@ -1009,6 +1009,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem = new JMenuItem("Undeploy Unit");
                     menuItem.setActionCommand(COMMAND_UNDEPLOY);
                     menuItem.addActionListener(this);
+                    menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
                     menu.add(menuItem);
                 }
 
