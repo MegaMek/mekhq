@@ -33,7 +33,7 @@ import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
-import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
+import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -652,10 +652,10 @@ public class Force {
      * @return a list of the operational statuses for units in this force and in all
      *         of its subForces.
      */
-    public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
+    public List<OperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
         // First, update all subForces, collecting their unit statuses into a single
         // list
-        final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream()
+        final List<OperationalStatus> statuses = getSubForces().stream()
                 .flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream())
                 .collect(Collectors.toList());
 
@@ -663,7 +663,7 @@ public class Force {
         statuses.addAll(getUnits().stream()
                 .map(campaign::getUnit)
                 .filter(Objects::nonNull)
-                .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
+                .map(OperationalStatus::determineLayeredForceIconOperationalStatus)
                 .toList());
 
         // Can only update the icon for LayeredForceIcons, but still need to return the
@@ -682,7 +682,7 @@ public class Force {
             // the ordinal of the force's status. Then assign the operational status to
             // this.
             final int index = (int) round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
-            final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
+            final OperationalStatus status = OperationalStatus.values()[index];
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER,
                     new ArrayList<>());
             ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
