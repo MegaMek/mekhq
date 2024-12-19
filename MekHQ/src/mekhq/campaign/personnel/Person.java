@@ -1077,13 +1077,13 @@ public class Person {
                 setRetirement(today);
 
                 break;
+            case STUDENT:
+                // log entries and reports are handled by the education package
+                // (mekhq/campaign/personnel/education)
+                break;
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
-            case STUDENT:
-                // log entries & reports are handled by the education package
-                // (mekhq/campaign/personnel/education)
-                break;
             default:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
@@ -1096,7 +1096,7 @@ public class Person {
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
-                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
+                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), this);
             }
 
             // log death across genealogy
