@@ -1941,7 +1941,6 @@ public class StratconRulesManager {
      *   <li>Match the specified unit type.</li>
      * </ul>
      * Forces that meet all conditions are returned as a list of unique force IDs.
-     * </p>
      *
      * @param unitType the desired type of unit to evaluate for deployment eligibility.
      * @param campaign the {@link Campaign} containing the forces to evaluate.
