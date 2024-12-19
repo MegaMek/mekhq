@@ -435,6 +435,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             final boolean combatForce = !singleForce.isCombatForce();
+
             final boolean subforces = command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUSES);
             for (final Force force : forces) {
                 force.setCombatForce(combatForce, subforces);
@@ -501,6 +502,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                     // Clear any transport assignments of units in the deleted force
                     clearTransportAssignment(force.getAllUnits(false));
+
+                    for (Force childForce : force.getAllSubForces()) {
+                        gui.getCampaign().removeForce(childForce);
+                    }
 
                     gui.getCampaign().removeForce(force);
                 }
@@ -1076,6 +1081,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     "Mark All Forces as Support Forces" : "Remove Support Designation from All Forces");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
                 menuItem.addActionListener(this);
+                menuItem.setEnabled(!force.isConvoyForce());
                 popup.add(menuItem);
 
                 if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
@@ -1136,7 +1142,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             menuItem = new JMenuItem("Remove Force");
-
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
             menuItem.setEnabled(
