@@ -120,7 +120,7 @@ MEKHQ VERSION HISTORY:
 + PR #5435: Halved Duration of Recon Scenarios
 + PR #5436: Adjusted Scenario Modifiers BV & Unit Count Contribution
 + PR #5437: Added Further Edge Case Handling for Turn Limit Scenario Objectives
-
++ PR #5438: fix: quick bandaid for gun emplacements in ACAR
 
 
 0.50.01 (2024-11-10 1800 UTC)
