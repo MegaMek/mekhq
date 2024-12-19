@@ -32,8 +32,8 @@ import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -80,7 +80,7 @@ public class CombatTeam {
 
     private int forceId;
     private int missionId;
-    private AtBLanceRole role;
+    private CombatRole role;
     private UUID commanderId;
 
     /**
@@ -139,7 +139,7 @@ public class CombatTeam {
 
     public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
-        role = AtBLanceRole.IN_RESERVE;
+        role = CombatRole.IN_RESERVE;
         missionId = -1;
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null)
@@ -169,11 +169,11 @@ public class CombatTeam {
         }
     }
 
-    public AtBLanceRole getRole() {
+    public CombatRole getRole() {
         return role;
     }
 
-    public void setRole(AtBLanceRole role) {
+    public void setRole(CombatRole role) {
         this.role = role;
     }
 
@@ -596,7 +596,7 @@ public class CombatTeam {
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
                     retVal.missionId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("role")) {
-                    retVal.setRole(AtBLanceRole.parseFromString(wn2.getTextContent().trim()));
+                    retVal.setRole(CombatRole.parseFromInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commanderId")) {
                     retVal.commanderId = UUID.fromString(wn2.getTextContent());
                 }

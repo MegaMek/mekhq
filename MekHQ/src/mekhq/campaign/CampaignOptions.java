@@ -34,7 +34,7 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
@@ -1206,11 +1206,11 @@ public class CampaignOptions {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        atbBattleChance = new int[AtBLanceRole.values().length - 1];
-        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
-        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
-        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
-        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 10;
+        atbBattleChance = new int[CombatRole.values().length - 1];
+        atbBattleChance[CombatRole.FIGHTING.ordinal()] = 40;
+        atbBattleChance[CombatRole.DEFENCE.ordinal()] = 20;
+        atbBattleChance[CombatRole.SCOUTING.ordinal()] = 60;
+        atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
         // Scenarios
@@ -4471,10 +4471,10 @@ public class CampaignOptions {
     }
 
     /**
-     * @param role the {@link AtBLanceRole} to get the battle chance for
+     * @param role the {@link CombatRole} to get the battle chance for
      * @return the chance of having a battle for the specified role, or {@code 0} if StratCon is enabled
      */
-    public int getAtBBattleChance(final AtBLanceRole role) {
+    public int getAtBBattleChance(final CombatRole role) {
         if (useStratCon) {
             return 0;
         }
@@ -4483,7 +4483,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @param role      the {@link AtBLanceRole} ordinal value
+     * @param role      the {@link CombatRole} ordinal value
      * @param frequency the frequency to set the generation to (percent chance from
      *                  0 to 100)
      */
@@ -6328,10 +6328,10 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                    retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy

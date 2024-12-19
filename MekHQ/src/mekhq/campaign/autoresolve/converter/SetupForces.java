@@ -179,7 +179,7 @@ public class SetupForces {
      */
     private List<Entity> setupPlayerForces(Player player) {
         boolean useDropship = false;
-        if (scenario.getLanceRole().isScouting()) {
+        if (scenario.getCombatRole().isScouting()) {
             for (Entity en : scenario.getAlliesPlayer()) {
                 if (en.getUnitType() == UnitType.DROPSHIP) {
                     useDropship = true;
@@ -228,7 +228,7 @@ public class SetupForces {
                 // Set scenario type-specific delay
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                if (scenario.getLanceRole().isScouting() && (scenario.getCombatTeamById(campaign) != null)
+                if (scenario.getCombatRole().isScouting() && (scenario.getCombatTeamById(campaign) != null)
                     && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
                     && !useDropship) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
@@ -264,7 +264,7 @@ public class SetupForces {
                     }
                 }
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                if (!useDropship && scenario.getLanceRole().isScouting()
+                if (!useDropship && scenario.getCombatRole().isScouting()
                     && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
                 }

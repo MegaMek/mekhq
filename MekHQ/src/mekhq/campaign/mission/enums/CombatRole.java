@@ -23,13 +23,14 @@ import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
-public enum AtBLanceRole {
+public enum CombatRole {
     // region Enum Declarations
-    FIGHTING("AtBLanceRole.FIGHTING.text", "AtBLanceRole.FIGHTING.toolTipText"),
-    DEFENCE("AtBLanceRole.DEFENCE.text", "AtBLanceRole.DEFENCE.toolTipText"),
-    SCOUTING("AtBLanceRole.SCOUTING.text", "AtBLanceRole.SCOUTING.toolTipText"),
-    TRAINING("AtBLanceRole.TRAINING.text", "AtBLanceRole.TRAINING.toolTipText"),
-    IN_RESERVE("AtBLanceRole.IN_RESERVE.text", "AtBLanceRole.IN_RESERVE.toolTipText");
+    FIGHTING("CombatRole.FIGHTING.text", "CombatRole.FIGHTING.toolTipText"),
+    DEFENCE("CombatRole.DEFENCE.text", "CombatRole.DEFENCE.toolTipText"),
+    SCOUTING("CombatRole.SCOUTING.text", "CombatRole.SCOUTING.toolTipText"),
+    TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
+    AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
+    IN_RESERVE("CombatRole.IN_RESERVE.text", "CombatRole.IN_RESERVE.toolTipText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -38,7 +39,7 @@ public enum AtBLanceRole {
     // endregion Variable Declarations
 
     // region Constructors
-    AtBLanceRole(final String name, final String toolTipText) {
+    CombatRole(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
@@ -69,42 +70,38 @@ public enum AtBLanceRole {
         return this == TRAINING;
     }
 
+    public boolean isAuxiliary() {
+        return this == AUXILIARY;
+    }
+
     public boolean isInReserve() {
         return this == IN_RESERVE;
     }
     // endregion Boolean Comparison Methods
 
     // region File I/O
-    public static AtBLanceRole parseFromString(final String text) {
+    /**
+     * Parses an integer into a {@link CombatRole} enum value.
+     * <p>
+     * This method attempts to map an integer to the corresponding {@link CombatRole} value
+     * based on the ordinal index. If the parsing fails (e.g., if the integer is out of bounds
+     * or an exception occurs), it logs an error and returns the default value {@code IN_RESERVE}.
+     * </p>
+     *
+     * @param text the value representing the ordinal of the {@link CombatRole}.
+     * @return the corresponding {@link CombatRole} if the integer is valid;
+     *         otherwise, returns {@code IN_RESERVE}.
+     */
+    public static CombatRole parseFromInt(final String text) {
         try {
-            return valueOf(text);
-        } catch (Exception ignored) {
+            int value = Integer.parseInt(text);
+            return values()[value];
+        } catch (Exception ignored) {}
 
-        }
+        MMLogger.create(CombatRole.class)
+            .error("Unable to parse " + text + " into an CombatRole. Returning IN_RESERVE.");
 
-        try {
-            switch (Integer.parseInt(text)) {
-                case 0:
-                    return IN_RESERVE;
-                case 1:
-                    return FIGHTING;
-                case 2:
-                    return DEFENCE;
-                case 3:
-                    return SCOUTING;
-                case 4:
-                    return TRAINING;
-                default:
-                    break;
-            }
-        } catch (Exception ignored) {
-
-        }
-
-        MMLogger.create(AtBLanceRole.class)
-                .error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
-
-        return FIGHTING;
+        return IN_RESERVE;
     }
     // endregion File I/O
 

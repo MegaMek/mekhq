@@ -68,8 +68,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -3750,7 +3750,7 @@ public class Campaign implements ITechManager {
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
-        final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
+        final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (CombatTeam combatTeam : combatTeams.values()) {
             if (!combatTeam.getRole().isInReserve() && (combatTeam.getMissionId() == contract.getId())) {
                 total++;
