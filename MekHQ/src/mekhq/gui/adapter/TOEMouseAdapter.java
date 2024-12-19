@@ -128,6 +128,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String CHANGE_NAME = "CHANGE_NAME";
     private static final String CHANGE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS";
     private static final String CHANGE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES";
+    private static final String CHANGE_CONVOY_STATUS = "CHANGE_CONVOY_STATUS";
     private static final String CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE";
     private static final String REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE";
 
@@ -140,6 +141,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_CONVOY_STATUS = "CHANGE_CONVOY_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
     private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
 
@@ -436,8 +438,27 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             final boolean subforces = command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUSES);
             for (final Force force : forces) {
                 force.setCombatForce(combatForce, subforces);
+                force.setConvoyForce(false);
             }
-            gui.undeployForces(forces);
+            gui.getTOETab().refreshForceView();
+        } else if (command.contains(TOEMouseAdapter.CHANGE_CONVOY_STATUS)) {
+            if (singleForce == null) {
+                return;
+            }
+
+            final boolean convoyForce = !singleForce.isConvoyForce();
+            for (final Force force : forces) {
+                force.setConvoyForce(convoyForce);
+            }
+
+            for (Force parentForce : singleForce.getAllParents()) {
+                parentForce.setConvoyForce(false);
+            }
+
+            for (Force childForce : singleForce.getAllSubForces()) {
+                childForce.setConvoyForce(false);
+            }
+
             gui.getTOETab().refreshForceView();
 
             for (Force formation : gui.getCampaign().getAllForces()) {
@@ -1046,16 +1067,24 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
-                menuItem = new JMenuItem(force.isCombatForce() ? "Make Non-Combat Force" : "Make Combat Force");
+                menuItem = new JMenuItem(force.isCombatForce() ? "Make Support Force" : "Remove Support Designation");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUS + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
 
                 menuItem = new JMenuItem(force.isCombatForce() ?
-                    "Make Force and Subforces Non-Combat Forces" : "Make Force and Subforces Combat Forces");
+                    "Mark All Forces as Support Forces" : "Remove Support Designation from All Forces");
                 menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
+
+                if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
+                    menuItem = new JMenuItem(!force.isConvoyForce() ?
+                        "Mark force as a Resupply Convoy" : "Remove Resupply Convoy Designation");
+                    menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CONVOY_STATUS + forceIds);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
 
                 JMenuItem optionStrategicForceOverride = new JMenuItem((force.isCombatTeam() ?
                     "Never" : "Always") + " Consider Force a Combat Team");

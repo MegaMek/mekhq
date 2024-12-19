@@ -53,7 +53,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
-            if (((Unit) value).getEntity() instanceof GunEmplacement) {
+            if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
             String c3network = "";
@@ -149,16 +149,15 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
 
-            String format;
-            if (force.isCombatTeam()) {
-                format = (force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE) ?
-                    "<html><b><u>%s</u></b></html>" : "<html><b>%s</b></html>";
-            } else {
-                format = (force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE) ?
-                    "<html><u>%s</u></html>" : "%s";
-            }
+            String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
+                force.isCombatTeam() ? "<b>" : "",
+                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+                force.getName(),
+                force.isCombatTeam() ? "</b>" : "",
+                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+                force.isConvoyForce() ? " &#926;" : force.isCombatForce() ? "" : " &#8709;");
 
-            setText(String.format(format, force.getName()));
+            setText(formattedForceName);
         } else {
             logger.error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));

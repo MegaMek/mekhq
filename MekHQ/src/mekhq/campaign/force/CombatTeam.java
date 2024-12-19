@@ -348,7 +348,7 @@ public class CombatTeam {
             return overrideState;
         }
 
-        if (force.getUnits().isEmpty()) {
+        if (force.getAllUnits(true).isEmpty()) {
             force.setCombatTeamStatus(false);
             return false;
         }

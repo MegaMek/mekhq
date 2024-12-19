@@ -72,6 +72,8 @@ import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -102,7 +104,6 @@ import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -147,12 +148,15 @@ import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 /**
  * The main campaign class, keeps track of teams and units
@@ -2080,6 +2084,22 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves a list of personnel, excluding those whose status indicates they have
+     * left the unit.
+     * <p>
+     * This method filters the personnel collection to only include individuals who
+     * are still part of the unit, as determined by their status.
+     * </p>
+     *
+     * @return a {@code List} of {@link Person} objects who have not left the unit
+     */
+    public List<Person> getPersonnelFilteringOutDeparted() {
+        return getPersonnel().stream()
+            .filter(person -> !person.getStatus().isDepartedUnit())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only active Persons.
      *
      * @return a {@link Person} <code>List</code> containing all active personnel
@@ -3820,6 +3840,10 @@ public class Campaign implements ITechManager {
                         if (stub) {
                             scenario.convertToStub(this, ScenarioStatus.DEFEAT);
                             addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
+
+                            if (scenario.getStratConScenarioType().isResupply()) {
+                                processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            }
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
@@ -3951,6 +3975,16 @@ public class Campaign implements ITechManager {
                 if (!report.isBlank()) {
                     addReport(report);
                 }
+
+                // Resupply
+                if (getCampaignOptions().isUseStratCon()) {
+                    boolean inLocation = location.isOnPlanet()
+                        && location.getCurrentSystem().equals(contract.getSystem());
+
+                    if (inLocation) {
+                        processResupply(contract);
+                    }
+                }
             }
         }
 
@@ -4014,14 +4048,7 @@ public class Campaign implements ITechManager {
             }
 
             int negoatiatedSupportPoints = 0;
-            int maximumSupportPointsNegotiated = 1;
-
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
-            if (campaignState != null) {
-                List<StratconTrackState> tracks = campaignState.getTracks();
-
-                maximumSupportPointsNegotiated = tracks.isEmpty() ? 1 : tracks.size();
-            }
+            int maximumSupportPointsNegotiated = contract.getRequiredLances();
 
             int availableAdmins = adminTransport.size();
 
@@ -4061,51 +4088,78 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Processes the new day for all personnel present in the campaign.
+     * Processes the resupply operation for a given contract.
      * <p>
-     * This method loops through all personnel present and performs the necessary actions
-     * for each person for a new day.
+     * This method checks if the contract type is not Guerrilla Warfare or if a
+     * d6 roll is greater than 4. If any of these conditions is met, it calculates the maximum
+     * resupply size based on the contract's required lances, creates an instance of the
+     * {@link Resupply} class, and initiates a resupply action.
+     *
+     * @param contract The relevant {@link AtBContract}
+     */
+    private void processResupply(AtBContract contract) {
+        boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
+
+        if (!isGuerrilla || Compute.d6(1) > 4) {
+            int dropCount = (int) round((double) contract.getRequiredLances() / 3);
+
+            ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
+            Resupply resupply = new Resupply(this, contract, resupplyType);
+            performResupply(resupply, contract, dropCount);
+        }
+    }
+
+    /**
+     * Processes the daily activities and updates for all personnel that haven't already left the
+     * campaign.
+     * <p>
+     * This method iterates through all personnel and performs various daily updates, including
+     * health checks, status updates, relationship events, and other daily or periodic tasks.
      * <p>
      * The following tasks are performed for each person:
      * <ul>
-     *   <li>Death - If the person has died, skip processing further for the dead person.</li>
-     *   <li>Marriage - Process any marriage-related actions.</li>
-     *   <li>Reset minutes left for the person.</li>
-     *   <li>Reset acquisitions made to 0.</li>
-     *   <li>Healing - If the person needs healing and advanced medical is not used,
-     *   decrement the days to wait for healing and heal naturally or with a doctor.</li>
-     *   <li>Advanced Medical - If advanced medical is used, resolve the daily healing for the person.</li>
-     *   <li>Reset current edge points for support personnel on Mondays.</li>
-     *   <li>Idle XP - If idle XP is enabled and it's the first day of the month,
-     *   check if the person qualifies for idle XP and award them if they do.</li>
-     *   <li>Divorce - Process any divorce-related actions.</li>
-     *   <li>Procreation - Process any procreation-related actions.</li>
-     *   <li>Anniversaries - Check if it's the person's birthday or 18th birthday
-     *   and announce it if needed.</li>
-     *   <li>Auto Awards - If it's the first day of the month, calculate the auto award
-     *   support points based on the person's roles and experience level.</li>
+     *   <li><b>Death Handling:</b> If the person has died, their processing is skipped for the day.</li>
+     *   <li><b>Relationship Events:</b> Processes relationship-related events, such as marriage or divorce.</li>
+     *   <li><b>Reset Actions:</b> Resets the person's minutes left for work and sets acquisitions made to 0.</li>
+     *   <li><b>Medical Events:</b></li>
+     *       <li>- If advanced medical care is available, processes the person's daily healing.</li>
+     *       <li>- If advanced medical care is unavailable, decreases the healing wait time and
+     *       applies natural or doctor-assisted healing.</li>
+     *   <li><b>Weekly Edge Resets:</b> Resets edge points to their purchased value weekly (applies
+     *   to support personnel).</li>
+     *   <li><b>Vocational XP:</b> Awards monthly vocational experience points to the person where
+     *   applicable.</li>
+     *   <li><b>Anniversaries:</b> Checks for birthdays or significant anniversaries and announces
+     *   them as needed.</li>
+     *   <li><b>autoAwards:</b> On the first day of every month, calculates and awards support
+     *   points based on roles and experience levels.</li>
      * </ul>
      * <p>
-     * Note: This method uses several other methods to perform the specific actions for each task.
+     * <b>Concurrency Note:</b>
+     * A separate filtered list of personnel is used to avoid concurrent modification issues during iteration.
+     * <p>
+     * This method relies on several helper methods to perform specific tasks for each person,
+     * separating the responsibilities for modularity and readability.
+     *
+     * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
-        List<Person> personnelForRelationshipProcessing = new ArrayList<>();
+        // This list ensures we don't hit a concurrent modification error
+        List<Person> personnel = getPersonnelFilteringOutDeparted();
 
-        for (Person person : getPersonnel()) {
+        for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
 
-            personnelForRelationshipProcessing.add(person);
-
-            // Death
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
 
+            processWeeklyRelationshipEvents(person);
+
             person.resetMinutesLeft();
-            // Reset acquisitions made to 0
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
@@ -4116,17 +4170,9 @@ public class Campaign implements ITechManager {
 
             processMonthlyVocationalXp(person);
 
-            // Anniversaries
             processAnniversaries(person);
 
-            // autoAwards
             processMonthlyAutoAwards(person);
-        }
-
-        // Divorce, Marriage
-        // This has to be processed separately to avoid a ConcurrentModificationException
-        for (Person person : personnelForRelationshipProcessing) {
-            processWeeklyRelationshipEvents(person);
         }
     }
 
@@ -6866,57 +6912,6 @@ public class Campaign implements ITechManager {
         return null;
     }
 
-    /**
-     * AtB: count all available bonus parts
-     *
-     * @return the total <code>int</code> number of bonus parts for all active
-     *         contracts
-     */
-    public int totalBonusParts() {
-        int retVal = 0;
-        if (hasActiveContract()) {
-            for (Contract c : getActiveContracts()) {
-                if (c instanceof AtBContract) {
-                    retVal += ((AtBContract) c).getNumBonusParts();
-                }
-            }
-        }
-        return retVal;
-    }
-
-    public void spendBonusPart(IAcquisitionWork targetWork) {
-        // Can only spend from active contracts, so if there are none we can't spend a
-        // bonus part
-        if (!hasActiveContract()) {
-            return;
-        }
-
-        String report = targetWork.find(0);
-
-        if (report.endsWith("0 days.")) {
-            // First, try to spend from the contact the Acquisition's unit is attached to
-            AtBContract contract = getAttachedAtBContract(targetWork.getUnit());
-
-            if (contract == null) {
-                // Then, just the first free one that is active
-                for (Contract c : getActiveContracts()) {
-                    if (((AtBContract) c).getNumBonusParts() > 0) {
-                        contract = (AtBContract) c;
-                        break;
-                    }
-                }
-            }
-
-            if (contract == null) {
-                logger.error("AtB: used bonus part but no contract has bonus parts available.");
-            } else {
-                addReport(
-                        resources.getString("bonusPartLog.text") + ' ' + targetWork.getAcquisitionPart().getPartName());
-                contract.useBonusPart();
-            }
-        }
-    }
-
     public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
         AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
 
@@ -8743,22 +8738,46 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Gets a string to use for addressing the commander.
-     * If no commander is flagged, returns a default address.
+     * Retrieves the address or title for the commanding officer, either in a formal or informal format.
      *
-     * @return The title of the commander, or a default string if no commander.
+     * <p>This method checks for the presence of a flagged commander. If no commander is found,
+     * a general fallback address is returned based on the specified formality. If a commander is
+     * present, it further tailors the address based on the gender of the commander (for informal styles)
+     * or their rank and surname (for formal styles).</p>
+     *
+     * @param isInformal A boolean flag indicating whether the address should be informal
+     *                   (true for informal, false for formal).
+     * @return A {@link String} representing the appropriate address for the commander,
+     *         either formal or informal.
      */
-    public String getCommanderAddress() {
+    public String getCommanderAddress(boolean isInformal) {
         Person commander = getFlaggedCommander();
 
         if (commander == null) {
-            return resources.getString("generalFallbackAddress.text");
+            if (isInformal) {
+                return resources.getString("generalFallbackAddressInformal.text");
+            } else {
+                return resources.getString("generalFallbackAddress.text");
+            }
+        }
+
+        if (isInformal) {
+            Gender commanderGender = commander.getGender();
+
+            return switch (commanderGender) {
+                case MALE -> resources.getString("informalAddressMale.text");
+                case FEMALE -> resources.getString("informalAddressFemale.text");
+                case OTHER_MALE, OTHER_FEMALE, RANDOMIZE ->
+                    resources.getString("generalFallbackAddressInformal.text");
+            };
         }
 
         String commanderRank = commander.getRankName();
 
-        if (commanderRank.equalsIgnoreCase("None") || commanderRank.isBlank()) {
-            return commander.getFullName();
+        if (commanderRank.equalsIgnoreCase("None")
+            || commanderRank.equalsIgnoreCase("-")
+            || commanderRank.isBlank()) {
+            return resources.getString("generalFallbackAddress.text");
         }
 
         return commanderRank;
@@ -8851,5 +8870,24 @@ public class Campaign implements ITechManager {
                 partsInUseRequestedStockMap.get(key));
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
+    }
+    /**
+     * Retrieves the campaign faction icon for the specified {@link Campaign}.
+     * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
+     * Otherwise, a default faction logo is fetched based on the campaign's faction short name.
+     *
+     * @return An {@link ImageIcon} representing the faction icon for the given campaign.
+     */
+    public ImageIcon getCampaignFactionIcon() {
+        ImageIcon icon;
+        StandardForceIcon campaignIcon = getUnitIcon();
+
+        if (campaignIcon.getFilename() == null) {
+            icon = getFactionLogo(this, getFaction().getShortName(),
+                true);
+        } else {
+            icon = new ImageIcon(campaignIcon.getFilename());
+        }
+        return icon;
     }
 }

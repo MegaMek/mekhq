@@ -50,21 +50,12 @@ public class EndPhaseReporter {
     }
 
     public void reportUnitDestroyed(Entity entity) {
-        var crewMessageId = entity.getCrew().isDead() ? 3335 : 3336;
         var removalCondition = entity.getRemovalCondition();
         var reportId = reportIdForEachRemovalCondition.getOrDefault(removalCondition, MSG_ID_UNIT_DESTROYED_UNKNOWINGLY);
 
         var r = new PublicReportEntry(reportId)
-            .add(new EntityNameReportEntry(entity).reportText())
-            .add(new PublicReportEntry(crewMessageId)
-                .add(entity.getCrew().getName())
-                .add(entity.getCrew().getHits())
-                .reportText());
-        reportConsumer.accept(new PublicReportEntry(5005)
-                .add(r.reportText())
-                .add(String.format("%.2f%%", (entity).getArmorRemainingPercent() * 100))
-                .add(String.format("%.2f%%", (entity).getInternalRemainingPercent() * 100))
-                .indent(2));
+            .add(new EntityNameReportEntry(entity).reportText());
+        reportConsumer.accept(r);
     }
 
     public void destroyedUnitsHeader() {

@@ -475,6 +475,10 @@
             <value>data/images/stratcon/Stratcon_Mars.png</value>
         </entry>
         <entry>
+            <key>ColdFacility</key>
+            <value>data/images/stratcon/Stratcon_Cold_Facility.png</value>
+        </entry>
+        <entry>
             <key>ColdForest</key>
             <value>data/images/stratcon/Stratcon_Cold_Forest.png</value>
         </entry>
@@ -511,6 +515,10 @@
             <value>data/images/stratcon/Stratcon_Forest.png</value>
         </entry>
         <entry>
+            <key>FrozenFacility</key>
+            <value>data/images/stratcon/Stratcon_Frozen_Facility.png</value>
+        </entry>
+        <entry>
             <key>FrozenSea</key>
             <value>data/images/stratcon/Stratcon_Frozen_Sea.png</value>
         </entry>
@@ -545,6 +553,10 @@
         <entry>
             <key>HotHillsWet</key>
             <value>data/images/stratcon/Stratcon_Hot_Hills_Wet.png</value>
+        </entry>
+        <entry>
+            <key>HotFacility</key>
+            <value>data/images/stratcon/Stratcon_Hot_Facility.png</value>
         </entry>
         <entry>
             <key>HotSea</key>
@@ -601,6 +613,10 @@
         <entry>
             <key>Swamp</key>
             <value>data/images/stratcon/Stratcon_Swamp.png</value>
+        </entry>
+        <entry>
+            <key>TemperateFacility</key>
+            <value>data/images/stratcon/Stratcon_Temperate_Facility.png</value>
         </entry>
         <entry>
             <key>Tundra</key>

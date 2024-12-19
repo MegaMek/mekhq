@@ -42,6 +42,8 @@ import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
+import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -62,7 +64,7 @@ import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -2039,7 +2041,8 @@ public class StratconRulesManager {
      *
      * @return List of unit IDs.
      */
-    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, Set<Integer> forceIDs, int leadershipSkill) {
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, ArrayList<Integer> forceIDs,
+                                                        int leadershipSkill) {
         List<Unit> eligibleUnits = new ArrayList<>();
 
         // If there is no leadership skill, we shouldn't continue
@@ -2105,7 +2108,7 @@ public class StratconRulesManager {
     /**
      * Calculates the majority unit type for the forces given the IDs.
      */
-    private static int getPrimaryUnitType(Campaign campaign, Set<Integer> forceIDs) {
+    private static int getPrimaryUnitType(Campaign campaign, ArrayList<Integer> forceIDs) {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
@@ -2332,6 +2335,35 @@ public class StratconRulesManager {
                     processTrackForceReturnDates(track, campaign);
 
                     track.removeScenario(scenario);
+
+                    if (backingScenario.getStratConScenarioType().isResupply()) {
+                        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+
+                        if (victory) {
+                            campaign.addReport(String.format(resources.getString("convoyRescuedStratCon.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                                CLOSING_SPAN_TAG));
+                        } else {
+                            campaign.addReport(String.format(resources.getString("convoyDefeatedStratCon.text"),
+                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                                CLOSING_SPAN_TAG));
+                        }
+                    } else if (backingScenario.getStratConScenarioType().isLosTech()) {
+                        if (victory) {
+                            int roll = randomInt(10);
+                            StarLeagueCache cache = new StarLeagueCache(campaign, ((AtBContract) mission),
+                                CacheType.TRASH_CACHE.ordinal());
+
+                            // The rumor is a dud
+//                            if (false) { // TODO replace placeholder value
+//                                cache.createDudDialog(track, scenario);
+//                            } else {
+//                                if (Objects.equals(cache.getFaction().getShortName(), "SL")) {
+//                                    cache.createProposalDialog();
+//                                }
+//                            }
+                        }
+                    }
                     break;
                 }
             }
@@ -2453,6 +2485,10 @@ public class StratconRulesManager {
                 }
 
                 track.removeScenario(scenario);
+
+                if (scenario.getBackingScenario().getStratConScenarioType().isResupply()) {
+                    return true;
+                }
 
                 StratconFacility localFacility = track.getFacility(scenario.getCoords());
                 if (localFacility != null) {

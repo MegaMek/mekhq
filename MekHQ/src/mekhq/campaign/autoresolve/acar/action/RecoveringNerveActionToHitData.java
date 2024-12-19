@@ -22,7 +22,7 @@ package mekhq.campaign.autoresolve.acar.action;
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.component.Formation;
-import mekhq.utilities.I18n;
+import mekhq.utilities.Internationalization;
 
 public class RecoveringNerveActionToHitData extends TargetRoll {
 
@@ -32,26 +32,26 @@ public class RecoveringNerveActionToHitData extends TargetRoll {
 
     public static RecoveringNerveActionToHitData compileToHit(SimulationContext game, RecoveringNerveAction recoveringNerveAction) {
         if (recoveringNerveAction.isInvalid(game)) {
-            return new RecoveringNerveActionToHitData(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_nerve_recovering"));
+            return new RecoveringNerveActionToHitData(TargetRoll.IMPOSSIBLE, Internationalization.getText("acar.invalid_nerve_recovering"));
         }
         //noinspection OptionalGetWithoutIsPresent
         var formation = game.getFormation(recoveringNerveAction.getEntityId()).get();
-        RecoveringNerveActionToHitData toHit = new RecoveringNerveActionToHitData(formation.getMorale(), I18n.t("acar.formation_morale"));
+        RecoveringNerveActionToHitData toHit = new RecoveringNerveActionToHitData(formation.getMorale(), Internationalization.getText("acar.formation_morale"));
         processSkill(toHit, formation);
         return toHit;
     }
 
     private static void processSkill(RecoveringNerveActionToHitData toHit, Formation formation) {
         switch (formation.getSkill()) {
-            case 7 -> toHit.addModifier(+2, I18n.t("acar.skill_7"));
-            case 6 -> toHit.addModifier(+1, I18n.t("acar.skill_6"));
-            case 5 -> toHit.addModifier(0, I18n.t("acar.skill_5"));
-            case 4 -> toHit.addModifier(-1, I18n.t("acar.skill_4"));
-            case 3 -> toHit.addModifier(-2, I18n.t("acar.skill_3"));
-            case 2 -> toHit.addModifier(-3, I18n.t("acar.skill_2"));
-            case 1 -> toHit.addModifier(-4, I18n.t("acar.skill_1"));
-            case 0 -> toHit.addModifier(-5, I18n.t("acar.skill_0"));
-            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_skill"));
+            case 7 -> toHit.addModifier(+2, Internationalization.getText("acar.skill_7"));
+            case 6 -> toHit.addModifier(+1, Internationalization.getText("acar.skill_6"));
+            case 5 -> toHit.addModifier(0, Internationalization.getText("acar.skill_5"));
+            case 4 -> toHit.addModifier(-1, Internationalization.getText("acar.skill_4"));
+            case 3 -> toHit.addModifier(-2, Internationalization.getText("acar.skill_3"));
+            case 2 -> toHit.addModifier(-3, Internationalization.getText("acar.skill_2"));
+            case 1 -> toHit.addModifier(-4, Internationalization.getText("acar.skill_1"));
+            case 0 -> toHit.addModifier(-5, Internationalization.getText("acar.skill_0"));
+            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, Internationalization.getText("acar.invalid_skill"));
         }
     }
 }

@@ -439,11 +439,12 @@ public class SimulationContext implements IGame {
     }
 
     public void addUnitToGraveyard(Entity entity) {
-        var entityInGame = getEntity(entity.getId());
-        if (entityInGame.isPresent()) {
-            removeEntity(entity);
-            graveyard.add(entity);
+        if (!inGameObjects.containsKey(entity.getId())) {
+            logger.error("Tried to add entity {} to graveyard, but it's not in the game!", entity);
+            return;
         }
+        removeEntity(entity);
+        graveyard.add(entity);
     }
 
     public void setPlayerSkillLevel(int playerId, SkillLevel averageSkillLevel) {

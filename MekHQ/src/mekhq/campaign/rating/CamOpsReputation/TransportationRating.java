@@ -304,6 +304,8 @@ public class TransportationRating {
 
                 passengerCapacity += bay.getPersonnel(entity.isClan());
             }
+
+            passengerCapacity += entity.getNPassenger();
         }
 
         // Map the capacity of each bay type

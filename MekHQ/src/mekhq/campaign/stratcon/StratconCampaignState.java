@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -174,6 +174,15 @@ public class StratconCampaignState {
 
     public void useSupportPoint() {
         supportPoints--;
+    }
+
+    /**
+     * Decreases the number of support points by the specified decrement.
+     *
+     * @param decrement The number of support points to use/decrease.
+     */
+    public void useSupportPoints(int decrement) {
+        supportPoints -= decrement;
     }
 
     /**

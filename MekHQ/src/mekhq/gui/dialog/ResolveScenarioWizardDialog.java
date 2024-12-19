@@ -22,48 +22,6 @@
 
  package mekhq.gui.dialog;
 
-import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
-
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.WindowConstants;
-import javax.swing.SwingUtilities;
-
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -97,6 +55,14 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.utilities.ReportingUtilities;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.List;
+import java.util.*;
+
+import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
+
 /**
  * @author Taharqa
  */
@@ -116,6 +82,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             OBJECTIVEPANEL, PREVIEWPANEL
     };
 
+    private Campaign campaign;
     private final JFrame frame;
 
     private final ResolveScenarioTracker tracker;
@@ -215,8 +182,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
-    public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveScenarioWizardDialog(Campaign campaign, JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
+        this.campaign = campaign;
         this.frame = parent;
         this.tracker = t;
         objectiveProcessor = new ScenarioObjectiveProcessor();
@@ -1393,8 +1361,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     override = objectiveOverrideCheckboxes.get(objective).isSelected();
                 }
 
-                reportText.append(objectiveProcessor.processObjective(
-                        objective, qualifyingUnitCount, override, tracker, true));
+                reportText.append(objectiveProcessor.processObjective(campaign, objective,
+                    qualifyingUnitCount, override, tracker, true));
                 reportText.append('\n');
             }
 
@@ -1507,11 +1475,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnBack.setEnabled(prevEnable);
         btnNext.setEnabled(nextEnable);
 
-        if (current == tabMain.getTabCount() - 1) {
-            btnFinish.setEnabled(true);
-        } else {
-            btnFinish.setEnabled(false);
-        }
+        btnFinish.setEnabled(current == tabMain.getTabCount() - 1);
         // Let's just call these all on tab change for safety for now
         updateFromUnitsTab();
         updateFromSalvageTab();
@@ -1628,7 +1592,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     override = objectiveOverrideCheckboxes.get(objective).isSelected();
                 }
 
-                objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, false);
+                objectiveProcessor.processObjective(campaign, objective, qualifyingUnitCount, override, tracker, false);
             }
         }
 
@@ -1825,11 +1789,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
 
         StringBuilder salvageUsed = new StringBuilder();
-
         salvageUsed.append("<html>")
-            .append((currentSalvagePct <= maxSalvagePct) ? "" :
-                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
-            .append(currentSalvagePct).append("%")
+            .append((currentSalvagePct <= maxSalvagePct) ? ""
+                : ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+            .append(currentSalvagePct).append('%')
             .append((currentSalvagePct <= maxSalvagePct) ? "" : ReportingUtilities.CLOSING_SPAN_TAG)
             .append("<span>(max ").append(maxSalvagePct).append("%)</span></html>");
 

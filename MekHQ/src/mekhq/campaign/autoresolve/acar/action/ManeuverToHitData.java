@@ -22,7 +22,7 @@ package mekhq.campaign.autoresolve.acar.action;
 import megamek.common.TargetRoll;
 import mekhq.campaign.autoresolve.component.EngagementControl;
 import mekhq.campaign.autoresolve.component.Formation;
-import mekhq.utilities.I18n;
+import mekhq.utilities.Internationalization;
 
 public class ManeuverToHitData extends TargetRoll {
 
@@ -31,7 +31,7 @@ public class ManeuverToHitData extends TargetRoll {
     }
 
     public static ManeuverToHitData compileToHit(Formation formation) {
-        var toHit = new ManeuverToHitData(formation.getTactics(), I18n.t("acar.formation_tactics"));
+        var toHit = new ManeuverToHitData(formation.getTactics(), Internationalization.getText("acar.formation_tactics"));
         processFormationModifiers(toHit, formation);
         processCombatUnit(toHit, formation);
         return toHit;
@@ -39,31 +39,31 @@ public class ManeuverToHitData extends TargetRoll {
 
     private static void processFormationModifiers(ManeuverToHitData toHit, Formation formation) {
         if (formation.getEngagementControl() == EngagementControl.FORCED_ENGAGEMENT) {
-            toHit.addModifier(1, I18n.t("acar.forced_engagement"));
+            toHit.addModifier(1, Internationalization.getText("acar.forced_engagement"));
         }
         if (formation.isAerospace()) {
-            toHit.addModifier(2, I18n.t("acar.aerospace_formation"));
+            toHit.addModifier(2, Internationalization.getText("acar.aerospace_formation"));
         }
     }
 
     private static void processCombatUnit(ManeuverToHitData toHit, Formation formation) {
         switch (formation.getSkill()) {
-            case 7 -> toHit.addModifier(+4, I18n.t("acar.skill_7"));
-            case 6 -> toHit.addModifier(+3, I18n.t("acar.skill_6"));
-            case 5 -> toHit.addModifier(+2, I18n.t("acar.skill_5"));
-            case 4 -> toHit.addModifier(+1, I18n.t("acar.skill_4"));
-            case 3 -> toHit.addModifier(0, I18n.t("acar.skill_3"));
-            case 2 -> toHit.addModifier(-1, I18n.t("acar.skill_2"));
-            case 1 -> toHit.addModifier(-2, I18n.t("acar.skill_1"));
-            case 0 -> toHit.addModifier(-3, I18n.t("acar.skill_0"));
-            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, I18n.t("acar.invalid_skill"));
+            case 7 -> toHit.addModifier(+4, Internationalization.getText("acar.skill_7"));
+            case 6 -> toHit.addModifier(+3, Internationalization.getText("acar.skill_6"));
+            case 5 -> toHit.addModifier(+2, Internationalization.getText("acar.skill_5"));
+            case 4 -> toHit.addModifier(+1, Internationalization.getText("acar.skill_4"));
+            case 3 -> toHit.addModifier(0, Internationalization.getText("acar.skill_3"));
+            case 2 -> toHit.addModifier(-1, Internationalization.getText("acar.skill_2"));
+            case 1 -> toHit.addModifier(-2, Internationalization.getText("acar.skill_1"));
+            case 0 -> toHit.addModifier(-3, Internationalization.getText("acar.skill_0"));
+            default -> toHit.addModifier(TargetRoll.IMPOSSIBLE, Internationalization.getText("acar.invalid_skill"));
         }
 
         switch (formation.moraleStatus()) {
-            case SHAKEN -> toHit.addModifier(+0, I18n.t("acar.shaken_morale"));
-            case UNSTEADY -> toHit.addModifier(+1, I18n.t("acar.unsteady_morale"));
-            case BROKEN -> toHit.addModifier(+2, I18n.t("acar.broken_morale"));
-            case ROUTED -> toHit.addModifier(+2, I18n.t("acar.routed_morale"));
+            case SHAKEN -> toHit.addModifier(+0, Internationalization.getText("acar.shaken_morale"));
+            case UNSTEADY -> toHit.addModifier(+1, Internationalization.getText("acar.unsteady_morale"));
+            case BROKEN -> toHit.addModifier(+2, Internationalization.getText("acar.broken_morale"));
+            case ROUTED -> toHit.addModifier(+2, Internationalization.getText("acar.routed_morale"));
         }
     }
 }
