@@ -12,9 +12,9 @@
 		<allowedUnitType>1</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
+		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>false</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>true</deployOffboard>
 		<deploymentZones>
 			<deploymentZone>9</deploymentZone>
