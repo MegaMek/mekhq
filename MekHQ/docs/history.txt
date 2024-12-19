@@ -102,6 +102,24 @@ MEKHQ VERSION HISTORY:
 + PR #5407: Updated Name of I18n Class
 + PR #5411: Updated Damage Application in ACAR
 + PR #5415: Fixed Resolve Unit Test to Only Run when Asked
++ Fix #2800: Fixed Force Deployment Order Bug
++ Fix #4430: Fixed NPE in Caused by Deployment Attempt in Integrated Command
++ Fix #5299: Added Missing Tile Images to Stratcon Biome Manifest
++ Fix #5317: Set Minimum Target Skill Level in Mass Training Dialog to 1
++ Fix #5344: Improved StratCon Force Picker & Renamed LayeredForceIconOperationalStatus to OperationalStatus
++ Fix #5369: Fixed Divorce Logic
++ Fix #5408: Fixed Passenger Capacity Calculation in CamOps Reputation
++ Fix #5409: Refactored StratCon Campaign Management Dialog
++ PR #5416: Fixed Incorrect Ordering in Personnel Status Change Switch
++ PR #5417: Refactored Personnel Handling on New Day
++ PR #5423: Updated TO&E to Use "Support" Term instead of "Non-Combat"
++ PR #5425: Added Notification for Users Attempting to Manually Deploy on Integrated Commands
++ PR #5427: Fixed Unit Check in Combat Team Status Evaluation
++ PR #5428: Added Combat Teams & Support Forces Documentation
++ PR #5429: Archived Outdated Against the Bot Documentation
++ PR #5435: Halved Duration of Recon Scenarios
++ PR #5436: Adjusted Scenario Modifiers BV & Unit Count Contribution
++ PR #5437: Added Further Edge Case Handling for Turn Limit Scenario Objectives
 
 
 
