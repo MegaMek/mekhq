@@ -32,12 +32,14 @@ import megamek.common.force.Forces;
 import megamek.common.strategicBattleSystems.BaseFormationConverter;
 import megamek.common.strategicBattleSystems.SBFUnit;
 import megamek.common.strategicBattleSystems.SBFUnitConverter;
+import megamek.logging.MMLogger;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.component.Formation;
 
 import java.util.ArrayList;
 
 public class ForceToFormationConverter extends BaseFormationConverter<Formation> {
+    private static final MMLogger logger = MMLogger.create(ForceToFormationConverter.class);
 
     public ForceToFormationConverter(Force force, SimulationContext game) {
         super(force, game, new Formation());
@@ -50,7 +52,13 @@ public class ForceToFormationConverter extends BaseFormationConverter<Formation>
             var thisUnit = new ArrayList<AlphaStrikeElement>();
             for (ForceAssignable entity : forces.getFullEntities(subforce)) {
                 if (entity instanceof Entity entityCast) {
-                    thisUnit.add(ASConverter.convertAndKeepRefs(entityCast));
+                    var element = ASConverter.convertAndKeepRefs(entityCast);
+                    if (element != null) {
+                        thisUnit.add(element);
+                    } else {
+                        var msg = String.format("Could not convert entity %s to AS element", entityCast);
+                        logger.error(msg);
+                    }
                 }
             }
             SBFUnit convertedUnit = new SBFUnitConverter(thisUnit, subforce.getName(), report).createSbfUnit();
