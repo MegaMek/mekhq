@@ -200,7 +200,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 if (force.isConvoyForce()) {
                     forceType = "Resupply " + force.getFormationLevel().toString();
                 } else {
-                    forceType = "Non-Combat " + force.getFormationLevel().toString();
+                    forceType = "Support " + force.getFormationLevel().toString();
                 }
             }
 

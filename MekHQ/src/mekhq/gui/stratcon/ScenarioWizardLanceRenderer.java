@@ -18,12 +18,18 @@
  */
 package mekhq.gui.stratcon;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.icons.enums.OperationalStatus;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static mekhq.campaign.icons.enums.OperationalStatus.NOT_OPERATIONAL;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
@@ -38,7 +44,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
     }
 
     @Override
-    public Component getListCellRendererComponent(final JList<? extends Force> list, final Force value,
+    public Component getListCellRendererComponent(final JList<? extends Force> list, final Force force,
                                                   final int index, final boolean isSelected,
                                                   final boolean cellHasFocus) {
         // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
@@ -50,13 +56,37 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         setForeground(foreground);
         setBackground(background);
 
-        CombatTeam lance = campaign.getCombatTeamsTable().get(value.getId());
+        // Determine name color
+        OperationalStatus operationalStatus = force.updateForceIconOperationalStatus(campaign).get(0);
+
+        String statusOpenFormat = switch (operationalStatus) {
+            case NOT_OPERATIONAL -> "<s>";
+            case MARGINALLY_OPERATIONAL -> spanOpeningWithCustomColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor());
+            case SUBSTANTIALLY_OPERATIONAL -> spanOpeningWithCustomColor(
+                MekHQ.getMHQOptions().getFontColorWarningHexColor());
+            case FULLY_OPERATIONAL, FACTORY_FRESH -> spanOpeningWithCustomColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+        };
+
+        String statusCloseFormat = operationalStatus == NOT_OPERATIONAL ? "</s>" : CLOSING_SPAN_TAG;
+
+        // Get combat role
+        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(force.getId());
         String roleString = "";
-        if (lance != null) {
-            roleString = lance.getRole().toString() + ", ";
+        if (combatTeam != null) {
+            roleString = combatTeam.getRole().toString() + ", ";
         }
 
-        setText(String.format("%s (%sBV: %d)", value.getName(), roleString, value.getTotalBV(campaign, true)));
+        // Adjust force name to remove unnecessary information
+        String forceName = force.getFullName();
+        String originNodeName = ", " + campaign.getForce(0).getName();
+        forceName = forceName.replaceAll(originNodeName, "");
+
+        // Format string
+        setText(String.format("<html>%s<b>%s%s, %s</b> - BV %s<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>%s</i></html>",
+            statusOpenFormat, force.getName(), statusCloseFormat, roleString,
+            force.getTotalBV(campaign, true), forceName));
 
         return this;
     }
