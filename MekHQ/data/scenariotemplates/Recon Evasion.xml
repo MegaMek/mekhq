@@ -119,7 +119,7 @@
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitScaleFactor>1</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
