@@ -104,8 +104,8 @@ public class Resupply {
         focusArmor = 0.25;
         focusParts = 0.5;
 
-        buildPartsPools(collectParts());
         calculateNegotiationSkill();
+        buildPartsPools(collectParts());
         calculatePlayerConvoyValues();
 
         convoyContents = new ArrayList<>();

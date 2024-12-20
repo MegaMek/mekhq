@@ -164,7 +164,7 @@ public class CampaignManagementDialog extends JDialog {
         } else {
             AtBContract contract = currentCampaignState.getContract();
             Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
-            performResupply(resupply, contract, 1);
+            performResupply(resupply, contract);
         }
 
         btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
@@ -207,7 +207,7 @@ public class CampaignManagementDialog extends JDialog {
 
             AtBContract contract = currentCampaignState.getContract();
             Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
-            performResupply(resupply, contract, 1);
+            performResupply(resupply, contract);
 
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });
