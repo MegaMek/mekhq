@@ -1006,10 +1006,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (oneDeployed) {
-                    menuItem = new JMenuItem("Undeploy Unit");
+                    menuItem = new JMenuItem("Undeploy Unit (GM)");
                     menuItem.setActionCommand(COMMAND_UNDEPLOY);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+                    menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
                     menu.add(menuItem);
                 }
 
