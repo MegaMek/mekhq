@@ -986,7 +986,6 @@ public class MissionViewPanel extends JScrollablePanel {
         if (campaign.getCampaignOptions().isUseStratCon()) {
             lblCargoRequirement.setName("lblCargoRequirement");
             lblCargoRequirement.setText(resourceMap.getString("lblCargoRequirement.text"));
-            lblCargoRequirement.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -996,7 +995,6 @@ public class MissionViewPanel extends JScrollablePanel {
 
             txtCargoRequirement.setName("txtCargoRequirement");
             txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t");
-            txtCargoRequirement.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;

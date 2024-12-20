@@ -4102,11 +4102,9 @@ public class Campaign implements ITechManager {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
 
         if (!isGuerrilla || Compute.d6(1) > 4) {
-            int dropCount = (int) round((double) contract.getRequiredLances() / 3);
-
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
-            performResupply(resupply, contract, dropCount);
+            performResupply(resupply, contract);
         }
     }
 

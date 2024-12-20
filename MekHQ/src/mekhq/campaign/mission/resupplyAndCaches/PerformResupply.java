@@ -78,6 +78,26 @@ public class PerformResupply {
     private static final MMLogger logger = MMLogger.create(PerformResupply.class);
 
     /**
+     * Initiates the resupply process for a specified campaign and active contract.
+     *
+     * <p>This method provides a simplified entry point to the resupply workflow, using a default value
+     * of 1 for the supply drop count. It delegates to the overloaded method
+     * {@link #performResupply(Resupply, AtBContract, int)} for the main execution of the resupply
+     * process, encompassing supply generation, convoy interaction, and delivery confirmation.</p>
+     *
+     * <p>This entry point is typically used when the exact number of supply drops is not specified or
+     * defaults to a single drop per invocation.</p>
+     *
+     * @param resupply the {@link Resupply} instance containing information about the resupply operation,
+     *                 such as the supplies to be delivered, convoy setup, and context-specific rules.
+     * @param contract the {@link AtBContract} representing the current contract, which provides the
+     *                 operational context for the resupply, including permissions and restrictions.
+     */
+    public static void performResupply(Resupply resupply, AtBContract contract) {
+        performResupply(resupply, contract, 1);
+    }
+
+    /**
      * Executes the resupply process for a specified campaign, contract, and supply drop count.
      * This method coordinates supply allocation, convoy interaction, potential for interception,
      * and player confirmation dialogs, ensuring the resupply process adheres to the campaign's
@@ -141,6 +161,16 @@ public class PerformResupply {
             getResupplyContents(resupply, DROP_TYPE_AMMO, isUsePlayerConvoy);
             getResupplyContents(resupply, DROP_TYPE_PARTS, isUsePlayerConvoy);
         }
+
+        resupply.setConvoyContents(resupply.getConvoyContents());
+
+        double totalTonnage = 0;
+        for (Part part : resupply.getConvoyContents()) {
+            totalTonnage += part.getTonnage() * (part instanceof Armor || part instanceof AmmoBin ? 5 : 1);
+        }
+
+        logger.info("totalTonnage: " + totalTonnage);
+
 
         // This shouldn't occur, but we include it as insurance.
         if (resupply.getConvoyContents().isEmpty()) {
@@ -222,6 +252,9 @@ public class PerformResupply {
      * @param resupply the {@link Resupply} instance containing convoy and mission-specific data.
      */
     public static void loadPlayerConvoys(Resupply resupply) {
+        // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
+        // weight by five when picking these items.
+        final int WEIGHT_MULTIPLIER = 5;
         final Campaign campaign = resupply.getCampaign();
         final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
 
@@ -235,10 +268,8 @@ public class PerformResupply {
             sortedConvoys.add(entry.getKey());
         }
 
-        // Sort the available parts according to weight
         final List<Part> convoyContents = resupply.getConvoyContents();
-        convoyContents.sort((part1, part2) ->
-            Double.compare(part2.getTonnage(), part1.getTonnage()));
+        Collections.shuffle(convoyContents);
 
         // Distribute parts across the convoys
         for (Force convoy : sortedConvoys) {
@@ -249,42 +280,24 @@ public class PerformResupply {
             Double cargoCapacity = playerConvoys.get(convoy);
             List<Part> convoyItems = new ArrayList<>();
 
-            // It is technically possible to end up with one or more items that won't fit,
-            // we need an early break to avoid situations where we infinite loop due to a
-            // particularly large item.
-            while (!convoyContents.isEmpty() && cargoCapacity > 0) {
-                boolean partAdded = false; // Ensure at least one part is removed per iteration
+            for (Part part : convoyContents) {
+                double tonnage = part.getTonnage();
 
-                // Iterate over parts to find what can fit
-                Iterator<Part> iterator = convoyContents.iterator();
-                while (iterator.hasNext()) {
-                    Part part = iterator.next();
-                    if (cargoCapacity - part.getTonnage() >= 0) {
-                        convoyItems.add(part);
-                        cargoCapacity -= part.getTonnage();
-                        iterator.remove(); // Remove directly during iteration
-                        partAdded = true;
-                    }
+                if (part instanceof AmmoBin || part instanceof Armor) {
+                    tonnage *= WEIGHT_MULTIPLIER;
                 }
 
-                // Break the loop if no part was added in this iteration to avoid infinite looping
-                if (!partAdded) {
-                    break;
+                if (cargoCapacity - tonnage >= 0) {
+                    convoyItems.add(part);
+                    cargoCapacity -= tonnage;
                 }
             }
 
+            convoyContents.removeAll(convoyItems);
 
             campaign.addReport(String.format(resources.getString("convoyDispatched.text"),
                 convoy.getName()));
             processConvoy(resupply, convoyItems, convoy);
-        }
-
-        if (!convoyContents.isEmpty()) {
-            campaign.addReport(String.format(resources.getString("convoyInsufficientSize.text")));
-
-            for (Part part : convoyContents) {
-                campaign.addReport("- " + part.getName());
-            }
         }
     }
 

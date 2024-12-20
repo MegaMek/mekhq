@@ -30,7 +30,7 @@ import mekhq.campaign.unit.Unit;
 
 import java.util.UUID;
 
-import static java.lang.Math.round;
+import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
@@ -128,13 +128,13 @@ public class ResupplyUtilities {
 
     /**
      * Estimates the total cargo requirements for a resupply operation based on the campaign
-     * and the associated contract details.
+     * and the associated contract details. These cargo requirements are specifically modified for
+     * player-owned convoys.
      *
      * <p>This estimation is calculated as follows:
      * <ul>
      *     <li>Determines the target cargo tonnage using the {@link Campaign} and {@link AtBContract} data.</li>
      *     <li>Applies a cargo multiplier defined in {@link Resupply#CARGO_MULTIPLIER}.</li>
-     *     <li>Accounts for the required number of supply drops, assuming one drop per three lances.</li>
      * </ul>
      *
      * @param campaign the {@link Campaign} instance to calculate cargo requirements for.
@@ -142,8 +142,6 @@ public class ResupplyUtilities {
      * @return the estimated cargo requirement in tons.
      */
     public static int estimateCargoRequirements(Campaign campaign, AtBContract contract) {
-        final double dropCount = (double) contract.getRequiredLances() / 3;
-
-        return (int) round(calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER * dropCount);
+        return (int) ceil(calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER);
     }
 }
