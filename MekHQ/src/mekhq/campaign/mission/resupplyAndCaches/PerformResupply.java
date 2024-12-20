@@ -273,6 +273,9 @@ public class PerformResupply {
                 }
             }
 
+
+            campaign.addReport(String.format(resources.getString("convoyDispatched.text"),
+                convoy.getName()));
             processConvoy(resupply, convoyItems, convoy);
         }
 
