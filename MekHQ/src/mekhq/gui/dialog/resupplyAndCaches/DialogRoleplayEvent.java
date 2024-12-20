@@ -92,7 +92,7 @@ public class DialogRoleplayEvent {
 
         String speakerName;
         if (speaker != null) {
-            speakerName = speaker.getFullTitle();
+            speakerName = speaker.getFullTitle() + " - " + playerConvoy.getName();
         } else {
             speakerName = playerConvoy.getName();
         }
