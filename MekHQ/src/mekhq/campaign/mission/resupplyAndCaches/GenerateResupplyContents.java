@@ -21,6 +21,7 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
@@ -44,6 +45,8 @@ import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
  * item value constraints.
  */
 public class GenerateResupplyContents {
+    private static final MMLogger logger = MMLogger.create(GenerateResupplyContents.class);
+
     private static final Money HIGH_VALUE_ITEM = Money.of(250000);
 
     /**
@@ -66,6 +69,10 @@ public class GenerateResupplyContents {
      * @param usePlayerConvoys Indicates whether player convoy cargo capacity should be applied.
      */
     static void getResupplyContents(Resupply resupply, DropType dropType, boolean usePlayerConvoys) {
+        // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
+        // weight by five when picking these items.
+        final int WEIGHT_MULTIPLIER = dropType == DropType.DROP_TYPE_PARTS ? 1 : 5;
+
         double targetCargoTonnage = resupply.getTargetCargoTonnage();
         if (usePlayerConvoys) {
             final int targetCargoTonnagePlayerConvoy = resupply.getTargetCargoTonnagePlayerConvoy();
@@ -79,22 +86,25 @@ public class GenerateResupplyContents {
 
         final int negotiatorSkill = resupply.getNegotiatorSkill();
 
-        List<Part> resupplyContents = resupply.getConvoyContents();
-
         List<Part> droppedItems = new ArrayList<>();
-        double runningTotal = 0;
 
-        double targetValue = switch (dropType) {
+        double availableSpace = switch (dropType) {
             case DROP_TYPE_PARTS -> targetCargoTonnage * resupply.getFocusParts();
             case DROP_TYPE_ARMOR -> targetCargoTonnage * resupply.getFocusArmor();
             case DROP_TYPE_AMMO -> targetCargoTonnage * resupply.getFocusAmmo();
         };
 
-        if (targetValue == 0) {
+        if (availableSpace == 0) {
             return;
         }
 
-        while (runningTotal < targetValue) {
+        List<Part> relevantPartsPool = switch(dropType) {
+            case DROP_TYPE_PARTS -> partsPool;
+            case DROP_TYPE_ARMOR -> armorPool;
+            case DROP_TYPE_AMMO -> ammoBinPool;
+        };
+
+        while ((availableSpace > 0) && (!relevantPartsPool.isEmpty())) {
             Part potentialPart = switch(dropType) {
                 case DROP_TYPE_PARTS -> getRandomDrop(partsPool, negotiatorSkill);
                 case DROP_TYPE_ARMOR -> getRandomDrop(armorPool, negotiatorSkill);
@@ -105,8 +115,9 @@ public class GenerateResupplyContents {
             // Even if the pool isn't empty, it's highly unlikely we'll get a successful pull on
             // future iterations, so we end generation early.
             if (potentialPart == null) {
-                resupplyContents.addAll(droppedItems);
-                resupply.setConvoyContents(resupplyContents);
+                resupply.getConvoyContents().addAll(droppedItems);
+                calculateConvoyWorth(resupply);
+                logger.info("Encountered null part while getting resupply contents. Aborting early.");
                 return;
             }
 
@@ -136,13 +147,15 @@ public class GenerateResupplyContents {
                     case DROP_TYPE_AMMO -> ammoBinPool.remove(potentialPart);
                 }
 
-                runningTotal += potentialPart.getTonnage();
-                droppedItems.add(potentialPart);
+                availableSpace -= potentialPart.getTonnage() * WEIGHT_MULTIPLIER;
+
+                if (availableSpace >= 0) {
+                    droppedItems.add(potentialPart);
+                }
             }
         }
 
-        resupplyContents.addAll(droppedItems);
-        resupply.setConvoyContents(resupplyContents);
+        resupply.getConvoyContents().addAll(droppedItems);
         calculateConvoyWorth(resupply);
     }
 
