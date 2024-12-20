@@ -126,7 +126,8 @@ MEKHQ VERSION HISTORY:
 + PR #5446: Updated Convoy Scenarios to Exclude BV and Unit Count Contribution for Convoy Units
 + PR #5447: Refactored Conventional Fighter Handling in StratCon
 + Fix #5449: Fixed Force Removal Bug in TO&E, Fixed Convoy-Support Force Option Bug #5449
-+ Fix #5450: Fixed Combat Team Eligibility Check by Rolling Back Use of getAllUnits() 
++ Fix #5450: Fixed Combat Team Eligibility Check by Rolling Back Use of getAllUnits()
++ Fix #5439: Feat/acar mode selection
 
 
 0.50.01 (2024-11-10 1800 UTC)
@@ -317,7 +318,6 @@ MEKHQ VERSION HISTORY:
 + PR #5176: Temporarily Removed CAM_OPS from Contract Market Method ComboBox
 + PR #5179: Fix Perm. Injury showing as Injury on Personnel tabel
 + PR #5180: Show refitting techs and fix refit countdown
-+ PR #5412: Rolled Back #5399
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
