@@ -255,6 +255,7 @@ public class PerformResupply {
         // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
         // weight by five when picking these items.
         final int WEIGHT_MULTIPLIER = 5;
+        final Campaign campaign = resupply.getCampaign();
         final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
 
         // Sort the player's available convoys according to cargo space, largest -> smallest
@@ -293,6 +294,9 @@ public class PerformResupply {
             }
 
             convoyContents.removeAll(convoyItems);
+
+            campaign.addReport(String.format(resources.getString("convoyDispatched.text"),
+                convoy.getName()));
             processConvoy(resupply, convoyItems, convoy);
         }
     }
