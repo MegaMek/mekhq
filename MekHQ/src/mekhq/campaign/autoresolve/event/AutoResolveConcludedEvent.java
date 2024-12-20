@@ -22,12 +22,14 @@ package mekhq.campaign.autoresolve.event;
 import megamek.common.Entity;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.IGame;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.PostGameResolution;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.mission.AtBScenario;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.File;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -45,12 +47,18 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
     private final Vector<Entity> devastated = new Vector<>();
     private final Vector<Entity> wrecked = new Vector<>();
     private final VictoryResult victoryResult;
+    private final File logFile;
 
     public AutoResolveConcludedEvent(SimulationContext game, VictoryResult victoryResult) {
+        this(game, victoryResult, null);
+    }
+
+    public AutoResolveConcludedEvent(SimulationContext game, VictoryResult victoryResult, File logFile) {
         this.controlledScenario = (game.getLocalPlayer().getTeam() == victoryResult.getWinningTeam());
         this.victoryResult = victoryResult;
         this.game = game;
         this.scenario = game.getScenario();
+        this.logFile = logFile;
 
         game.getInGameObjects().stream()
             .filter(Entity.class::isInstance)
@@ -142,6 +150,11 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
     @Override
     public Enumeration<Entity> getDevastatedEntities() {
         return devastated.elements();
+    }
+
+    @Nullable
+    public File getLogFile() {
+        return logFile;
     }
 
     @Override

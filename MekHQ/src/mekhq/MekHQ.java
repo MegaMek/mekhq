@@ -39,7 +39,6 @@ import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
-import megamek.server.victory.VictoryResult;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -59,13 +58,13 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.AutoResolveChanceDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
+import mekhq.gui.dialog.helpDialogs.AutoResolveSimulationLogDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.Internationalization;
-import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -77,12 +76,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * The main class of the application.
@@ -661,6 +656,11 @@ public class MekHQ implements GameListener {
 
         var event = new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()))
             .resolveSimulation();
+
+        var autoResolveBattleReport = new AutoResolveSimulationLogDialog(getCampaigngui().getFrame(), event.getLogFile());
+        autoResolveBattleReport.setModal(true);
+        autoResolveBattleReport.setVisible(true);
+
         autoResolveConcluded(event);
     }
 

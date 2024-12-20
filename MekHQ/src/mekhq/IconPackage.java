@@ -54,9 +54,7 @@ public class IconPackage {
     }
 
     private final TreeMap<Integer, String> autoResolveScreenImages = new TreeMap<>(Map.of(
-        0, "data/images/misc/AutoResolve LoadSimulation_hd.jpg",
-        1441, "data/images/misc/AutoResolve LoadSimulation_fhd.jpg",
-        1921, "data/images/misc/AutoResolve LoadSimulation_uhd.jpg"));
+        0, "data/images/misc/MekHQ AutoResolve.png"));
 
     public TreeMap<Integer, String> getLoadingScreenImages() {
         return loadingScreenImages;
