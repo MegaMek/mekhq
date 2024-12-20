@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 /**
  * This is a convenience class that will keep all the various graphics
- * 
+ *
  * @author Jay Lawson
  */
 public class IconPackage {
@@ -53,8 +53,17 @@ public class IconPackage {
         loadingScreenImages.put(1921, "data/images/misc/MekHQ Load_spooky_uhd.png");
     }
 
+    private final TreeMap<Integer, String> autoResolveScreenImages = new TreeMap<>(Map.of(
+        0, "data/images/misc/AutoResolve LoadSimulation_hd.jpg",
+        1441, "data/images/misc/AutoResolve LoadSimulation_fhd.jpg",
+        1921, "data/images/misc/AutoResolve LoadSimulation_uhd.jpg"));
+
     public TreeMap<Integer, String> getLoadingScreenImages() {
         return loadingScreenImages;
+    }
+
+    public TreeMap<Integer, String> getAutoResolveScreenImages() {
+        return autoResolveScreenImages;
     }
 
     public TreeMap<Integer, String> getStartupScreenImagesScreenImages() {

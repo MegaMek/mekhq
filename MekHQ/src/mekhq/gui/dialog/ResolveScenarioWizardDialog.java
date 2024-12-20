@@ -214,14 +214,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
-        if (!tracker.isAutoResolve()) {
-            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        } else {
-            this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        }
+
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        getRootPane().registerKeyboardAction(e -> dispose(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+            JComponent.WHEN_IN_FOCUSED_WINDOW);
+
         setName("Form");
 
         getContentPane().setLayout(new GridBagLayout());

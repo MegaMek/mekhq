@@ -55,6 +55,16 @@ public class AutoResolveConcludedEvent implements PostGameResolution {
         game.getInGameObjects().stream()
             .filter(Entity.class::isInstance)
             .map(Entity.class::cast)
+            .forEach(e -> e.setOwner(game.getPlayer(e.getOwnerId())));
+
+        game.getGraveyard().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
+            .forEach(e -> e.setOwner(game.getPlayer(e.getOwnerId())));
+
+        game.getInGameObjects().stream()
+            .filter(Entity.class::isInstance)
+            .map(Entity.class::cast)
             .forEach(survived::addElement);
 
         game.getGraveyard().stream()
