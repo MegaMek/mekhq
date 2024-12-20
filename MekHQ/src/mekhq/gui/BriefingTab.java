@@ -33,14 +33,11 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
-import mekhq.campaign.Kill;
-import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -64,6 +61,7 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
+import mekhq.utilities.Internationalization;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -73,6 +71,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
@@ -797,11 +796,50 @@ public final class BriefingTab extends CampaignGuiTab {
         if (null == scenario) {
             return;
         }
-        switch(getCampaignOptions().getAutoResolveMethod()) {
-            case ABSTRACT_COMBAT -> getCampaign().getApp().startAutoResolve((AtBScenario) scenario, playerUnits(scenario, new StringBuilder()));
-            case PRINCESS -> startScenario(getCampaign().getAutoResolveBehaviorSettings());
+        promptAutoResolve(scenario);
+    }
+
+    private void runAbstractCombatAutoResolve(Scenario scenario) {
+        List<Unit> chosen = playerUnits(scenario, new StringBuilder());
+        if (chosen.isEmpty()) {
+            return;
+        }
+        getCampaign().getApp().startAutoResolve((AtBScenario) scenario, chosen);
+    }
+
+    private void runPrincessAutoResolve() {
+        startScenario(getCampaign().getAutoResolveBehaviorSettings());
+    }
+
+    private void promptAutoResolve(Scenario scenario) {
+        // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
+        // and it uses that to preselect the option that is currently set in the campaign options
+        Object[] options = new Object[]{
+            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.PRINCESS.text"),
+            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.ABSTRACT_COMBAT.text"),
+        };
+
+        var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
+
+        var selectedOption = JOptionPane.showOptionDialog(getFrame(),
+            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.text"),
+            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.title"),
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[preSelectedOptionIndex]);
+
+        if (selectedOption == JOptionPane.CLOSED_OPTION) {
+            return;
+        }
+
+        AutoResolveMethod autoResolveMethod = AutoResolveMethod.values()[selectedOption];
+
+        if (autoResolveMethod == AutoResolveMethod.PRINCESS) {
+            runPrincessAutoResolve();
+        } else if (autoResolveMethod == AutoResolveMethod.ABSTRACT_COMBAT) {
+            runAbstractCombatAutoResolve(scenario);
         }
     }
+
 
     private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);

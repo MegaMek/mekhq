@@ -22,6 +22,7 @@ package mekhq.campaign.autoresolve.acar.report;
 import megamek.common.GameLog;
 import megamek.common.Report;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -102,6 +103,10 @@ public class HtmlGameLogger {
 
     public void close() {
         addRaw("</body></html>");
+    }
+
+    public File getLogFile() {
+        return gameLog.getLogFile();
     }
 
 }

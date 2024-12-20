@@ -602,6 +602,7 @@ public class CampaignOptions {
     private boolean autoConfigMunitions;
     private AutoResolveMethod autoResolveMethod;
     private boolean autoResolveVictoryChanceEnabled;
+    private int autoResolveNumberOfScenarios;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1191,6 +1192,7 @@ public class CampaignOptions {
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
+        autoResolveNumberOfScenarios = 100;
 
         // Unit Administration
         useAero = false;
@@ -5175,6 +5177,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", getAutoResolveMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveNumberOfScenarios", getAutoResolveNumberOfScenarios());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -6163,6 +6166,8 @@ public class CampaignOptions {
                     retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
                     retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveNumberOfScenarios")) {
+                    retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6447,5 +6452,13 @@ public class CampaignOptions {
 
     public void setAutoResolveVictoryChanceEnabled(final boolean autoResolveVictoryChanceEnabled) {
         this.autoResolveVictoryChanceEnabled = autoResolveVictoryChanceEnabled;
+    }
+
+    public void setAutoResolveNumberOfScenarios(int autoResolveNumberOfScenarios) {
+        this.autoResolveNumberOfScenarios = autoResolveNumberOfScenarios;
+    }
+
+    public int getAutoResolveNumberOfScenarios() {
+        return autoResolveNumberOfScenarios;
     }
 }

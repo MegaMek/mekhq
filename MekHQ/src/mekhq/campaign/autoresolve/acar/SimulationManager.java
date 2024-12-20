@@ -75,7 +75,8 @@ public class SimulationManager extends AbstractGameManager {
     public AutoResolveConcludedEvent getConclusionEvent() {
         return new AutoResolveConcludedEvent(
             getGame(),
-            getCurrentVictoryResult()
+            getCurrentVictoryResult(),
+            gameLogger.getLogFile()
         );
     }
 

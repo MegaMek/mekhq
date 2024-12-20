@@ -24,6 +24,7 @@ import megamek.client.IClient;
 import megamek.common.IGame;
 import megamek.common.Player;
 
+import java.util.List;
 import java.util.Map;
 
 public class SimulatedClient implements IClient {
@@ -31,9 +32,9 @@ public class SimulatedClient implements IClient {
     private final IGame game;
     private final Player localPlayer;
 
-    public SimulatedClient(IGame game, Player player) {
+    public SimulatedClient(IGame game) {
         this.game = game;
-        this.localPlayer = player;
+        this.localPlayer = game.getPlayer(0);
     }
 
     @Override
@@ -50,6 +51,7 @@ public class SimulatedClient implements IClient {
     public Player getLocalPlayer() {
         return localPlayer;
     }
+
 
     // The following methods are not used in the context of the Abstract Combat Auto Resolve
     @Override

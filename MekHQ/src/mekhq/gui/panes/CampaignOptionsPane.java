@@ -694,6 +694,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JSpinner spnAutoResolveNumberOfScenarios;
     private JSpinner spnScenarioModMax;
     private JSpinner spnScenarioModChance;
     private JSpinner spnScenarioModBV;
@@ -3379,6 +3380,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkAutoResolveVictoryChanceEnabled, gridBagConstraints);
+
+        JLabel lblAutoResolveNumberOfRepetitions = new JLabel(resources.getString("lblAutoResolveNumberOfRepetitions.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBScenario.add(lblAutoResolveNumberOfRepetitions, gridBagConstraints);
+
+        spnAutoResolveNumberOfScenarios = new JSpinner(new SpinnerNumberModel(250, 10, 1000, 10));
+        spnAutoResolveNumberOfScenarios.setToolTipText(resources.getString("spnAutoResolveNumberOfScenarios.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(spnAutoResolveNumberOfScenarios, gridBagConstraints);
 
         chkUseDropShips = new JCheckBox(resources.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resources.getString("chkUseDropShips.toolTipText"));
@@ -8982,6 +8995,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
         comboAutoResolveType.setSelectedItem(options.getAutoResolveMethod());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
+        spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
         chkUseDropShips.setSelected(options.isUseDropShips());
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
@@ -9585,6 +9599,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
             options.setAutoResolveMethod(comboAutoResolveType.getSelectedItem());
             options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
+            options.setAutoResolveNumberOfScenarios((Integer) spnAutoResolveNumberOfScenarios.getValue());
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
