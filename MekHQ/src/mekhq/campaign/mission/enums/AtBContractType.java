@@ -206,7 +206,7 @@ public enum AtBContractType {
             case PIRATE_HUNTING:
             case PLANETARY_ASSAULT:
             case RELIEF_DUTY:
-                return CombatRole.BATTLELINE;
+                return CombatRole.FRONTLINE;
             case DIVERSIONARY_RAID:
             case EXTRACTION_RAID:
             case OBJECTIVE_RAID:

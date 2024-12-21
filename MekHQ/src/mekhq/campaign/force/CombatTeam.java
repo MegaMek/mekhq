@@ -422,7 +422,7 @@ public class CombatTeam {
          */
 
         switch (role) {
-            case BATTLELINE: {
+            case FRONTLINE: {
                 roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,

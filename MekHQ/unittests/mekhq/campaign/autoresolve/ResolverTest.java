@@ -177,7 +177,7 @@ public class ResolverTest {
         when(scenario.getBlowingSand()).thenReturn(BlowingSand.BLOWING_SAND_NONE);
 
         // Lance setup
-        when(scenario.getCombatRole()).thenReturn(CombatRole.BATTLELINE);
+        when(scenario.getCombatRole()).thenReturn(CombatRole.FRONTLINE);
         when(scenario.getId()).thenReturn(11);
 
         // Bots setup
