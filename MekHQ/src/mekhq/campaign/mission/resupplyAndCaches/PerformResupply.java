@@ -617,6 +617,7 @@ public class PerformResupply {
             }
 
             Loot loot = new Loot();
+            loot.setName("Resupply");
 
             if (convoyContents != null) {
                 for (Part part : convoyContents) {
