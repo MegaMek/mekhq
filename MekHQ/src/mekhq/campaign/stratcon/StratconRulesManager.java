@@ -1283,7 +1283,7 @@ public class StratconRulesManager {
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
-            return FAILED;
+            return DELAYED;
         }
 
         // Check failed, but enemy is routed
@@ -1460,11 +1460,9 @@ public class StratconRulesManager {
         int liaisonModifier = 0;
         if (commandRights.isLiaison()) {
             liaisonModifier -= 1;
-        } else if (commandRights.isHouse() || commandRights.isIntegrated()) {
-            liaisonModifier -= 2;
         }
 
-        reinforcementTargetNumber.addModifier(liaisonModifier, "Command Rights");
+        reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
 
         // Return final value
         return reinforcementTargetNumber;
