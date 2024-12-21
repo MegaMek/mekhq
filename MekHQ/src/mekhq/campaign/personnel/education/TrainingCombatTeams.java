@@ -102,7 +102,7 @@ public class TrainingCombatTeams {
      */
     private static void processTraining(final Campaign campaign, final CombatTeam combatTeam) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final String campaignName = campaign.getName();
+        final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
 
         // First, identify the Combat Team's commander
         Person commander = combatTeam.getCommander(campaign);
@@ -167,13 +167,15 @@ public class TrainingCombatTeams {
                         trainee.getHyperlinkedFullTitle(), commander.getFullTitle(),
                         spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                         CLOSING_SPAN_TAG));
+                    trainee.setEduAcademyName("");
+                    trainee.setEduEducationTime(0);
                     continue;
                 }
 
                 // We piggyback on the education module here.
                 // If the character ever enters actual education, this will be overwritten.
-                if (!Objects.equals(trainee.getEduAcademyName(), campaignName)) {
-                    trainee.setEduAcademyName(campaignName);
+                if (!Objects.equals(trainee.getEduAcademyName(), EDUCATION_STRING)) {
+                    trainee.setEduAcademyName(EDUCATION_STRING);
                     trainee.setEduEducationTime(0);
                 } else {
                     int newEducationTime = trainee.getEduEducationTime() + 7;
@@ -191,8 +193,9 @@ public class TrainingCombatTeams {
 
                     perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier * intelligenceCostMultiplier);
 
-                    if (newEducationTime >= (currentExperienceLevel * perExperienceLevelMultiplier)) {
-                        trainee.setEduEducationTime(0);
+                    int educationTimeReduction = currentExperienceLevel * perExperienceLevelMultiplier;
+                    if (newEducationTime >= educationTimeReduction) {
+                        trainee.setEduEducationTime(newEducationTime - educationTimeReduction);
                         targetSkill.setLevel(targetSkill.getLevel() + 1);
 
 
