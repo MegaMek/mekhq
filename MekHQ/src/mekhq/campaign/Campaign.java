@@ -3775,10 +3775,12 @@ public class Campaign implements ITechManager {
 
             if (!combatRole.isInReserve() && !combatRole.isAuxiliary()) {
                 if ((combatTeam.getMissionId() == contract.getId())) {
-                    total++;
+                    if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
+                        total++;
+                    }
                 }
 
-                if (!combatRole.isTraining() || combatRole == requiredLanceRole) {
+                if (combatRole == requiredLanceRole) {
                     role++;
                 }
             }
