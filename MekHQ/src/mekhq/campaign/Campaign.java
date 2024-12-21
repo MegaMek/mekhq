@@ -144,6 +144,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
@@ -154,10 +155,12 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+
 /**
  * The main campaign class, keeps track of teams and units
  *
@@ -1022,7 +1025,7 @@ public class Campaign implements ITechManager {
      * @param force
      */
     public void importForce(Force force) {
-        lastForceId = Math.max(lastForceId, force.getId());
+        lastForceId = max(lastForceId, force.getId());
         forceIds.put(force.getId(), force);
     }
 
@@ -1033,7 +1036,7 @@ public class Campaign implements ITechManager {
      * @param scenario
      */
     public void importScenario(Scenario scenario) {
-        lastScenarioId = Math.max(lastScenarioId, scenario.getId());
+        lastScenarioId = max(lastScenarioId, scenario.getId());
         scenarios.put(scenario.getId(), scenario);
     }
 
@@ -1132,7 +1135,7 @@ public class Campaign implements ITechManager {
     }
 
     private void addMissionWithoutId(Mission m) {
-        lastMissionId = Math.max(lastMissionId, m.getId());
+        lastMissionId = max(lastMissionId, m.getId());
         missions.put(m.getId(), m);
         MekHQ.triggerEvent(new MissionNewEvent(m));
     }
@@ -3764,7 +3767,7 @@ public class Campaign implements ITechManager {
         }
 
         int total = -contract.getRequiredLances();
-        int role = -Math.max(1, contract.getRequiredLances() / 2);
+        int role = -max(1, contract.getRequiredLances() / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (CombatTeam combatTeam : combatTeams.values()) {
@@ -3805,7 +3808,7 @@ public class Campaign implements ITechManager {
 
                 if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
                     LocalDate newRoutEndDate = contract.getStartDate()
-                        .plusMonths(Math.max(1, Compute.d6() - 3))
+                        .plusMonths(max(1, Compute.d6() - 3))
                         .minusDays(1);
                     contract.setRoutEndDate(newRoutEndDate);
                 }
@@ -3929,25 +3932,7 @@ public class Campaign implements ITechManager {
 
         if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processShipSearch();
-
-            // Training Experience - Award to eligible training Strategic Formations on active contracts
-            for (CombatTeam combatTeam : getCombatTeamsTable().values()) {
-                if (!combatTeam.getRole().isTraining()) {
-                    continue;
-                }
-
-                AtBContract contract = combatTeam.getContract(this);
-                if (contract == null || !contract.isActiveOn(getLocalDate(), true)) {
-                    continue;
-                }
-
-                if (getCampaignOptions().isUseStratCon()
-                    && !contract.getStratconCampaignState().isForceDeployedHere(combatTeam.getForceId())) {
-                    continue;
-                }
-
-                awardTrainingXP(combatTeam);
-            }
+            processTrainingCombatTeams(this);
         }
 
         if (getLocalDate().getDayOfMonth() == 1) {
@@ -4674,7 +4659,7 @@ public class Campaign implements ITechManager {
 
                 if (yearsBetween >= 1) {
                     if (crimePirateModifier < 0) {
-                        remainingCrimeChange = Math.max(0, 2 + crimePirateModifier);
+                        remainingCrimeChange = max(0, 2 + crimePirateModifier);
                         changeCrimePirateModifier(2); // this is the amount of change specified by CamOps
                     }
 
@@ -4770,7 +4755,7 @@ public class Campaign implements ITechManager {
         }
 
         // Prepare the data
-        int dependentCapacity = Math.max(1, (int) round(activeNonDependents * 0.05));
+        int dependentCapacity = max(1, (int) round(activeNonDependents * 0.05));
         Collections.shuffle(activeDependents);
 
         // roll for random removal
@@ -4849,7 +4834,7 @@ public class Campaign implements ITechManager {
     void dependentsAddNew(int dependentCount, int dependentCapacity) {
         if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
             int availableCapacity = dependentCapacity - dependentCount;
-            int rollCount = (int) Math.max(1, availableCapacity * 0.2);
+            int rollCount = (int) max(1, availableCapacity * 0.2);
 
             for (int i = 0; i < rollCount; i++) {
                 int roll = Compute.randomInt(100);
@@ -5103,70 +5088,13 @@ public class Campaign implements ITechManager {
 
         // Deal with Astech Pool Minutes
         if (person.getPrimaryRole().isAstech()) {
-            astechPoolMinutes = Math.max(0, astechPoolMinutes - Person.PRIMARY_ROLE_SUPPORT_TIME);
-            astechPoolOvertime = Math.max(0, astechPoolOvertime - Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME);
+            astechPoolMinutes = max(0, astechPoolMinutes - Person.PRIMARY_ROLE_SUPPORT_TIME);
+            astechPoolOvertime = max(0, astechPoolOvertime - Person.PRIMARY_ROLE_OVERTIME_SUPPORT_TIME);
         } else if (person.getSecondaryRole().isAstech()) {
-            astechPoolMinutes = Math.max(0, astechPoolMinutes - Person.SECONDARY_ROLE_SUPPORT_TIME);
-            astechPoolOvertime = Math.max(0, astechPoolOvertime - Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME);
+            astechPoolMinutes = max(0, astechPoolMinutes - Person.SECONDARY_ROLE_SUPPORT_TIME);
+            astechPoolOvertime = max(0, astechPoolOvertime - Person.SECONDARY_ROLE_OVERTIME_SUPPORT_TIME);
         }
         MekHQ.triggerEvent(new PersonRemovedEvent(person));
-    }
-
-    /**
-     * Awards XP to the lance based on the maximum experience level of its
-     * commanding officer and
-     * the minimum experience level of the unit's members.
-     *
-     * @param l The {@link CombatTeam} to calculate XP to award for training.
-     */
-    private void awardTrainingXP(final CombatTeam combatTeam) {
-        for (UUID trainerId : forceIds.get(combatTeam.getForceId()).getAllUnits(true)) {
-            Unit trainerUnit = getHangar().getUnit(trainerId);
-
-            // not sure how this occurs, but it probably shouldn't halt processing of a new
-            // day.
-            if (trainerUnit == null) {
-                continue;
-            }
-
-            Person commander = trainerUnit.getCommander();
-            // AtB 2.31: Training lance – needs a officer with Veteran skill levels
-            // and adds 1xp point to every Green skilled unit.
-            if (commander != null && commander.getRank().isOfficer()) {
-                // Take the maximum of the commander's Primary and Secondary Role
-                // experience to calculate their experience level...
-                int commanderExperience = Math.max(commander.getExperienceLevel(this, false),
-                        commander.getExperienceLevel(this, true));
-                if (commanderExperience > SkillType.EXP_REGULAR) {
-                    // ...and if the commander is better than a veteran, find all of
-                    // the personnel under their command...
-                    for (UUID traineeId : forceIds.get(combatTeam.getForceId()).getAllUnits(true)) {
-                        Unit traineeUnit = getHangar().getUnit(traineeId);
-
-                        if (traineeUnit == null) {
-                            continue;
-                        }
-
-                        for (Person p : traineeUnit.getCrew()) {
-                            if (p.equals(commander)) {
-                                continue;
-                            }
-                            // ...and if their weakest role is Green or Ultra-Green
-                            int experienceLevel = Math.min(p.getExperienceLevel(this, false),
-                                    !p.getSecondaryRole().isNone()
-                                            ? p.getExperienceLevel(this, true)
-                                            : SkillType.EXP_ELITE);
-                            if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
-                                // ...add one XP.
-                                p.awardXP(this, 1);
-                                addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
     }
 
     public void removeAllPatientsFor(Person doctor) {
@@ -6262,29 +6190,29 @@ public class Campaign implements ITechManager {
         double carriedCargo = cargoStats.getCargoTonnage(true, false) + cargoStats.getCargoTonnage(false, true);
 
         // calculate the number of units left untransported
-        int noMek = Math.max(nMek - stats.getOccupiedBays(Entity.ETYPE_MEK), 0);
-        int noDS = Math.max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
-        int noSC = Math.max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int noCF = Math.max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
-        int nolv = Math.max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(
+        int noMek = max(nMek - stats.getOccupiedBays(Entity.ETYPE_MEK), 0);
+        int noDS = max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
+        int noSC = max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noCF = max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
+        int nolv = max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = max(
                 stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(nBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(nProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
-        int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(stats.getTotalInfantryBays() - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int freeba = Math.max(stats.getTotalBattleArmorBays() - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeSC = Math.max(stats.getTotalSmallCraftBays() - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int noCargo = (int) Math.ceil(Math.max(carriedCargo - nCargo, 0));
+        int noBA = max(nBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = max(nProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
+        int freehv = max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeinf = max(stats.getTotalInfantryBays() - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int freeba = max(stats.getTotalBattleArmorBays() - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int freeSC = max(stats.getTotalSmallCraftBays() - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noCargo = (int) Math.ceil(max(carriedCargo - nCargo, 0));
 
-        int newNoASF = Math.max(noASF - freeSC, 0);
-        int placedASF = Math.max(noASF - newNoASF, 0);
+        int newNoASF = max(noASF - freeSC, 0);
+        int placedASF = max(noASF - newNoASF, 0);
         freeSC -= placedASF;
 
-        int newNolv = Math.max(nolv - freehv, 0);
-        int placedlv = Math.max(nolv - newNolv, 0);
+        int newNolv = max(nolv - freehv, 0);
+        int placedlv = max(nolv - newNolv, 0);
         freehv -= placedlv;
         int noVehicles = (nohv + newNolv);
 
@@ -6500,7 +6428,7 @@ public class Campaign implements ITechManager {
         collarsNeeded += nDropship;
 
         // now factor in owned JumpShips
-        collarsNeeded = Math.max(0, collarsNeeded - nCollars);
+        collarsNeeded = max(0, collarsNeeded - nCollars);
 
         Money totalCost = dropshipCost.plus(collarCost.multipliedBy(collarsNeeded));
 
@@ -6836,7 +6764,7 @@ public class Campaign implements ITechManager {
              * non-Clan units
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
-                partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
+                partAvailability = max(partAvailability, EquipmentType.RATING_F);
                 partAvailabilityLog.append("<br>[clan part for non clan faction]");
             } else if (et != null) {
                 /*
@@ -7033,10 +6961,10 @@ public class Campaign implements ITechManager {
     }
 
     public void decreaseAstechPool(int i) {
-        astechPool = Math.max(0, astechPool - i);
+        astechPool = max(0, astechPool - i);
         // always assume that we fire the ones who have not yet worked
-        astechPoolMinutes = Math.max(0, astechPoolMinutes - 480 * i);
-        astechPoolOvertime = Math.max(0, astechPoolOvertime - 240 * i);
+        astechPoolMinutes = max(0, astechPoolMinutes - 480 * i);
+        astechPoolOvertime = max(0, astechPoolOvertime - 240 * i);
         MekHQ.triggerEvent(new AstechPoolChangedEvent(this, -i));
     }
 
@@ -7166,7 +7094,7 @@ public class Campaign implements ITechManager {
     }
 
     public void decreaseMedicPool(int i) {
-        medicPool = Math.max(0, medicPool - i);
+        medicPool = max(0, medicPool - i);
         MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
@@ -7950,7 +7878,7 @@ public class Campaign implements ITechManager {
         // calculate number of jumps by dividing by 30
         int jumps = (int) Math.ceil(distance / 30.0);
         // you need a recharge except for the first jump
-        int recharges = Math.max(jumps - 1, 0);
+        int recharges = max(jumps - 1, 0);
         // if you are delivering from the same planet then no transit times
         int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
         int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
@@ -8115,10 +8043,10 @@ public class Campaign implements ITechManager {
         if (healDiff != 0 || naturalDiff != 0) {
             for (Person p : getPersonnel()) {
                 if (p.getDoctorId() != null) {
-                    p.setDaysToWaitForHealing(Math.max(
+                    p.setDaysToWaitForHealing(max(
                             p.getDaysToWaitForHealing() + healDiff, 1));
                 } else {
-                    p.setDaysToWaitForHealing(Math.max(
+                    p.setDaysToWaitForHealing(max(
                             p.getDaysToWaitForHealing() + naturalDiff, 1));
                 }
             }
