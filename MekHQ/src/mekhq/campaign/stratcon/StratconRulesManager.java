@@ -41,6 +41,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
@@ -1917,8 +1918,12 @@ public class StratconRulesManager {
             }
 
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
-            if (!combatTeam.getRole().isInReserve() && !combatTeam.getRole().isAuxiliary()) {
-                suitableForces.add(combatTeam.getForceId());
+            CombatRole combatRole = combatTeam.getRole();
+            if (!combatRole.isInReserve() && !combatRole.isAuxiliary()) {
+
+                if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
+                    suitableForces.add(combatTeam.getForceId());
+                }
             }
         }
 
