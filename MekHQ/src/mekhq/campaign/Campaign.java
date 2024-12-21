@@ -144,8 +144,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
@@ -160,6 +162,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -3768,21 +3771,50 @@ public class Campaign implements ITechManager {
 
         int total = -contract.getRequiredLances();
         int role = -max(1, contract.getRequiredLances() / 2);
+        int minimumUnitCount = (int) ((double) getStandardForceSize(faction) / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (CombatTeam combatTeam : combatTeams.values()) {
             CombatRole combatRole = combatTeam.getRole();
 
+            Force force = null;
+            int unitCount = 0;
+            try {
+                int forceId = combatTeam.getForceId();
+                force = getForce(forceId);
+
+                unitCount += force.getAllUnits(true).size();
+            } catch (Exception ignored) {
+                continue;
+            }
+
+            boolean isUnderStrength = unitCount < minimumUnitCount;
+            boolean reportUnderStrength = false;
+
             if (!combatRole.isInReserve() && !combatRole.isAuxiliary()) {
                 if ((combatTeam.getMissionId() == contract.getId())) {
                     if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
-                        total++;
+                        if (isUnderStrength) {
+                            reportUnderStrength = true;
+                        } else {
+                            total++;
+                        }
                     }
                 }
 
                 if (combatRole == requiredLanceRole) {
-                    role++;
+                    if (isUnderStrength) {
+                        reportUnderStrength = true;
+                    } else {
+                        role++;
+                    }
                 }
+            }
+
+            if (reportUnderStrength) {
+                addReport(String.format(resources.getString("understrength.text"),
+                    force.getName(), spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                    CLOSING_SPAN_TAG, minimumUnitCount));
             }
         }
 
@@ -6307,7 +6339,7 @@ public class Campaign implements ITechManager {
                 mekCollars += 1;
             }
 
-            leasedASFCapacity += (int) Math.floor(leasedLargeMekDropships * largeMekDropshipASFCapacity);
+            leasedASFCapacity += (int) floor(leasedLargeMekDropships * largeMekDropshipASFCapacity);
             leasedCargoCapacity += largeMekDropshipCargoCapacity;
         }
 
@@ -6327,8 +6359,8 @@ public class Campaign implements ITechManager {
             }
 
             // Our Union-ish DropShip can carry some ASFs and cargo.
-            leasedASFCapacity += (int) Math.floor(leasedAverageMekDropships * mekDropshipASFCapacity);
-            leasedCargoCapacity += (int) Math.floor(leasedAverageMekDropships * mekDropshipCargoCapacity);
+            leasedASFCapacity += (int) floor(leasedAverageMekDropships * mekDropshipASFCapacity);
+            leasedCargoCapacity += (int) floor(leasedAverageMekDropships * mekDropshipCargoCapacity);
         }
 
         // Leopard CVs
@@ -6350,7 +6382,7 @@ public class Campaign implements ITechManager {
             }
 
             // Our Leopard-ish DropShip can carry some cargo.
-            leasedCargoCapacity += (int) Math.floor(asfDropshipCargoCapacity * leasedAverageASFDropships);
+            leasedCargoCapacity += (int) floor(asfDropshipCargoCapacity * leasedAverageASFDropships);
         }
 
         // Triumphs
@@ -6365,7 +6397,7 @@ public class Campaign implements ITechManager {
                 vehicleCollars += 1;
             }
 
-            leasedCargoCapacity += (int) Math.floor(leasedLargeVehicleDropships * largeVehicleDropshipCargoCapacity);
+            leasedCargoCapacity += (int) floor(leasedLargeVehicleDropships * largeVehicleDropshipCargoCapacity);
         }
 
         // Gazelles
@@ -6382,7 +6414,7 @@ public class Campaign implements ITechManager {
             }
 
             // Our Gazelle-ish DropShip can carry some cargo.
-            leasedCargoCapacity += (int) Math.floor(vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
+            leasedCargoCapacity += (int) floor(vehicleDropshipCargoCapacity * leasedAverageVehicleDropships);
         }
 
         // Do we have any leftover cargo?
@@ -7004,7 +7036,7 @@ public class Campaign implements ITechManager {
             return 0;
         }
 
-        int availableHelp = (int) Math.floor(((double) astechPoolMinutes) / minutes);
+        int availableHelp = (int) floor(((double) astechPoolMinutes) / minutes);
         if (isOvertimeAllowed() && (availableHelp < MHQConstants.ASTECH_TEAM_SIZE)) {
             // if we are less than fully staffed, then determine whether
             // we should dip into overtime or just continue as short-staffed
