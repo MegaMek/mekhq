@@ -18,13 +18,19 @@
  */
 package mekhq.gui.stratcon;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Minefield;
+import megamek.common.TargetRoll;
+import megamek.common.TargetRollModifier;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
@@ -43,10 +49,12 @@ import java.util.List;
 import java.util.*;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
+import static mekhq.campaign.stratcon.StratconRulesManager.calculateReinforcementTargetNumber;
 import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
 import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -97,7 +105,7 @@ public class StratconScenarioWizard extends JDialog {
      * Sets up the UI as appropriate for the currently selected scenario.
      */
     private void setUI() {
-        setTitle("Scenario Setup Wizard");
+        setTitle(resourceMap.getString("scenarioSetupWizard.title"));
         getContentPane().removeAll();
 
         // Create a new panel to hold all components
@@ -109,25 +117,25 @@ public class StratconScenarioWizard extends JDialog {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Add components to the new panel instead of directly to the content pane
+        // Add instructions
         setInstructions(gbc);
 
-        if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
-            gbc.gridy++;
-            setAssignForcesUI(gbc, false);
-        } else {
-            gbc.gridy++;
-            setAssignForcesUI(gbc, true);
-            gbc.gridy++;
+        // Move to the next row
+        gbc.gridy++;
+        boolean reinforcements = Objects.requireNonNull(currentScenario.getCurrentState()) != ScenarioState.UNRESOLVED;
 
-            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(
-                S_LEADER, campaign);
+        // Add UI for assigning forces
+        setAssignForcesUI(gbc, reinforcements);
 
-            List<Unit> eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign,
-                currentScenario.getPrimaryForceIDs(), leadershipSkill);
+        // Handle optional UI for eligible leadership, defensive points, etc.
+        if (!reinforcements) {
+            gbc.gridy++;
+            int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
+            List<Unit> eligibleLeadershipUnits = getEligibleLeadershipUnits(
+                campaign, currentScenario.getPrimaryForceIDs(), leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
-            if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
+            if (!eligibleLeadershipUnits.isEmpty() && leadershipSkill > 0) {
                 setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
                 gbc.gridy++;
             }
@@ -138,11 +146,12 @@ public class StratconScenarioWizard extends JDialog {
             }
         }
 
+        // Add navigation buttons
         gbc.gridx = 0;
         gbc.gridy++;
         setNavigationButtons(gbc);
 
-        // Wrap the contentPanel in a JScrollPane
+        // Wrap contentPanel in a scroll pane
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -207,12 +216,6 @@ public class StratconScenarioWizard extends JDialog {
             || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords())
             || (currentScenario.getDeploymentDate() != null)) {
             labelBuilder.append(currentScenario.getInfo(campaign));
-        }
-
-        if (Objects.requireNonNull(currentScenario.getCurrentState()) == ScenarioState.UNRESOLVED) {
-            labelBuilder.append("primaryForceAssignmentInstructions.text");
-        } else {
-            labelBuilder.append("reinforcementsAndSupportInstructions.text");
         }
 
         labelBuilder.append("<br/>");
@@ -382,7 +385,7 @@ public class StratconScenarioWizard extends JDialog {
 
         // Add labels for unit selection details
         JLabel unitStatusLabel = new JLabel();
-        JLabel unitSelectionLabel = new JLabel("0 selected");
+        JLabel unitSelectionLabel = new JLabel(resourceMap.getString("unitSelectLabelDefaultValue.text"));
 
         // Add the "# units selected" label
         localGbc.gridy++;
@@ -487,31 +490,216 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Sets the navigation button - commit.
+     * Creates and configures the "Commit" navigation button and adds it to the content panel.
+     * The behavior of the button is determined based on the state of the current scenario:
+     * <ul>
+     *   <li>If the scenario state is {@code UNRESOLVED}, the button triggers the immediate commit
+     *       action via {@link #btnCommitClicked(ActionEvent, Integer)}.</li>
+     *   <li>If the scenario state requires reinforcements, the button opens the
+     *       {@link #reinforcementConfirmDialog()} and is only enabled if there are sufficient
+     *       support points available.</li>
+     * </ul>
      *
-     * @param gbc GridBagConstraints for layout positioning.
+     * <p>The button is added to the layout using the provided {@link GridBagConstraints},
+     * which defines its position and alignment within the panel.</p>
+     *
+     * @param constraints the {@link GridBagConstraints} used for positioning the button within the panel.
      */
-    private void setNavigationButtons(GridBagConstraints gbc) {
+    private void setNavigationButtons(GridBagConstraints constraints) {
         // Create the commit button
         btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
-        btnCommit.addActionListener(this::btnCommitClicked);
-        btnCommit.setEnabled(Objects.requireNonNull(currentScenario.getCurrentState()) != ScenarioState.UNRESOLVED);
+        if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
+            btnCommit.addActionListener(evt -> btnCommitClicked(evt, null));
+        } else {
+            btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
+            btnCommit.setEnabled(currentCampaignState.getSupportPoints() > 0);
+        }
 
         // Configure layout constraints for the button
-        gbc.gridheight = GridBagConstraints.REMAINDER;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.CENTER;
+        constraints.gridheight = GridBagConstraints.REMAINDER;
+        constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.CENTER;
 
         // Add the commit button to the content panel
-        contentPanel.add(btnCommit, gbc);
+        contentPanel.add(btnCommit, constraints);
     }
 
     /**
-     * Event handler for when the user clicks the 'commit' button.
-     * Behaves differently depending on the state of the scenario
+     * Creates and displays the "Reinforcement Confirmation" dialog, allowing the user to review
+     * and commit reinforcements to a scenario. The dialog provides information on the current
+     * target roll modifiers, allows the user to adjust the number of Support Points spent,
+     * and calculates the updated target number accordingly.
+     *
+     * <p>The dialog includes the following components:
+     * <ul>
+     *   <li><b>Description:</b> Explains the reinforcement process and the impact of Support Points</li>
+     *   <li><b>Breakdown:</b> Displays detailed breakdown of the target roll modifiers</li>
+     *   <li><b>Support Point Selector:</b> A spinner that lets the user adjust Support Points</li>
+     *   <li><b>Confirm/Cancel Buttons:</b> Allows the user to commit changes or close the dialog without changes</li>
+     * </ul>
+     *
+     * <p>Key functionalities include:
+     * <ul>
+     *   <li>Calculates the target number for reinforcement using the Administration skill of the
+     *       most senior Admin/Command character.</li>
+     *   <li>Adjusts the target number dynamically based on the number of Support Points spent.</li>
+     *   <li>Handles errors in calculation, such as missing Administration skill or unassignable targets.</li>
+     *   <li>Dispatches an action to commit the reinforcements upon confirmation.</li>
+     *   <li>Updates the remaining Support Points based on the user's selection.</li>
+     * </ul>
+     *
+     * <p>If no suitable Admin/Command personnel is available, the dialog informs the user that
+     * reinforcement attempts will fail.
      */
-    private void btnCommitClicked(ActionEvent e) {
+    private void reinforcementConfirmDialog() {
+        // Create the dialog
+        JDialog dialog = new JDialog((Frame) null, resourceMap.getString("reinforcementConfirmation.title"),
+            true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLocationRelativeTo(null);
+
+        // Set the layout manager for vertical alignment
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+        // Description
+        JLabel lblDescription = new JLabel(String.format(resourceMap.getString("reinforcementConfirmation.description"),
+            UIUtil.scaleForGUI(500),
+            campaign.getCommanderAddress(false)));
+        lblDescription.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align the label
+        contentPanel.add(lblDescription);
+
+        // Target Number Breakdown
+        JLabel lblBreakdown = new JLabel();
+        lblBreakdown.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align the label
+        contentPanel.add(lblBreakdown);
+
+        // Start by determining the entity responsible for making the attempt
+        StringBuilder breakdownContents = new StringBuilder();
+        Integer targetNumber = null;
+
+        Person commandLiaison = campaign.getSeniorAdminCommandPerson();
+        if (commandLiaison != null) {
+            Skill skill = commandLiaison.getSkill(S_ADMIN);
+
+            if (skill != null) {
+                int skillTargetNumber = skill.getFinalSkillValue();
+
+                // Determine StratCon Track and other context for recalculation
+                StratconTrackState track = null;
+                for (StratconTrackState trackState : currentCampaignState.getTracks()) {
+                    if (trackState.getScenarios().containsValue(currentScenario)) {
+                        track = trackState;
+                        break;
+                    }
+                }
+
+                // Recalculate the target number using updated spinner value
+                TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(
+                    campaign, skillTargetNumber, track, currentCampaignState.getContract(), 1);
+                targetNumber = reinforcementTargetNumber.getValue();
+
+                breakdownContents.append(String.format(resourceMap.getString("reinforcementConfirmation.breakdown"),
+                    UIUtil.scaleForGUI(500)));
+
+                for (TargetRollModifier modifier : reinforcementTargetNumber.getModifiers()) {
+                    breakdownContents.append(String.format("<b>- %s:</b> %d<br>", modifier.getDesc(),
+                        modifier.getValue()));
+                }
+
+                breakdownContents.append(String.format("<b>- Total:</b> %d<br><br>", targetNumber));
+                breakdownContents.append("</div></html>");
+            }
+        }
+
+        if (targetNumber == null) {
+            // This is a purposefully impossible value, as this is what we'll use if the player
+            // doesn't have a suitably skilled character
+            targetNumber = 999;
+        }
+
+        if (breakdownContents.isEmpty()) {
+            breakdownContents.append(String.format(resourceMap.getString("reinforcementConfirmation.breakdown.noTarget"),
+                UIUtil.scaleForGUI(500),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                CLOSING_SPAN_TAG));
+        }
+
+        lblBreakdown.setText(breakdownContents.toString());
+
+        // Set up the Support Points Spinner
+        JPanel spinnerPanel = new JPanel();
+        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));
+
+        // Label for the spinner
+        JLabel lblSpinner = new JLabel(String.format("%s: ",
+            resourceMap.getString("reinforcementConfirmation.spinnerLabel")));
+        lblSpinner.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // Spinner for support points
+        int availableSupportPoints = currentCampaignState.getSupportPoints();
+        JSpinner spnSupportPointCost = new JSpinner(
+            new SpinnerNumberModel(1, 1, availableSupportPoints, 1));
+        spnSupportPointCost.setMaximumSize(spnSupportPointCost.getPreferredSize());
+        spnSupportPointCost.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        spinnerPanel.add(lblSpinner);
+        spinnerPanel.add(spnSupportPointCost);
+        spinnerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(spinnerPanel);
+
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        JButton confirmButton = new JButton(resourceMap.getString("reinforcementConfirmation.confirmButton"));
+        int finalTargetNumber = targetNumber;
+        confirmButton.addActionListener(evt -> {
+            int spentSupportPoints = (int) spnSupportPointCost.getValue();
+            int reinforcementTargetNumber = finalTargetNumber - ((spentSupportPoints - 1) * 2);
+
+            if (finalTargetNumber != 999) {
+                currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
+            }
+
+            btnCommitClicked(evt, reinforcementTargetNumber);
+            dialog.dispose();
+        });
+        buttonPanel.add(confirmButton);
+
+        JButton cancelButton = new JButton(resourceMap.getString("reinforcementConfirmation.cancelButton"));
+        cancelButton.addActionListener(evt -> dialog.dispose());
+        buttonPanel.add(cancelButton);
+
+        // Add all components to the content panel
+        contentPanel.add(buttonPanel);
+
+        // Add content panel to dialog
+        dialog.add(contentPanel);
+        dialog.pack();
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Handles the event when the user clicks the 'commit' button.
+     * This method processes the selected forces, reinforcements, and scenario states,
+     * committing primary forces, reinforcements, and units based on the current
+     * state of the scenario, and updating the scenario as appropriate.
+     *
+     * <p>Depending on the current state of the scenario, this method either:
+     * <ul>
+     *   <li>Commits primary forces to the scenario if in the unresolved state.</li>
+     *   <li>Commits reinforcement forces and processes their deployment.</li>
+     *   <li>Adds units (e.g., infantry and leadership units) to the scenario.</li>
+     *   <li>Assigns deployed forces to the campaign track and updates scenario parameters (e.g., minefields).</li>
+     *   <li>Publishes scenarios to the campaign and allows immediate play if forces have been committed.</li>
+     * </ul>
+     *
+     * @param e the {@link ActionEvent} triggered by the button press
+     * @param reinforcementTargetNumber the number representing the reinforcement
+     *        target threshold used when processing reinforcement deployment
+     */
+    private void btnCommitClicked(ActionEvent e, @Nullable Integer reinforcementTargetNumber) {
         // go through all the force lists and add the selected forces to the scenario
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
@@ -522,21 +710,14 @@ public class StratconScenarioWizard extends JDialog {
                     }
                 } else if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
                     logger.info("Committing reinforcement force: " + force.getFullName());
-                    if (currentCampaignState.getSupportPoints() <= 0) {
-                        campaign.addReport(String.format(resourceMap.getString("reinforcementsNoSupportPoints.text"),
-                            currentScenario.getName(),
-                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                            CLOSING_SPAN_TAG));
-                        continue;
-                    }
-
                     ReinforcementEligibilityType reinforcementType = StratconRulesManager.getReinforcementType(
                         force.getId(), currentTrackState,
                         campaign, currentCampaignState);
 
                     // if we failed to deploy as reinforcements, move on to the next force
                     ReinforcementResultsType reinforcementResults = processReinforcementDeployment(
-                        force, reinforcementType, currentCampaignState, currentScenario, campaign);
+                        force, reinforcementType, currentCampaignState, currentScenario, campaign,
+                        reinforcementTargetNumber);
 
                     if (reinforcementResults.ordinal() >= FAILED.ordinal()) {
                         currentScenario.addFailedReinforcements(force.getId());
@@ -659,11 +840,13 @@ public class StratconScenarioWizard extends JDialog {
             selectedItems = 0;
             for (Unit unit : changedList.getSelectedValuesList()) {
                 selectedItems += unit.getEntity().calculateBattleValue(true, true);
-                selectionCountLabel.setText(String.format("%d selected (ignores crew skill)", selectedItems));
+                selectionCountLabel.setText(String.format("%d %s", selectedItems,
+                    resourceMap.getString("unitsSelectedLabel.bv")));
             }
         } else {
             selectedItems = changedList.getSelectedIndices().length;
-            selectionCountLabel.setText(String.format("%d selected", selectedItems));
+            selectionCountLabel.setText(String.format("%d %s", selectedItems,
+                resourceMap.getString("unitsSelectedLabel.count")));
         }
 
         // if we've selected too many units here, change the label and disable the

@@ -1219,7 +1219,7 @@ public class StratconRulesManager {
         }
 
         if (reinforcementTargetNumber == 999) {
-            campaign.addReport(String.format(resources.getString("reinforcementsNoAdmin..text"),
+            campaign.addReport(String.format(resources.getString("reinforcementsNoAdmin.text"),
                 scenario.getName(),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG));
