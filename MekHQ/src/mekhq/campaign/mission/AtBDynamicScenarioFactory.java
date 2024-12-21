@@ -3649,7 +3649,13 @@ public class AtBDynamicScenarioFactory {
 
             for (StratconTrackState track : campaignState.getTracks()) {
                 StratconScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
-                primaryForceIDs = stratconScenario.getPrimaryForceIDs();
+                if (stratconScenario != null) {
+                    primaryForceIDs = stratconScenario.getPrimaryForceIDs();
+                }
+            }
+
+            if (primaryForceIDs.isEmpty()) {
+                logger.warn(String.format("Unable to find primary force for scenario %s (%d)", scenario.getName(), scenario.getId()));
             }
         }
 
