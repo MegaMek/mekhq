@@ -597,7 +597,7 @@ public class StratconScenarioWizard extends JDialog {
 
                 // Recalculate the target number using updated spinner value
                 TargetRoll reinforcementTargetNumber = calculateReinforcementTargetNumber(
-                    campaign, skillTargetNumber, track, currentCampaignState.getContract(), 1);
+                    campaign, commandLiaison, skillTargetNumber, track, currentCampaignState.getContract());
                 targetNumber = reinforcementTargetNumber.getValue();
 
                 breakdownContents.append(String.format(resourceMap.getString("reinforcementConfirmation.breakdown"),

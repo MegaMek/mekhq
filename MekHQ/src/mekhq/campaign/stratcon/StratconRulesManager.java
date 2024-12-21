@@ -1409,25 +1409,27 @@ public class StratconRulesManager {
      * </ul>
      * </p>
      *
-     * @param campaign           the {@link Campaign} representing the current campaign, which provides global game
-     *                           configuration and reputation data.
-     * @param skillTargetNumber  the base target number derived from the skill level of the relevant unit or character.
-     * @param track              the {@link StratconTrackState} representing the current track in the strategic
-     *                           conflict, providing facility details for modifier calculations. Can be {@code null}.
-     * @param contract           the {@link AtBContract} containing the details of the ongoing contract, such as
-     *                           ally and enemy skill levels, and command rights.
+     * @param campaign          the {@link Campaign} representing the current campaign, which provides global game
+     *                          configuration and reputation data.
+     * @param commandLiaison    the {@link Person} performing the reinforcement check.
+     * @param skillTargetNumber the base target number derived from the skill level of the relevant unit or character.
+     * @param track             the {@link StratconTrackState} representing the current track in the strategic
+     *                          conflict, providing facility details for modifier calculations. Can be {@code null}.
+     * @param contract          the {@link AtBContract} containing the details of the ongoing contract, such as
+     *                          ally and enemy skill levels, and command rights.
      * @return a {@link TargetRoll} object containing the calculated target number and all contributing modifiers.
      */
-    public static TargetRoll calculateReinforcementTargetNumber(Campaign campaign, int skillTargetNumber,
-                                                                StratconTrackState track, AtBContract contract,
-                                                                int supportPoints) {
+    public static TargetRoll calculateReinforcementTargetNumber(Campaign campaign,
+                                                                Person commandLiaison,
+                                                                int skillTargetNumber,
+                                                                StratconTrackState track, AtBContract contract) {
         TargetRoll reinforcementTargetNumber = new TargetRoll();
 
         // Base Target Number
-        reinforcementTargetNumber.addModifier(skillTargetNumber, "Base TN");
+        reinforcementTargetNumber.addModifier(skillTargetNumber,
+            "Base TN (" + commandLiaison.getFullName() +')');
 
         // Facilities Modifier
-
         int facilityModifier = 0;
         if (track != null) {
             for (StratconFacility facility : track.getFacilities().values()) {
