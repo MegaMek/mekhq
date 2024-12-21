@@ -34,6 +34,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 
 import javax.xml.namespace.QName;
@@ -59,6 +61,7 @@ public class ScenarioTemplate implements Cloneable {
 
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
+    private static final Logger log = LogManager.getLogger(ScenarioTemplate.class);
 
     public String name;
     @XmlElement(name = "stratConScenarioType")
@@ -111,7 +114,7 @@ public class ScenarioTemplate implements Cloneable {
 
     public void setStratConScenarioType(String scenarioType) {
         try {
-            this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim());
+            this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             logger.error("Invalid ScenarioType: " + scenarioType, e);
             this.stratConScenarioType = ScenarioType.NONE;
@@ -306,8 +309,8 @@ public class ScenarioTemplate implements Cloneable {
 
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            Unmarshaller um = context.createUnmarshaller();
-            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            JAXBElement<ScenarioTemplate> templateElement = unmarshaller.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch (Exception e) {
             logger.error("Error Deserializing Scenario Template", e);
@@ -320,19 +323,17 @@ public class ScenarioTemplate implements Cloneable {
         @Override
         public ScenarioType unmarshal(String value) {
             try {
-                // Match XML string to Enum
-                return ScenarioType.valueOf(value.trim()); // Ensure no extra spaces
-            } catch (IllegalArgumentException | NullPointerException e) {
-                // Log a warning for invalid input and return default
-                MMLogger.create(ScenarioTypeAdapter.class).warn("Invalid ScenarioType in XML: " + value);
-                return ScenarioType.NONE;
+                return ScenarioType.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException iae) {
+                MMLogger.create(ScenarioTypeAdapter.class).error("Error Invalid ScenarioType in XML: " + value);
+                return ScenarioType.NONE; // Default for invalid values
             }
         }
 
         @Override
         public String marshal(ScenarioType scenarioType) {
             // Converts Enum back to String for XML
-            return scenarioType.name();
+            return String.valueOf(scenarioType);
         }
     }
 }
