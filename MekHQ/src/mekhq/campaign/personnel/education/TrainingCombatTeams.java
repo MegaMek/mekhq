@@ -1,5 +1,6 @@
 package mekhq.campaign.personnel.education;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -35,6 +36,8 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  * </ul>
  */
 public class TrainingCombatTeams {
+    private static final MMLogger logger = MMLogger.create(TrainingCombatTeams.class);
+
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
     private static ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
@@ -103,28 +106,52 @@ public class TrainingCombatTeams {
     private static void processTraining(final Campaign campaign, final CombatTeam combatTeam) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final String EDUCATION_STRING = "TRAINING_COMBAT_TEAM"; // Never change this
+        final int WEEK_DURATION = 7; // days
+        final int EDUCATION_TIME_MULTIPLIER = 28; // days
 
         // First, identify the Combat Team's commander
         Person commander = combatTeam.getCommander(campaign);
 
-        // Then build a list of their skills
-        List<String> professionSkills = new ArrayList<>();
-
-        if (commander.getPrimaryRole().isCombat()) {
-            professionSkills.addAll(commander.getProfessionSkills(campaign, false));
+        if (commander == null) {
+            logger.info(String.format("Failed to fetch commander for Combat Team: %s",
+                    combatTeam.getForceId()));
+            return;
         }
 
-        if (commander.getSecondaryRole().isCombat()) {
-            professionSkills.addAll(commander.getProfessionSkills(campaign, true));
-        }
+        // Second, fetch all active crew in the commander's unit.
+        // If the commander's unit is not multi-crewed, only the commander will be returned.
+        Map<String, Integer> educatorSkills = new HashMap<>();
 
-        Map<String, Integer> commanderSkills = new HashMap<>();
+        Set<Person> educators = new HashSet<>(commander.getUnit().getActiveCrew());
 
-        for (String professionSkill : professionSkills) {
-            Skill skill = commander.getSkill(professionSkill);
+        // Then build a set of their skills
+        for (Person educator : educators) {
+            // First, collect all the skills. We use a Set, as we don't want duplicates
+            Set<String> professionSkills = new HashSet<>();
 
-            if (skill != null) {
-                commanderSkills.put(professionSkill, skill.getExperienceLevel());
+            if (educator.getPrimaryRole().isCombat()) {
+                professionSkills.addAll(educator.getProfessionSkills(campaign, false));
+            }
+
+            if (educator.getSecondaryRole().isCombat()) {
+                professionSkills.addAll(educator.getProfessionSkills(campaign, true));
+            }
+
+            // Then, find the best experience level available among educators in the commander's unit
+            for (String professionSkill : professionSkills) {
+                Skill skill = educator.getSkill(professionSkill);
+
+                if (skill != null) {
+                    if (!educatorSkills.containsKey(professionSkill)) {
+                        educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                    } else {
+                        int educatorSkillLevel = educatorSkills.get(professionSkill);
+
+                        if (educatorSkillLevel < skill.getExperienceLevel()) {
+                            educatorSkills.put(professionSkill, skill.getExperienceLevel());
+                        }
+                    }
+                }
             }
         }
 
@@ -144,7 +171,7 @@ public class TrainingCombatTeams {
                 }
 
                 List<Skill> skillsBeingTrained = new ArrayList<>();
-                for (String commanderSkill : commanderSkills.keySet()) {
+                for (String commanderSkill : educatorSkills.keySet()) {
                     Skill traineeSkill = trainee.getSkill(commanderSkill);
 
                     if (traineeSkill != null) {
@@ -156,13 +183,13 @@ public class TrainingCombatTeams {
 
                         // The commander is required to be one step above the experience level they
                         // are teaching.
-                        if (traineeExperienceLevel < (commanderSkills.get(commanderSkill) - 1)) {
+                        if (traineeExperienceLevel < (educatorSkills.get(commanderSkill) - 1)) {
                             skillsBeingTrained.add(traineeSkill);
                         }
                     }
                 }
 
-                if (commanderSkills.isEmpty()) {
+                if (educatorSkills.isEmpty()) {
                     campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
                         trainee.getHyperlinkedFullTitle(), commander.getFullTitle(),
                         spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
@@ -178,7 +205,7 @@ public class TrainingCombatTeams {
                     trainee.setEduAcademyName(EDUCATION_STRING);
                     trainee.setEduEducationTime(0);
                 } else {
-                    int newEducationTime = trainee.getEduEducationTime() + 7;
+                    int newEducationTime = trainee.getEduEducationTime() + WEEK_DURATION;
                     trainee.setEduEducationTime(newEducationTime);
 
                     // The lowest skill is improved first
@@ -187,7 +214,7 @@ public class TrainingCombatTeams {
                     // The +1 is to account for the next experience level to be gained
                     int currentExperienceLevel = targetSkill.getExperienceLevel() + 1;
 
-                    int perExperienceLevelMultiplier = 28;
+                    int perExperienceLevelMultiplier = EDUCATION_TIME_MULTIPLIER;
                     double experienceMultiplier = campaignOptions.getXpCostMultiplier();
                     double intelligenceCostMultiplier = trainee.getIntelligenceXpCostMultiplier(campaignOptions);
 
