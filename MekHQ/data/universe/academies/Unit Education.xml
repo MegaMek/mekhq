@@ -172,7 +172,7 @@
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Basic Battle Armor Training</qualification>
-        <curriculum>Gunnery/BattleArmor</curriculum>
+        <curriculum>Gunnery/BattleArmor, Anti-Mek</curriculum>
         <qualificationStartYear>3050</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
