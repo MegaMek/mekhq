@@ -1534,7 +1534,7 @@ public class StratconRulesManager {
             if (commanderUnit != null) {
                 CombatTeam lance = campaign.getCombatTeamsTable().get(commanderUnit.getForceId());
 
-                return (lance != null) && lance.getRole().isDefence();
+                return (lance != null) && lance.getRole().isGarrison();
             }
         }
 
@@ -2194,7 +2194,7 @@ public class StratconRulesManager {
             }
 
             if (campaignState.getSupportPoints() > 0) {
-                if (formation.getRole().isFighting() || formation.getRole().isAuxiliary()) {
+                if (formation.getRole().isBattleline() || formation.getRole().isAuxiliary()) {
                     return AUXILIARY;
                 } else {
                     return ReinforcementEligibilityType.REGULAR;

@@ -25,9 +25,9 @@ import java.util.ResourceBundle;
 
 public enum CombatRole {
     // region Enum Declarations
-    FIGHTING("CombatRole.FIGHTING.text", "CombatRole.FIGHTING.toolTipText"),
-    DEFENCE("CombatRole.DEFENCE.text", "CombatRole.DEFENCE.toolTipText"),
-    SCOUTING("CombatRole.SCOUTING.text", "CombatRole.SCOUTING.toolTipText"),
+    BATTLELINE("CombatRole.BATTLELINE.text", "CombatRole.BATTLELINE.toolTipText"),
+    GARRISON("CombatRole.GARRISON.text", "CombatRole.GARRISON.toolTipText"),
+    RECON("CombatRole.RECON.text", "CombatRole.RECON.toolTipText"),
     TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
     AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
     IN_RESERVE("CombatRole.IN_RESERVE.text", "CombatRole.IN_RESERVE.toolTipText");
@@ -54,16 +54,16 @@ public enum CombatRole {
     // endregion Getters
 
     // region Boolean Comparison Methods
-    public boolean isFighting() {
-        return this == FIGHTING;
+    public boolean isBattleline() {
+        return this == BATTLELINE;
     }
 
-    public boolean isDefence() {
-        return this == DEFENCE;
+    public boolean isGarrison() {
+        return this == GARRISON;
     }
 
     public boolean isScouting() {
-        return this == SCOUTING;
+        return this == RECON;
     }
 
     public boolean isTraining() {
