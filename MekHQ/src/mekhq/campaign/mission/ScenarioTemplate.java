@@ -26,6 +26,8 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -59,7 +61,9 @@ public class ScenarioTemplate implements Cloneable {
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 
     public String name;
-    private ScenarioType stratConScenarioType;
+    @XmlElement(name = "stratConScenarioType")
+    @XmlJavaTypeAdapter(value = ScenarioTypeAdapter.class)
+    private ScenarioType stratConScenarioType = ScenarioType.NONE;
     public String shortBriefing;
     public String detailedBriefing;
 
@@ -79,7 +83,7 @@ public class ScenarioTemplate implements Cloneable {
     public ScenarioTemplate clone() {
         ScenarioTemplate template = new ScenarioTemplate();
         template.name = this.name;
-        template.stratConScenarioType = getStratConScenarioType();
+        template.stratConScenarioType = this.stratConScenarioType;
         template.shortBriefing = this.shortBriefing;
         template.detailedBriefing = this.detailedBriefing;
         template.isHostileFacility = this.isHostileFacility;
@@ -103,6 +107,15 @@ public class ScenarioTemplate implements Cloneable {
 
     public ScenarioType getStratConScenarioType() {
         return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
+    }
+
+    public void setStratConScenarioType(String scenarioType) {
+        try {
+            this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim());
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid ScenarioType: " + scenarioType, e);
+            this.stratConScenarioType = ScenarioType.NONE;
+        }
     }
 
     /**
@@ -301,5 +314,25 @@ public class ScenarioTemplate implements Cloneable {
         }
 
         return resultingTemplate;
+    }
+
+    public static class ScenarioTypeAdapter extends XmlAdapter<String, ScenarioType> {
+        @Override
+        public ScenarioType unmarshal(String value) {
+            try {
+                // Match XML string to Enum
+                return ScenarioType.valueOf(value.trim()); // Ensure no extra spaces
+            } catch (IllegalArgumentException | NullPointerException e) {
+                // Log a warning for invalid input and return default
+                MMLogger.create(ScenarioTypeAdapter.class).warn("Invalid ScenarioType in XML: " + value);
+                return ScenarioType.NONE;
+            }
+        }
+
+        @Override
+        public String marshal(ScenarioType scenarioType) {
+            // Converts Enum back to String for XML
+            return scenarioType.name();
+        }
     }
 }
