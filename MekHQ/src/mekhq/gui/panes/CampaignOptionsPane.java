@@ -3150,7 +3150,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
-        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
+        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 2];
 
         JLabel lblFightChance = new JLabel(CombatRole.FIGHTING + ":");
         gridBagConstraints.gridy = 15;
