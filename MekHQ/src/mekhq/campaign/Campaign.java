@@ -68,8 +68,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -2084,6 +2084,22 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves a list of personnel, excluding those whose status indicates they have
+     * left the unit.
+     * <p>
+     * This method filters the personnel collection to only include individuals who
+     * are still part of the unit, as determined by their status.
+     * </p>
+     *
+     * @return a {@code List} of {@link Person} objects who have not left the unit
+     */
+    public List<Person> getPersonnelFilteringOutDeparted() {
+        return getPersonnel().stream()
+            .filter(person -> !person.getStatus().isDepartedUnit())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only active Persons.
      *
      * @return a {@link Person} <code>List</code> containing all active personnel
@@ -3750,9 +3766,10 @@ public class Campaign implements ITechManager {
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
 
-        final AtBLanceRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
+        final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
         for (CombatTeam combatTeam : combatTeams.values()) {
-            if (!combatTeam.getRole().isInReserve() && (combatTeam.getMissionId() == contract.getId())) {
+            if (!(combatTeam.getRole().isInReserve() || combatTeam.getRole().isAuxiliary())
+                && (combatTeam.getMissionId() == contract.getId())) {
                 total++;
                 if (combatTeam.getRole() == requiredLanceRole) {
                     role++;
@@ -4085,60 +4102,63 @@ public class Campaign implements ITechManager {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
 
         if (!isGuerrilla || Compute.d6(1) > 4) {
-            int dropCount = (int) round((double) contract.getRequiredLances() / 3);
-
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
-            performResupply(resupply, contract, dropCount);
+            performResupply(resupply, contract);
         }
     }
 
     /**
-     * Processes the new day for all personnel present in the campaign.
+     * Processes the daily activities and updates for all personnel that haven't already left the
+     * campaign.
      * <p>
-     * This method loops through all personnel present and performs the necessary actions
-     * for each person for a new day.
+     * This method iterates through all personnel and performs various daily updates, including
+     * health checks, status updates, relationship events, and other daily or periodic tasks.
      * <p>
      * The following tasks are performed for each person:
      * <ul>
-     *   <li>Death - If the person has died, skip processing further for the dead person.</li>
-     *   <li>Marriage - Process any marriage-related actions.</li>
-     *   <li>Reset minutes left for the person.</li>
-     *   <li>Reset acquisitions made to 0.</li>
-     *   <li>Healing - If the person needs healing and advanced medical is not used,
-     *   decrement the days to wait for healing and heal naturally or with a doctor.</li>
-     *   <li>Advanced Medical - If advanced medical is used, resolve the daily healing for the person.</li>
-     *   <li>Reset current edge points for support personnel on Mondays.</li>
-     *   <li>Idle XP - If idle XP is enabled and it's the first day of the month,
-     *   check if the person qualifies for idle XP and award them if they do.</li>
-     *   <li>Divorce - Process any divorce-related actions.</li>
-     *   <li>Procreation - Process any procreation-related actions.</li>
-     *   <li>Anniversaries - Check if it's the person's birthday or 18th birthday
-     *   and announce it if needed.</li>
-     *   <li>Auto Awards - If it's the first day of the month, calculate the auto award
-     *   support points based on the person's roles and experience level.</li>
+     *   <li><b>Death Handling:</b> If the person has died, their processing is skipped for the day.</li>
+     *   <li><b>Relationship Events:</b> Processes relationship-related events, such as marriage or divorce.</li>
+     *   <li><b>Reset Actions:</b> Resets the person's minutes left for work and sets acquisitions made to 0.</li>
+     *   <li><b>Medical Events:</b></li>
+     *       <li>- If advanced medical care is available, processes the person's daily healing.</li>
+     *       <li>- If advanced medical care is unavailable, decreases the healing wait time and
+     *       applies natural or doctor-assisted healing.</li>
+     *   <li><b>Weekly Edge Resets:</b> Resets edge points to their purchased value weekly (applies
+     *   to support personnel).</li>
+     *   <li><b>Vocational XP:</b> Awards monthly vocational experience points to the person where
+     *   applicable.</li>
+     *   <li><b>Anniversaries:</b> Checks for birthdays or significant anniversaries and announces
+     *   them as needed.</li>
+     *   <li><b>autoAwards:</b> On the first day of every month, calculates and awards support
+     *   points based on roles and experience levels.</li>
      * </ul>
      * <p>
-     * Note: This method uses several other methods to perform the specific actions for each task.
+     * <b>Concurrency Note:</b>
+     * A separate filtered list of personnel is used to avoid concurrent modification issues during iteration.
+     * <p>
+     * This method relies on several helper methods to perform specific tasks for each person,
+     * separating the responsibilities for modularity and readability.
+     *
+     * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
-        List<Person> personnelForRelationshipProcessing = new ArrayList<>();
+        // This list ensures we don't hit a concurrent modification error
+        List<Person> personnel = getPersonnelFilteringOutDeparted();
 
-        for (Person person : getPersonnel()) {
+        for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
 
-            personnelForRelationshipProcessing.add(person);
-
-            // Death
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
 
+            processWeeklyRelationshipEvents(person);
+
             person.resetMinutesLeft();
-            // Reset acquisitions made to 0
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
@@ -4149,17 +4169,9 @@ public class Campaign implements ITechManager {
 
             processMonthlyVocationalXp(person);
 
-            // Anniversaries
             processAnniversaries(person);
 
-            // autoAwards
             processMonthlyAutoAwards(person);
-        }
-
-        // Divorce, Marriage
-        // This has to be processed separately to avoid a ConcurrentModificationException
-        for (Person person : personnelForRelationshipProcessing) {
-            processWeeklyRelationshipEvents(person);
         }
     }
 

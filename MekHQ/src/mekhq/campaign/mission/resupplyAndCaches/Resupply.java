@@ -104,8 +104,8 @@ public class Resupply {
         focusArmor = 0.25;
         focusParts = 0.5;
 
-        buildPartsPools(collectParts());
         calculateNegotiationSkill();
+        buildPartsPools(collectParts());
         calculatePlayerConvoyValues();
 
         convoyContents = new ArrayList<>();
@@ -566,6 +566,7 @@ public class Resupply {
         return checkExclusionList(part)
             || checkMekLocation(part, unit)
             || checkTankLocation(part)
+            || checkMotiveSystem(part)
             || checkTransporter(part);
     }
 
@@ -587,6 +588,16 @@ public class Resupply {
             }
         }
         return false;
+    }
+
+    /**
+     * Checks if the given part is an instance of {@code MotiveSystem}.
+     *
+     * @param part the {@link Part} to be checked.
+     * @return {@code true} if the part is a {@link MotiveSystem}, {@code false} otherwise.
+     */
+    private boolean checkMotiveSystem(Part part) {
+        return part instanceof MotiveSystem;
     }
 
     /**

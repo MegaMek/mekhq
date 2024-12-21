@@ -3766,7 +3766,9 @@ public class Unit implements ITechnology {
         // Clear any stale game data that may somehow have gotten set incorrectly
         getCampaign().clearGameData(entity);
         // Set up SPAs, Implants, Edge, etc
-        if (getCampaign().getCampaignOptions().isUseAbilities()) {
+        if (getCampaign().getCampaignOptions().isUseAbilities()
+                || getCampaign().getCampaignOptions().isUseEdge()
+                || getCampaign().getCampaignOptions().isUseImplants()) {
             PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
             // This double enumeration is annoying to work with for crew-served units.
             // Get the option names while we enumerate so they can be used later
@@ -3776,9 +3778,14 @@ public class Unit implements ITechnology {
                 IOptionGroup group = i.nextElement();
                 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                     IOption option = j.nextElement();
-                    if (group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
+                    if (getCampaign().getCampaignOptions().isUseImplants()
+                            && group.getKey().equals(PersonnelOptions.MD_ADVANTAGES)) {
                         cyberOptionNames.add(option.getName());
-                    } else {
+                    } else if (getCampaign().getCampaignOptions().isUseEdge()
+                            && group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
+                        optionNames.add(option.getName());
+                    } else if(getCampaign().getCampaignOptions().isUseAbilities()
+                            && !group.getKey().equals(PersonnelOptions.EDGE_ADVANTAGES)) {
                         optionNames.add(option.getName());
                     }
                 }

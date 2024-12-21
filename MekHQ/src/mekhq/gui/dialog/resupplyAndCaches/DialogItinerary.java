@@ -24,6 +24,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
@@ -168,6 +169,15 @@ public class DialogItinerary {
             } else {
                 if (resupply.getUsePlayerConvoy()) {
                     loadPlayerConvoys(resupply);
+
+                    final List<Part> convoyContents = resupply.getConvoyContents();
+                    if (!convoyContents.isEmpty()) {
+                        campaign.addReport(String.format(resources.getString("convoyInsufficientSize.text")));
+
+                        for (Part part : convoyContents) {
+                            campaign.addReport("- " + part.getName());
+                        }
+                    }
                 } else {
                     processConvoy(resupply, resupply.getConvoyContents(), null);
                 }

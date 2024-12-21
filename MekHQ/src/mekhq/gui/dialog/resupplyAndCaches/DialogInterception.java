@@ -91,13 +91,13 @@ public class DialogInterception {
 
         String speakerName;
         if (speaker != null) {
-            speakerName = speaker.getFullTitle();
+            speakerName = speaker.getFullTitle() + " - " + targetConvoy.getName();
         } else {
             if (targetConvoy == null) {
                 speakerName = String.format(resources.getString("dialogBorderConvoySpeakerDefault.text"),
                     contract.getEmployerName(campaign.getGameYear()));
             } else {
-                speakerName = campaign.getName();
+                speakerName = targetConvoy.getName();
             }
         }
 

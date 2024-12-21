@@ -102,7 +102,39 @@ MEKHQ VERSION HISTORY:
 + PR #5407: Updated Name of I18n Class
 + PR #5411: Updated Damage Application in ACAR
 + PR #5415: Fixed Resolve Unit Test to Only Run when Asked
-
++ Fix #2800: Fixed Force Deployment Order Bug
++ Fix #4430: Fixed NPE in Caused by Deployment Attempt in Integrated Command
++ Fix #5299: Added Missing Tile Images to Stratcon Biome Manifest
++ Fix #5317: Set Minimum Target Skill Level in Mass Training Dialog to 1
++ Fix #5344: Improved StratCon Force Picker & Renamed LayeredForceIconOperationalStatus to OperationalStatus
++ Fix #5369: Fixed Divorce Logic
++ Fix #5408: Fixed Passenger Capacity Calculation in CamOps Reputation
++ Fix #5409: Refactored StratCon Campaign Management Dialog
++ PR #5416: Fixed Incorrect Ordering in Personnel Status Change Switch
++ PR #5417: Refactored Personnel Handling on New Day
++ PR #5423: Updated TO&E to Use "Support" Term instead of "Non-Combat"
++ PR #5425: Added Notification for Users Attempting to Manually Deploy on Integrated Commands
++ PR #5427: Fixed Unit Check in Combat Team Status Evaluation
++ PR #5428: Added Combat Teams & Support Forces Documentation
++ PR #5429: Archived Outdated Against the Bot Documentation
++ PR #5435: Halved Duration of Recon Scenarios
++ PR #5436: Adjusted Scenario Modifiers BV & Unit Count Contribution
++ PR #5437: Added Further Edge Case Handling for Turn Limit Scenario Objectives
++ PR #5438: fix: quick bandaid for gun emplacements in ACAR
++ PR #5443: Updated Naming of AtBLanceRole Class, Added Auxiliaries Combat Role
++ PR #5444: Removed Remaining Instance of Undeploy Functionality when StratCon is Enabled
++ PR #5446: Updated Convoy Scenarios to Exclude BV and Unit Count Contribution for Convoy Units
++ PR #5447: Refactored Conventional Fighter Handling in StratCon
++ Fix #5449: Fixed Force Removal Bug in TO&E, Fixed Convoy-Support Force Option Bug #5449
++ Fix #5450: Fixed Combat Team Eligibility Check by Rolling Back Use of getAllUnits()
++ Fix #5439: Feat/acar mode selection
++ Fix #5453: Refactored Resupply Logic and Streamlined Cargo Calculations
++ PR #5456: Added Motive System Exclusion in Resupply Eligibility
++ PR #5458: Clarified Speaker Names in Resupply Dialogs
++ PR #5459: Added Notification for Dispatched Convoys During Resupplies
++ Fix #5461: Fixed Legacy AtB Battle Chance Spinner Array Indexing Bug
++ Fix #5464: Adjusted Force Multipliers in Emergency Convoy Defense - VTOL Scenario Template
++ PR #5489: Fixed NPE when Searching for Primary Force in StratCon Scenario Generation
 
 
 0.50.01 (2024-11-10 1800 UTC)
@@ -293,7 +325,6 @@ MEKHQ VERSION HISTORY:
 + PR #5176: Temporarily Removed CAM_OPS from Contract Market Method ComboBox
 + PR #5179: Fix Perm. Injury showing as Injury on Personnel tabel
 + PR #5180: Show refitting techs and fix refit countdown
-+ PR #5412: Rolled Back #5399
 
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)

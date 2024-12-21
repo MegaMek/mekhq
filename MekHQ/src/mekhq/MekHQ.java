@@ -39,7 +39,6 @@ import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
-import megamek.server.victory.VictoryResult;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -56,15 +55,16 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.AutoResolveChanceDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
+import mekhq.gui.dialog.helpDialogs.AutoResolveSimulationLogDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.utilities.Internationalization;
-import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -76,14 +76,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The main class of the application.
@@ -95,7 +89,6 @@ public class MekHQ implements GameListener {
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
     private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
-    public static final int NUMBER_OF_COMBAT_SIMULATIONS = 250;
 
     private static ObservableString selectedTheme;
 
@@ -647,46 +640,28 @@ public class MekHQ implements GameListener {
      * @param units The list of player units involved in the scenario
      */
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
-        String message = Internationalization.getText("AutoResolveDialog.message");
 
-        var numberOfSimulations = NUMBER_OF_COMBAT_SIMULATIONS;
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            var simulatedVictories = calculateNumberOfVictories(numberOfSimulations, scenario, units);
-            stopWatch.stop();
-            if (simulatedVictories.getRuns() == 0 && simulatedVictories.getRuns() < numberOfSimulations) {
-                message = Internationalization.getText("AutoResolveDialog.messageFailedCalc");
-                logger.debug("No combat scenarios were simulated, possible error!");
-            } else {
-                var timePerRun = stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors());
-                logger.debug("Simulated victories: {} runs, {} victories, {} losses, {} draws - processed in {} ms per CPU core - total of {}",
-                    simulatedVictories.getRuns(),
-                    simulatedVictories.getVictories(),
-                    simulatedVictories.getLosses(),
-                    simulatedVictories.getDraws(),
-                    timePerRun,
-                    stopWatch.toString());
-
-                message = Internationalization.getFormattedText("AutoResolveDialog.messageSimulated",
-                    simulatedVictories.getRuns(),
-                    simulatedVictories.getVictories(),
-                    simulatedVictories.getLosses(),
-                    simulatedVictories.getDraws(),
-                    simulatedVictories.getVictories() * 100 / simulatedVictories.getRuns());
+            var proceed = AutoResolveChanceDialog
+                .showSimulationProgressDialog(
+                    getCampaigngui().getFrame(),
+                    getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
+                    units,
+                    scenario,
+                    getCampaign()) == JOptionPane.YES_OPTION;
+            if (!proceed) {
+                return;
             }
         }
 
-        String title = Internationalization.getText("AutoResolveDialog.title");
-        boolean proceed =  JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
-            message, title,
-            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+        var event = new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()))
+            .resolveSimulation();
 
-        if (proceed) {
-            var event = new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()))
-                .resolveSimulation();
-            autoResolveConcluded(event);
-        }
+        var autoResolveBattleReport = new AutoResolveSimulationLogDialog(getCampaigngui().getFrame(), event.getLogFile());
+        autoResolveBattleReport.setModal(true);
+        autoResolveBattleReport.setVisible(true);
+
+        autoResolveConcluded(event);
     }
 
     /**
@@ -705,7 +680,7 @@ public class MekHQ implements GameListener {
             var scenario = autoResolveConcludedEvent.getScenario();
 
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
-            tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame(), getCampaign().getPlayer()));
+            tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame()));
             tracker.setEvent(autoResolveConcludedEvent);
             tracker.processGame();
 
@@ -725,87 +700,6 @@ public class MekHQ implements GameListener {
         } catch (Exception ex) {
             logger.error("Error during auto resolve concluded", ex);
         }
-    }
-
-    private static class SimulationScore {
-        private final AtomicInteger victories;
-        private final AtomicInteger losses;
-        private final AtomicInteger draws;
-        private final AtomicInteger gamesRun;
-
-        public SimulationScore() {
-            this.victories = new AtomicInteger(0);
-            this.losses = new AtomicInteger(0);
-            this.draws = new AtomicInteger(0);
-            this.gamesRun = new AtomicInteger(0);
-        }
-
-        public void addResult(AutoResolveConcludedEvent event) {
-            this.addResult(event.getVictoryResult());
-        }
-
-        public void addResult(VictoryResult victoryResult) {
-            if (victoryResult.getWinningTeam() == 1) {
-                victories.incrementAndGet();
-            } else if (victoryResult.getWinningTeam() > 1) {
-                losses.incrementAndGet();
-            } else {
-                draws.incrementAndGet();
-            }
-            gamesRun.incrementAndGet();
-        }
-
-        public int getVictories() {
-            return victories.get();
-        }
-
-        public int getRuns() {
-            return gamesRun.get();
-        }
-
-        public int getLosses() {
-            return losses.get();
-        }
-
-        public int getDraws() {
-            return draws.get();
-        }
-    }
-
-    /**
-     * Calculates the victory chance for a given scenario and list of units by running multiple auto resolve scenarios in parallel.
-     *
-     * @param scenario the scenario to resolve
-     * @param units the list of units involved in the scenario
-     * @return the calculated victory chance as an integer percentage (0 to 100)
-     */
-    private SimulationScore calculateNumberOfVictories(int numberOfGames, AtBScenario scenario, List<Unit> units) {
-        var simulationScore = new SimulationScore();
-
-        if (numberOfGames <= 0) {
-            return simulationScore;
-        }
-
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        List<Future<AutoResolveConcludedEvent>> futures = new ArrayList<>();
-        for (int i = 0; i < numberOfGames; i++) {
-            futures.add(executor.submit(() -> new Resolver(
-                getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()))
-                .resolveSimulation()));
-        }
-
-        // Wait for all tasks to complete
-        for (Future<AutoResolveConcludedEvent> future : futures) {
-            try {
-                var event = future.get();
-                simulationScore.addResult(event);
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error("Error in parallel execution", e);
-            }
-        }
-
-        executor.shutdown();
-        return simulationScore;
     }
 
     /*

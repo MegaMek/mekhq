@@ -116,11 +116,15 @@ public class EndPhase extends PhaseHandler {
                 var entityOpt = getContext().getEntity(element.getId());
                 if (entityOpt.isPresent()) {
                     var entity = entityOpt.get();
+                    var firstRemovalCondition = entity.isEjectionPossible() ?
+                        IEntityRemovalConditions.REMOVE_EJECTED : IEntityRemovalConditions.REMOVE_SALVAGEABLE;
+
                     switch (Compute.rollD6(2).getIntValue()) {
-                        case 3, 4, 10, 11 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_EJECTED);
+                        case 3, 4, 10, 11 -> entity.setRemovalCondition(firstRemovalCondition);
                         case 2, 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
                         default -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
                     }
+
                     reporter.reportUnitDestroyed(entity);
                     getContext().addUnitToGraveyard(entity);
                 }

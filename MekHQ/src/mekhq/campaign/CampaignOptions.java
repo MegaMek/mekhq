@@ -34,7 +34,7 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
@@ -602,6 +602,7 @@ public class CampaignOptions {
     private boolean autoConfigMunitions;
     private AutoResolveMethod autoResolveMethod;
     private boolean autoResolveVictoryChanceEnabled;
+    private int autoResolveNumberOfScenarios;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1191,6 +1192,7 @@ public class CampaignOptions {
         setSkillLevel(SkillLevel.REGULAR);
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
+        autoResolveNumberOfScenarios = 100;
 
         // Unit Administration
         useAero = false;
@@ -1206,11 +1208,11 @@ public class CampaignOptions {
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        atbBattleChance = new int[AtBLanceRole.values().length - 1];
-        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
-        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
-        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
-        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 10;
+        atbBattleChance = new int[CombatRole.values().length - 1];
+        atbBattleChance[CombatRole.FIGHTING.ordinal()] = 40;
+        atbBattleChance[CombatRole.DEFENCE.ordinal()] = 20;
+        atbBattleChance[CombatRole.SCOUTING.ordinal()] = 60;
+        atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
         // Scenarios
@@ -4471,19 +4473,39 @@ public class CampaignOptions {
     }
 
     /**
-     * @param role the {@link AtBLanceRole} to get the battle chance for
-     * @return the chance of having a battle for the specified role, or {@code 0} if StratCon is enabled
+     * Retrieves the chance of having a battle for the specified {@link CombatRole}.
+     * <p>
+     * This method calculates the battle chance percentage for the provided combat role based on
+     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled, the
+     * method immediately returns {@code 0}.
+     * Roles marked as {@link CombatRole#IN_RESERVE} or as {@link CombatRole#AUXILIARY} are not
+     * eligible for battles and also return {@code 0}.
+     * </p>
+     *
+     * @param role the {@link CombatRole} to evaluate the battle chance for.
+     * @return the chance of having a battle for the specified role. Returns:
+     *         <ul>
+     *           <li>{@code 0} if StratCon is enabled.</li>
+     *           <li>{@code 0} if the role is {@link CombatRole#IN_RESERVE} or
+     *           {@link CombatRole#AUXILIARY}.</li>
+     *           <li>A non-zero value from the {@code atbBattleChance} array corresponding to the
+     *           role otherwise.</li>
+     *         </ul>
      */
-    public int getAtBBattleChance(final AtBLanceRole role) {
+    public int getAtBBattleChance(CombatRole role) {
         if (useStratCon) {
             return 0;
         }
 
-        return role.isInReserve() ? 0 : atbBattleChance[role.ordinal()];
+        if (role.isInReserve() || role.isAuxiliary()) {
+            return 0;
+        }
+
+        return atbBattleChance[role.ordinal()];
     }
 
     /**
-     * @param role      the {@link AtBLanceRole} ordinal value
+     * @param role      the {@link CombatRole} ordinal value
      * @param frequency the frequency to set the generation to (percent chance from
      *                  0 to 100)
      */
@@ -5155,6 +5177,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", getAutoResolveMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveNumberOfScenarios", getAutoResolveNumberOfScenarios());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -6143,6 +6166,8 @@ public class CampaignOptions {
                     retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
                     retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveNumberOfScenarios")) {
+                    retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6328,10 +6353,10 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                    retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
@@ -6427,5 +6452,13 @@ public class CampaignOptions {
 
     public void setAutoResolveVictoryChanceEnabled(final boolean autoResolveVictoryChanceEnabled) {
         this.autoResolveVictoryChanceEnabled = autoResolveVictoryChanceEnabled;
+    }
+
+    public void setAutoResolveNumberOfScenarios(int autoResolveNumberOfScenarios) {
+        this.autoResolveNumberOfScenarios = autoResolveNumberOfScenarios;
+    }
+
+    public int getAutoResolveNumberOfScenarios() {
+        return autoResolveNumberOfScenarios;
     }
 }

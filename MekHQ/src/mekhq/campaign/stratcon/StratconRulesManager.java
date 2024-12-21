@@ -64,7 +64,7 @@ import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.Coords.ALL_DIRECTIONS;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -74,7 +74,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificG
 import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.SkillType.S_TACTICS;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.FIGHT_LANCE;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.AUXILIARY;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
@@ -102,7 +102,7 @@ public class StratconRulesManager {
         NONE,
 
         /**
-         * Lance is already deployed to the track
+         * Combat Team is already deployed to the track
          */
         CHAINED_SCENARIO,
 
@@ -112,9 +112,10 @@ public class StratconRulesManager {
         REGULAR,
 
         /**
-         * The lance's deployment orders are "Fight". We pay a support point and make an enhanced roll
+         * The Combat Team's deployment orders are "Fight" or "Auxiliary".
+         * We pay a support point and make an enhanced roll
          */
-        FIGHT_LANCE
+        AUXILIARY
     }
 
     /**
@@ -1291,7 +1292,7 @@ public class StratconRulesManager {
 
         // If the formation is in Fight Stance, use the highest of two rolls
         String fightStanceReport = "";
-        if (reinforcementType == FIGHT_LANCE) {
+        if (reinforcementType == AUXILIARY) {
             int secondRoll = d6(2);
             roll = max(roll, secondRoll);
             fightStanceReport = String.format(" (%s)", roll);
@@ -1915,8 +1916,8 @@ public class StratconRulesManager {
                 continue;
             }
 
-            // So long as the combat team isn't In Reserve, they are eligible to be deployed
-            if (!combatTeam.getRole().isInReserve()) {
+            // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
+            if (!combatTeam.getRole().isInReserve() && !combatTeam.getRole().isAuxiliary()) {
                 suitableForces.add(combatTeam.getForceId());
             }
         }
@@ -1925,10 +1926,33 @@ public class StratconRulesManager {
     }
 
     /**
-     * This is a list of all force IDs for forces that can be deployed to a scenario
-     * in the given force template a) have not been assigned to a track b) are combat-capable c) are
-     * not deployed to a scenario d) if attempting to deploy as reinforcements, haven't already failed
-     * to deploy
+     * Retrieves a list of all force IDs eligible for deployment to a scenario.
+     * <p>
+     * This method evaluates all forces in the specified {@link Campaign} and identifies those that
+     * meet the criteria for deployment.
+     * <p>
+     * The criteria ensure that the forces:
+     * <ul>
+     *   <li>Are combat-capable (i.e., not auxiliary or in reserve).</li>
+     *   <li>Are not currently assigned to a track (except for the current track if deploying as
+     *   reinforcements).</li>
+     *   <li>Are not already deployed to a scenario.</li>
+     *   <li>Have not previously failed to deploy (if deploying as reinforcements).</li>
+     *   <li>Match the specified unit type.</li>
+     * </ul>
+     * Forces that meet all conditions are returned as a list of unique force IDs.
+     *
+     * @param unitType the desired type of unit to evaluate for deployment eligibility.
+     * @param campaign the {@link Campaign} containing the forces to evaluate.
+     * @param currentTrack the {@link StratconTrackState} representing the current track, used to
+     *                    filter eligible forces.
+     * @param reinforcements {@code true} if the forces are being deployed as reinforcements;
+     *                                   otherwise {@code false}.
+     * @param currentScenario the current {@link StratconScenario}, if any, used to exclude failed
+     *                       reinforcements. Can be {@code null}.
+     * @param campaignState the current {@link StratconCampaignState} representing the campaign
+     *                      state for further filtering of eligible forces.
+     * @return a {@link List} of unique force IDs that meet all deployment criteria.
      */
     public static List<Integer> getAvailableForceIDs(int unitType, Campaign campaign, StratconTrackState currentTrack,
             boolean reinforcements, @Nullable StratconScenario currentScenario, StratconCampaignState campaignState) {
@@ -1955,6 +1979,10 @@ public class StratconRulesManager {
             }
 
             if (formation.getRole().isInReserve()) {
+                continue;
+            }
+
+            if (formation.getRole().isAuxiliary()) {
                 continue;
             }
 
@@ -2041,7 +2069,8 @@ public class StratconRulesManager {
      *
      * @return List of unit IDs.
      */
-    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, Set<Integer> forceIDs, int leadershipSkill) {
+    public static List<Unit> getEligibleLeadershipUnits(Campaign campaign, ArrayList<Integer> forceIDs,
+                                                        int leadershipSkill) {
         List<Unit> eligibleUnits = new ArrayList<>();
 
         // If there is no leadership skill, we shouldn't continue
@@ -2107,7 +2136,7 @@ public class StratconRulesManager {
     /**
      * Calculates the majority unit type for the forces given the IDs.
      */
-    private static int getPrimaryUnitType(Campaign campaign, Set<Integer> forceIDs) {
+    private static int getPrimaryUnitType(Campaign campaign, ArrayList<Integer> forceIDs) {
         Map<Integer, Integer> unitTypeBuckets = new TreeMap<>();
         int biggestBucketID = -1;
         int biggestBucketCount = 0;
@@ -2165,8 +2194,8 @@ public class StratconRulesManager {
             }
 
             if (campaignState.getSupportPoints() > 0) {
-                if (formation.getRole().isFighting()) {
-                    return FIGHT_LANCE;
+                if (formation.getRole().isFighting() || formation.getRole().isAuxiliary()) {
+                    return AUXILIARY;
                 } else {
                     return ReinforcementEligibilityType.REGULAR;
                 }

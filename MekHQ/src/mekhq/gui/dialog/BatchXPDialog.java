@@ -299,7 +299,7 @@ public final class BatchXPDialog extends JDialog {
                     skillLevel.setEnabled(true);
                     ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
                     skillLevel.getModel().setValue(
-                            MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 0, maxSkillLevel));
+                            MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 1, maxSkillLevel));
                     buttonSpendXP.setEnabled(true);
                 }
             }
@@ -310,7 +310,7 @@ public final class BatchXPDialog extends JDialog {
         panel.add(Box.createRigidArea(new Dimension(10, 10)));
         panel.add(new JLabel(resourceMap.getString("targetSkillLevel.text")));
 
-        skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
+        skillLevel = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
         skillLevel.addChangeListener(evt -> {
             personnelFilter.setMaxSkillLevel((Integer) skillLevel.getModel().getValue());

@@ -20,6 +20,7 @@
 package mekhq.gui.stratcon;
 
 import megamek.client.ui.swing.util.UIUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -32,6 +33,7 @@ import mekhq.gui.StratconTab;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 
@@ -48,6 +50,9 @@ public class CampaignManagementDialog extends JDialog {
     private JButton btnGMAddVP;
     private JButton btnGMAddSP;
     private JLabel lblTrackScenarioOdds;
+
+    final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+        MekHQ.getMHQOptions().getLocale());
 
     public CampaignManagementDialog(StratconTab parent) {
         this.parent = parent;
@@ -69,7 +74,7 @@ public class CampaignManagementDialog extends JDialog {
 
         lblTrackScenarioOdds.setVisible(gmMode);
         if (gmMode) {
-            lblTrackScenarioOdds.setText(String.format("Track Scenario Odds: %d%%",
+            lblTrackScenarioOdds.setText(String.format(resources.getString("trackScenarioOdds.text"),
                     StratconRulesManager.calculateScenarioOdds(currentTrack, campaignState.getContract(),
                         false)));
         }
@@ -81,39 +86,61 @@ public class CampaignManagementDialog extends JDialog {
      * One-time set up for all the buttons.
      */
     private void initializeUI() {
-        GridLayout layout = new GridLayout();
-        layout.setColumns(2);
-        layout.setRows(0);
-        layout.setHgap(1);
-        layout.setVgap(1);
-
         getContentPane().removeAll();
+
+        // Set up GridBagLayout and constraints
+        GridBagLayout layout = new GridBagLayout();
         getContentPane().setLayout(layout);
 
-        btnRemoveCVP = new JButton();
-        btnRemoveCVP.setText("Remove CVP (GM)");
-        btnRemoveCVP.addActionListener(this::removeCVP);
-        getContentPane().add(btnRemoveCVP);
+        GridBagConstraints gbc = new GridBagConstraints();
+        int insertSize = UIUtil.scaleForGUI(8);
+        gbc.insets = new Insets(insertSize, insertSize, insertSize, insertSize);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        btnRequestResupply = new JButton();
-        btnRequestResupply.setText("Request Resupply");
-        btnRequestResupply.addActionListener(this::requestResupply);
-        getContentPane().add(btnRequestResupply);
-
-        btnGMAddVP = new JButton();
-        btnGMAddVP.setText("Add CVP (GM)");
-        btnGMAddVP.addActionListener(this::gmAddVPHandler);
-        getContentPane().add(btnGMAddVP);
-
-        btnGMAddSP = new JButton();
-        btnGMAddSP.setText("Add SP (GM)");
-        btnGMAddSP.addActionListener(this::gmAddSPHandler);
-        getContentPane().add(btnGMAddSP);
-
+        // Add the "Track Scenario Odds" label
         lblTrackScenarioOdds = new JLabel();
-        getContentPane().add(lblTrackScenarioOdds);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        getContentPane().add(lblTrackScenarioOdds, gbc);
 
+        // Add the "Request Resupply" button
+        btnRequestResupply = new JButton(resources.getString("btnRequestResupply.text"));
+        btnRequestResupply.addActionListener(evt -> {
+            dispose();
+            requestResupply(evt);
+        });
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        getContentPane().add(btnRequestResupply, gbc);
+
+        // Add the "Add SP (GM)" button
+        btnGMAddSP = new JButton(resources.getString("btnAddSP.text"));
+        btnGMAddSP.addActionListener(this::gmAddSPHandler);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        getContentPane().add(btnGMAddSP, gbc);
+
+        // Add the "Add CVP (GM)" button
+        btnGMAddVP = new JButton(resources.getString("btnAddCVP.text"));
+        btnGMAddVP.addActionListener(this::gmAddVPHandler);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        getContentPane().add(btnGMAddVP, gbc);
+
+        // Add the "Remove CVP (GM)" button
+        btnRemoveCVP = new JButton(resources.getString("btnRemoveCVP.text"));
+        btnRemoveCVP.addActionListener(this::removeCVP);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        getContentPane().add(btnRemoveCVP, gbc);
+
+        // Finalize the dialog
         pack();
+        setModal(true);
+        setResizable(false);
     }
 
     private void removeCVP(ActionEvent e) {
@@ -137,7 +164,7 @@ public class CampaignManagementDialog extends JDialog {
         } else {
             AtBContract contract = currentCampaignState.getContract();
             Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
-            performResupply(resupply, contract, 1);
+            performResupply(resupply, contract);
         }
 
         btnRequestResupply.setEnabled(currentCampaignState.getSupportPoints() > 0);
@@ -147,18 +174,19 @@ public class CampaignManagementDialog extends JDialog {
     public void supplyDropDialog() {
         final JDialog dialog = new JDialog();
         dialog.setLayout(new GridBagLayout());
-        dialog.setTitle("Requesting Resupply");
-        dialog.setSize(400, 200);
+        dialog.setTitle(resources.getString("requestingResupply.title"));
+        dialog.setSize(UIUtil.scaleForGUI(500, 200));
         dialog.setLocationRelativeTo(null);
 
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(10, 10, 10, 10);
+        int insertSize = UIUtil.scaleForGUI(8);
+        constraints.insets = new Insets(insertSize, insertSize, insertSize, insertSize);
 
         constraints.gridx = 0;
         constraints.gridy = 0;
         JLabel description = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(500), "How many Support Points would you like to spend?"));
+                UIUtil.scaleForGUI(500), resources.getString("supplyPointExpenditure.text")));
         description.setAlignmentX(Component.CENTER_ALIGNMENT);
         dialog.add(description, constraints);
 
@@ -173,13 +201,13 @@ public class CampaignManagementDialog extends JDialog {
         constraints.gridy = 2;
         constraints.gridwidth = 1;
         constraints.anchor = GridBagConstraints.SOUTH;
-        JButton btnConfirm = new JButton("Confirm");
+        JButton btnConfirm = new JButton(resources.getString("btnConfirm.text"));
         btnConfirm.addActionListener( e-> {
             dialog.dispose();
 
             AtBContract contract = currentCampaignState.getContract();
             Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_NORMAL);
-            performResupply(resupply, contract, 1);
+            performResupply(resupply, contract);
 
             currentCampaignState.useSupportPoints((int) numberModel.getValue());
         });

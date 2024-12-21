@@ -253,7 +253,7 @@ public class StratconScenarioWizard extends JDialog {
             localGbc.gridy = 1;
             JLabel selectedForceInfo = new JLabel();
             JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
-
+            availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             // Add a listener to handle changes to the selected force
             availableForceList
                     .addListSelectionListener(e -> {
@@ -474,8 +474,8 @@ public class StratconScenarioWizard extends JDialog {
             case CHAINED_SCENARIO:
                 costBuilder.append(resourceMap.getString("fromChainedScenario.text"));
                 break;
-            case FIGHT_LANCE:
-                costBuilder.append(resourceMap.getString("lanceInFightRole.text"));
+            case AUXILIARY:
+                costBuilder.append(resourceMap.getString("auxiliary.text"));
                 break;
             default:
                 costBuilder.append("Error: Invalid Reinforcement Type");
@@ -515,8 +515,13 @@ public class StratconScenarioWizard extends JDialog {
         // go through all the force lists and add the selected forces to the scenario
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
-                // if we are assigning reinforcements, pay the price if appropriate
-                if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                if (templateID.equals(ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID)) {
+                    logger.info("Committing primary force: " + force.getFullName());
+                    if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
+                        currentScenario.addForce(force, templateID, campaign);
+                    }
+                } else if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                    logger.info("Committing reinforcement force: " + force.getFullName());
                     if (currentCampaignState.getSupportPoints() <= 0) {
                         campaign.addReport(String.format(resourceMap.getString("reinforcementsNoSupportPoints.text"),
                             currentScenario.getName(),
@@ -526,8 +531,8 @@ public class StratconScenarioWizard extends JDialog {
                     }
 
                     ReinforcementEligibilityType reinforcementType = StratconRulesManager.getReinforcementType(
-                            force.getId(), currentTrackState,
-                            campaign, currentCampaignState);
+                        force.getId(), currentTrackState,
+                        campaign, currentCampaignState);
 
                     // if we failed to deploy as reinforcements, move on to the next force
                     ReinforcementResultsType reinforcementResults = processReinforcementDeployment(
@@ -551,11 +556,6 @@ public class StratconScenarioWizard extends JDialog {
                             }
                         }
                     }
-                } else {
-                    // In the event the player has selected multiple forces to act as the primary
-                    // force, only commit the first force
-                    currentScenario.addForce(force, templateID, campaign);
-                    break;
                 }
             }
         }
