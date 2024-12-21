@@ -134,6 +134,7 @@ MEKHQ VERSION HISTORY:
 + PR #5459: Added Notification for Dispatched Convoys During Resupplies
 + Fix #5461: Fixed Legacy AtB Battle Chance Spinner Array Indexing Bug
 + Fix #5464: Adjusted Force Multipliers in Emergency Convoy Defense - VTOL Scenario Template
++ PR #5489: Fixed NPE when Searching for Primary Force in StratCon Scenario Generation
 
 
 0.50.01 (2024-11-10 1800 UTC)
