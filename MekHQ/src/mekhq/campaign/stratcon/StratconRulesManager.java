@@ -1917,7 +1917,7 @@ public class StratconRulesManager {
             }
 
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
-            if (!combatTeam.getRole().isInReserve() && !combatTeam.getRole().isAuxiliary()) {
+            if (!combatTeam.getRole().isReserve() && !combatTeam.getRole().isAuxiliary()) {
                 suitableForces.add(combatTeam.getForceId());
             }
         }
@@ -1978,7 +1978,7 @@ public class StratconRulesManager {
                 continue;
             }
 
-            if (formation.getRole().isInReserve()) {
+            if (formation.getRole().isReserve()) {
                 continue;
             }
 

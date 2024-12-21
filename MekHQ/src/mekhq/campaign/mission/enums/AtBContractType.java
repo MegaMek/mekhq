@@ -213,7 +213,7 @@ public enum AtBContractType {
             case RECON_RAID:
                 return CombatRole.RECON;
             default:
-                return CombatRole.IN_RESERVE;
+                return CombatRole.RESERVE;
         }
     }
 
