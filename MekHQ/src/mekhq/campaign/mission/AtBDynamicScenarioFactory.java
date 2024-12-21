@@ -3873,12 +3873,14 @@ public class AtBDynamicScenarioFactory {
      */
     public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier,
                                                            boolean isDelayed) {
-        int minimumSpeed = 999;
         int arrivalScale = REINFORCEMENT_ARRIVAL_SCALE;
 
         // First, we organize the reinforcements into pools.
         // This ensures each Force's reinforcements are handled separately.
         Map<Integer, Integer> delayByForce = new HashMap<>();
+
+        int actualArrivalTurn = 0;
+        int delayedArrivalScale = REINFORCEMENT_ARRIVAL_SCALE * (randomInt(2) + 2);
 
         // first, we figure out the slowest "atb speed" of this group.
         for (Entity entity : entityList) {
@@ -3888,7 +3890,6 @@ public class AtBDynamicScenarioFactory {
                 if (delayByForce.containsKey(forceId)) {
                     arrivalScale = delayByForce.get(forceId);
                 } else {
-                    int delayedArrivalScale = REINFORCEMENT_ARRIVAL_SCALE * (randomInt(2) + 2);
                     delayByForce.put(forceId, delayedArrivalScale);
                     arrivalScale = delayedArrivalScale;
                 }
@@ -3899,13 +3900,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            int speed = calculateAtBSpeed(entity);
-
-            // don't reduce minimum speed to 0, since dividing by zero further down is
-            // problematic
-            if ((speed < minimumSpeed) && (speed > 0)) {
-                minimumSpeed = speed;
-            }
+            int speed = max(1, calculateAtBSpeed(entity));
 
             // the actual arrival turn will be the scale divided by the slowest speed.
             // so, a group of Atlases (3/5) should arrive at turn 7 (20 / 3)
@@ -3913,8 +3908,14 @@ public class AtBDynamicScenarioFactory {
             // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
             // we then subtract the passed-in turn modifier, which is usually the
             // commander's strategy skill level.
-            int actualArrivalTurn = max(0, (arrivalScale / minimumSpeed) - turnModifier);
+            int rollingArrivalTurn = max(0, (arrivalScale / speed) - turnModifier);
 
+            if (rollingArrivalTurn > actualArrivalTurn) {
+                actualArrivalTurn = rollingArrivalTurn;
+            }
+        }
+
+        for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }
     }
