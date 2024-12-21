@@ -2,6 +2,7 @@ package mekhq.campaign.personnel.education;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -12,6 +13,7 @@ import mekhq.campaign.unit.Unit;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.personnel.SkillType.EXP_GREEN;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -99,6 +101,7 @@ public class TrainingCombatTeams {
      * @param combatTeam the {@link CombatTeam} undergoing training in this session
      */
     private static void processTraining(final Campaign campaign, final CombatTeam combatTeam) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final String campaignName = campaign.getName();
 
         // First, identify the Combat Team's commander
@@ -182,8 +185,13 @@ public class TrainingCombatTeams {
                     // The +1 is to account for the next experience level to be gained
                     int currentExperienceLevel = targetSkill.getExperienceLevel() + 1;
 
-                    final int EDUCATION_TIME_PER_EXPERIENCE_LEVEL = 25;
-                    if (newEducationTime >= (currentExperienceLevel * EDUCATION_TIME_PER_EXPERIENCE_LEVEL)) {
+                    int perExperienceLevelMultiplier = 28;
+                    double experienceMultiplier = campaignOptions.getXpCostMultiplier();
+                    double intelligenceCostMultiplier = trainee.getIntelligenceXpCostMultiplier(campaignOptions);
+
+                    perExperienceLevelMultiplier = (int) round(perExperienceLevelMultiplier * experienceMultiplier * intelligenceCostMultiplier);
+
+                    if (newEducationTime >= (currentExperienceLevel * perExperienceLevelMultiplier)) {
                         trainee.setEduEducationTime(0);
                         targetSkill.setLevel(targetSkill.getLevel() + 1);
 
