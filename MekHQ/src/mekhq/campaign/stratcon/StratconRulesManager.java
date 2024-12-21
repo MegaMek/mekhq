@@ -1040,7 +1040,7 @@ public class StratconRulesManager {
             if (template != null) {
                 scenario = generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment);
             } else {
-                scenario = generateScenario(campaign, contract, track, forceID, coords);
+                scenario = generateScenario(campaign, contract, track, forceID, coords, daysTilDeployment);
             }
 
             if (scenario == null) {
@@ -1602,20 +1602,34 @@ public class StratconRulesManager {
     }
 
     /**
-     * Worker function that generates stratcon scenario at the given coords, for the
-     * given force, on the
-     * given track. Also registers it with the track and campaign.
+     * Generates a StratCon scenario at the specified coordinates for the given force on the specified track.
+     * The scenario is determined based on a random template suitable for the unit type of the specified force,
+     * and it is optionally configured with a deployment delay.
+     *
+     * <p>This method selects a random scenario template based on the primary unit type of the force,
+     * then delegates the scenario creation and configuration to another overloaded {@code generateScenario} method
+     * which handles specific template-based scenario generation.</p>
+     *
+     * @param campaign           the {@link Campaign} managing the overall gameplay state
+     * @param contract           the {@link AtBContract} governing the StratCon campaign
+     * @param track              the {@link StratconTrackState} where the scenario is placed
+     * @param forceID            the ID of the force for which the scenario is generated
+     * @param coords             the {@link StratconCoords} specifying where the scenario will be generated
+     * @param daysTilDeployment  the number of days until the scenario is deployed; if {@code null},
+     *                          deployment dates are determined dynamically
+     * @return the generated {@link StratconScenario}, or {@code null} if scenario generation fails
      */
     private static @Nullable StratconScenario generateScenario(Campaign campaign, AtBContract contract,
                                                                StratconTrackState track, int forceID,
-                                                               StratconCoords coords) {
+                                                               StratconCoords coords,
+                                                               @Nullable Integer daysTilDeployment) {
         int unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
         ScenarioTemplate template = StratconScenarioFactory.getRandomScenario(unitType);
         // useful for debugging specific scenario types
         // template = StratconScenarioFactory.getSpecificScenario("Defend Grounded
         // Dropship.xml");
 
-        return generateScenario(campaign, contract, track, forceID, coords, template, -1);
+        return generateScenario(campaign, contract, track, forceID, coords, template, daysTilDeployment);
     }
 
     /**
