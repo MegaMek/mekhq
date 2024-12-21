@@ -1407,7 +1407,6 @@ public class StratconRulesManager {
      *     <li><b>Liaison Modifiers:</b> Reductions based on the type of command rights
      *         (e.g., Liaison, House, or Integrated).</li>
      * </ul>
-     * </p>
      *
      * @param campaign          the {@link Campaign} representing the current campaign, which provides global game
      *                          configuration and reputation data.
