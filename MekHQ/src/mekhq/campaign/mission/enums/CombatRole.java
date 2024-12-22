@@ -108,10 +108,27 @@ public enum CombatRole {
             return valueOf(text);
         } catch (Exception ignored) {}
 
-        MMLogger.create(CombatRole.class)
-            .error("Unable to parse " + text + " into an CombatRole. Returning IN_RESERVE.");
+        // <50.02 compatibility handler
+        return switch (text) {
+            case "FIGHTING" -> FRONTLINE;
+            case "SCOUTING" -> RECON;
+            case "DEFENCE" -> GARRISON;
+            case "IN_RESERVE", "UNASSIGNED" -> RESERVE;
+            default -> {
+                MMLogger.create(CombatRole.class)
+                    .warn(String.format("Unable to parse %s into an CombatRole. Returning RESERVE.",
+                        text));
 
-        return RESERVE;
+                yield RESERVE;
+            }
+
+        };
+
+        // To be uncommented once the above compatibility handler is removed.
+//        MMLogger.create(CombatRole.class)
+//            .error("Unable to parse " + text + " into an CombatRole. Returning RESERVE.");
+//
+//        return RESERVE;
     }
     // endregion File I/O
 
