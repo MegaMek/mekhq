@@ -419,8 +419,7 @@ public class Resupply {
             return false;
         }
 
-        return entity.isWarShip()
-            || entity.isSmallCraft()
+        return entity.isSmallCraft()
             || entity.isLargeCraft()
             || entity.isSuperHeavy()
             || entity.isConventionalInfantry();
