@@ -137,4 +137,20 @@ public class MissingAeroSensor extends MissingPart {
     public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
+
+    @Override
+    public String getAcquisitionName() {
+        String[] parts = super.getAcquisitionName().split("(?<=\\()|(?=\\))");
+        for(int i = 0; i < parts.length; i++) {
+            System.out.println(parts[i]);
+        }
+        System.out.println("\n");
+        if(dropship) {
+            String[] sliced = super.getAcquisitionName().split("(?<=\\()|(?=\\))");
+            String descString = sliced[0] + sliced[2] + sliced[3];
+            return descString;
+        } else {
+            return super.getAcquisitionName();
+        }
+    }
 }
