@@ -1134,10 +1134,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllForcesDeployed(forces)) {
-                menuItem = new JMenuItem("Undeploy Force");
+                menuItem = new JMenuItem("Undeploy Force (GM)");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+                menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
                 popup.add(menuItem);
             }
 
@@ -1635,10 +1635,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Undeploy Unit");
+                menuItem = new JMenuItem("Undeploy Unit (GM)");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!gui.getCampaign().getCampaignOptions().isUseStratCon());
+                menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
                 popup.add(menuItem);
             }
 

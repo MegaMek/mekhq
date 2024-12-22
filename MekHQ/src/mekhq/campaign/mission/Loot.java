@@ -20,13 +20,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
@@ -42,6 +35,12 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -113,36 +112,28 @@ public class Loot {
     }
 
     public String getShortDescription() {
-        String desc = getName() + " - ";
+        StringBuilder description = new StringBuilder("<html>");
+
+        description.append("<b>").append(getName()).append("</b>");
         if (!cash.isZero()) {
-            desc += cash.toAmountAndSymbolString();
+            description.append("<br>- ").append(cash.toAmountAndSymbolString());
         }
 
-        if (!units.isEmpty()) {
-            String s = units.size() + " unit";
-            if (units.size() > 1) {
-                s += "s";
-            }
-
-            if (!cash.isZero()) {
-                s = ", " + s;
-            }
-            desc += s;
+        for (Entity entity : units) {
+            description.append("<br>- ").append(entity.getDisplayName());
         }
 
-        if (!parts.isEmpty()) {
-            String s = parts.size() + " part";
-            if (parts.size() > 1) {
-                s += "s";
+        for (Part part : parts) {
+            description.append("<br>- ").append(part.getName());
+            if (part.isClan()) {
+                description.append(" (Clan)");
             }
-
-            if (!cash.isZero() || !units.isEmpty()) {
-                s = ", " + s;
-            }
-            desc += s;
+            description.append(" [").append(part.getQualityName()).append(']');
         }
 
-        return desc;
+        description.append("</html>");
+
+        return description.toString();
 
     }
 

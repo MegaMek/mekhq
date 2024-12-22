@@ -139,7 +139,7 @@ public class CombatTeam {
 
     public CombatTeam(int forceId, Campaign campaign) {
         this.forceId = forceId;
-        role = CombatRole.IN_RESERVE;
+        role = CombatRole.RESERVE;
         missionId = -1;
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null)
@@ -422,7 +422,7 @@ public class CombatTeam {
          */
 
         switch (role) {
-            case FIGHTING: {
+            case FRONTLINE: {
                 roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,
@@ -460,7 +460,7 @@ public class CombatTeam {
                             getBattleDate(campaign.getLocalDate()));
                 }
             }
-            case SCOUTING: {
+            case RECON: {
                 roll = Compute.randomInt(60) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,
@@ -498,7 +498,7 @@ public class CombatTeam {
                             getBattleDate(campaign.getLocalDate()));
                 }
             }
-            case DEFENCE: {
+            case GARRISON: {
                 roll = Compute.randomInt(20) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,
