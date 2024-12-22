@@ -45,10 +45,10 @@ public class MissingAeroSensor extends MissingPart {
         this(0, false, null);
     }
 
-    public MissingAeroSensor(int tonnage, boolean drop, Campaign c) {
-        super(tonnage, c);
+    public MissingAeroSensor(int tonnage, boolean dropship, Campaign campaign) {
+        super(tonnage, campaign);
         this.name = "Aero Sensors";
-        this.dropship = drop;
+        this.dropship = dropship;
     }
 
     @Override
@@ -136,5 +136,21 @@ public class MissingAeroSensor extends MissingPart {
     @Override
     public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
+    }
+
+    /**  This function is over-ridden from it's parent because Aero Sensors depend on tonnage for small craft, but not for dropships/warships
+    * So we have to use regexes to change the acquistion name if the sensors are for spacecraft
+    * @return description string for the missing part
+    */
+    @Override
+    public String getAcquisitionName() {
+        if (dropship) {
+            //The below regex splits by the () characters but keeps them in the description
+            String[] sliced = super.getAcquisitionName().split("(?<=\\()|(?=\\))");
+            String description = sliced[0] + sliced[2] + sliced[3];
+            return description;
+        } else {
+            return super.getAcquisitionName();
+        }
     }
 }
