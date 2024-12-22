@@ -440,7 +440,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             for (final Force force : forces) {
                 force.setCombatForce(combatForce, subforces);
                 force.setConvoyForce(false);
+
+
             }
+
+            for (Force formation : gui.getCampaign().getAllForces()) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            }
+
             gui.getTOETab().refreshForceView();
         } else if (command.contains(TOEMouseAdapter.CHANGE_CONVOY_STATUS)) {
             if (singleForce == null) {
@@ -460,11 +467,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 childForce.setConvoyForce(false);
             }
 
-            gui.getTOETab().refreshForceView();
-
             for (Force formation : gui.getCampaign().getAllForces()) {
                 MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
             }
+
+            gui.getTOETab().refreshForceView();
         } else if (command.contains(CHANGE_STRATEGIC_FORCE_OVERRIDE)) {
             if (singleForce == null) {
                 return;
