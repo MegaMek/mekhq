@@ -654,8 +654,8 @@
             <value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
         </entry>
         <entry>
-            <key>FacilityAlliedSupplyDepot</key>
-            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
+            <key>FacilityAlliedSpacePort</key>
+            <value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png</value>
         </entry>
         <entry>
             <key>FacilityAlliedDataCenter</key>
@@ -703,8 +703,8 @@
             <value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
         </entry>
         <entry>
-            <key>FacilityHostileSupplyDepot</key>
-            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
+            <key>FacilityHostileSpacePort</key>
+            <value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png</value>
         </entry>
         <entry>
             <key>FacilityHostileDataCenter</key>
