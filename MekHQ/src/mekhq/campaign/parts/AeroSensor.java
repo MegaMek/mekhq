@@ -51,7 +51,7 @@ public class AeroSensor extends Part {
         super(tonnage, c);
         this.name = "Aerospace Sensors";
         this.largeCraft = lc;
-        this.unitTonnageMatters = true;
+        this.unitTonnageMatters = !lc;
     }
 
     @Override
