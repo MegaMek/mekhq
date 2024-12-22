@@ -538,7 +538,7 @@ public class Resupply {
                     continue;
                 }
 
-                if (!unit.isSalvage() && unit.isAvailable()) {
+                if (!unit.isSalvage() && (unit.isAvailable() || unit.isDeployed())) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
                         if (isIneligiblePart(part, unit)) {
