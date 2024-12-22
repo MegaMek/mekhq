@@ -127,7 +127,20 @@ MEKHQ VERSION HISTORY:
 + PR #5447: Refactored Conventional Fighter Handling in StratCon
 + Fix #5449: Fixed Force Removal Bug in TO&E, Fixed Convoy-Support Force Option Bug #5449
 + Fix #5450: Fixed Combat Team Eligibility Check by Rolling Back Use of getAllUnits()
-+ Fix #5439: Feat/acar mode selection
++ Fix #5439: ACAR mode selection
++ PR #5460: Refined Deploy/Undeploy Menu Behavior for GM Permissions
++ Fix #5442: Improved Reinforcement Transparency and User Control
++ Fix #5465: Corrected Date of Resupply Interception Scenarios & Added Clarity to Scenario Names
++ Fix #3639, #4036: Fixed Monthly Facility Support Point Gains & Added Functionality to Allied Industrial Facilities
++ PR #5472: Renamed Supply Depots to Space Ports, Buffed Support Point Gain
++ PR #5473: Renamed Fight, Defense, and Scouting Combat Role Names
++ PR #5475: Fixed Resupply Smuggler Dialog Formatting
++ PR #5476: Added Missing Anti-Mek Skill to Battle Armor Basic Training In-Unit Education Curriculum
++ Fix #5491: Fixed Transportation Capacity and Requirement Calculations
++ Fix #5478: Refactored Loot Description for Clarity
++ PR #5493: Added Name for Resupply Loot
++ PR #5494: Fixed Marshalling and Unmarshalling of stratConScenarioType
++ PR #5495, #5496: Updated Documentation for Personnel Modules, Unit Markets, Force Documentation
 + Fix #5453: Refactored Resupply Logic and Streamlined Cargo Calculations
 + PR #5456: Added Motive System Exclusion in Resupply Eligibility
 + PR #5458: Clarified Speaker Names in Resupply Dialogs
@@ -135,6 +148,7 @@ MEKHQ VERSION HISTORY:
 + Fix #5461: Fixed Legacy AtB Battle Chance Spinner Array Indexing Bug
 + Fix #5464: Adjusted Force Multipliers in Emergency Convoy Defense - VTOL Scenario Template
 + PR #5489: Fixed NPE when Searching for Primary Force in StratCon Scenario Generation
++ PR #5477: Rewrote & Reworked Training Combat Role
 
 
 0.50.01 (2024-11-10 1800 UTC)
