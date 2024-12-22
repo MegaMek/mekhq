@@ -3791,7 +3791,7 @@ public class Campaign implements ITechManager {
             boolean isUnderStrength = unitCount < minimumUnitCount;
             boolean reportUnderStrength = false;
 
-            if (!combatRole.isInReserve() && !combatRole.isAuxiliary()) {
+            if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if ((combatTeam.getMissionId() == contract.getId())) {
                     if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
                         if (isUnderStrength) {

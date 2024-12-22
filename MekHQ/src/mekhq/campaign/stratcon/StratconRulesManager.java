@@ -2005,7 +2005,7 @@ public class StratconRulesManager {
 
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
             CombatRole combatRole = combatTeam.getRole();
-            if (!combatRole.isInReserve() && !combatRole.isAuxiliary()) {
+            if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
 
                 if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
                     suitableForces.add(combatTeam.getForceId());
