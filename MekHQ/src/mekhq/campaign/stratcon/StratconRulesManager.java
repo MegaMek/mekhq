@@ -1574,7 +1574,7 @@ public class StratconRulesManager {
             if (commanderUnit != null) {
                 CombatTeam lance = campaign.getCombatTeamsTable().get(commanderUnit.getForceId());
 
-                return (lance != null) && lance.getRole().isDefence();
+                return (lance != null) && lance.getRole().isGarrison();
             }
         }
 
@@ -2003,7 +2003,7 @@ public class StratconRulesManager {
             }
 
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
-            if (!combatTeam.getRole().isInReserve() && !combatTeam.getRole().isAuxiliary()) {
+            if (!combatTeam.getRole().isReserve() && !combatTeam.getRole().isAuxiliary()) {
                 suitableForces.add(combatTeam.getForceId());
             }
         }
@@ -2064,7 +2064,7 @@ public class StratconRulesManager {
                 continue;
             }
 
-            if (formation.getRole().isInReserve()) {
+            if (formation.getRole().isReserve()) {
                 continue;
             }
 
@@ -2280,7 +2280,7 @@ public class StratconRulesManager {
             }
 
             if (campaignState.getSupportPoints() > 0) {
-                if (formation.getRole().isFighting() || formation.getRole().isAuxiliary()) {
+                if (formation.getRole().isFrontline() || formation.getRole().isAuxiliary()) {
                     return AUXILIARY;
                 } else {
                     return ReinforcementEligibilityType.REGULAR;

@@ -1209,9 +1209,9 @@ public class CampaignOptions {
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
         atbBattleChance = new int[CombatRole.values().length - 1];
-        atbBattleChance[CombatRole.FIGHTING.ordinal()] = 40;
-        atbBattleChance[CombatRole.DEFENCE.ordinal()] = 20;
-        atbBattleChance[CombatRole.SCOUTING.ordinal()] = 60;
+        atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 40;
+        atbBattleChance[CombatRole.GARRISON.ordinal()] = 20;
+        atbBattleChance[CombatRole.RECON.ordinal()] = 60;
         atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
@@ -4478,7 +4478,7 @@ public class CampaignOptions {
      * This method calculates the battle chance percentage for the provided combat role based on
      * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled, the
      * method immediately returns {@code 0}.
-     * Roles marked as {@link CombatRole#IN_RESERVE} or as {@link CombatRole#AUXILIARY} are not
+     * Roles marked as {@link CombatRole#RESERVE} or as {@link CombatRole#AUXILIARY} are not
      * eligible for battles and also return {@code 0}.
      * </p>
      *
@@ -4486,7 +4486,7 @@ public class CampaignOptions {
      * @return the chance of having a battle for the specified role. Returns:
      *         <ul>
      *           <li>{@code 0} if StratCon is enabled.</li>
-     *           <li>{@code 0} if the role is {@link CombatRole#IN_RESERVE} or
+     *           <li>{@code 0} if the role is {@link CombatRole#RESERVE} or
      *           {@link CombatRole#AUXILIARY}.</li>
      *           <li>A non-zero value from the {@code atbBattleChance} array corresponding to the
      *           role otherwise.</li>
@@ -4497,7 +4497,7 @@ public class CampaignOptions {
             return 0;
         }
 
-        if (role.isInReserve() || role.isAuxiliary()) {
+        if (role.isReserve() || role.isAuxiliary()) {
             return 0;
         }
 
@@ -6353,9 +6353,9 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                    retVal.atbBattleChance[CombatRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[CombatRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[CombatRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.GARRISON.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.RECON.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
                     retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));

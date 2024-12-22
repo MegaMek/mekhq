@@ -25,12 +25,12 @@ import java.util.ResourceBundle;
 
 public enum CombatRole {
     // region Enum Declarations
-    FIGHTING("CombatRole.FIGHTING.text", "CombatRole.FIGHTING.toolTipText"),
-    DEFENCE("CombatRole.DEFENCE.text", "CombatRole.DEFENCE.toolTipText"),
-    SCOUTING("CombatRole.SCOUTING.text", "CombatRole.SCOUTING.toolTipText"),
+    FRONTLINE("CombatRole.FRONTLINE.text", "CombatRole.FRONTLINE.toolTipText"),
+    GARRISON("CombatRole.GARRISON.text", "CombatRole.GARRISON.toolTipText"),
+    RECON("CombatRole.RECON.text", "CombatRole.RECON.toolTipText"),
     TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
     AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
-    IN_RESERVE("CombatRole.IN_RESERVE.text", "CombatRole.IN_RESERVE.toolTipText");
+    RESERVE("CombatRole.RESERVE.text", "CombatRole.RESERVE.toolTipText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -54,16 +54,16 @@ public enum CombatRole {
     // endregion Getters
 
     // region Boolean Comparison Methods
-    public boolean isFighting() {
-        return this == FIGHTING;
+    public boolean isFrontline() {
+        return this == FRONTLINE;
     }
 
-    public boolean isDefence() {
-        return this == DEFENCE;
+    public boolean isGarrison() {
+        return this == GARRISON;
     }
 
     public boolean isScouting() {
-        return this == SCOUTING;
+        return this == RECON;
     }
 
     public boolean isTraining() {
@@ -74,8 +74,8 @@ public enum CombatRole {
         return this == AUXILIARY;
     }
 
-    public boolean isInReserve() {
-        return this == IN_RESERVE;
+    public boolean isReserve() {
+        return this == RESERVE;
     }
     // endregion Boolean Comparison Methods
 
@@ -111,7 +111,7 @@ public enum CombatRole {
         MMLogger.create(CombatRole.class)
             .error("Unable to parse " + text + " into an CombatRole. Returning IN_RESERVE.");
 
-        return IN_RESERVE;
+        return RESERVE;
     }
     // endregion File I/O
 
