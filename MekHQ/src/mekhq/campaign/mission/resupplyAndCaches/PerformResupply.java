@@ -73,6 +73,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 public class PerformResupply {
     private static final int NPC_CONVOY_MULTIPLIER = 10;
     private static final double INTERCEPTION_LOAD_INFLUENCE = 50;
+    public static final String RESUPPLY_LOOT_BOX_NAME = "Resupply";
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
@@ -626,7 +627,7 @@ public class PerformResupply {
             }
 
             Loot loot = new Loot();
-            loot.setName("Resupply");
+            loot.setName(RESUPPLY_LOOT_BOX_NAME);
 
             if (convoyContents != null) {
                 for (Part part : convoyContents) {
