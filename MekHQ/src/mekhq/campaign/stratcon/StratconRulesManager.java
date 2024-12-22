@@ -2455,19 +2455,7 @@ public class StratconRulesManager {
 
                     track.removeScenario(scenario);
 
-                    if (backingScenario.getStratConScenarioType().isResupply()) {
-                        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
-
-                        if (victory) {
-                            campaign.addReport(String.format(resources.getString("convoyRescuedStratCon.text"),
-                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                                CLOSING_SPAN_TAG));
-                        } else {
-                            campaign.addReport(String.format(resources.getString("convoyDefeatedStratCon.text"),
-                                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                                CLOSING_SPAN_TAG));
-                        }
-                    } else if (backingScenario.getStratConScenarioType().isLosTech()) {
+                    if (backingScenario.getStratConScenarioType().isLosTech()) {
                         if (victory) {
                             int roll = randomInt(10);
                             StarLeagueCache cache = new StarLeagueCache(campaign, ((AtBContract) mission),
