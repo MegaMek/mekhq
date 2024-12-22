@@ -26,7 +26,8 @@ import mekhq.campaign.autoresolve.acar.action.WithdrawAction;
 import mekhq.campaign.autoresolve.acar.action.WithdrawToHitData;
 import mekhq.campaign.autoresolve.acar.report.WithdrawReporter;
 import mekhq.campaign.unit.damage.DamageApplierChooser;
-import mekhq.utilities.Internationalization;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WithdrawActionHandler extends AbstractActionHandler {
 
@@ -59,30 +60,39 @@ public class WithdrawActionHandler extends AbstractActionHandler {
 
         var withdrawFormation = withdrawOpt.get();
         var toHit = WithdrawToHitData.compileToHit(game(), withdrawFormation);
-        if (withdrawFormation.isCrippled()) {
-            toHit.addModifier(3, Internationalization.getText("acar.withdraw.crippled"));
-        }
-
         var withdrawRoll = Compute.rollD6(2);
+
         // Reporting the start of the withdrawal attempt
         reporter.reportStartWithdraw(withdrawFormation, toHit);
         // Reporting the roll
         reporter.reportWithdrawRoll(withdrawFormation, withdrawRoll);
 
-        if (withdrawRoll.isTargetRollSuccess(11)) {
+        if (withdrawRoll.isTargetRollSuccess(toHit)) {
             // successful withdraw
             withdrawFormation.setDeployed(false);
+            AtomicInteger unitWithdrawn = new AtomicInteger();
             for (var unit : withdrawFormation.getUnits()) {
                 for (var element : unit.getElements()) {
                     game().getEntity(element.getId()).ifPresent(entity -> {
-                        entity.setDeployed(false);
-                        entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
-                        DamageApplierChooser.damageRemovedEntity(entity, entity.getRemovalCondition());
+                        // only withdraw live units
+                        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_IN_RETREAT &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_SALVAGEABLE &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_PUSHED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_CAPTURED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_EJECTED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_NEVER_JOINED)
+                        {
+                            entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
+                            unitWithdrawn.getAndIncrement();
+                        }
                         game().addUnitToGraveyard(entity);
                     });
                 }
             }
-            reporter.reportSuccessfulWithdraw();
+            if (unitWithdrawn.get() > 0) {
+                reporter.reportSuccessfulWithdraw();
+            }
             game().removeFormation(withdrawFormation);
         } else {
             reporter.reportFailedWithdraw();

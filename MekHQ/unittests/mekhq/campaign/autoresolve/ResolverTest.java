@@ -60,9 +60,7 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -101,22 +99,22 @@ public class ResolverTest {
     }
 
     static double lowerBoundTeam1() {
-        return 0.45;
+        return 0.35;
     }
     static double upperBoundTeam1() {
-        return 0.52;
+        return 0.50;
     }
     static double lowerBoundTeam2() {
-        return 0.45;
+        return 0.35;
     }
     static double upperBoundTeam2() {
-        return 0.52;
+        return 0.50;
     }
     static double lowerBoundDraw() {
-        return 0.01;
+        return 0.10;
     }
     static double upperBoundDraw() {
-        return 0.04;
+        return 0.20;
     }
 
     static TeamArrangement getTeamArrangement() {

@@ -23,6 +23,7 @@ import megamek.common.Compute;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.enums.GamePhase;
 import megamek.common.strategicBattleSystems.SBFUnit;
+import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
 import mekhq.campaign.autoresolve.acar.action.MoraleCheckAction;
 import mekhq.campaign.autoresolve.acar.action.RecoveringNerveAction;
@@ -47,8 +48,8 @@ public class EndPhase extends PhaseHandler {
     protected void executePhase() {
         reporter.endPhaseHeader();
         checkUnitDestruction();
-        checkWithdrawingForces();
         checkMorale();
+        checkWithdrawingForces();
         checkRecoveringNerves();
         forgetEverything();
     }
@@ -110,20 +111,26 @@ public class EndPhase extends PhaseHandler {
         formations.forEach(Formation::reset);
     }
 
+    private static final WeightedDoubleMap<Integer> REMOVAL_CONDITIONS_TABLE = WeightedDoubleMap.of(
+        IEntityRemovalConditions.REMOVE_SALVAGEABLE, 2,
+        IEntityRemovalConditions.REMOVE_DEVASTATED, 5,
+        IEntityRemovalConditions.REMOVE_EJECTED, 10
+    );
+
+    private static final WeightedDoubleMap<Integer> REMOVAL_CONDITIONS_TABLE_NO_EJECTION = WeightedDoubleMap.of(
+        IEntityRemovalConditions.REMOVE_SALVAGEABLE, 3,
+        IEntityRemovalConditions.REMOVE_DEVASTATED, 7
+    );
+
     public void destroyUnits(Formation formation, List<SBFUnit> destroyedUnits) {
         for (var unit : destroyedUnits) {
             for (var element : unit.getElements()) {
                 var entityOpt = getContext().getEntity(element.getId());
                 if (entityOpt.isPresent()) {
                     var entity = entityOpt.get();
-                    var firstRemovalCondition = entity.isEjectionPossible() ?
-                        IEntityRemovalConditions.REMOVE_EJECTED : IEntityRemovalConditions.REMOVE_SALVAGEABLE;
-
-                    switch (Compute.rollD6(2).getIntValue()) {
-                        case 3, 4, 10, 11 -> entity.setRemovalCondition(firstRemovalCondition);
-                        case 2, 12 -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
-                        default -> entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_SALVAGEABLE);
-                    }
+                    var removalConditionTable = entity.isEjectionPossible() ?
+                        REMOVAL_CONDITIONS_TABLE : REMOVAL_CONDITIONS_TABLE_NO_EJECTION;
+                    entity.setRemovalCondition(removalConditionTable.randomItem());
 
                     reporter.reportUnitDestroyed(entity);
                     getContext().addUnitToGraveyard(entity);

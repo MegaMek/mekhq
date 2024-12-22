@@ -66,6 +66,14 @@ public class ForceToFormationConverter extends BaseFormationConverter<Formation>
         }
         formation.setName(force.getName());
         formation.setStdDamage(setStdDamageForFormation(formation));
+        for (var unit : formation.getUnits()) {
+            var health = 0;
+            for (var element : unit.getElements()) {
+                health += element.getCurrentArmor() + element.getCurrentStructure();
+            }
+            unit.setArmor(health);
+            unit.setCurrentArmor(health);
+        }
         return formation;
     }
 

@@ -32,8 +32,11 @@ public interface DamageApplier<E extends Entity> {
     MMLogger logger = MMLogger.create(DamageApplier.class);
 
     record HitDetails(HitData hit, int damageToApply, int setArmorValueTo, boolean hitInternal, int hitCrew) {
-        public HitDetails withIncrementedHitCrew() {
-            return new HitDetails(hit, damageToApply, setArmorValueTo, hitInternal, hitCrew + 1);
+        public HitDetails withCrewDamage(int crewDamage) {
+            return new HitDetails(hit, damageToApply, setArmorValueTo, hitInternal, crewDamage);
+        }
+        public HitDetails killsCrew() {
+            return new HitDetails(hit, damageToApply, setArmorValueTo, hitInternal, Crew.DEATH);
         }
     }
 
@@ -110,10 +113,9 @@ public interface DamageApplier<E extends Entity> {
      * @param hitDetails the hit details
      */
     default void applyDamage(HitDetails hitDetails) {
-        damageArmor(hitDetails);
+        hitDetails = damageArmor(hitDetails);
         if (hitDetails.hitInternal()) {
-            hitDetails = hitDetails.withIncrementedHitCrew();
-            damageInternals(hitDetails);
+            hitDetails = damageInternals(hitDetails);
         }
         tryToDamageCrew(hitDetails.hitCrew());
     }
@@ -130,7 +132,7 @@ public interface DamageApplier<E extends Entity> {
      *
      * @param hitDetails the hit details
      */
-    default void damageInternals(HitDetails hitDetails) {
+    default HitDetails damageInternals(HitDetails hitDetails) {
         HitData hit = hitDetails.hit();
         var entity = entity();
         int currentInternalValue = entity.getInternal(hit);
@@ -140,17 +142,19 @@ public interface DamageApplier<E extends Entity> {
         entity.setInternal(newInternalValue, hit);
         applyDamageToEquipments(hit);
         if (newInternalValue == 0) {
-            destroyLocation(hit);
+            hitDetails = destroyLocation(hitDetails);
         }
+        return hitDetails;
     }
 
     /**
      * Destroys the location of the entity. This one is used when you have the HitData.
      *
-     * @param hit the hit data with information about the location
+     * @param hitDetails the hit details with information about the location
      */
-    default void destroyLocation(HitData hit) {
-        destroyLocation(hit.getLocation());
+    default HitDetails destroyLocation(HitDetails hitDetails) {
+        destroyLocation(hitDetails.hit().getLocation());
+        return hitDetails.killsCrew();
     }
 
     /**
@@ -163,7 +167,6 @@ public interface DamageApplier<E extends Entity> {
         logger.trace("[{}] Destroying location {}", entity.getDisplayName(), location);
         entity.destroyLocation(location);
         entity.setDestroyed(true);
-        tryToDamageCrew(Crew.DEATH);
         setEntityDestroyed(entity);
     }
 
@@ -174,7 +177,7 @@ public interface DamageApplier<E extends Entity> {
      * @param hitCrew the amount of hits to apply to ALL crew
      */
     default void tryToDamageCrew(int hitCrew) {
-        if ((hitCrew == 0) || (entity().getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)) {
+        if (hitCrew == 0) {
             return;
         }
 
@@ -184,7 +187,6 @@ public interface DamageApplier<E extends Entity> {
             return;
         }
         var hits = tryToNotKillTheCrew(hitCrew, crew);
-        if (hits == null) return;
 
         crew.setHits(hits, 0);
         logger.trace("[{}] Crew hit ({} hits)", entity().getDisplayName(), crew.getHits());
@@ -205,18 +207,14 @@ public interface DamageApplier<E extends Entity> {
      */
     private Integer tryToNotKillTheCrew(int hitCrew, Crew crew) {
         var hits = Math.min(crew.getHits() + hitCrew, Crew.DEATH);
-        if (hits == Crew.DEATH) {
-            if (Compute.rollD6(2).isTargetRollSuccess(3)) {
-                hits = Compute.randomIntInclusive(Crew.DEATH);
-            }
-        }
 
-        if ((crewMustSurvive()) || (hits == Crew.DEATH)) {
+        if (hits == Crew.DEATH) {
+            if (crewMustSurvive()) {
+                hits = Compute.randomIntInclusive(4) + 1;
+            }
             if (tryToEjectCrew()) {
                 destroyLocationAfterEjection();
-                return null;
             }
-            hits = Crew.DEATH - 1;
         }
         return hits;
     }
@@ -289,10 +287,11 @@ public interface DamageApplier<E extends Entity> {
      *
      * @param hitDetails the hit details
      */
-    default void damageArmor(HitDetails hitDetails) {
+    default HitDetails damageArmor(HitDetails hitDetails) {
         var currentArmorValue = Math.max(hitDetails.setArmorValueTo(), 0);
         entity().setArmor(currentArmorValue, hitDetails.hit());
         logger.trace("[{}] Damage: {} - Armor at: {}", entity().getDisplayName(), hitDetails.damageToApply(), currentArmorValue);
+        return hitDetails;
     }
 
     /**

@@ -345,13 +345,18 @@ public class SimulationContext implements IGame {
     public List<InGameObject> getGraveyard() {
         List<InGameObject> destroyed = new ArrayList<>();
         for (Entity entity : this.graveyard) {
-            if ((entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_SALVAGEABLE)
-                || (entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_EJECTED)) {
+            if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_IN_RETREAT) {
                 destroyed.add(entity);
             }
         }
 
         return destroyed;
+    }
+
+    public List<Entity> getRetreatingUnits() {
+        return this.graveyard.stream()
+            .filter(entity -> entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_IN_RETREAT)
+            .toList();
     }
 
     public int getLiveDeployedEntitiesOwnedBy(Player player) {

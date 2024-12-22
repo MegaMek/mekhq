@@ -37,7 +37,7 @@ public record InfantryDamageApplier(Infantry entity) implements DamageApplier<In
     }
 
     @Override
-    public void damageArmor(HitDetails hitDetails) {
+    public HitDetails damageArmor(HitDetails hitDetails) {
         if (entity() instanceof BattleArmor te) {
             for (int i = 0; i < te.getTroopers(); i++) {
                 var currentValueArmor = te.getArmor(BattleArmor.LOC_SQUAD);
@@ -50,10 +50,11 @@ public record InfantryDamageApplier(Infantry entity) implements DamageApplier<In
         if (entity().isCrippled()) {
             entity().setDestroyed(true);
         }
+        return hitDetails;
     }
 
     @Override
-    public void damageInternals(HitDetails hitDetails) {
+    public HitDetails damageInternals(HitDetails hitDetails) {
         if (entity() instanceof BattleArmor te) {
             for (int i = 0; i < te.getTroopers(); i++) {
                 var currentValue = te.getInternal(BattleArmor.LOC_SQUAD);
@@ -71,5 +72,6 @@ public record InfantryDamageApplier(Infantry entity) implements DamageApplier<In
         if (entity().isCrippled()) {
             entity().setDestroyed(true);
         }
+        return hitDetails;
     }
 }

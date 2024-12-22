@@ -36,7 +36,7 @@ public class Formation extends SBFFormation {
     private final Memory memory = new Memory();
     private boolean clanFormation = false;
     private ASDamageVector stdDamage;
-
+    private boolean highStressEpisode = false;
     public Memory getMemory() {
         return memory;
     }
@@ -86,12 +86,13 @@ public class Formation extends SBFFormation {
     }
 
     public void setHighStressEpisode() {
-        getMemory().put("highStressEpisode", true);
+        highStressEpisode = true;
     }
 
     public void reset() {
         targetFormationId = Entity.NONE;
         engagementControl = null;
+        highStressEpisode = false;
         getMemory().clear();
         setDone(false);
     }
@@ -101,7 +102,7 @@ public class Formation extends SBFFormation {
     }
 
     public boolean hadHighStressEpisode() {
-        return (Boolean) getMemory().get("highStressEpisode").orElse(false);
+        return highStressEpisode;
     }
 
 
@@ -114,11 +115,18 @@ public class Formation extends SBFFormation {
             var halfOfUnitsDoZeroDamage = getUnits().stream()
                 .filter(u -> !u.getCurrentDamage().hasDamage())
                 .count() >= Math.ceil(getUnits().size() / 2.0);
+
             var hasVeryDamagedMovement = (getCurrentMovement() <= 1) && (getMovement() >= 3);
 
-            var halfOfUnitsHaveTwentyPercentOfArmorOrLess = getUnits().stream()
-                .filter(u -> u.getCurrentArmor() <= Math.floor(0.2 * u.getArmor()))
-                .count() >= Math.ceil(getUnits().size() / 2.0);
+            var totalUnits = getUnits().size();
+            var lessThan20PercentOfArmorOrLess = 0;
+            for (var units : getUnits()) {
+                if (((double) units.getCurrentArmor() / units.getArmor()) <= 0.2) {
+                    lessThan20PercentOfArmorOrLess++;
+                }
+            }
+
+            var halfOfUnitsHaveTwentyPercentOfArmorOrLess = lessThan20PercentOfArmorOrLess >= Math.ceil(totalUnits / 2.0);
 
             var halfOfUnitsTookTwoTargetDamageOrMore = getUnits().stream()
                 .filter(u -> u.getTargetingCrits() >= 2)
