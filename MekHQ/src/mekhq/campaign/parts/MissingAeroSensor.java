@@ -138,14 +138,16 @@ public class MissingAeroSensor extends MissingPart {
         return PartRepairType.ELECTRONICS;
     }
 
+    // This function is over-ridden from it's parent because Aero Sensors depend on tonnage for small craft, but not for dropships/warships
+    //So we have to use regexes to change the acquistion name if the sensors are for spacecraft
     @Override
     public String getAcquisitionName() {
-        String[] parts = super.getAcquisitionName().split("(?<=\\()|(?=\\))");
         for(int i = 0; i < parts.length; i++) {
             System.out.println(parts[i]);
         }
         System.out.println("\n");
         if(dropship) {
+            //The below regex splits by the () characters but keeps them in the description
             String[] sliced = super.getAcquisitionName().split("(?<=\\()|(?=\\))");
             String descString = sliced[0] + sliced[2] + sliced[3];
             return descString;
