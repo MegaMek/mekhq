@@ -65,13 +65,13 @@ public record PhaseEndManager(SimulationManager simulationManager) implements Si
                 break;
             case END:
                 simulationManager.getActionsProcessor().handleActions();
-                phaseCleanup();
+                endPhaseCleanup();
                 if (simulationManager.isVictory()) {
                     simulationManager.changePhase(GamePhase.VICTORY);
                 }
                 break;
             case VICTORY:
-                phaseCleanup();
+                endPhaseCleanup();
             case STARTING_SCENARIO:
             default:
                 break;
@@ -79,6 +79,11 @@ public record PhaseEndManager(SimulationManager simulationManager) implements Si
     }
 
     private void phaseCleanup() {
+        simulationManager.resetPlayersDone();
+        simulationManager.resetFormationsDone();
+        simulationManager.flushPendingReports();
+    }
+    private void endPhaseCleanup() {
         simulationManager.resetPlayersDone();
         simulationManager.resetFormations();
         simulationManager.flushPendingReports();

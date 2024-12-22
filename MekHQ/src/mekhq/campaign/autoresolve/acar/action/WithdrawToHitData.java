@@ -33,8 +33,20 @@ public class WithdrawToHitData extends TargetRoll {
     public static WithdrawToHitData compileToHit(SimulationContext game, Formation formation) {
         var toHit = new WithdrawToHitData(formation.getTactics(), Internationalization.getText("acar.formation_tactics"));
         processFormationModifiers(toHit, formation);
+        processJumpModifiers(toHit, formation);
         processMorale(toHit, formation);
+        processIsCrippled(toHit, formation);
         return toHit;
+    }
+
+    private static void processIsCrippled(WithdrawToHitData toHit, Formation formation) {
+        if (formation.isCrippled()) {
+            toHit.addModifier(1, Internationalization.getText("acar.withdraw.crippled"));
+        }
+    }
+
+    private static void processJumpModifiers(WithdrawToHitData toHit, Formation formation) {
+        toHit.addModifier( 2 - formation.getJumpMove(), Internationalization.getText("acar.jump_modifier"));
     }
 
     private static void processFormationModifiers(WithdrawToHitData toHit, Formation formation) {

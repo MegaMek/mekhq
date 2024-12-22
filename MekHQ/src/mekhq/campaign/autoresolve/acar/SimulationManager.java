@@ -108,6 +108,12 @@ public class SimulationManager extends AbstractGameManager {
         }
     }
 
+    public void resetFormationsDone() {
+        for (var formation : getGame().getActiveFormations()) {
+            formation.setDone(false);
+        }
+    }
+
     public void resetFormations() {
         for (var formation : getGame().getActiveFormations()) {
             formation.reset();

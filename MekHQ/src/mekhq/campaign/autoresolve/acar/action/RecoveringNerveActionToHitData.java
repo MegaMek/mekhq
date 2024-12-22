@@ -34,9 +34,8 @@ public class RecoveringNerveActionToHitData extends TargetRoll {
         if (recoveringNerveAction.isInvalid(game)) {
             return new RecoveringNerveActionToHitData(TargetRoll.IMPOSSIBLE, Internationalization.getText("acar.invalid_nerve_recovering"));
         }
-        //noinspection OptionalGetWithoutIsPresent
-        var formation = game.getFormation(recoveringNerveAction.getEntityId()).get();
-        RecoveringNerveActionToHitData toHit = new RecoveringNerveActionToHitData(formation.getMorale(), Internationalization.getText("acar.formation_morale"));
+        var formation = game.getFormation(recoveringNerveAction.getEntityId()).orElseThrow();
+        RecoveringNerveActionToHitData toHit = new RecoveringNerveActionToHitData(3 + formation.getSkill(), Internationalization.getText("acar.formation_morale"));
         processSkill(toHit, formation);
         return toHit;
     }
