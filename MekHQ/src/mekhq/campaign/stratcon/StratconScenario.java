@@ -141,10 +141,20 @@ public class StratconScenario implements IStratconDisplayable {
     @XmlElementWrapper(name = "primaryForceIDs")
     @XmlElement(name = "primaryForceID")
     public ArrayList<Integer> getPrimaryForceIDs() {
+        // <50.02 compatibility handler
+        if (primaryForceIDs == null) {
+            primaryForceIDs = new ArrayList<>();
+        }
+
         return primaryForceIDs;
     }
 
     public void setPrimaryForceIDs(ArrayList<Integer> primaryForceIDs) {
+        // <50.02 compatibility handler
+        if (primaryForceIDs == null) {
+            primaryForceIDs = new ArrayList<>();
+        }
+
         this.primaryForceIDs = primaryForceIDs;
     }
 

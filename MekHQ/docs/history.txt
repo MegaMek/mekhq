@@ -149,6 +149,8 @@ MEKHQ VERSION HISTORY:
 + Fix #5464: Adjusted Force Multipliers in Emergency Convoy Defense - VTOL Scenario Template
 + PR #5489: Fixed NPE when Searching for Primary Force in StratCon Scenario Generation
 + PR #5477: Rewrote & Reworked Training Combat Role
++ Fix #5506: Updated Force Refresh Logic in TOEMouseAdapter
++ Fix #5512: Added Compatibility Handlers for Legacy Save File Support
 
 
 0.50.01 (2024-11-10 1800 UTC)
