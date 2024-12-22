@@ -419,7 +419,11 @@ public class Resupply {
             return false;
         }
 
-        return entity.isLargeCraft() || entity.isSuperHeavy() || entity.isConventionalInfantry();
+        return entity.isWarShip()
+            || entity.isSmallCraft()
+            || entity.isLargeCraft()
+            || entity.isSuperHeavy()
+            || entity.isConventionalInfantry();
     }
 
     /**
@@ -513,11 +517,17 @@ public class Resupply {
      * @return A map of part names with their corresponding details (e.g., weight).
      */
     private Map<String, PartDetails> collectParts() {
-        final Collection<Unit> units = campaign.getUnits();
+        final Collection<UUID> unitIds = campaign.getForce(0).getAllUnits(true);
         Map<String, PartDetails> processedParts = new HashMap<>();
 
         try {
-            for (Unit unit : units) {
+            for (UUID unitId : unitIds) {
+                Unit unit = campaign.getUnit(unitId);
+
+                if (unit == null) {
+                    continue;
+                }
+
                 Entity entity = unit.getEntity();
 
                 if (entity == null) {
