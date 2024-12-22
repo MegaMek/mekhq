@@ -111,7 +111,7 @@ public class VictoryPhaseReporter {
             .toList();
 
         reportConsumer.accept(new PublicReportEntry(5007).add(new PlayerNameReportEntry(player).reportText())
-            .add(deadEntities.size()).indent());
+            .add(retreatingEntities.size()).indent());
 
         for (var entity : retreatingEntities) {
             reportConsumer.accept(new PublicReportEntry(5004)
