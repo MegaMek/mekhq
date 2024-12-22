@@ -96,20 +96,23 @@ public record MekDamageApplier(Mek entity, boolean crewMustSurvive, boolean enti
 
 
     @Override
-    public void destroyLocation(HitData hit) {
+    public HitDetails destroyLocation(HitDetails hitDetails) {
         var entity = entity();
+        var hit = hitDetails.hit();
         entity.destroyLocation(hit.getLocation());
         if (hit.getLocation() == Mek.LOC_CT || hit.getLocation() == Mek.LOC_HEAD) {
             entity.setDestroyed(true);
             if (hit.getLocation() == Mek.LOC_HEAD) {
-                var toHit = new ToHitData();
-                toHit.addModifier(4, "Ejection");
-                if (rollD6(2).isTargetRollSuccess(toHit)) {
-                    if (!tryToEjectCrew()) {
-                        tryToDamageCrew(Compute.randomRealIntInclusive(5));
+                if (entity.isEjectionPossible()) {
+                    var toHit = new ToHitData();
+                    toHit.addModifier(4, "Ejection");
+                    if (rollD6(2).isTargetRollSuccess(toHit)) {
+                        hitDetails = hitDetails.withCrewDamage(2);
+                    } else {
+                        hitDetails = hitDetails.killsCrew();
                     }
                 } else {
-                    tryToDamageCrew(Crew.DEATH);
+                    hitDetails = hitDetails.killsCrew();
                 }
                 DamageApplier.setEntityDestroyed(entity);
             } else {
@@ -118,11 +121,15 @@ public record MekDamageApplier(Mek entity, boolean crewMustSurvive, boolean enti
                 logger.trace("[{}] Mek devastated!", entity.getDisplayName());
             }
         }
+        if (hit.getLocation() == Mek.LOC_RLEG || hit.getLocation() == Mek.LOC_LLEG) {
+            // leg destroyed causes a fall which damages the pilot
+            hitDetails.withCrewDamage(1);
+        }
+        return hitDetails;
     }
 
     @Override
     public void applyDamageToEquipments(HitData hit) {
-
         var entity = entity();
         var criticalSlots = entity.getCriticalSlots(hit.getLocation());
         Collections.shuffle(criticalSlots);
@@ -139,6 +146,9 @@ public record MekDamageApplier(Mek entity, boolean crewMustSurvive, boolean enti
                 break;
             }
         }
+        // TODO: check if damage on ammo
+        // TODO: check if damage on life support
+        // TODO: check if damage on cockpit
     }
 
     @Override
@@ -148,7 +158,7 @@ public record MekDamageApplier(Mek entity, boolean crewMustSurvive, boolean enti
     }
 
     @Override
-    public  void damageInternals(HitDetails hitDetails) {
+    public  HitDetails damageInternals(HitDetails hitDetails) {
         HitData hit = hitDetails.hit();
         var entity = entity();
         int currentInternalValue = entity.getInternal(hit);
@@ -160,8 +170,9 @@ public record MekDamageApplier(Mek entity, boolean crewMustSurvive, boolean enti
         entity.setInternal(newInternalValue, hit);
         applyDamageToEquipments(hit);
         if (newInternalValue == 0) {
-            destroyLocation(hit);
+            hitDetails = destroyLocation(hitDetails);
         }
+        return hitDetails;
     }
 
     private boolean canLoseLocation(HitData hitData) {

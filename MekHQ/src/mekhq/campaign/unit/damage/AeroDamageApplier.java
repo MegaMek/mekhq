@@ -60,7 +60,7 @@ public record AeroDamageApplier(Aero entity, boolean crewMustSurvive, boolean en
     }
 
     @Override
-    public void damageInternals(HitDetails hitDetails) {
+    public HitDetails damageInternals(HitDetails hitDetails) {
         HitData hit = hitDetails.hit();
         var entity = entity();
         int currentInternalValue = entity.getSI();
@@ -69,7 +69,8 @@ public record AeroDamageApplier(Aero entity, boolean crewMustSurvive, boolean en
         entity.setSI(newInternalValue);
         applyDamageToEquipments(hit);
         if (newInternalValue == 0) {
-            destroyLocation(hit);
+            hitDetails = destroyLocation(hitDetails);
         }
+        return hitDetails;
     }
 }

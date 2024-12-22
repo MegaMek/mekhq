@@ -26,7 +26,6 @@ import mekhq.campaign.autoresolve.acar.action.WithdrawAction;
 import mekhq.campaign.autoresolve.acar.action.WithdrawToHitData;
 import mekhq.campaign.autoresolve.acar.report.WithdrawReporter;
 import mekhq.campaign.unit.damage.DamageApplierChooser;
-import mekhq.utilities.Internationalization;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
