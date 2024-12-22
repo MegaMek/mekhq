@@ -74,14 +74,19 @@ public class WithdrawActionHandler extends AbstractActionHandler {
             for (var unit : withdrawFormation.getUnits()) {
                 for (var element : unit.getElements()) {
                     game().getEntity(element.getId()).ifPresent(entity -> {
-                        entity.setDeployed(false);
                         // only withdraw live units
-                        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_UNKNOWN) {
+                        if (entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_IN_RETREAT &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_DEVASTATED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_SALVAGEABLE &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_PUSHED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_CAPTURED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_EJECTED &&
+                            entity.getRemovalCondition() != IEntityRemovalConditions.REMOVE_NEVER_JOINED)
+                        {
                             entity.setRemovalCondition(IEntityRemovalConditions.REMOVE_IN_RETREAT);
-                            DamageApplierChooser.damageRemovedEntity(entity, entity.getRemovalCondition());
-                            game().addUnitToGraveyard(entity);
                             unitWithdrawn.getAndIncrement();
                         }
+                        game().addUnitToGraveyard(entity);
                     });
                 }
             }

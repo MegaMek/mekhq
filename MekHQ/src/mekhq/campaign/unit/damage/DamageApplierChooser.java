@@ -105,6 +105,7 @@ public class DamageApplierChooser {
             case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
             default -> entity.getTotalOArmor() * 0.33;
         };
+
         var numberOfDices = Math.max(1, (int) (targetDamage / 6 / 0.6));
         var damage = Compute.d6(numberOfDices);
         var clusterSize = 5;

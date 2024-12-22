@@ -22,6 +22,7 @@ package mekhq.campaign.autoresolve.acar.report;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.Player;
+import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
 
 import java.util.ArrayList;
@@ -96,6 +97,23 @@ public class VictoryPhaseReporter {
             .add(deadEntities.size()).indent());
 
         for (var entity : deadEntities) {
+            reportConsumer.accept(new PublicReportEntry(5004)
+                .add(new EntityNameReportEntry(entity).reportText())
+                .add(String.format("%.2f%%", entity.getArmorRemainingPercent() * 100))
+                .add(String.format("%.2f%%", entity.getInternalRemainingPercent() * 100))
+                .add(entity.getCrew().getName())
+                .add(entity.getCrew().getHits())
+                .indent(2));
+        }
+
+        var retreatingEntities = ((SimulationContext) game).getRetreatingUnits().stream()
+            .filter(e -> e.getOwnerId() == player.getId())
+            .toList();
+
+        reportConsumer.accept(new PublicReportEntry(5007).add(new PlayerNameReportEntry(player).reportText())
+            .add(deadEntities.size()).indent());
+
+        for (var entity : retreatingEntities) {
             reportConsumer.accept(new PublicReportEntry(5004)
                 .add(new EntityNameReportEntry(entity).reportText())
                 .add(String.format("%.2f%%", entity.getArmorRemainingPercent() * 100))

@@ -118,18 +118,15 @@ public class Formation extends SBFFormation {
 
             var hasVeryDamagedMovement = (getCurrentMovement() <= 1) && (getMovement() >= 3);
 
-            var totalElements = 0;
+            var totalUnits = getUnits().size();
             var lessThan20PercentOfArmorOrLess = 0;
             for (var units : getUnits()) {
-                for (var element : units.getElements()) {
-                    totalElements += 1;
-                    if (element.getCurrentArmor() <= Math.floor(0.2 * element.getFullArmor())) {
-                        lessThan20PercentOfArmorOrLess += 1;
-                    }
+                if (((double) units.getCurrentArmor() / units.getArmor()) <= 0.2) {
+                    lessThan20PercentOfArmorOrLess++;
                 }
             }
 
-            var halfOfUnitsHaveTwentyPercentOfArmorOrLess = lessThan20PercentOfArmorOrLess >= Math.ceil(totalElements / 2.0);
+            var halfOfUnitsHaveTwentyPercentOfArmorOrLess = lessThan20PercentOfArmorOrLess >= Math.ceil(totalUnits / 2.0);
 
             var halfOfUnitsTookTwoTargetDamageOrMore = getUnits().stream()
                 .filter(u -> u.getTargetingCrits() >= 2)
