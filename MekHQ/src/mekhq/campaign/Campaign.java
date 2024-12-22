@@ -4578,23 +4578,23 @@ public class Campaign implements ITechManager {
         autosaveService.requestDayAdvanceAutosave(this);
 
         // Advance the day by one
-        final LocalDate yesterday = getLocalDate();
-        setLocalDate(getLocalDate().plusDays(1));
+        final LocalDate yesterday = currentDay;
+        currentDay = currentDay.plusDays(1);
 
         // Determine if we have an active contract or not, as this can get used
         // elsewhere before we actually hit the AtB new day (e.g., personnel market)
-        if (getCampaignOptions().isUseAtB()) {
+        if (campaignOptions.isUseAtB()) {
             setHasActiveContract();
         }
 
         // Clear Reports
-        getCurrentReport().clear();
-        setCurrentReportHTML("");
+        currentReport.clear();
+        currentReportHTML="";
         newReports.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
-        if (getLocalDate().getDayOfYear() == 1) {
+        if (currentDay.getDayOfYear() == 1) {
             // News is reloaded
             reloadNews();
 
@@ -4604,17 +4604,17 @@ public class Campaign implements ITechManager {
 
         readNews();
 
-        getLocation().newDay(this);
+        location.newDay(this);
 
         // Manage the Markets
-        getPersonnelMarket().generatePersonnelForDay(this);
+        personnelMarket.generatePersonnelForDay(this);
 
         // TODO : AbstractContractMarket : Uncomment
         // getContractMarket().processNewDay(this);
-        getUnitMarket().processNewDay(this);
+        unitMarket.processNewDay(this);
 
         // Process New Day for AtB
-        if (getCampaignOptions().isUseAtB()) {
+        if (campaignOptions.isUseAtB()) {
             processNewDayATB();
         }
 
@@ -4630,12 +4630,12 @@ public class Campaign implements ITechManager {
             processEducationNewDay();
         }
 
-        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
+        if ((campaignOptions.isEnableAutoAwards()) && (currentDay.getDayOfMonth() == 1)) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(this, false);
         }
 
-        if ((getLocation().isOnPlanet()) && (getLocalDate().getDayOfMonth() == 1)) {
+        if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
             processRandomDependents();
         }
 
@@ -4648,17 +4648,12 @@ public class Campaign implements ITechManager {
         setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
-        getFinances().newDay(this, yesterday, getLocalDate());
+        finances.newDay(this, yesterday, getLocalDate());
 
         // process removal of old personnel data on the last day of each month
         if ((campaignOptions.isUsePersonnelRemoval())
-                && (getLocalDate().getMonth().length(false) == getLocalDate().getDayOfMonth())) {
+                && (currentDay.getMonth().length(false) == currentDay.getDayOfMonth())) {
             processPersonnelRemoval();
-        }
-
-        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.ManualController(this, false);
         }
 
         // this duplicates any turnover information so that it is still available on the
@@ -4670,7 +4665,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (topUpWeekly == true && getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (topUpWeekly && currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
             int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, ignoreSparesUnderQuality));
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
