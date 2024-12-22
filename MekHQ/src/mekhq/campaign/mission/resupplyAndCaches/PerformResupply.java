@@ -601,17 +601,19 @@ public class PerformResupply {
         // scenario, or a facility. If the player is really lucky, the scenario will spawn on top
         // of a force already deployed to the Strategic Map.
         StratconScenario scenario = generateExternalScenario(campaign, contract, track,
-            null, template, false);
+            null, template, false, 0);
 
         // If we successfully generated a scenario, we need to make a couple of final
         // adjustments, including assigning the Resupply contents as loot and
         // assigning a player convoy (if appropriate)
         if (scenario != null) {
             AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-            backingScenario.setDate(campaign.getLocalDate());
 
             if (targetConvoy != null) {
-                backingScenario.addForce(targetConvoy.getId(), "Player");
+                String currentName = backingScenario.getName();
+                backingScenario.setName(currentName + " - " + targetConvoy.getName());
+
+                backingScenario.addForce(targetConvoy.getId(), ScenarioTemplate.PRIMARY_PLAYER_FORCE_ID);
                 targetConvoy.setScenarioId(backingScenario.getId(), campaign);
                 scenario.commitPrimaryForces();
             }
