@@ -61,6 +61,7 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
 import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
 
 /**
@@ -1559,11 +1560,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         tracker.assignKills();
 
-        //now get loot
-        if (((ScenarioStatus) Objects.requireNonNull(choiceStatus.getSelectedItem())).isOverallVictory()) {
+        boolean isResupply = tracker.getScenario().getStratConScenarioType().isResupply();
+        boolean isOverallVictory = ((ScenarioStatus) Objects.requireNonNull(choiceStatus.getSelectedItem())).isOverallVictory();
+        if (isOverallVictory || isResupply) {
             for (int i = 0; i < lootBoxes.size(); i++) {
                 JCheckBox box = lootBoxes.get(i);
-                if (box.isSelected()) {
+                if (box.isSelected()
+                    && (!isResupply || loots.get(i).getName().equals(RESUPPLY_LOOT_BOX_NAME))) {
                     tracker.addLoot(loots.get(i));
                 }
             }
