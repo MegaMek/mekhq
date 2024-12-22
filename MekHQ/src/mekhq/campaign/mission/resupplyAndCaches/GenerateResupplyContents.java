@@ -48,6 +48,13 @@ public class GenerateResupplyContents {
     private static final MMLogger logger = MMLogger.create(GenerateResupplyContents.class);
 
     private static final Money HIGH_VALUE_ITEM = Money.of(250000);
+    /**
+     * Some parts are weightless, so we include a nominal weight for those.
+     * <p>
+     * This minimum value can be hand waved as being the weight of the container the part is in.
+     */
+    public static final double RESUPPLY_MINIMUM_PART_WEIGHT = 0.1;
+
 
     /**
      * Enum representing different types of drops that can be generated during resupply.
@@ -147,7 +154,9 @@ public class GenerateResupplyContents {
                     case DROP_TYPE_AMMO -> ammoBinPool.remove(potentialPart);
                 }
 
-                availableSpace -= potentialPart.getTonnage() * WEIGHT_MULTIPLIER;
+                double partWeight = potentialPart.getTonnage();
+                partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
+                availableSpace -= partWeight * WEIGHT_MULTIPLIER;
 
                 if (availableSpace >= 0) {
                     droppedItems.add(potentialPart);
