@@ -668,7 +668,7 @@ public class Resupply {
                 if ((targetPartCount - spareCount) < 1) {
                     partsList.remove(part.toString());
                 } else {
-                    targetPart.setWeight(targetPartCount);
+                    targetPart.setWeight(min(1, targetPartCount - spareCount));
                 }
             }
         }
