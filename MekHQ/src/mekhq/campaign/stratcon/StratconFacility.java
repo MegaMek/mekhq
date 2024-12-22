@@ -47,7 +47,7 @@ public class StratconFacility implements Cloneable {
         TankBase,
         AirBase,
         ArtilleryBase,
-        SupplyDepot,
+        SpacePort,
         DataCenter,
         IndustrialFacility,
         CommandCenter,

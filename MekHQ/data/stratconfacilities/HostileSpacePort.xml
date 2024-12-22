@@ -1,0 +1,11 @@
+<StratconFacility>
+	<bvBudgetModifier>0.15</bvBudgetModifier>
+	<capturedDefinition>AlliedSpacePort.xml</capturedDefinition>
+	<displayableName>SpacePort</displayableName>
+	<localModifiers>HostileBVBudgetIncrease.xml</localModifiers>
+	<sharedModifiers>HostileBVBudgetIncrease.xml</sharedModifiers>
+	<facilityType>SpacePort</facilityType>
+	<owner>Opposing</owner>
+	<userDescription>Hostile forces on this track are significantly larger due to improved logistics.</userDescription>
+	<visible>false</visible>
+</StratconFacility>

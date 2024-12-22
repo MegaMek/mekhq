@@ -1,0 +1,9 @@
+<StratconFacility>
+	<capturedDefinition>HostileSpacePort.xml</capturedDefinition>
+	<displayableName>Space Port</displayableName>
+	<facilityType>SpacePort</facilityType>
+	<owner>Allied</owner>
+	<monthlySPModifier>2</monthlySPModifier>
+	<userDescription>Provides 2 SP/month of allied logistical support.</userDescription>
+	<visible>true</visible>
+</StratconFacility>
