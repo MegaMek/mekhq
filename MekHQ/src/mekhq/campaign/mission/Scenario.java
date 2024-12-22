@@ -878,7 +878,7 @@ public class Scenario implements IPlayerSettings {
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenario", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConScenarioType", stratConScenarioType.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConScenarioType", stratConScenarioType.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "report", report);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingPos", startingPos);
@@ -1013,8 +1013,8 @@ public class Scenario implements IPlayerSettings {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioType")) {
-                    retVal.setStratConScenarioType(ScenarioType.fromOrdinal(Integer.parseInt(wn2.getTextContent())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("stratConScenarioType")) {
+                    retVal.setStratConScenarioType(ScenarioType.valueOf(wn2.getTextContent().trim().toUpperCase()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(ScenarioStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
