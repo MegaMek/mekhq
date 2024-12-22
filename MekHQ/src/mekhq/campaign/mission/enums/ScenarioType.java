@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import megamek.logging.MMLogger;
-
 public enum ScenarioType {
     NONE,
     SPECIAL_LOSTECH,
@@ -37,17 +35,5 @@ public enum ScenarioType {
      */
     public boolean isResupply() {
         return this == SPECIAL_RESUPPLY;
-    }
-
-    public static ScenarioType fromOrdinal(int ordinal) {
-        final MMLogger logger = MMLogger.create(ScenarioType.class);
-
-        try {
-            return ScenarioType.values()[ordinal];
-        }  catch (IndexOutOfBoundsException e) {
-            logger.warn("Unknown scenario type {}, valid scenario types are {}",
-                ordinal, ScenarioType.values());
-            return ScenarioType.NONE;
-        }
     }
 }

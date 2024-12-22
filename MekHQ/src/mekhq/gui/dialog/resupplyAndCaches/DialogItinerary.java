@@ -319,16 +319,14 @@ public class DialogItinerary {
                 yield String.format(message, value);
             }
             case RESUPPLY_SMUGGLER -> {
-                String message = String.format(
-                    resources.getString("guerrillaSupplies" + randomInt(25) + ".text"),
-                    campaign.getCommanderAddress(true), getEnemyFactionReference(resupply),
-                    resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString());
-
                 String value = String.format(resources.getString("supplyCostFull.text"),
                     resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),
                     resupply.getConvoyContentsValueBase().toAmountAndSymbolString());
 
-                yield String.format(message, value);
+                yield String.format(
+                    resources.getString("guerrillaSupplies" + randomInt(25) + ".text"),
+                    campaign.getCommanderAddress(true), getEnemyFactionReference(resupply),
+                    resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(), value);
             }
         };
     }

@@ -350,7 +350,7 @@ class RequiredLancesTableModel extends DataTableModel {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
                     if (data.get(row).equals(combatTeam.getContract(campaign))
-                            && (combatTeam.getRole() != CombatRole.IN_RESERVE)
+                            && (combatTeam.getRole() != CombatRole.RESERVE)
                             && combatTeam.isEligible(campaign)) {
                         t++;
                     }
