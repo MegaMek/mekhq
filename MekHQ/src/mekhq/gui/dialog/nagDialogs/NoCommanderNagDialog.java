@@ -42,6 +42,16 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * @see AbstractMHQNagDialog_NEW
  */
 public class NoCommanderNagDialog extends AbstractMHQNagDialog_NEW {
+    /**
+     * Constructs a {@code NoCommanderNagDialog} for a campaign.
+     *
+     * <p>
+     * This dialog uses the localization key {@code "NoCommanderNagDialog.text"}
+     * to display a message informing the user about the absence of a commander in their campaign.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} for which the nag dialog is being triggered.
+     */
     public NoCommanderNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_NO_COMMANDER);
 
@@ -50,6 +60,19 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog_NEW {
             campaign.getCommanderAddress(false)));
     }
 
+    /**
+     * Checks whether the "No Commander" nag dialog should be displayed.
+     *
+     * <p>
+     * This method evaluates the following conditions:
+     * <ul>
+     *   <li>If the "No Commander" nag dialog is not flagged as ignored in the user settings.</li>
+     *   <li>If the campaign currently does not have a flagged commander.</li>
+     * </ul>
+     * If both conditions are true, the dialog is displayed.
+     *
+     * @param campaign The {@link Campaign} to check for a flagged commander.
+     */
     public void checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
 
