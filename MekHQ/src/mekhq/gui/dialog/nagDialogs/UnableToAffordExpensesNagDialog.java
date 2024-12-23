@@ -23,75 +23,81 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import javax.swing.*;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
 /**
- * This class represents a nag dialog displayed when the campaign does not have enough funds to
- * cover monthly expenses
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that warns the user if the campaign's available funds are insufficient to cover monthly expenses.
+ *
+ * <p>
+ * This dialog is designed to notify players when their campaign is at financial risk due to
+ * a shortage of funds relative to required monthly expenses. It calculates the total expenses
+ * for the current financial report and compares it with the campaign's available funds. If
+ * the funds are insufficient, the dialog is displayed to alert the player.
+ * </p>
  */
-public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "UnableToAffordExpensesNagDialog";
-    private static String DIALOG_TITLE = "UnableToAffordExpensesNagDialog.title";
-    private static String DIALOG_BODY = "UnableToAffordExpensesNagDialog.text";
+public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog_NEW {
+    private Money monthlyExpenses = Money.zero();
 
     /**
-     * Determines whether the given campaign is unable to afford its monthly expenses.
+     * Retrieves and calculates the campaign's total monthly expenses.
      *
-     * @param campaign the ongoing campaign
-     * @return {@code true} if the campaign's funds are less than the total deficit, {@code false} otherwise
-     */
-    static boolean isUnableToAffordExpenses (Campaign campaign) {
-        Money deficit = getMonthlyExpenses(campaign);
-
-        // check if the campaign's funds are less than the total deficit
-        return campaign.getFunds().isLessThan(deficit);
-    }
-
-    /**
-     * Calculates and returns the monthly expenses of a given campaign.
+     * <p>
+     * This method generates a {@link FinancialReport} for the campaign to compute the
+     * total monthly expenses, which are then stored in the {@code monthlyExpenses} field.
+     * The expenses include operational costs, unit upkeep, payroll, and other recurring items.
+     * </p>
      *
-     * @param campaign the campaign for which to calculate the monthly expenses
-     * @return the monthly expenses as a {@link Money} object
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    static Money getMonthlyExpenses(Campaign campaign) {
+    private void getMonthlyExpenses(Campaign campaign) {
         // calculate a financial report which includes the monthly expenses
         FinancialReport financialReport = FinancialReport.calculate(campaign);
 
         // get the total monthly expenses
-        return financialReport.getMonthlyExpenses();
+        monthlyExpenses = financialReport.getMonthlyExpenses();
     }
 
-    //region Constructors
     /**
-     * Creates a new instance of the {@link ShortDeploymentNagDialog} class.
+     * Constructs the nag dialog for insufficient campaign funds.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>
+     * This constructor initializes the dialog with the necessary campaign information
+     * and formats the displayed message to include the total monthly expenses and the
+     * commander's name or title.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public UnableToAffordExpensesNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES);
+    public UnableToAffordExpensesNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES);
+
+        final String DIALOG_BODY = "UnableToAffordExpensesNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false),
+            monthlyExpenses.toAmountAndSymbolString()));
     }
-    //endregion Constructors
 
     /**
-     * Checks if the campaign is able to afford its monthly expenses.
-     * If the campaign is unable to afford monthly expenses and the Nag dialog for the current key
-     * is not ignored, it sets the description using the specified format and returns {@code true}.
-     * Otherwise, it returns {@code false}.
+     * Determines whether the insufficient funds nag dialog should be displayed to the user.
+     *
+     * <p>
+     * The dialog is displayed if:
+     * <ul>
+     *     <li>The nag dialog for insufficient funds is not ignored in MekHQ options.</li>
+     *     <li>The campaign's available funds are less than the calculated monthly expenses.</li>
+     * </ul>
+     * If the conditions are met, the dialog is displayed to alert the player.
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    @Override
-    protected boolean checkNag() {
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUnableToAffordExpenses(getCampaign())) {
-            setDescription(String.format(
-                    resources.getString(DIALOG_BODY),
-                    getMonthlyExpenses(getCampaign()).toAmountAndSymbolString()));
-            return true;
-        }
+    public void checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES;
 
-        return false;
+        getMonthlyExpenses(campaign);
+
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && campaign.getFunds().isLessThan(monthlyExpenses)) {
+            showDialog();
+        }
     }
 }

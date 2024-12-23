@@ -77,7 +77,6 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog_NEW {
      * <p>
      * The dialog will be shown if the following conditions are met:
      * <ul>
-     *     <li>AtB campaigns are enabled in the campaign options.</li>
      *     <li>The nag dialog for prisoners is not ignored in MekHQ options.</li>
      *     <li>The campaign contains prisoners, as determined by {@link #hasPrisoners(Campaign)}.</li>
      * </ul>
@@ -89,8 +88,7 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog_NEW {
     public void checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_PRISONERS;
 
-        if (campaign.getCampaignOptions().isUseAtB()
-            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
             && (hasPrisoners(campaign))) {
             showDialog();
         }
