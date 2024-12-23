@@ -84,14 +84,12 @@ public abstract class AbstractMHQNagDialog_NEW extends JDialog {
     private static final MMLogger logger = MMLogger.create(AbstractMHQNagDialog_NEW.class);
 
     /**
-     * Constructs an AbstractMHQNagDialog_NEW with the provided campaign, owner, and nag key.
+     * Constructs an AbstractMHQNagDialog_NEW with the provided campaign and nag key.
      *
      * @param campaign The current campaign, used to determine speaker details and other contextual data.
-     * @param owner    The parent frame of the dialog (often the main application window).
      * @param nagKey   A unique key to identify this nag dialog for tracking ignore preferences.
      */
-    public AbstractMHQNagDialog_NEW(final Campaign campaign, final Frame owner, final String nagKey) {
-        super(owner, "", true);
+    public AbstractMHQNagDialog_NEW(final Campaign campaign, final String nagKey) {
         setTitle(resources.getString("incomingTransmission.title"));
 
         this.campaign = campaign;
@@ -191,7 +189,7 @@ public abstract class AbstractMHQNagDialog_NEW extends JDialog {
 
         // Dialog settings
         pack();
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
