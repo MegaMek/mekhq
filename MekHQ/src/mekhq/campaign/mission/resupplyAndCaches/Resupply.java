@@ -419,7 +419,10 @@ public class Resupply {
             return false;
         }
 
-        return entity.isLargeCraft() || entity.isSuperHeavy() || entity.isConventionalInfantry();
+        return entity.isSmallCraft()
+            || entity.isLargeCraft()
+            || entity.isSuperHeavy()
+            || entity.isConventionalInfantry();
     }
 
     /**
@@ -513,11 +516,17 @@ public class Resupply {
      * @return A map of part names with their corresponding details (e.g., weight).
      */
     private Map<String, PartDetails> collectParts() {
-        final Collection<Unit> units = campaign.getUnits();
+        final Collection<UUID> unitIds = campaign.getForce(0).getAllUnits(true);
         Map<String, PartDetails> processedParts = new HashMap<>();
 
         try {
-            for (Unit unit : units) {
+            for (UUID unitId : unitIds) {
+                Unit unit = campaign.getUnit(unitId);
+
+                if (unit == null) {
+                    continue;
+                }
+
                 Entity entity = unit.getEntity();
 
                 if (entity == null) {
@@ -528,7 +537,7 @@ public class Resupply {
                     continue;
                 }
 
-                if (!unit.isSalvage() && unit.isAvailable()) {
+                if (!unit.isSalvage() && (unit.isAvailable() || unit.isDeployed())) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
                         if (isIneligiblePart(part, unit)) {
@@ -658,7 +667,7 @@ public class Resupply {
                 if ((targetPartCount - spareCount) < 1) {
                     partsList.remove(part.toString());
                 } else {
-                    targetPart.setWeight(targetPartCount);
+                    targetPart.setWeight(min(1, targetPartCount - spareCount));
                 }
             }
         }

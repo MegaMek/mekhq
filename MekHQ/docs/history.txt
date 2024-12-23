@@ -151,7 +151,12 @@ MEKHQ VERSION HISTORY:
 + PR #5477: Rewrote & Reworked Training Combat Role
 + Fix #5506: Updated Force Refresh Logic in TOEMouseAdapter
 + Fix #5512: Added Compatibility Handlers for Legacy Save File Support
-
++ Fix #5500: Update contract scenarios to replace VIP Capture objectives
++ PR #5504: Fixed Duplicated autoAwards Trigger in New Day
++ PR #5501: Updated Resupply Mechanics, Added Documentation
++ Fix #5480: AutoLogistics requesting incorrect parts when variants of the same part exist in some cases
++ Fix #5479: AutoLogistics orders reset values
++ PR #5509: ACAR Improvements- Damage delivery more granular, fixed error with morale never checking
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

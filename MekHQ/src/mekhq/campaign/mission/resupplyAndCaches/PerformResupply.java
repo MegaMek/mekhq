@@ -45,10 +45,12 @@ import java.util.Map.Entry;
 import static java.lang.Math.floor;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.ROUTED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
+import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.getResupplyContents;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
@@ -72,6 +74,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 public class PerformResupply {
     private static final int NPC_CONVOY_MULTIPLIER = 10;
     private static final double INTERCEPTION_LOAD_INFLUENCE = 50;
+    public static final String RESUPPLY_LOOT_BOX_NAME = "Resupply";
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
@@ -282,6 +285,7 @@ public class PerformResupply {
 
             for (Part part : convoyContents) {
                 double tonnage = part.getTonnage();
+                tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
                 if (part instanceof AmmoBin || part instanceof Armor) {
                     tonnage *= WEIGHT_MULTIPLIER;
@@ -329,6 +333,12 @@ public class PerformResupply {
         }
 
         int interceptionChance = morale.ordinal();
+
+        // There isn't any chance of an interception if the enemy is Routed, so early-exit
+        if (interceptionChance == ROUTED.ordinal()) {
+            completeSuccessfulDelivery(resupply, convoyContents);
+            return;
+        }
 
         // This chance is modified by convoy weight, for player convoys this is easy - we just
         // calculate the weight of all units in the convoy. For NPC convoys, we need to get a bit
@@ -619,7 +629,7 @@ public class PerformResupply {
             }
 
             Loot loot = new Loot();
-            loot.setName("Resupply");
+            loot.setName(RESUPPLY_LOOT_BOX_NAME);
 
             if (convoyContents != null) {
                 for (Part part : convoyContents) {

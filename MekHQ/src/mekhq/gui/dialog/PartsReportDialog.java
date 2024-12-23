@@ -87,7 +87,7 @@ public class PartsReportDialog extends JDialog {
         this.gui = gui;
         this.campaign = gui.getCampaign();
         initComponents();
-        refreshOverviewPartsInUse();
+        updateOverviewPartsInUse();
         pack();
         setLocationRelativeTo(gui.getFrame());
 
@@ -379,6 +379,7 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void refreshOverviewSpecificPart(int row, PartInUse partInUse, IAcquisitionWork newPart) {
+        storePartInUseRequestedStock(partInUse);
         if (partInUse.equals(new PartInUse((Part) newPart))) {
             // Simple update
             campaign.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
@@ -390,7 +391,7 @@ public class PartsReportDialog extends JDialog {
         }
     }
 
-    private void refreshOverviewPartsInUse() {
+    private void updateOverviewPartsInUse() {
         overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
                 getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
@@ -402,6 +403,11 @@ public class PartsReportDialog extends JDialog {
                 .getCellRenderer();
         column.setEnabled(campaign.isGM());
         topUpGMButton.setEnabled(campaign.isGM());
+    }
+
+    private void refreshOverviewPartsInUse() {
+        storePartInUseRequestedStockMap();
+        updateOverviewPartsInUse();
     }
 
     private Set<PartInUse> getPartsInUseFromTable() {
@@ -439,6 +445,21 @@ public class PartsReportDialog extends JDialog {
             stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
         }
         campaign.setPartsInUseRequestedStockMap(stockMap);
+    }
+
+    private void storePartInUseRequestedStock(PartInUse partInUse) {
+        Map<String,Double> stockMap = campaign.getPartsInUseRequestedStockMap();
+        stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+    }
+
+    private Map<String,Double> getCurrentRequestedStockMap() {
+        Map<String,Double> stockMap = new LinkedHashMap<>();
+        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+        }
+
+        return stockMap;
     }
 
     private void onClose() {

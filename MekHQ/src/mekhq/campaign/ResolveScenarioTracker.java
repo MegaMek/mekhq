@@ -1739,7 +1739,7 @@ public class ResolveScenarioTracker {
         }
 
         for (Loot loot : actualLoot) {
-            loot.getLoot(campaign, scenario);
+            loot.getLoot(campaign, scenario, unitsStatus);
         }
 
         scenario.setStatus(resolution);
