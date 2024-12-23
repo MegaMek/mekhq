@@ -91,6 +91,7 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      */
     public UnableToAffordJumpNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
+        pack();
     }
     //endregion Constructors
 

@@ -101,6 +101,7 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
      */
     public InvalidFactionNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INVALID_FACTION);
+        pack();
     }
     //endregion Constructors
 

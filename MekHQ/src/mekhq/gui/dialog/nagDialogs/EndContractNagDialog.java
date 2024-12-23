@@ -67,6 +67,7 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
      */
     public EndContractNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_CONTRACT_ENDED);
+        pack();
     }
 
     /**

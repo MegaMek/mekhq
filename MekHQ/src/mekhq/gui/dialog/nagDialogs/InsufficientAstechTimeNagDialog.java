@@ -78,6 +78,7 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
      */
     public InsufficientAstechTimeNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
+        pack();
     }
     //endregion Constructors
 

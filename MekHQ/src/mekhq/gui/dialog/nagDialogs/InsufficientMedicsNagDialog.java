@@ -52,6 +52,7 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      */
     public InsufficientMedicsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INSUFFICIENT_MEDICS);
+        pack();
     }
     //endregion Constructors
 

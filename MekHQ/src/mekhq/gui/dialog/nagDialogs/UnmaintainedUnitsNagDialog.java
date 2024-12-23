@@ -59,6 +59,7 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
+        pack();
     }
     //endregion Constructors
 

@@ -36,6 +36,7 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     public UntreatedPersonnelNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "UntreatedPersonnelNagDialog", "UntreatedPersonnelNagDialog.title",
                 "UntreatedPersonnelNagDialog.text", campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
+        pack();
     }
     //endregion Constructors
 

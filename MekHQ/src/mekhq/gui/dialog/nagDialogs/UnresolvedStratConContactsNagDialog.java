@@ -81,9 +81,12 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
                 for (StratconScenario scenario : track.getScenarios().values()) {
                     if ((scenario.getCurrentState() == ScenarioState.UNRESOLVED)
                             && (campaign.getLocalDate().equals(scenario.getDeploymentDate()))) {
-                        String resolvedScenario = String.format("%s, %s\n",
-                                scenario.getName(),
-                                track.getDisplayableName());
+                        String resolvedScenario = String.format("%s, %s-%s %s\n",
+                            scenario.getName(),
+                            track.getDisplayableName(),
+                            scenario.getCoords().toBTString(),
+                            scenario.isRequiredScenario() ? " (Critical)" : ""
+                        );
 
                         unresolvedContacts.append(resolvedScenario);
                     }
@@ -103,6 +106,7 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      */
     public UnresolvedStratConContactsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
+        pack();
     }
     //endregion Constructors
 

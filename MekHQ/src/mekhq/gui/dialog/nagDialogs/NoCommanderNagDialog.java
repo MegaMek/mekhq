@@ -53,6 +53,7 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
      */
     public NoCommanderNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_NO_COMMANDER);
+        pack();
     }
 
     /**

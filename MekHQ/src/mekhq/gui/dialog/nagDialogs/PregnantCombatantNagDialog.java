@@ -76,6 +76,7 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
      */
     public PregnantCombatantNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_PREGNANT_COMBATANT);
+        pack();
     }
     //endregion Constructors
 

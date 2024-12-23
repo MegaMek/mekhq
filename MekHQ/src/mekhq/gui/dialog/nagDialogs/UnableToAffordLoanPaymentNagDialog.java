@@ -86,6 +86,7 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
      */
     public UnableToAffordLoanPaymentNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
+        pack();
     }
     //endregion Constructors
 
