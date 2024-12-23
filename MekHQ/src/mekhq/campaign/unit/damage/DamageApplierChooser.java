@@ -85,28 +85,20 @@ public class DamageApplierChooser {
      * The removal condition is a code that indicates why the entity is being removed from the game.
      * It will decide if the unit or entity must survive based on the type of removal condition.
      * The removal conditions are:
-     *      * RETREAT: crew must survive, entity must survive, 80% of the total armor is applied as damage
-     *      * SALVAGEABLE: crew may die, entity must be destroyed, 75% of the total armor is applied as damage
-     *      * CAPTURED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
-     *      * EJECTED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
-     *      * DEVASTATED: crew may survive, entity must be destroyed, 500% of the total armor is applied as damage
-     *      * OTHER: crew may die, entity may be destroyed, 33% of the total armor applied as damage
+     * * RETREAT: crew must survive, entity must survive, 80% of the total armor is applied as damage
+     * * SALVAGEABLE: crew may die, entity must be destroyed, 75% of the total armor is applied as damage
+     * * CAPTURED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
+     * * EJECTED: crew must survive, entity must be destroyed, 33% of the total armor is applied as damage
+     * * DEVASTATED: crew may survive, entity must be destroyed, 500% of the total armor is applied as damage
+     * * OTHER: crew may die, entity may be destroyed, 33% of the total armor applied as damage
      * The amount of damage applied present right now was decided arbitrarily and can be changed later, maybe even make it follow
      * a config file, client settings, etc.
-     * @param entity the entity to choose the handler for
+     *
+     * @param entity           the entity to choose the handler for
      * @param removalCondition the reason why the entity is being removed
-     * @return the total amount of damage applied to the entity
      */
-    public static int damageRemovedEntity(Entity entity, int removalCondition) {
-        double targetDamage = switch (removalCondition) {
-            case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> (double) (entity.getTotalOArmor() * (1 / (Compute.d6() + 1)));
-            case IEntityRemovalConditions.REMOVE_DEVASTATED -> entity.getTotalOArmor() * 5; // no damage is actually applied
-            case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
-            case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
-            default -> entity.getTotalOArmor() * 0.33;
-        };
-
-        var numberOfDices = Math.max(1, (int) (targetDamage / 6 / 0.6));
+    public static void damageRemovedEntity(Entity entity, int removalCondition) {
+        var numberOfDices = getNumberOfDices(entity, removalCondition);
         var damage = Compute.d6(numberOfDices);
         var clusterSize = 5;
 
@@ -119,8 +111,20 @@ public class DamageApplierChooser {
         var crewMustSurvive = retreating || captured || ejected;
         var entityMustSurvive = !devastated && !salvageable && !ejected;
 
-        return DamageApplierChooser.choose(entity, crewMustSurvive, entityMustSurvive)
+        DamageApplierChooser.choose(entity, crewMustSurvive, entityMustSurvive)
             .applyDamageInClusters(damage, clusterSize);
+    }
+
+    private static int getNumberOfDices(Entity entity, int removalCondition) {
+        double targetDamage = switch (removalCondition) {
+            case IEntityRemovalConditions.REMOVE_CAPTURED, IEntityRemovalConditions.REMOVE_EJECTED -> entity.getTotalOArmor() * 1.2;
+            case IEntityRemovalConditions.REMOVE_DEVASTATED -> entity.getTotalOArmor() * 5; // no damage is actually applied
+            case IEntityRemovalConditions.REMOVE_IN_RETREAT -> entity.getTotalOArmor() * 0.8;
+            case IEntityRemovalConditions.REMOVE_SALVAGEABLE -> entity.getTotalOArmor() * 0.75;
+            default -> entity.getTotalOArmor() * 0.33;
+        };
+
+        return Math.max(1, (int) (targetDamage / 6 / 0.6));
     }
 
 }
