@@ -23,6 +23,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
@@ -55,6 +58,16 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
                 LocalDate scenarioDate = scenario.getDate();
 
                 if (scenarioDate.equals(today)) {
+                    if (scenario.getHasTrack()) {
+                        for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
+                            for (StratconScenario stratconScenario : track.getScenarios().values()) {
+                                if (stratconScenario.getBackingScenario().equals(scenario)) {
+                                    return stratconScenario.getCurrentState() != ScenarioState.UNRESOLVED;
+                                }
+                            }
+                        }
+                    }
+
                     return true;
                 }
             }
@@ -72,6 +85,7 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
      */
     public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
+        pack();
     }
     //endregion Constructors
 
