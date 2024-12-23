@@ -21,57 +21,83 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import javax.swing.*;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
 /**
- * This class represents a nag dialog displayed when a campaign's Astech deficit is greater than 0.
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A dialog used to notify the user that their campaign has insufficient astechs.
+ *
+ * <p>
+ * This nag dialog is triggered when the campaign does not have enough astechs to handle
+ * the current maintenance and repair workload. Users are notified via a localized
+ * message that provides relevant details about the issue.
+ * </p>
+ *
+ * <strong>Features:</strong>
+ * <ul>
+ *   <li>Notifies users about the shortage of astechs in the current campaign.</li>
+ *   <li>Allows users to address the issue or dismiss the dialog while optionally ignoring future warnings.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog_NEW} for consistent functionality with other nag dialogs.</li>
+ * </ul>
  */
-public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "InsufficientAstechsNagDialog";
-    private static String DIALOG_TITLE = "InsufficientAstechsNagDialog.title";
-    private static String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
-
+public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog_NEW {
+    private int asTechsNeeded = 0;
     /**
-     * Checks if the count of Astechs needed is greater than zero.
-     * If so, it sets the description using the specified format and returns {@code true}.
-     * Otherwise, it returns {@code false}.
-     */
-    static boolean checkAstechsNeededCount(Campaign campaign) {
-        final int need = campaign.getAstechNeed();
-        return need > 0;
-    }
-
-    //region Constructors
-    /**
-     * Creates a new instance of the {@link InsufficientAstechsNagDialog} class.
+     * Constructs an {@code InsufficientAstechsNagDialog} for the given campaign.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>
+     * This dialog uses a localized message identified by the key
+     * {@code "InsufficientAstechsNagDialog.text"} to inform the user of the insufficient
+     * astechs in their campaign.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} associated with this nag dialog.
      */
-    public InsufficientAstechsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
+    public InsufficientAstechsNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
+
+        checkAsTechsNeededCount(campaign);
+
+        String pluralizer = (asTechsNeeded > 1) ? "s" : "";
+
+        final String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false), asTechsNeeded, pluralizer));
     }
-    //endregion Constructors
 
     /**
-     * Checks if the count of Astechs needed is greater than zero.
-     * If the count is greater than zero and the Nag dialog for the current key is not ignored,
-     * it sets the description using the specified format and returns {@code true}.
-     * Otherwise, it returns {@code false}.
+     * Verifies if the campaign has an unmet astech requirement.
+     *
+     * <p>
+     * This method checks whether the campaign has any pending maintenance or
+     * repair tasks that require astechs. It evaluates the current astech
+     * need in the campaign and determines if it exceeds zero.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} to check for astech needs.
      */
-    @Override
-    protected boolean checkNag() {
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && checkAstechsNeededCount(getCampaign())) {
-            setDescription(String.format(
-                    resources.getString(DIALOG_BODY),
-                    getCampaign().getAstechNeed()));
-            return true;
-        }
+    private void checkAsTechsNeededCount(Campaign campaign) {
+        asTechsNeeded = campaign.getAstechNeed();
+    }
 
-        return false;
+    /**
+     * Evaluates whether the "Insufficient Astechs" nag dialog should be displayed.
+     *
+     * <p>
+     * This method checks the following conditions:
+     * <ul>
+     *   <li>If the "Insufficient Astechs" nag dialog has not been flagged as ignored
+     *       in the user options.</li>
+     *   <li>If the campaign has an unmet asTech requirement as determined by
+     *       {@link #checkAsTechsNeededCount(Campaign)}.</li>
+     * </ul>
+     * If both conditions are met, the dialog is displayed.
+     */
+    public void checkNag() {
+        final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
+
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && (asTechsNeeded > 0)) {
+            showDialog();
+        }
     }
 }
