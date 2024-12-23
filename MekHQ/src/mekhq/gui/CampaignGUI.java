@@ -2522,7 +2522,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+        NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(getCampaign());
+        noCommanderNagDialog.checkNag(getCampaign());
+        if (!noCommanderNagDialog.isAdvanceDaySelected()) {
             dayEndingEvent.cancel();
             return;
         }
