@@ -23,7 +23,28 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
+/**
+ * A nag dialog that alerts the user about prisoners of war (POWs) in the campaign.
+ *
+ * <p>
+ * This dialog checks whether there are prisoners of war in the campaign and displays a warning
+ * if the user attempts to advance the day without addressing them. The purpose is to ensure
+ * the player is aware of the prisoners and can take any necessary actions before proceeding.
+ * </p>
+ */
 public class PrisonersNagDialog extends AbstractMHQNagDialog_NEW {
+    /**
+     * Checks if the current campaign has prisoners of war (POWs).
+     *
+     * <p>
+     * This method evaluates the state of the campaign to determine if there are prisoners present.
+     * If the campaign does not have an active contract, the method checks the campaign's list of
+     * current prisoners. If the list is not empty, the method returns {@code true}.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @return {@code true} if there are prisoners in the campaign; otherwise, {@code false}.
+     */
     static boolean hasPrisoners (Campaign campaign) {
         if (!campaign.hasActiveContract()) {
             return !campaign.getCurrentPrisoners().isEmpty();
@@ -32,6 +53,16 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog_NEW {
         return false;
     }
 
+    /**
+     * Constructs the prisoners nag dialog for the given campaign.
+     *
+     * <p>
+     * This constructor initializes the dialog with the specified campaign and
+     * formats the resource message to display information about prisoners in the campaign.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
+     */
     public PrisonersNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_PRISONERS);
 
@@ -40,6 +71,21 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog_NEW {
             campaign.getCommanderAddress(false)));
     }
 
+    /**
+     * Determines whether the prisoners nag dialog should be displayed to the user.
+     *
+     * <p>
+     * The dialog will be shown if the following conditions are met:
+     * <ul>
+     *     <li>AtB campaigns are enabled in the campaign options.</li>
+     *     <li>The nag dialog for prisoners is not ignored in MekHQ options.</li>
+     *     <li>The campaign contains prisoners, as determined by {@link #hasPrisoners(Campaign)}.</li>
+     * </ul>
+     * If all these conditions are satisfied, the dialog is displayed to notify the user about the prisoners.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
+     */
     public void checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_PRISONERS;
 
