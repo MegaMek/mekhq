@@ -23,66 +23,148 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
-import javax.swing.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static mekhq.campaign.stratcon.StratconCampaignState.getStratconScenarioFromAtBScenario;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
+
 /**
- * This class represents a nag dialog displayed when the campaign one or more unresolved scenarios.
- * It extends the {@link AbstractMHQNagDialog} class.
+ * Represents a nag dialog for displaying the list of outstanding scenarios in a campaign.
+ *
+ * <p>
+ * This dialog checks for active scenarios within the campaign, categorizes them by
+ * their state (e.g., unresolved or requiring a track), and displays a list of these
+ * scenarios to the user. Scenarios are considered "outstanding" if they are unresolved or
+ * require attention on the current campaign date.
+ * </p>
+ *
+ * <p>
+ * The dialog includes logic to account for both AtB contracts and StratCon-enabled campaigns,
+ * formatting the outstanding scenarios with additional details when appropriate.
+ * </p>
  */
-public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "OutstandingScenariosNagDialog";
-    private static String DIALOG_TITLE = "OutstandingScenariosNagDialog.title";
-    private static String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
+public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog_NEW {
+    String outstandingScenarios = "";
 
     /**
-     * Checks if there are any outstanding scenarios in the given campaign.
-     * An outstanding scenario is defined as a scenario whose date is the same as the current date.
+     * Retrieves and processes the list of outstanding scenarios for the current campaign.
      *
-     * @param campaign the campaign to check for outstanding scenarios
-     * @return {@code true} if there are outstanding scenarios, {@code false} otherwise
+     * <p>
+     * This method iterates through all active contracts and their associated AtB scenarios,
+     * identifying scenarios that are outstanding based on the following conditions:
+     * <ul>
+     *     <li>Whether the scenario's date matches the current campaign date.</li>
+     *     <li>If the scenario is part of StratCon and is unresolved or critical.</li>
+     *     <li>If it's associated with a track and includes detailed information about that track.</li>
+     * </ul>
+     * Scenarios are categorized into "critical" scenarios (e.g., required StratCon scenarios)
+     * and others, with additional formatting for StratCon-specific scenarios where applicable.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} from which to retrieve outstanding scenarios.
      */
-    static boolean checkForOutstandingScenarios(Campaign campaign) {
+    private void getOutstandingScenarios(Campaign campaign) {
         List<AtBContract> activeContracts = campaign.getActiveAtBContracts(true);
-
         LocalDate today = campaign.getLocalDate();
+        StringBuilder activeScenarios = new StringBuilder();
 
         for (AtBContract contract : activeContracts) {
             for (AtBScenario scenario : contract.getCurrentAtBScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();
 
-                if (scenarioDate.equals(today)) {
-                    return true;
+                // Skip scenarios not matching today's date
+                if (!scenarioDate.equals(today)) {
+                    continue;
                 }
+
+                if (scenario.getHasTrack()) {
+                    StratconScenario stratconScenario = getStratconScenarioFromAtBScenario(campaign, scenario);
+
+                    if (stratconScenario != null) {
+                        // Skip if the scenario is unresolved
+                        if (stratconScenario.getCurrentState() == UNRESOLVED) {
+                            continue;
+                        }
+
+                        StratconTrackState track = stratconScenario.getTrackForScenario(campaign, null);
+
+                        if (track != null) {
+                            activeScenarios.append("<br>- ")
+                                .append(scenario.getName())
+                                .append(", ").append(contract.getName())
+                                .append(", ").append(track.getDisplayableName())
+                                .append('-').append(stratconScenario.getCoords().toBTString());
+
+                            if (stratconScenario.isRequiredScenario()) {
+                                activeScenarios.append(" (Critical)");
+                            }
+
+                            continue;
+                        }
+                    }
+                }
+
+                // Add non-track scenarios
+                activeScenarios.append("<br>- ")
+                    .append(scenario.getName())
+                    .append(", ").append(contract.getName());
             }
         }
 
-        return false;
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            activeScenarios.append(resources.getString("OutstandingScenariosNagDialog.stratCon"));
+        }
+
+        outstandingScenarios = activeScenarios.toString();
     }
 
-    //region Constructors
     /**
-     * Creates a new instance of the {@link OutstandingScenariosNagDialog} class.
+     * Constructs the OutstandingScenariosNagDialog for the given campaign.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>
+     * Upon initialization, this dialog prepares a formatted string of outstanding
+     * scenarios (if any) and sets up the dialog UI for display.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} associated with this nag dialog.
      */
-    public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
+    public OutstandingScenariosNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
+
+        final String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false), outstandingScenarios));
     }
-    //endregion Constructors
 
     /**
-     * Checks if there is a nag message to display.
+     * Checks if the nag dialog should be displayed, based on the current campaign state.
      *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
+     * <p>
+     * The dialog is displayed if the following conditions are met:
+     * <ul>
+     *     <li>AtB campaigns are enabled in the campaign options.</li>
+     *     <li>The nag dialog for outstanding scenarios is not ignored in MekHQ options.</li>
+     *     <li>Outstanding scenarios exist in the campaign.</li>
+     * </ul>
+     * If all these conditions are satisfied, the nag dialog is displayed to the user.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} to check for outstanding scenarios.
      */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && checkForOutstandingScenarios(getCampaign());
+    public void checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_OUTSTANDING_SCENARIOS;
+
+        getOutstandingScenarios(campaign);
+
+        if (campaign.getCampaignOptions().isUseAtB()
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && !outstandingScenarios.isBlank()) {
+            showDialog();
+        }
     }
 }
