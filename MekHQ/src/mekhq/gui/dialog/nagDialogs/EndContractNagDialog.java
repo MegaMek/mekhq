@@ -43,6 +43,17 @@ import java.time.LocalDate;
  * </ul>
  */
 public class EndContractNagDialog extends AbstractMHQNagDialog_NEW {
+    /**
+     * Constructs an {@code EndContractNagDialog} for the given campaign.
+     *
+     * <p>
+     * This dialog uses the localization key {@code "EndContractNagDialog.text"} to provide
+     * a message that includes additional information, such as the commander's address.
+     * It is specifically tailored to show when a contract is reaching its end date.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} that the nag dialog is tied to.
+     */
     public EndContractNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_CONTRACT_ENDED);
 
@@ -51,6 +62,18 @@ public class EndContractNagDialog extends AbstractMHQNagDialog_NEW {
             campaign.getCommanderAddress(false)));
     }
 
+    /**
+     * Checks if any contract in the current campaign has its end date set to today.
+     *
+     * <p>
+     * This method is used to detect whether there are any active contracts
+     * ending on the campaign's current local date. It iterates over the active
+     * contracts for the campaign and compares each contract's ending date to today's date.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} to check for contracts ending today.
+     * @return {@code true} if a contract's end date matches today's date, otherwise {@code false}.
+     */
     static boolean isContractEnded(Campaign campaign) {
         LocalDate today = campaign.getLocalDate();
 
@@ -67,6 +90,21 @@ public class EndContractNagDialog extends AbstractMHQNagDialog_NEW {
         return false;
     }
 
+    /**
+     * Checks if the "Contract End" nag dialog should be displayed.
+     *
+     * <p>
+     * This method evaluates whether the nag dialog for contract end dates should be shown.
+     * It checks the following conditions:
+     * <ul>
+     *   <li>If the "Contract Ended" nag dialog is flagged as ignored in the user’s settings.</li>
+     *   <li>If any active contracts in the campaign are ending on the current date.</li>
+     * </ul>
+     * If these conditions are met, the dialog is displayed.
+     *
+     * @param campaign The {@link Campaign} to check for contracts ending today.
+     * @return {@code true} if the dialog was shown, otherwise {@code false}.
+     */
     public boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
 
