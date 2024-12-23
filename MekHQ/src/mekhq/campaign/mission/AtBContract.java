@@ -44,6 +44,7 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Bloodname;
@@ -566,17 +567,19 @@ public class AtBContract extends Contract {
                 continue;
             }
 
-            if (scenario.getStatus().isOverallVictory()) {
+            ScenarioStatus scenarioStatus = scenario.getStatus();
+
+            if (scenarioStatus.isOverallVictory()) {
                 victories++;
-            } else if (scenario.getStatus().isOverallDefeat()) {
+            } else if (scenarioStatus.isOverallDefeat() || scenarioStatus.isRefusedEngagement()) {
                 defeats++;
             }
 
-            if (scenario.getStatus().isDecisiveVictory()) {
+            if (scenarioStatus.isDecisiveVictory()) {
                 victories++;
-            } else if (scenario.getStatus().isDecisiveDefeat()) {
+            } else if (scenarioStatus.isDecisiveDefeat()) {
                 defeats++;
-            } else if (scenario.getStatus().isPyrrhicVictory()) {
+            } else if (scenarioStatus.isPyrrhicVictory()) {
                 victories--;
             }
         }
@@ -711,7 +714,7 @@ public class AtBContract extends Contract {
         for (Scenario s : getCompletedScenarios()) {
             // Special Scenarios get no points for victory and only -1 for defeat.
             if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialScenario()) {
-                if (s.getStatus().isOverallDefeat()) {
+                if (s.getStatus().isOverallDefeat() || s.getStatus().isRefusedEngagement()) {
                     score--;
                 }
             } else {

@@ -1719,7 +1719,9 @@ public class StratconRulesManager {
         applyFacilityModifiers(scenario, track, coords);
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
-        if (contract.getCommandRights().isHouse() || contract.getCommandRights().isIntegrated()) {
+        if (contract.getCommandRights().isHouse()
+            || contract.getCommandRights().isIntegrated()
+            || contract.getCommandRights().isIndependent()) {
             scenario.setRequiredScenario(true);
         }
 
