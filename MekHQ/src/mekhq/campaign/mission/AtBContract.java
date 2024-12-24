@@ -44,6 +44,7 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Bloodname;
@@ -566,17 +567,19 @@ public class AtBContract extends Contract {
                 continue;
             }
 
-            if (scenario.getStatus().isOverallVictory()) {
+            ScenarioStatus scenarioStatus = scenario.getStatus();
+
+            if (scenarioStatus.isOverallVictory()) {
                 victories++;
-            } else if (scenario.getStatus().isOverallDefeat()) {
+            } else if (scenarioStatus.isOverallDefeat() || scenarioStatus.isRefusedEngagement()) {
                 defeats++;
             }
 
-            if (scenario.getStatus().isDecisiveVictory()) {
+            if (scenarioStatus.isDecisiveVictory()) {
                 victories++;
-            } else if (scenario.getStatus().isDecisiveDefeat()) {
+            } else if (scenarioStatus.isDecisiveDefeat()) {
                 defeats++;
-            } else if (scenario.getStatus().isPyrrhicVictory()) {
+            } else if (scenarioStatus.isPyrrhicVictory()) {
                 victories--;
             }
         }
@@ -708,14 +711,14 @@ public class AtBContract extends Contract {
         int score = employerMinorBreaches - playerMinorBreaches;
         int battles = 0;
         boolean earlySuccess = false;
-        for (Scenario s : getCompletedScenarios()) {
+        for (Scenario scenario : getCompletedScenarios()) {
             // Special Scenarios get no points for victory and only -1 for defeat.
-            if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialScenario()) {
-                if (s.getStatus().isOverallDefeat()) {
+            if ((scenario instanceof AtBScenario) && ((AtBScenario) scenario).isSpecialScenario()) {
+                if (scenario.getStatus().isOverallDefeat() || scenario.getStatus().isRefusedEngagement()) {
                     score--;
                 }
             } else {
-                switch (s.getStatus()) {
+                switch (scenario.getStatus()) {
                     case DECISIVE_VICTORY:
                     case VICTORY:
                     case MARGINAL_VICTORY:
@@ -737,9 +740,9 @@ public class AtBContract extends Contract {
                 }
             }
 
-            if ((s instanceof AtBScenario)
-                    && (((AtBScenario) s).getScenarioType() == AtBScenario.BASEATTACK)
-                    && ((AtBScenario) s).isAttacker() && s.getStatus().isOverallVictory()) {
+            if ((scenario instanceof AtBScenario)
+                    && (((AtBScenario) scenario).getScenarioType() == AtBScenario.BASEATTACK)
+                    && ((AtBScenario) scenario).isAttacker() && scenario.getStatus().isOverallVictory()) {
                 earlySuccess = true;
             } else if (getMoraleLevel().isRouted() && !getContractType().isGarrisonType()) {
                 earlySuccess = true;
