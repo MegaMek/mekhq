@@ -326,7 +326,7 @@ public class StratconRulesManager {
                 // if under liaison command, pick a random scenario from the ones generated
                 // to set as required and attach liaison
                 if (contract.getCommandRights().isLiaison() && (randomInt(4) == 0)) {
-                    scenario.setRequiredScenario(true);
+                    scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
                 }
 
@@ -931,7 +931,7 @@ public class StratconRulesManager {
 
             // if under liaison command, randomly determine if this is a Liason scenario
             if (contract.getCommandRights().isLiaison() && (randomInt(4) == 0)) {
-                scenario.setRequiredScenario(true);
+                scenario.setTurningPoint(true);
                 setAttachedUnitsModifier(scenario, contract);
             }
 
@@ -1720,7 +1720,7 @@ public class StratconRulesManager {
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
         if (contract.getCommandRights().isHouse() || contract.getCommandRights().isIntegrated()) {
-            scenario.setRequiredScenario(true);
+            scenario.setTurningPoint(true);
         }
 
         AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(),
@@ -1887,7 +1887,7 @@ public class StratconRulesManager {
                                 : MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
             case LIAISON:
-                if (scenario.isRequiredScenario()) {
+                if (scenario.isTurningPoint()) {
                     backingScenario.addScenarioModifier(
                             AtBScenarioModifier
                                     .getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_LIAISON_AIR
@@ -2439,7 +2439,7 @@ public class StratconRulesManager {
 
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
-                    if (scenario.isRequiredScenario() && !backingScenario.getStatus().isDraw()) {
+                    if (scenario.isTurningPoint() && !backingScenario.getStatus().isDraw()) {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
 
@@ -2587,7 +2587,7 @@ public class StratconRulesManager {
         for (StratconTrackState track : campaignState.getTracks()) {
             if (track.getScenarios().containsKey(scenario.getCoords())) {
                 // subtract VP if scenario is 'required'
-                if (scenario.isRequiredScenario()) {
+                if (scenario.isTurningPoint()) {
                     campaignState.updateVictoryPoints(-1);
                 }
 

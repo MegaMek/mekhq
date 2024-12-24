@@ -70,7 +70,7 @@ public class StratconScenario implements IStratconDisplayable {
     private int backingScenarioID;
     private ScenarioState currentState = ScenarioState.UNRESOLVED;
     private int requiredPlayerLances;
-    private boolean requiredScenario;
+    private boolean turningPoint;
     private boolean isStrategicObjective;
     private LocalDate deploymentDate;
     private LocalDate actionDate;
@@ -202,9 +202,9 @@ public class StratconScenario implements IStratconDisplayable {
                     .append("<br/>");
             }
 
-            if (isRequiredScenario()) {
-                stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                    .append("'>-1 VP if lost/ignored; +1 VP if won</span><br/>");
+            if (isTurningPoint()) {
+                stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorWarning())
+                    .append("'>Turning Point</span><br/>");
             }
 
             stateBuilder.append("<b>Status:</b> ")
@@ -267,12 +267,12 @@ public class StratconScenario implements IStratconDisplayable {
         requiredPlayerLances++;
     }
 
-    public boolean isRequiredScenario() {
-        return requiredScenario;
+    public boolean isTurningPoint() {
+        return turningPoint;
     }
 
-    public void setRequiredScenario(boolean requiredScenario) {
-        this.requiredScenario = requiredScenario;
+    public void setTurningPoint(boolean turningPoint) {
+        this.turningPoint = turningPoint;
     }
 
     @XmlTransient
