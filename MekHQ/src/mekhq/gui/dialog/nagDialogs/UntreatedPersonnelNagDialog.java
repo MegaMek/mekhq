@@ -21,27 +21,36 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
-import javax.swing.*;
-
-public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
-    static boolean isUntreatedInjury(Campaign campaign) {
-        return campaign.getActivePersonnel().stream()
-                .filter(p -> (p.needsFixing()) && (p.getDoctorId() == null))
-                .anyMatch(p -> !p.getPrisonerStatus().isCurrentPrisoner());
+public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog_NEW {
+    static boolean campaignHasUntreatedInjuries(Campaign campaign) {
+        for (Person person : campaign.getActivePersonnel()) {
+            if (person.needsFixing()
+                && person.getDoctorId() == null
+                && !person.getPrisonerStatus().isCurrentPrisoner()) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    //region Constructors
-    public UntreatedPersonnelNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UntreatedPersonnelNagDialog", "UntreatedPersonnelNagDialog.title",
-                "UntreatedPersonnelNagDialog.text", campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
-    }
-    //endregion Constructors
+    public UntreatedPersonnelNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
 
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUntreatedInjury(getCampaign());
+        final String DIALOG_BODY = "UntreatedPersonnelNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
+    }
+
+    public void checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
+
+        if (campaign.getCampaignOptions().isUseStratCon()
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && !campaignHasUntreatedInjuries(campaign)) {
+            showDialog();
+        }
     }
 }
