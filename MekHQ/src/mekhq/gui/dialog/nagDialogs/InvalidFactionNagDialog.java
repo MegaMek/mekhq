@@ -22,7 +22,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.time.LocalDate;
 
@@ -39,10 +39,10 @@ import java.time.LocalDate;
  * <ul>
  *   <li>Checks whether the campaign's faction is valid based on the current in-game date.</li>
  *   <li>Displays a warning dialog to alert the user when an invalid faction is detected.</li>
- *   <li>Extends {@link AbstractMHQNagDialog_NEW} to ensure consistent behavior with other nag dialogs.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog} to ensure consistent behavior with other nag dialogs.</li>
  * </ul>
  */
-public class InvalidFactionNagDialog extends AbstractMHQNagDialog_NEW {
+public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks whether the campaign's faction is invalid for the current in-game date.
      *

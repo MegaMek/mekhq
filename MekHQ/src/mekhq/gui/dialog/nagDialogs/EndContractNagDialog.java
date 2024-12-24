@@ -22,7 +22,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.time.LocalDate;
 
@@ -39,10 +39,10 @@ import java.time.LocalDate;
  * <ul>
  *   <li>Handles notifications for contract end dates in the campaign.</li>
  *   <li>Uses a localized message with context-specific details from the campaign.</li>
- *   <li>Extends the {@link AbstractMHQNagDialog_NEW} to reuse base nag dialog functionality.</li>
+ *   <li>Extends the {@link AbstractMHQNagDialog} to reuse base nag dialog functionality.</li>
  * </ul>
  */
-public class EndContractNagDialog extends AbstractMHQNagDialog_NEW {
+public class EndContractNagDialog extends AbstractMHQNagDialog {
     /**
      * Constructs an {@code EndContractNagDialog} for the given campaign.
      *

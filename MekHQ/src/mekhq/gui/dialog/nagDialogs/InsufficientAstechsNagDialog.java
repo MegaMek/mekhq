@@ -21,7 +21,7 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A dialog used to notify the user that their campaign has insufficient astechs. Not to be
@@ -37,10 +37,10 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * <ul>
  *   <li>Notifies users about the shortage of astechs in the current campaign.</li>
  *   <li>Allows users to address the issue or dismiss the dialog while optionally ignoring future warnings.</li>
- *   <li>Extends {@link AbstractMHQNagDialog_NEW} for consistent functionality with other nag dialogs.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog} for consistent functionality with other nag dialogs.</li>
  * </ul>
  */
-public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog_NEW {
+public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     private int asTechsNeeded = 0;
 
     /**

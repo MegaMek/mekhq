@@ -25,7 +25,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,7 +48,7 @@ import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
  * formatting the outstanding scenarios with additional details when appropriate.
  * </p>
  */
-public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog_NEW {
+public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     String outstandingScenarios = "";
 
     /**

@@ -22,7 +22,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.time.DayOfWeek;
 
@@ -36,7 +36,7 @@ import java.time.DayOfWeek;
  * the dialog is displayed to prompt the user to correct the situation.
  * </p>
  */
-public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog_NEW {
+public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks if the campaign's active contracts have deployment deficits that need to be addressed.
      *

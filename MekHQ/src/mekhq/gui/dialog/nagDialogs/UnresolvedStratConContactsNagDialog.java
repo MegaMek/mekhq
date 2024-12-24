@@ -25,7 +25,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A nag dialog that warns the user about unresolved StratCon contacts within the campaign.
@@ -48,7 +48,7 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * @see StratconScenario
  * @see StratconScenario.ScenarioState
  */
-public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog_NEW {
+public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     String unresolvedContactsReport = "";
 
     /**

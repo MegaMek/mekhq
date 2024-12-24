@@ -21,7 +21,7 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A dialog used to notify the user that their campaign lacks a designated commander.
@@ -36,12 +36,12 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * <ul>
  *   <li>Handles the "No Commander" notification for campaigns.</li>
  *   <li>Localized message fetched using resource bundles.</li>
- *   <li>Extends the {@link AbstractMHQNagDialog_NEW} for reusable dialog behavior.</li>
+ *   <li>Extends the {@link AbstractMHQNagDialog} for reusable dialog behavior.</li>
  * </ul>
  *
- * @see AbstractMHQNagDialog_NEW
+ * @see AbstractMHQNagDialog
  */
-public class NoCommanderNagDialog extends AbstractMHQNagDialog_NEW {
+public class NoCommanderNagDialog extends AbstractMHQNagDialog {
     /**
      * Constructs a {@code NoCommanderNagDialog} for a campaign.
      *

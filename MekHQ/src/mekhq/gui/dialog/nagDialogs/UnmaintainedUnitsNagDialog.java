@@ -22,7 +22,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A nag dialog that alerts the user about unmaintained units in the campaign's hangar.
@@ -33,7 +33,7 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * active units in proper working order.
  * </p>
  */
-public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog_NEW {
+public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks whether the campaign has any unmaintained units in the hangar.
      *

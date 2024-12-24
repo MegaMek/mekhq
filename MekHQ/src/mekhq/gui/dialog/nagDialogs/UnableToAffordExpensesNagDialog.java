@@ -23,7 +23,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.time.temporal.TemporalAdjusters;
 
@@ -37,7 +37,7 @@ import java.time.temporal.TemporalAdjusters;
  * the funds are insufficient, the dialog is displayed to alert the player.
  * </p>
  */
-public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog_NEW {
+public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog {
     private Money monthlyExpenses = Money.zero();
 
     /**

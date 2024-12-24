@@ -24,7 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.util.Objects;
 
@@ -39,7 +39,7 @@ import java.util.Objects;
  * to another system.
  * </p>
  */
-public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog_NEW {
+public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
     private Money nextJumpCost = Money.zero();
 
     /**

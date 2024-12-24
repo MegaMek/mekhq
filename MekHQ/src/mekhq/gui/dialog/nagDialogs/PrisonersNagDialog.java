@@ -21,7 +21,7 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A nag dialog that alerts the user about prisoners of war (POWs) in the campaign.
@@ -32,7 +32,7 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * the player is aware of the prisoners and can take any necessary actions before proceeding.
  * </p>
  */
-public class PrisonersNagDialog extends AbstractMHQNagDialog_NEW {
+public class PrisonersNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks if the current campaign has prisoners of war (POWs).
      *

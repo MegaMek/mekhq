@@ -22,7 +22,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A dialog used to notify the user about insufficient available time for astechs to complete the
@@ -38,10 +38,10 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * <ul>
  *   <li>Calculates the time deficit for the astech pool based on hangar unit maintenance requirements.</li>
  *   <li>Notifies the user when there is inadequate time available to maintain all units.</li>
- *   <li>Extends {@link AbstractMHQNagDialog_NEW} for consistent nag dialog behavior.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog} for consistent nag dialog behavior.</li>
  * </ul>
  */
-public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog_NEW {
+public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     private int asTechsTimeDeficit = 0;
 
     /**

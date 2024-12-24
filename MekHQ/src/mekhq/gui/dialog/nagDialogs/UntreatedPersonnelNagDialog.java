@@ -22,7 +22,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A nag dialog that alerts the user about untreated injuries within the campaign's personnel.
@@ -33,7 +33,7 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * that injured personnel receive immediate treatment.
  * </p>
  */
-public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog_NEW {
+public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks whether the campaign has any untreated personnel with injuries.
      *

@@ -23,7 +23,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.List;
  * the payments, the dialog is displayed to alert the user and prompt corrective action.
  * </p>
  */
-public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog_NEW {
+public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     private Money totalPaymentsDue = Money.zero();
 
     /**

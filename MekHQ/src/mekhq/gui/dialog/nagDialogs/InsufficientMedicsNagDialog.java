@@ -21,7 +21,7 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A dialog used to notify the user about insufficient medics required to meet the medical needs of the campaign.
@@ -37,10 +37,10 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * <ul>
  *   <li>Calculates the number of medics required for a campaign using {@link Campaign#getMedicsNeed()}.</li>
  *   <li>Displays a dialog to warn the user if the required number of medics exceeds the available count.</li>
- *   <li>Extends {@link AbstractMHQNagDialog_NEW} to provide consistent behavior with other nag dialogs.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog} to provide consistent behavior with other nag dialogs.</li>
  * </ul>
  */
-public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog_NEW {
+public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
     private int medicsRequired = 0;
 
     /**

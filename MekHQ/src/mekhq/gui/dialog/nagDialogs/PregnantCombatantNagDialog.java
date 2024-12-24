@@ -24,7 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 /**
  * A nag dialog that warns the user if there are pregnant personnel actively assigned to combat forces.
@@ -35,7 +35,7 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
  * dialog is not ignored in MekHQ options, the dialog is displayed to notify the user.
  * </p>
  */
-public class PregnantCombatantNagDialog extends AbstractMHQNagDialog_NEW {
+public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks if the current campaign contains any personnel who are pregnant and actively assigned
      * to a force.
