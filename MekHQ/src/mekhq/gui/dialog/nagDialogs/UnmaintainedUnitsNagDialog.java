@@ -22,54 +22,83 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import javax.swing.*;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
 /**
- * A dialog that displays a nag message if there are unmaintained units in the campaign's hangar.
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that alerts the user about unmaintained units in the campaign's hangar.
+ *
+ * <p>
+ * This dialog identifies units that require maintenance but have not received it yet,
+ * excluding units marked as salvage. It provides a reminder to the player to keep
+ * active units in proper working order.
+ * </p>
  */
-public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "UnmaintainedUnitsNagDialog";
-    private static String DIALOG_TITLE = "UnmaintainedUnitsNagDialog.title";
-    private static String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
-
+public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog_NEW {
     /**
-     * Checks if there are any unmaintained units in the given campaign's hangar.
+     * Checks whether the campaign has any unmaintained units in the hangar.
      *
-     * @param campaign the {@link Campaign} containing the hangar to check
-     * @return {@code true} if there are unmaintained units in the hangar, {@code false} otherwise
+     * <p>
+     * This method iterates over the units in the campaign's hangar and identifies units
+     * that meet the following criteria:
+     * <ul>
+     *     <li>The unit is classified as unmaintained ({@link Unit#isUnmaintained()}).</li>
+     *     <li>The unit is not marked as salvage ({@link Unit#isSalvage()}).</li>
+     * </ul>
+     * If any units match these conditions, the method returns {@code true}.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @return {@code true} if unmaintained units are found, otherwise {@code false}.
      */
-    static boolean checkHanger(Campaign campaign) {
-        for (Unit u : campaign.getHangar().getUnits()) {
-            if ((u.isUnmaintained()) && (!u.isSalvage())) {
-                    return true;
+    static boolean campaignHasUnmaintainedUnits(Campaign campaign) {
+        for (Unit unit : campaign.getHangar().getUnits()) {
+            if ((unit.isUnmaintained()) && (!unit.isSalvage())) {
+                return true;
             }
         }
         return false;
     }
 
     /**
-     * Creates a new instance of the {@link UnmaintainedUnitsNagDialog} class.
+     * Constructs the nag dialog for unmaintained units.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>
+     * This constructor initializes the dialog with relevant campaign details and
+     * formats the displayed message to include context for the commander.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    //region Constructors
-    public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
+    public UnmaintainedUnitsNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
+
+        final String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
     }
-    //endregion Constructors
 
     /**
-     * Checks if there is a nag message to display.
+     * Determines whether the nag dialog for unmaintained units should be displayed.
      *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
+     * <p>
+     * The dialog is shown if:
+     * <ul>
+     *     <li>Maintenance checks are enabled.</li>
+     *     <li>The nag dialog for unmaintained units is not ignored in MekHQ options.</li>
+     *     <li>There are unmaintained units in the campaign hangar, as determined by {@link #campaignHasUnmaintainedUnits(Campaign)}.</li>
+     * </ul>
+     * If both conditions are met, the dialog is displayed to alert the player to address unit maintenance.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && checkHanger(getCampaign());
+    public void checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNMAINTAINED_UNITS;
+
+        if (campaign.getCampaignOptions().isCheckMaintenance()
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && campaignHasUnmaintainedUnits(campaign)) {
+            showDialog();
+        }
     }
 }
