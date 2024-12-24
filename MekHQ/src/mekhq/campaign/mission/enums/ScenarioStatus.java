@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.mission.enums;
 
-import java.util.ResourceBundle;
-
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum ScenarioStatus {
     // region Enum Declarations
@@ -33,7 +33,8 @@ public enum ScenarioStatus {
     DRAW("ScenarioStatus.DRAW.text", "ScenarioStatus.DRAW.toolTipText"),
     MARGINAL_DEFEAT("ScenarioStatus.MARGINAL_DEFEAT.text", "ScenarioStatus.MARGINAL_DEFEAT.toolTipText"),
     DEFEAT("ScenarioStatus.DEFEAT.text", "ScenarioStatus.DEFEAT.toolTipText"),
-    DECISIVE_DEFEAT("ScenarioStatus.DECISIVE_DEFEAT.text", "ScenarioStatus.DECISIVE_DEFEAT.toolTipText");
+    DECISIVE_DEFEAT("ScenarioStatus.DECISIVE_DEFEAT.text", "ScenarioStatus.DECISIVE_DEFEAT.toolTipText"),
+    REFUSED_ENGAGEMENT("ScenarioStatus.REFUSED_ENGAGEMENT.text", "ScenarioStatus.REFUSED_ENGAGEMENT.toolTipText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -91,6 +92,10 @@ public enum ScenarioStatus {
 
     public boolean isDecisiveDefeat() {
         return this == DECISIVE_DEFEAT;
+    }
+
+    public boolean isRefusedEngagement() {
+        return this == REFUSED_ENGAGEMENT;
     }
 
     public boolean isOverallVictory() {
