@@ -56,8 +56,7 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
         super(campaign, MHQConstants.NAG_NO_COMMANDER);
 
         final String DIALOG_BODY = "NoCommanderNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
+        setRightDescriptionMessage(resources.getString(DIALOG_BODY));
     }
 
     /**
