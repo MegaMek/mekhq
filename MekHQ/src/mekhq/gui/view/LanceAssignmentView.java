@@ -44,6 +44,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.enums.CombatRole.GARRISON;
+import static mekhq.campaign.mission.enums.CombatRole.RECON;
+import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
+
 /**
  * Against the Bot
  * Shows how many lances are required to be deployed on active contracts and
@@ -294,7 +299,8 @@ class RequiredLancesTableModel extends DataTableModel {
     public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<AtBContract>();
-        columnNames = new String[]{"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
+        columnNames = new String[]{"Contract", "Total", FRONTLINE.toString(), GARRISON.toString(),
+            RECON.toString(), TRAINING.toString()};
     }
 
     @Override
