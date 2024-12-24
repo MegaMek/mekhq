@@ -3,7 +3,7 @@ package mekhq.gui.panes.campaignOptions;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Skills;
 
 import javax.swing.*;
@@ -554,7 +554,7 @@ public class RulesetsTab {
         lblDefendChance = new JLabel();
         lblScoutChance = new JLabel();
         lblTrainingChance = new JLabel();
-        spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
+        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
         btnIntensityUpdate = new JButton();
     }
 
@@ -642,11 +642,11 @@ public class RulesetsTab {
         spnAtBBattleIntensity = new CampaignOptionsSpinner("AtBBattleIntensity",
             0.0, 0.0, 100.0, 0.1);
 
-        lblFightChance = new JLabel(AtBLanceRole.FIGHTING.toString());
-        lblDefendChance = new JLabel(AtBLanceRole.DEFENCE.toString());
-        lblScoutChance = new JLabel(AtBLanceRole.SCOUTING.toString());
-        lblTrainingChance = new JLabel(AtBLanceRole.TRAINING.toString());
-        spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
+        lblFightChance = new JLabel(CombatRole.FRONTLINE.toString());
+        lblDefendChance = new JLabel(CombatRole.GARRISON.toString());
+        lblScoutChance = new JLabel(CombatRole.RECON.toString());
+        lblTrainingChance = new JLabel(CombatRole.TRAINING.toString());
+        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 1];
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
             spnAtBBattleChance[i] = new JSpinner(
@@ -664,25 +664,25 @@ public class RulesetsTab {
         layoutBattleChance.gridwidth = 1;
         panelBattleChance.add(lblFightChance, layoutBattleChance);
         layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()], layoutBattleChance);
+        panelBattleChance.add(spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()], layoutBattleChance);
 
         layoutBattleChance.gridx = 0;
         layoutBattleChance.gridy++;
         panelBattleChance.add(lblDefendChance, layoutBattleChance);
         layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()], layoutBattleChance);
+        panelBattleChance.add(spnAtBBattleChance[CombatRole.GARRISON.ordinal()], layoutBattleChance);
 
         layoutBattleChance.gridx = 0;
         layoutBattleChance.gridy++;
         panelBattleChance.add(lblScoutChance, layoutBattleChance);
         layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()], layoutBattleChance);
+        panelBattleChance.add(spnAtBBattleChance[CombatRole.RECON.ordinal()], layoutBattleChance);
 
         layoutBattleChance.gridx = 0;
         layoutBattleChance.gridy++;
         panelBattleChance.add(lblTrainingChance, layoutBattleChance);
         layoutBattleChance.gridx++;
-        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()], layoutBattleChance);
+        panelBattleChance.add(spnAtBBattleChance[CombatRole.TRAINING.ordinal()], layoutBattleChance);
 
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
             "LegacyScenarioGenerationPanel");
@@ -714,16 +714,16 @@ public class RulesetsTab {
     private double determineAtBBattleIntensity() {
         double intensity = 0.0;
 
-        int x = (Integer) spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].getValue();
+        int x = (Integer) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
         intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.GARRISON.ordinal()].getValue();
         intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.RECON.ordinal()].getValue();
         intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
         intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
         intensity = intensity / 4.0;
@@ -743,20 +743,20 @@ public class RulesetsTab {
             if (intensity >= AtBContract.MINIMUM_INTENSITY) {
                 int value = (int) Math.min(
                     Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
-                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05),
                     100);
-                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05),
                     100);
-                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
-                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
             } else {
-                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(0);
-                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(0);
-                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(0);
-                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
             }
         }
     }
