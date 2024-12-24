@@ -25,95 +25,120 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.baseComponents.AbstractMHQNagDialog;
-
-import javax.swing.*;
+import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
 /**
- * This class represents a nag dialog displayed when the campaign has outstanding StratCon contacts
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that warns the user about unresolved StratCon contacts within the campaign.
+ *
+ * <p>
+ * This dialog identifies unresolved scenarios in StratCon tracks attached to active contracts
+ * where the player can deploy forces. It provides a detailed report of unresolved contacts to
+ * notify the player of critical actions required before advancing the campaign.
+ * </p>
+ *
+ * <strong>Usage:</strong>
+ * <p>
+ * This class is part of MekHQ's nagging system and is used when StratCon contacts remain unresolved.
+ * Use {@link #checkNag(Campaign)} to determine whether the dialog should be displayed.
+ * </p>
+ *
+ * @see Campaign
+ * @see AtBContract
+ * @see StratconTrackState
+ * @see StratconScenario
+ * @see StratconScenario.ScenarioState
  */
-public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "UnresolvedStratConContactsNagDialog";
-    private static String DIALOG_TITLE = "UnresolvedStratConContactsNagDialog.title";
-    private static String DIALOG_BODY = "UnresolvedStratConContactsNagDialog.text";
+public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog_NEW {
+    String unresolvedContactsReport = "";
 
     /**
-     * Checks if the given campaign has unresolved contact nags.
+     * Determines unresolved StratCon contacts for the campaign and generates a report.
      *
-     * @param campaign the campaign to check for unresolved contacts
-     * @return a string indicating whether the campaign has unresolved contacts or not
-     */
-    boolean hasUnresolvedContacts(Campaign campaign) {
-        String unresolvedContacts = nagUnresolvedContacts(campaign);
-
-        if (unresolvedContacts.isEmpty()) {
-            return false;
-        } else {
-            setDescription(String.format(resources.getString(DIALOG_BODY), unresolvedContacts));
-            return true;
-        }
-    }
-
-    /**
-     * Determine whether the user should be nagged about unresolved scenarios on AtB
-     * StratCon tracks.
+     * <p>
+     * This method checks all active AtB contracts in the campaign and iterates over their
+     * StratCon tracks to find unresolved scenarios. Scenarios are considered unresolved if:
+     * <ul>
+     *     <li>Their current state is {@link ScenarioState#UNRESOLVED}.</li>
+     *     <li>Their deployment date matches the current campaign date.</li>
+     * </ul>
+     * A formatted report is created, summarizing all unresolved scenarios and marking critical ones.
+     * </p>
      *
-     * @param campaign Campaign to check.
-     * @return An informative string containing the reasons the user was nagged.
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    static String nagUnresolvedContacts(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseStratCon()) {
-            return "";
-        }
-
+    private void determineUnresolvedContacts(Campaign campaign) {
         StringBuilder unresolvedContacts = new StringBuilder();
 
         // check every track attached to an active contract for unresolved scenarios
-        // to which the player must deploy forces today
+        // to which the player can deploy forces
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
             if (contract.getStratconCampaignState() == null) {
                 continue;
             }
 
             for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                // "scenario name, track name"
                 for (StratconScenario scenario : track.getScenarios().values()) {
                     if ((scenario.getCurrentState() == ScenarioState.UNRESOLVED)
-                            && (campaign.getLocalDate().equals(scenario.getDeploymentDate()))) {
-                        String resolvedScenario = String.format("%s, %s\n",
-                                scenario.getName(),
-                                track.getDisplayableName());
-
-                        unresolvedContacts.append(resolvedScenario);
+                        && (campaign.getLocalDate().equals(scenario.getDeploymentDate()))) {
+                        unresolvedContacts.append(String.format("<br><b>- %s</b>, %s, %s-%s %s",
+                            scenario.getName(), contract.getName(),
+                            track.getDisplayableName(), scenario.getCoords().toBTString(),
+                            scenario.isRequiredScenario() ? " (Critical)" : ""));
                     }
                 }
             }
         }
 
-        return unresolvedContacts.toString();
+        unresolvedContacts.append(resources.getString("UnresolvedStratConContactsNagDialog.stratcon"));
+
+        unresolvedContactsReport = unresolvedContacts.toString();
     }
 
-    //region Constructors
     /**
-     * Creates a new instance of the {@link UnresolvedStratConContactsNagDialog} class.
+     * Constructs the nag dialog for unresolved StratCon contacts.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>
+     * The dialog is initialized with information about unresolved StratCon scenarios and the
+     * campaign's current state. The dynamic message is formatted to include the name or title
+     * of the commander, providing context for the player.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public UnresolvedStratConContactsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
+    public UnresolvedStratConContactsNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
+
+        final String DIALOG_BODY = "UnresolvedStratConContactsNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
     }
-    //endregion Constructors
 
     /**
-     * Checks if there is a nag message to display.
+     * Determines whether the unresolved StratCon contacts nag dialog should be displayed.
      *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
+     * <p>
+     * The dialog is displayed if:
+     * <ul>
+     *     <li>StratCon is enabled in the campaign options.</li>
+     *     <li>The nag dialog for unresolved StratCon contacts is not ignored in MekHQ options.</li>
+     *     <li>There are unresolved StratCon contacts, as determined by
+     *     {@link #determineUnresolvedContacts(Campaign)}.</li>
+     * </ul>
+     * The dialog warns the player about unresolved scenarios requiring attention before
+     * advancing the campaign.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && hasUnresolvedContacts(getCampaign());
+    public void checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS;
+
+        determineUnresolvedContacts(campaign);
+
+        if (campaign.getCampaignOptions().isUseStratCon()
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && !unresolvedContactsReport.isBlank()) {
+            showDialog();
+        }
     }
 }
