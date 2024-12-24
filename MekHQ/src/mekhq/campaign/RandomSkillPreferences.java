@@ -20,15 +20,15 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.Version;
-import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.utilities.MHQXMLUtility;
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson

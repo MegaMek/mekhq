@@ -23,6 +23,7 @@ import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Money;
