@@ -2126,7 +2126,7 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getPersonnel().stream()
+        return getActivePersonnel().stream()
             .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
             .collect(Collectors.toList());
     }
