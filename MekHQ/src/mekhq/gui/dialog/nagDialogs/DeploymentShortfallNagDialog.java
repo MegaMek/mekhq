@@ -49,7 +49,6 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
      *     <li>If any active AtB contract has a deployment deficit, the method returns {@code true}.</li>
      * </ul>
      * If none of these conditions are met, the method returns {@code false}.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if there are unmet deployment requirements; otherwise, {@code false}.

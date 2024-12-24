@@ -45,7 +45,6 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
      *     <li>The unit is not marked as salvage ({@link Unit#isSalvage()}).</li>
      * </ul>
      * If any units match these conditions, the method returns {@code true}.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if unmaintained units are found, otherwise {@code false}.
@@ -85,10 +84,10 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *     <li>Maintenance checks are enabled.</li>
      *     <li>The nag dialog for unmaintained units is not ignored in MekHQ options.</li>
-     *     <li>There are unmaintained units in the campaign hangar, as determined by {@link #campaignHasUnmaintainedUnits(Campaign)}.</li>
+     *     <li>There are unmaintained units in the campaign hangar, as determined by
+     *     {@link #campaignHasUnmaintainedUnits(Campaign)}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed to alert the player to address unit maintenance.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */

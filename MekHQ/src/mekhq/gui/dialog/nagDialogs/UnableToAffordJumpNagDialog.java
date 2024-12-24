@@ -101,7 +101,6 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign's available funds are less than the cost of the next jump.</li>
      * </ul>
      * If both conditions are satisfied, the dialog is displayed to notify the user.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */

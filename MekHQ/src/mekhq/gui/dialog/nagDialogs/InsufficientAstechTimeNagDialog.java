@@ -59,7 +59,6 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
      * Each valid unit requires six astechs per unit of maintenance time. If overtime is allowed in
      * the campaign, it is added to the available astech pool. The deficit is calculated, rounded up,
      * and stored in {@link #asTechsTimeDeficit}.
-     * </p>
      *
      * @param campaign The {@link Campaign} from which to calculate the maintenance requirements and work time.
      */
@@ -115,7 +114,6 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If both conditions are met, the dialog is displayed to alert the user about
      * insufficient available time for astechs.
-     * </p>
      */
     public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME;

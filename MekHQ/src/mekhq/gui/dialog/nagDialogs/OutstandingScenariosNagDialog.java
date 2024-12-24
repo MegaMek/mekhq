@@ -64,7 +64,6 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * Scenarios are categorized into "critical" scenarios (e.g., required StratCon scenarios)
      * and others, with additional formatting for StratCon-specific scenarios where applicable.
-     * </p>
      *
      * @param campaign The {@link Campaign} from which to retrieve outstanding scenarios.
      */
@@ -152,7 +151,6 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
      *     <li>Outstanding scenarios exist in the campaign.</li>
      * </ul>
      * If all these conditions are satisfied, the nag dialog is displayed to the user.
-     * </p>
      *
      * @param campaign The {@link Campaign} to check for outstanding scenarios.
      */

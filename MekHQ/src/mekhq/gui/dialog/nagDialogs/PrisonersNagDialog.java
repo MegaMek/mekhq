@@ -81,7 +81,6 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign contains prisoners, as determined by {@link #hasPrisoners(Campaign)}.</li>
      * </ul>
      * If all these conditions are satisfied, the dialog is displayed to notify the user about the prisoners.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */

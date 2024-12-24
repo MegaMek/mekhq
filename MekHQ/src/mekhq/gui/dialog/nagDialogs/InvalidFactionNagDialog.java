@@ -94,7 +94,6 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
      *   as determined by {@link #isFactionInvalid(Campaign)}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed to notify the user of the issue.
-     * </p>
      *
      * @param campaign The {@link Campaign} being evaluated for faction validity.
      */

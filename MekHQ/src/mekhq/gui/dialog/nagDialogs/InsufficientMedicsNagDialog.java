@@ -94,7 +94,6 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If both conditions are met, the dialog is displayed to notify the user about
      * the medic shortage.
-     * </p>
      */
     public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_MEDICS;

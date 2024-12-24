@@ -36,7 +36,6 @@ public class NagController {
      * If the player cancels any nag dialog, this method returns {@code true} and stops
      * further processing. If all nag dialogs are successfully passed, it returns {@code false},
      * allowing the campaign to progress to the next day.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if the player cancels any nag dialog, {@code false} otherwise.

@@ -35,18 +35,6 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * where the player can deploy forces. It provides a detailed report of unresolved contacts to
  * notify the player of critical actions required before advancing the campaign.
  * </p>
- *
- * <strong>Usage:</strong>
- * <p>
- * This class is part of MekHQ's nagging system and is used when StratCon contacts remain unresolved.
- * Use {@link #checkNag(Campaign)} to determine whether the dialog should be displayed.
- * </p>
- *
- * @see Campaign
- * @see AtBContract
- * @see StratconTrackState
- * @see StratconScenario
- * @see StratconScenario.ScenarioState
  */
 public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     String unresolvedContactsReport = "";
@@ -62,7 +50,6 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      *     <li>Their deployment date matches the current campaign date.</li>
      * </ul>
      * A formatted report is created, summarizing all unresolved scenarios and marking critical ones.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */
@@ -126,7 +113,6 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * The dialog warns the player about unresolved scenarios requiring attention before
      * advancing the campaign.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */

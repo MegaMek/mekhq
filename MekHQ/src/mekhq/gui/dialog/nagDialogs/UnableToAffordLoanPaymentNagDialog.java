@@ -99,7 +99,6 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If both conditions are met, the user is shown the dialog to alert them about upcoming
      * loan payment issues.
-     * </p>
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */
