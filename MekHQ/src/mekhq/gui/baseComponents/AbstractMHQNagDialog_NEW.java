@@ -189,6 +189,7 @@ public abstract class AbstractMHQNagDialog_NEW extends JDialog {
 
         // Dialog settings
         pack();
+        setModal(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
