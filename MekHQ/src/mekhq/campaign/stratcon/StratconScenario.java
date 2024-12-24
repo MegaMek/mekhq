@@ -23,6 +23,7 @@ import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -380,5 +381,79 @@ public class StratconScenario implements IStratconDisplayable {
 
     public void setAvailableLeadershipBudget(int leadershipPointsUsed) {
         this.leadershipPointsUsed = leadershipPointsUsed;
+    }
+
+    /**
+     * Retrieves the {@link StratconTrackState} that contains this {@link StratconScenario}
+     * within the given {@link StratconCampaignState} or derives the campaign state if not provided.
+     *
+     * <p>
+     * If a {@link StratconCampaignState} is not provided, the method attempts to derive it using
+     * information from the backing scenario associated with this {@link StratconScenario}. It uses
+     * the campaign and contract details to fetch the {@link StratconCampaignState}. Once the
+     * campaign state is obtained (or provided as input), it searches for the track that contains
+     * this scenario.
+     * </p>
+     *
+     * <p>
+     * If no matching track is found, or if the input or derived data is incomplete (such as
+     * missing tracks or scenarios), the method returns {@code null}.
+     * </p>
+     *
+     * <strong>Usage:</strong>
+     * <p>
+     * Use this method to locate the {@link StratconTrackState} that contains this scenario, either by
+     * directly providing a {@link StratconCampaignState} or allowing the method to derive one using
+     * the campaign and available scenario details.
+     * </p>
+     *
+     * @param campaign      The {@link Campaign} containing the data needed to derive the campaign state
+     *                      if none is provided.
+     * @param campaignState The {@link StratconCampaignState} to search for the track containing this scenario.
+     *                      Can be {@code null}, in which case the method attempts to determine the campaign state.
+     * @return The {@link StratconTrackState} that contains this scenario, or {@code null} if no matching track
+     *         is found or if enough data to derive the campaign state is unavailable.
+     */
+    public @Nullable StratconTrackState getTrackForScenario(Campaign campaign,
+                                                            @Nullable StratconCampaignState campaignState) {
+        // If a campaign state hasn't been provided, we try to derive it from the available
+        // scenario information.
+        if (campaignState == null) {
+            backingScenario = getBackingScenario();
+
+            if (backingScenario == null) {
+                return null;
+            }
+
+            AtBContract contract = backingScenario.getContract(campaign);
+
+            campaignState = contract.getStratconCampaignState();
+
+            if (campaignState == null) {
+                return null;
+            }
+        }
+
+        // If we have been provided a campaign state, or have derived one, we can start tracking
+        // down the associated track.
+        List<StratconTrackState> tracks = campaignState.getTracks();
+
+        if (tracks == null) {
+            return null;
+        }
+
+        for (StratconTrackState track : tracks) {
+            Map<StratconCoords, StratconScenario> scenarios = track.getScenarios();
+
+            if (scenarios == null) {
+                return null;
+            }
+
+            if (scenarios.containsValue(this)) {
+                return track;
+            }
+        }
+
+        return null;
     }
 }

@@ -91,7 +91,7 @@ public class ResupplyDialogUtilities {
      * @param speaker  the {@link Person} serving as the speaker for the dialog; can be {@code null}.
      * @return an {@link ImageIcon} for the speaker's portrait, or the faction icon if the speaker is {@code null}.
      */
-    static @Nullable ImageIcon getSpeakerIcon(Campaign campaign, @Nullable Person speaker) {
+    public static @Nullable ImageIcon getSpeakerIcon(Campaign campaign, @Nullable Person speaker) {
         if (speaker == null) {
             return campaign.getCampaignFactionIcon();
         }

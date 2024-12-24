@@ -22,31 +22,41 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
-
 /**
- * This class represents a nag dialog displayed when the campaign has an active mission and has one
- * or more pregnant personnel assigned to the TOE
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that warns the user if there are pregnant personnel actively assigned to combat forces.
+ *
+ * <p>
+ * This dialog checks the current campaign for any personnel who are actively pregnant and
+ * assigned to a combat unit that is part of a force. If such personnel are detected, and the
+ * dialog is not ignored in MekHQ options, the dialog is displayed to notify the user.
+ * </p>
  */
 public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "PregnantCombatantNagDialog";
-    private static String DIALOG_TITLE = "PregnantCombatantNagDialog.title";
-    private static String DIALOG_BODY = "PregnantCombatantNagDialog.text";
-
     /**
-     * Checks if there is a pregnant combatant in the provided campaign. Combatants are defined as
-     * personnel assigned to a {@link Unit} in the TO&E during an active {@link Mission}
+     * Checks if the current campaign contains any personnel who are pregnant and actively assigned
+     * to a force.
      *
-     * @param campaign the campaign to check
-     * @return {@code true} if there is a pregnant combatant, {@code false} otherwise
+     * <p>
+     * This method iterates through all active personnel in the campaign to determine if any
+     * are pregnant. If a pregnant person is assigned to a unit that belongs to a combat force
+     * (i.e., a force with an ID other than {@link Force#FORCE_NONE}), this method returns {@code true}.
+     * Otherwise, it returns {@code false}.
+     * </p>
+     *
+     * <p>
+     * If there are no active missions in the campaign, the method short-circuits and immediately
+     * returns {@code false}.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
+     * @return {@code true} if there are pregnant personnel actively assigned to a combat force,
+     * {@code false} otherwise.
      */
-    static boolean isPregnantCombatant(Campaign campaign) {
+    static boolean hasActivePregnantCombatant(Campaign campaign) {
         if (campaign.getActiveMissions(false).isEmpty()) {
             return false;
         }
@@ -67,26 +77,43 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
         return false;
     }
 
-    //region Constructors
     /**
-     * Creates a new instance of the {@link PregnantCombatantNagDialog} class.
+     * Constructs the pregnant combatant nag dialog for the given campaign.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>
+     * This constructor sets up the dialog to display a warning related to
+     * pregnant personnel actively assigned to combat forces. It also sets
+     * the appropriate resource message to be displayed as the dialog body.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public PregnantCombatantNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_PREGNANT_COMBATANT);
+    public PregnantCombatantNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_PREGNANT_COMBATANT);
+
+        final String DIALOG_BODY = "PregnantCombatantNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
     }
-    //endregion Constructors
 
     /**
-     * Checks if there is a nag message to display.
+     * Determines whether the nag dialog should be displayed to the user, based on campaign state
+     * and configuration.
      *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
+     * <p>
+     * This method checks if MekHQ options allow the "pregnant combatant" nag dialog to be shown,
+     * and if there are any pregnant personnel actively assigned to combat. If both conditions
+     * are met, the dialog is displayed to notify the user.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isPregnantCombatant(getCampaign());
+    public void checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_PREGNANT_COMBATANT;
+
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && (hasActivePregnantCombatant(campaign))) {
+            showDialog();
+        }
     }
 }
