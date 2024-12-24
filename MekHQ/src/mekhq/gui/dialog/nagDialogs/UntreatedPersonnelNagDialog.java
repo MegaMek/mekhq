@@ -52,9 +52,9 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog_NEW {
      */
     static boolean campaignHasUntreatedInjuries(Campaign campaign) {
         for (Person person : campaign.getActivePersonnel()) {
-            if (person.needsFixing()
-                && person.getDoctorId() == null
-                && !person.getPrisonerStatus().isCurrentPrisoner()) {
+            if (!person.getPrisonerStatus().isCurrentPrisoner()
+                && person.needsFixing()
+                && person.getDoctorId() == null) {
                 return true;
             }
         }
@@ -97,7 +97,7 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog_NEW {
         final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && !campaignHasUntreatedInjuries(campaign)) {
+            && campaignHasUntreatedInjuries(campaign)) {
             showDialog();
         }
     }

@@ -60,7 +60,7 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog_NEW {
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();
 
-        return campaignFaction.validIn(today);
+        return !campaignFaction.validIn(today);
     }
 
     /**

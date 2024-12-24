@@ -73,7 +73,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
-import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
@@ -93,12 +92,12 @@ import java.awt.event.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 
+import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
@@ -2489,6 +2488,12 @@ public class CampaignGUI extends JPanel {
     // region Subscriptions
     @Subscribe
     public void handleDayEnding(DayEndingEvent dayEndingEvent) {
+        if (triggerDailyNags(getCampaign())) {
+            dayEndingEvent.cancel();
+            return;
+        }
+
+        // Compulsory New Day Blockers
         if (checkForOverdueLoans(dayEndingEvent)) {
             return;
         }
@@ -2497,93 +2502,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new PregnantCombatantNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new PrisonersNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(getCampaign());
-        noCommanderNagDialog.checkNag(getCampaign());
-        if (!noCommanderNagDialog.isAdvanceDaySelected()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new InvalidFactionNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new UnableToAffordJumpNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (getCampaign().getLocalDate()
-                .equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
-            if (new UnableToAffordExpensesNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                dayEndingEvent.cancel();
-                return;
-            }
-        }
-
-        if (new UnableToAffordLoanPaymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            dayEndingEvent.cancel();
-            return;
-        }
-
-        if (getCampaign().getCampaignOptions().isUseAtB()) {
-            if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                dayEndingEvent.cancel();
-                return;
-            }
-
-            if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                dayEndingEvent.cancel();
-                return;
-            }
-
-            if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                dayEndingEvent.cancel();
-                return;
-            }
-        }
-
+        // Optional New Day Blocker
         if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
             int turnoverPrompt = getCampaign().checkTurnoverPrompt();
 
@@ -2606,7 +2525,8 @@ public class CampaignGUI extends JPanel {
                     return;
                 default:
                     throw new IllegalStateException(
-                            "Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " + turnoverPrompt);
+                            "Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: "
+                                + turnoverPrompt);
             }
         }
     }
