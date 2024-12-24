@@ -25,6 +25,8 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog_NEW;
 
+import java.time.temporal.TemporalAdjusters;
+
 /**
  * A nag dialog that warns the user if the campaign's available funds are insufficient to cover monthly expenses.
  *
@@ -83,6 +85,7 @@ public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog_NEW {
      * <p>
      * The dialog is displayed if:
      * <ul>
+     *     <li>It's the last day of the month.</li>
      *     <li>The nag dialog for insufficient funds is not ignored in MekHQ options.</li>
      *     <li>The campaign's available funds are less than the calculated monthly expenses.</li>
      * </ul>
@@ -95,7 +98,8 @@ public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog_NEW {
 
         getMonthlyExpenses(campaign);
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+        if (campaign.getLocalDate().equals(campaign.getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
             && campaign.getFunds().isLessThan(monthlyExpenses)) {
             showDialog();
         }
