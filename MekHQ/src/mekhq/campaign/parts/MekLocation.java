@@ -962,13 +962,17 @@ public class MekLocation extends Part {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
-        return null;
+        if ((null != getUnit()) && (null != getUnit().getEntity()))
+        {
+            return getUnit().getEntity().getLocationName(getLoc());
+        } else {
+            return null;
+        }
     }
 
     @Override
     public int getLocation() {
-        return Entity.LOC_NONE;
+        return getLoc();
     }
 
     @Override
