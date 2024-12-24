@@ -19,6 +19,27 @@
 
 package mekhq.campaign.mission;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.logging.MMLogger;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
@@ -27,24 +48,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-
-import org.w3c.dom.Node;
-
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import megamek.logging.MMLogger;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This is the root data structure for organizing information related to a
@@ -58,8 +61,12 @@ public class ScenarioTemplate implements Cloneable {
 
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
+    private static final Logger log = LogManager.getLogger(ScenarioTemplate.class);
 
     public String name;
+    @XmlElement(name = "stratConScenarioType")
+    @XmlJavaTypeAdapter(value = ScenarioTypeAdapter.class)
+    private ScenarioType stratConScenarioType = ScenarioType.NONE;
     public String shortBriefing;
     public String detailedBriefing;
 
@@ -77,27 +84,41 @@ public class ScenarioTemplate implements Cloneable {
 
     @Override
     public ScenarioTemplate clone() {
-        ScenarioTemplate st = new ScenarioTemplate();
-        st.name = this.name;
-        st.shortBriefing = this.shortBriefing;
-        st.detailedBriefing = this.detailedBriefing;
-        st.isHostileFacility = this.isHostileFacility;
-        st.isAlliedFacility = this.isAlliedFacility;
+        ScenarioTemplate template = new ScenarioTemplate();
+        template.name = this.name;
+        template.stratConScenarioType = this.stratConScenarioType;
+        template.shortBriefing = this.shortBriefing;
+        template.detailedBriefing = this.detailedBriefing;
+        template.isHostileFacility = this.isHostileFacility;
+        template.isAlliedFacility = this.isAlliedFacility;
         for (ScenarioForceTemplate sft : scenarioForces.values()) {
-            st.scenarioForces.put(sft.getForceName(), sft.clone());
+            template.scenarioForces.put(sft.getForceName(), sft.clone());
         }
 
         for (String mod : scenarioModifiers) {
-            st.scenarioModifiers.add(mod);
+            template.scenarioModifiers.add(mod);
         }
 
         for (ScenarioObjective obj : scenarioObjectives) {
-            st.scenarioObjectives.add(new ScenarioObjective(obj));
+            template.scenarioObjectives.add(new ScenarioObjective(obj));
         }
 
-        st.mapParameters = (ScenarioMapParameters) mapParameters.clone();
+        template.mapParameters = mapParameters.clone();
 
-        return st;
+        return template;
+    }
+
+    public ScenarioType getStratConScenarioType() {
+        return (this.stratConScenarioType != null) ? this.stratConScenarioType : ScenarioType.NONE;
+    }
+
+    public void setStratConScenarioType(String scenarioType) {
+        try {
+            this.stratConScenarioType = ScenarioType.valueOf(scenarioType.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid ScenarioType: " + scenarioType, e);
+            this.stratConScenarioType = ScenarioType.NONE;
+        }
     }
 
     /**
@@ -288,13 +309,31 @@ public class ScenarioTemplate implements Cloneable {
 
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            Unmarshaller um = context.createUnmarshaller();
-            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            JAXBElement<ScenarioTemplate> templateElement = unmarshaller.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch (Exception e) {
             logger.error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;
+    }
+
+    public static class ScenarioTypeAdapter extends XmlAdapter<String, ScenarioType> {
+        @Override
+        public ScenarioType unmarshal(String value) {
+            try {
+                return ScenarioType.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException iae) {
+                MMLogger.create(ScenarioTypeAdapter.class).error("Error Invalid ScenarioType in XML: " + value);
+                return ScenarioType.NONE; // Default for invalid values
+            }
+        }
+
+        @Override
+        public String marshal(ScenarioType scenarioType) {
+            // Converts Enum back to String for XML
+            return String.valueOf(scenarioType);
+        }
     }
 }

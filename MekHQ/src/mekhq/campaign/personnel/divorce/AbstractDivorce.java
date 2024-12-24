@@ -199,56 +199,50 @@ public abstract class AbstractDivorce {
 
         style.apply(campaign, origin, spouse);
 
-        final FormerSpouseReason reason;
+        final FormerSpouseReason reasonOrigin;
+        final FormerSpouseReason reasonSpouse;
 
-        if (spouse.getStatus().isDeadOrMIA() == origin.getStatus().isDeadOrMIA()) {
-            reason = FormerSpouseReason.DIVORCE;
+        if (!origin.getStatus().isDead()) {
+            reasonOrigin = FormerSpouseReason.DIVORCE;
+            reasonSpouse = FormerSpouseReason.DIVORCE;
 
             PersonalLogger.divorcedFrom(origin, spouse, today);
+            PersonalLogger.divorcedFrom(spouse, origin, today);
 
-            if (origin.getStatus().isDead()) {
-                PersonalLogger.widowedBy(spouse, origin, today);
-
-                campaign.addReport(String.format(resources.getString("widowed.report"),
-                        origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
-            } else {
-                PersonalLogger.divorcedFrom(spouse, origin, today);
-
-                campaign.addReport(String.format(resources.getString("divorce.report"),
-                        origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
-            }
-
-            spouse.setMaidenName(null);
-            origin.setMaidenName(null);
-
-            spouse.getGenealogy().setSpouse(null);
-            origin.getGenealogy().setSpouse(null);
-        } else if (spouse.getStatus().isDeadOrMIA()) {
-            reason = FormerSpouseReason.WIDOWED;
-
-            if (spouse.getStatus().isKIA()) {
-                PersonalLogger.spouseKia(origin, spouse, today);
-            }
-            origin.setMaidenName(null);
-            origin.getGenealogy().setSpouse(null);
+            campaign.addReport(String.format(resources.getString("divorce.report"),
+                origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         } else {
-            // Origin is Dead or MIA
-            reason = FormerSpouseReason.WIDOWED;
+            reasonOrigin = FormerSpouseReason.DIVORCE;
+            reasonSpouse = FormerSpouseReason.WIDOWED;
 
             if (origin.getStatus().isKIA()) {
                 PersonalLogger.spouseKia(spouse, origin, today);
+            } else {
+                PersonalLogger.widowedBy(spouse, origin, today);
             }
-            spouse.setMaidenName(null);
-            spouse.getGenealogy().setSpouse(null);
+
+            PersonalLogger.divorcedFrom(origin, spouse, today);
+
+
+            campaign.addReport(String.format(resources.getString("widowed.report"),
+                origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
         }
 
         // Add to the former spouse list
-        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reason));
-        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reason));
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reasonOrigin));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reasonSpouse));
 
-        // Clear origin spouses
+        // Clear spouse data
         origin.getGenealogy().setOriginSpouse(null);
+        origin.getGenealogy().setSpouse(null);
+
         spouse.getGenealogy().setOriginSpouse(null);
+        spouse.getGenealogy().setSpouse(null);
+
+
+        // Clear maiden names
+        spouse.setMaidenName(null);
+        origin.setMaidenName(null);
 
         // roll for removal of marriageable flag
         if (Compute.d6(1) <= 2) {
@@ -261,11 +255,11 @@ public abstract class AbstractDivorce {
 
         List<Person> departingPartners = new ArrayList<>();
 
-        if (origin.getPrimaryRole().isDependent()) {
+        if (origin.isDependent() && !origin.getStatus().isDead()) {
             departingPartners.add(origin);
         }
 
-        if (spouse.getPrimaryRole().isDependent()) {
+        if (spouse.isDependent() && !spouse.getStatus().isDead()) {
             departingPartners.add(spouse);
         }
 

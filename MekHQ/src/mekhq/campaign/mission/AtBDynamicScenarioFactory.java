@@ -52,8 +52,8 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.*;
+import mekhq.campaign.stratcon.StratconFacility.FacilityType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
@@ -120,6 +120,7 @@ public class AtBDynamicScenarioFactory {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
 
         scenario.setName(template.name);
+        scenario.setStratConScenarioType(template.getStratConScenarioType());
         scenario.setDesc(template.detailedBriefing);
         scenario.setTemplate(template);
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
@@ -210,7 +211,7 @@ public class AtBDynamicScenarioFactory {
         int generatedLanceCount = generateForces(scenario, contract, campaign);
 
         // approximate estimate, anyway.
-        scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
+        scenario.setForceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
         scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
         setDeploymentZones(scenario);
@@ -339,23 +340,43 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * "Meaty" function that generates a set of forces for the given scenario from
-     * the given force template,
-     * subject to several other restrictions
+     * Generates a set of forces for a given scenario based on the provided force template and other
+     * parameters.
+     * <p>
+     * This method creates `lances` or other units, tailored to the context of the scenario,
+     * campaign, and contract. These forces are generated according to numerous configurable
+     * criteria, including:
+     * <ul>
+     *     <li>The scenario's alignment (Allied, Opposing, Third Party, etc.).</li>
+     *     <li>The force template’s settings (e.g., Battle Value (BV) scaling, unit count scaling).</li>
+     *     <li>Planetary modifiers (e.g., atmosphere, toxic conditions, gravity, etc.).</li>
+     *     <li>The campaign’s rules on faction relations and planetary ownership.</li>
+     * </ul>
+     * <p>
+     * Forces are configured for their roles, available equipment, and alignment parameters,
+     * adapting to special cases such as unidentified third-party factions or forces involving
+     * planetary owners. The method integrates numerous campaign-related modifiers and ensures
+     * compliance with configured budgets (e.g., BV, unit count).
+     * </p>
+     * <p>
+     * Generated forces are stored in the scenario's bot forces, where they can be used for
+     * gameplay or additional adjustments as required.
+     * </p>
      *
-     * @param scenario           Scenario for which we're generating forces
-     * @param contract           The contract on which we're currently working. Used
-     *                           for skill/quality/planetary info parameters
-     * @param campaign           The current campaign
-     * @param effectiveBV        The effective battle value, up to this point, of
-     *                           player and allied units
-     * @param effectiveUnitCount The effective unit count, up to this point, of
-     *                           player and allied units
-     * @param weightClass        The average weight class to generate this force at
-     * @param forceTemplate      The force template to use to generate the force
-     * @param isScenarioModifier true if the source of generateForce() was a
-     *                           scenario modifier
-     * @return How many "lances" or other individual units were generated.
+     * @param scenario           The {@link AtBDynamicScenario} for which the forces are being generated.
+     * @param contract           The {@link AtBContract} providing context about the campaign and planetary parameters
+     *                           for force generation, including faction and alignment.
+     * @param campaign           The active {@link Campaign} to which the forces will be added.
+     * @param effectiveBV        The effective Battle Value (BV) of allied and player units prior to force generation.
+     * @param effectiveUnitCount The effective count of allied and player units prior to force generation.
+     * @param weightClass        The weight class (light, medium, heavy, assault) to focus on when selecting units for
+     *                           force generation.
+     * @param forceTemplate      The {@link ScenarioForceTemplate} used to guide force generation, defining parameters
+     *                           like generation method, unit types, and alignment.
+     * @param isScenarioModifier A boolean indicating whether the force generation is the result of a scenario modifier.
+     *                           If true, scenario-specific effects on force generation are applied.
+     *
+     * @return The number of "lances" or other unit groups successfully generated.
      */
     public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
             int effectiveBV, int effectiveUnitCount, int weightClass,
@@ -636,11 +657,6 @@ public class AtBDynamicScenarioFactory {
 
                 // All other unit types use the force generator system to randomly select units
                 } else {
-                    boolean allowConventionalAircraft = isPlanetOwner
-                        && actualUnitType == SPECIAL_UNIT_TYPE_ATB_AERO_MIX
-                        && scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space
-                        && scenario.getAtmosphere().isDenserThan(Atmosphere.THIN);
-
                     if (actualUnitType == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                         lanceSize = getAeroLanceSize(faction);
                     }
@@ -650,7 +666,7 @@ public class AtBDynamicScenarioFactory {
                     // a Mek/vehicle mixed formation. Similarly, SPECIAL_UNIT_TYPE_ATB_AERO_MIX may
                     // generate all Aerospace Fighters, Conventional Fighters, or a mixed formation.
                     List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality,
-                        factionCode, allowsTanks, allowConventionalAircraft, campaign);
+                        factionCode, allowsTanks, campaign);
 
                     // Formations composed entirely of Meks, aerospace fighters (but not conventional),
                     // and ground vehicles use weight categories as do SPECIAL_UNIT_TYPE_ATB_MIX.
@@ -862,6 +878,47 @@ public class AtBDynamicScenarioFactory {
 
                 generatedEntities.clear();
                 generatedEntities.addAll(forceComposition);
+
+                // If we're generating an aircraft force for the planetary owner,
+                // there is a chance they may reinforce with additional Conventional Fighters.
+                if (campaign.getCampaignOptions().isUseStratCon()
+                    && forceTemplate.getAllowedUnitType() == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+                    if (isPlanetOwner && !faction.isClan()) {
+                        int baseFighterCount = getAeroLanceSize(faction);
+                        int fighterMultiplier = 0;
+
+                        try {
+                            StratconTrackState scenarioHomeTrack = getStratconTrackState(scenario, contract);
+
+                            if (scenarioHomeTrack != null) {
+                                for (StratconFacility facility : scenarioHomeTrack.getFacilities().values()) {
+                                    if (facility.getFacilityType().equals(FacilityType.AirBase)) {
+                                        fighterMultiplier++;
+                                    }
+                                }
+                            }
+                        } catch (Exception ignored) {}
+
+                        boolean allowConventionalAircraft =
+                            scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space
+                                && scenario.getAtmosphere().isDenserThan(Atmosphere.THIN);
+
+                        if (fighterMultiplier > 0 && allowConventionalAircraft) {
+                            baseFighterCount *= fighterMultiplier;
+
+                            // Create a list with `baseFighterCount` entries, all set to CONV_FIGHTER
+                            List<Integer> conventionalAircraft = new ArrayList<>();
+                            for (int i = 0; i < baseFighterCount; i++) {
+                                conventionalAircraft.add(CONV_FIGHTER);
+                            }
+
+                            List<Entity> generatedLance = generateLance(factionCode, skill, quality,
+                                conventionalAircraft, new HashMap<>(), campaign);
+
+                            generatedEntities.addAll(generatedLance);
+                        }
+                    }
+                }
             }
 
             logger.info(String.format("Final force %s / %s %s BV",
@@ -1016,6 +1073,36 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Retrieves the {@link StratconTrackState} associated with the given {@link AtBDynamicScenario}.
+     * <p>
+     * This method iterates over all {@link StratconTrackState} instances in the provided {@link AtBContract}'s
+     * {@link StratconCampaignState} to find the track that contains a {@link StratconScenario} corresponding to
+     * the specified {@link AtBDynamicScenario}. If a match is found, the track is returned;
+     * otherwise, {@code null} is returned.
+     * </p>
+     *
+     * @param scenario the {@link AtBDynamicScenario} whose associated track is to be identified.
+     * @param contract the {@link AtBContract} containing the {@link StratconCampaignState} with all available tracks.
+     * @return the {@link StratconTrackState} that contains the {@link StratconScenario} backed by the specified
+     *         {@link AtBDynamicScenario}, or {@code null} if no matching track is found.
+     */
+    private static @Nullable StratconTrackState getStratconTrackState(AtBDynamicScenario scenario,
+                                                                      AtBContract contract) {
+        List<StratconTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        StratconTrackState scenarioHomeTrack = null;
+
+        for (StratconTrackState track : tracks) {
+            for (StratconScenario stratconScenario : track.getScenarios().values()) {
+                if (stratconScenario.getBackingScenarioID() == scenario.getId()) {
+                    scenarioHomeTrack = track;
+                    break;
+                }
+            }
+        }
+        return scenarioHomeTrack;
     }
 
     /**
@@ -1378,6 +1465,7 @@ public class AtBDynamicScenarioFactory {
      * units that have associated force templates that "contribute to the unit count".
      */
     private static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
+        final int DEFAULT_TIME_LIMIT = 6;
         int primaryUnitCount = 0;
 
         for (int forceID : scenario.getPlayerForceTemplates().keySet()) {
@@ -1397,9 +1485,13 @@ public class AtBDynamicScenarioFactory {
         // We want a minimum value here, to avoid situations where we spawn scenarios with only a
         // single turn requirement.
         // This effectively treats any player-aligned forces less than 6 as 6.
-        primaryUnitCount = max(primaryUnitCount, 6);
+        primaryUnitCount = max(DEFAULT_TIME_LIMIT, 6);
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            // We set a default time to protect against instances where setting time limit fails
+            // for some reason.
+            objective.setTimeLimit(DEFAULT_TIME_LIMIT);
+
             if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
                 Integer scaleFactor = objective.getTimeLimitScaleFactor();
 
@@ -1556,8 +1648,8 @@ public class AtBDynamicScenarioFactory {
         }
 
         // increment map size by template-specified increments
-        mapSizeX += template.mapParameters.getWidthScalingIncrement() * scenario.getLanceCount();
-        mapSizeY += template.mapParameters.getHeightScalingIncrement() * scenario.getLanceCount();
+        mapSizeX += template.mapParameters.getWidthScalingIncrement() * scenario.getForceCount();
+        mapSizeY += template.mapParameters.getHeightScalingIncrement() * scenario.getForceCount();
 
         // 50/50 odds to rotate the map 90 degrees if specified.
         if (template.mapParameters.isAllowRotation()) {
@@ -2532,10 +2624,7 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Generates a selection of unit types, typically composing a lance, star, Level
-     * II, or similar
-     * tactical formation.
-     * TODO: generate ProtoMek points when Clan mixed stars are called for
-     * TODO: generate Clan mixed nova stars e.g. two points of Meks, two of vehicles, one ProtoMek point
+     * II, or similar tactical formation.
      *
      * @param unitTypeCode The type of units to generate, also accepts
      *                     SPECIAL_UNIT_TYPE_ATB_MIX for
@@ -2549,13 +2638,8 @@ public class AtBDynamicScenarioFactory {
      *         May
      *         contain duplicates.
      */
-    private static List<Integer> generateUnitTypes(int unitTypeCode,
-            int unitCount,
-            int forceQuality,
-            String factionCode,
-            boolean allowTanks,
-            boolean allowConventionalAircraft,
-            Campaign campaign) {
+    private static List<Integer> generateUnitTypes(int unitTypeCode, int unitCount, int forceQuality,
+                                                   String factionCode, boolean allowTanks, Campaign campaign) {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
         int actualUnitType = unitTypeCode;
 
@@ -2671,56 +2755,7 @@ public class AtBDynamicScenarioFactory {
                 }
             }
         } else if (unitTypeCode == SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            Faction faction = Factions.getInstance().getFaction(factionCode);
-
-            if (campaign.getCampaignOptions().isUseVehicles() && allowConventionalAircraft
-                && (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()))) {
-
-                // Use the Mek/Vehicle/Mixed ratios from campaign options as weighted values for
-                // random unit types.
-                // Then modify based on faction.
-                int aeroFlightWeight = campaign.getCampaignOptions().getOpForLanceTypeVehicles();
-                int mixedFlightWeight = campaign.getCampaignOptions().getOpForLanceTypeMixed();
-                int conventionalLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeMeks();
-
-                if (faction.isClan()) {
-                    aeroFlightWeight += 2;
-                    mixedFlightWeight = 0;
-                    conventionalLanceWeight = max(0, conventionalLanceWeight - 2);
-                } else if (faction.isMinorPower() || faction.isPirate()) {
-                    aeroFlightWeight = max(0, aeroFlightWeight - 1);
-                    mixedFlightWeight++;
-                    conventionalLanceWeight++;
-                }
-
-                int totalWeight = aeroFlightWeight + mixedFlightWeight + conventionalLanceWeight;
-
-                // Roll for unit types
-                if (totalWeight <= 0) {
-                    actualUnitType = AEROSPACEFIGHTER;
-                } else {
-                    int roll = randomInt(totalWeight);
-
-                    if (roll < conventionalLanceWeight) {
-                        actualUnitType = CONV_FIGHTER;
-                    // Mixed units randomly select between Aerospace or Conventional Fighter
-                    } else if (roll < conventionalLanceWeight + mixedFlightWeight) {
-                        for (int x = 0; x < unitCount; x++) {
-                            boolean addConventional = randomInt(2) == 0;
-                            if (addConventional) {
-                                unitTypes.add(CONV_FIGHTER);
-                            } else {
-                                unitTypes.add(AEROSPACEFIGHTER);
-                            }
-                        }
-                        return unitTypes;
-                    } else {
-                        actualUnitType = AEROSPACEFIGHTER;
-                    }
-                }
-            } else {
-                actualUnitType = AEROSPACEFIGHTER;
-            }
+            actualUnitType = AEROSPACEFIGHTER;
         }
 
         // Add unit types to the list of actual unity types
@@ -3606,17 +3641,34 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign in which the scenario is occurring.
      */
     public static void setPlayerDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
-        // make note of battle commander strategy
+        ArrayList<Integer> primaryForceIDs = new ArrayList<>();
+
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            AtBContract contract = scenario.getContract(campaign);
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+            for (StratconTrackState track : campaignState.getTracks()) {
+                StratconScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());
+                if (stratconScenario != null) {
+                    primaryForceIDs = stratconScenario.getPrimaryForceIDs();
+                }
+            }
+
+            if (primaryForceIDs.isEmpty()) {
+                logger.warn(String.format("Unable to find primary force for scenario %s (%d)", scenario.getName(), scenario.getId()));
+            }
+        }
+
+        // Make note of battle commander strategy
         int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
 
-        // for player forces where there's an associated force template, we can set the
-        // deployment turn explicitly
-        // or use a stagger algorithm.
-        // for player forces where there's not an associated force template, we
-        // calculate the deployment turn
-        // as if they were reinforcements
+        // For player forces where there's an associated force template, we can set the
+        // deployment turn explicitly or use a stagger algorithm.
+        // For player forces where there's not an associated force template, we calculate the
+        // deployment turn as if they were reinforcements
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+
             List<Entity> forceEntities = new ArrayList<>();
             Force playerForce = campaign.getForce(forceID);
 
@@ -3628,14 +3680,39 @@ public class AtBDynamicScenarioFactory {
             }
 
             // now, attempt to set deployment turns
-            // if the force has a template, then use the appropriate algorithm
-            // otherwise, treat it as reinforcements
+            // if the force has a template, then use the appropriate algorithm otherwise, treat it
+            // as reinforcements
             if (forceTemplate != null) {
                 int deployRound = forceTemplate.getArrivalTurn();
 
+                // Override to ensure we're treating primary forces correctly.
+                // This is to resolve a very annoying bug with StratCon where force templates are
+                // not stored when saving, so cannot be fetched later. At the time of writing,
+                // we've not been able to track down the origin of that bug. Though, from my own
+                // searching, it looks like the issue might be with the Scenario class and fixing
+                // it there would likely break things for non-StratCon users. -- Illiani
+                Collection<ScenarioForceTemplate> templates = scenario.getPlayerForceTemplates().values();
+                for (ScenarioForceTemplate template : templates) {
+                    if (Objects.equals(template.getForceName(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID)) {
+                        if (primaryForceIDs.contains(forceID)) {
+                            deployRound = template.getArrivalTurn();
+                        } else {
+                            deployRound = ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS;
+                        }
+                        break;
+                    }
+                }
+
+                // After we're overwritten the template, as necessary, continue
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+                    logger.info(String.format("We're using staggered deployment turn calculation for %s",
+                        playerForce.getName()));
+
                     setDeploymentTurnsStaggeredByLance(forceEntities);
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+                    logger.info(String.format("We're using reinforcement deployment turn calculation for %s",
+                        playerForce.getName()));
+
                     setDeploymentTurnsForReinforcements(forceEntities, strategy + scenario.getFriendlyReinforcementDelayReduction());
 
                     // Here we selectively overwrite the earlier entries
@@ -3660,11 +3737,16 @@ public class AtBDynamicScenarioFactory {
                         }
                     }
                 } else {
+                    logger.info(String.format("We're using normal deployment turn calculation for %s",
+                        playerForce.getName()));
+
                     for (Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
                     }
                 }
             } else {
+                logger.info(String.format("We're using a fallback deployment turn calculation for %s",
+                    playerForce.getName()));
                 setDeploymentTurnsForReinforcements(forceEntities, strategy);
             }
         }
@@ -3797,12 +3879,14 @@ public class AtBDynamicScenarioFactory {
      */
     public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier,
                                                            boolean isDelayed) {
-        int minimumSpeed = 999;
         int arrivalScale = REINFORCEMENT_ARRIVAL_SCALE;
 
         // First, we organize the reinforcements into pools.
         // This ensures each Force's reinforcements are handled separately.
         Map<Integer, Integer> delayByForce = new HashMap<>();
+
+        int actualArrivalTurn = 0;
+        int delayedArrivalScale = REINFORCEMENT_ARRIVAL_SCALE * (randomInt(2) + 2);
 
         // first, we figure out the slowest "atb speed" of this group.
         for (Entity entity : entityList) {
@@ -3812,7 +3896,6 @@ public class AtBDynamicScenarioFactory {
                 if (delayByForce.containsKey(forceId)) {
                     arrivalScale = delayByForce.get(forceId);
                 } else {
-                    int delayedArrivalScale = REINFORCEMENT_ARRIVAL_SCALE * (randomInt(2) + 2);
                     delayByForce.put(forceId, delayedArrivalScale);
                     arrivalScale = delayedArrivalScale;
                 }
@@ -3823,13 +3906,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            int speed = calculateAtBSpeed(entity);
-
-            // don't reduce minimum speed to 0, since dividing by zero further down is
-            // problematic
-            if ((speed < minimumSpeed) && (speed > 0)) {
-                minimumSpeed = speed;
-            }
+            int speed = max(1, calculateAtBSpeed(entity));
 
             // the actual arrival turn will be the scale divided by the slowest speed.
             // so, a group of Atlases (3/5) should arrive at turn 7 (20 / 3)
@@ -3837,8 +3914,14 @@ public class AtBDynamicScenarioFactory {
             // a group of Ostscouts (8/12/8) should arrive on turn 2 (20 / 9, rounded down)
             // we then subtract the passed-in turn modifier, which is usually the
             // commander's strategy skill level.
-            int actualArrivalTurn = max(0, (arrivalScale / minimumSpeed) - turnModifier);
+            int rollingArrivalTurn = max(0, (arrivalScale / speed) - turnModifier);
 
+            if (rollingArrivalTurn > actualArrivalTurn) {
+                actualArrivalTurn = rollingArrivalTurn;
+            }
+        }
+
+        for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }
     }

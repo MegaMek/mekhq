@@ -224,6 +224,26 @@ public class StratconContractInitializer {
         // Determine starting Support Points
         campaign.negotiateAdditionalSupportPoints();
 
+        // Roll to see if a hidden cache is present
+        if (campaign.getLocalDate().isAfter(LocalDate.of(2900, 1, 1))) {
+//            if (Compute.randomInt(100) == 0) {
+//                ScenarioTemplate template = ScenarioTemplate.Deserialize(
+//                    "data/scenariotemplates/Chasing a Rumor.xml");
+//
+//                if (template != null) {
+//                    StratconScenario hiddenCache = addHiddenExternalScenario(campaign, contract,
+//                        null, template, false);
+//
+//                    if (hiddenCache != null) {
+//                        logger.info(String.format("A secret cache has been spawned for contract %s",
+//                            contract.getName()));
+//                    }
+//                } else {
+//                    logger.error("'Chasing a Rumor' scenario failed to deserialize");
+//                }
+//            }
+        }
+
         // now we're done
     }
 
@@ -346,8 +366,31 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Worker function that takes a trackstate and plops down the given number of
-     * facilities owned by the given faction
+     * Initializes and populates a StratCon track with a specified number of objective scenarios.
+     * This method selects scenario templates, places them on the track in unoccupied coordinates,
+     * and optionally assigns facilities and objectives based on predefined rules.
+     *
+     * <p>The key steps of this method include:
+     * <ul>
+     *   <li>Selecting scenario templates from the provided list of objective scenarios.</li>
+     *   <li>Identifying unoccupied coordinates on the track to place each scenario.</li>
+     *   <li>Adding facilities if the scenario template requires them (hostile or allied).</li>
+     *   <li>Generating and configuring scenarios with relevant attributes and modifiers:</li>
+     *   <ul>
+     *     <li>Clearing scenario dates to maintain persistence.</li>
+     *     <li>Marking scenarios as strategic objectives.</li>
+     *     <li>Adding optional modifiers to provide additional effects or conditions.</li>
+     *   </ul>
+     *   <li>Tracking newly added scenarios as strategic objectives for gameplay purposes.</li>
+     * </ul>
+     *
+     * @param campaign            the {@link Campaign} managing the state of the overall gameplay
+     * @param contract            the {@link AtBContract} related to the current StratCon campaign
+     * @param trackState          the {@link StratconTrackState} representing the track where objectives are placed
+     * @param numScenarios        the number of objective scenarios to generate
+     * @param objectiveScenarios  a list of {@link String} identifiers for potential scenarios that can be generated
+     * @param objectiveModifiers  a list of optional {@link String} modifiers to apply to the generated scenarios;
+     *                             can be {@code null} if no modifiers are required
      */
     private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
             StratconTrackState trackState,
@@ -389,7 +432,7 @@ public class StratconContractInitializer {
 
             // create scenario - don't assign a force yet
             StratconScenario scenario = StratconRulesManager.generateScenario(campaign, contract, trackState,
-                    Force.FORCE_NONE, coords, template);
+                    Force.FORCE_NONE, coords, template, null);
 
             // clear dates, because we don't want the scenario disappearing on us
             scenario.setDeploymentDate(null);

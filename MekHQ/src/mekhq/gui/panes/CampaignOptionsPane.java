@@ -43,6 +43,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -52,7 +53,7 @@ import mekhq.campaign.market.PersonnelMarketRandom;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -87,8 +88,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -650,6 +649,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<SkillLevel> comboSkillLevel;
+    private MMComboBox<AutoResolveMethod> comboAutoResolveType;
 
     // unit administration
     private JCheckBox chkUseAero;
@@ -660,8 +660,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // contract operations
     private JCheckBox chkMercSizeLimited;
     private JCheckBox chkRestrictPartsByMission;
-    private JSpinner spnBonusPartExchangeValue;
-    private JSpinner spnBonusPartMaxExchangeCount;
     private JCheckBox chkLimitLanceWeight;
     private JCheckBox chkLimitLanceNumUnits;
     private JCheckBox chkUseStrategy;
@@ -691,13 +689,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkRegionalMekVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
     private JCheckBox chkPlayerControlsAttachedUnits;
+    private JCheckBox chkAutoResolveVictoryChanceEnabled;
     private JCheckBox chkUseDropShips;
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JSpinner spnAutoResolveNumberOfScenarios;
     private JSpinner spnScenarioModMax;
     private JSpinner spnScenarioModChance;
     private JSpinner spnScenarioModBV;
+
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -3071,31 +3072,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkRestrictPartsByMission, gridBagConstraints);
 
-        JLabel lblBonusPartExchangeValue = new JLabel(resources.getString("lblBonusPartExchangeValue.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 1;
-        panSubAtBContract.add(lblBonusPartExchangeValue, gridBagConstraints);
-
-        spnBonusPartExchangeValue = new JSpinner(new SpinnerNumberModel(500000, 0, 1000000, 1));
-        spnBonusPartExchangeValue.setToolTipText(resources.getString("lblBonusPartExchangeValue.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        panSubAtBContract.add(spnBonusPartExchangeValue, gridBagConstraints);
-
-        JLabel lblBonusPartMaxExchangeCount = new JLabel(resources.getString("lblBonusPartMaxExchangeCount.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 1;
-        panSubAtBContract.add(lblBonusPartMaxExchangeCount, gridBagConstraints);
-
-        spnBonusPartMaxExchangeCount = new JSpinner(new SpinnerNumberModel(10, 0, 100, 1));
-        spnBonusPartMaxExchangeCount
-                .setToolTipText(resources.getString("lblBonusPartMaxExchangeCount.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        panSubAtBContract.add(spnBonusPartMaxExchangeCount, gridBagConstraints);
-
         chkLimitLanceWeight = new JCheckBox(resources.getString("chkLimitLanceWeight.text"));
         chkLimitLanceWeight.setToolTipText(resources.getString("chkLimitLanceWeight.toolTipText"));
         gridBagConstraints.gridx = 0;
@@ -3173,45 +3149,45 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
-        spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
+        spnAtBBattleChance = new JSpinner[CombatRole.values().length - 2];
 
-        JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING + ":");
+        JLabel lblFightChance = new JLabel(CombatRole.FRONTLINE + ":");
         gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
         JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE + ":");
+        JLabel lblDefendChance = new JLabel(CombatRole.GARRISON + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.GARRISON.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING + ":");
+        JLabel lblScoutChance = new JLabel(CombatRole.RECON + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 17;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.RECON.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING + ":");
+        JLabel lblTrainingChance = new JLabel(CombatRole.TRAINING + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 18;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.TRAINING.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
@@ -3382,8 +3358,43 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkPlayerControlsAttachedUnits, gridBagConstraints);
 
+        JLabel lblAutoResolveType = new JLabel(resources.getString("lblAutoResolveType.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBScenario.add(lblAutoResolveType, gridBagConstraints);
+
+        final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
+            AutoResolveMethod.values());
+        comboAutoResolveType = new MMComboBox<>("comboAutoResolveType", autoResolveTypeModel);
+        comboAutoResolveType.setToolTipText(resources.getString("lblAutoResolveType.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition;
+        panSubAtBScenario.add(comboAutoResolveType, gridBagConstraints);
+
+        chkAutoResolveVictoryChanceEnabled = new JCheckBox(
+            resources.getString("chkAutoResolveVictoryChanceEnabled.text"));
+        chkAutoResolveVictoryChanceEnabled.setToolTipText(
+            resources.getString("chkAutoResolveVictoryChanceEnabled.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(chkAutoResolveVictoryChanceEnabled, gridBagConstraints);
+
+        JLabel lblAutoResolveNumberOfRepetitions = new JLabel(resources.getString("lblAutoResolveNumberOfRepetitions.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBScenario.add(lblAutoResolveNumberOfRepetitions, gridBagConstraints);
+
+        spnAutoResolveNumberOfScenarios = new JSpinner(new SpinnerNumberModel(250, 10, 1000, 10));
+        spnAutoResolveNumberOfScenarios.setToolTipText(resources.getString("spnAutoResolveNumberOfScenarios.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = yTablePosition++;
+        panSubAtBScenario.add(spnAutoResolveNumberOfScenarios, gridBagConstraints);
+
         chkUseDropShips = new JCheckBox(resources.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resources.getString("chkUseDropShips.toolTipText"));
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
         panSubAtBScenario.add(chkUseDropShips, gridBagConstraints);
 
@@ -8400,7 +8411,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
         spnMaxAcquisitions.setValue(options.getMaxAcquisitions());
         spnDefaultStockPercent.setValue(options.getDefaultStockPercent());
-        
+
 
         spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
         spnConstantTransitTime.setValue(options.getConstantTransitTime());
@@ -8944,22 +8955,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAutoConfigMunitions.setSelected(options.isAutoConfigMunitions());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
-        spnBonusPartExchangeValue.setValue(options.getBonusPartExchangeValue());
-        spnBonusPartMaxExchangeCount.setValue(options.getBonusPartMaxExchangeCount());
         chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
         chkLimitLanceNumUnits.setSelected(options.isLimitLanceNumUnits());
         chkUseStrategy.setSelected(options.isUseStrategy());
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         chkAdjustPaymentForStrategy.setSelected(options.isAdjustPaymentForStrategy());
-        spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]
-                .setValue(options.getAtBBattleChance(AtBLanceRole.FIGHTING));
-        spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]
-                .setValue(options.getAtBBattleChance(AtBLanceRole.DEFENCE));
-        spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]
-                .setValue(options.getAtBBattleChance(AtBLanceRole.SCOUTING));
-        spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]
-                .setValue(options.getAtBBattleChance(AtBLanceRole.TRAINING));
+        spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()]
+                .setValue(options.getAtBBattleChance(CombatRole.FRONTLINE));
+        spnAtBBattleChance[CombatRole.GARRISON.ordinal()]
+                .setValue(options.getAtBBattleChance(CombatRole.GARRISON));
+        spnAtBBattleChance[CombatRole.RECON.ordinal()]
+                .setValue(options.getAtBBattleChance(CombatRole.RECON));
+        spnAtBBattleChance[CombatRole.TRAINING.ordinal()]
+                .setValue(options.getAtBBattleChance(CombatRole.TRAINING));
         btnIntensityUpdate.doClick();
         chkGenerateChases.setSelected(options.isGenerateChases());
 
@@ -8983,6 +8992,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
+        comboAutoResolveType.setSelectedItem(options.getAutoResolveMethod());
+        chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
+        spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
         chkUseDropShips.setSelected(options.isUseDropShips());
         chkUseWeatherConditions.setSelected(options.isUseWeatherConditions());
         chkUseLightConditions.setSelected(options.isUseLightConditions());
@@ -9581,11 +9593,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setGenerateChases(chkGenerateChases.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
-            options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
-            options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());
             options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
             options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
+            options.setAutoResolveMethod(comboAutoResolveType.getSelectedItem());
+            options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
+            options.setAutoResolveNumberOfScenarios((Integer) spnAutoResolveNumberOfScenarios.getValue());
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
@@ -9963,16 +9976,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private double determineAtBBattleIntensity() {
         double intensity = 0.0;
 
-        int x = (Integer) spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].getValue();
+        int x = (Integer) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
         intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.GARRISON.ordinal()].getValue();
         intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.RECON.ordinal()].getValue();
         intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
         intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
         intensity = intensity / 4.0;
@@ -9992,20 +10005,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (intensity >= AtBContract.MINIMUM_INTENSITY) {
                 int value = (int) Math.min(
                         Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
-                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05),
                         100);
-                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05),
                         100);
-                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
-                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
             } else {
-                spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()].setValue(0);
-                spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()].setValue(0);
-                spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()].setValue(0);
-                spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
             }
         }
     }

@@ -77,7 +77,86 @@ MEKHQ VERSION HISTORY:
 + PR #5362: Refactored StratCon Scenario Deployment to Support Scout Role Behavior
 + Fix #5322: Fixed Incorrect Color Usage for Quality Decline Messages
 + PR #5368: Env var mm.profile=dev makes log print on console
-
++ Fix #5322: Fixed Incorrect Color Usage for Quality Decline Messages
++ Fix #5330: Refactored Combat Team Validation Logic, Loosened Combat Team Requirements
++ PR #5358: Disabled Startup Screen Buttons during Actions
++ PR #5363: Added Requirement for Training Lances to be Deployed to a StratCon Track
++ PR #5364: Renamed 'Unassigned' Combat Team Role to 'In Reserve'
++ PR #5365: Refactored Logic for Retrieving Deployable Combat Forces
++ Fix #5380: Removed Monthly & Mission Accomplished XP Awards from Children & Dependents
++ PR #5382: Establishment of a Requested Stock % feature, and automating weekly checks to keep spare parts in stock
++ Fix #5383: Fixed save bug
++ PR #5389: Abstract Combat Auto Resolve
++ Fix #5304: Fixed Force Commanders Changing on Load
++ Fix #5390: Adjusted Dependent Addition & Removal Logic
++ Fix #5391: Refactored StratconScenarioWizard to use a Scroll Pane
++ Fix #5392: Updated StratCon Deployment Mechanics
++ PR #5393: Fixed Experience Rating Parsing to Handle Invalid Character
++ Fix #5394: Corrected Scenario Briefings by Removing Explicit Turn Limits
++ PR #5397: Prevent Reserved Formations from Being Deployed to StratCon
++ PR #5399: Capped Negotiated StratCon Support Points at Sector Count
++ PR #5400: Removed Contract Breach References in Scenario and Loan Events
++ PR #5401: Set Default Maintenance Multiplier for Salvaged Units
++ PR #5403: Disabled Commit Forces Button when No Forces Selected
++ PR #5158: Implemented Resupply Module
++ PR #5407: Updated Name of I18n Class
++ PR #5411: Updated Damage Application in ACAR
++ PR #5415: Fixed Resolve Unit Test to Only Run when Asked
++ Fix #2800: Fixed Force Deployment Order Bug
++ Fix #4430: Fixed NPE in Caused by Deployment Attempt in Integrated Command
++ Fix #5299: Added Missing Tile Images to Stratcon Biome Manifest
++ Fix #5317: Set Minimum Target Skill Level in Mass Training Dialog to 1
++ Fix #5344: Improved StratCon Force Picker & Renamed LayeredForceIconOperationalStatus to OperationalStatus
++ Fix #5369: Fixed Divorce Logic
++ Fix #5408: Fixed Passenger Capacity Calculation in CamOps Reputation
++ Fix #5409: Refactored StratCon Campaign Management Dialog
++ PR #5416: Fixed Incorrect Ordering in Personnel Status Change Switch
++ PR #5417: Refactored Personnel Handling on New Day
++ PR #5423: Updated TO&E to Use "Support" Term instead of "Non-Combat"
++ PR #5425: Added Notification for Users Attempting to Manually Deploy on Integrated Commands
++ PR #5427: Fixed Unit Check in Combat Team Status Evaluation
++ PR #5428: Added Combat Teams & Support Forces Documentation
++ PR #5429: Archived Outdated Against the Bot Documentation
++ PR #5435: Halved Duration of Recon Scenarios
++ PR #5436: Adjusted Scenario Modifiers BV & Unit Count Contribution
++ PR #5437: Added Further Edge Case Handling for Turn Limit Scenario Objectives
++ PR #5438: fix: quick bandaid for gun emplacements in ACAR
++ PR #5443: Updated Naming of AtBLanceRole Class, Added Auxiliaries Combat Role
++ PR #5444: Removed Remaining Instance of Undeploy Functionality when StratCon is Enabled
++ PR #5446: Updated Convoy Scenarios to Exclude BV and Unit Count Contribution for Convoy Units
++ PR #5447: Refactored Conventional Fighter Handling in StratCon
++ Fix #5449: Fixed Force Removal Bug in TO&E, Fixed Convoy-Support Force Option Bug #5449
++ Fix #5450: Fixed Combat Team Eligibility Check by Rolling Back Use of getAllUnits()
++ Fix #5439: ACAR mode selection
++ PR #5460: Refined Deploy/Undeploy Menu Behavior for GM Permissions
++ Fix #5442: Improved Reinforcement Transparency and User Control
++ Fix #5465: Corrected Date of Resupply Interception Scenarios & Added Clarity to Scenario Names
++ Fix #3639, #4036: Fixed Monthly Facility Support Point Gains & Added Functionality to Allied Industrial Facilities
++ PR #5472: Renamed Supply Depots to Space Ports, Buffed Support Point Gain
++ PR #5473: Renamed Fight, Defense, and Scouting Combat Role Names
++ PR #5475: Fixed Resupply Smuggler Dialog Formatting
++ PR #5476: Added Missing Anti-Mek Skill to Battle Armor Basic Training In-Unit Education Curriculum
++ Fix #5491: Fixed Transportation Capacity and Requirement Calculations
++ Fix #5478: Refactored Loot Description for Clarity
++ PR #5493: Added Name for Resupply Loot
++ PR #5494: Fixed Marshalling and Unmarshalling of stratConScenarioType
++ PR #5495, #5496: Updated Documentation for Personnel Modules, Unit Markets, Force Documentation
++ Fix #5453: Refactored Resupply Logic and Streamlined Cargo Calculations
++ PR #5456: Added Motive System Exclusion in Resupply Eligibility
++ PR #5458: Clarified Speaker Names in Resupply Dialogs
++ PR #5459: Added Notification for Dispatched Convoys During Resupplies
++ Fix #5461: Fixed Legacy AtB Battle Chance Spinner Array Indexing Bug
++ Fix #5464: Adjusted Force Multipliers in Emergency Convoy Defense - VTOL Scenario Template
++ PR #5489: Fixed NPE when Searching for Primary Force in StratCon Scenario Generation
++ PR #5477: Rewrote & Reworked Training Combat Role
++ Fix #5506: Updated Force Refresh Logic in TOEMouseAdapter
++ Fix #5512: Added Compatibility Handlers for Legacy Save File Support
++ Fix #5500: Update contract scenarios to replace VIP Capture objectives
++ PR #5504: Fixed Duplicated autoAwards Trigger in New Day
++ PR #5501: Updated Resupply Mechanics, Added Documentation
++ Fix #5480: AutoLogistics requesting incorrect parts when variants of the same part exist in some cases
++ Fix #5479: AutoLogistics orders reset values
++ PR #5509: ACAR Improvements- Damage delivery more granular, fixed error with morale never checking
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

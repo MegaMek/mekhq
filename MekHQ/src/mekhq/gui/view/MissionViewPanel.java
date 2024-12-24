@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -89,10 +90,10 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtMorale;
     private JLabel lblScore;
     private JLabel txtScore;
-    private JLabel lblBonusParts;
-    private JLabel txtBonusParts;
     private JLabel lblSharePct;
     private JLabel txtSharePct;
+    private JLabel lblCargoRequirement;
+    private JLabel txtCargoRequirement;
 
     protected JTable scenarioTable;
 
@@ -591,10 +592,10 @@ public class MissionViewPanel extends JScrollablePanel {
         txtMorale = new JLabel();
         lblSharePct = new JLabel();
         txtSharePct = new JLabel();
+        lblCargoRequirement = new JLabel();
+        txtCargoRequirement = new JLabel();
         lblScore = new JLabel();
         txtScore = new JLabel();
-        lblBonusParts = new JLabel();
-        txtBonusParts = new JLabel();
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -961,6 +962,7 @@ public class MissionViewPanel extends JScrollablePanel {
         if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
             lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
+            lblSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -970,6 +972,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
             txtSharePct.setName("txtSharePct");
             txtSharePct.setText(contract.getSharesPercent() + "%");
+            txtSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
@@ -978,6 +981,28 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSharePct, gridBagConstraints);
+        }
+
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            lblCargoRequirement.setName("lblCargoRequirement");
+            lblCargoRequirement.setText(resourceMap.getString("lblCargoRequirement.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblCargoRequirement, gridBagConstraints);
+
+            txtCargoRequirement.setName("txtCargoRequirement");
+            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtCargoRequirement, gridBagConstraints);
         }
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
@@ -1007,26 +1032,6 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtScore, gridBagConstraints);
         }
-
-        lblBonusParts.setName("lblBonusParts");
-        lblBonusParts.setText(resourceMap.getString("lblBonusParts.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblBonusParts, gridBagConstraints);
-
-        txtBonusParts.setName("txtBonusParts");
-        txtBonusParts.setText(Integer.toString(contract.getNumBonusParts()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtBonusParts, gridBagConstraints);
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);

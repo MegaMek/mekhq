@@ -1077,13 +1077,13 @@ public class Person {
                 setRetirement(today);
 
                 break;
+            case STUDENT:
+                // log entries and reports are handled by the education package
+                // (mekhq/campaign/personnel/education)
+                break;
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
-            case STUDENT:
-                // log entries & reports are handled by the education package
-                // (mekhq/campaign/personnel/education)
-                break;
             default:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
@@ -1096,7 +1096,7 @@ public class Person {
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
-                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
+                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), this);
             }
 
             // log death across genealogy
@@ -3290,6 +3290,81 @@ public class Person {
             default:
                 return SkillType.EXP_NONE;
         }
+    }
+
+    /**
+     * Retrieves the skills associated with the character's profession.
+     * The skills returned depend on whether the personnel's primary or secondary role
+     * is being queried and may also vary based on the campaign's configuration settings, such as
+     * whether artillery skills are enabled.
+     *
+     * <p>This method identifies the {@link PersonnelRole} associated with the personnel and returns
+     * a list of corresponding skills. The resulting skills depend on the profession and specific
+     * conditions, such as whether artillery is enabled in the campaign options.</p>
+     *
+     * <p>Examples of skill mappings include:
+     * <ul>
+     *     <li><strong>MEKWARRIOR:</strong> Includes gun and piloting skills for meks, with optional
+     *     artillery skills if enabled in the campaign.</li>
+     *     <li><strong>LAM_PILOT:</strong> Covers skills for both meks and aerospace combat.</li>
+     *     <li><strong>GROUND_VEHICLE_DRIVER:</strong> Includes piloting skills for ground vehicles.</li>
+     *     <li><strong>VEHICLE_GUNNER:</strong> Includes vehicle gunnery skills, with optional artillery skills
+     *         if enabled.</li>
+     *     <li><strong>AEROSPACE_PILOT:</strong> Covers skills for aerospace gunnery and piloting.</li>
+     *     <li><strong>ADMINISTRATORS:</strong> Includes administrative, negotiation, and scrounging skills.</li>
+     *     <li><strong>DEPENDENT or NONE:</strong> Returns no specific skills.</li>
+     * </ul>
+     *
+     * @param campaign  the current {@link Campaign}
+     * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true})
+     *                  or primary ({@code false}) profession of the character
+     * @return a {@link List} of skill identifiers ({@link String}) associated with the personnel's role,
+     *         possibly modified by campaign settings
+     */
+    public List<String> getProfessionSkills(final Campaign campaign, final boolean secondary) {
+        final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
+        final boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
+
+        return switch (profession) {
+            case MEKWARRIOR -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                }
+            }
+            case LAM_PILOT -> List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK,
+                SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_VEE);
+                }
+            }
+            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
+            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
+            case VESSEL_CREW -> List.of(SkillType.S_TECH_VESSEL);
+            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAV);
+            case MEK_TECH -> List.of(SkillType.S_TECH_MEK);
+            case AERO_TEK -> List.of(SkillType.S_TECH_AERO);
+            case BA_TECH -> List.of(SkillType.S_TECH_BA);
+            case ASTECH -> List.of(SkillType.S_ASTECH);
+            case DOCTOR -> List.of(SkillType.S_DOCTOR);
+            case MEDIC -> List.of(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
+                 ADMINISTRATOR_HR -> List.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+            case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
+        };
     }
 
     /**

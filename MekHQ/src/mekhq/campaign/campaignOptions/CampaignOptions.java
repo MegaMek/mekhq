@@ -28,13 +28,14 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
@@ -565,8 +566,6 @@ public class CampaignOptions {
     // Contract Operations
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
-    private int bonusPartExchangeValue = 500000;
-    private int bonusPartMaxExchangeCount = 10;
     private boolean limitLanceWeight;
     private boolean limitLanceNumUnits;
     private boolean useStrategy;
@@ -602,6 +601,9 @@ public class CampaignOptions {
     private int scenarioModChance;
     private int scenarioModBV;
     private boolean autoConfigMunitions;
+    private AutoResolveMethod autoResolveMethod;
+    private boolean autoResolveVictoryChanceEnabled;
+    private int autoResolveNumberOfScenarios;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1133,10 +1135,6 @@ public class CampaignOptions {
         phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
         phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
-
-        // Remove Milestone after 0.49.19
-        phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = 95;
-        phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         // endregion Skill Randomization Tab
 
         // region Rank System Tab
@@ -1193,6 +1191,9 @@ public class CampaignOptions {
         useAtB = false;
         useStratCon = false;
         setSkillLevel(SkillLevel.REGULAR);
+        autoResolveMethod = AutoResolveMethod.PRINCESS;
+        autoResolveVictoryChanceEnabled = false;
+        autoResolveNumberOfScenarios = 100;
 
         // Unit Administration
         useAero = false;
@@ -1202,19 +1203,17 @@ public class CampaignOptions {
         // Contract Operations
         mercSizeLimited = false;
         restrictPartsByMission = true;
-        bonusPartExchangeValue = 500000;
-        bonusPartMaxExchangeCount = 10;
         limitLanceWeight = true;
         limitLanceNumUnits = true;
         useStrategy = true;
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
-        atbBattleChance = new int[AtBLanceRole.values().length - 1];
-        atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = 40;
-        atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = 20;
-        atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = 60;
-        atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = 10;
+        atbBattleChance = new int[CombatRole.values().length - 1];
+        atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 40;
+        atbBattleChance[CombatRole.GARRISON.ordinal()] = 20;
+        atbBattleChance[CombatRole.RECON.ordinal()] = 60;
+        atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
         // Scenarios
@@ -4479,19 +4478,39 @@ public class CampaignOptions {
     }
 
     /**
-     * @param role the {@link AtBLanceRole} to get the battle chance for
-     * @return the chance of having a battle for the specified role, or {@code 0} if StratCon is enabled
+     * Retrieves the chance of having a battle for the specified {@link CombatRole}.
+     * <p>
+     * This method calculates the battle chance percentage for the provided combat role based on
+     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled, the
+     * method immediately returns {@code 0}.
+     * Roles marked as {@link CombatRole#RESERVE} or as {@link CombatRole#AUXILIARY} are not
+     * eligible for battles and also return {@code 0}.
+     * </p>
+     *
+     * @param role the {@link CombatRole} to evaluate the battle chance for.
+     * @return the chance of having a battle for the specified role. Returns:
+     *         <ul>
+     *           <li>{@code 0} if StratCon is enabled.</li>
+     *           <li>{@code 0} if the role is {@link CombatRole#RESERVE} or
+     *           {@link CombatRole#AUXILIARY}.</li>
+     *           <li>A non-zero value from the {@code atbBattleChance} array corresponding to the
+     *           role otherwise.</li>
+     *         </ul>
      */
-    public int getAtBBattleChance(final AtBLanceRole role) {
+    public int getAtBBattleChance(CombatRole role) {
         if (useStratCon) {
             return 0;
         }
 
-        return role.isInReserve() ? 0 : atbBattleChance[role.ordinal()];
+        if (role.isReserve() || role.isAuxiliary()) {
+            return 0;
+        }
+
+        return atbBattleChance[role.ordinal()];
     }
 
     /**
-     * @param role      the {@link AtBLanceRole} ordinal value
+     * @param role      the {@link CombatRole} ordinal value
      * @param frequency the frequency to set the generation to (percent chance from
      *                  0 to 100)
      */
@@ -4569,22 +4588,6 @@ public class CampaignOptions {
 
     public void setRestrictPartsByMission(final boolean restrictPartsByMission) {
         this.restrictPartsByMission = restrictPartsByMission;
-    }
-
-    public int getBonusPartExchangeValue() {
-        return bonusPartExchangeValue;
-    }
-
-    public void setBonusPartExchangeValue(final int bonusPartExchangeValue) {
-        this.bonusPartExchangeValue = bonusPartExchangeValue;
-    }
-
-    public int getBonusPartMaxExchangeCount() {
-        return bonusPartMaxExchangeCount;
-    }
-
-    public void setBonusPartMaxExchangeCount(final int bonusPartMaxExchangeCount) {
-        this.bonusPartMaxExchangeCount = bonusPartMaxExchangeCount;
     }
 
     public boolean isLimitLanceWeight() {
@@ -5177,6 +5180,9 @@ public class CampaignOptions {
 
         // region AtB Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", getAutoResolveMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveNumberOfScenarios", getAutoResolveNumberOfScenarios());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -5208,8 +5214,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPaymentForStrategy", adjustPaymentForStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonusPartExchangeValue", bonusPartExchangeValue);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonusPartMaxExchangeCount", bonusPartMaxExchangeCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
@@ -5249,7 +5253,7 @@ public class CampaignOptions {
                 continue;
             }
 
-            logger.debug("%s\n\t%s", wn2.getNodeName(), wn2.getTextContent());
+            logger.debug("{}\n\t{}", wn2.getNodeName(), wn2.getTextContent());
             try {
                 // region Repair and Maintenance Tab
                 if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -6163,6 +6167,12 @@ public class CampaignOptions {
                     // region AtB Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                     retVal.setSkillLevel(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveMethod")) {
+                    retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
+                    retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveNumberOfScenarios")) {
+                    retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6236,10 +6246,6 @@ public class CampaignOptions {
                     retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("bonusPartExchangeValue")) {
-                    retVal.bonusPartExchangeValue = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("bonusPartMaxExchangeCount")) {
-                    retVal.bonusPartMaxExchangeCount = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {
                     retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
@@ -6352,10 +6358,10 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                    retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.GARRISON.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.RECON.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
@@ -6437,4 +6443,27 @@ public class CampaignOptions {
         }
     }
     // endregion File IO
+    public AutoResolveMethod getAutoResolveMethod() {
+        return autoResolveMethod;
+    }
+
+    public void setAutoResolveMethod(final AutoResolveMethod autoResolveMethod) {
+        this.autoResolveMethod = autoResolveMethod;
+    }
+
+    public boolean isAutoResolveVictoryChanceEnabled() {
+        return autoResolveVictoryChanceEnabled;
+    }
+
+    public void setAutoResolveVictoryChanceEnabled(final boolean autoResolveVictoryChanceEnabled) {
+        this.autoResolveVictoryChanceEnabled = autoResolveVictoryChanceEnabled;
+    }
+
+    public void setAutoResolveNumberOfScenarios(int autoResolveNumberOfScenarios) {
+        this.autoResolveNumberOfScenarios = autoResolveNumberOfScenarios;
+    }
+
+    public int getAutoResolveNumberOfScenarios() {
+        return autoResolveNumberOfScenarios;
+    }
 }

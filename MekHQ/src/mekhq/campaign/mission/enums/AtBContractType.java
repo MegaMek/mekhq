@@ -194,26 +194,26 @@ public enum AtBContractType {
         }
     }
 
-    public AtBLanceRole getRequiredLanceRole() {
+    public CombatRole getRequiredLanceRole() {
         switch (this) {
             case CADRE_DUTY:
-                return AtBLanceRole.TRAINING;
+                return CombatRole.TRAINING;
             case GARRISON_DUTY:
             case SECURITY_DUTY:
             case RIOT_DUTY:
-                return AtBLanceRole.DEFENCE;
+                return CombatRole.GARRISON;
             case GUERRILLA_WARFARE:
             case PIRATE_HUNTING:
             case PLANETARY_ASSAULT:
             case RELIEF_DUTY:
-                return AtBLanceRole.FIGHTING;
+                return CombatRole.FRONTLINE;
             case DIVERSIONARY_RAID:
             case EXTRACTION_RAID:
             case OBJECTIVE_RAID:
             case RECON_RAID:
-                return AtBLanceRole.SCOUTING;
+                return CombatRole.RECON;
             default:
-                return AtBLanceRole.IN_RESERVE;
+                return CombatRole.RESERVE;
         }
     }
 

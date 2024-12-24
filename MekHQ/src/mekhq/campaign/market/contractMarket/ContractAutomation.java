@@ -73,7 +73,7 @@ public class ContractAutomation {
         final String speakerName = getSpeakerName(campaign, speaker);
         final ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
 
-        final String commanderAddress = campaign.getCommanderAddress();
+        final String commanderAddress = campaign.getCommanderAddress(false);
 
         // Mothballing
         String message = String.format(resources.getString("mothballDescription.text"), commanderAddress);

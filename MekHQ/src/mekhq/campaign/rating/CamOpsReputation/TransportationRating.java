@@ -71,8 +71,8 @@ public class TransportationRating {
         // The above logic is repeated for the remaining entities
 
         // ASF
-        capacity = transportationCapacities.get("asfBays");
-        requirements = Math.max(0, transportationRequirements.get("asfCount") - spareCapacity);
+        capacity = transportationCapacities.get("asfBays") + spareCapacity;
+        requirements = transportationRequirements.get("asfCount");
 
         rating = calculateRating(capacity, requirements);
         capacityRating = getCapacityRating(rating, capacityRating);
@@ -94,20 +94,19 @@ public class TransportationRating {
         spareCapacity = Math.max(0, capacity - requirements);
 
         // Heavy Vehicles
-        capacity = transportationCapacities.get("heavyVehicleBays");
-        requirements = Math.max(0, transportationRequirements.get("heavyVehicleCount") - spareCapacity);
+        capacity = transportationCapacities.get("heavyVehicleBays") + spareCapacity;
+        requirements = transportationRequirements.get("heavyVehicleCount");
 
         rating = calculateRating(capacity, requirements);
         capacityRating = getCapacityRating(rating, capacityRating);
 
         // as this spare capacity can also be used by light vehicles,
         // we need to track the remaining spare capacity
-        spareCapacity -= Math.max(0, transportationRequirements.get("heavyVehicleCount"));
         spareCapacity += Math.max(0, capacity - requirements);
 
         // Light Vehicles
-        capacity = transportationCapacities.get("lightVehicleBays");
-        requirements = Math.max(0, transportationRequirements.get("lightVehicleCount") - spareCapacity);
+        capacity = transportationCapacities.get("lightVehicleBays") + spareCapacity;
+        requirements = transportationRequirements.get("lightVehicleCount");
 
         rating = calculateRating(capacity, requirements);
         capacityRating = getCapacityRating(rating, capacityRating);
@@ -174,7 +173,8 @@ public class TransportationRating {
         // Docking Collar Requirements
         int dockingCollarCount = transportationCapacities.get("dockingCollars");
 
-        if ((dockingCollarCount > 0) && (dockingCollarCount >= transportationRequirements.get("dropShipCount"))) {
+        if ((dockingCollarCount >= 0)
+            && (dockingCollarCount >= transportationRequirements.get("dropShipCount"))) {
             transportationRating += 5;
             logger.debug("Exceeding docking collar requirements: +5");
         }
@@ -228,7 +228,7 @@ public class TransportationRating {
 
             if (usage < 0) {
                 return BELOW_CAPACITY;
-            } else if (usage > requirements * 2) {
+            } else if (usage >= requirements * 2) {
                 return DOUBLE_CAPACITY;
             } else {
                 return AT_CAPACITY;
@@ -304,6 +304,8 @@ public class TransportationRating {
 
                 passengerCapacity += bay.getPersonnel(entity.isClan());
             }
+
+            passengerCapacity += entity.getNPassenger();
         }
 
         // Map the capacity of each bay type

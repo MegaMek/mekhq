@@ -22,6 +22,8 @@ import megamek.common.Entity;
 import mekhq.MHQConstants;
 import mekhq.campaign.unit.Unit;
 
+import static megamek.codeUtilities.MathUtility.clamp;
+
 /**
  * This is the Operational Status of a force or unit, as part of automatically assigning and
  * updating the force's LayeredForceIcon on a new day. It is also used to determine the Operation
@@ -29,7 +31,7 @@ import mekhq.campaign.unit.Unit;
  *
  * @author Justin "Windchild" Bowen
  */
-public enum LayeredForceIconOperationalStatus {
+public enum OperationalStatus {
     //region Enum Declarations
     FULLY_OPERATIONAL(MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_FULLY_OPERATIONAL_FILENAME),
     SUBSTANTIALLY_OPERATIONAL(MHQConstants.LAYERED_FORCE_ICON_OPERATIONAL_STATUS_SUBSTANTIALLY_OPERATIONAL_FILENAME),
@@ -43,7 +45,7 @@ public enum LayeredForceIconOperationalStatus {
     //endregion Variable Declarations
 
     //region Constructors
-    LayeredForceIconOperationalStatus(final String filename) {
+    OperationalStatus(final String filename) {
         this.filename = filename;
     }
     //endregion Constructors
@@ -82,7 +84,7 @@ public enum LayeredForceIconOperationalStatus {
      * @param unit the specified unit
      * @return the determined operational status
      */
-    public static LayeredForceIconOperationalStatus determineLayeredForceIconOperationalStatus(final Unit unit) {
+    public static OperationalStatus determineLayeredForceIconOperationalStatus(final Unit unit) {
         if (unit.isMothballing() || unit.isMothballed() || !unit.isPresent() || unit.isRefitting()
                 || !unit.isRepairable() || !unit.isFunctional()) {
             return NOT_OPERATIONAL;
@@ -94,5 +96,22 @@ public enum LayeredForceIconOperationalStatus {
             case Entity.DMG_HEAVY, Entity.DMG_CRIPPLED -> MARGINALLY_OPERATIONAL;
             default -> NOT_OPERATIONAL;
         };
+    }
+
+    /**
+     * Retrieves the {@code LayeredForceIconOperationalStatus} corresponding to the given ordinal value.
+     * <p>
+     * If the specified ordinal is out of range, it will be clamped to ensure it lies within the valid range
+     * of the available enumeration values.
+     *
+     * @param ordinal the ordinal value to map to a {@code LayeredForceIconOperationalStatus}.
+     *                If the value is less than 0, it will be clamped to 0. If it exceeds the
+     *                maximum ordinal value, it will be clamped to the last index.
+     * @return the corresponding {@code LayeredForceIconOperationalStatus} enum value for the adjusted ordinal.
+     */
+    public static OperationalStatus fromInt(int ordinal) {
+        ordinal = clamp(ordinal, 0, values().length);
+
+        return values()[ordinal];
     }
 }

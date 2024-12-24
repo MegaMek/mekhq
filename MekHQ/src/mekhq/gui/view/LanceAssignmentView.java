@@ -28,7 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.model.DataTableModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -59,7 +59,7 @@ public class LanceAssignmentView extends JPanel {
     private JPanel panRequiredLances;
     private JPanel panAssignments;
     private JComboBox<AtBContract> cbContract;
-    private JComboBox<AtBLanceRole> cbRole;
+    private JComboBox<CombatRole> cbRole;
 
     public LanceAssignmentView(Campaign c) {
         campaign = c;
@@ -76,7 +76,7 @@ public class LanceAssignmentView extends JPanel {
             }
         });
 
-        cbRole = new JComboBox<>(AtBLanceRole.values());
+        cbRole = new JComboBox<>(CombatRole.values());
         cbRole.setName("cbRole");
         cbRole.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -84,8 +84,8 @@ public class LanceAssignmentView extends JPanel {
                                                           final int index, final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AtBLanceRole) {
-                    list.setToolTipText(((AtBLanceRole) value).getToolTipText());
+                if (value instanceof CombatRole) {
+                    list.setToolTipText(((CombatRole) value).getToolTipText());
                 }
                 return this;
             }
@@ -350,7 +350,7 @@ class RequiredLancesTableModel extends DataTableModel {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
                     if (data.get(row).equals(combatTeam.getContract(campaign))
-                            && (combatTeam.getRole() != AtBLanceRole.IN_RESERVE)
+                            && (combatTeam.getRole() != CombatRole.RESERVE)
                             && combatTeam.isEligible(campaign)) {
                         t++;
                     }
@@ -417,7 +417,7 @@ class LanceAssignmentTableModel extends DataTableModel {
         return switch (c) {
             case COL_FORCE -> Force.class;
             case COL_CONTRACT -> AtBContract.class;
-            case COL_ROLE -> AtBLanceRole.class;
+            case COL_ROLE -> CombatRole.class;
             default -> String.class;
         };
     }
@@ -452,8 +452,8 @@ class LanceAssignmentTableModel extends DataTableModel {
         if (col == COL_CONTRACT) {
             ((CombatTeam) data.get(row)).setContract((AtBContract) value);
         } else if (col == COL_ROLE) {
-            if (value instanceof AtBLanceRole) {
-                ((CombatTeam) data.get(row)).setRole((AtBLanceRole) value);
+            if (value instanceof CombatRole) {
+                ((CombatTeam) data.get(row)).setRole((CombatRole) value);
             }
         }
         fireTableDataChanged();
