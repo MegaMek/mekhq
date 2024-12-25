@@ -240,6 +240,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane financesContentTabs = createSubTabs(Map.of(
             "financesGeneralTab", financesTab.createFinancesGeneralOptionsTab(),
             "priceMultipliersTab", financesTab.createPriceMultipliersTab()));
+        financesTab.loadValuesFromCampaignOptions();
 
         // Markets
         MarketsTab marketsTab = new MarketsTab(getFrame(), "marketsTab");
