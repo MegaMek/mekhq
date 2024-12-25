@@ -154,13 +154,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane advancementParentTab = new JTabbedPane();
 
         // Experience + Skill Randomization
-        AdvancementTab advancementTab = new AdvancementTab(getFrame(), "advancementTab");
+        AdvancementTab advancementTab = new AdvancementTab(campaign, getFrame(), "advancementTab");
         SkillsTab skillsTab = new SkillsTab(getFrame(), "skillsTab");
         AbilitiesTab abilitiesTab = new AbilitiesTab(getFrame(), "abilitiesTab");
 
         JTabbedPane awardsAndRandomizationContentTabs = createSubTabs(Map.of(
             "xpAwardsTab", advancementTab.xpAwardsTab(),
             "randomizationTab", advancementTab.skillRandomizationTab()));
+        advancementTab.loadValuesFromCampaignOptions();
 
         JTabbedPane skillsContentTabs = createSubTabs(Map.of(
             "combatSkillsTab", skillsTab.createSkillsTab(true),
