@@ -78,6 +78,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createGeneralTab() {
         GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
         JPanel createdGeneralTab = generalTab.createGeneralTab();
+        generalTab.loadValuesFromCampaignOptions();
 
         return new JScrollPane(createdGeneralTab);
     }

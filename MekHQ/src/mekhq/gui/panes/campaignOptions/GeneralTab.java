@@ -7,6 +7,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -33,10 +34,10 @@ import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
  */
 public class GeneralTab {
     // region Variable Declarations
-    JFrame frame;
-    String name;
-
     private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
+    private JFrame frame;
+    private String name;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -65,9 +66,10 @@ public class GeneralTab {
      * @param name the name of the tab
      */
     public GeneralTab(Campaign campaign, JFrame frame, String name) {
+        this.campaign = campaign;
+        this.campaignOptions = campaign.getCampaignOptions();
         this.frame = frame;
         this.name = name;
-        this.campaign = campaign;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();
@@ -376,5 +378,15 @@ public class GeneralTab {
         panel.add(headerPanelCampaignOperations, layout);
 
         return panel;
+    }
+
+    void loadValuesFromCampaignOptions() {
+        txtName.setText(campaign.getName());
+        comboFaction.setSelectedItem(campaign.getFaction());
+        unitRatingMethodCombo.setSelectedItem(campaignOptions.getUnitRatingMethod());
+        manualUnitRatingModifier.setValue(campaignOptions.getManualUnitRatingModifier());
+        date = campaign.getLocalDate();
+        camouflage = campaign.getCamouflage();
+        unitIcon = campaign.getUnitIcon();
     }
 }
