@@ -2,6 +2,7 @@ package mekhq.gui.panes.campaignOptions;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.panes.campaignOptions.AbilitiesTab.AbilityCategory;
 
@@ -194,6 +195,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @return JTabbedPane representing the "Logistics and Maintenance" tab.
      */
     private JTabbedPane createEquipmentAndSuppliesParentTab() {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         // Parent Tab
         JTabbedPane equipmentAndSuppliesParentTab = new JTabbedPane();
 
@@ -206,13 +209,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "maintenanceTab", repairAndMaintenanceTab.createMaintenanceTab()));
 
         // Supplies and Acquisition
-        EquipmentAndSuppliesTab suppliesAndAcquisitionTab = new EquipmentAndSuppliesTab(getFrame(),
-            "suppliesAndAcquisitionTab");
+        EquipmentAndSuppliesTab suppliesAndAcquisitionTab = new EquipmentAndSuppliesTab(campaignOptions,
+            getFrame(), "suppliesAndAcquisitionTab");
 
         JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
             "acquisitionTab", suppliesAndAcquisitionTab.createAcquisitionTab(),
             "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab(),
             "techLimitsTab", suppliesAndAcquisitionTab.createTechLimitsTab()));
+        suppliesAndAcquisitionTab.loadValuesFromCampaignOptions();
 
         // Add tabs
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,

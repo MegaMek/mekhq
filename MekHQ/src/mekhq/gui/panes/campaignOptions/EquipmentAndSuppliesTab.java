@@ -20,8 +20,9 @@ public class EquipmentAndSuppliesTab {
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
 
-    JFrame frame;
-    String name;
+    private CampaignOptions campaignOptions;
+    private JFrame frame;
+    private String name;
 
     //start Acquisition Tab
     private JPanel pnlAcquisitions;
@@ -95,7 +96,8 @@ public class EquipmentAndSuppliesTab {
     private JCheckBox useAmmoByTypeBox;
     //end Tech Limits Tab
 
-    public EquipmentAndSuppliesTab(JFrame frame, String name) {
+    public EquipmentAndSuppliesTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
 
@@ -769,5 +771,51 @@ public class EquipmentAndSuppliesTab {
         maximumTechLevelModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_UNOFFICIAL));
 
         return maximumTechLevelModel;
+    }
+
+    void loadValuesFromCampaignOptions() {
+        // Acquisitions
+        choiceAcquireSkill.setSelectedItem(campaignOptions.getAcquisitionSkill());
+        chkSupportStaffOnly.setSelected(campaignOptions.isAcquisitionSupportStaffOnly());
+        spnAcquireClanPenalty.setValue(campaignOptions.getClanAcquisitionPenalty());
+        spnAcquireIsPenalty.setValue(campaignOptions.getIsAcquisitionPenalty());
+        spnAcquireWaitingPeriod.setValue(campaignOptions.getWaitingPeriod());
+        spnMaxAcquisitions.setValue(campaignOptions.getMaxAcquisitions());
+
+        // Delivery
+        spnNDiceTransitTime.setValue(campaignOptions.getNDiceTransitTime());
+        spnConstantTransitTime.setValue(campaignOptions.getConstantTransitTime());
+        choiceTransitTimeUnits.setSelectedIndex(campaignOptions.getUnitTransitTime());
+
+        spnAcquireMosBonus.setValue(campaignOptions.getAcquireMosBonus());
+        choiceAcquireMosUnits.setSelectedIndex(campaignOptions.getAcquireMosUnit());
+
+        spnAcquireMinimum.setValue(campaignOptions.getAcquireMinimumTime());
+        choiceAcquireMinimumUnit.setSelectedIndex(campaignOptions.getAcquireMinimumTimeUnit());
+
+        // Planetary Acquisitions
+        usePlanetaryAcquisitions.setSelected(campaignOptions.isUsePlanetaryAcquisition());
+        spnMaxJumpPlanetaryAcquisitions.setValue(campaignOptions.getMaxJumpsPlanetaryAcquisition());
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(campaignOptions.getPlanetAcquisitionFactionLimit());
+        disallowPlanetaryAcquisitionClanCrossover.setSelected(campaignOptions.isPlanetAcquisitionNoClanCrossover());
+        disallowClanPartsFromIS.setSelected(campaignOptions.isNoClanPartsFromIS());
+        spnPenaltyClanPartsFromIS.setValue(campaignOptions.getPenaltyClanPartsFromIS());
+        usePlanetaryAcquisitionsVerbose.setSelected(campaignOptions.isPlanetAcquisitionVerbose());
+        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
+            spnPlanetAcquireTechBonus[i].setValue(campaignOptions.getPlanetTechAcquisitionBonus(i));
+            spnPlanetAcquireIndustryBonus[i].setValue(campaignOptions.getPlanetIndustryAcquisitionBonus(i));
+            spnPlanetAcquireOutputBonus[i].setValue(campaignOptions.getPlanetOutputAcquisitionBonus(i));
+        }
+
+        // Tech Limits
+        limitByYearBox.setSelected(campaignOptions.isLimitByYear());
+        disallowExtinctStuffBox.setSelected(campaignOptions.isDisallowExtinctStuff());
+        allowClanPurchasesBox.setSelected(campaignOptions.isAllowClanPurchases());
+        allowISPurchasesBox.setSelected(campaignOptions.isAllowISPurchases());
+        allowCanonOnlyBox.setSelected(campaignOptions.isAllowCanonOnly());
+        allowCanonRefitOnlyBox.setSelected(campaignOptions.isAllowCanonRefitOnly());
+        choiceTechLevel.setSelectedIndex(campaignOptions.getTechLevel());
+        variableTechLevelBox.setSelected(campaignOptions.isVariableTechLevel());
+        useAmmoByTypeBox.setSelected(campaignOptions.isUseAmmoByType());
     }
 }
