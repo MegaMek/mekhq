@@ -1,8 +1,8 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static mekhq.campaign.personnel.SpecialAbility.getDefaultSpecialAbilities;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.resources;
@@ -61,7 +62,7 @@ public class AbilitiesTab {
             temporarySPATable.put(ability.getDisplayName(), ability.clone());
         }
 
-        HashMap<String, SpecialAbility> unusedAbilities = getUnusedSPA();
+        HashMap<String, SpecialAbility> unusedAbilities = getUnusedSPAs();
 
         for (SpecialAbility ability : unusedAbilities.values()) {
             temporarySPATable.put(ability.getName(), ability);
@@ -119,7 +120,7 @@ public class AbilitiesTab {
             SpecialAbility ability = eligibleAbilities.get(i);
 
             if (ability != null) {
-                JPanel abilityPanel = createSPAPanel(ability);
+                JPanel abilityPanel = createSPAPanel(ability, unusedAbilities);
 
                 layout.gridx = i % 4;
                 layout.gridy = 1 + (i / 4);
@@ -133,33 +134,39 @@ public class AbilitiesTab {
         return createParentPanel(panel, "AbilitiesGeneralTab");
     }
 
-    private HashMap<String, SpecialAbility> getUnusedSPA() {
+    private HashMap<String, SpecialAbility> getUnusedSPAs() {
+        final Map<String, SpecialAbility> defaultSpecialAbilities = getDefaultSpecialAbilities();
+
         HashMap<String, SpecialAbility> unusedAbilities = new HashMap<>();
+        PersonnelOptions personnelOptions = new PersonnelOptions();
 
-        PersonnelOptions options = new PersonnelOptions();
-        for (final Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
-            IOptionGroup group = i.nextElement();
+        // Find the specific group ("Level 3 Advantages") directly
+        IOptionGroup lvl3AdvantagesGroup = getGroup(personnelOptions);
 
-            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
-                continue;
-            }
-
-            for (final Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-                IOption option = j.nextElement();
-                if (temporarySPATable.get(option.getName()) == null) {
-                    String name = option.getName();
-                    String displayName = option.getDisplayableName();
-                    String description = option.getDescription();
-
-                    unusedAbilities.put(displayName, new SpecialAbility(name, displayName, description));
+        if (lvl3AdvantagesGroup != null) {
+            for (String key : defaultSpecialAbilities.keySet()) {
+                // Check if the ability is unused
+                if (temporarySPATable.get(key) == null && !unusedAbilities.containsKey(key)) {
+                    SpecialAbility unusedAbility = defaultSpecialAbilities.get(key).clone();
+                    unusedAbilities.put(unusedAbility.getDisplayName(), unusedAbility);
                 }
             }
         }
-
         return unusedAbilities;
     }
 
-    private JPanel createSPAPanel(SpecialAbility ability) {
+    private IOptionGroup getGroup(PersonnelOptions personnelOptions) {
+        for (Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements(); ) {
+            IOptionGroup group = i.nextElement();
+            if (group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+                return group;
+            }
+
+        }
+        return null; // Return null if the specified group is not found
+    }
+
+    private JPanel createSPAPanel(SpecialAbility ability, HashMap<String, SpecialAbility> unusedAbilities) {
         // Initialization
         final JPanel panel = new AbilitiesTabStandardPanel(ability);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel,
@@ -167,6 +174,7 @@ public class AbilitiesTab {
 
         // Contents
         JCheckBox chkAbility = new JCheckBox(resources.getString("abilityEnable.text"));
+        chkAbility.setSelected(!unusedAbilities.containsValue(ability));
 
         JLabel lblCost = getAbilityCost(ability);
 
