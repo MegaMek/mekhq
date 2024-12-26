@@ -124,12 +124,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         biographyTab.loadValuesFromCampaignOptions();
 
         // Relationships
-        RelationshipsTab relationshipsTab = new RelationshipsTab(getFrame(), "relationshipsTab");
+        RelationshipsTab relationshipsTab = new RelationshipsTab(campaignOptions, getFrame(), "relationshipsTab");
 
         JTabbedPane relationshipsContentTabs = createSubTabs(Map.of(
             "marriageTab", relationshipsTab.createMarriageTab(),
             "divorceTab", relationshipsTab.createDivorceTab(),
             "procreationTab", relationshipsTab.createProcreationTab()));
+        relationshipsTab.loadValuesFromCampaignOptions();
 
         // Turnover and Retention
         TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(getFrame(),
