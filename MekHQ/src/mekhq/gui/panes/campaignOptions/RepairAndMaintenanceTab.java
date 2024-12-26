@@ -1,5 +1,7 @@
 package mekhq.gui.panes.campaignOptions;
 
+import mekhq.campaign.campaignOptions.CampaignOptions;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,8 +11,9 @@ import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
  * This class represents the tab for repair and maintenance settings.
  */
 public class RepairAndMaintenanceTab {
-    JFrame frame;
-    String name;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
     //start Repair Tab
     private JCheckBox useEraModsCheckBox;
@@ -44,7 +47,8 @@ public class RepairAndMaintenanceTab {
     /**
      * Represents a tab for repair and maintenance in an application.
      */
-    public RepairAndMaintenanceTab(JFrame frame, String name) {
+    public RepairAndMaintenanceTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
 
@@ -317,5 +321,29 @@ public class RepairAndMaintenanceTab {
 
     private void recreateFinancesPanel(boolean isReversingQualityNames) {
         // TODO handle this
+    }
+
+    void loadValuesFromCampaignOptions() {
+        // Repair
+        useEraModsCheckBox.setSelected(campaignOptions.isUseEraMods());
+        assignedTechFirstCheckBox.setSelected(campaignOptions.isAssignedTechFirst());
+        resetToFirstTechCheckBox.setSelected(campaignOptions.isResetToFirstTech());
+        useQuirksBox.setSelected(campaignOptions.isUseQuirks());
+        useAeroSystemHitsBox.setSelected(campaignOptions.isUseAeroSystemHits());
+        useDamageMargin.setSelected(campaignOptions.isDestroyByMargin());
+        spnDamageMargin.setValue(campaignOptions.getDestroyMargin());
+        spnDestroyPartTarget.setValue(campaignOptions.getDestroyPartTarget());
+
+        // Maintenance
+        checkMaintenance.setSelected(campaignOptions.isCheckMaintenance());
+        spnMaintenanceDays.setValue(campaignOptions.getMaintenanceCycleDays());
+        spnMaintenanceBonus.setValue(campaignOptions.getMaintenanceBonus());
+        spnDefaultMaintenanceTime.setValue(campaignOptions.getDefaultMaintenanceTime());
+        useQualityMaintenance.setSelected(campaignOptions.isUseQualityMaintenance());
+        reverseQualityNames.setSelected(campaignOptions.isReverseQualityNames());
+        chkUseRandomUnitQualities.setSelected(campaignOptions.isUseRandomUnitQualities());
+        chkUsePlanetaryModifiers.setSelected(campaignOptions.isUsePlanetaryModifiers());
+        useUnofficialMaintenance.setSelected(campaignOptions.isUseUnofficialMaintenance());
+        logMaintenance.setSelected(campaignOptions.isLogMaintenance());
     }
 }
