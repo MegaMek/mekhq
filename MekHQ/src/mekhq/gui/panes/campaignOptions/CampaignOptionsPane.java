@@ -100,7 +100,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane humanResourcesParentTab = new JTabbedPane();
 
         // Personnel
-        PersonnelTab personnelTab = new PersonnelTab(getFrame(), "personnelTab");
+        PersonnelTab personnelTab = new PersonnelTab(campaignOptions, getFrame(), "personnelTab");
 
         JTabbedPane personnelContentTabs = createSubTabs(Map.of(
             "personnelGeneralTab", personnelTab.createGeneralTab(),
@@ -109,6 +109,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "prisonersAndDependentsTab", personnelTab.createPrisonersAndDependentsTab(),
             "medicalTab", personnelTab.createMedicalTab(),
             "salariesTab", personnelTab.createSalariesTab()));
+        personnelTab.loadValuesFromCampaignOptions();
 
         // Biography
         BiographyTab biographyTab = new BiographyTab(campaign, getFrame(), "biographyTab");

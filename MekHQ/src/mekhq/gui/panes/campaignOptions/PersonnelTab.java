@@ -3,6 +3,7 @@ package mekhq.gui.panes.campaignOptions;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 
@@ -15,6 +16,7 @@ import javax.swing.JSpinner.DefaultEditor;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
@@ -23,8 +25,9 @@ import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
  * Handles the Personnel tab of campaign options
  */
 public class PersonnelTab {
-    JFrame frame;
-    String name;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
     //start General Tab
     private JPanel pnlPersonnelGeneralOptions;
@@ -151,7 +154,8 @@ public class PersonnelTab {
     /**
      * Represents a tab for repair and maintenance in an application.
      */
-    PersonnelTab(JFrame frame, String name) {
+    PersonnelTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
 
@@ -1302,5 +1306,95 @@ public class PersonnelTab {
         layout.setVerticalGroup(mainVerticalGroup);
 
         return panel;
+    }
+
+    void loadValuesFromCampaignOptions() {
+        // General
+        chkUseTactics.setSelected(campaignOptions.isUseTaxes());
+        chkUseInitiativeBonus.setSelected(campaignOptions.isUseInitiativeBonus());
+        chkUseToughness.setSelected(campaignOptions.isUseToughness());
+        chkUseRandomToughness.setSelected(campaignOptions.isUseRandomToughness());
+        chkUseArtillery.setSelected(campaignOptions.isUseArtillery());
+        chkUseAbilities.setSelected(campaignOptions.isUseAbilities());
+        chkUseEdge.setSelected(campaignOptions.isUseEdge());
+        chkUseSupportEdge.setSelected(campaignOptions.isUseSupportEdge());
+        chkUseImplants.setSelected(campaignOptions.isUseImplants());
+        chkUseAlternativeQualityAveraging.setSelected(campaignOptions.isAlternativeQualityAveraging());
+        chkUsePersonnelRemoval.setSelected(campaignOptions.isUsePersonnelRemoval());
+        chkUseRemovalExemptCemetery.setSelected(campaignOptions.isUseRemovalExemptCemetery());
+        chkUseRemovalExemptRetirees.setSelected(campaignOptions.isUseRemovalExemptRetirees());
+        chkAdminsHaveNegotiation.setSelected(campaignOptions.isAdminsHaveNegotiation());
+        chkAdminExperienceLevelIncludeNegotiation.setSelected(campaignOptions.isAdminExperienceLevelIncludeNegotiation());
+        chkAdminsHaveScrounge.setSelected(campaignOptions.isAdminsHaveScrounge());
+        chkAdminExperienceLevelIncludeScrounge.setSelected(campaignOptions.isAdminExperienceLevelIncludeScrounge());
+
+        // Personnel Log
+        chkUseTransfers.setSelected(campaignOptions.isUseTransfers());
+        chkUseExtendedTOEForceName.setSelected(campaignOptions.isUseExtendedTOEForceName());
+        chkPersonnelLogSkillGain.setSelected(campaignOptions.isPersonnelLogSkillGain());
+        chkPersonnelLogAbilityGain.setSelected(campaignOptions.isPersonnelLogAbilityGain());
+        chkPersonnelLogEdgeGain.setSelected(campaignOptions.isPersonnelLogEdgeGain());
+        chkDisplayPersonnelLog.setSelected(campaignOptions.isDisplayPersonnelLog());
+        chkDisplayScenarioLog.setSelected(campaignOptions.isDisplayScenarioLog());
+        chkDisplayKillRecord.setSelected(campaignOptions.isDisplayKillRecord());
+
+        // Personnel Information
+        chkUseTimeInService.setSelected(campaignOptions.isUseTimeInService());
+        comboTimeInServiceDisplayFormat.setSelectedItem(campaignOptions.getTimeInServiceDisplayFormat());
+        chkUseTimeInRank.setSelected(campaignOptions.isUseTimeInRank());
+        comboTimeInRankDisplayFormat.setSelectedItem(campaignOptions.getTimeInRankDisplayFormat());
+        chkTrackTotalEarnings.setSelected(campaignOptions.isTrackTotalEarnings());
+        chkTrackTotalXPEarnings.setSelected(campaignOptions.isTrackTotalXPEarnings());
+        chkShowOriginFaction.setSelected(campaignOptions.isShowOriginFaction());
+
+        // Awards
+        comboAwardBonusStyle.setSelectedItem(campaignOptions.getAwardBonusStyle());
+        spnAwardTierSize.setValue(campaignOptions.getAwardTierSize());
+        chkEnableAutoAwards.setSelected(campaignOptions.isEnableAutoAwards());
+        chkIssuePosthumousAwards.setSelected(campaignOptions.isIssuePosthumousAwards());
+        chkIssueBestAwardOnly.setSelected(campaignOptions.isIssueBestAwardOnly());
+        chkIgnoreStandardSet.setSelected(campaignOptions.isIgnoreStandardSet());
+        chkEnableContractAwards.setSelected(campaignOptions.isEnableContractAwards());
+        chkEnableFactionHunterAwards.setSelected(campaignOptions.isEnableFactionHunterAwards());
+        chkEnableInjuryAwards.setSelected(campaignOptions.isEnableInjuryAwards());
+        chkEnableIndividualKillAwards.setSelected(campaignOptions.isEnableIndividualKillAwards());
+        chkEnableFormationKillAwards.setSelected(campaignOptions.isEnableFormationKillAwards());
+        chkEnableRankAwards.setSelected(campaignOptions.isEnableRankAwards());
+        chkEnableScenarioAwards.setSelected(campaignOptions.isEnableScenarioAwards());
+        chkEnableSkillAwards.setSelected(campaignOptions.isEnableSkillAwards());
+        chkEnableTheatreOfWarAwards.setSelected(campaignOptions.isEnableTheatreOfWarAwards());
+        chkEnableTimeAwards.setSelected(campaignOptions.isEnableTimeAwards());
+        chkEnableTrainingAwards.setSelected(campaignOptions.isEnableTrainingAwards());
+        chkEnableMiscAwards.setSelected(campaignOptions.isEnableMiscAwards());
+        txtAwardSetFilterList.setText(campaignOptions.getAwardSetFilterList());
+
+        // Medical
+        chkUseAdvancedMedical.setSelected(campaignOptions.isUseAdvancedMedical());
+        spnHealWaitingPeriod.setValue(campaignOptions.getHealingWaitingPeriod());
+        spnNaturalHealWaitingPeriod.setValue(campaignOptions.getNaturalHealingWaitingPeriod());
+        spnMinimumHitsForVehicles.setValue(campaignOptions.getMinimumHitsForVehicles());
+        chkUseRandomHitsForVehicles.setSelected(campaignOptions.isUseRandomHitsForVehicles());
+        chkUseTougherHealing.setSelected(campaignOptions.isTougherHealing());
+        spnMaximumPatients.setValue(campaignOptions.getMaximumPatients());
+
+        // Prisoners and Dependents
+        comboPrisonerCaptureStyle.setSelectedItem(campaignOptions.getPrisonerCaptureStyle());
+        comboPrisonerStatus.setSelectedItem(campaignOptions.getDefaultPrisonerStatus());
+        chkPrisonerBabyStatus.setSelected(campaignOptions.isPrisonerBabyStatus());
+        chkAtBPrisonerDefection.setSelected(campaignOptions.isUseAtBPrisonerDefection());
+        chkAtBPrisonerRansom.setSelected(campaignOptions.isUseAtBPrisonerRansom());
+        chkUseRandomDependentAddition.setSelected(campaignOptions.isUseRandomDependentAddition());
+        chkUseRandomDependentRemoval.setSelected(campaignOptions.isUseRandomDependentRemoval());
+
+        // Salaries
+        chkDisableSecondaryRoleSalary.setSelected(campaignOptions.isDisableSecondaryRoleSalary());
+        spnAntiMekSalary.setValue(campaignOptions.getSalaryAntiMekMultiplier());
+        spnSpecialistInfantrySalary.setValue(campaignOptions.getSalarySpecialistInfantryMultiplier());
+        for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
+            entry.getValue().setValue(campaignOptions.getSalaryXPMultipliers().get(entry.getKey()));
+        }
+        for (int i = 0; i < spnBaseSalary.length; i++) {
+            spnBaseSalary[i].setValue(campaignOptions.getRoleBaseSalaries()[i].getAmount().doubleValue());
+        }
     }
 }
