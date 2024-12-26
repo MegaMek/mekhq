@@ -54,8 +54,24 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      *
      * @param campaign The {@link Campaign} from which to retrieve the required medic count.
      */
-    private void checkMedicsNeededCount(Campaign campaign) {
+    void checkMedicsNeededCount(Campaign campaign) {
         medicsRequired =  campaign.getMedicsNeed();
+    }
+
+    /**
+     * Checks if there is a need for medics in the campaign.
+     *
+     * <p>
+     * This method evaluates whether the number of required medics is greater than zero.
+     * If {@code medicsRequired} is greater than zero, it means that additional medics
+     * are needed to meet the campaign's requirements.
+     * </p>
+     *
+     * @return {@code true} if the number of required medics ({@code medicsRequired}) is greater than zero;
+     *         {@code false} otherwise.
+     */
+    boolean hasMedicsNeeded() {
+        return medicsRequired > 0;
     }
 
     /**
@@ -99,7 +115,7 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_MEDICS;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (medicsRequired > 0)) {
+            && hasMedicsNeeded()) {
             showDialog();
         }
     }

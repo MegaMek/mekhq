@@ -116,7 +116,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
 
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
-        speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        if (speakerIcon != null) {
+            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        }
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(speakerIcon);
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

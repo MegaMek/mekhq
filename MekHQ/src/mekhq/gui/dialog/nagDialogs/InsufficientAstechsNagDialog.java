@@ -44,6 +44,37 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     private int asTechsNeeded = 0;
 
     /**
+     * Verifies if the campaign has an unmet astech requirement.
+     *
+     * <p>
+     * This method checks whether the campaign has any pending maintenance or
+     * repair tasks that require astechs. It evaluates the current astech
+     * need in the campaign and determines if it exceeds zero.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} to check for astech needs.
+     */
+    void checkAsTechsNeededCount(Campaign campaign) {
+        asTechsNeeded = campaign.getAstechNeed();
+    }
+
+    /**
+     * Checks if there is a need for AsTechs in the campaign.
+     *
+     * <p>
+     * This method determines whether the number of required AsTechs
+     * is greater than zero. If {@code asTechsNeeded} is greater than zero,
+     * it indicates that there is a need for AsTechs to meet the campaign's requirements.
+     * </p>
+     *
+     * @return {@code true} if the number of required AsTechs ({@code asTechsNeeded}) is greater than zero;
+     *         {@code false} otherwise.
+     */
+    boolean hasAsTechsNeeded() {
+        return asTechsNeeded > 0;
+    }
+
+    /**
      * Constructs an {@code InsufficientAstechsNagDialog} for the given campaign.
      *
      * <p>
@@ -67,21 +98,6 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Verifies if the campaign has an unmet astech requirement.
-     *
-     * <p>
-     * This method checks whether the campaign has any pending maintenance or
-     * repair tasks that require astechs. It evaluates the current astech
-     * need in the campaign and determines if it exceeds zero.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} to check for astech needs.
-     */
-    private void checkAsTechsNeededCount(Campaign campaign) {
-        asTechsNeeded = campaign.getAstechNeed();
-    }
-
-    /**
      * Evaluates whether the "Insufficient Astechs" nag dialog should be displayed.
      *
      * <p>
@@ -98,7 +114,7 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (asTechsNeeded > 0)) {
+            && hasAsTechsNeeded()) {
             showDialog();
         }
     }
