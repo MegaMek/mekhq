@@ -37,7 +37,26 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </p>
  */
 public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
-    String unresolvedContactsReport = "";
+    private final Campaign campaign;
+
+    private String unresolvedContactsReport = "";
+
+    /**
+     * Checks if there are any unresolved contacts in the current report.
+     *
+     * <p>
+     * This method inspects the {@code unresolvedContactsReport} and determines whether
+     * it contains any unresolved contacts. If the report is not empty, it indicates
+     * that there are unresolved contacts, and the method returns {@code true};
+     * otherwise, it returns {@code false}.
+     * </p>
+     *
+     * @return {@code true} if there are unresolved contacts in the report;
+     *         {@code false} otherwise.
+     */
+    boolean hasUnresolvedContacts() {
+        return !unresolvedContactsReport.isEmpty();
+    }
 
     /**
      * Determines unresolved StratCon contacts for the campaign and generates a report.
@@ -50,10 +69,8 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      *     <li>Their deployment date matches the current campaign date.</li>
      * </ul>
      * A formatted report is created, summarizing all unresolved scenarios and marking critical ones.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    private void determineUnresolvedContacts(Campaign campaign) {
+    private void determineUnresolvedContacts() {
         StringBuilder unresolvedContacts = new StringBuilder();
 
         // check every track attached to an active contract for unresolved scenarios
@@ -95,6 +112,8 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
     public UnresolvedStratConContactsNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "UnresolvedStratConContactsNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
@@ -109,21 +128,19 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      *     <li>StratCon is enabled in the campaign options.</li>
      *     <li>The nag dialog for unresolved StratCon contacts is not ignored in MekHQ options.</li>
      *     <li>There are unresolved StratCon contacts, as determined by
-     *     {@link #determineUnresolvedContacts(Campaign)}.</li>
+     *     {@link #determineUnresolvedContacts()}.</li>
      * </ul>
      * The dialog warns the player about unresolved scenarios requiring attention before
      * advancing the campaign.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS;
 
-        determineUnresolvedContacts(campaign);
+        determineUnresolvedContacts();
 
         if (campaign.getCampaignOptions().isUseStratCon()
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && !unresolvedContactsReport.isBlank()) {
+            && hasUnresolvedContacts()) {
             showDialog();
         }
     }

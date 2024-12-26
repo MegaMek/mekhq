@@ -42,6 +42,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </ul>
  */
 public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     private int asTechsTimeDeficit = 0;
 
     /**
@@ -59,10 +61,8 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
      * Each valid unit requires six astechs per unit of maintenance time. If overtime is allowed in
      * the campaign, it is added to the available astech pool. The deficit is calculated, rounded up,
      * and stored in {@link #asTechsTimeDeficit}.
-     *
-     * @param campaign The {@link Campaign} from which to calculate the maintenance requirements and work time.
      */
-    private void getAstechTimeDeficit(Campaign campaign) {
+    private void getAstechTimeDeficit() {
         // Units are only valid if they are maintained, present, and not self crewed (as the crew
         // maintain it in that case).
         // For each unit, this is valid for; we need six asTechs to help the tech for the maintenance.
@@ -93,7 +93,9 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     public InsufficientAstechTimeNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
 
-        getAstechTimeDeficit(campaign);
+        this.campaign = campaign;
+
+        getAstechTimeDeficit();
 
         String pluralizer = (asTechsTimeDeficit > 1) ? "s" : "";
 

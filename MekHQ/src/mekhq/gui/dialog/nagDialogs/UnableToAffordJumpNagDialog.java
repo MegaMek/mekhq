@@ -40,7 +40,27 @@ import java.util.Objects;
  * </p>
  */
 public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     private Money nextJumpCost = Money.zero();
+
+    /**
+     * Determines whether the campaign's current funds are insufficient to cover the cost
+     * of the next jump.
+     *
+     * <p>
+     * This method compares the campaign's available funds with the calculated cost
+     * of the next jump stored in the {@code nextJumpCost} field. If the funds are less than
+     * the jump cost, it returns {@code true}, indicating that the jump cannot be afforded;
+     * otherwise, it returns {@code false}.
+     * </p>
+     *
+     * @return {@code true} if the campaign's funds are less than the cost of the next jump;
+     *         {@code false} otherwise.
+     */
+    boolean unableToAffordNextJump() {
+        return campaign.getFunds().isLessThan(nextJumpCost);
+    }
 
     /**
      * Calculates the cost of the next jump based on the campaign's location and financial settings.
@@ -51,10 +71,8 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      * The actual jump cost is determined by the campaign's settings, particularly whether
      * contracts base their costs on the value of units in the player's TOE (Table of Equipment).
      * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    private void getNextJumpCost(Campaign campaign) {
+    private void getNextJumpCost() {
         CurrentLocation location = campaign.getLocation();
         JumpPath jumpPath = location.getJumpPath();
 
@@ -85,6 +103,8 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
     public UnableToAffordJumpNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "UnableToAffordJumpNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false),
@@ -101,16 +121,14 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      *     <li>The campaign's available funds are less than the cost of the next jump.</li>
      * </ul>
      * If both conditions are satisfied, the dialog is displayed to notify the user.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP;
 
-        getNextJumpCost(campaign);
+        getNextJumpCost();
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaign.getFunds().isLessThan(nextJumpCost)) {
+            && unableToAffordNextJump()) {
             showDialog();
         }
     }

@@ -41,6 +41,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </ul>
  */
 public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     private int asTechsNeeded = 0;
 
     /**
@@ -51,10 +53,8 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
      * repair tasks that require astechs. It evaluates the current astech
      * need in the campaign and determines if it exceeds zero.
      * </p>
-     *
-     * @param campaign The {@link Campaign} to check for astech needs.
      */
-    void checkAsTechsNeededCount(Campaign campaign) {
+    void checkAsTechsNeededCount() {
         asTechsNeeded = campaign.getAstechNeed();
     }
 
@@ -88,7 +88,9 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     public InsufficientAstechsNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
 
-        checkAsTechsNeededCount(campaign);
+        this.campaign = campaign;
+
+        checkAsTechsNeededCount();
 
         String pluralizer = (asTechsNeeded > 1) ? "s" : "";
 
@@ -106,7 +108,7 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
      *   <li>If the "Insufficient Astechs" nag dialog has not been flagged as ignored
      *       in the user options.</li>
      *   <li>If the campaign has an unmet asTech requirement as determined by
-     *       {@link #checkAsTechsNeededCount(Campaign)}.</li>
+     *       {@link #checkAsTechsNeededCount()}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed.
      */

@@ -108,10 +108,8 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
      * and if there are any pregnant personnel actively assigned to combat. If both conditions
      * are met, the dialog is displayed to notify the user.
      * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_PREGNANT_COMBATANT;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)

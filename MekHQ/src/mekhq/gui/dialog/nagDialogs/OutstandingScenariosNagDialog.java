@@ -49,6 +49,8 @@ import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
  * </p>
  */
 public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     String outstandingScenarios = "";
 
     /**
@@ -80,10 +82,8 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * Scenarios are categorized into "critical" scenarios (e.g., required StratCon scenarios)
      * and others, with additional formatting for StratCon-specific scenarios where applicable.
-     *
-     * @param campaign The {@link Campaign} from which to retrieve outstanding scenarios.
      */
-    private void getOutstandingScenarios(Campaign campaign) {
+    private void getOutstandingScenarios() {
         List<AtBContract> activeContracts = campaign.getActiveAtBContracts(true);
         LocalDate today = campaign.getLocalDate();
         StringBuilder activeScenarios = new StringBuilder();
@@ -147,9 +147,11 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     public OutstandingScenariosNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
 
-        getOutstandingScenarios(campaign);
+        getOutstandingScenarios();
 
         String addendum = "";
         if (campaign.getCampaignOptions().isUseStratCon()) {
@@ -171,13 +173,11 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
      *     <li>Outstanding scenarios exist in the campaign.</li>
      * </ul>
      * If all these conditions are satisfied, the nag dialog is displayed to the user.
-     *
-     * @param campaign The {@link Campaign} to check for outstanding scenarios.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_OUTSTANDING_SCENARIOS;
 
-        getOutstandingScenarios(campaign);
+        getOutstandingScenarios();
 
         if (campaign.getCampaignOptions().isUseAtB()
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)

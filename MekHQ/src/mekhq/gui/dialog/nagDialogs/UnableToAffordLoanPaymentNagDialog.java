@@ -39,7 +39,26 @@ import java.util.List;
  * </p>
  */
 public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     private Money totalPaymentsDue = Money.zero();
+
+    /**
+     * Determines whether the campaign's current funds are insufficient to cover
+     * the total loan payments due.
+     *
+     * <p>
+     * This method compares the campaign's available funds with the {@code totalPaymentsDue}
+     * amount. If the available funds are less than the total loan payments due, it returns {@code true},
+     * indicating that the campaign cannot afford the loan payments; otherwise, it returns {@code false}.
+     * </p>
+     *
+     * @return {@code true} if the campaign's funds are less than the total loan payments due;
+     *         {@code false} otherwise.
+     */
+    boolean unableToAffordLoans() {
+        return campaign.getFunds().isLessThan(totalPaymentsDue);
+    }
 
     /**
      * Calculates the total loan payments due for tomorrow.
@@ -49,10 +68,8 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
      * next payment date matches tomorrow's date. If a payment is due, the amount is added to the
      * cumulative total, which is stored in the {@code totalPaymentsDue} field.
      * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    private void getTotalPaymentsDue(Campaign campaign) {
+    private void getTotalPaymentsDue() {
         // gets the list of the campaign's current loans
         List<Loan> loans = campaign.getFinances().getLoans();
 
@@ -82,6 +99,8 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false),
@@ -99,16 +118,14 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If both conditions are met, the user is shown the dialog to alert them about upcoming
      * loan payment issues.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
-        getTotalPaymentsDue(campaign);
+        getTotalPaymentsDue();
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaign.getFunds().isLessThan(totalPaymentsDue)) {
+            && unableToAffordLoans()) {
             showDialog();
         }
     }

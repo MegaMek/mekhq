@@ -43,24 +43,7 @@ import java.time.LocalDate;
  * </ul>
  */
 public class EndContractNagDialog extends AbstractMHQNagDialog {
-    /**
-     * Constructs an {@code EndContractNagDialog} for the given campaign.
-     *
-     * <p>
-     * This dialog uses the localization key {@code "EndContractNagDialog.text"} to provide
-     * a message that includes additional information, such as the commander's address.
-     * It is specifically tailored to show when a contract is reaching its end date.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} that the nag dialog is tied to.
-     */
-    public EndContractNagDialog(final Campaign campaign) {
-        super(campaign, MHQConstants.NAG_CONTRACT_ENDED);
-
-        final String DIALOG_BODY = "EndContractNagDialog.text";
-        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
-    }
+    private final Campaign campaign;
 
     /**
      * Checks if any contract in the current campaign has its end date set to today.
@@ -71,10 +54,9 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
      * contracts for the campaign and compares each contract's ending date to today's date.
      * </p>
      *
-     * @param campaign The {@link Campaign} to check for contracts ending today.
      * @return {@code true} if a contract's end date matches today's date, otherwise {@code false}.
      */
-    static boolean isContractEnded(Campaign campaign) {
+    boolean isContractEnded() {
         LocalDate today = campaign.getLocalDate();
 
         // we can't use 'is date y after x', as once the end date has been passed,
@@ -91,6 +73,27 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
+     * Constructs an {@code EndContractNagDialog} for the given campaign.
+     *
+     * <p>
+     * This dialog uses the localization key {@code "EndContractNagDialog.text"} to provide
+     * a message that includes additional information, such as the commander's address.
+     * It is specifically tailored to show when a contract is reaching its end date.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} that the nag dialog is tied to.
+     */
+    public EndContractNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_CONTRACT_ENDED);
+
+        this.campaign = campaign;
+
+        final String DIALOG_BODY = "EndContractNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
+    }
+
+    /**
      * Checks if the "Contract End" nag dialog should be displayed.
      *
      * <p>
@@ -102,10 +105,9 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If these conditions are met, the dialog is displayed.
      *
-     * @param campaign The {@link Campaign} to check for contracts ending today.
      * @return {@code true} if the dialog was shown, otherwise {@code false}.
      */
-    public boolean checkNag(Campaign campaign) {
+    public boolean checkNag() {
         final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
@@ -113,6 +115,6 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
             showDialog();
         }
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-                && isContractEnded(campaign);
+                && isContractEnded();
     }
 }

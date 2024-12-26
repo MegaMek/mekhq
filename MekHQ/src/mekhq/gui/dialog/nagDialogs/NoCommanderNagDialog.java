@@ -42,6 +42,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * @see AbstractMHQNagDialog
  */
 public class NoCommanderNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     /**
      * Checks if the campaign has no assigned commander.
      *
@@ -51,11 +53,10 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
      * that no commander has been assigned.
      * </p>
      *
-     * @param campaign the campaign to check for an assigned commander
      * @return {@code true} if the campaign has no flagged commander
      * ({@code campaign.getFlaggedCommander()} is {@code null}); {@code false} otherwise.
      */
-    boolean hasNoCommander(Campaign campaign) {
+    boolean hasNoCommander() {
         return campaign.getFlaggedCommander() == null;
     }
 
@@ -72,6 +73,8 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
     public NoCommanderNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_NO_COMMANDER);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "NoCommanderNagDialog.text";
         setRightDescriptionMessage(resources.getString(DIALOG_BODY));
     }
@@ -86,14 +89,12 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
      *   <li>If the campaign currently does not have a flagged commander.</li>
      * </ul>
      * If both conditions are true, the dialog is displayed.
-     *
-     * @param campaign The {@link Campaign} to check for a flagged commander.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasNoCommander(campaign)) {
+            && hasNoCommander()) {
             showDialog();
         }
     }

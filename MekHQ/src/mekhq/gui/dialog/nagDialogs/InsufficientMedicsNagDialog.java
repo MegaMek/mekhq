@@ -41,6 +41,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </ul>
  */
 public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     private int medicsRequired = 0;
 
     /**
@@ -51,10 +53,8 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      * calling {@link Campaign#getMedicsNeed()}. The result is assigned to
      * {@link #medicsRequired}, representing the deficit in the number of medics.
      * </p>
-     *
-     * @param campaign The {@link Campaign} from which to retrieve the required medic count.
      */
-    void checkMedicsNeededCount(Campaign campaign) {
+    void checkMedicsNeededCount() {
         medicsRequired =  campaign.getMedicsNeed();
     }
 
@@ -89,7 +89,9 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
     public InsufficientMedicsNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INSUFFICIENT_MEDICS);
 
-        checkMedicsNeededCount(campaign);
+        this.campaign = campaign;
+
+        checkMedicsNeededCount();
 
         String pluralizer = (medicsRequired > 1) ? "s" : "";
 
@@ -106,7 +108,7 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *   <li>If the "Insufficient Medics" nag dialog is flagged as ignored in the user settings.</li>
      *   <li>If the campaign currently requires more medics than are available, as determined by
-     *   {@link #checkMedicsNeededCount(Campaign)}.</li>
+     *   {@link #checkMedicsNeededCount()}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed to notify the user about
      * the medic shortage.

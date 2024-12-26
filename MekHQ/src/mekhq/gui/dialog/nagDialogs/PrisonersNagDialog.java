@@ -33,6 +33,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </p>
  */
 public class PrisonersNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     /**
      * Checks if the current campaign has prisoners of war (POWs).
      *
@@ -42,10 +44,9 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
      * current prisoners. If the list is not empty, the method returns {@code true}.
      * </p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if there are prisoners in the campaign; otherwise, {@code false}.
      */
-    static boolean hasPrisoners (Campaign campaign) {
+    boolean hasPrisoners() {
         if (!campaign.hasActiveContract()) {
             return !campaign.getCurrentPrisoners().isEmpty();
         }
@@ -66,6 +67,8 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
     public PrisonersNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_PRISONERS);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "PrisonersNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
@@ -78,17 +81,15 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
      * The dialog will be shown if the following conditions are met:
      * <ul>
      *     <li>The nag dialog for prisoners is not ignored in MekHQ options.</li>
-     *     <li>The campaign contains prisoners, as determined by {@link #hasPrisoners(Campaign)}.</li>
+     *     <li>The campaign contains prisoners, as determined by {@link #hasPrisoners()}.</li>
      * </ul>
      * If all these conditions are satisfied, the dialog is displayed to notify the user about the prisoners.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_PRISONERS;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (hasPrisoners(campaign))) {
+            && hasPrisoners()) {
             showDialog();
         }
     }

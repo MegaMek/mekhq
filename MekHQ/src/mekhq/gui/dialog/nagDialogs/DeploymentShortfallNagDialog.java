@@ -37,6 +37,8 @@ import java.time.DayOfWeek;
  * </p>
  */
 public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
+    private Campaign campaign;
+
     /**
      * Checks if the campaign's active contracts have deployment deficits that need to be addressed.
      *
@@ -50,10 +52,9 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If none of these conditions are met, the method returns {@code false}.
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if there are unmet deployment requirements; otherwise, {@code false}.
      */
-    static boolean checkDeploymentRequirementsMet(Campaign campaign) {
+    boolean hasDeploymentShortfall() {
         if (!campaign.getLocation().isOnPlanet()) {
             return false;
         }
@@ -86,6 +87,8 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
     public DeploymentShortfallNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_SHORT_DEPLOYMENT);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "DeploymentShortfallNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
@@ -101,18 +104,16 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
      *     <li>AtB campaigns are enabled in the campaign options.</li>
      *     <li>The nag dialog for short deployments is not ignored in MekHQ options.</li>
      *     <li>There are unmet deployment requirements, as determined by
-     *     {@link #checkDeploymentRequirementsMet(Campaign)}.</li>
+     *     {@link #hasDeploymentShortfall()}.</li>
      * </ul>
      * If all these conditions are satisfied, the dialog is shown to the user.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_SHORT_DEPLOYMENT;
 
         if (campaign.getCampaignOptions().isUseAtB()
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (checkDeploymentRequirementsMet(campaign))) {
+            && (hasDeploymentShortfall())) {
             showDialog();
         }
     }

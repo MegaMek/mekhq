@@ -34,6 +34,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </p>
  */
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     /**
      * Checks whether the campaign has any untreated personnel with injuries.
      *
@@ -47,10 +49,9 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * If any personnel match these conditions, the method returns {@code true}.
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if untreated injuries are present, otherwise {@code false}.
      */
-    static boolean campaignHasUntreatedInjuries(Campaign campaign) {
+    boolean campaignHasUntreatedInjuries() {
         for (Person person : campaign.getActivePersonnel()) {
             if (!person.getPrisonerStatus().isCurrentPrisoner()
                 && person.needsFixing()
@@ -71,8 +72,10 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
      *
      * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public UntreatedPersonnelNagDialog(final Campaign campaign) {
+    public UntreatedPersonnelNagDialog(Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
+
+        this.campaign = campaign;
 
         final String DIALOG_BODY = "UntreatedPersonnelNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
@@ -87,17 +90,15 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *     <li>The nag dialog for untreated personnel is not ignored in MekHQ options.</li>
      *     <li>There are untreated injuries in the campaign, as determined by
-     *     {@link #campaignHasUntreatedInjuries(Campaign)}.</li>
+     *     {@link #campaignHasUntreatedInjuries()}.</li>
      * </ul>
      * If these conditions are met, the dialog is displayed to remind the user to address untreated injuries.
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    public void checkNag(Campaign campaign) {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUntreatedInjuries(campaign)) {
+            && campaignHasUntreatedInjuries()) {
             showDialog();
         }
     }
