@@ -21,10 +21,9 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import java.time.LocalDate;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
 
 /**
  * A dialog used to notify the user about an invalid faction in the current campaign.
@@ -44,25 +43,6 @@ import java.time.LocalDate;
  */
 public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
-
-    /**
-     * Checks whether the campaign's faction is invalid for the current in-game date.
-     *
-     * <p>
-     * This method retrieves the campaign's faction using {@link Campaign#getFaction()} and evaluates
-     * its validity for the current date using {@link Faction#validIn(LocalDate)}. A faction is considered
-     * invalid if it is not valid for the campaign's local date.
-     * </p>
-     *
-     * @return {@code true} if the faction is invalid for the campaign's current date; otherwise,
-     * {@code false}.
-     */
-    boolean isFactionInvalid() {
-        Faction campaignFaction = campaign.getFaction();
-        LocalDate today = campaign.getLocalDate();
-
-        return !campaignFaction.validIn(today);
-    }
 
     /**
      * Constructs an {@code InvalidFactionNagDialog} for the given campaign.
@@ -103,7 +83,7 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_INVALID_FACTION;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (isFactionInvalid())) {
+            && (isFactionInvalid(campaign))) {
             showDialog();
         }
     }

@@ -21,12 +21,11 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import java.time.LocalDate;
-import java.util.List;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
 
 /**
  * A nag dialog that warns the user if the campaign's available funds are not enough to cover
@@ -40,50 +39,6 @@ import java.util.List;
  */
 public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
-
-    private Money totalPaymentsDue = Money.zero();
-
-    /**
-     * Determines whether the campaign's current funds are insufficient to cover
-     * the total loan payments due.
-     *
-     * <p>
-     * This method compares the campaign's available funds with the {@code totalPaymentsDue}
-     * amount. If the available funds are less than the total loan payments due, it returns {@code true},
-     * indicating that the campaign cannot afford the loan payments; otherwise, it returns {@code false}.
-     * </p>
-     *
-     * @return {@code true} if the campaign's funds are less than the total loan payments due;
-     *         {@code false} otherwise.
-     */
-    boolean unableToAffordLoans() {
-        return campaign.getFunds().isLessThan(totalPaymentsDue);
-    }
-
-    /**
-     * Calculates the total loan payments due for tomorrow.
-     *
-     * <p>
-     * This method retrieves the list of loans associated with the campaign and checks if their
-     * next payment date matches tomorrow's date. If a payment is due, the amount is added to the
-     * cumulative total, which is stored in the {@code totalPaymentsDue} field.
-     * </p>
-     */
-    private void getTotalPaymentsDue() {
-        // gets the list of the campaign's current loans
-        List<Loan> loans = campaign.getFinances().getLoans();
-
-        // gets tomorrow's date
-        LocalDate tomorrow = campaign.getLocalDate().plusDays(1);
-
-        // iterate over all loans
-        for (Loan loan : loans) {
-            // if a loan payment is due tomorrow, add its payment amount to the total payments due
-            if (loan.getNextPayment().equals(tomorrow)) {
-                totalPaymentsDue = totalPaymentsDue.plus(loan.getPaymentAmount());
-            }
-        }
-    }
 
     /**
      * Constructs the nag dialog for insufficient funds to cover loan payments.
@@ -100,6 +55,8 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
 
         this.campaign = campaign;
+
+        Money totalPaymentsDue = getTotalPaymentsDue(campaign);
 
         final String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
@@ -122,10 +79,8 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
-        getTotalPaymentsDue();
-
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && unableToAffordLoans()) {
+            && unableToAffordLoans(campaign)) {
             showDialog();
         }
     }

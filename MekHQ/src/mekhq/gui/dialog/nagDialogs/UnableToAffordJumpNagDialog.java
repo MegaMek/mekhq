@@ -21,12 +21,11 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import java.util.Objects;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.getNextJumpCost;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.unableToAffordNextJump;
 
 /**
  * A nag dialog that warns the user if the campaign's available funds are not enough to cover the
@@ -41,53 +40,6 @@ import java.util.Objects;
  */
 public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
-
-    private Money nextJumpCost = Money.zero();
-
-    /**
-     * Determines whether the campaign's current funds are insufficient to cover the cost
-     * of the next jump.
-     *
-     * <p>
-     * This method compares the campaign's available funds with the calculated cost
-     * of the next jump stored in the {@code nextJumpCost} field. If the funds are less than
-     * the jump cost, it returns {@code true}, indicating that the jump cannot be afforded;
-     * otherwise, it returns {@code false}.
-     * </p>
-     *
-     * @return {@code true} if the campaign's funds are less than the cost of the next jump;
-     *         {@code false} otherwise.
-     */
-    boolean unableToAffordNextJump() {
-        return campaign.getFunds().isLessThan(nextJumpCost);
-    }
-
-    /**
-     * Calculates the cost of the next jump based on the campaign's location and financial settings.
-     *
-     * <p>
-     * This method retrieves the {@link JumpPath} for the campaign's current location and only
-     * calculates the jump cost if the next system on the path differs from the current system.
-     * The actual jump cost is determined by the campaign's settings, particularly whether
-     * contracts base their costs on the value of units in the player's TOE (Table of Equipment).
-     * </p>
-     */
-    private void getNextJumpCost() {
-        CurrentLocation location = campaign.getLocation();
-        JumpPath jumpPath = location.getJumpPath();
-
-        if (jumpPath == null) {
-            return;
-        }
-
-        if (Objects.equals(jumpPath.getLastSystem(), location.getCurrentSystem())) {
-            return;
-        }
-
-        boolean isContractPayBasedOnToeUnitsValue = campaign.getCampaignOptions().isEquipmentContractBase();
-
-        nextJumpCost = campaign.calculateCostPerJump(true, isContractPayBasedOnToeUnitsValue);
-    }
 
     /**
      * Constructs the nag dialog for insufficient funds to afford a jump.
@@ -104,6 +56,8 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
 
         this.campaign = campaign;
+
+        Money nextJumpCost = getNextJumpCost(campaign);
 
         final String DIALOG_BODY = "UnableToAffordJumpNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
@@ -125,10 +79,8 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
     public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP;
 
-        getNextJumpCost();
-
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && unableToAffordNextJump()) {
+            && unableToAffordNextJump(campaign)) {
             showDialog();
         }
     }

@@ -23,6 +23,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.hasAsTechsNeeded;
+
 /**
  * A dialog used to notify the user that their campaign has insufficient astechs. Not to be
  * confused with {@link InsufficientAstechTimeNagDialog}.
@@ -43,37 +45,6 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
 
-    private int asTechsNeeded = 0;
-
-    /**
-     * Verifies if the campaign has an unmet astech requirement.
-     *
-     * <p>
-     * This method checks whether the campaign has any pending maintenance or
-     * repair tasks that require astechs. It evaluates the current astech
-     * need in the campaign and determines if it exceeds zero.
-     * </p>
-     */
-    void checkAsTechsNeededCount() {
-        asTechsNeeded = campaign.getAstechNeed();
-    }
-
-    /**
-     * Checks if there is a need for AsTechs in the campaign.
-     *
-     * <p>
-     * This method determines whether the number of required AsTechs
-     * is greater than zero. If {@code asTechsNeeded} is greater than zero,
-     * it indicates that there is a need for AsTechs to meet the campaign's requirements.
-     * </p>
-     *
-     * @return {@code true} if the number of required AsTechs ({@code asTechsNeeded}) is greater than zero;
-     *         {@code false} otherwise.
-     */
-    boolean hasAsTechsNeeded() {
-        return asTechsNeeded > 0;
-    }
-
     /**
      * Constructs an {@code InsufficientAstechsNagDialog} for the given campaign.
      *
@@ -90,7 +61,7 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
 
         this.campaign = campaign;
 
-        checkAsTechsNeededCount();
+        int asTechsNeeded = campaign.getAstechNeed();
 
         String pluralizer = (asTechsNeeded > 1) ? "s" : "";
 
@@ -116,7 +87,7 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasAsTechsNeeded()) {
+            && hasAsTechsNeeded(campaign)) {
             showDialog();
         }
     }

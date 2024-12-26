@@ -23,6 +23,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
+
 /**
  * A nag dialog that alerts the user about prisoners of war (POWs) in the campaign.
  *
@@ -34,25 +36,6 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  */
 public class PrisonersNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
-
-    /**
-     * Checks if the current campaign has prisoners of war (POWs).
-     *
-     * <p>
-     * This method evaluates the state of the campaign to determine if there are prisoners present.
-     * If the campaign does not have an active contract, the method checks the campaign's list of
-     * current prisoners. If the list is not empty, the method returns {@code true}.
-     * </p>
-     *
-     * @return {@code true} if there are prisoners in the campaign; otherwise, {@code false}.
-     */
-    boolean hasPrisoners() {
-        if (!campaign.hasActiveContract()) {
-            return !campaign.getCurrentPrisoners().isEmpty();
-        }
-
-        return false;
-    }
 
     /**
      * Constructs the prisoners nag dialog for the given campaign.
@@ -89,7 +72,7 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_PRISONERS;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasPrisoners()) {
+            && hasPrisoners(campaign)) {
             showDialog();
         }
     }

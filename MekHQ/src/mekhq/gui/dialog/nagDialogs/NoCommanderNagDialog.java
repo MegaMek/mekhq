@@ -23,6 +23,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
+
 /**
  * A dialog used to notify the user that their campaign lacks a designated commander.
  *
@@ -43,22 +45,6 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  */
 public class NoCommanderNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
-
-    /**
-     * Checks if the campaign has no assigned commander.
-     *
-     * <p>
-     * This method determines whether the campaign has a flagged commander assigned or not.
-     * If {@code campaign.getFlaggedCommander()} returns {@code null}, it indicates
-     * that no commander has been assigned.
-     * </p>
-     *
-     * @return {@code true} if the campaign has no flagged commander
-     * ({@code campaign.getFlaggedCommander()} is {@code null}); {@code false} otherwise.
-     */
-    boolean hasNoCommander() {
-        return campaign.getFlaggedCommander() == null;
-    }
 
     /**
      * Constructs a {@code NoCommanderNagDialog} for a campaign.
@@ -94,7 +80,7 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasNoCommander()) {
+            && hasNoCommander(campaign)) {
             showDialog();
         }
     }

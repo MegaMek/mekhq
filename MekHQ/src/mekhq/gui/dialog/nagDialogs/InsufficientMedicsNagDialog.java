@@ -23,6 +23,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
+
 /**
  * A dialog used to notify the user about insufficient medics required to meet the medical needs of the campaign.
  *
@@ -43,37 +45,6 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
 
-    private int medicsRequired = 0;
-
-    /**
-     * Calculates the number of medics required for the campaign.
-     *
-     * <p>
-     * This method retrieves the number of medics currently needed in the campaign by
-     * calling {@link Campaign#getMedicsNeed()}. The result is assigned to
-     * {@link #medicsRequired}, representing the deficit in the number of medics.
-     * </p>
-     */
-    void checkMedicsNeededCount() {
-        medicsRequired =  campaign.getMedicsNeed();
-    }
-
-    /**
-     * Checks if there is a need for medics in the campaign.
-     *
-     * <p>
-     * This method evaluates whether the number of required medics is greater than zero.
-     * If {@code medicsRequired} is greater than zero, it means that additional medics
-     * are needed to meet the campaign's requirements.
-     * </p>
-     *
-     * @return {@code true} if the number of required medics ({@code medicsRequired}) is greater than zero;
-     *         {@code false} otherwise.
-     */
-    boolean hasMedicsNeeded() {
-        return medicsRequired > 0;
-    }
-
     /**
      * Constructs an {@code InsufficientMedicsNagDialog} for the given campaign.
      *
@@ -91,7 +62,7 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
 
         this.campaign = campaign;
 
-        checkMedicsNeededCount();
+        int medicsRequired =  campaign.getMedicsNeed();
 
         String pluralizer = (medicsRequired > 1) ? "s" : "";
 
@@ -117,7 +88,7 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_MEDICS;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasMedicsNeeded()) {
+            && hasMedicsNeeded(campaign)) {
             showDialog();
         }
     }

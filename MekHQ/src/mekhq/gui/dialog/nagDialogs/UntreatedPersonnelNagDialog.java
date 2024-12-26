@@ -21,8 +21,9 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
+
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 
 /**
  * A nag dialog that alerts the user about untreated injuries within the campaign's personnel.
@@ -35,32 +36,6 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  */
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     private final Campaign campaign;
-
-    /**
-     * Checks whether the campaign has any untreated personnel with injuries.
-     *
-     * <p>
-     * This method iterates over the campaign's active personnel and identifies individuals
-     * who meet the following criteria:
-     * <ul>
-     *     <li>The individual requires treatment ({@link Person#needsFixing()}).</li>
-     *     <li>The individual has not been assigned to a doctor.</li>
-     *     <li>The individual is not currently classified as a prisoner.</li>
-     * </ul>
-     * If any personnel match these conditions, the method returns {@code true}.
-     *
-     * @return {@code true} if untreated injuries are present, otherwise {@code false}.
-     */
-    boolean campaignHasUntreatedInjuries() {
-        for (Person person : campaign.getActivePersonnel()) {
-            if (!person.getPrisonerStatus().isCurrentPrisoner()
-                && person.needsFixing()
-                && person.getDoctorId() == null) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Constructs the nag dialog for untreated personnel injuries.
@@ -90,7 +65,7 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *     <li>The nag dialog for untreated personnel is not ignored in MekHQ options.</li>
      *     <li>There are untreated injuries in the campaign, as determined by
-     *     {@link #campaignHasUntreatedInjuries()}.</li>
+     *     {@code campaignHasUntreatedInjuries()}.</li>
      * </ul>
      * If these conditions are met, the dialog is displayed to remind the user to address untreated injuries.
      */
@@ -98,7 +73,7 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUntreatedInjuries()) {
+            && campaignHasUntreatedInjuries(campaign)) {
             showDialog();
         }
     }
