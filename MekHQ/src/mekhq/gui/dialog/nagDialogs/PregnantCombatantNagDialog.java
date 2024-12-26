@@ -36,6 +36,8 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
  * </p>
  */
 public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
+    private final Campaign campaign;
+
     /**
      * Checks if the current campaign contains any personnel who are pregnant and actively assigned
      * to a force.
@@ -52,11 +54,10 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
      * returns {@code false}.
      * </p>
      *
-     * @param campaign The {@link Campaign} object representing the current campaign.
      * @return {@code true} if there are pregnant personnel actively assigned to a combat force,
      * {@code false} otherwise.
      */
-    static boolean hasActivePregnantCombatant(Campaign campaign) {
+    boolean hasActivePregnantCombatant() {
         if (campaign.getActiveMissions(false).isEmpty()) {
             return false;
         }
@@ -91,6 +92,8 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
     public PregnantCombatantNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_PREGNANT_COMBATANT);
 
+        this.campaign = campaign;
+
         final String DIALOG_BODY = "PregnantCombatantNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
@@ -112,7 +115,7 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
         final String NAG_KEY = MHQConstants.NAG_PREGNANT_COMBATANT;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (hasActivePregnantCombatant(campaign))) {
+            && (hasActivePregnantCombatant())) {
             showDialog();
         }
     }

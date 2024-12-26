@@ -52,6 +52,22 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     String outstandingScenarios = "";
 
     /**
+     * Checks if there are any outstanding scenarios in the campaign.
+     *
+     * <p>
+     * This method evaluates whether the {@code outstandingScenarios} string is blank or not.
+     * If the string is not blank, it indicates that there are outstanding scenarios
+     * that need to be addressed.
+     * </p>
+     *
+     * @return {@code true} if {@code outstandingScenarios} is not blank, indicating there are
+     * outstanding scenarios; {@code false} otherwise.
+     */
+    boolean hasOutStandingScenarios() {
+        return !outstandingScenarios.isBlank();
+    }
+
+    /**
      * Retrieves and processes the list of outstanding scenarios for the current campaign.
      *
      * <p>
@@ -115,10 +131,6 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
             }
         }
 
-        if (campaign.getCampaignOptions().isUseStratCon()) {
-            activeScenarios.append(resources.getString("OutstandingScenariosNagDialog.stratCon"));
-        }
-
         outstandingScenarios = activeScenarios.toString();
     }
 
@@ -136,8 +148,16 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
         super(campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
 
         final String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
+
+        getOutstandingScenarios(campaign);
+
+        String addendum = "";
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            addendum = resources.getString("OutstandingScenariosNagDialog.stratCon");
+        }
+
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false), outstandingScenarios));
+            campaign.getCommanderAddress(false), outstandingScenarios, addendum));
     }
 
     /**
@@ -161,7 +181,7 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
 
         if (campaign.getCampaignOptions().isUseAtB()
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && !outstandingScenarios.isBlank()) {
+            && hasOutStandingScenarios()) {
             showDialog();
         }
     }
