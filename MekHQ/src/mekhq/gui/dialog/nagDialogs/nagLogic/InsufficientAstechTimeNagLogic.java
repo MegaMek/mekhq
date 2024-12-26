@@ -2,6 +2,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 
 public class InsufficientAstechTimeNagLogic {
     public static boolean hasAsTechTimeDeficit(Campaign campaign) {
@@ -26,18 +27,20 @@ public class InsufficientAstechTimeNagLogic {
      * and stored in {@link #asTechsTimeDeficit}.
      */
     public static int getAsTechTimeDeficit(Campaign campaign) {
-        // Units are only valid if they are maintained, present, and not self crewed (as the crew
-        // maintain it in that case).
-        // For each unit, this is valid for; we need six asTechs to help the tech for the maintenance.
-        final int need = campaign.getHangar().getUnitsStream()
-            .filter(unit -> !unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed())
-            .mapToInt(unit -> unit.getMaintenanceTime() * 6).sum();
+        // Calculate the total maintenance time needed using a traditional loop
+        int need = 0;
+        for (Unit unit : campaign.getHangar().getUnits()) { // Assuming getUnits() returns a collection of units
+            if (!unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed()) {
+                need += unit.getMaintenanceTime() * 6;
+            }
+        }
 
         int available = campaign.getPossibleAstechPoolMinutes();
         if (campaign.isOvertimeAllowed()) {
             available += campaign.getPossibleAstechPoolOvertime();
         }
 
-        return (int) Math.ceil((need - available) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME);
+        // Ensure deficit is non-negative
+        return Math.max(0, (int) Math.ceil((need - available) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME));
     }
 }
