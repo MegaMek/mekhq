@@ -133,12 +133,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         relationshipsTab.loadValuesFromCampaignOptions();
 
         // Turnover and Retention
-        TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(getFrame(),
-            "turnoverAndRetentionTab");
+        TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions,
+                getFrame(), "turnoverAndRetentionTab");
 
         JTabbedPane turnoverAndRetentionContentTabs = createSubTabs(Map.of(
             "turnoverTab", turnoverAndRetentionTab.createTurnoverTab(),
             "fatigueTab", turnoverAndRetentionTab.createFatigueTab()));
+        turnoverAndRetentionTab.loadValuesFromCampaignOptions();
 
         // Add Tabs
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,

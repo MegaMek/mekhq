@@ -1,6 +1,7 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 
 import javax.swing.*;
@@ -25,8 +26,9 @@ import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
  * class are then called in response to user interactions with the GUI.
  */
 public class TurnoverAndRetentionTab {
-    JFrame frame;
-    String name;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
     //start Turnover Tab
     private JCheckBox chkUseRandomRetirement;
@@ -111,10 +113,12 @@ public class TurnoverAndRetentionTab {
      * variables 'frame' and 'name', and then calls the initilize method to initialize the components
      * of the tabs.
      *
-     * @param frame the {@link JFrame} to be assigned to this tab's frame
-     * @param name the name to be assigned to this tab's name
+     * @param campaignOptions
+     * @param frame           the {@link JFrame} to be assigned to this tab's frame
+     * @param name            the name to be assigned to this tab's name
      */
-    TurnoverAndRetentionTab(JFrame frame, String name) {
+    TurnoverAndRetentionTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
 
@@ -800,5 +804,51 @@ public class TurnoverAndRetentionTab {
         panel.add(spnManagementSkillPenalty, layout);
 
         return panel;
+    }
+
+    void loadValuesFromCampaignOptions() {
+        // Turnover
+        chkUseRandomRetirement.setSelected(campaignOptions.isUseRandomRetirement());
+        spnTurnoverFixedTargetNumber.setValue(campaignOptions.getTurnoverFixedTargetNumber());
+        comboTurnoverFrequency.setSelectedItem(campaignOptions.getTurnoverFrequency());
+        chkUseContractCompletionRandomRetirement.setSelected(campaignOptions.isUseContractCompletionRandomRetirement());
+        chkUseRandomFounderTurnover.setSelected(campaignOptions.isUseRandomFounderTurnover());
+        chkTrackOriginalUnit.setSelected(campaignOptions.isTrackOriginalUnit());
+        chkAeroRecruitsHaveUnits.setSelected(campaignOptions.isAeroRecruitsHaveUnits());
+        chkUseSubContractSoldiers.setSelected(campaignOptions.isUseSubContractSoldiers());
+        spnServiceContractDuration.setValue(campaignOptions.getServiceContractDuration());
+        spnServiceContractModifier.setValue(campaignOptions.getServiceContractModifier());
+        chkPayBonusDefault.setSelected(campaignOptions.isPayBonusDefault());
+        spnPayBonusDefaultThreshold.setValue(campaignOptions.getPayBonusDefaultThreshold());
+        chkUseCustomRetirementModifiers.setSelected(campaignOptions.isUseCustomRetirementModifiers());
+        chkUseFatigueModifiers.setSelected(campaignOptions.isUseFatigueModifiers());
+        chkUseSkillModifiers.setSelected(campaignOptions.isUseSkillModifiers());
+        chkUseAgeModifiers.setSelected(campaignOptions.isUseAgeModifiers());
+        chkUseUnitRatingModifiers.setSelected(campaignOptions.isUseUnitRatingModifiers());
+        chkUseFactionModifiers.setSelected(campaignOptions.isUseFactionModifiers());
+        chkUseMissionStatusModifiers.setSelected(campaignOptions.isUseMissionStatusModifiers());
+        chkUseHostileTerritoryModifiers.setSelected(campaignOptions.isUseHostileTerritoryModifiers());
+        chkUseFamilyModifiers.setSelected(campaignOptions.isUseFamilyModifiers());
+        chkUseLoyaltyModifiers.setSelected(campaignOptions.isUseLoyaltyModifiers());
+        chkUseHideLoyalty.setSelected(campaignOptions.isUseHideLoyalty());
+        spnPayoutRateOfficer.setValue(campaignOptions.getPayoutRateOfficer());
+        spnPayoutRateEnlisted.setValue(campaignOptions.getPayoutRateEnlisted());
+        spnPayoutRetirementMultiplier.setValue(campaignOptions.getPayoutRetirementMultiplier());
+        chkUsePayoutServiceBonus.setSelected(campaignOptions.isUsePayoutServiceBonus());
+        spnPayoutServiceBonusRate.setValue(campaignOptions.getPayoutServiceBonusRate());
+        chkUseAdministrativeStrain.setSelected(campaignOptions.isUseAdministrativeStrain());
+        spnAdministrativeCapacity.setValue(campaignOptions.getAdministrativeCapacity());
+        spnMultiCrewStrainDivider.setValue(campaignOptions.getMultiCrewStrainDivider());
+        chkUseManagementSkill.setSelected(campaignOptions.isUseManagementSkill());
+        chkUseCommanderLeadershipOnly.setSelected(campaignOptions.isUseCommanderLeadershipOnly());
+        spnManagementSkillPenalty.setValue(campaignOptions.getManagementSkillPenalty());
+
+        // Fatigue
+        chkUseFatigue.setSelected(campaignOptions.isUseFatigue());
+        spnFatigueRate.setValue(campaignOptions.getFatigueRate());
+        chkUseInjuryFatigue.setSelected(campaignOptions.isUseInjuryFatigue());
+        spnFieldKitchenCapacity.setValue(campaignOptions.getFieldKitchenCapacity());
+        chkFieldKitchenIgnoreNonCombatants.setSelected(campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+        spnFatigueLeaveThreshold.setValue(campaignOptions.getFatigueLeaveThreshold());
     }
 }
