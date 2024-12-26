@@ -1,28 +1,36 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.SkillType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
-    JFrame frame;
-    String name;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
-    private static List<JLabel> allSkillLabels = new ArrayList<>();
-    private static List<JSpinner> allSkillSpinners = new ArrayList<>();
-    private static List<JComboBox<SkillLevel>> allSkillComboBoxes = new ArrayList<>();
+    private static Map<SkillType, JSpinner> allTargetNumbers;
+    private static Map<SkillType, List<JLabel>> allSkillLevels;
+    private static Map<SkillType, List<JSpinner>> allSkillCosts;
+    private static Map<SkillType, List<JComboBox<SkillLevel>>> allSkillMilestones;
     private static double storedTargetNumber = 0;
     private static List<Double> storedValuesSpinners = new ArrayList<>();
     private static List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
-    SkillsTab(JFrame frame, String name) {
+    SkillsTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
 
@@ -34,9 +42,10 @@ public class SkillsTab {
     }
 
     private void initializeGeneral() {
-        allSkillLabels = new ArrayList<>();
-        allSkillSpinners = new ArrayList<>();
-        allSkillComboBoxes = new ArrayList<>();
+        allTargetNumbers = new HashMap<>();
+        allSkillLevels = new HashMap<>();
+        allSkillCosts = new HashMap<>();
+        allSkillMilestones = new HashMap<>();
         storedTargetNumber = 0;
         storedValuesSpinners = new ArrayList<>();
         storedValuesComboBoxes = new ArrayList<>();
@@ -67,7 +76,7 @@ public class SkillsTab {
             }
         }
 
-        java.util.List<JPanel> skillPanels = new ArrayList<>();
+        List<JPanel> skillPanels = new ArrayList<>();
 
         for (String skill : skills) {
             JPanel skillPanel = createSkillPanel(skill);
@@ -128,10 +137,20 @@ public class SkillsTab {
     }
 
     private void setVisibleForAll(boolean visible) {
-        for (int i = 0; i < allSkillLabels.size(); i++) {
-            allSkillLabels.get(i).setVisible(visible);
-            allSkillSpinners.get(i).setVisible(visible);
-            allSkillComboBoxes.get(i).setVisible(visible);
+        setVisibleForAll(allSkillLevels, visible);
+        setVisibleForAll(allSkillCosts, visible);
+        setVisibleForAll(allSkillMilestones, visible);
+    }
+
+    private <T extends JComponent> void setVisibleForAll(Map<SkillType, List<T>> componentsMap,
+                                                         boolean visible) {
+        for (SkillType skillType : componentsMap.keySet()) {
+            List<T> components = componentsMap.get(skillType);
+            if (components != null) {
+                for (T component : components) {
+                    component.setVisible(visible);
+                }
+            }
         }
     }
 
@@ -142,29 +161,42 @@ public class SkillsTab {
         JLabel lblTargetNumber = new CampaignOptionsLabel("SkillPanelTargetNumber");
         JSpinner spnTargetNumber = new CampaignOptionsSpinner("SkillPanelTargetNumber",
             0, 0, 10, 1);
+        allTargetNumbers.put(SkillType.getType(skillName), spnTargetNumber);
 
         List<JLabel> labels = new ArrayList<>();
         List<JSpinner> spinners = new ArrayList<>();
         List<JComboBox<SkillLevel>> comboBoxes = new ArrayList<>();
 
+        List<JLabel> skillLevels = new ArrayList<>();
+        List<JSpinner> skillCosts = new ArrayList<>();
+        List<JComboBox<SkillLevel>> skillMilestones = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
             JLabel label = new CampaignOptionsLabel("SkillLevel" + i, null, true);
             label.setVisible(false);
             labels.add(label);
-            allSkillLabels.add(label);
+            skillLevels.add(label);
 
             JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + i,
-                null, 0, 0, 10, 1, true);
+                null, 0, 0, 9999, 1, true);
             spinner.setVisible(false);
             spinners.add(spinner);
-            allSkillSpinners.add(spinner);
+            skillCosts.add(spinner);
 
-            JComboBox<SkillLevel> comboBox = new JComboBox<>(SkillLevel.values());
+            JComboBox<SkillLevel> comboBox = new JComboBox<>();
+            comboBox.addItem(ULTRA_GREEN);
+            comboBox.addItem(GREEN);
+            comboBox.addItem(REGULAR);
+            comboBox.addItem(VETERAN);
+            comboBox.addItem(ELITE);
             comboBox.addActionListener(e -> milestoneActionListener(comboBoxes, comboBox));
             comboBox.setVisible(false);
             comboBoxes.add(comboBox);
-            allSkillComboBoxes.add(comboBox);
+            skillMilestones.add(comboBox);
         }
+
+        allSkillLevels.put(SkillType.getType(skillName), skillLevels);
+        allSkillCosts.put(SkillType.getType(skillName), skillCosts);
+        allSkillMilestones.put(SkillType.getType(skillName), skillMilestones);
 
         JButton copyButton = new JButton(resources.getString("btnCopy.text"));
         copyButton.addActionListener(e -> {
@@ -258,12 +290,12 @@ public class SkillsTab {
                 if (previousSelection.ordinal() > currentSelection.ordinal()) {
                     comboBox.setSelectedItem(previousSelection);
                 } else if (currentSelection.ordinal() > previousSelection.ordinal() + 1) {
-                    comboBox.setSelectedItem(SkillLevel.parseFromInteger(previousSelection.ordinal() + 1));
+                    comboBox.setSelectedItem(parseFromInteger(previousSelection.ordinal() + 1));
                 }
             }
         } else {
-            if (comboBox.getSelectedItem() != SkillLevel.NONE) {
-                comboBox.setSelectedItem(SkillLevel.ULTRA_GREEN);
+            if (comboBox.getSelectedItem() != NONE) {
+                comboBox.setSelectedItem(ULTRA_GREEN);
             }
         }
 
@@ -271,6 +303,57 @@ public class SkillsTab {
             originIndex++;
             JComboBox<SkillLevel> nextComboBox = comboBoxes.get(originIndex);
             nextComboBox.setSelectedItem(comboBox.getSelectedItem());
+        }
+    }
+
+    void loadValuesFromCampaignOptions() {
+        Map<String, SkillType> skillHash = SkillType.getSkillHash();
+
+        for (Entry<String, SkillType> entry : skillHash.entrySet()) {
+            SkillType skill = entry.getValue();
+
+            // Target Number
+            if (allTargetNumbers.get(skill) == null) {
+                // This will happen if we're trying to load a skill that doesn't exist anymore
+                continue;
+            }
+
+            // Costs
+            List<JSpinner> skillCosts = allSkillCosts.get(skill);
+            Integer[] costs = skill.getCosts(); // Get skill costs
+
+            if (costs != null && skillCosts != null) { // Null safety check
+                for (int i = 0; i < Math.min(costs.length, skillCosts.size()); i++) {
+                    skillCosts.get(i).setValue(costs[i]);
+                }
+            }
+
+            // Milestones
+            List<JComboBox<SkillLevel>> milestones = allSkillMilestones.get(skill);
+            if (milestones != null) { // Null safety check for milestones
+                int greenIndex = skill.getGreenLevel();
+                int regularIndex = skill.getRegularLevel();
+                int veteranIndex = skill.getVeteranLevel();
+                int eliteIndex = skill.getEliteLevel();
+
+                for (int i = 0; i < milestones.size(); i++) {
+                    SkillLevel levelToSet;
+
+                    if (i < greenIndex) {
+                        levelToSet = SkillLevel.ULTRA_GREEN;
+                    } else if (i < regularIndex) {
+                        levelToSet = SkillLevel.GREEN;
+                    } else if (i < veteranIndex) {
+                        levelToSet = SkillLevel.REGULAR;
+                    } else if (i < eliteIndex) {
+                        levelToSet = SkillLevel.VETERAN;
+                    } else {
+                        levelToSet = SkillLevel.ELITE;
+                    }
+
+                    milestones.get(i).setSelectedItem(levelToSet); // Set selected milestone level
+                }
+            }
         }
     }
 }

@@ -333,6 +333,15 @@ public class SkillType {
         }
     }
 
+    /**
+     * Retrieves the cost values associated with this skill type for different levels.
+     *
+     * @return an array of Integer representing the costs for each level of the skill.
+     */
+    public Integer[] getCosts() {
+        return costs;
+    }
+
     /** get the cost to acquire this skill at the given level from scratch **/
     public int getTotalCost(int lvl) {
         int totalCost = 0;
