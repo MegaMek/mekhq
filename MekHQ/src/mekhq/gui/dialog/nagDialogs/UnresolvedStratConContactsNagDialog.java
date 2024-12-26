@@ -70,7 +70,7 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      * </ul>
      * A formatted report is created, summarizing all unresolved scenarios and marking critical ones.
      */
-    private void determineUnresolvedContacts() {
+    void determineUnresolvedContacts() {
         StringBuilder unresolvedContacts = new StringBuilder();
 
         // check every track attached to an active contract for unresolved scenarios
@@ -93,8 +93,6 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
             }
         }
 
-        unresolvedContacts.append(resources.getString("UnresolvedStratConContactsNagDialog.stratcon"));
-
         unresolvedContactsReport = unresolvedContacts.toString();
     }
 
@@ -114,9 +112,14 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
 
         this.campaign = campaign;
 
+        String addendum = "";
+        if (unresolvedContactsReport.isEmpty()) {
+            addendum = resources.getString("UnresolvedStratConContactsNagDialog.stratcon");
+        }
+
         final String DIALOG_BODY = "UnresolvedStratConContactsNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
-            campaign.getCommanderAddress(false)));
+            campaign.getCommanderAddress(false), addendum));
     }
 
     /**
