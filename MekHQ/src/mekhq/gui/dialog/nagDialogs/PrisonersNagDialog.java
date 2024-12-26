@@ -64,7 +64,7 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
      * The dialog will be shown if the following conditions are met:
      * <ul>
      *     <li>The nag dialog for prisoners is not ignored in MekHQ options.</li>
-     *     <li>The campaign contains prisoners, as determined by {@link #hasPrisoners()}.</li>
+     *     <li>The campaign contains prisoners, as determined by {@code hasPrisoners()}.</li>
      * </ul>
      * If all these conditions are satisfied, the dialog is displayed to notify the user about the prisoners.
      */

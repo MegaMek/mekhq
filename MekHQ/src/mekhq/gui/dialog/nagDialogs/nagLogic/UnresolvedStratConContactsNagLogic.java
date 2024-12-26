@@ -3,6 +3,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 
 public class UnresolvedStratConContactsNagLogic {
@@ -31,7 +32,7 @@ public class UnresolvedStratConContactsNagLogic {
      * This method checks all active AtB contracts in the campaign and iterates over their
      * StratCon tracks to find unresolved scenarios. Scenarios are considered unresolved if:
      * <ul>
-     *     <li>Their current state is {@link StratconScenario.ScenarioState#UNRESOLVED}.</li>
+     *     <li>Their current state is {@link ScenarioState#UNRESOLVED}.</li>
      *     <li>Their deployment date matches the current campaign date.</li>
      * </ul>
      * A formatted report is created, summarizing all unresolved scenarios and marking critical ones.
@@ -48,7 +49,7 @@ public class UnresolvedStratConContactsNagLogic {
 
             for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
                 for (StratconScenario scenario : track.getScenarios().values()) {
-                    if ((scenario.getCurrentState() == StratconScenario.ScenarioState.UNRESOLVED)
+                    if ((scenario.getCurrentState() == ScenarioState.UNRESOLVED)
                         && (campaign.getLocalDate().equals(scenario.getDeploymentDate()))) {
                         unresolvedContacts.append(String.format("<br><b>- %s</b>, %s, %s-%s %s",
                             scenario.getName(), contract.getName(),

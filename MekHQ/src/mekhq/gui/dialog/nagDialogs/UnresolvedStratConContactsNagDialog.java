@@ -75,7 +75,7 @@ public class UnresolvedStratConContactsNagDialog extends AbstractMHQNagDialog {
      *     <li>StratCon is enabled in the campaign options.</li>
      *     <li>The nag dialog for unresolved StratCon contacts is not ignored in MekHQ options.</li>
      *     <li>There are unresolved StratCon contacts, as determined by
-     *     {@link #determineUnresolvedContacts()}.</li>
+     *     {@code determineUnresolvedContacts()}.</li>
      * </ul>
      * The dialog warns the player about unresolved scenarios requiring attention before
      * advancing the campaign.

@@ -68,7 +68,7 @@ public class DeploymentShortfallNagDialog extends AbstractMHQNagDialog {
      *     <li>AtB campaigns are enabled in the campaign options.</li>
      *     <li>The nag dialog for short deployments is not ignored in MekHQ options.</li>
      *     <li>There are unmet deployment requirements, as determined by
-     *     {@link #hasDeploymentShortfall()}.</li>
+     *     {@code hasDeploymentShortfall()}.</li>
      * </ul>
      * If all these conditions are satisfied, the dialog is shown to the user.
      */

@@ -79,7 +79,7 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *   <li>If the "Insufficient Medics" nag dialog is flagged as ignored in the user settings.</li>
      *   <li>If the campaign currently requires more medics than are available, as determined by
-     *   {@link #checkMedicsNeededCount()}.</li>
+     *   {@code checkMedicsNeededCount()}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed to notify the user about
      * the medic shortage.

@@ -74,7 +74,7 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
      * <ul>
      *   <li>If the "Invalid Faction" nag dialog is flagged as ignored in user settings.</li>
      *   <li>If the campaign's faction is invalid for the current in-game date,
-     *   as determined by {@link #isFactionInvalid()}.</li>
+     *   as determined by {@code isFactionInvalid()}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed to notify the user of the issue.
 

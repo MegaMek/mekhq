@@ -5,6 +5,20 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class InsufficientAstechTimeNagLogic {
+    /**
+     * Determines whether there is a deficit in available astech time for the campaign.
+     *
+     * <p>
+     * This method calculates the astech time deficit for the given campaign and
+     * returns {@code true} if there is a positive deficit, indicating that the
+     * campaign's available astech time is insufficient. If the deficit is zero
+     * or negative, it returns {@code false}.
+     * </p>
+     *
+     * @param campaign the campaign object to retrieve the astech time deficit information from
+     * @return {@code true} if there is a positive astech time deficit (deficit > 0),
+     *         {@code false} otherwise
+     */
     public static boolean hasAsTechTimeDeficit(Campaign campaign) {
         int asTechsTimeDeficit = getAsTechTimeDeficit(campaign);
         return asTechsTimeDeficit > 0;
@@ -24,12 +38,12 @@ public class InsufficientAstechTimeNagLogic {
      * </ul>
      * Each valid unit requires six astechs per unit of maintenance time. If overtime is allowed in
      * the campaign, it is added to the available astech pool. The deficit is calculated, rounded up,
-     * and stored in {@link #asTechsTimeDeficit}.
+     * and returned.
      */
     public static int getAsTechTimeDeficit(Campaign campaign) {
         // Calculate the total maintenance time needed using a traditional loop
         int need = 0;
-        for (Unit unit : campaign.getHangar().getUnits()) { // Assuming getUnits() returns a collection of units
+        for (Unit unit : campaign.getHangar().getUnits()) {
             if (!unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed()) {
                 need += unit.getMaintenanceTime() * 6;
             }

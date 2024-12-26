@@ -66,7 +66,7 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
      *     <li>Maintenance checks are enabled.</li>
      *     <li>The nag dialog for unmaintained units is not ignored in MekHQ options.</li>
      *     <li>There are unmaintained units in the campaign hangar, as determined by
-     *     {@link #campaignHasUnmaintainedUnits()}.</li>
+     *     {@code campaignHasUnmaintainedUnits()}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed to alert the player to address unit maintenance.
      */

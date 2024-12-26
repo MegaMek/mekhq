@@ -79,7 +79,7 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
      *   <li>If the "Insufficient Astechs" nag dialog has not been flagged as ignored
      *       in the user options.</li>
      *   <li>If the campaign has an unmet asTech requirement as determined by
-     *       {@link #checkAsTechsNeededCount()}.</li>
+     *       {@code checkAsTechsNeededCount()}.</li>
      * </ul>
      * If both conditions are met, the dialog is displayed.
      */
