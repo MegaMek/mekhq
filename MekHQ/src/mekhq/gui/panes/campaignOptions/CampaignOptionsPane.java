@@ -256,11 +256,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         marketsTab.loadValuesFromCampaignOptions();
 
         // Rulesets
-        RulesetsTab rulesetsTab = new RulesetsTab(getFrame(), "rulesetsTab");
+        RulesetsTab rulesetsTab = new RulesetsTab(campaignOptions, getFrame(), "rulesetsTab");
 
         JTabbedPane rulesetsContentTabs = createSubTabs(Map.of(
             "stratConGeneralTab", rulesetsTab.createStratConTab(),
             "legacyTab", rulesetsTab.createLegacyTab()));
+        rulesetsTab.loadValuesFromCampaignOptions();
 
         // Add tabs
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,

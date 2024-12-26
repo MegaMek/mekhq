@@ -2,6 +2,7 @@ package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Skills;
@@ -14,8 +15,9 @@ import java.awt.*;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RulesetsTab {
-    JFrame frame;
-    String name;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
     //start Universal Options
     private JLabel lblSkillLevel;
@@ -60,10 +62,6 @@ public class RulesetsTab {
 
     private JPanel pnlPartsPanel;
     private JCheckBox chkRestrictPartsByMission;
-    private JLabel lblBonusPartExchangeValue;
-    private JSpinner spnBonusPartExchangeValue;
-    private JLabel lblBonusPartMaxExchangeCount;
-    private JSpinner spnBonusPartMaxExchangeCount;
 
     private JPanel pnlLancePanel;
     private JCheckBox chkLimitLanceWeight;
@@ -106,7 +104,8 @@ public class RulesetsTab {
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
 
-    RulesetsTab(JFrame frame, String name) {
+    RulesetsTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
 
@@ -165,10 +164,6 @@ public class RulesetsTab {
         // Parts
         pnlPartsPanel = new JPanel();
         chkRestrictPartsByMission = new JCheckBox();
-        lblBonusPartExchangeValue = new JLabel();
-        spnBonusPartExchangeValue = new JSpinner();
-        lblBonusPartMaxExchangeCount = new JLabel();
-        spnBonusPartMaxExchangeCount = new JSpinner();
 
         // Lances
         pnlLancePanel = new JPanel();
@@ -399,12 +394,6 @@ public class RulesetsTab {
     private JPanel createUniversalPartsPanel() {
         // Content
         chkRestrictPartsByMission = new CampaignOptionsCheckBox("RestrictPartsByMission");
-        lblBonusPartExchangeValue = new CampaignOptionsLabel("BonusPartExchangeValue");
-        spnBonusPartExchangeValue = new CampaignOptionsSpinner("BonusPartExchangeValue",
-            500000, 0, 1000000, 1);
-        lblBonusPartMaxExchangeCount = new CampaignOptionsLabel("BonusPartMaxExchangeCount");
-        spnBonusPartMaxExchangeCount = new CampaignOptionsSpinner("BonusPartMaxExchangeCount",
-            10, 0, 100, 1);
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalPartsPanel", true,
@@ -415,18 +404,6 @@ public class RulesetsTab {
         layout.gridy = 0;
         layout.gridwidth = 2;
         panel.add(chkRestrictPartsByMission, layout);
-
-        layout.gridy++;
-        layout.gridwidth = 1;
-        panel.add(lblBonusPartExchangeValue, layout);
-        layout.gridx++;
-        panel.add(spnBonusPartExchangeValue, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblBonusPartMaxExchangeCount, layout);
-        layout.gridx++;
-        panel.add(spnBonusPartMaxExchangeCount, layout);
 
         return panel;
     }
@@ -757,6 +734,56 @@ public class RulesetsTab {
                 spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
+            }
+        }
+    }
+
+    void loadValuesFromCampaignOptions() {
+        // Universal
+        comboSkillLevel.setSelectedItem(campaignOptions.getSkillLevel());
+        spnOpForLanceTypeMeks.setValue(campaignOptions.getOpForLanceTypeMeks());
+        spnOpForLanceTypeMixed.setValue(campaignOptions.getOpForLanceTypeMixed());
+        spnOpForLanceTypeVehicles.setValue(campaignOptions.getOpForLanceTypeVehicles());
+        chkUseDropShips.setSelected(campaignOptions.isUseDropShips());
+        chkOpForUsesVTOLs.setSelected(campaignOptions.isOpForUsesVTOLs());
+        chkClanVehicles.setSelected(campaignOptions.isClanVehicles());
+        chkRegionalMekVariations.setSelected(campaignOptions.isRegionalMekVariations());
+        chkAttachedPlayerCamouflage.setSelected(campaignOptions.isAttachedPlayerCamouflage());
+        chkPlayerControlsAttachedUnits.setSelected(campaignOptions.isPlayerControlsAttachedUnits());
+        spnSPAUpgradeIntensity.setValue(campaignOptions.getSpaUpgradeIntensity());
+        chkAutoConfigMunitions.setSelected(campaignOptions.isAutoConfigMunitions());
+        spnScenarioModMax.setValue(campaignOptions.getScenarioModMax());
+        spnScenarioModChance.setValue(campaignOptions.getScenarioModChance());
+        spnScenarioModBV.setValue(campaignOptions.getScenarioModBV());
+        chkUseWeatherConditions.setSelected(campaignOptions.isUseWeatherConditions());
+        chkUseLightConditions.setSelected(campaignOptions.isUseLightConditions());
+        chkUsePlanetaryConditions.setSelected(campaignOptions.isUsePlanetaryConditions());
+        spnFixedMapChance.setValue(campaignOptions.getFixedMapChance());
+        chkRestrictPartsByMission.setSelected(campaignOptions.isRestrictPartsByMission());
+        chkLimitLanceWeight.setSelected(campaignOptions.isLimitLanceWeight());
+        chkLimitLanceNumUnits.setSelected(campaignOptions.isLimitLanceNumUnits());
+        chkUseStrategy.setSelected(campaignOptions.isUseStrategy());
+        spnBaseStrategyDeployment.setValue(campaignOptions.getBaseStrategyDeployment());
+        spnAdditionalStrategyDeployment.setValue(campaignOptions.getAdditionalStrategyDeployment());
+        chkAdjustPaymentForStrategy.setSelected(campaignOptions.isAdjustPaymentForStrategy());
+
+        // StratCon
+        chkUseStratCon.setSelected(campaignOptions.isUseStratCon());
+        chkUseGenericBattleValue.setSelected(campaignOptions.isUseGenericBattleValue());
+        chkUseVerboseBidding.setSelected(campaignOptions.isUseVerboseBidding());
+
+        // Legacy
+        chkUseAtB.setSelected(campaignOptions.isUseAtB());
+        chkUseVehicles.setSelected(campaignOptions.isUseVehicles());
+        chkDoubleVehicles.setSelected(campaignOptions.isDoubleVehicles());
+        chkOpForUsesAero.setSelected(campaignOptions.isUseAero());
+        spnOpForAeroChance.setValue(campaignOptions.getOpForAeroChance());
+        chkOpForUsesLocalForces.setSelected(campaignOptions.isAllowOpForLocalUnits());
+        chkAdjustPlayerVehicles.setSelected(campaignOptions.isAdjustPlayerVehicles());
+        chkGenerateChases.setSelected(campaignOptions.isGenerateChases());
+        for (CombatRole role : CombatRole.values()) {
+            if (role.ordinal() <= CombatRole.TRAINING.ordinal()) {
+                spnAtBBattleChance[role.ordinal()].setValue(campaignOptions.getAtBBattleChance(role));
             }
         }
     }
