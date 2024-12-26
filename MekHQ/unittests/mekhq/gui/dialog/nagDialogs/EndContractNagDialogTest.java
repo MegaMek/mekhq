@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +44,11 @@ public class EndContractNagDialogTest {
     private Contract contract1, contract2;
 
     private EndContractNagDialog endContractNagDialog;
+
+    @BeforeEach
+    void setup() {
+        System.setProperty("java.awt.headless", "true");
+    }
 
     /**
      * Test setup for each test, runs before each test.
@@ -60,6 +66,7 @@ public class EndContractNagDialogTest {
 
         // When the Campaign mock calls 'getLocalDate()' return today's date
         when(campaign.getLocalDate()).thenReturn(today);
+        doNothing().when(endContractNagDialog).showDialog();
     }
 
     // In the following tests the isContractEnded() method is called, and its response is
