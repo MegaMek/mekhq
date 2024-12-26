@@ -203,12 +203,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
      * This method makes the dialog visible and halts further execution until the user
      * either dismisses or interacts with the dialog (e.g., clicks a button).
      * </p>
-     *
-     * @return {@code true} if the user selected the "Advance Day" option, otherwise {@code false}.
      */
-    public boolean showDialog() {
+    public void showDialog() {
         setVisible(true);
-        return advanceDaySelected;
     }
 
     /**
@@ -292,9 +289,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
      * if the "Advance Day" button was selected, otherwise {@code false}.
      * </p>
      *
-     * @return {@code true} if "Advance Day" was chosen, otherwise {@code false}.
+     * @return {@code true} if "Advance Day" was canceled, otherwise {@code false}.
      */
-    public boolean isAdvanceDaySelected() {
-        return advanceDaySelected;
+    public boolean wasAdvanceDayCanceled() {
+        return !advanceDaySelected;
     }
 }

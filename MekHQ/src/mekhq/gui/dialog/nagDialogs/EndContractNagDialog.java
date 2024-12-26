@@ -104,17 +104,13 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
      *   <li>If any active contracts in the campaign are ending on the current date.</li>
      * </ul>
      * If these conditions are met, the dialog is displayed.
-     *
-     * @return {@code true} if the dialog was shown, otherwise {@code false}.
      */
-    public boolean checkNag() {
+    public void checkNag() {
         final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
 
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (campaign.getFlaggedCommander() == null)) {
+            && isContractEnded()) {
             showDialog();
         }
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-                && isContractEnded();
     }
 }

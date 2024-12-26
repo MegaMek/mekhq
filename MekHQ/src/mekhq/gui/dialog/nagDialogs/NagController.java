@@ -44,112 +44,112 @@ public class NagController {
         // Invalid Faction
         InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
         invalidFactionNagDialog.checkNag();
-        if (!invalidFactionNagDialog.isAdvanceDaySelected()) {
+        if (invalidFactionNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // No Commander
         NoCommanderNagDialog noCommanderNagDialog = new NoCommanderNagDialog(campaign);
         noCommanderNagDialog.checkNag();
-        if (!noCommanderNagDialog.isAdvanceDaySelected()) {
+        if (noCommanderNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Untreated personnel
         UntreatedPersonnelNagDialog untreatedPersonnelNagDialog = new UntreatedPersonnelNagDialog(campaign);
         untreatedPersonnelNagDialog.checkNag();
-        if (!untreatedPersonnelNagDialog.isAdvanceDaySelected()) {
+        if (untreatedPersonnelNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Unable to afford expenses
         UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(campaign);
         unableToAffordExpensesNagDialog.checkNag();
-        if (!unableToAffordExpensesNagDialog.isAdvanceDaySelected()) {
+        if (unableToAffordExpensesNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Unable to afford next jump
         UnableToAffordJumpNagDialog unableToAffordJumpNagDialog = new UnableToAffordJumpNagDialog(campaign);
         unableToAffordJumpNagDialog.checkNag();
-        if (!unableToAffordJumpNagDialog.isAdvanceDaySelected()) {
+        if (unableToAffordJumpNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Unable to afford next loan payment
         UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(campaign);
         unableToAffordLoanPaymentNagDialog.checkNag();
-        if (!unableToAffordLoanPaymentNagDialog.isAdvanceDaySelected()) {
+        if (unableToAffordLoanPaymentNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Unmaintained Units
         UnmaintainedUnitsNagDialog unmaintainedUnitsNagDialog = new UnmaintainedUnitsNagDialog(campaign);
         unmaintainedUnitsNagDialog.checkNag();
-        if (!unmaintainedUnitsNagDialog.isAdvanceDaySelected()) {
+        if (unmaintainedUnitsNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Insufficient Medics
         InsufficientMedicsNagDialog insufficientMedicsNagDialog = new InsufficientMedicsNagDialog(campaign);
         insufficientMedicsNagDialog.checkNag();
-        if (!insufficientMedicsNagDialog.isAdvanceDaySelected()) {
+        if (insufficientMedicsNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Insufficient AsTechs
         InsufficientAstechsNagDialog insufficientAstechsNagDialog = new InsufficientAstechsNagDialog(campaign);
         insufficientAstechsNagDialog.checkNag();
-        if (!insufficientAstechsNagDialog.isAdvanceDaySelected()) {
+        if (insufficientAstechsNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Insufficient AsTech Time
         InsufficientAstechTimeNagDialog insufficientAstechTimeNagDialog = new InsufficientAstechTimeNagDialog(campaign);
         insufficientAstechTimeNagDialog.checkNag();
-        if (!insufficientAstechTimeNagDialog.isAdvanceDaySelected()) {
+        if (insufficientAstechTimeNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Unresolved StratCon AO Contacts
         UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(campaign);
         unresolvedStratConContactsNagDialog.checkNag();
-        if (!unresolvedStratConContactsNagDialog.isAdvanceDaySelected()) {
+        if (unresolvedStratConContactsNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Outstanding Scenarios
         OutstandingScenariosNagDialog outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
         outstandingScenariosNagDialog.checkNag();
-        if (!outstandingScenariosNagDialog.isAdvanceDaySelected()) {
+        if (outstandingScenariosNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Deployment Shortfall
         DeploymentShortfallNagDialog deploymentShortfallNagDialog = new DeploymentShortfallNagDialog(campaign);
         deploymentShortfallNagDialog.checkNag();
-        if (!deploymentShortfallNagDialog.isAdvanceDaySelected()) {
+        if (deploymentShortfallNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Prisoners of War
         PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);
         prisonersNagDialog.checkNag();
-        if (!prisonersNagDialog.isAdvanceDaySelected()) {
+        if (prisonersNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Pregnant Personnel Assigned to Active Force
         PregnantCombatantNagDialog pregnantCombatantNagDialog = new PregnantCombatantNagDialog(campaign);
         pregnantCombatantNagDialog.checkNag();
-        if (!pregnantCombatantNagDialog.isAdvanceDaySelected()) {
+        if (pregnantCombatantNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
         // Contract Ended
         EndContractNagDialog endContractNagDialog = new EndContractNagDialog(campaign);
         endContractNagDialog.checkNag();
-        if (!endContractNagDialog.isAdvanceDaySelected()) {
+        if (endContractNagDialog.wasAdvanceDayCanceled()) {
             return true;
         }
 
