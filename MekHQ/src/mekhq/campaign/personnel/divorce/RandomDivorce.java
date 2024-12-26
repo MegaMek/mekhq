@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.divorce;
 
 import megamek.common.Compute;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 /**

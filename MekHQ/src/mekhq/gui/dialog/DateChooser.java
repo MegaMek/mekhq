@@ -273,6 +273,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         // center this dialog over the owner
         setLocationRelativeTo(owner);
         setUserPreferences();
+        setAlwaysOnTop(true);
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
@@ -676,7 +677,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         turningPointsDialog.getContentPane().add(descriptionAndButtonsPanel, BorderLayout.CENTER);
 
         // set turningPointsDialog size and location, and make it visible
-        setResizable(false);
+        turningPointsDialog.setResizable(false);
+        turningPointsDialog.setAlwaysOnTop(true);
         turningPointsDialog.pack();
         turningPointsDialog.setMinimumSize(turningPointsDialog.getSize());
         turningPointsDialog.setLocationRelativeTo(null);

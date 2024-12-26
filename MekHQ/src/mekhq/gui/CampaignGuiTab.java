@@ -18,14 +18,13 @@
  */
 package mekhq.gui;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.enums.MHQTabType;
+
+import javax.swing.*;
 
 /**
  * Abstract base class for CampaignGUI tab components. Custom tabs should extend

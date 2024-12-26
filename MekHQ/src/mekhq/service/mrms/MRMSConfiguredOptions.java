@@ -19,7 +19,7 @@
 package mekhq.service.mrms;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.MRMSDialog.MRMSOptionControl;
