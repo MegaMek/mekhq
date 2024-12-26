@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -26,9 +26,11 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.nagDialogs.UnableToAffordExpensesNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogic.unableToAffordExpenses;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,13 +39,12 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link UnableToAffordExpensesNagDialog} class.
  * It contains tests for various scenarios related to the {@code isUnableToAffordExpenses} method
  */
-class UnableToAffordExpensesNagDialogTest {
+class UnableToAffordExpensesNagLogicTest {
     // Mock objects for the tests
     // I know some of these can be converted to a local variable, but it makes sense to keep all the
     // mock objects in one place
     private Campaign campaign;
     private CampaignOptions campaignOptions;
-    private UnableToAffordExpensesNagDialog unableToAffordExpensesNagDialog;
     private Finances finances;
     private Unit unit;
     private Hangar hangar;
@@ -59,8 +60,6 @@ class UnableToAffordExpensesNagDialogTest {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
         campaignOptions = mock(CampaignOptions.class);
-
-        unableToAffordExpensesNagDialog = new UnableToAffordExpensesNagDialog(campaign);
 
         finances = mock(Finances.class);
 
@@ -84,7 +83,7 @@ class UnableToAffordExpensesNagDialogTest {
         when(campaign.getFunds()).thenReturn(Money.of(2));
         when(report.getMonthlyExpenses()).thenReturn(Money.of(1));
 
-        assertFalse(unableToAffordExpensesNagDialog.unableToAffordExpenses());
+        assertFalse(unableToAffordExpenses(campaign));
     }
 
     @Test
@@ -92,6 +91,6 @@ class UnableToAffordExpensesNagDialogTest {
         when(campaign.getFunds()).thenReturn(Money.of(1));
         when(report.getMonthlyExpenses()).thenReturn(Money.of(2));
 
-        assertFalse(unableToAffordExpensesNagDialog.unableToAffordExpenses());
+        assertFalse(unableToAffordExpenses(campaign));
     }
 }

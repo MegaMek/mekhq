@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -26,6 +26,7 @@ import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.dialog.nagDialogs.UnresolvedStratConContactsNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnresolvedStratConContactsNagLogic.hasUnresolvedContacts;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -42,13 +44,12 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link UnresolvedStratConContactsNagDialog} class.
  * It contains tests for various scenarios related to the {@code nagUnresolvedContacts} method
  */
-public class UnresolvedStratConContactsNagDialogTest {
+public class UnresolvedStratConContactsNagLogicTest {
     private Campaign campaign;
     private CampaignOptions campaignOptions;
     private AtBContract contract;
     private StratconCampaignState stratconCampaignState;
     private StratconTrackState track;
-    private UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog;
     private LocalDate today;
     private StratconScenario scenario1, scenario2;
 
@@ -95,11 +96,7 @@ public class UnresolvedStratConContactsNagDialogTest {
         when(scenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
         when(scenario2.getDeploymentDate()).thenReturn(today.plusDays(1));
 
-        unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(campaign);
-
-        unresolvedStratConContactsNagDialog.determineUnresolvedContacts();
-
-        assertFalse(unresolvedStratConContactsNagDialog.hasUnresolvedContacts());
+        assertFalse(hasUnresolvedContacts(campaign));
     }
 
     @Test
@@ -107,10 +104,6 @@ public class UnresolvedStratConContactsNagDialogTest {
         when(scenario1.getDeploymentDate()).thenReturn(today.plusDays(1));
         when(scenario2.getDeploymentDate()).thenReturn(today);
 
-        unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(campaign);
-
-        unresolvedStratConContactsNagDialog.determineUnresolvedContacts();
-
-        assertTrue(unresolvedStratConContactsNagDialog.hasUnresolvedContacts());
+        assertTrue(hasUnresolvedContacts(campaign));
     }
 }

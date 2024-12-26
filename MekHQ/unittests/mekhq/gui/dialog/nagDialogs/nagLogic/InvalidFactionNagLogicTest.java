@@ -16,15 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.nagDialogs.InvalidFactionNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -37,14 +39,12 @@ import static org.mockito.Mockito.when;
  * {@code isFactionInvalid()}, {@code lyranAllianceSpecialHandler()}, and
  * {@code federatedSunsSpecialHandler()} methods.
  */
-class InvalidFactionNagDialogTest {
+class InvalidFactionNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private Faction faction;
     private LocalDate dateValid;
     private LocalDate dateInvalid;
-
-    private InvalidFactionNagDialog invalidFactionNagDialog;
 
     /**
      * Sets up the necessary dependencies and configurations before running the test methods.
@@ -55,8 +55,6 @@ class InvalidFactionNagDialogTest {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
         faction = mock(Faction.class);
-
-        invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
 
         dateValid = LocalDate.of(3151, 1, 1);
         dateInvalid = LocalDate.of(1936, 1, 1);
@@ -73,7 +71,7 @@ class InvalidFactionNagDialogTest {
         when(faction.validIn(dateValid)).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(dateValid);
 
-        assertFalse(invalidFactionNagDialog.isFactionInvalid());
+        assertFalse(isFactionInvalid(campaign));
     }
 
     @Test
@@ -81,6 +79,6 @@ class InvalidFactionNagDialogTest {
         when(faction.validIn(dateInvalid)).thenReturn(false);
         when(campaign.getLocalDate()).thenReturn(dateInvalid);
 
-        assertTrue(invalidFactionNagDialog.isFactionInvalid());
+        assertTrue(isFactionInvalid(campaign));
     }
 }

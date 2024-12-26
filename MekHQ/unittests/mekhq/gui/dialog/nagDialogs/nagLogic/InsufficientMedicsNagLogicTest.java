@@ -16,25 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This class contains test cases for the {@link InsufficientAstechsNagDialog} class.
- * It tests the different combinations of Astech requirements and verifies the behavior of the
- * {@code checkAstechsNeededCount()} method.
+ * This class contains test cases for the {@link InsufficientMedicsNagLogicTest} class.
+ * It tests the different combinations of Medic requirements and verifies the behavior of the
+ * {@code checkMedicsNeededCount()} method.
  */
-class InsufficientAstechsNagDialogTest {
+class InsufficientMedicsNagLogicTest {
     private Campaign campaign;
-    private InsufficientAstechsNagDialog insufficientAstechsNagDialog;
 
     /**
      * Test setup for each test, runs before each test.
@@ -43,27 +43,23 @@ class InsufficientAstechsNagDialogTest {
     @BeforeEach
     void init() {
         campaign = mock(Campaign.class);
-        insufficientAstechsNagDialog = new InsufficientAstechsNagDialog(campaign);
     }
 
     @Test
-    void noAsTechsNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(0);
-        insufficientAstechsNagDialog.checkAsTechsNeededCount();
-        assertFalse(insufficientAstechsNagDialog.hasAsTechsNeeded());
+    void noMedicsNeeded() {
+        when(campaign.getMedicsNeed()).thenReturn(0);
+        assertFalse(hasMedicsNeeded(campaign));
     }
 
     @Test
-    void oneAsTechNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(1);
-        insufficientAstechsNagDialog.checkAsTechsNeededCount();
-        assertTrue(insufficientAstechsNagDialog.hasAsTechsNeeded());
+    void oneMedicNeeded() {
+        when(campaign.getMedicsNeed()).thenReturn(1);
+        assertTrue(hasMedicsNeeded(campaign));
     }
 
     @Test
-    void negativeAsTechsNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(-1);
-        insufficientAstechsNagDialog.checkAsTechsNeededCount();
-        assertFalse(insufficientAstechsNagDialog.hasAsTechsNeeded());
+    void negativeMedicsNeeded() {
+        when(campaign.getMedicsNeed()).thenReturn(-1);
+        assertFalse(hasMedicsNeeded(campaign));
     }
 }

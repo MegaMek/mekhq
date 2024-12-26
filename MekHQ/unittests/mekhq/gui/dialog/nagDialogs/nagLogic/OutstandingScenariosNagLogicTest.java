@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +31,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.hasOutStandingScenarios;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -39,10 +41,9 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link OutstandingScenariosNagDialog} class.
  * It contains tests for various scenarios related to the {@code checkForOutstandingScenarios} method
  */
-class OutstandingScenariosNagDialogTest {
+class OutstandingScenariosNagLogicTest {
     private Campaign campaign;
     private CampaignOptions campaignOptions;
-    private OutstandingScenariosNagDialog outstandingScenariosNagDialog;
     private AtBContract contract;
     private AtBScenario scenario1, scenario2;
     private LocalDate today;
@@ -78,9 +79,7 @@ class OutstandingScenariosNagDialogTest {
         when(scenario1.getHasTrack()).thenReturn(false);
         when(scenario2.getHasTrack()).thenReturn(false);
 
-        outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-
-        assertTrue(outstandingScenariosNagDialog.hasOutStandingScenarios());
+        assertTrue(hasOutStandingScenarios(campaign));
     }
 
     @Test
@@ -90,9 +89,7 @@ class OutstandingScenariosNagDialogTest {
         when(scenario1.getHasTrack()).thenReturn(false);
         when(scenario2.getHasTrack()).thenReturn(false);
 
-        outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-
-        assertTrue(outstandingScenariosNagDialog.hasOutStandingScenarios());
+        assertTrue(hasOutStandingScenarios(campaign));
     }
 
     @Test
@@ -102,8 +99,6 @@ class OutstandingScenariosNagDialogTest {
         when(scenario1.getHasTrack()).thenReturn(false);
         when(scenario2.getHasTrack()).thenReturn(false);
 
-        outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
-
-        assertFalse(outstandingScenariosNagDialog.hasOutStandingScenarios());
+        assertFalse(hasOutStandingScenarios(campaign));
     }
 }

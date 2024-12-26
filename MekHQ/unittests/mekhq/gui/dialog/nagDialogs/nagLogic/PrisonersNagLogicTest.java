@@ -16,25 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.dialog.nagDialogs.PrisonersNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This class contains test cases for the {@link InsufficientMedicsNagDialogTest} class.
- * It tests the different combinations of Medic requirements and verifies the behavior of the
- * {@code checkMedicsNeededCount()} method.
+ * This class is a test class for the {@link PrisonersNagDialog} class.
+ * It contains tests for various scenarios related to the {@code hasPrisoners} method
  */
-class InsufficientMedicsNagDialogTest {
+class PrisonersNagLogicTest {
+    // Mock objects for the tests
     private Campaign campaign;
-    private InsufficientMedicsNagDialog insufficientMedicsNagDialog;
 
     /**
      * Test setup for each test, runs before each test.
@@ -42,28 +47,32 @@ class InsufficientMedicsNagDialogTest {
      */
     @BeforeEach
     void init() {
+        // Initialize the mock objects
         campaign = mock(Campaign.class);
-        insufficientMedicsNagDialog = new InsufficientMedicsNagDialog(campaign);
     }
 
     @Test
-    void noMedicsNeeded() {
-        when(campaign.getMedicsNeed()).thenReturn(0);
-        insufficientMedicsNagDialog.checkMedicsNeededCount();
-        assertFalse(insufficientMedicsNagDialog.hasMedicsNeeded());
+    void activeContract() {
+        when(campaign.hasActiveContract()).thenReturn(true);
+
+        assertFalse(hasPrisoners(campaign));
     }
 
     @Test
-    void oneMedicNeeded() {
-        when(campaign.getMedicsNeed()).thenReturn(1);
-        insufficientMedicsNagDialog.checkMedicsNeededCount();
-        assertTrue(insufficientMedicsNagDialog.hasMedicsNeeded());
+    void noActiveContractNoPrisoners() {
+        when(campaign.hasActiveContract()).thenReturn(false);
+        when(campaign.getCurrentPrisoners()).thenReturn(new ArrayList<>());
+
+        assertFalse(hasPrisoners(campaign));
     }
 
     @Test
-    void negativeMedicsNeeded() {
-        when(campaign.getMedicsNeed()).thenReturn(-1);
-        insufficientMedicsNagDialog.checkMedicsNeededCount();
-        assertFalse(insufficientMedicsNagDialog.hasMedicsNeeded());
+    void noActiveContractPrisoners() {
+        Person prisoner = mock(Person.class);
+
+        when(campaign.hasActiveContract()).thenReturn(false);
+        when(campaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
+
+        assertTrue(hasPrisoners(campaign));
     }
 }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -24,10 +24,13 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.dialog.nagDialogs.UnableToAffordJumpNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.unableToAffordNextJump;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,10 +38,9 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link UnableToAffordJumpNagDialog} class.
  * It contains tests for various scenarios related to the {@code isUnableToAffordNextJump} method
  */
-class UnableToAffordJumpNagDialogTest {
+class UnableToAffordJumpNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
-    private UnableToAffordJumpNagDialog unableToAffordJumpNagDialog;
 
     /**
      * Test setup for each test, runs before each test.
@@ -53,8 +55,6 @@ class UnableToAffordJumpNagDialogTest {
         JumpPath jumpPath = mock(JumpPath.class);
         PlanetarySystem originSystem = mock(PlanetarySystem.class);
         PlanetarySystem destinationSystem = mock(PlanetarySystem.class);
-
-        unableToAffordJumpNagDialog = new UnableToAffordJumpNagDialog(campaign);
 
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(campaign.getFunds()).thenReturn(Money.of(1));
@@ -71,13 +71,13 @@ class UnableToAffordJumpNagDialogTest {
     void canAffordNextJump() {
         when(campaign.calculateCostPerJump(true, false)).thenReturn(Money.of(0));
 
-        assertFalse(unableToAffordJumpNagDialog.unableToAffordNextJump());
+        assertFalse(unableToAffordNextJump(campaign));
     }
 
     @Test
     void cannotAffordNextJump() {
         when(campaign.calculateCostPerJump(true, false)).thenReturn(Money.of(2));
 
-        assertFalse(unableToAffordJumpNagDialog.unableToAffordNextJump());
+        assertTrue(unableToAffordNextJump(campaign));
     }
 }

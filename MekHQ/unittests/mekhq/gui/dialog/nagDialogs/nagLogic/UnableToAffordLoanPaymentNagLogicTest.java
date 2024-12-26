@@ -16,19 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
+import mekhq.gui.dialog.nagDialogs.UnableToAffordLoanPaymentNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,10 +40,9 @@ import static org.mockito.Mockito.when;
  * It contains tests for various scenarios related to the {@code getTotalPaymentsDue} and
  * {@code isUnableToAffordLoanPayment} methods
  */
-class UnableToAffordLoanPaymentNagDialogTest {
+class UnableToAffordLoanPaymentNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
-    private UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog;
     private LocalDate today;
     private Finances finances;
     private Loan firstLoan, secondLoan;
@@ -58,8 +60,6 @@ class UnableToAffordLoanPaymentNagDialogTest {
         firstLoan = mock(Loan.class);
         secondLoan = mock(Loan.class);
 
-        unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(campaign);
-
         // Stubs
         when(campaign.getFinances()).thenReturn(finances);
         when(campaign.getLocalDate()).thenReturn(today);
@@ -72,13 +72,12 @@ class UnableToAffordLoanPaymentNagDialogTest {
      * Initializes the loans with the specified number of days till the next payment.
      *
      * @param daysTillFirstLoan The number of days till the next payment for the first loan.
-     * @param daysTillSecondLoan The number of days till the next payment for the second loan.
      */
-    private void initializeLoans(int daysTillFirstLoan, int daysTillSecondLoan) {
+    private void initializeLoans(int daysTillFirstLoan) {
         when(finances.getLoans()).thenReturn(List.of(firstLoan, secondLoan));
 
         when(firstLoan.getNextPayment()).thenReturn(today.plusDays(daysTillFirstLoan));
-        when(secondLoan.getNextPayment()).thenReturn(today.plusDays(daysTillSecondLoan));
+        when(secondLoan.getNextPayment()).thenReturn(today.plusDays(1));
     }
 
     // In the following tests the getTotalPaymentsDue() method is called, and its response
@@ -86,19 +85,19 @@ class UnableToAffordLoanPaymentNagDialogTest {
 
     @Test
     void canAffordLoans() {
-        initializeLoans(2, 1);
+        initializeLoans(2);
 
         when(campaign.getFunds()).thenReturn(Money.of(10));
 
-        assertFalse(unableToAffordLoanPaymentNagDialog.unableToAffordLoans());
+        assertFalse(unableToAffordLoans(campaign));
     }
 
     @Test
     void cannotAffordLoans() {
-        initializeLoans(1, 1);
+        initializeLoans(1);
 
         when(campaign.getFunds()).thenReturn(Money.of(5));
 
-        assertFalse(unableToAffordLoanPaymentNagDialog.unableToAffordLoans());
+        assertTrue(unableToAffordLoans(campaign));
     }
 }
