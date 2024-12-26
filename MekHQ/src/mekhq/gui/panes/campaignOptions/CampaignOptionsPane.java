@@ -22,10 +22,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final int HEADER_FONT_SIZE = 5;
 
     private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
 
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign) {
         super(frame, resources, "campaignOptionsDialog");
         this.campaign = campaign;
+        this.campaignOptions = campaign.getCampaignOptions();
 
         initialize();
     }
@@ -196,8 +198,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @return JTabbedPane representing the "Logistics and Maintenance" tab.
      */
     private JTabbedPane createEquipmentAndSuppliesParentTab() {
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-
         // Parent Tab
         JTabbedPane equipmentAndSuppliesParentTab = new JTabbedPane();
 
@@ -244,12 +244,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions();
 
         // Markets
-        MarketsTab marketsTab = new MarketsTab(getFrame(), "marketsTab");
+        MarketsTab marketsTab = new MarketsTab(campaignOptions, getFrame(), "marketsTab");
 
         JTabbedPane marketsContentTabs = createSubTabs(Map.of(
             "personnelMarketTab", marketsTab.createPersonnelMarketTab(),
             "unitMarketTab", marketsTab.createUnitMarketTab(),
             "contractMarketTab", marketsTab.createContractMarketTab()));
+        marketsTab.loadValuesFromCampaignOptions();
 
         // Rulesets
         RulesetsTab rulesetsTab = new RulesetsTab(getFrame(), "rulesetsTab");
