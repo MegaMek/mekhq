@@ -2117,6 +2117,21 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves a filtered list of personnel who have at least one combat profession.
+     * <p>
+     * This method filters the list of all personnel to include only those whose primary
+     * or secondary role is designated as a combat role.
+     * </p>
+     *
+     * @return a {@link List} of {@link Person} objects representing combat-capable personnel
+     */
+    public List<Person> getActiveCombatPersonnel() {
+        return getActivePersonnel().stream()
+            .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only active Dependents.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
@@ -4922,15 +4937,12 @@ public class Campaign implements ITechManager {
             int personnelCount;
 
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                    .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
-                    .count();
+                personnelCount = getActiveCombatPersonnel().size();
             } else {
-                personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                    .count();
+                personnelCount = getActivePersonnel().size();
             }
+
+            personnelCount -= getCurrentPrisoners().size();
             fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;
