@@ -146,7 +146,7 @@ public class StratconRulesManager {
     /**
      * This method generates scenario dates for each week of the StratCon campaign.
      * <p>
-     * The method first determines the number of required scenario rolls based on the required
+     * The method first determines the number of turning point scenario rolls based on the required
      * lance count from the track, then multiplies that count depending on the contract's morale level.
      * <p>
      * If auto-assign for lances is enabled, and either there are no available forces or the number of
@@ -582,8 +582,8 @@ public class StratconRulesManager {
                         StratconScenario scenario) {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
-        // First determine if the scenario is Critical (that win/lose will affect CVP)
-        determineIfCriticalScenario(contract, scenario);
+        // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
+        determineIfTurningPointScenario(contract, scenario);
 
         // Then add any Cadre Duty units
         if (contract.getContractType().isCadreDuty()) {
@@ -650,7 +650,7 @@ public class StratconRulesManager {
      * contract.
      * <p>
      * This method evaluates the scenario's template, type, and the contract's command rights to decide
-     * if the scenario should be flagged as a "required scenario." Required scenarios can cause CVP
+     * if the scenario should be flagged as a "turning point." Turning Point scenarios can cause CVP
      * to be increased or decreased.
      * </p>
      *
@@ -667,14 +667,14 @@ public class StratconRulesManager {
      * </ul>
      *
      * @param contract The {@link AtBContract} representing the current contract.
-     * @param scenario The {@link StratconScenario} being evaluated to determine if it is critical.
+     * @param scenario The {@link StratconScenario} being evaluated to determine if it is a Turning Point.
      */
-    private static void determineIfCriticalScenario(AtBContract contract, StratconScenario scenario) {
+    private static void determineIfTurningPointScenario(AtBContract contract, StratconScenario scenario) {
         ScenarioTemplate template = scenario.getScenarioTemplate();
         boolean isResupply = scenario.getBackingScenario().getStratConScenarioType().isResupply();
 
         if (isResupply) {
-            scenario.setRequiredScenario(false);
+            scenario.setTurningPoint(false);
             return;
         }
 
@@ -682,20 +682,20 @@ public class StratconRulesManager {
             ContractCommandRights commandRights = contract.getCommandRights();
             switch (commandRights) {
                 case INTEGRATED, HOUSE -> {
-                    scenario.setRequiredScenario(true);
+                    scenario.setTurningPoint(true);
                     if (randomInt(4) == 0) {
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case LIAISON -> {
                     if (randomInt(4) == 0) {
-                        scenario.setRequiredScenario(true);
+                        scenario.setTurningPoint(true);
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case INDEPENDENT -> {
                     if (randomInt(4) == 0) {
-                        scenario.setRequiredScenario(true);
+                        scenario.setTurningPoint(true);
                     }
                 }
             }
