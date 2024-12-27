@@ -1462,18 +1462,7 @@ public class StratconRulesManager {
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
 
-            String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
-
-            ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
-
-            int primaryUnitType = force.getPrimaryUnitType(campaign);
-
-            if ((primaryUnitType == CONV_FIGHTER)
-                || (primaryUnitType == AEROSPACEFIGHTER) && (randomInt(3) == 0)) {
-                scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-            } else if (primaryUnitType >= AEROSPACEFIGHTER) {
-                scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
-            }
+            ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
 
             generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
@@ -1505,19 +1494,52 @@ public class StratconRulesManager {
             CLOSING_SPAN_TAG, roll, targetNumber));
         campaign.addReport(reportStatus.toString());
 
-        MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
-
-        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
-
-        ScenarioTemplate scenarioTemplate = switch (mapLocation) {
-            case AllGroundTerrain, SpecificGroundTerrain -> ScenarioTemplate.Deserialize(String.format(templateString, ""));
-            case Space -> ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
-            case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-        };
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
 
         generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
         return INTERCEPTED;
+    }
+
+    /**
+     * Retrieves the appropriate {@link ScenarioTemplate} for an interception scenario based on the
+     * provided {@link Force} and {@link Campaign}.
+     * <p>
+     * The method determines which scenario template file should be used by analyzing the primary unit
+     * type of the {@link Force} within the given {@link Campaign}. It then deserializes the template
+     * file into a {@link ScenarioTemplate} object.
+     * <p>
+     * Special cases:
+     * <ul>
+     *   <li>If the primary unit type is `CONV_FIGHTER` or `AEROSPACEFIGHTER` (and a random check passes),
+     *       a "Low-Atmosphere" template is selected.</li>
+     *   <li>If the primary unit type qualifies as an `AEROSPACEFIGHTER` or higher,
+     *       a "Space" template is selected.</li>
+     *   <li>Otherwise, the default template is used.</li>
+     * </ul>
+     *
+     * @param force    The {@link Force} instance that the scenario is based on.
+     *                 This is used to determine the primary unit type.
+     * @param campaign The {@link Campaign} in which the interception is taking place.
+     *                 Provides context for evaluating the {@link Force}.
+     * @return A {@link ScenarioTemplate} instance based on the template file matching the logic above,
+     *         or a default template if no specific case is matched.
+     * @see ScenarioTemplate#Deserialize(String)
+     */
+    private static ScenarioTemplate getInterceptionScenarioTemplate(Force force, Campaign campaign) {
+        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
+
+        ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
+
+        int primaryUnitType = force.getPrimaryUnitType(campaign);
+
+        if ((primaryUnitType == CONV_FIGHTER)
+            || (primaryUnitType == AEROSPACEFIGHTER) && (randomInt(3) == 0)) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+        } else if (primaryUnitType >= AEROSPACEFIGHTER) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        }
+        return scenarioTemplate;
     }
 
     /**
