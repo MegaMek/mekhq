@@ -922,7 +922,7 @@ public class Utilities {
             age += roll;
         }
 
-        // Clam age, if necessary
+        // Clamp age, if necessary
         if (experienceLevel != EXP_NONE) {
             age = max(18, age);
         }
