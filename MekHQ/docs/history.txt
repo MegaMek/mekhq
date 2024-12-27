@@ -157,6 +157,19 @@ MEKHQ VERSION HISTORY:
 + Fix #5480: AutoLogistics requesting incorrect parts when variants of the same part exist in some cases
 + Fix #5479: AutoLogistics orders reset values
 + PR #5509: ACAR Improvements- Damage delivery more granular, fixed error with morale never checking
++ PR #5528: Updated Space Scenario OpFor Deployment & Arrival
++ PR #5526: Renamed 'requiredScenario' to 'turningPoint' in StratCon
++ PR #5525: Refactored Support Point Negotiation into a Dedicated Class; Fixed Initial Support Point Pool Bug
++ Fix #5515: Added "Refused Engagement" ScenarioStatus
++ Fix #5517: Refactored Personnel Filtering Logic for Field Kitchens...Again
++ Fix #5519: Fixed Recon Scenario Spawn; Fixed Bugs Related to Role Name Changes
++ Fix #5529: Fixed Training Logic to Handle Empty Skill Lists
++ PR #5532: ACAR Documentation
++ PR #5522: Implemented Nag Dialog Visual & Code Improvements
++ PR #5514: Added Travel Description Report to Transit Automation
++ Fix #5221: Adjusted Required Scenario Distribution to More Evenly Award CVP;
+             Reduced Scenario Sizes for House & Integrated Commands
+
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
