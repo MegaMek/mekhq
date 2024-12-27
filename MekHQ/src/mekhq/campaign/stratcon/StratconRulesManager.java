@@ -63,6 +63,7 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.Coords.ALL_DIRECTIONS;
+import static megamek.common.UnitType.*;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -1461,15 +1462,18 @@ public class StratconRulesManager {
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
 
-            MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
-
             String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
 
-            ScenarioTemplate scenarioTemplate = switch (mapLocation) {
-                case AllGroundTerrain, SpecificGroundTerrain -> ScenarioTemplate.Deserialize(String.format(templateString, ""));
-                case Space -> ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
-                case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-            };
+            ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
+
+            int primaryUnitType = force.getPrimaryUnitType(campaign);
+
+            if ((primaryUnitType == CONV_FIGHTER)
+                || (primaryUnitType == AEROSPACEFIGHTER) && (randomInt(3) == 0)) {
+                scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+            } else if (primaryUnitType >= AEROSPACEFIGHTER) {
+                scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+            }
 
             generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
@@ -1702,11 +1706,11 @@ public class StratconRulesManager {
 
         for (int forceID : forceIDs) {
             switch (campaign.getForce(forceID).getPrimaryUnitType(campaign)) {
-                case UnitType.BATTLE_ARMOR:
-                case UnitType.INFANTRY:
-                case UnitType.MEK:
-                case UnitType.TANK:
-                case UnitType.PROTOMEK:
+                case BATTLE_ARMOR:
+                case INFANTRY:
+                case MEK:
+                case TANK:
+                case PROTOMEK:
                 case UnitType.VTOL:
                     retVal.get(AllGroundTerrain).add(forceID);
                     break;
@@ -1789,7 +1793,7 @@ public class StratconRulesManager {
         StratconScenario scenario = new StratconScenario();
 
         if (template == null) {
-            int unitType = UnitType.MEK;
+            int unitType = MEK;
 
             try {
                 unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
@@ -2210,8 +2214,8 @@ public class StratconRulesManager {
             // "defensive" units are infantry, battle armor and (Weisman help you) gun
             // emplacements
             // and also said unit should be intact/alive/etc
-            boolean isEligibleInfantry = ((u.getEntity().getUnitType() == UnitType.INFANTRY)
-                    || (u.getEntity().getUnitType() == UnitType.BATTLE_ARMOR)) && !u.isUnmanned();
+            boolean isEligibleInfantry = ((u.getEntity().getUnitType() == INFANTRY)
+                    || (u.getEntity().getUnitType() == BATTLE_ARMOR)) && !u.isUnmanned();
 
             boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT;
 
