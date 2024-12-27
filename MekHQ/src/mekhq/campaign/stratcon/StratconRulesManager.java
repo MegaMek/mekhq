@@ -89,6 +89,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  */
 public class StratconRulesManager {
     public final static int BASE_LEADERSHIP_BUDGET = 1000;
+
     private static final MMLogger logger = MMLogger.create(StratconRulesManager.class);
 
     /**
