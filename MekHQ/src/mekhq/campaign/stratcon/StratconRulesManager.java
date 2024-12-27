@@ -146,7 +146,7 @@ public class StratconRulesManager {
     /**
      * This method generates scenario dates for each week of the StratCon campaign.
      * <p>
-     * The method first determines the number of required scenario rolls based on the required
+     * The method first determines the number of turning point scenario rolls based on the required
      * lance count from the track, then multiplies that count depending on the contract's morale level.
      * <p>
      * If auto-assign for lances is enabled, and either there are no available forces or the number of
@@ -324,13 +324,6 @@ public class StratconRulesManager {
             }
 
             if (scenario != null) {
-                // if under liaison command, pick a random scenario from the ones generated
-                // to set as required and attach liaison
-                if (contract.getCommandRights().isLiaison() && (randomInt(4) == 0)) {
-                    scenario.setTurningPoint(true);
-                    setAttachedUnitsModifier(scenario, contract);
-                }
-
                 finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
             }
         }
@@ -587,13 +580,24 @@ public class StratconRulesManager {
     private static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
                         @Nullable StratconTrackState track, boolean autoAssignLances,
                         StratconScenario scenario) {
-        AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+        final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+        // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
+        determineIfTurningPointScenario(contract, scenario);
+
+        // Then add any Cadre Duty units
+        if (contract.getContractType().isCadreDuty()) {
+            addCadreDutyTrainees(backingScenario);
+        }
+
+        // Finally, finish scenario set up
+        AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
         setScenarioParametersFromBiome(track, scenario);
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
         if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
-                scenario.getBackingScenario().removeForce(forceID);
+                backingScenario.removeForce(forceID);
             }
 
             scenario.setCurrentState(ScenarioState.UNRESOLVED);
@@ -603,6 +607,97 @@ public class StratconRulesManager {
             // if we're auto-assigning lances, deploy all assigned forces to the track as well
             for (int forceID : scenario.getPrimaryForceIDs()) {
                 processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
+            }
+        }
+    }
+
+    /**
+     * Adds a Cadre Duty trainees modifier to the given scenario based on the location of the battle.
+     *
+     * <p>
+     * This method determines the type of trainees to be added to the scenario by evaluating the map
+     * location parameter of the scenario's template. Depending on whether the battle is an air or
+     * space battle versus a ground battle, the appropriate Cadre Duty trainees scenario modifier
+     * is applied to the backing scenario.
+     * </p>
+     *
+     * <p>
+     * The logic is as follows:
+     * <ul>
+     *     <li>If the battle occurs in low atmosphere or space, the air trainees modifier is added.</li>
+     *     <li>If the battle occurs on the ground at any other map location, the ground trainees
+     *     modifier is added.</li>
+     * </ul>
+     *
+     * @param backingScenario The {@link AtBDynamicScenario} representing the current scenario to which the modifier will be applied.
+     */
+    private static void addCadreDutyTrainees(AtBDynamicScenario backingScenario) {
+        final ScenarioTemplate template = backingScenario.getTemplate();
+        final MapLocation mapLocation = template.mapParameters.getMapLocation();
+        boolean isAirBattle = (mapLocation == LowAtmosphere) || (mapLocation == Space);
+
+        if (isAirBattle) {
+            backingScenario.addScenarioModifier(
+                AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
+        } else {
+            backingScenario.addScenarioModifier(
+                AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
+        }
+    }
+
+    /**
+     * Determines if a given StratCon scenario should be marked as critical within the context of a
+     * contract.
+     * <p>
+     * This method evaluates the scenario's template, type, and the contract's command rights to decide
+     * if the scenario should be flagged as a "turning point." Turning Point scenarios can cause CVP
+     * to be increased or decreased.
+     * </p>
+     *
+     * <p>
+     * The logic follows these rules:
+     * <ul>
+     *     <li>If the scenario template or its type is not related to resupply operations, the
+     *     method evaluates the contract's command rights.</li>
+     *     <li>For <strong>INTEGRATED</strong> or <strong>HOUSE</strong> command rights:
+     *     non-resupply scenarios are always marked as required.</li>
+     *     <li>For <strong>LIAISON</strong> or <strong>INDEPENDENT</strong> command rights:
+     *     non-resupply scenarios have a 25% chance (1 in 4) to be marked as required. An attached
+     *     units modifier is also set if the scenario becomes required.</li>
+     * </ul>
+     *
+     * @param contract The {@link AtBContract} representing the current contract.
+     * @param scenario The {@link StratconScenario} being evaluated to determine if it is a Turning Point.
+     */
+    private static void determineIfTurningPointScenario(AtBContract contract, StratconScenario scenario) {
+        ScenarioTemplate template = scenario.getScenarioTemplate();
+        boolean isResupply = scenario.getBackingScenario().getStratConScenarioType().isResupply();
+
+        if (isResupply) {
+            scenario.setTurningPoint(false);
+            return;
+        }
+
+        if (template == null || !template.getStratConScenarioType().isResupply()) {
+            ContractCommandRights commandRights = contract.getCommandRights();
+            switch (commandRights) {
+                case INTEGRATED, HOUSE -> {
+                    scenario.setTurningPoint(true);
+                    if (randomInt(4) == 0) {
+                        setAttachedUnitsModifier(scenario, contract);
+                    }
+                }
+                case LIAISON -> {
+                    if (randomInt(4) == 0) {
+                        scenario.setTurningPoint(true);
+                        setAttachedUnitsModifier(scenario, contract);
+                    }
+                }
+                case INDEPENDENT -> {
+                    if (randomInt(4) == 0) {
+                        scenario.setTurningPoint(true);
+                    }
+                }
             }
         }
     }
@@ -928,12 +1023,6 @@ public class StratconRulesManager {
                 }
 
                 scenario = setupScenario(coords, forceID, campaign, contract, track);
-            }
-
-            // if under liaison command, randomly determine if this is a Liason scenario
-            if (contract.getCommandRights().isLiaison() && (randomInt(4) == 0)) {
-                scenario.setTurningPoint(true);
-                setAttachedUnitsModifier(scenario, contract);
             }
 
             finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
@@ -1727,13 +1816,8 @@ public class StratconRulesManager {
         // do an appropriate allied force if the contract calls for it
         // do any attached or integrated units
         setAlliedForceModifier(scenario, contract);
-        setAttachedUnitsModifier(scenario, contract);
         applyFacilityModifiers(scenario, track, coords);
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
-
-        if (contract.getCommandRights().isHouse() || contract.getCommandRights().isIntegrated()) {
-            scenario.setTurningPoint(true);
-        }
 
         AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(),
             scenario.getBackingScenario());
@@ -1873,19 +1957,6 @@ public class StratconRulesManager {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere)
                 || (backingScenario.getTemplate().mapParameters.getMapLocation() == Space);
-
-        // if we're on cadre duty, we're getting three trainees, period
-        if (contract.getContractType().isCadreDuty()) {
-            if (airBattle) {
-                backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
-            } else {
-                backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
-            }
-            return;
-        }
-
         // if we're under non-independent command rights, a supervisor may come along
         switch (contract.getCommandRights()) {
             case INTEGRATED:

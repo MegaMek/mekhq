@@ -54,7 +54,7 @@ public class UnresolvedStratConContactsNagLogic {
                         unresolvedContacts.append(String.format("<br><b>- %s</b>, %s, %s-%s %s",
                             scenario.getName(), contract.getName(),
                             track.getDisplayableName(), scenario.getCoords().toBTString(),
-                            scenario.isRequiredScenario() ? " (Critical)" : ""));
+                            scenario.isTurningPoint() ? " (Turning Point)" : ""));
                     }
                 }
             }
