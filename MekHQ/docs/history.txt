@@ -169,6 +169,7 @@ MEKHQ VERSION HISTORY:
 + PR #5514: Added Travel Description Report to Transit Automation
 + Fix #5221: Adjusted Required Scenario Distribution to More Evenly Award CVP;
              Reduced Scenario Sizes for House & Integrated Commands
++ PR #5540: Refactored Pilot Starting Age Calculation
 
 
 0.50.01 (2024-11-10 1800 UTC)
