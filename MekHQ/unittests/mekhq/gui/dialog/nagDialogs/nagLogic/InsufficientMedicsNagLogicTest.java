@@ -16,25 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog.checkAstechsNeededCount;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.hasMedicsNeeded;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This class contains test cases for the {@link InsufficientAstechsNagDialog} class.
- * It tests the different combinations of Astech requirements and verifies the behavior of the
- * {@code checkAstechsNeededCount()} method.
+ * This class contains test cases for the {@link InsufficientMedicsNagLogicTest} class.
+ * It tests the different combinations of Medic requirements and verifies the behavior of the
+ * {@code checkMedicsNeededCount()} method.
  */
-class InsufficientAstechsNagDialogTest {
-    // Mock objects for the tests
+class InsufficientMedicsNagLogicTest {
     private Campaign campaign;
 
     /**
@@ -46,24 +45,21 @@ class InsufficientAstechsNagDialogTest {
         campaign = mock(Campaign.class);
     }
 
-    // In the following tests the checkAstechsNeededCount() method is called, and its response is
-    // checked against expected behavior
-
     @Test
-    void noAstechsNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(0);
-        assertFalse(checkAstechsNeededCount(campaign));
+    void noMedicsNeeded() {
+        when(campaign.getMedicsNeed()).thenReturn(0);
+        assertFalse(hasMedicsNeeded(campaign));
     }
 
     @Test
-    void oneAstechNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(1);
-        assertTrue(checkAstechsNeededCount(campaign));
+    void oneMedicNeeded() {
+        when(campaign.getMedicsNeed()).thenReturn(1);
+        assertTrue(hasMedicsNeeded(campaign));
     }
 
     @Test
-    void negativeAstechsNeeded() {
-        when(campaign.getAstechNeed()).thenReturn(-1);
-        assertFalse(checkAstechsNeededCount(campaign));
+    void negativeMedicsNeeded() {
+        when(campaign.getMedicsNeed()).thenReturn(-1);
+        assertFalse(hasMedicsNeeded(campaign));
     }
 }

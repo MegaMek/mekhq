@@ -28,8 +28,11 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import org.w3c.dom.Node;
 
 import javax.xml.namespace.QName;
@@ -210,6 +213,48 @@ public class StratconCampaignState {
         for (StratconTrackState trackState : tracks) {
             trackState.removeScenario(scenarioID);
         }
+    }
+
+    /**
+     * Retrieves the {@link StratconScenario} associated with a given {@link AtBScenario}.
+     *
+     * <p>
+     * This method searches through all {@link StratconTrackState} objects in the {@link StratconCampaignState}
+     * to find the first {@link StratconScenario} whose backing scenario matches the specified {@link AtBScenario}.
+     * If no such scenario is found, it returns {@code null}.
+     * </p>
+     *
+     * <strong>Usage:</strong>
+     * <p>
+     * Use this method to easily fetch the {@link StratconScenario} associated with the provided
+     * {@link AtBScenario}.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} containing the data to search through.
+     * @param scenario The {@link AtBScenario} to find the corresponding {@link StratconScenario} for.
+     * @return The matching {@link StratconScenario}, or {@code null} if no corresponding scenario is found.
+     */
+    public static @Nullable StratconScenario getStratconScenarioFromAtBScenario(Campaign campaign,
+                                                                                AtBScenario scenario) {
+        AtBContract contract = scenario.getContract(campaign);
+        if (contract == null) {
+            return null;
+        }
+
+        StratconCampaignState campaignState = contract.getStratconCampaignState();
+        if (campaignState == null) {
+            return null;
+        }
+
+        for (StratconTrackState track : campaignState.getTracks()) {
+            for (StratconScenario stratConScenario : track.getScenarios().values()) {
+                if (scenario.equals(stratConScenario.getBackingScenario())) {
+                    return stratConScenario; // Return the first matching scenario if found
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -16,20 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.nagDialogs.PregnantCombatantNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.PregnantCombatantNagDialog.isPregnantCombatant;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.hasActivePregnantCombatant;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link PregnantCombatantNagDialog} class.
  * It contains tests for various scenarios related to the {@code isPregnantCombatant} method
  */
-class PregnantCombatantNagDialogTest {
+class PregnantCombatantNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private Mission mission;
@@ -60,6 +61,7 @@ class PregnantCombatantNagDialogTest {
         personPregnant = mock(Person.class);
         unit = mock(Unit.class);
 
+
         // Stubs
         when(personNotPregnant.isPregnant()).thenReturn(false);
         when(personPregnant.isPregnant()).thenReturn(true);
@@ -71,7 +73,7 @@ class PregnantCombatantNagDialogTest {
     @Test
     void noActiveMission() {
         when(campaign.getActiveMissions(false)).thenReturn(new ArrayList<>());
-        assertFalse(isPregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(campaign));
     }
 
     @Test
@@ -79,7 +81,7 @@ class PregnantCombatantNagDialogTest {
         when(campaign.getActiveMissions(false)).thenReturn(List.of(mission));
         when(campaign.getActivePersonnel()).thenReturn(List.of(personNotPregnant));
 
-        assertFalse(isPregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(campaign));
     }
 
     @Test
@@ -89,7 +91,7 @@ class PregnantCombatantNagDialogTest {
 
         when(personPregnant.getUnit()).thenReturn(null);
 
-        assertFalse(isPregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(campaign));
     }
 
     @Test
@@ -100,7 +102,7 @@ class PregnantCombatantNagDialogTest {
         when(personPregnant.getUnit()).thenReturn(unit);
         when(unit.getForceId()).thenReturn(Force.FORCE_NONE);
 
-        assertFalse(isPregnantCombatant(campaign));
+        assertFalse(hasActivePregnantCombatant(campaign));
     }
 
     @Test
@@ -111,6 +113,6 @@ class PregnantCombatantNagDialogTest {
         when(personPregnant.getUnit()).thenReturn(unit);
         when(unit.getForceId()).thenReturn(1);
 
-        assertTrue(isPregnantCombatant(campaign));
+        assertTrue(hasActivePregnantCombatant(campaign));
     }
 }

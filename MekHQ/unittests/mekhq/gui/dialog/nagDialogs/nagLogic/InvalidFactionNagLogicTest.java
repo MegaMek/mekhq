@@ -16,18 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.nagDialogs.InvalidFactionNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static mekhq.gui.dialog.nagDialogs.InvalidFactionNagDialog.federatedSunsSpecialHandler;
-import static mekhq.gui.dialog.nagDialogs.InvalidFactionNagDialog.isFactionInvalid;
-import static mekhq.gui.dialog.nagDialogs.InvalidFactionNagDialog.lyranAllianceSpecialHandler;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.when;
  * {@code isFactionInvalid()}, {@code lyranAllianceSpecialHandler()}, and
  * {@code federatedSunsSpecialHandler()} methods.
  */
-class InvalidFactionNagDialogTest {
+class InvalidFactionNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private Faction faction;
@@ -81,50 +80,5 @@ class InvalidFactionNagDialogTest {
         when(campaign.getLocalDate()).thenReturn(dateInvalid);
 
         assertTrue(isFactionInvalid(campaign));
-    }
-
-    // In the following tests, the lyranAllianceSpecialHandler() method is called, and its response
-    // is checked against expected behavior
-
-    @Test
-    public void lyranAllianceSpecialHandlerInvalidDate() {
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 4, 19));
-        assertTrue(lyranAllianceSpecialHandler(campaign));
-    }
-
-    @Test
-    public void lyranAllianceSpecialHandlerBeforeActiveDate() {
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3040, 1, 17));
-        assertFalse(lyranAllianceSpecialHandler(campaign));
-    }
-
-    @Test
-    public void lyranAllianceSpecialHandlerAfterInactiveDate() {
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 4, 21));
-        assertFalse(lyranAllianceSpecialHandler(campaign));
-    }
-
-    // In the following tests, the federatedSunsSpecialHandler() method is called, and its response
-    // is checked against expected behavior
-
-    @Test
-    public void federatedSunsSpecialHandlerInvalidDate() {
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3057, 9, 17));
-
-        assertTrue(federatedSunsSpecialHandler(campaign));
-    }
-
-    @Test
-    public void federatedSunsSpecialHandlerBeforeActiveDate() {
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3040, 1, 17));
-
-        assertFalse(federatedSunsSpecialHandler(campaign));
-    }
-
-    @Test
-    public void federatedSunsSpecialHandlerAfterInactiveDate() {
-        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3057, 9, 19));
-
-        assertFalse(federatedSunsSpecialHandler(campaign));
     }
 }
