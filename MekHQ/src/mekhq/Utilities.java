@@ -843,7 +843,7 @@ public class Utilities {
      * <ul>
      *   <li><b>EXP_NONE</b>:</li>
      *           <li>- Non-clan: ~25.2 years</li>
-     *           <li>- Clan: ~12.6 years</li>
+     *           <li>- Clan: ~25.2 years</li>
      *   <li><b>EXP_GREEN</b>:</li>
      *           <li>- Non-clan: ~22.2 years</li>
      *           <li>- Clan: ~20.1 years</li>
@@ -891,7 +891,7 @@ public class Utilities {
                 roll += (Compute.d6() - 1);
             }
 
-            if (isClan) {
+            if (isClan && (experienceLevel != SkillType.EXP_NONE)) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
 
