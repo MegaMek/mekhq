@@ -58,6 +58,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import static java.lang.Math.max;
+
 public class Utilities {
     private static final MMLogger logger = MMLogger.create(Utilities.class);
 
@@ -375,7 +377,7 @@ public class Utilities {
         } else if (dice == 6) {
             target += 2;
         }
-        return Math.max(target, 0);
+        return max(target, 0);
     }
 
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c,
@@ -828,48 +830,67 @@ public class Utilities {
     }
 
     /**
-     * Calculates the age of a pilot based on their experience level and clan status.
+     * Calculates the age based on the experience level and clan status.
      *
-     * <p>The age is determined by rolling a number of dice (specified by the experience level)
-     * and applying modifications based on clan status. Dice rolls of 6 "explode," meaning an additional
-     * roll is added with one subtracted. If the pilot is from a Clan origin, each roll is halved
-     * (rounded up).</p>
+     * <p>This method computes the age of a character by rolling a given number of exploding
+     * six-sided dice (d6) depending on the specified experience level. It starts with a base age
+     * and adds results of the rolls. If the character is part of a Clan, the dice rolls are halved
+     * (rounded up). Additionally, for all experience levels other than {@code EXP_NONE}, the final
+     * result is clamped to a minimum of 18.</p>
      *
-     * <p>The results are then added to a base age (18), except for {@code SkillType.EXP_NONE},
-     * where the base age is subtracted at the end.</p>
+     * <p>An exploding die roll occurs if the roll is 6. In such cases, another die is rolled, and
+     * the result is added to the previous roll (minus one).</p>
      *
-     * <p>Below are the average ages based on the experience level (assuming exploding dice logic):</p>
+     * <p>The calculated average age for each experience level is shown below:</p>
      *
-     * <ul>
-     *   <li><b>EXP_NONE</b>:</li>
-     *           <li>- Non-clan: ~25.2 years</li>
-     *           <li>- Clan: ~25.2 years</li>
-     *   <li><b>EXP_GREEN</b>:</li>
-     *           <li>- Non-clan: ~22.2 years</li>
-     *           <li>- Clan: ~20.1 years</li>
-     *   <li><b>EXP_REGULAR</b>:</li>
-     *           <li>- Non-clan: ~26.4 years</li>
-     *           <li>- Clan: ~22.2 years</li>
-     *   <li><b>EXP_VETERAN</b>:</li>
-     *           <li>- Non-clan: ~30.6 years</li>
-     *           <li>- Clan: ~24.3 years</li>
-     *   <li><b>EXP_ELITE</b>:</li>
-     *           <li>- Non-clan: ~34.8 years</li>
-     *           <li>- Clan: ~26.4 years</li>
-     * </ul>
+     * <table border="1">
+     *   <caption><strong>Average Ages by Experience Level</strong></caption>
+     *   <tr>
+     *     <th>Experience Level</th>
+     *     <th>Non-Clan Average Age</th>
+     *     <th>Clan Average Age</th>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_NONE</td>
+     *     <td>29.4</td>
+     *     <td>14.7</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_GREEN</td>
+     *     <td>18</td>
+     *     <td>18</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_REGULAR</td>
+     *     <td>24.4</td>
+     *     <td>18.2</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_VETERAN</td>
+     *     <td>28.6</td>
+     *     <td>20.3</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_ELITE</td>
+     *     <td>32.8</td>
+     *     <td>22.4</td>
+     *   </tr>
+     * </table>
      *
-     * @param experienceLevel the skill type of the pilot, represented by one of the
-     *               {@code SkillType} constants.
-     * @param isClan  whether the pilot is from a Clan origin. If {@code true}, age calculations
-     *               involve halving each dice roll (rounded up).
-     * @return the calculated age of the pilot.
+     * @param experienceLevel The experience level of the character. Must be one of the constants
+     *                       defined in {@code SkillType}.
+     * @param isClan {@code true} if the character is part of a Clan, in which case dice rolls are
+     *                          halved (rounded up), {@code false} otherwise.
+     * @return The calculated age of the character based on the input parameters.
      */
     public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
-        int baseAge = 18;
+        int baseAge = 16;
 
         if (experienceLevel == SkillType.EXP_NONE) {
             baseAge = 0; // only use the result of the dice roll
         }
+
+        int age = baseAge;
 
         // How many dice to roll
         int diceCount = switch (experienceLevel) {
@@ -880,8 +901,6 @@ public class Utilities {
             case SkillType.EXP_ELITE -> 4;
             default -> 0;
         };
-
-        int age = baseAge;
 
         // Handle exploding dice
         for (int i = 0; i < diceCount; i++) {
@@ -896,6 +915,11 @@ public class Utilities {
             }
 
             age += roll;
+        }
+
+        // Clam age, if necessary
+        if (experienceLevel != SkillType.EXP_NONE) {
+            age = max(18, age);
         }
 
         return age;
@@ -921,7 +945,7 @@ public class Utilities {
 
     public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[Math.max(values.length, minimumSize)];
+        Money[] result = new Money[max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
