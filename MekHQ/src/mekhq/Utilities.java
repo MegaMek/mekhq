@@ -828,42 +828,74 @@ public class Utilities {
     }
 
     /**
-     * Calculates the age of a character based on their experience level and clan status.
+     * Calculates the age of a pilot based on their experience level and clan status.
      *
-     * @param expLevel the experience level of the character represented by an integer value.
-     * @param clan     a boolean value indicating whether the character is a clan character.
-     * @return the age of the character calculated based on the provided expLevel and clan.
+     * <p>The age is determined by rolling a number of dice (specified by the experience level)
+     * and applying modifications based on clan status. Dice rolls of 6 "explode," meaning an additional
+     * roll is added with one subtracted. If the pilot is from a Clan origin, each roll is halved
+     * (rounded up).</p>
+     *
+     * <p>The results are then added to a base age (18), except for {@code SkillType.EXP_NONE},
+     * where the base age is subtracted at the end.</p>
+     *
+     * <p>Below are the average ages based on the experience level (assuming exploding dice logic):</p>
+     *
+     * <ul>
+     *   <li><b>EXP_NONE</b>:</li>
+     *           <li>- Non-clan: ~25.2 years</li>
+     *           <li>- Clan: ~12.6 years</li>
+     *   <li><b>EXP_GREEN</b>:</li>
+     *           <li>- Non-clan: ~22.2 years</li>
+     *           <li>- Clan: ~20.1 years</li>
+     *   <li><b>EXP_REGULAR</b>:</li>
+     *           <li>- Non-clan: ~26.4 years</li>
+     *           <li>- Clan: ~22.2 years</li>
+     *   <li><b>EXP_VETERAN</b>:</li>
+     *           <li>- Non-clan: ~30.6 years</li>
+     *           <li>- Clan: ~24.3 years</li>
+     *   <li><b>EXP_ELITE</b>:</li>
+     *           <li>- Non-clan: ~34.8 years</li>
+     *           <li>- Clan: ~26.4 years</li>
+     * </ul>
+     *
+     * @param experienceLevel the skill type of the pilot, represented by one of the
+     *               {@code SkillType} constants.
+     * @param isClan  whether the pilot is from a Clan origin. If {@code true}, age calculations
+     *               involve halving each dice roll (rounded up).
+     * @return the calculated age of the pilot.
      */
-    public static int getAgeByExpLevel(int expLevel, boolean clan) {
+    public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
         int baseAge = 18;
 
-        int nDice = switch (expLevel) {
+        if (experienceLevel == SkillType.EXP_NONE) {
+            baseAge = 0; // only use the result of the dice roll
+        }
+
+        // How many dice to roll
+        int diceCount = switch (experienceLevel) {
             case SkillType.EXP_NONE -> 7;
             case SkillType.EXP_GREEN -> 1;
             case SkillType.EXP_REGULAR -> 2;
-            case SkillType.EXP_VETERAN -> 4;
-            case SkillType.EXP_ELITE -> 8;
+            case SkillType.EXP_VETERAN -> 3;
+            case SkillType.EXP_ELITE -> 4;
             default -> 0;
         };
 
         int age = baseAge;
 
-        for (int i = 0; i < nDice; i++) {
+        // Handle exploding dice
+        for (int i = 0; i < diceCount; i++) {
             int roll = Compute.d6(1);
 
             if (roll == 6) {
                 roll += (Compute.d6() - 1);
             }
 
-            if (clan) {
+            if (isClan) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
 
             age += roll;
-        }
-
-        if (expLevel == SkillType.EXP_NONE) {
-            age -= baseAge; // only use the result of the dice roll
         }
 
         return age;
@@ -1324,7 +1356,7 @@ public class Utilities {
     /**
      * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
      * @throws EntityLoadingException
-     */    
+     */
     public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
         MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);
 
