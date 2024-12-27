@@ -104,6 +104,9 @@ public class ContractAutomation {
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
             campaign.getApp().getCampaigngui().refreshLocation();
+
+            campaign.addReport(String.format(resources.getString("transitDescription.supplemental"),
+                targetSystem, travelDays));
         }
     }
 

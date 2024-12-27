@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
@@ -28,11 +28,12 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Systems;
+import mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog.isUntreatedInjury;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * It tests the different combinations of untreated personnel and verifies the behavior of the
  * {@code isUntreatedInjury()} method.
  */
-class UntreatedPersonnelNagDialogTest {
+class UntreatedPersonnelNagLogicTest {
     Campaign campaign;
     Person person;
 
@@ -56,7 +57,7 @@ class UntreatedPersonnelNagDialogTest {
         try {
             Systems.setInstance(Systems.loadDefault());
         } catch (Exception ex) {
-            MMLogger.create(UntreatedPersonnelNagDialogTest.class).error("", ex);
+            MMLogger.create(UntreatedPersonnelNagLogicTest.class).error("", ex);
         }
     }
 
@@ -78,34 +79,34 @@ class UntreatedPersonnelNagDialogTest {
     public void isUntreatedInjuryIncludesNonPrisonersTest() {
         person.setPrisonerStatus(campaign, PrisonerStatus.FREE, false);
         campaign.importPerson(person);
-        assertTrue(isUntreatedInjury(campaign));
+        assertTrue(campaignHasUntreatedInjuries(campaign));
     }
 
     @Test
     public void isUntreatedInjuryExcludesPrisonersTest() {
         person.setPrisonerStatus(campaign, PrisonerStatus.PRISONER, false);
         campaign.importPerson(person);
-        assertFalse(isUntreatedInjury(campaign));
+        assertFalse(campaignHasUntreatedInjuries(campaign));
     }
 
     @Test
     public void isUntreatedInjuryExcludesPrisonerDefectorsTest() {
         person.setPrisonerStatus(campaign, PrisonerStatus.PRISONER_DEFECTOR, false);
         campaign.importPerson(person);
-        assertFalse(isUntreatedInjury(campaign));
+        assertFalse(campaignHasUntreatedInjuries(campaign));
     }
 
     @Test
     public void isUntreatedInjuryExcludesBondsmenTest() {
         person.setPrisonerStatus(campaign, PrisonerStatus.BONDSMAN, false);
         campaign.importPerson(person);
-        assertTrue(isUntreatedInjury(campaign));
+        assertTrue(campaignHasUntreatedInjuries(campaign));
     }
 
     @Test
     public void isUntreatedInjuryExcludesInactivePersonnelTest() {
         person.setStatus(PersonnelStatus.AWOL);
         campaign.importPerson(person);
-        assertFalse(isUntreatedInjury(campaign));
+        assertFalse(campaignHasUntreatedInjuries(campaign));
     }
 }

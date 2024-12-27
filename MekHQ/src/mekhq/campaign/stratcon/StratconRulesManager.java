@@ -89,6 +89,7 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  */
 public class StratconRulesManager {
     public final static int BASE_LEADERSHIP_BUDGET = 1000;
+
     private static final MMLogger logger = MMLogger.create(StratconRulesManager.class);
 
     /**
@@ -111,7 +112,7 @@ public class StratconRulesManager {
         REGULAR,
 
         /**
-         * The Combat Team's deployment orders are "Fight" or "Auxiliary".
+         * The Combat Team's deployment orders are "Frontline" or "Auxiliary".
          * We pay a support point and make an enhanced roll
          */
         AUXILIARY
@@ -955,7 +956,7 @@ public class StratconRulesManager {
             return;
         }
 
-        boolean isScouting = combatTeam.getRole().isScouting();
+        boolean isRecon = combatTeam.getRole().isRecon();
 
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
@@ -976,7 +977,7 @@ public class StratconRulesManager {
             return;
         }
 
-        if (isScouting) {
+        if (isRecon) {
             StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
 
             if (newCoords != null) {
@@ -993,7 +994,7 @@ public class StratconRulesManager {
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario;
-            boolean autoAssignLances = !isScouting;
+            boolean autoAssignLances = !isRecon;
 
             Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
 
@@ -1037,6 +1038,7 @@ public class StratconRulesManager {
      *     <li>No scenario is assigned to the coordinate (using {@link StratconTrackState#getScenario})</li>
      *     <li>No facility exists at the coordinate (using {@link StratconTrackState#getFacility})</li>
      *     <li>The coordinate is not occupied by any assigned forces (using {@link StratconTrackState#getAssignedForceCoords})</li>
+     *     <li>The coordinate is on the map</li>
      * </ul>
      * If multiple suitable coordinates are found, one is selected at random and returned.
      * If no suitable coordinates are available, the method returns {@code null}.
@@ -1047,8 +1049,10 @@ public class StratconRulesManager {
      */
     private static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
                                                                        StratconTrackState trackState) {
-        List<StratconCoords> suitableCoords = new ArrayList<>();
+        final int trackWidth = trackState.getWidth();
+        final int trackHeight = trackState.getHeight();
 
+        List<StratconCoords> suitableCoords = new ArrayList<>();
         for (int direction : ALL_DIRECTIONS) {
             StratconCoords newCoords = originCoords.translate(direction);
 
@@ -1061,6 +1065,14 @@ public class StratconRulesManager {
             }
 
             if (trackState.getAssignedForceCoords().containsValue(newCoords)) {
+                continue;
+            }
+
+            // This is to ensure we're not trying to place a scenario off the map
+            if ((newCoords.getX() < 0)
+                || (newCoords.getX() > trackWidth)
+                || (newCoords.getY() < 0)
+                || (newCoords.getY() > trackHeight)) {
                 continue;
             }
 
@@ -1237,7 +1249,7 @@ public class StratconRulesManager {
 
         // This may return null if we're deploying a force that isn't a Combat Team for whatever reason
         if (combatTeam != null) {
-            if (combatTeam.getRole().isScouting()) {
+            if (combatTeam.getRole().isRecon()) {
                 for (int direction = 0; direction < 6; direction++) {
                     StratconCoords checkCoords = coords.translate(direction);
 
@@ -1958,7 +1970,7 @@ public class StratconRulesManager {
                                 : MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
                 break;
             case LIAISON:
-                if (scenario.isRequiredScenario()) {
+                if (scenario.isTurningPoint()) {
                     backingScenario.addScenarioModifier(
                             AtBScenarioModifier
                                     .getScenarioModifier(airBattle ? MHQConstants.SCENARIO_MODIFIER_LIAISON_AIR
@@ -2510,7 +2522,7 @@ public class StratconRulesManager {
 
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
-                    if (scenario.isRequiredScenario() && !backingScenario.getStatus().isDraw()) {
+                    if (scenario.isTurningPoint() && !backingScenario.getStatus().isDraw()) {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
                     }
 
@@ -2658,7 +2670,7 @@ public class StratconRulesManager {
         for (StratconTrackState track : campaignState.getTracks()) {
             if (track.getScenarios().containsKey(scenario.getCoords())) {
                 // subtract VP if scenario is 'required'
-                if (scenario.isRequiredScenario()) {
+                if (scenario.isTurningPoint()) {
                     campaignState.updateVictoryPoints(-1);
                 }
 

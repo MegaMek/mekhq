@@ -154,11 +154,11 @@ import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -2117,6 +2117,21 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves a filtered list of personnel who have at least one combat profession.
+     * <p>
+     * This method filters the list of all personnel to include only those whose primary
+     * or secondary role is designated as a combat role.
+     * </p>
+     *
+     * @return a {@link List} of {@link Person} objects representing combat-capable personnel
+     */
+    public List<Person> getActiveCombatPersonnel() {
+        return getActivePersonnel().stream()
+            .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only active Dependents.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
@@ -3880,8 +3895,7 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            scenario.convertToStub(this, ScenarioStatus.DEFEAT);
-                            addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
+                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
 
                             if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
@@ -3890,11 +3904,11 @@ public class Campaign implements ITechManager {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
                     } else {
-                        scenario.convertToStub(this, ScenarioStatus.DEFEAT);
+                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
 
                         addReport("Failure to deploy for " + scenario.getName()
-                                + " resulted in defeat and a minor contract breach.");
+                                + " resulted in a minor contract breach.");
                     }
                 }
             }
@@ -4013,7 +4027,7 @@ public class Campaign implements ITechManager {
         }
 
         if (campaignOptions.isUseStratCon() && (currentDay.getDayOfMonth() == 1)) {
-            negotiateAdditionalSupportPoints();
+            negotiateAdditionalSupportPoints(this);
         }
 
         processNewDayATBScenarios();
@@ -4026,87 +4040,6 @@ public class Campaign implements ITechManager {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Handles monthly negotiation of additional support points for active AtB Contracts.
-     * Admin/Transport personnel skill levels and contract start dates are considered during negotiations.
-     * Side effects include state changes and report generation.
-     */
-    public void negotiateAdditionalSupportPoints() {
-        // Fetch a list of all Admin/Transport personnel
-        List<Person> adminTransport = new ArrayList<>();
-
-        for (Person person : getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorTransport()
-                || person.getSecondaryRole().isAdministratorTransport()) {
-                adminTransport.add(person);
-            }
-        }
-
-        // Sort that list based on skill
-        adminTransport.sort((person1, person2) -> {
-            Skill person1Skill = person1.getSkill(S_ADMIN);
-            int person1SkillValue = person1Skill.getLevel() + person1Skill.getBonus();
-
-            Skill person2Skill = person2.getSkill(S_ADMIN);
-            int person2SkillValue = person2Skill.getLevel() + person2Skill.getBonus();
-
-            return Double.compare(person1SkillValue, person2SkillValue);
-        });
-
-        // Fetch a list of all active AtB Contracts and sort that list oldest -> newest
-        List<AtBContract> activeContracts = getActiveAtBContracts();
-
-        List<AtBContract> sortedContracts = activeContracts.stream()
-            .sorted(Comparator.comparing(AtBContract::getStartDate))
-            .toList();
-
-        // Loop through available contracts, rolling for additional Support Points until we run
-        // out of Admin/Transport personnel, or we run out of active contracts
-        for (AtBContract contract : sortedContracts) {
-            if (adminTransport.isEmpty()) {
-                break;
-            }
-
-            int negoatiatedSupportPoints = 0;
-            int maximumSupportPointsNegotiated = contract.getRequiredLances();
-
-            int availableAdmins = adminTransport.size();
-
-            for (int i = 0; i < availableAdmins; i++) {
-                Person assignedAdmin = adminTransport.get(0);
-                adminTransport.remove(0);
-
-                int targetNumber = assignedAdmin.getSkill(S_ADMIN).getFinalSkillValue();
-                int roll = Compute.d6(2);
-
-                if (roll >= targetNumber) {
-                    negoatiatedSupportPoints++;
-
-                    int marginOfSuccess = (roll - targetNumber) / 4;
-
-                    negoatiatedSupportPoints += marginOfSuccess;
-                }
-
-                if (negoatiatedSupportPoints >= maximumSupportPointsNegotiated) {
-                    negoatiatedSupportPoints = maximumSupportPointsNegotiated;
-                    break;
-                }
-            }
-
-            if (negoatiatedSupportPoints > 0) {
-                contract.getStratconCampaignState().addSupportPoints(negoatiatedSupportPoints);
-
-                addReport(String.format(resources.getString("stratConWeeklySupportPoints.text"),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                    negoatiatedSupportPoints, CLOSING_SPAN_TAG, contract.getName()));
-            } else {
-                addReport(String.format(resources.getString("stratConWeeklySupportPointsFailed.text"),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    CLOSING_SPAN_TAG, contract.getName()));
             }
         }
     }
@@ -5004,15 +4937,12 @@ public class Campaign implements ITechManager {
             int personnelCount;
 
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                    .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
-                    .count();
+                personnelCount = getActiveCombatPersonnel().size();
             } else {
-                personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                    .count();
+                personnelCount = getActivePersonnel().size();
             }
+
+            personnelCount -= getCurrentPrisoners().size();
             fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;

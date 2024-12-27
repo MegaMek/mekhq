@@ -16,26 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.gui.dialog.nagDialogs.NoCommanderNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static mekhq.gui.dialog.nagDialogs.InsufficientMedicsNagDialog.checkMedicsNeededCount;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This class contains test cases for the {@link InsufficientMedicsNagDialogTest} class.
- * It tests the different combinations of Medic requirements and verifies the behavior of the
- * {@code checkMedicsNeededCount()} method.
+ * This class is a test class for the {@link NoCommanderNagDialog} class.
+ * It contains test methods for various scenarios related to commander assignment.
  */
-class InsufficientMedicsNagDialogTest {
+class NoCommanderNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
+    private Person commander;
+    private Person commanderNull;
 
     /**
      * Test setup for each test, runs before each test.
@@ -43,27 +46,24 @@ class InsufficientMedicsNagDialogTest {
      */
     @BeforeEach
     void init() {
+        // Initialize the mock objects
         campaign = mock(Campaign.class);
+        commander = mock(Person.class);
+        commanderNull = null;
     }
 
-    // In the following tests the checkMedicsNeededCount() method is called, and its response is
-    // checked against expected behavior
+    // In the following tests the isCommanderMissing() method is called, and its response is checked
+    // against expected behavior
 
     @Test
-    void noMedicsNeeded() {
-        when(campaign.getMedicsNeed()).thenReturn(0);
-        assertFalse(checkMedicsNeededCount(campaign));
-    }
-
-    @Test
-    void oneMedicNeeded() {
-        when(campaign.getMedicsNeed()).thenReturn(1);
-        assertTrue(checkMedicsNeededCount(campaign));
+    void commanderPresent() {
+        when(campaign.getFlaggedCommander()).thenReturn(commander);
+        assertFalse(hasNoCommander(campaign));
     }
 
     @Test
-    void negativeMedicsNeeded() {
-        when(campaign.getMedicsNeed()).thenReturn(-1);
-        assertFalse(checkMedicsNeededCount(campaign));
+    void commanderMissing() {
+        when(campaign.getFlaggedCommander()).thenReturn(commanderNull);
+        assertTrue(hasNoCommander(campaign));
     }
 }
