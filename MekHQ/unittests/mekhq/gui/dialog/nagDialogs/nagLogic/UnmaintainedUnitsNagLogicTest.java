@@ -16,17 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog.checkHanger;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.campaignHasUnmaintainedUnits;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link UnmaintainedUnitsNagDialog} class.
  * It tests the different combinations of unit states and verifies the behavior of the {@code checkHanger()} method.
  */
-class UnmaintainedUnitsNagDialogTest {
+class UnmaintainedUnitsNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private Hangar hangar;
@@ -66,7 +67,8 @@ class UnmaintainedUnitsNagDialogTest {
      * @param unit2Unmaintained A boolean indicating whether the second unit is unmaintained.
      * @param unit2Salvage A boolean indicating whether the second unit is salvage.
      */
-    private void initializeUnits(boolean unit1Unmaintained, boolean unit1Salvage, boolean unit2Unmaintained, boolean unit2Salvage) {
+    private void initializeUnits(boolean unit1Unmaintained, boolean unit1Salvage,
+                                 boolean unit2Unmaintained, boolean unit2Salvage) {
         when(mockUnit1.isUnmaintained()).thenReturn(unit1Unmaintained);
         when(mockUnit1.isSalvage()).thenReturn(unit1Salvage);
 
@@ -83,60 +85,60 @@ class UnmaintainedUnitsNagDialogTest {
     @Test
     void unmaintainedUnitExistsUnit1() {
         initializeUnits(true, false, false, false);
-        assertTrue(checkHanger(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void unmaintainedUnitExistsUnit2() {
         initializeUnits(false, false, true, false);
-        assertTrue(checkHanger(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageUnit1() {
         initializeUnits(true, true, true, false);
-        assertTrue(checkHanger(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageUnit2() {
         initializeUnits(true, false, true, true);
-        assertTrue(checkHanger(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void unmaintainedUnitExistsButSalvageMixed() {
         initializeUnits(false, true, true, false);
-        assertTrue(checkHanger(campaign));
+        assertTrue(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void noUnmaintainedUnitExistsNoSalvage() {
         initializeUnits(false, false, false, false);
-        assertFalse(checkHanger(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void noUnmaintainedUnitExistsAllSalvage() {
         initializeUnits(false, true, false, true);
-        assertFalse(checkHanger(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageUnit1() {
         initializeUnits(false, true, false, false);
-        assertFalse(checkHanger(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageUnit2() {
         initializeUnits(false, false, false, true);
-        assertFalse(checkHanger(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(campaign));
     }
 
     @Test
     void noUnmaintainedUnitExistsButSalvageMixed() {
         initializeUnits(false, true, false, false);
-        assertFalse(checkHanger(campaign));
+        assertFalse(campaignHasUnmaintainedUnits(campaign));
     }
 }

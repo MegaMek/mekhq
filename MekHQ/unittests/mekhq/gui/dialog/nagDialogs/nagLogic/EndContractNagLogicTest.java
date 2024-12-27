@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
+import mekhq.gui.dialog.nagDialogs.EndContractNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.EndContractNagDialog.isContractEnded;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContractEnded;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link EndContractNagDialog} class.
  * It contains test methods for various scenarios related to contract expiration.
  */
-public class EndContractNagDialogTest {
+public class EndContractNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private LocalDate today;
@@ -49,13 +50,14 @@ public class EndContractNagDialogTest {
      */
     @BeforeEach
     void init() {
+        System.setProperty("java.awt.headless", "true");
+
         // Initialize the mock objects
         campaign = mock(Campaign.class);
         today = LocalDate.now();
         contract1 = mock(Contract.class);
         contract2 = mock(Contract.class);
 
-        // When the Campaign mock calls 'getLocalDate()' return today's date
         when(campaign.getLocalDate()).thenReturn(today);
     }
 

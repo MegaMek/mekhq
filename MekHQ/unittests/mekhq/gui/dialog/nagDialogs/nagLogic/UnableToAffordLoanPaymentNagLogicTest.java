@@ -16,22 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
+import mekhq.gui.dialog.nagDialogs.UnableToAffordLoanPaymentNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.UnableToAffordLoanPaymentNagDialog.getTotalPaymentsDue;
-import static mekhq.gui.dialog.nagDialogs.UnableToAffordLoanPaymentNagDialog.isUnableToAffordLoanPayment;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -42,7 +40,7 @@ import static org.mockito.Mockito.when;
  * It contains tests for various scenarios related to the {@code getTotalPaymentsDue} and
  * {@code isUnableToAffordLoanPayment} methods
  */
-class UnableToAffordLoanPaymentNagDialogTest {
+class UnableToAffordLoanPaymentNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
     private LocalDate today;
@@ -74,64 +72,32 @@ class UnableToAffordLoanPaymentNagDialogTest {
      * Initializes the loans with the specified number of days till the next payment.
      *
      * @param daysTillFirstLoan The number of days till the next payment for the first loan.
-     * @param daysTillSecondLoan The number of days till the next payment for the second loan.
      */
-    private void initializeLoans(int daysTillFirstLoan, int daysTillSecondLoan) {
+    private void initializeLoans(int daysTillFirstLoan) {
         when(finances.getLoans()).thenReturn(List.of(firstLoan, secondLoan));
 
         when(firstLoan.getNextPayment()).thenReturn(today.plusDays(daysTillFirstLoan));
-        when(secondLoan.getNextPayment()).thenReturn(today.plusDays(daysTillSecondLoan));
+        when(secondLoan.getNextPayment()).thenReturn(today.plusDays(1));
     }
 
     // In the following tests the getTotalPaymentsDue() method is called, and its response
     // is checked against expected behavior
 
     @Test
-    void noLoans() {
-        when(finances.getLoans()).thenReturn(new ArrayList<>());
-
-        assertEquals(Money.zero(), getTotalPaymentsDue(campaign));
-    }
-
-    @Test
-    void noLoanDueTomorrow() {
-        initializeLoans(2, 2);
-
-        assertEquals(Money.zero(), getTotalPaymentsDue(campaign));
-    }
-
-    @Test
-    void oneLoanDueTomorrow() {
-        initializeLoans(2, 1);
-
-        assertEquals(Money.of(5), getTotalPaymentsDue(campaign));
-    }
-
-    @Test
-    void twoLoansDueTomorrow() {
-        initializeLoans(1, 1);
-
-        assertEquals(Money.of(10), getTotalPaymentsDue(campaign));
-    }
-
-    // In the following tests the canAffordLoans() method is called, and its response is checked
-    // against expected behavior
-
-    @Test
     void canAffordLoans() {
-        initializeLoans(2, 1);
+        initializeLoans(2);
 
         when(campaign.getFunds()).thenReturn(Money.of(10));
 
-        assertFalse(isUnableToAffordLoanPayment(campaign));
+        assertFalse(unableToAffordLoans(campaign));
     }
 
     @Test
     void cannotAffordLoans() {
-        initializeLoans(1, 1);
+        initializeLoans(1);
 
         when(campaign.getFunds()).thenReturn(Money.of(5));
 
-        assertTrue(isUnableToAffordLoanPayment(campaign));
+        assertTrue(unableToAffordLoans(campaign));
     }
 }

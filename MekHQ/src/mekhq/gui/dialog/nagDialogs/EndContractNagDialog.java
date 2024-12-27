@@ -21,62 +21,68 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
-import java.time.LocalDate;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContractEnded;
 
 /**
- * This class represents a nag dialog displayed on the day a contract ends
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A dialog used to notify the user about the end date of a contract in the campaign.
+ *
+ * <p>
+ * This nag dialog is triggered when a contract in the campaign is flagged as ending on the current date
+ * and the user has not opted to ignore such notifications. It shows relevant details about the situation
+ * and allows the user to take action or dismiss the dialog.
+ * </p>
+ *
+ * <strong>Features:</strong>
+ * <ul>
+ *   <li>Handles notifications for contract end dates in the campaign.</li>
+ *   <li>Uses a localized message with context-specific details from the campaign.</li>
+ *   <li>Extends the {@link AbstractMHQNagDialog} to reuse base nag dialog functionality.</li>
+ * </ul>
  */
 public class EndContractNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "EndContractNagDialog";
-    private static String DIALOG_TITLE = "EndContractNagDialog.title";
-    private static String DIALOG_BODY = "EndContractNagDialog.text";
+    private final Campaign campaign;
 
     /**
-     * Checks if a contract within a campaign has ended on the current date.
+     * Constructs an {@code EndContractNagDialog} for the given campaign.
      *
-     * @param campaign the {@link Campaign} containing the contracts to be checked
-     * @return {@code true} if a contract within the campaign has ended on the current date,
-     *         {@code false} otherwise
+     * <p>
+     * This dialog uses the localization key {@code "EndContractNagDialog.text"} to provide
+     * a message that includes additional information, such as the commander's address.
+     * It is specifically tailored to show when a contract is reaching its end date.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} that the nag dialog is tied to.
      */
-    static boolean isContractEnded(Campaign campaign) {
-        LocalDate today = campaign.getLocalDate();
+    public EndContractNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_CONTRACT_ENDED);
 
-        // we can't use 'is date y after x', as once the end date has been passed,
-        // the contract is removed from the list of active contracts
+        this.campaign = campaign;
 
-        // there is no reason to use a stream here, as there won't be enough iterations to warrant it
-        for (Contract contract : campaign.getActiveContracts()) {
-            if (contract.getEndingDate().equals(today)) {
-                return true;
-            }
+        final String DIALOG_BODY = "EndContractNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
+    }
+
+    /**
+     * Checks if the "Contract End" nag dialog should be displayed.
+     *
+     * <p>
+     * This method evaluates whether the nag dialog for contract end dates should be shown.
+     * It checks the following conditions:
+     * <ul>
+     *   <li>If the "Contract Ended" nag dialog is flagged as ignored in the user’s settings.</li>
+     *   <li>If any active contracts in the campaign are ending on the current date.</li>
+     * </ul>
+     * If these conditions are met, the dialog is displayed.
+     */
+    public void checkNag() {
+        final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
+
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && isContractEnded(campaign)) {
+            showDialog();
         }
-
-        return false;
-    }
-
-    /**
-     * Creates a new instance of the {@link EndContractNagDialog} class.
-     *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
-     */
-    public EndContractNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_CONTRACT_ENDED);
-    }
-
-    /**
-     * Checks if there is a nag message to display.
-     *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
-     */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isContractEnded(getCampaign());
     }
 }
