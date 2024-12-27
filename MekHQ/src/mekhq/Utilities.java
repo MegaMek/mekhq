@@ -853,7 +853,7 @@ public class Utilities {
      *   <tr>
      *     <td>EXP_NONE</td>
      *     <td>29.4</td>
-     *     <td>14.7</td>
+     *     <td>29.4</td>
      *   </tr>
      *   <tr>
      *     <td>EXP_GREEN</td>
