@@ -59,6 +59,7 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import static java.lang.Math.max;
+import static mekhq.campaign.personnel.SkillType.*;
 
 public class Utilities {
     private static final MMLogger logger = MMLogger.create(Utilities.class);
@@ -347,10 +348,10 @@ public class Utilities {
 
         return switch (roll) {
             case 1 -> SkillType.EXP_ULTRA_GREEN;
-            case 2, 3, 4, 5 -> SkillType.EXP_GREEN;
-            case 6, 7, 8, 9 -> SkillType.EXP_REGULAR;
-            case 10, 11 -> SkillType.EXP_VETERAN;
-            case 12 -> SkillType.EXP_ELITE;
+            case 2, 3, 4, 5 -> EXP_GREEN;
+            case 6, 7, 8, 9 -> EXP_REGULAR;
+            case 10, 11 -> EXP_VETERAN;
+            case 12 -> EXP_ELITE;
             default -> throw new IllegalStateException("Unexpected value in mekhq/Utilities.java/generateExpLevel: "
                     + roll);
         };
@@ -884,9 +885,13 @@ public class Utilities {
      * @return The calculated age of the character based on the input parameters.
      */
     public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
+        if (experienceLevel > EXP_ELITE) {
+            experienceLevel = EXP_ELITE;
+        }
+
         int baseAge = 16;
 
-        if (experienceLevel == SkillType.EXP_NONE) {
+        if (experienceLevel == EXP_NONE) {
             baseAge = 0; // only use the result of the dice roll
         }
 
@@ -894,11 +899,11 @@ public class Utilities {
 
         // How many dice to roll
         int diceCount = switch (experienceLevel) {
-            case SkillType.EXP_NONE -> 7;
-            case SkillType.EXP_GREEN -> 1;
-            case SkillType.EXP_REGULAR -> 2;
-            case SkillType.EXP_VETERAN -> 3;
-            case SkillType.EXP_ELITE -> 4;
+            case EXP_NONE -> 7;
+            case EXP_GREEN -> 1;
+            case EXP_REGULAR -> 2;
+            case EXP_VETERAN -> 3;
+            case EXP_ELITE -> 4;
             default -> 0;
         };
 
@@ -910,7 +915,7 @@ public class Utilities {
                 roll += (Compute.d6() - 1);
             }
 
-            if (isClan && (experienceLevel != SkillType.EXP_NONE)) {
+            if (isClan && (experienceLevel != EXP_NONE)) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
 
@@ -918,7 +923,7 @@ public class Utilities {
         }
 
         // Clam age, if necessary
-        if (experienceLevel != SkillType.EXP_NONE) {
+        if (experienceLevel != EXP_NONE) {
             age = max(18, age);
         }
 
