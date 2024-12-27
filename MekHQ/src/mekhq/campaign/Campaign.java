@@ -3880,8 +3880,7 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            scenario.convertToStub(this, ScenarioStatus.DEFEAT);
-                            addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
+                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
 
                             if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
@@ -3890,11 +3889,11 @@ public class Campaign implements ITechManager {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
                     } else {
-                        scenario.convertToStub(this, ScenarioStatus.DEFEAT);
+                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
 
                         addReport("Failure to deploy for " + scenario.getName()
-                                + " resulted in defeat and a minor contract breach.");
+                                + " resulted in a minor contract breach.");
                     }
                 }
             }
