@@ -347,7 +347,7 @@ public class Utilities {
         int roll = MathUtility.clamp(Compute.d6(2) + bonus, 1, 12);
 
         return switch (roll) {
-            case 1 -> SkillType.EXP_ULTRA_GREEN;
+            case 1 -> EXP_ULTRA_GREEN;
             case 2, 3, 4, 5 -> EXP_GREEN;
             case 6, 7, 8, 9 -> EXP_REGULAR;
             case 10, 11 -> EXP_VETERAN;
