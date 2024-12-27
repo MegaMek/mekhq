@@ -21,7 +21,6 @@ package mekhq.campaign.stratcon;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -1733,13 +1732,13 @@ public class StratconRulesManager {
                 case MEK:
                 case TANK:
                 case PROTOMEK:
-                case UnitType.VTOL:
+                case VTOL:
                     retVal.get(AllGroundTerrain).add(forceID);
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case AEROSPACEFIGHTER:
                     retVal.get(Space).add(forceID);
                     // intentional fallthrough here, ASFs can go to atmospheric maps too
-                case UnitType.CONV_FIGHTER:
+                case CONV_FIGHTER:
                     retVal.get(LowAtmosphere).add(forceID);
                     break;
             }
@@ -2048,9 +2047,9 @@ public class StratconRulesManager {
     private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
         int unitType = template.getAllowedUnitType();
 
-        return ((unitType == UnitType.AEROSPACEFIGHTER) ||
-                (unitType == UnitType.CONV_FIGHTER) ||
-                (unitType == UnitType.DROPSHIP) ||
+        return ((unitType == AEROSPACEFIGHTER) ||
+                (unitType == CONV_FIGHTER) ||
+                (unitType == DROPSHIP) ||
                 (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) &&
                 (template.getStartingAltitude() > 0);
     }
@@ -2064,9 +2063,9 @@ public class StratconRulesManager {
     public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType) {
         // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
         if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
-            return primaryUnitType < UnitType.JUMPSHIP;
+            return primaryUnitType < JUMPSHIP;
         } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            return primaryUnitType >= UnitType.CONV_FIGHTER;
+            return primaryUnitType >= CONV_FIGHTER;
         } else {
             return primaryUnitType == unitType;
         }
@@ -2239,7 +2238,7 @@ public class StratconRulesManager {
             boolean isEligibleInfantry = ((u.getEntity().getUnitType() == INFANTRY)
                     || (u.getEntity().getUnitType() == BATTLE_ARMOR)) && !u.isUnmanned();
 
-            boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT;
+            boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == GUN_EMPLACEMENT;
 
             if ((isEligibleInfantry || isEligibleGunEmplacement)
                     && !u.isDeployed()
