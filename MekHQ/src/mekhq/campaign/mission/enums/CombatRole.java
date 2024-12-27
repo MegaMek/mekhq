@@ -62,7 +62,7 @@ public enum CombatRole {
         return this == GARRISON;
     }
 
-    public boolean isScouting() {
+    public boolean isRecon() {
         return this == RECON;
     }
 
