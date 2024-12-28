@@ -21,7 +21,6 @@ package mekhq.campaign.stratcon;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
-import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
@@ -63,6 +62,7 @@ import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.Coords.ALL_DIRECTIONS;
+import static megamek.common.UnitType.*;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -1461,15 +1461,7 @@ public class StratconRulesManager {
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
 
-            MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
-
-            String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
-
-            ScenarioTemplate scenarioTemplate = switch (mapLocation) {
-                case AllGroundTerrain, SpecificGroundTerrain -> ScenarioTemplate.Deserialize(String.format(templateString, ""));
-                case Space -> ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
-                case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-            };
+            ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
 
             generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
@@ -1501,19 +1493,52 @@ public class StratconRulesManager {
             CLOSING_SPAN_TAG, roll, targetNumber));
         campaign.addReport(reportStatus.toString());
 
-        MapLocation mapLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
-
-        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
-
-        ScenarioTemplate scenarioTemplate = switch (mapLocation) {
-            case AllGroundTerrain, SpecificGroundTerrain -> ScenarioTemplate.Deserialize(String.format(templateString, ""));
-            case Space -> ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
-            case LowAtmosphere -> ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
-        };
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
 
         generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
 
         return INTERCEPTED;
+    }
+
+    /**
+     * Retrieves the appropriate {@link ScenarioTemplate} for an interception scenario based on the
+     * provided {@link Force} and {@link Campaign}.
+     * <p>
+     * The method determines which scenario template file should be used by analyzing the primary unit
+     * type of the {@link Force} within the given {@link Campaign}. It then deserializes the template
+     * file into a {@link ScenarioTemplate} object.
+     * <p>
+     * Special cases:
+     * <ul>
+     *   <li>If the primary unit type is `CONV_FIGHTER` or `AEROSPACEFIGHTER` (and a random check passes),
+     *       a "Low-Atmosphere" template is selected.</li>
+     *   <li>If the primary unit type qualifies as an `AEROSPACEFIGHTER` or higher,
+     *       a "Space" template is selected.</li>
+     *   <li>Otherwise, the default template is used.</li>
+     * </ul>
+     *
+     * @param force    The {@link Force} instance that the scenario is based on.
+     *                 This is used to determine the primary unit type.
+     * @param campaign The {@link Campaign} in which the interception is taking place.
+     *                 Provides context for evaluating the {@link Force}.
+     * @return A {@link ScenarioTemplate} instance based on the template file matching the logic above,
+     *         or a default template if no specific case is matched.
+     * @see ScenarioTemplate#Deserialize(String)
+     */
+    private static ScenarioTemplate getInterceptionScenarioTemplate(Force force, Campaign campaign) {
+        String templateString = "data/scenariotemplates/%sReinforcements Intercepted.xml";
+
+        ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, ""));
+
+        int primaryUnitType = force.getPrimaryUnitType(campaign);
+
+        if ((primaryUnitType == CONV_FIGHTER)
+            || (primaryUnitType == AEROSPACEFIGHTER) && (randomInt(3) == 0)) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Low-Atmosphere "));
+        } else if (primaryUnitType >= AEROSPACEFIGHTER) {
+            scenarioTemplate = ScenarioTemplate.Deserialize(String.format(templateString, "Space "));
+        }
+        return scenarioTemplate;
     }
 
     /**
@@ -1702,18 +1727,18 @@ public class StratconRulesManager {
 
         for (int forceID : forceIDs) {
             switch (campaign.getForce(forceID).getPrimaryUnitType(campaign)) {
-                case UnitType.BATTLE_ARMOR:
-                case UnitType.INFANTRY:
-                case UnitType.MEK:
-                case UnitType.TANK:
-                case UnitType.PROTOMEK:
-                case UnitType.VTOL:
+                case BATTLE_ARMOR:
+                case INFANTRY:
+                case MEK:
+                case TANK:
+                case PROTOMEK:
+                case VTOL:
                     retVal.get(AllGroundTerrain).add(forceID);
                     break;
-                case UnitType.AEROSPACEFIGHTER:
+                case AEROSPACEFIGHTER:
                     retVal.get(Space).add(forceID);
                     // intentional fallthrough here, ASFs can go to atmospheric maps too
-                case UnitType.CONV_FIGHTER:
+                case CONV_FIGHTER:
                     retVal.get(LowAtmosphere).add(forceID);
                     break;
             }
@@ -1789,7 +1814,7 @@ public class StratconRulesManager {
         StratconScenario scenario = new StratconScenario();
 
         if (template == null) {
-            int unitType = UnitType.MEK;
+            int unitType = MEK;
 
             try {
                 unitType = campaign.getForce(forceID).getPrimaryUnitType(campaign);
@@ -2022,9 +2047,9 @@ public class StratconRulesManager {
     private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
         int unitType = template.getAllowedUnitType();
 
-        return ((unitType == UnitType.AEROSPACEFIGHTER) ||
-                (unitType == UnitType.CONV_FIGHTER) ||
-                (unitType == UnitType.DROPSHIP) ||
+        return ((unitType == AEROSPACEFIGHTER) ||
+                (unitType == CONV_FIGHTER) ||
+                (unitType == DROPSHIP) ||
                 (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) &&
                 (template.getStartingAltitude() > 0);
     }
@@ -2038,9 +2063,9 @@ public class StratconRulesManager {
     public static boolean forceCompositionMatchesDeclaredUnitType(int primaryUnitType, int unitType) {
         // special cases are "ATB_MIX" and "ATB_AERO_MIX", which encompass multiple unit types
         if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
-            return primaryUnitType < UnitType.JUMPSHIP;
+            return primaryUnitType < JUMPSHIP;
         } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            return primaryUnitType >= UnitType.CONV_FIGHTER;
+            return primaryUnitType >= CONV_FIGHTER;
         } else {
             return primaryUnitType == unitType;
         }
@@ -2210,10 +2235,10 @@ public class StratconRulesManager {
             // "defensive" units are infantry, battle armor and (Weisman help you) gun
             // emplacements
             // and also said unit should be intact/alive/etc
-            boolean isEligibleInfantry = ((u.getEntity().getUnitType() == UnitType.INFANTRY)
-                    || (u.getEntity().getUnitType() == UnitType.BATTLE_ARMOR)) && !u.isUnmanned();
+            boolean isEligibleInfantry = ((u.getEntity().getUnitType() == INFANTRY)
+                    || (u.getEntity().getUnitType() == BATTLE_ARMOR)) && !u.isUnmanned();
 
-            boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == UnitType.GUN_EMPLACEMENT;
+            boolean isEligibleGunEmplacement = u.getEntity().getUnitType() == GUN_EMPLACEMENT;
 
             if ((isEligibleInfantry || isEligibleGunEmplacement)
                     && !u.isDeployed()
