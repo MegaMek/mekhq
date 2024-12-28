@@ -2156,7 +2156,7 @@ public class StratconRulesManager {
                 continue;
             }
 
-            if (formation.getRole().isAuxiliary()) {
+            if (formation.getRole().isAuxiliary() && !reinforcements) {
                 continue;
             }
 
