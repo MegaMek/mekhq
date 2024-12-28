@@ -659,7 +659,7 @@ public class Academy implements Comparable<Academy> {
      *         false otherwise
      */
     public boolean hasRejectedApplication(Person person) {
-        return person.getEduFailedApplications().contains(this);
+        return person.getEduFailedApplications().contains(name + "::" + getEducationLevel(person));
     }
 
     /**

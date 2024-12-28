@@ -47,7 +47,6 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -216,7 +215,7 @@ public class Person {
     private int eduEducationTime;
     private int eduDaysOfTravel;
     private List<UUID> eduTagAlongs;
-    private List<Academy> eduFailedApplications;
+    private List<String> eduFailedApplications;
     // endregion Education
 
     // region Personality
@@ -1722,14 +1721,12 @@ public class Person {
         this.eduTagAlongs.add(tagAlong);
     }
 
-    public List<Academy> getEduFailedApplications() {
+    public List<String> getEduFailedApplications() {
         return eduFailedApplications;
     }
 
-    public void addEduFailedApplications(final Academy eduFailedApplications) {
-        if (!this.eduFailedApplications.contains(eduFailedApplications)) {
-            this.eduFailedApplications.add(eduFailedApplications);
-        }
+    public void addEduFailedApplications(final String failedApplication) {
+        eduFailedApplications.add(failedApplication);
     }
 
     /**
@@ -2174,6 +2171,16 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduTagAlongs");
             }
 
+            if (!eduTagAlongs.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "eduFailedApplications");
+
+                for (String failedApplication : eduFailedApplications) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduFailedApplication", failedApplication);
+                }
+
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduFailedApplications");
+            }
+
             if (eduAcademySystem != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
             }
@@ -2544,6 +2551,18 @@ public class Person {
                                 UUID uuid = UUID.fromString(uuidString);
 
                                 retVal.eduTagAlongs.add(uuid);
+                            }
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduFailedApplications")) {
+                    if (wn2.getNodeName().equalsIgnoreCase("eduFailedApplications")) {
+                        NodeList nodes = wn2.getChildNodes();
+
+                        for (int j = 0; j < nodes.getLength(); j++) {
+                            Node node = nodes.item(j);
+
+                            if (node.getNodeName().equalsIgnoreCase("eduFailedApplication")) {
+                                retVal.eduFailedApplications.add(node.getTextContent());
                             }
                         }
                     }
