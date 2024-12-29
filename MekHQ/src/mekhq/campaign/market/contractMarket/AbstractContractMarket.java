@@ -26,6 +26,8 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
@@ -246,7 +248,7 @@ public abstract class AbstractContractMarket {
         } else if (roll <= 9) {
             return SkillLevel.REGULAR;
         } else if (roll <= 11) {
-            return SkillLevel.VETERAN;
+            return VETERAN;
         } else {
             return SkillLevel.ELITE;
         }
@@ -403,6 +405,17 @@ public abstract class AbstractContractMarket {
         // Apply historical modifiers
         if (!contract.getEmployerFaction().isClan()) {
             mod += calculateHistoricalModifiers(year);
+        } else {
+            // Apply Clan clamping
+            if (contract.isAttacker()) {
+                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setAllySkill(VETERAN);
+                }
+            } else {
+                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setAllySkill(SkillLevel.REGULAR);
+                }
+            }
         }
 
         // Assign ally quality rating
@@ -434,6 +447,17 @@ public abstract class AbstractContractMarket {
         // Apply historical modifiers
         if (!enemyFaction.isClan()) {
             mod += calculateHistoricalModifiers(year);
+        } else {
+            // Apply Clan clamping
+            if (!contract.isAttacker()) {
+                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setAllySkill(VETERAN);
+                }
+            } else {
+                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setAllySkill(SkillLevel.REGULAR);
+                }
+            }
         }
 
         // Assign enemy quality rating
