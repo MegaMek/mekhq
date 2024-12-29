@@ -107,9 +107,9 @@ public class EducationController {
         if (roll >= targetNumber) {
             return true;
         } else {
-            // Mark the academy in the person's list of failed applications preventing
-            // re-application
-            person.addEduFailedApplications(academy);
+            // Mark the academy in the person's list of failed applications preventing re-application
+            person.addEduFailedApplications(academyNameInSet + "::" + academy.getEducationLevel(person));
+
             campaign.addReport(String.format(resources.getString("applicationFailure.text"),
                 person.getHyperlinkedFullTitle(),
                 ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
