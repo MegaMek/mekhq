@@ -25,9 +25,9 @@ import java.util.ResourceBundle;
 
 public enum CombatRole {
     // region Enum Declarations
-    MANEUVER("CombatRole.FRONTLINE.text", "CombatRole.FRONTLINE.toolTipText"),
+    MANEUVER("CombatRole.MANEUVER.text", "CombatRole.MANEUVER.toolTipText"),
     FRONTLINE("CombatRole.FRONTLINE.text", "CombatRole.FRONTLINE.toolTipText"),
-    PATROL("CombatRole.PATROL.text", "CombatRole.RECON.toolTipText"),
+    PATROL("CombatRole.PATROL.text", "CombatRole.PATROL.toolTipText"),
     TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
     AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
     RESERVE("CombatRole.RESERVE.text", "CombatRole.RESERVE.toolTipText");
