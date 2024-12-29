@@ -1014,7 +1014,7 @@ public class Scenario implements IPlayerSettings {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("stratConScenarioType")) {
-                    retVal.setStratConScenarioType(ScenarioType.valueOf(wn2.getTextContent().trim().toUpperCase()));
+                    retVal.setStratConScenarioType(ScenarioType.parseFromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(ScenarioStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
