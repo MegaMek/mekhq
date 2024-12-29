@@ -956,7 +956,7 @@ public class StratconRulesManager {
             return;
         }
 
-        boolean isRecon = combatTeam.getRole().isRecon();
+        boolean isRecon = combatTeam.getRole().isPatrol();
 
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
@@ -1249,7 +1249,7 @@ public class StratconRulesManager {
 
         // This may return null if we're deploying a force that isn't a Combat Team for whatever reason
         if (combatTeam != null) {
-            if (combatTeam.getRole().isRecon()) {
+            if (combatTeam.getRole().isPatrol()) {
                 for (int direction = 0; direction < 6; direction++) {
                     StratconCoords checkCoords = coords.translate(direction);
 
@@ -1701,7 +1701,7 @@ public class StratconRulesManager {
             if (commanderUnit != null) {
                 CombatTeam lance = campaign.getCombatTeamsTable().get(commanderUnit.getForceId());
 
-                return (lance != null) && lance.getRole().isGarrison();
+                return (lance != null) && lance.getRole().isFrontline();
             }
         }
 
@@ -2393,7 +2393,7 @@ public class StratconRulesManager {
             }
 
             if (campaignState.getSupportPoints() > 0) {
-                if (formation.getRole().isFrontline() || formation.getRole().isAuxiliary()) {
+                if (formation.getRole().isManeuver() || formation.getRole().isAuxiliary()) {
                     return AUXILIARY;
                 } else {
                     return ReinforcementEligibilityType.REGULAR;

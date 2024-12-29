@@ -3153,33 +3153,33 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnAtBBattleChance = new JSpinner[CombatRole.values().length - 2];
 
-        JLabel lblFightChance = new JLabel(CombatRole.FRONTLINE + ":");
+        JLabel lblFightChance = new JLabel(CombatRole.MANEUVER + ":");
         gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
         JSpinner atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.MANEUVER.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblDefendChance = new JLabel(CombatRole.GARRISON + ":");
+        JLabel lblDefendChance = new JLabel(CombatRole.FRONTLINE + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[CombatRole.GARRISON.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
-        JLabel lblScoutChance = new JLabel(CombatRole.RECON + ":");
+        JLabel lblScoutChance = new JLabel(CombatRole.PATROL + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 17;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        spnAtBBattleChance[CombatRole.RECON.ordinal()] = atbBattleChance;
+        spnAtBBattleChance[CombatRole.PATROL.ordinal()] = atbBattleChance;
         gridBagConstraints.gridx = 1;
         panSubAtBContract.add(atbBattleChance, gridBagConstraints);
 
@@ -8964,12 +8964,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         chkAdjustPaymentForStrategy.setSelected(options.isAdjustPaymentForStrategy());
+        spnAtBBattleChance[CombatRole.MANEUVER.ordinal()]
+                .setValue(options.getAtBBattleChance(CombatRole.MANEUVER));
         spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()]
                 .setValue(options.getAtBBattleChance(CombatRole.FRONTLINE));
-        spnAtBBattleChance[CombatRole.GARRISON.ordinal()]
-                .setValue(options.getAtBBattleChance(CombatRole.GARRISON));
-        spnAtBBattleChance[CombatRole.RECON.ordinal()]
-                .setValue(options.getAtBBattleChance(CombatRole.RECON));
+        spnAtBBattleChance[CombatRole.PATROL.ordinal()]
+                .setValue(options.getAtBBattleChance(CombatRole.PATROL));
         spnAtBBattleChance[CombatRole.TRAINING.ordinal()]
                 .setValue(options.getAtBBattleChance(CombatRole.TRAINING));
         btnIntensityUpdate.doClick();
@@ -9979,13 +9979,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private double determineAtBBattleIntensity() {
         double intensity = 0.0;
 
-        int x = (Integer) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
+        int x = (Integer) spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].getValue();
         intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[CombatRole.GARRISON.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
         intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[CombatRole.RECON.ordinal()].getValue();
+        x = (Integer) spnAtBBattleChance[CombatRole.PATROL.ordinal()].getValue();
         intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
         x = (Integer) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
@@ -10008,19 +10008,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (intensity >= AtBContract.MINIMUM_INTENSITY) {
                 int value = (int) Math.min(
                         Math.round(400.0 * intensity / (4.0 * intensity + 6.0) + 0.05), 100);
-                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(200.0 * intensity / (2.0 * intensity + 8.0) + 0.05),
                         100);
-                spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(600.0 * intensity / (6.0 * intensity + 4.0) + 0.05),
                         100);
-                spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(value);
+                spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(value);
                 value = (int) Math.min(Math.round(100.0 * intensity / (intensity + 9.0) + 0.05), 100);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(value);
             } else {
+                spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.GARRISON.ordinal()].setValue(0);
-                spnAtBBattleChance[CombatRole.RECON.ordinal()].setValue(0);
+                spnAtBBattleChance[CombatRole.PATROL.ordinal()].setValue(0);
                 spnAtBBattleChance[CombatRole.TRAINING.ordinal()].setValue(0);
             }
         }

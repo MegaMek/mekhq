@@ -180,7 +180,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             // Rout for a while
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
             final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
-            if (requiredLanceRole.isFrontline() || requiredLanceRole.isRecon()) {
+            if (requiredLanceRole.isManeuver() || requiredLanceRole.isPatrol()) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
                 destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
             } else {
