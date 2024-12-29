@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2016-2024 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,6 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -91,8 +90,6 @@ public final class BatchXPDialog extends JDialog {
         personnelModel.refreshData();
 
         initComponents();
-
-        setUserPreferences();
     }
 
     private void initComponents() {
@@ -103,41 +100,6 @@ public final class BatchXPDialog extends JDialog {
 
         pack();
         setLocationRelativeTo(getParent());
-    }
-
-    private void setUserPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
-
-            choiceType.setName("primaryRole");
-            preferences.manage(new JComboBoxPreference(choiceType));
-
-            choiceExp.setName("experienceLevel");
-            preferences.manage(new JComboBoxPreference(choiceExp));
-
-            choiceRank.setName("rank");
-            preferences.manage(new JComboBoxPreference(choiceRank));
-
-            onlyOfficers.setName("onlyOfficers");
-            preferences.manage(new JToggleButtonPreference(onlyOfficers));
-
-            noOfficers.setName("noOfficers");
-            preferences.manage(new JToggleButtonPreference(noOfficers));
-
-            choiceSkill.setName("skill");
-            preferences.manage(new JComboBoxPreference(choiceSkill));
-
-            skillLevel.setName("skillLevel");
-            preferences.manage(new JIntNumberSpinnerPreference(skillLevel));
-
-            allowPrisoners.setName("allowPrisoners");
-            preferences.manage(new JToggleButtonPreference(allowPrisoners));
-
-            this.setName("dialog");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
-        }
     }
 
     private JComponent getPersonnelTable() {
