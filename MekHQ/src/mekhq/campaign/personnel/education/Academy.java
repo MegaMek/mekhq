@@ -813,6 +813,12 @@ public class Academy implements Comparable<Academy> {
         tooltip.append("<br>");
 
         // with the skill content resolved, we can move onto the rest of the tooltip
+        if (!isLocal && !isHomeSchool) {
+            int targetNumber = campaign.getCampaignOptions().getEntranceExamBaseTargetNumber() - facultySkill;
+            tooltip.append("<b>").append(resources.getString("entranceExam.text"))
+                .append("</b> ").append(' ').append(targetNumber).append("+<br>");
+        }
+
         if (personnel.size() == 1) {
             tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
                     .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person)).append(" CSB")
