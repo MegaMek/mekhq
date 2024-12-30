@@ -40,8 +40,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogi
  * </p>
  */
 public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs the nag dialog for insufficient campaign funds.
      *
@@ -56,35 +54,33 @@ public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog {
     public UnableToAffordExpensesNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES);
 
-        this.campaign = campaign;
-
         Money monthlyExpenses = getMonthlyExpenses(campaign);
 
         final String DIALOG_BODY = "UnableToAffordExpensesNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false),
             monthlyExpenses.toAmountAndSymbolString()));
+        showDialog();
     }
 
     /**
-     * Determines whether the insufficient funds nag dialog should be displayed to the user.
+     * Checks if a nag dialog should be displayed for the inability to afford expenses in the given campaign.
      *
-     * <p>
-     * The dialog is displayed if:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *     <li>It's the last day of the month.</li>
-     *     <li>The nag dialog for insufficient funds is not ignored in MekHQ options.</li>
-     *     <li>The campaign's available funds are less than the calculated monthly expenses.</li>
+     *     <li>If it is the last day of the month in the campaign.</li>
+     *     <li>If the nag dialog for the inability to afford expenses has not been ignored in the user options.</li>
+     *     <li>If the campaign is unable to afford its expenses.</li>
      * </ul>
-     * If the conditions are met, the dialog is displayed to alert the player.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES;
 
-        if (campaign.getLocalDate().equals(campaign.getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))
+        return campaign.getLocalDate().equals(campaign.getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && unableToAffordExpenses(campaign)) {
-            showDialog();
-        }
+            && unableToAffordExpenses(campaign);
     }
 }

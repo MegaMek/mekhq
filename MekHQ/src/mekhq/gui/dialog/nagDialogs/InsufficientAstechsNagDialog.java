@@ -43,8 +43,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechsNagLogic.h
  * </ul>
  */
 public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs an {@code InsufficientAstechsNagDialog} for the given campaign.
      *
@@ -58,9 +56,6 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
      */
     public InsufficientAstechsNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
-
-        this.campaign = campaign;
-
         int asTechsNeeded = campaign.getAstechNeed();
 
         String pluralizer = (asTechsNeeded > 1) ? "s" : "";
@@ -68,27 +63,25 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
         final String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false), asTechsNeeded, pluralizer));
+        showDialog();
     }
 
     /**
-     * Evaluates whether the "Insufficient Astechs" nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for insufficient AsTechs in the given campaign.
      *
-     * <p>
-     * This method checks the following conditions:
+     * <p>The method evaluates the following conditions:</p>
      * <ul>
-     *   <li>If the "Insufficient Astechs" nag dialog has not been flagged as ignored
-     *       in the user options.</li>
-     *   <li>If the campaign has an unmet asTech requirement as determined by
-     *       {@code checkAsTechsNeededCount()}.</li>
+     *     <li>If the nag dialog for insufficient AsTechs has not been ignored in the user options.</li>
+     *     <li>If the campaign does not have the required number of AsTechs.</li>
      * </ul>
-     * If both conditions are met, the dialog is displayed.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECHS;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasAsTechsNeeded(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasAsTechsNeeded(campaign);
     }
 }

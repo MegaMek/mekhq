@@ -42,8 +42,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.
  * </p>
  */
 public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs the OutstandingScenariosNagDialog for the given campaign.
      *
@@ -57,8 +55,6 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
     public OutstandingScenariosNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
 
         String outstandingScenarios = getOutstandingScenarios(campaign);
@@ -70,27 +66,27 @@ public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
 
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false), outstandingScenarios, addendum));
+        showDialog();
     }
 
     /**
-     * Checks if the nag dialog should be displayed, based on the current campaign state.
+     * Checks if a nag dialog should be displayed for outstanding scenarios in the given campaign.
      *
-     * <p>
-     * The dialog is displayed if the following conditions are met:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *     <li>AtB campaigns are enabled in the campaign options.</li>
-     *     <li>The nag dialog for outstanding scenarios is not ignored in MekHQ options.</li>
-     *     <li>Outstanding scenarios exist in the campaign.</li>
+     *     <li>If the campaign is set to use AtB (Against the Bot) rules.</li>
+     *     <li>If the nag dialog for outstanding scenarios has not been ignored in the user options.</li>
+     *     <li>If there are outstanding scenarios in the campaign.</li>
      * </ul>
-     * If all these conditions are satisfied, the nag dialog is displayed to the user.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_OUTSTANDING_SCENARIOS;
 
-        if (campaign.getCampaignOptions().isUseAtB()
+        return campaign.getCampaignOptions().isUseAtB()
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasOutStandingScenarios(campaign)) {
-            showDialog();
-        }
+            && hasOutStandingScenarios(campaign);
     }
 }
