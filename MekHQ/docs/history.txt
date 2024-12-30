@@ -1,6 +1,6 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.02-SNAPSHOT
+0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
 + PR #5206: Re-enabled CamOps Contract Market Method
 + PR #5207: Re-enabled Confirm Preset Option for New Campaign Preset Picker
