@@ -35,8 +35,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.PregnantCombatantNagLogic.has
  * </p>
  */
 public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs the pregnant combatant nag dialog for the given campaign.
      *
@@ -51,29 +49,28 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
     public PregnantCombatantNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_PREGNANT_COMBATANT);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "PregnantCombatantNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Determines whether the nag dialog should be displayed to the user, based on campaign state
-     * and configuration.
+     * Checks if a nag dialog should be displayed for active pregnant combatants in the given campaign.
      *
-     * <p>
-     * This method checks if MekHQ options allow the "pregnant combatant" nag dialog to be shown,
-     * and if there are any pregnant personnel actively assigned to combat. If both conditions
-     * are met, the dialog is displayed to notify the user.
-     * </p>
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for active pregnant combatants has not been ignored in the user options.</li>
+     *     <li>If there are active pregnant combatants in the campaign.</li>
+     * </ul>
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_PREGNANT_COMBATANT;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (hasActivePregnantCombatant(campaign))) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && (hasActivePregnantCombatant(campaign));
     }
 }

@@ -35,8 +35,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.cam
  * </p>
  */
 public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs the nag dialog for unmaintained units.
      *
@@ -50,33 +48,29 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     public UnmaintainedUnitsNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Determines whether the nag dialog for unmaintained units should be displayed.
+     * Checks if a nag dialog should be displayed for the inability to afford loan payments in the given campaign.
      *
-     * <p>
-     * The dialog is shown if:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *     <li>Maintenance checks are enabled.</li>
-     *     <li>The nag dialog for unmaintained units is not ignored in MekHQ options.</li>
-     *     <li>There are unmaintained units in the campaign hangar, as determined by
-     *     {@code campaignHasUnmaintainedUnits()}.</li>
+     *     <li>If the nag dialog for the inability to afford loan payments has not been ignored in the user options.</li>
+     *     <li>If the campaign is unable to afford its loan payments.</li>
      * </ul>
-     * If both conditions are met, the dialog is displayed to alert the player to address unit maintenance.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_UNMAINTAINED_UNITS;
 
-        if (campaign.getCampaignOptions().isCheckMaintenance()
+        return campaign.getCampaignOptions().isCheckMaintenance()
             && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUnmaintainedUnits(campaign)) {
-            showDialog();
-        }
+            && campaignHasUnmaintainedUnits(campaign);
     }
 }

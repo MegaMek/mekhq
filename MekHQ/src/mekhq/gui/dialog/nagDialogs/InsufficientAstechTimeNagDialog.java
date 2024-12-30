@@ -44,8 +44,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAstechTimeNagLogi
  * </ul>
  */
 public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs an {@code InsufficientAstechTimeNagDialog} for the given campaign.
      *
@@ -61,8 +59,6 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
     public InsufficientAstechTimeNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
 
-        this.campaign = campaign;
-
         int asTechsTimeDeficit = getAsTechTimeDeficit(campaign);
 
         String pluralizer = (asTechsTimeDeficit > 1) ? "s" : "";
@@ -70,27 +66,25 @@ public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
         final String DIALOG_BODY = "InsufficientAstechTimeNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false), asTechsTimeDeficit, pluralizer));
+        showDialog();
     }
 
     /**
-     * Determines whether the "Insufficient Astech Time" nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for insufficient AsTech time in the given campaign.
      *
-     * <p>
-     * This method checks the following conditions:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *   <li>If the "Insufficient Astech Time" nag dialog is flagged as ignored in the user settings.</li>
-     *   <li>If there is a time deficit in the astech pool based on the campaign's
-     *   maintenance requirements.</li>
+     *     <li>If the nag dialog for insufficient AsTech time has not been ignored in the user options.</li>
+     *     <li>If there is a deficit in the available AsTech time for the given campaign.</li>
      * </ul>
-     * If both conditions are met, the dialog is displayed to alert the user about
-     * insufficient available time for astechs.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasAsTechTimeDeficit(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasAsTechTimeDeficit(campaign);
     }
 }
