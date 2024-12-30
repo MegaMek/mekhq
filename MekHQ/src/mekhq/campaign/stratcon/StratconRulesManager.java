@@ -1615,10 +1615,10 @@ public class StratconRulesManager {
             }
 
             reinforcementTargetNumber.addModifier(skillTargetNumber,
-                "Base TN (" + commandLiaison.getFullTitle() +')');
+                "Administration (" + commandLiaison.getFullTitle() +')');
         } else {
             reinforcementTargetNumber.addModifier(skillTargetNumber,
-                "Base TN (Unskilled)");
+                "Administration (Unskilled)");
         }
 
         // Facilities Modifier
