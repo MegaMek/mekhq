@@ -618,7 +618,7 @@ public class StratconScenarioWizard extends JDialog {
         }
         breakdownContents.append(String.format("<b>%s:</b> %s",
             resources.getString("reinforcementConfirmation.breakdown.total"),
-            reinforcementTargetNumber.getValue()));
+            reinforcementTargetNumber.getValue())).append('+');
         rightDescriptionMessage.append(breakdownContents);
 
         JLabel rightDescription = new JLabel(
@@ -640,11 +640,13 @@ public class StratconScenarioWizard extends JDialog {
         spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));
         JLabel lblSpinner = new JLabel(String.format("%s: ",
             resources.getString("reinforcementConfirmation.spinnerLabel")));
+        lblSpinner.setToolTipText(resources.getString("reinforcementConfirmation.spinnerLabel.tooltip"));
         lblSpinner.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         int availableSupportPoints = currentCampaignState.getSupportPoints();
         JSpinner spnSupportPointCost = new JSpinner(
             new SpinnerNumberModel(1, 1, availableSupportPoints, 1));
+        spnSupportPointCost.setToolTipText(resources.getString("reinforcementConfirmation.spinnerLabel.tooltip"));
         spnSupportPointCost.setMaximumSize(spnSupportPointCost.getPreferredSize());
         spnSupportPointCost.setAlignmentY(Component.CENTER_ALIGNMENT);
         spinnerPanel.add(lblSpinner);

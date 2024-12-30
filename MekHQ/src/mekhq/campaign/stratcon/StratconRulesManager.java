@@ -1562,7 +1562,7 @@ public class StratconRulesManager {
      * contract-related skill levels, and command rights configurations. Multiple modifiers
      * are applied step-by-step to generate the final {@link TargetRoll}.</p>
      *
-     * <h2>Steps in Calculation:</h2>
+     * <strong>Steps in Calculation:</strong>
      * <ol>
      *     <li><b>Base Target Number:</b></li>
      *             <li>-- If the {@code commandLiaison} is provided and has administrative skill,
