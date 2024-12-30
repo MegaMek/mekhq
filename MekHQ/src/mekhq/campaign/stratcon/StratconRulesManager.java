@@ -1417,7 +1417,7 @@ public class StratconRulesManager {
         if (interceptionRoll >= interceptionOdds) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return DELAYED;

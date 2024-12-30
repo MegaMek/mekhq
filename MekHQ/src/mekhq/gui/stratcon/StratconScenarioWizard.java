@@ -756,9 +756,17 @@ public class StratconScenarioWizard extends JDialog {
                         campaign, currentCampaignState);
 
                     // if we failed to deploy as reinforcements, move on to the next force
+                    if (reinforcementTargetNumber == null) {
+                        // If we've passed a null value into a reinforcement attempt, treat it as
+                        // an impossibly large number, so that it's clear something is wrong.
+                        reinforcementTargetNumber = 999;
+                        logger.error("null reinforcementTargetNumber incorrectly passed into" +
+                            " btnCommitClicked for reinforcement attempt");
+                    }
+
                     ReinforcementResultsType reinforcementResults = processReinforcementDeployment(force,
-                            reinforcementType, currentCampaignState, currentScenario, campaign,
-                            reinforcementTargetNumber, isGMReinforcement);
+                        reinforcementType, currentCampaignState, currentScenario, campaign,
+                        reinforcementTargetNumber, isGMReinforcement);
 
                     if (reinforcementResults.ordinal() >= FAILED.ordinal()) {
                         currentScenario.addFailedReinforcements(force.getId());
