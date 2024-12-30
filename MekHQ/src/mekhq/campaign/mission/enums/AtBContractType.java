@@ -201,17 +201,17 @@ public enum AtBContractType {
             case GARRISON_DUTY:
             case SECURITY_DUTY:
             case RIOT_DUTY:
-                return CombatRole.GARRISON;
+                return CombatRole.FRONTLINE;
             case GUERRILLA_WARFARE:
             case PIRATE_HUNTING:
             case PLANETARY_ASSAULT:
             case RELIEF_DUTY:
-                return CombatRole.FRONTLINE;
+                return CombatRole.MANEUVER;
             case DIVERSIONARY_RAID:
             case EXTRACTION_RAID:
             case OBJECTIVE_RAID:
             case RECON_RAID:
-                return CombatRole.RECON;
+                return CombatRole.PATROL;
             default:
                 return CombatRole.RESERVE;
         }
