@@ -186,6 +186,7 @@ MEKHQ VERSION HISTORY:
 + PR #5561: Added Missing in-House Bootcamps for NCOs, Warrant Officers, and Officers
 + PR #5562: Fixed Entrance Exam Logic and Added Tooltip Display
 + PR #5563: Log jvm parameters
++ PR #5565: Refactored StratCon Reinforcement Dialog & Added GM Reinforcement Option
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
