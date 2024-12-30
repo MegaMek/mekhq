@@ -60,7 +60,9 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -175,7 +177,7 @@ public class ResolverTest {
         when(scenario.getBlowingSand()).thenReturn(BlowingSand.BLOWING_SAND_NONE);
 
         // Lance setup
-        when(scenario.getCombatRole()).thenReturn(CombatRole.FRONTLINE);
+        when(scenario.getCombatRole()).thenReturn(CombatRole.MANEUVER);
         when(scenario.getId()).thenReturn(11);
 
         // Bots setup

@@ -46,6 +46,15 @@ public class SupportPointNegotiation {
      * @param campaign The {@link Campaign} instance managing the current game state.
      */
     public static void negotiateAdditionalSupportPoints(Campaign campaign) {
+        // Fetch all active contracts and sort them by start date (oldest -> newest)
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+
+        if (activeContracts.isEmpty()) {
+            return;
+        }
+
+        List<AtBContract> sortedContracts = getSortedContractsByStartDate(activeContracts);
+
         // Get sorted Admin/Transport personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
 
@@ -54,9 +63,6 @@ public class SupportPointNegotiation {
             addReportNoPersonnel(campaign, null);
             return;
         }
-
-        // Fetch all active contracts and sort them by start date (oldest -> newest)
-        List<AtBContract> sortedContracts = getSortedContractsByStartDate(campaign);
 
         // Iterate over contracts and negotiate support points
         for (AtBContract contract : sortedContracts) {
@@ -175,13 +181,11 @@ public class SupportPointNegotiation {
     }
 
     /**
-     * Retrieves and sorts all active AtB contracts by their start date in ascending order.
+     * Sorts all active AtB contracts by their start date in ascending order.
      *
-     * @param campaign The {@link Campaign} instance containing the active contracts.
      * @return A {@link List} of {@link AtBContract} instances, sorted by start date.
      */
-    private static List<AtBContract> getSortedContractsByStartDate(Campaign campaign) {
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+    private static List<AtBContract> getSortedContractsByStartDate(List<AtBContract> activeContracts) {
         activeContracts.sort(Comparator.comparing(AtBContract::getStartDate));
         return activeContracts;
     }
@@ -219,16 +223,16 @@ public class SupportPointNegotiation {
      */
     private static void addReportNoPersonnel(Campaign campaign, @Nullable AtBContract contract) {
         String reportKey = String.format("supportPoints.%s.noAdministrators",
-            contract == null ? "initial" : "monthly");
+            contract == null ? "monthly" : "initial");
 
-        if (contract != null) {
+        if (contract == null) {
             campaign.addReport(String.format(resources.getString(reportKey),
-                contract.getName(),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG
             ));
         } else {
             campaign.addReport(String.format(resources.getString(reportKey),
+                contract.getName(),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                 CLOSING_SPAN_TAG
             ));
