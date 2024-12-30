@@ -1652,12 +1652,10 @@ public class StratconRulesManager {
         reinforcementTargetNumber.addModifier(skillModifier, "Skill Modifier");
 
         // Liaison Modifier
-        int liaisonModifier = 0;
-        if (commandRights.isLiaison()) {
-            liaisonModifier -= 1;
+         if (commandRights.isLiaison()) {
+            int liaisonModifier = -1;
+            reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
         }
-
-        reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
 
         // Return final value
         return reinforcementTargetNumber;
