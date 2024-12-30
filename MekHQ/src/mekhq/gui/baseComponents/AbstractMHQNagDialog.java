@@ -57,7 +57,6 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * </ul>
  */
 public abstract class AbstractMHQNagDialog extends JDialog {
-    private final Campaign campaign;
     /**
      * Unique key for this nag dialog, used to track if the dialog has been ignored
      * by the user in the campaign settings.
@@ -67,7 +66,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
      * The right-side description label which displays the message.
      * Dynamically updated when {@link #setRightDescriptionMessage(String)} is called.
      */
-    private JLabel rightDescription = new JLabel();
+    private JLabel rightDescription;
     private String rightDescriptionMessage;
 
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
@@ -84,7 +83,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(AbstractMHQNagDialog.class);
 
     /**
-     * Constructs an AbstractMHQNagDialog_NEW with the provided campaign and nag key.
+     * Constructs an AbstractMHQNagDialog with the provided campaign and nag key.
      *
      * @param campaign The current campaign, used to determine speaker details and other contextual data.
      * @param nagKey   A unique key to identify this nag dialog for tracking ignore preferences.
@@ -92,7 +91,6 @@ public abstract class AbstractMHQNagDialog extends JDialog {
     public AbstractMHQNagDialog(final Campaign campaign, final String nagKey) {
         setTitle(resources.getString("incomingTransmission.title"));
 
-        this.campaign = campaign;
         this.nagKey = nagKey;
         this.rightDescriptionMessage = "";
 
@@ -124,7 +122,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Speaker description (below the icon)
-        StringBuilder speakerDescription = getSpeakerDescription(speaker, speakerName);
+        StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
         JLabel leftDescription = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 LEFT_WIDTH, speakerDescription));
@@ -240,11 +238,12 @@ public abstract class AbstractMHQNagDialog extends JDialog {
      *   <li>A fallback to the campaign name if the speaker is not available.</li>
      * </ul>
      *
+     * @param campaign    The current campaign.
      * @param speaker     The {@link Person} representing the speaker, or {@code null} to use fallback data.
      * @param speakerName The name/title to use for the speaker if one exists.
      * @return A {@link StringBuilder} containing the formatted HTML description of the speaker.
      */
-    private StringBuilder getSpeakerDescription(Person speaker, String speakerName) {
+    public static StringBuilder getSpeakerDescription(Campaign campaign, Person speaker, String speakerName) {
         StringBuilder speakerDescription = new StringBuilder();
 
         if (speaker != null) {

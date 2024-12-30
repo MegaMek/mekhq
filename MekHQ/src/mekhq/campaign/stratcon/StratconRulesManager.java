@@ -45,6 +45,7 @@ import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
@@ -71,7 +72,9 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGround
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.SkillType.S_TACTICS;
+import static mekhq.campaign.personnel.SkillType.getSkillHash;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.AUXILIARY;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
@@ -1323,31 +1326,29 @@ public class StratconRulesManager {
      * @param scenario                  the scenario to which the reinforcements are being deployed
      * @param campaign                  the overarching campaign instance managing the scenario
      * @param reinforcementTargetNumber the target number that the reinforcement roll must meet or exceed
+     * @param isGMReinforcement         {@code true} if the player is using GM powers to bypass the
+     *                                             reinforcement check, {@code false} otherwise.
      * @return a {@link ReinforcementResultsType} indicating the result of the reinforcement deployment:
-     *         <ul>
-     *             <li>{@link ReinforcementResultsType#SUCCESS} - The reinforcement is deployed successfully.</li>
-     *             <li>{@link ReinforcementResultsType#FAILED} - The reinforcement deployment fails.</li>
-     *             <li>{@link ReinforcementResultsType#DELAYED} - The reinforcement is delayed.</li>
-     *             <li>{@link ReinforcementResultsType#INTERCEPTED} - The reinforcement is intercepted,
-     *             possibly resulting in a new scenario.</li>
-     *         </ul>
+     * <ul>
+     *     <li>{@link ReinforcementResultsType#SUCCESS} - The reinforcement is deployed successfully.</li>
+     *     <li>{@link ReinforcementResultsType#FAILED} - The reinforcement deployment fails.</li>
+     *     <li>{@link ReinforcementResultsType#DELAYED} - The reinforcement is delayed.</li>
+     *     <li>{@link ReinforcementResultsType#INTERCEPTED} - The reinforcement is intercepted,
+     *     possibly resulting in a new scenario.</li>
+     * </ul>
      */
-    public static ReinforcementResultsType processReinforcementDeployment(
-        Force force, ReinforcementEligibilityType reinforcementType, StratconCampaignState campaignState,
-        StratconScenario scenario, Campaign campaign, int reinforcementTargetNumber) {
+    public static ReinforcementResultsType processReinforcementDeployment(Force force,
+                                                                          ReinforcementEligibilityType reinforcementType,
+                                                                          StratconCampaignState campaignState,
+                                                                          StratconScenario scenario,
+                                                                          Campaign campaign,
+                                                                          int reinforcementTargetNumber,
+                                                                          boolean isGMReinforcement) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
             MekHQ.getMHQOptions().getLocale());
 
         if (reinforcementType.equals(ReinforcementEligibilityType.CHAINED_SCENARIO)) {
             return SUCCESS;
-        }
-
-        if (reinforcementTargetNumber == 999) {
-            campaign.addReport(String.format(resources.getString("reinforcementsNoAdmin.text"),
-                scenario.getName(),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
-            return FAILED;
         }
 
         AtBContract contract = campaignState.getContract();
@@ -1364,17 +1365,29 @@ public class StratconRulesManager {
         // Make the roll
         int roll = d6(2);
 
-        // If the formation is in Fight Stance, use the highest of two rolls
-        String fightStanceReport = "";
+        // If the formation is set to Maneuver or Auxiliary, use the highest of two rolls
+        String maneuverRoleReport = "";
         if (reinforcementType == AUXILIARY) {
             int secondRoll = d6(2);
             roll = max(roll, secondRoll);
-            fightStanceReport = String.format(" (%s)", roll);
+            maneuverRoleReport = String.format(" (%s)", roll);
         }
 
         StringBuilder reportStatus = new StringBuilder();
-        reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
-                scenario.getName(), roll, fightStanceReport, reinforcementTargetNumber));
+
+        if (isGMReinforcement) {
+            reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text.gm"),
+                scenario.getName()));
+            reportStatus.append(' ');
+            reportStatus.append(String.format(resources.getString("reinforcementsAutomaticSuccess.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                CLOSING_SPAN_TAG));
+            campaign.addReport(reportStatus.toString());
+            return SUCCESS;
+        } else {
+            reportStatus.append(String.format(resources.getString("reinforcementsAttempt.text"),
+                scenario.getName(), roll, maneuverRoleReport, reinforcementTargetNumber));
+        }
 
         // Critical Failure
         if (roll == 2) {
@@ -1404,7 +1417,7 @@ public class StratconRulesManager {
         if (interceptionRoll >= interceptionOdds) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
                 CLOSING_SPAN_TAG));
             campaign.addReport(reportStatus.toString());
             return DELAYED;
@@ -1542,42 +1555,75 @@ public class StratconRulesManager {
     }
 
     /**
-     * Calculates the target number for a reinforcement attempt based on multiple factors, including
-     * campaign data, skill levels, track state, and contract details.
+     * Calculates the target roll required for determining reinforcements in a specific campaign scenario.
      *
-     * <p>This method computes a {@link TargetRoll}, which accounts for modifiers from different sources:
-     * <ul>
-     *     <li><b>Base Target Number:</b> The base skill target number as an initial value.</li>
-     *     <li><b>Facilities Modifier:</b> Adjustments based on ownership of facilities
-     *         on the given {@link StratconTrackState}, reducing the target number for player or allied ownership
-     *         and increasing it for enemy ownership.</li>
-     *     <li><b>Skill Modifiers:</b> Adjustments based on ally and enemy skill levels, as well as the command rights
-     *         provided by the {@link AtBContract}.</li>
-     *     <li><b>Liaison Modifiers:</b> Reductions based on the type of command rights
-     *         (e.g., Liaison, House, or Integrated).</li>
-     * </ul>
+     * <p>This method evaluates the reinforcement target number by considering various factors
+     * such as the administrative skill of the command liaison, facility ownership influence,
+     * contract-related skill levels, and command rights configurations. Multiple modifiers
+     * are applied step-by-step to generate the final {@link TargetRoll}.</p>
      *
-     * @param campaign          the {@link Campaign} representing the current campaign, which provides global game
-     *                          configuration and reputation data.
-     * @param commandLiaison    the {@link Person} performing the reinforcement check.
-     * @param skillTargetNumber the base target number derived from the skill level of the relevant unit or character.
-     * @param track             the {@link StratconTrackState} representing the current track in the strategic
-     *                          conflict, providing facility details for modifier calculations. Can be {@code null}.
-     * @param contract          the {@link AtBContract} containing the details of the ongoing contract, such as
-     *                          ally and enemy skill levels, and command rights.
-     * @return a {@link TargetRoll} object containing the calculated target number and all contributing modifiers.
+     * <strong>Steps in Calculation:</strong>
+     * <ol>
+     *     <li><b>Base Target Number:</b></li>
+     *             <li>-- If the {@code commandLiaison} is provided and has administrative skill,
+     *             it replaces the default base target number with their skill value.</li>
+     *             <li>-- If no liaison is provided, or they lack administrative skill, the base target
+     *             number remains at the default value.</li>
+     *     <li><b>Facilities Modifier:</b></li>
+     *             <li>-- Iterates through the facilities in the relevant track to determine their
+     *             ownership.</li>
+     *             <li>-- If a facility is owned by the player or allied forces, a negative modifier
+     *             is applied, reducing the target number.</li>
+     *             <li>-- If a facility is owned by non-allied forces, a positive modifier is applied,
+     *             increasing the target number.</li>
+     *     <li><b>Skill Modifier:</b></li>
+     *             <li>-- The skill modifier reflects the ally and enemy skill adjustments from the contract.</li>
+     *             <li>-- If the campaign is operating under an "Independent" rights condition, additional
+     *             checks and adjustments are made based on ally and enemy skill levels.</li>
+     *     <li><b>Liaison Command Modifier:</b></li>
+     *             <li>-- If command rights indicate that a liaison is required, the modifier is adjusted.</li>
+     * </ol>
+     *
+     * @param campaign         the {@link Campaign} instance representing the current operational campaign.
+     * @param scenario         the {@link StratconScenario} for which reinforcement details are being determined.
+     * @param commandLiaison   the {@link Person} acting as the command liaison, or {@code null} if no liaison exists.
+     * @param campaignState    the {@link StratconCampaignState} representing the state of the overarching campaign.
+     * @param contract         the {@link AtBContract} defining the terms of the contract for this scenario.
+     * @return                 a {@link TargetRoll} object representing the calculated reinforcement target number,
+     *                         with appropriate modifiers applied.
      */
     public static TargetRoll calculateReinforcementTargetNumber(Campaign campaign,
-                                                                Person commandLiaison,
-                                                                int skillTargetNumber,
-                                                                StratconTrackState track, AtBContract contract) {
+                                                                StratconScenario scenario,
+                                                                @Nullable Person commandLiaison,
+                                                                StratconCampaignState campaignState,
+                                                                AtBContract contract) {
+        // Create Target Roll
         TargetRoll reinforcementTargetNumber = new TargetRoll();
 
         // Base Target Number
-        reinforcementTargetNumber.addModifier(skillTargetNumber,
-            "Base TN (" + commandLiaison.getFullName() +')');
+        int skillTargetNumber = 12;
+        SkillType skillType = getSkillHash().get(S_ADMIN);
+        if (skillType != null) {
+            skillTargetNumber = getSkillHash().get(S_ADMIN).getTarget();
+        }
+
+        if (commandLiaison != null) {
+            Skill skill = commandLiaison.getSkill(S_ADMIN);
+
+            if (skill != null) {
+                skillTargetNumber = skill.getFinalSkillValue();
+            }
+
+            reinforcementTargetNumber.addModifier(skillTargetNumber,
+                "Administration (" + commandLiaison.getFullTitle() +')');
+        } else {
+            reinforcementTargetNumber.addModifier(skillTargetNumber,
+                "Administration (Unskilled)");
+        }
 
         // Facilities Modifier
+        StratconTrackState track = scenario.getTrackForScenario(campaign, campaignState);
+
         int facilityModifier = 0;
         if (track != null) {
             for (StratconFacility facility : track.getFacilities().values()) {
@@ -1606,12 +1652,10 @@ public class StratconRulesManager {
         reinforcementTargetNumber.addModifier(skillModifier, "Skill Modifier");
 
         // Liaison Modifier
-        int liaisonModifier = 0;
-        if (commandRights.isLiaison()) {
-            liaisonModifier -= 1;
+         if (commandRights.isLiaison()) {
+            int liaisonModifier = -1;
+            reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
         }
-
-        reinforcementTargetNumber.addModifier(liaisonModifier, "Liaison Command Rights");
 
         // Return final value
         return reinforcementTargetNumber;
