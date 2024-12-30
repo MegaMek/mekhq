@@ -83,7 +83,7 @@ public class EducationController {
         }
 
         // has the character already failed to apply to this academy?
-        if (person.getEduFailedApplications().contains(academy)) {
+        if (person.getEduFailedApplications().contains(academyNameInSet + "::" + academy.getEducationLevel(person))) {
             campaign.addReport(String.format(resources.getString("secondApplication.text"),
                     person.getHyperlinkedFullTitle(),
                     academyNameInSet,
