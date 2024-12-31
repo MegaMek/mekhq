@@ -4026,7 +4026,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)) {
             negotiateAdditionalSupportPoints(this);
         }
 
