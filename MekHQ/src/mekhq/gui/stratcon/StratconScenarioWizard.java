@@ -181,10 +181,8 @@ public class StratconScenarioWizard extends JDialog {
                 campaign, currentScenario.getPrimaryForceIDs(), leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
-            if (leadershipSkill > 0) {
-                setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-                gbc.gridy++;
-            }
+            setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
+            gbc.gridy++;
 
             if (currentScenario.getNumDefensivePoints() > 0) {
                 setDefensiveUI(gbc);
