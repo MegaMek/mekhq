@@ -1,6 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.03-SNAPSHOT
++ PR #5568: Spare parts rules reference adjustment
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
