@@ -176,4 +176,64 @@
         <qualificationStartYear>3050</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
+    <academy>
+        <name>In-House NCO Bootcamp</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>The In-House NCO Candidate Bootcamp is led by veteran personnel, blending physical conditioning, simulations, and practical exercises to instill leadership, cohesion, and loyalty.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>70</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>In-House NCO Graduate</qualification>
+        <curriculum>Leadership</curriculum>
+        <qualificationStartYear>3050</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>In-House Warrant Officer Bootcamp</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>Led by veteran experts, in-unit Warrant Officer bootcamps focus on advanced technical skills, leadership development, and unit cohesion, preparing candidates for specialized support roles.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>70</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>In-House Warrant Officer Graduate</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>In-House Officer Bootcamp</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>An iOfficer Bootcamp emphasizes leadership, tactical acumen, and strategic planning, blending classroom instruction, simulations, and field exercises to prepare candidates for command roles.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>70</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>In-House Field Officer Graduate</qualification>
+        <curriculum>Leadership, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>In-House Command Officer Graduate</qualification>
+        <curriculum>Leadership, Strategy</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
 </academies>

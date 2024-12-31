@@ -44,8 +44,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoComm
  * @see AbstractMHQNagDialog
  */
 public class NoCommanderNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs a {@code NoCommanderNagDialog} for a campaign.
      *
@@ -59,29 +57,27 @@ public class NoCommanderNagDialog extends AbstractMHQNagDialog {
     public NoCommanderNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_NO_COMMANDER);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "NoCommanderNagDialog.text";
         setRightDescriptionMessage(resources.getString(DIALOG_BODY));
+        showDialog();
     }
 
     /**
-     * Checks whether the "No Commander" nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for the absence of a commander in the given campaign.
      *
-     * <p>
-     * This method evaluates the following conditions:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *   <li>If the "No Commander" nag dialog is not flagged as ignored in the user settings.</li>
-     *   <li>If the campaign currently does not have a flagged commander.</li>
+     *     <li>If the nag dialog for the absence of a commander has not been ignored in the user options.</li>
+     *     <li>If the campaign does not have a commander assigned.</li>
      * </ul>
-     * If both conditions are true, the dialog is displayed.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    static public boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasNoCommander(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasNoCommander(campaign);
     }
 }

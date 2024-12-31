@@ -28,15 +28,19 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 import mekhq.utilities.ReportingUtilities;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.personnel.SkillType.EXP_REGULAR;
+import static mekhq.campaign.personnel.SkillType.EXP_VETERAN;
 
 /**
  * The EducationController class is responsible for managing the education
@@ -79,7 +83,7 @@ public class EducationController {
         }
 
         // has the character already failed to apply to this academy?
-        if (person.getEduFailedApplications().contains(academy)) {
+        if (person.getEduFailedApplications().contains(academyNameInSet + "::" + academy.getEducationLevel(person))) {
             campaign.addReport(String.format(resources.getString("secondApplication.text"),
                     person.getHyperlinkedFullTitle(),
                     academyNameInSet,
@@ -91,7 +95,7 @@ public class EducationController {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Calculate the roll based on Intelligence if necessary
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         if (campaignOptions.isUseRandomPersonalities()) {
             roll += (person.getIntelligence().getIntelligenceScore() / 4);
         }
@@ -103,9 +107,9 @@ public class EducationController {
         if (roll >= targetNumber) {
             return true;
         } else {
-            // Mark the academy in the person's list of failed applications preventing
-            // re-application
-            person.addEduFailedApplications(academy);
+            // Mark the academy in the person's list of failed applications preventing re-application
+            person.addEduFailedApplications(academyNameInSet + "::" + academy.getEducationLevel(person));
+
             campaign.addReport(String.format(resources.getString("applicationFailure.text"),
                 person.getHyperlinkedFullTitle(),
                 ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
@@ -322,7 +326,7 @@ public class EducationController {
                 MekHQ.getMHQOptions().getLocale());
 
         if (academy.isPrepSchool()) {
-            if (Compute.d6(1) <= 3) {
+            if (d6(1) <= 3) {
                 return campus + ' ' + generateTypeChild(resources) + ' ' + resources.getString("conjoinerOf.text") + ' '
                         + generateSuffix(resources);
             } else {
@@ -330,7 +334,7 @@ public class EducationController {
             }
         }
 
-        if (Compute.d6(1) <= 3) {
+        if (d6(1) <= 3) {
             if (academy.isMilitary()) {
                 return campus + ' ' + generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' '
                         + resources.getString("conjoinerOf.text") + ' ' + generateSuffix(resources);
@@ -357,7 +361,7 @@ public class EducationController {
      * @throws IllegalStateException if an unexpected roll occurs
      */
     private static String generateMilitaryPrefix(ResourceBundle resources) {
-        return switch (Compute.d6(1)) {
+        return switch (d6(1)) {
             case 1 -> resources.getString("prefixCombinedArms.text");
             case 2 -> resources.getString("prefixCombinedForces.text");
             case 3 -> resources.getString("prefixMilitary.text");
@@ -376,7 +380,7 @@ public class EducationController {
      * @throws IllegalStateException if the random roll is unexpected.
      */
     private static String generateSuffix(ResourceBundle resources) {
-        return switch (Compute.d6(1)) {
+        return switch (d6(1)) {
             case 1 -> resources.getString("suffixTechnology.text");
             case 2 -> resources.getString("suffixTechnologyAdvanced.text");
             case 3 -> resources.getString("suffixScience.text");
@@ -397,7 +401,7 @@ public class EducationController {
      * @throws IllegalStateException if the generated roll is unexpected
      */
     private static String generateTypeAdult(ResourceBundle resources) {
-        return switch (Compute.d6(1)) {
+        return switch (d6(1)) {
             case 1 -> resources.getString("typeAcademy.text");
             case 2 -> resources.getString("typeCollege.text");
             case 3 -> resources.getString("typeInstitute.text");
@@ -418,7 +422,7 @@ public class EducationController {
      * @throws IllegalStateException if the generated roll is unexpected
      */
     private static String generateTypeChild(ResourceBundle resources) {
-        return switch (Compute.d6(1)) {
+        return switch (d6(1)) {
             case 1 -> resources.getString("typeAcademy.text");
             case 2 -> resources.getString("typePreparatorySchool.text");
             case 3 -> resources.getString("typeInstitute.text");
@@ -741,7 +745,7 @@ public class EducationController {
 
             if (roll == 0) {
                 if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
-                    if (Compute.d6(2) >= 5) {
+                    if (d6(2) >= 5) {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
                         String resultString = String.format(resources.getString("eventTrainingAccidentKilled.text"),
@@ -774,7 +778,7 @@ public class EducationController {
      */
     private static void processTrainingInjury(Campaign campaign, Academy academy, Person person,
             ResourceBundle resources) {
-        int roll = Compute.d6(3);
+        int roll = d6(3);
 
         String resultString = String.format(resources.getString("eventTrainingAccidentWounded.text"),
                 ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
@@ -974,7 +978,7 @@ public class EducationController {
         if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear())
                 || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
             if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
-                if (Compute.d6(2) >= 5) {
+                if (d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
                             person.getHyperlinkedFullTitle(),
                             ReportingUtilities
@@ -1083,7 +1087,7 @@ public class EducationController {
 
         // class resits required
         if (graduationRoll < 20) {
-            roll = Compute.d6(3);
+            roll = d6(3);
 
             String reportMessage = String.format(resources.getString("graduatedClassNeeded.text"),
                     person.getHyperlinkedFullTitle(),
@@ -1099,7 +1103,7 @@ public class EducationController {
         }
 
         if (graduationRoll >= 99) {
-            if (Compute.d6(1) >= 5) {
+            if (d6(1) >= 5) {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                             person.getHyperlinkedFullTitle(),
@@ -1160,7 +1164,7 @@ public class EducationController {
 
         // graduated with honors
         if (graduationRoll >= 90) {
-            if (Compute.d6(1) >= 5) {
+            if (d6(1) >= 5) {
 
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
@@ -1221,7 +1225,7 @@ public class EducationController {
         }
 
         // default graduation
-        if (Compute.d6(1) >= 5) {
+        if (d6(1) >= 5) {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                         person.getHyperlinkedFullTitle(),
@@ -1419,7 +1423,7 @@ public class EducationController {
      * @param person the person whose loyalty is to be adjusted
      */
     private static void adjustLoyalty(Person person) {
-        int roll = Compute.d6(1);
+        int roll = d6(1);
 
         if (roll == 1) {
             person.setLoyalty(person.getLoyalty() - 1);
@@ -1463,7 +1467,7 @@ public class EducationController {
             List<Integer> rolls = new ArrayList<>();
 
             for (int roll = 0; roll < 4; roll++) {
-                rolls.add(Compute.d6(1));
+                rolls.add(d6(1));
             }
 
             Collections.sort(rolls);
@@ -1645,46 +1649,6 @@ public class EducationController {
         Collections.shuffle(graduationEventTable);
 
         return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
-    }
-
-    /**
-     * Sets the initial education level for a person based on their age and experience level.
-     *
-     * @param campaign the current campaign
-     * @param person the person whose education level needs to be set
-     */
-    public static void setInitialEducation(Campaign campaign, Person person) {
-        LocalDate today = campaign.getLocalDate();
-
-        // If the person is younger than 16, set their highest education as early childhood
-        if (person.getAge(today) < 16) {
-            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-            return;
-        }
-
-        int experienceLevel = person.getExperienceLevel(campaign, false);
-
-        // If the person's primary role is support
-        if (person.getPrimaryRole().isSupport(true)) {
-            if (experienceLevel == SkillType.EXP_VETERAN) {
-                // If experience level is Veteran, set Education level as Post Graduate
-                person.setEduHighestEducation(EducationLevel.POST_GRADUATE);
-                return;
-            } else if (experienceLevel == SkillType.EXP_ELITE) {
-                // If experience level is Elite, assign Doctorate level qualification and prefix Dr.
-                person.setEduHighestEducation(EducationLevel.DOCTORATE);
-                person.setPreNominal("Dr");
-                return;
-            }
-        }
-
-        // If the person's experience level is above Ultra-Green, assign College level education
-        // Else, assign them High School level education
-        if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
-            person.setEduHighestEducation(EducationLevel.COLLEGE);
-        } else {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
     }
 
     /**
@@ -1918,5 +1882,141 @@ public class EducationController {
                 "surpriseMishap.text",
                 "surpriseMisunderstanding.text",
                 "surpriseRejection.text");
+    }
+
+    /**
+     * Sets the initial education level for a person based on their age, experience level, intelligence,
+     * a random pass/fail system, and their primary role.
+     * Additionally, assigns a pre-nominal ("Dr") for individuals who achieve a doctorate-level education.
+     *
+     * <p>The method applies the following rules:</p>
+     * <ul>
+     *   <li>Persons younger than 16 are automatically assigned the "Early Childhood" education level.</li>
+     *   <li>For individuals aged 16 or older, a pass/fail rate (based on intelligence and default thresholds)
+     *   determines whether they flunk or succeed at further education.</li>
+     *   <li>The assigned education level depends on their experience level and whether they have a combat or non-combat role.</li>
+     *   <li>If the person's education reaches the doctorate level, they are granted the pre-nominal "Dr".</li>
+     * </ul>
+     *
+     * <p>The pass rate is influenced by the campaign's settings. When using random personalities, the person's
+     * intelligence modifies the base pass rate (defaulting to average intelligence if personalities are disabled).</p>
+     *
+     * @param campaign the campaign context, used to retrieve the current date, options, and calculate the person's experience.
+     * @param person   the person whose initial education level is being set.
+     */
+    public static void setInitialEducationLevel(final Campaign campaign, final Person person) {
+        // Retrieve the current date and the person's age
+        final LocalDate today = campaign.getLocalDate();
+        final int age = person.getAge(today);
+
+        // Assign "Early Childhood" education if the person is younger than 16
+        if (age < 16) {
+            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+            return;
+        }
+
+        // Get the person's experience level and role (combat or non-combat)
+        final int experienceLevel = person.getExperienceLevel(campaign, false);
+        final boolean isCombatRole = person.getPrimaryRole().isCombat();
+
+        // We base passRate on US averages
+        int passRate = 60 - (Intelligence.values().length / 2);
+        final int intelligenceModifier = campaign.getCampaignOptions().isUseRandomPersonalities()
+            ? person.getIntelligence().getIntelligenceScore()
+            : Intelligence.values().length / 2;
+        passRate += intelligenceModifier;
+
+        final boolean flunked = Compute.randomInt(100) >= passRate;
+
+        EducationLevel educationLevel;
+        if (isCombatRole) {
+            // Determine education levels for combat roles
+            educationLevel = getCombatEducationLevel(experienceLevel, flunked, passRate);
+        } else {
+            // Determine education levels for non-combat roles
+            educationLevel = getNonCombatEducationLevel(experienceLevel, flunked, passRate);
+        }
+
+        // Assign the determined education level
+        person.setEduHighestEducation(educationLevel);
+
+        // Optionally assign a pre-nominal for doctorate-level education
+        if (educationLevel.isDoctorate()) {
+            person.setPreNominal("Dr");
+        }
+    }
+
+    /**
+     * Determines the education level for individuals in combat roles based on their experience level,
+     * intelligence-based pass/fail rate, and whether they flunked previously.
+     *
+     * <p>The following rules are applied:</p>
+     * <ul>
+     *   <li>If the experience level is below "regular", the education level is either:</li>
+     *       <li>-- "Early Childhood" if the individual flunked (with a second-chance roll based on the pass rate), or</li>
+     *       <li>-- "High School" if they succeed.</li>
+     *   <li>If the experience level is "regular" or higher, the education level is either:</li>
+     *       <li>-- "High School" if the individual flunked, or</li>
+     *       <li>-- "College" if they succeed.</li>
+     * </ul>
+     *
+     * @param experienceLevel the person's experience level (e.g., below regular, regular, or higher).
+     * @param flunked         whether the person initially flunked based on the pass rate.
+     * @param passRate        the calculated pass rate based on default thresholds and intelligence modifiers.
+     * @return the appropriate {@link EducationLevel} based on the person's experience level and final success status.
+     */
+    private static EducationLevel getCombatEducationLevel(final int experienceLevel, boolean flunked, final int passRate) {
+        if (experienceLevel < EXP_REGULAR) {
+            // Second-chance roll for High School
+            if (flunked) {
+                flunked = Compute.randomInt(100) < passRate;
+            }
+
+            return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
+        }
+        return flunked ? EducationLevel.HIGH_SCHOOL : EducationLevel.COLLEGE;
+    }
+
+    /**
+     * Determines the education level for individuals in non-combat roles based on their experience level,
+     * intelligence-based pass/fail rate, and whether they flunked previously.
+     *
+     * <p>The following rules are applied:</p>
+     * <ul>
+     *   <li>If the experience level is below "regular", the education level is either:</li>
+     *       <li>-- "Early Childhood" if the individual flunked (with a second-chance roll based on the pass rate), or</li>
+     *       <li>-- "High School" if they succeed.</li>
+     *   <li>If the experience level is "regular", the education level is either:</li>
+     *       <li>-- "High School" if the individual flunked, or</li>
+     *       <li>-- "College" if they succeed.</li>
+     *   <li>If the experience level is "veteran", the education level is either:</li>
+     *       <li>-- "College" if the individual flunked, or</li>
+     *       <li>-- "Post-Graduate" if they succeed.</li>
+     *   <li>If the experience level is above "veteran", the education level is either:</li>
+     *       <li>-- "Post-Graduate" if the individual flunked, or</li>
+     *       <li>-- "Doctorate" if they succeed.</li>
+     * </ul>
+     *
+     * @param experienceLevel the person's experience level (e.g., below regular, regular, veteran, or higher).
+     * @param flunked         whether the person initially flunked based on the pass rate.
+     * @param passRate        the calculated pass rate based on default thresholds and intelligence modifiers.
+     * @return the appropriate {@link EducationLevel} based on the person's experience level and final success status.
+     */
+    private static EducationLevel getNonCombatEducationLevel(final int experienceLevel,
+                                                             boolean flunked, final int passRate) {
+        if (experienceLevel < EXP_REGULAR) {
+            // Second-chance roll for High School
+            if (flunked) {
+                flunked = Compute.randomInt(100) < passRate;
+            }
+
+            return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
+        } else if (experienceLevel == EXP_REGULAR) {
+            return flunked ? EducationLevel.HIGH_SCHOOL : EducationLevel.COLLEGE;
+        } else if (experienceLevel == EXP_VETERAN) {
+            return flunked ? EducationLevel.COLLEGE : EducationLevel.POST_GRADUATE;
+        } else {
+            return flunked ? EducationLevel.POST_GRADUATE : EducationLevel.DOCTORATE;
+        }
     }
 }

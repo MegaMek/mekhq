@@ -35,8 +35,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.ca
  * </p>
  */
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs the nag dialog for untreated personnel injuries.
      *
@@ -50,31 +48,28 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     public UntreatedPersonnelNagDialog(Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "UntreatedPersonnelNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Determines whether the untreated personnel nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for untreated personnel injuries in the given campaign.
      *
-     * <p>
-     * The dialog is triggered if:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *     <li>The nag dialog for untreated personnel is not ignored in MekHQ options.</li>
-     *     <li>There are untreated injuries in the campaign, as determined by
-     *     {@code campaignHasUntreatedInjuries()}.</li>
+     *     <li>If the nag dialog for untreated personnel injuries has not been ignored in the user options.</li>
+     *     <li>If the campaign has untreated injuries among its personnel.</li>
      * </ul>
-     * If these conditions are met, the dialog is displayed to remind the user to address untreated injuries.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_UNTREATED_PERSONNEL;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && campaignHasUntreatedInjuries(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && campaignHasUntreatedInjuries(campaign);
     }
 }

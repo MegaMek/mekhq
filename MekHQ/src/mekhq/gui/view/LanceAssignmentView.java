@@ -45,8 +45,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
-import static mekhq.campaign.mission.enums.CombatRole.GARRISON;
-import static mekhq.campaign.mission.enums.CombatRole.RECON;
+import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
 
 /**
@@ -299,8 +299,8 @@ class RequiredLancesTableModel extends DataTableModel {
     public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<AtBContract>();
-        columnNames = new String[]{"Contract", "Total", FRONTLINE.toString(), GARRISON.toString(),
-            RECON.toString(), TRAINING.toString()};
+        columnNames = new String[]{"Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(),
+            PATROL.toString(), TRAINING.toString()};
     }
 
     @Override

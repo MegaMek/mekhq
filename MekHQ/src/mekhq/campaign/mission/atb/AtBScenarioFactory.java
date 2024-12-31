@@ -229,7 +229,7 @@ public class AtBScenarioFactory {
                     List<CombatTeam> lList = new ArrayList<>();
                     for (CombatTeam combatTeam : combatTeamsTable.values()) {
                         if ((combatTeam.getMissionId() == contract.getId())
-                            && combatTeam.getRole().isGarrison() && combatTeam.isEligible(campaign)) {
+                            && combatTeam.getRole().isFrontline() && combatTeam.isEligible(campaign)) {
                             lList.add(combatTeam);
                         }
                     }

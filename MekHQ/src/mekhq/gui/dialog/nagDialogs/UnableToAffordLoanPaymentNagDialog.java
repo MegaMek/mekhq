@@ -38,8 +38,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.
  * </p>
  */
 public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs the nag dialog for insufficient funds to cover loan payments.
      *
@@ -54,34 +52,31 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
     public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
 
-        this.campaign = campaign;
-
         Money totalPaymentsDue = getTotalPaymentsDue(campaign);
 
         final String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false),
             totalPaymentsDue.toAmountAndSymbolString()));
+        showDialog();
     }
 
     /**
-     * Determines whether the insufficient loan payment funds nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for the inability to afford loan payments in the given campaign.
      *
-     * <p>
-     * The dialog is displayed if:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *     <li>The nag dialog for loan payments is not ignored in MekHQ options.</li>
-     *     <li>The total loan payments due tomorrow exceed the campaign's available funds.</li>
+     *     <li>If the nag dialog for the inability to afford loan payments has not been ignored in the user options.</li>
+     *     <li>If the campaign is unable to afford its loan payments.</li>
      * </ul>
-     * If both conditions are met, the user is shown the dialog to alert them about upcoming
-     * loan payment issues.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && unableToAffordLoans(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && unableToAffordLoans(campaign);
     }
 }

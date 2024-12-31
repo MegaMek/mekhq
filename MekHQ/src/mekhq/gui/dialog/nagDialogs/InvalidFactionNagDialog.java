@@ -42,8 +42,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFact
  * </ul>
  */
 public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs an {@code InvalidFactionNagDialog} for the given campaign.
      *
@@ -59,32 +57,28 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
     public InvalidFactionNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INVALID_FACTION);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "InvalidFactionNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Determines whether the "Invalid Faction" nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for an invalid faction in the given campaign.
      *
-     * <p>
-     * This method checks the following conditions:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *   <li>If the "Invalid Faction" nag dialog is flagged as ignored in user settings.</li>
-     *   <li>If the campaign's faction is invalid for the current in-game date,
-     *   as determined by {@code isFactionInvalid()}.</li>
+     *     <li>If the nag dialog for an invalid faction has not been ignored in the user options.</li>
+     *     <li>If the faction associated with the campaign is considered invalid.</li>
      * </ul>
-     * If both conditions are met, the dialog is displayed to notify the user of the issue.
-
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_INVALID_FACTION;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && (isFactionInvalid(campaign))) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && (isFactionInvalid(campaign));
     }
 }

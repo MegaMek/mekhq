@@ -42,8 +42,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.EndContractNagLogic.isContrac
  * </ul>
  */
 public class EndContractNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs an {@code EndContractNagDialog} for the given campaign.
      *
@@ -58,31 +56,28 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
     public EndContractNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_CONTRACT_ENDED);
 
-        this.campaign = campaign;
-
         final String DIALOG_BODY = "EndContractNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Checks if the "Contract End" nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for an ended contract within the given campaign.
      *
-     * <p>
-     * This method evaluates whether the nag dialog for contract end dates should be shown.
-     * It checks the following conditions:
+     * <p>The method evaluates the following conditions:</p>
      * <ul>
-     *   <li>If the "Contract Ended" nag dialog is flagged as ignored in the user’s settings.</li>
-     *   <li>If any active contracts in the campaign are ending on the current date.</li>
+     *     <li>If the nag dialog for an ended contract has not been ignored in the user options.</li>
+     *     <li>If the contract associated with the provided campaign has ended.</li>
      * </ul>
-     * If these conditions are met, the dialog is displayed.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_CONTRACT_ENDED;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && isContractEnded(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && isContractEnded(campaign);
     }
 }

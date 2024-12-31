@@ -76,6 +76,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.UUID;
 
@@ -305,6 +306,9 @@ public class MekHQ implements GameListener {
 
         // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
+
+        // log jvm parameters
+        logger.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
     public static void initializeLogging(final String originProject) {
