@@ -43,8 +43,6 @@ import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientMedicsNagLogic.ha
  * </ul>
  */
 public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
-    private final Campaign campaign;
-
     /**
      * Constructs an {@code InsufficientMedicsNagDialog} for the given campaign.
      *
@@ -60,8 +58,6 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
     public InsufficientMedicsNagDialog(final Campaign campaign) {
         super(campaign, MHQConstants.NAG_INSUFFICIENT_MEDICS);
 
-        this.campaign = campaign;
-
         int medicsRequired =  campaign.getMedicsNeed();
 
         String pluralizer = (medicsRequired > 1) ? "s" : "";
@@ -69,27 +65,25 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
         final String DIALOG_BODY = "InsufficientMedicsNagDialog.text";
         setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
             campaign.getCommanderAddress(false), medicsRequired, pluralizer));
+        showDialog();
     }
 
     /**
-     * Determines whether the "Insufficient Medics" nag dialog should be displayed.
+     * Checks if a nag dialog should be displayed for insufficient medics in the given campaign.
      *
-     * <p>
-     * This method checks the following conditions:
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
      * <ul>
-     *   <li>If the "Insufficient Medics" nag dialog is flagged as ignored in the user settings.</li>
-     *   <li>If the campaign currently requires more medics than are available, as determined by
-     *   {@code checkMedicsNeededCount()}.</li>
+     *     <li>If the nag dialog for insufficient medics has not been ignored in the user options.</li>
+     *     <li>If the campaign does not have the required number of medics.</li>
      * </ul>
-     * If both conditions are met, the dialog is displayed to notify the user about
-     * the medic shortage.
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public void checkNag() {
+    public static boolean checkNag(Campaign campaign) {
         final String NAG_KEY = MHQConstants.NAG_INSUFFICIENT_MEDICS;
 
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
-            && hasMedicsNeeded(campaign)) {
-            showDialog();
-        }
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasMedicsNeeded(campaign);
     }
 }

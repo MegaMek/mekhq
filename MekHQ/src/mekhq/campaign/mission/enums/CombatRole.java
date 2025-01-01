@@ -25,9 +25,9 @@ import java.util.ResourceBundle;
 
 public enum CombatRole {
     // region Enum Declarations
+    MANEUVER("CombatRole.MANEUVER.text", "CombatRole.MANEUVER.toolTipText"),
     FRONTLINE("CombatRole.FRONTLINE.text", "CombatRole.FRONTLINE.toolTipText"),
-    GARRISON("CombatRole.GARRISON.text", "CombatRole.GARRISON.toolTipText"),
-    RECON("CombatRole.RECON.text", "CombatRole.RECON.toolTipText"),
+    PATROL("CombatRole.PATROL.text", "CombatRole.PATROL.toolTipText"),
     TRAINING("CombatRole.TRAINING.text", "CombatRole.TRAINING.toolTipText"),
     AUXILIARY("CombatRole.AUXILIARY.text", "CombatRole.AUXILIARY.toolTipText"),
     RESERVE("CombatRole.RESERVE.text", "CombatRole.RESERVE.toolTipText");
@@ -54,16 +54,16 @@ public enum CombatRole {
     // endregion Getters
 
     // region Boolean Comparison Methods
+    public boolean isManeuver() {
+        return this == MANEUVER;
+    }
+
     public boolean isFrontline() {
         return this == FRONTLINE;
     }
 
-    public boolean isGarrison() {
-        return this == GARRISON;
-    }
-
-    public boolean isRecon() {
-        return this == RECON;
+    public boolean isPatrol() {
+        return this == PATROL;
     }
 
     public boolean isTraining() {
@@ -110,9 +110,9 @@ public enum CombatRole {
 
         // <50.02 compatibility handler
         return switch (text) {
-            case "FIGHTING" -> FRONTLINE;
-            case "SCOUTING" -> RECON;
-            case "DEFENCE" -> GARRISON;
+            case "FIGHTING" -> MANEUVER;
+            case "SCOUTING", "RECON" -> PATROL;
+            case "DEFENCE", "GARRISON" -> FRONTLINE;
             case "IN_RESERVE", "UNASSIGNED" -> RESERVE;
             default -> {
                 MMLogger.create(CombatRole.class)

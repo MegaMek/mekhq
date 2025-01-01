@@ -1,6 +1,9 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.02-SNAPSHOT
+0.50.03-SNAPSHOT
++ PR #5568: Spare parts rules reference adjustment
+
+0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
 + PR #5206: Re-enabled CamOps Contract Market Method
 + PR #5207: Re-enabled Confirm Preset Option for New Campaign Preset Picker
@@ -180,7 +183,14 @@ MEKHQ VERSION HISTORY:
 + Fix #5543: Refactored ScenarioType Parsing Logic
 + Fix #5542: Remove User Preferences Handling from BatchXPDialog
 + PR #5551: Refactored Initial Education Logic
-
++ PR #5557: Refactored Ally and Enemy Rating Calculations for Contracts
++ Fix #5556: Refactored Combat Roles for Clarity
++ PR #5560: Fixed Support Point Negotiation Report
++ PR #5561: Added Missing in-House Bootcamps for NCOs, Warrant Officers, and Officers
++ PR #5562: Fixed Entrance Exam Logic and Added Tooltip Display
++ PR #5563: Log jvm parameters
++ PR #5565: Refactored StratCon Reinforcement Dialog & Added GM Reinforcement Option
++ PR #5566: Refactored Nag Dialog Checks to Improve Performance 
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
