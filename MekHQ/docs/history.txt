@@ -2,6 +2,9 @@ MEKHQ VERSION HISTORY:
 ---------------
 0.50.03-SNAPSHOT
 + PR #5568: Spare parts rules reference adjustment
++ PR #5559: Refactored Combat Team Handling in Scenarios for Better null Safety
++ Fix #5572: don't attempt to sum NaN tonnage equipment
++ PR #5577: Leadership Units & Support Point Scarcity Hot Fixes
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
