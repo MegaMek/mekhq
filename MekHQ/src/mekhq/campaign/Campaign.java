@@ -3924,9 +3924,9 @@ public class Campaign implements ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
-                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = s.getCombatTeamId();
+            for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
+                if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(getLocalDate())) {
+                    int forceId = atBScenario.getCombatTeamId();
                     if ((combatTeams.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
@@ -3940,20 +3940,20 @@ public class Campaign implements ITechManager {
                         }
 
                         if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(s.getId(), this);
-                            s.addForces(forceId);
+                            forceIds.get(forceId).setScenarioId(atBScenario.getId(), this);
+                            atBScenario.addForces(forceId);
 
                             addReport(MessageFormat.format(
                                     resources.getString("atbScenarioTodayWithForce.format"),
-                                    s.getName(), forceIds.get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
+                                    atBScenario.getName(), forceIds.get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
                         } else {
                             addReport(MessageFormat.format(
-                                    resources.getString("atbScenarioToday.format"), s.getName()));
+                                    resources.getString("atbScenarioToday.format"), atBScenario.getName()));
                         }
                     } else {
                         addReport(MessageFormat.format(
-                                resources.getString("atbScenarioToday.format"), s.getName()));
+                                resources.getString("atbScenarioToday.format"), atBScenario.getName()));
                     }
                 }
             }

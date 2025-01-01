@@ -20,6 +20,7 @@ package mekhq.campaign.mission.atb.scenario;
 
 import megamek.common.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
@@ -76,8 +77,11 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign),
-                isAttacker() ? EntityWeightClass.WEIGHT_ASSAULT : EntityWeightClass.WEIGHT_MEDIUM, 0, 0, campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+
+        addEnemyForce(enemyEntities, weightClass, isAttacker() ? EntityWeightClass.WEIGHT_ASSAULT : EntityWeightClass.WEIGHT_MEDIUM,
+            0, 0, campaign);
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
     }

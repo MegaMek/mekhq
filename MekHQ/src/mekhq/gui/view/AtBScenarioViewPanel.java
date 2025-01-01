@@ -30,6 +30,7 @@ import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.*;
@@ -293,7 +294,13 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForce, gridBagConstraints);
 
             if (null != scenario.getCombatTeamById(campaign)) {
-                lblForceDesc.setText(campaign.getForce(scenario.getCombatTeamId()).getFullName());
+                Force force = campaign.getForce(scenario.getCombatTeamId());
+
+                if (force != null) {
+                    lblForceDesc.setText(campaign.getForce(scenario.getCombatTeamId()).getFullName());
+                } else {
+                    lblForceDesc.setText("Unknown Force ID: " + scenario.getCombatTeamId());
+                }
             } else if (scenario instanceof AtBDynamicScenario) {
                 StringBuilder forceBuilder = new StringBuilder();
                 forceBuilder.append("<html>");

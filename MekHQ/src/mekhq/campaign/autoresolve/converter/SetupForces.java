@@ -228,7 +228,8 @@ public class SetupForces {
                 // Set scenario type-specific delay
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 // Lances deployed in scout roles always deploy units in 6-walking speed turns
-                if (scenario.getCombatRole().isPatrol() && (scenario.getCombatTeamById(campaign) != null)
+                if (scenario.getCombatRole().isPatrol()
+                    && (scenario.getCombatTeamById(campaign) != null)
                     && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())
                     && !useDropship) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
@@ -264,7 +265,9 @@ public class SetupForces {
                     }
                 }
                 deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                if (!useDropship && scenario.getCombatRole().isPatrol()
+                if (!useDropship
+                    && scenario.getCombatRole().isPatrol()
+                    && (scenario.getCombatTeamById(campaign) != null)
                     && (scenario.getCombatTeamById(campaign).getForceId() == scenario.getCombatTeamId())) {
                     deploymentRound = Math.max(deploymentRound, 6 - speed);
                 }
