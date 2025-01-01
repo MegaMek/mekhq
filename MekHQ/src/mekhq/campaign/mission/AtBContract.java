@@ -100,6 +100,7 @@ import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FA
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -1854,8 +1855,10 @@ public class AtBContract extends Contract {
         JPanel panel = new JPanel(new FlowLayout());
 
         // Load and scale the images
-        ImageIcon skullFull = new ImageIcon("data/images/misc/challenge_estimate_full.png");
-        ImageIcon skullHalf = new ImageIcon("data/images/misc/challenge_estimate_half.png");
+        ImageIcon skullFull = scaleImageIconToWidth(
+            new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50);
+        ImageIcon skullHalf = scaleImageIconToWidth(
+            new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50);
 
         int iterations = difficulty;
 
