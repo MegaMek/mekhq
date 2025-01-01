@@ -758,7 +758,7 @@ public class MekHQ implements GameListener {
 
     public static void updateGuiScaling() {
         System.setProperty("flatlaf.uiScale", Double.toString(GUIPreferences.getInstance().getGUIScale()));
-        setLookAndFeel(GUIPreferences.getInstance().getUITheme());
+        setLookAndFeel(selectedTheme.getValue());
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {
