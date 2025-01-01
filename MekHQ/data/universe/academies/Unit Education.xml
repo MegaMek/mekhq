@@ -192,7 +192,7 @@
         <ageMin>16</ageMin>
         <qualification>In-House NCO Graduate</qualification>
         <curriculum>Leadership</curriculum>
-        <qualificationStartYear>3050</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -218,7 +218,7 @@
         <name>In-House Officer Bootcamp</name>
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
-        <description>An iOfficer Bootcamp emphasizes leadership, tactical acumen, and strategic planning, blending classroom instruction, simulations, and field exercises to prepare candidates for command roles.</description>
+        <description>Officer Bootcamp emphasizes leadership, tactical acumen, and strategic planning, blending classroom instruction, simulations, and field exercises to prepare candidates for command roles.</description>
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
