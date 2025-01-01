@@ -119,7 +119,9 @@ public class SupportPointNegotiation {
     private static void processContractSupportPoints(Campaign campaign, AtBContract contract,
                                                      List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
-        int maxSupportPoints = contract.getRequiredLances();
+        int maxSupportPoints = isInitialNegotiation
+            ? contract.getRequiredLances() * 3
+            : contract.getRequiredLances();
 
         Iterator<Person> iterator = adminTransport.iterator();
 
