@@ -683,13 +683,13 @@ public class StratconRulesManager {
         if (template == null || !template.getStratConScenarioType().isResupply()) {
             ContractCommandRights commandRights = contract.getCommandRights();
             switch (commandRights) {
-                case INTEGRATED, HOUSE -> {
+                case INTEGRATED -> {
                     scenario.setTurningPoint(true);
                     if (randomInt(4) == 0) {
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
-                case LIAISON -> {
+                case HOUSE, LIAISON -> {
                     if (randomInt(4) == 0) {
                         scenario.setTurningPoint(true);
                         setAttachedUnitsModifier(scenario, contract);
