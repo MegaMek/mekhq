@@ -21,6 +21,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.stratcon.*;
 import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
+import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
@@ -955,32 +956,56 @@ public class StratconPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Event handler for various button and menu item presses.
+     * Handles action events for various StratCon-related commands from the right-click context menu.
+     * This method processes the user actions and updates the game state, scenarios, facilities,
+     * and UI elements accordingly based on the selected command.
+     *
+     * @param evt the {@link ActionEvent} triggered by the user's action.
+     *          It includes the source component and the specific action command.
+     *
+     * <p>Supported commands:</p>
+     * <ul>
+     *   <li>{@code RCLICK_COMMAND_MANAGE_FORCES}: Displays the force management UI for the selected coordinates.</li>
+     *   <li>{@code RCLICK_COMMAND_MANAGE_SCENARIO}: Displays the scenario wizard if a scenario exists for the selected coordinates.</li>
+     *   <li>{@code RCLICK_COMMAND_REVEAL_TRACK}: Toggles the track's "GM revealed" state and updates the menu text accordingly.</li>
+     *   <li>{@code RCLICK_COMMAND_STICKY_FORCE}: Toggles the sticky force assignment for a given force ID at the selected track.</li>
+     *   <li>{@code RCLICK_COMMAND_REMOVE_FACILITY}: Removes a facility at the selected coordinates from the track.</li>
+     *   <li>{@code RCLICK_COMMAND_CAPTURE_FACILITY}: Switches the facility owner at the selected coordinates.</li>
+     *   <li>{@code RCLICK_COMMAND_ADD_FACILITY}: Adds a new facility to the selected coordinates, copied from the source facility.</li>
+     *   <li>{@code RCLICK_COMMAND_REMOVE_SCENARIO}: Removes the currently selected scenario from the campaign.</li>
+     * </ul>
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent evt) {
         StratconCoords selectedCoords = boardState.getSelectedCoords();
         if (selectedCoords == null) {
             return;
         }
 
-        switch (e.getActionCommand()) {
+        boolean isPrimaryForce = false;
+        switch (evt.getActionCommand()) {
             case RCLICK_COMMAND_MANAGE_FORCES:
                 assignmentUI.display(campaign, campaignState, selectedCoords);
                 assignmentUI.setVisible(true);
-                break;
+                isPrimaryForce = true;
+            // Deliberate fall-through
             case RCLICK_COMMAND_MANAGE_SCENARIO:
-                scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                        currentTrack, campaignState);
-                scenarioWizard.toFront();
-                scenarioWizard.setVisible(true);
+                StratconScenario selectedScenario = currentTrack.getScenario(selectedCoords);
+                if (selectedScenario != null
+                    && selectedScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
+                        currentTrack, campaignState, isPrimaryForce);
+
+                    scenarioWizard.toFront();
+                    scenarioWizard.setVisible(true);
+                }
                 break;
             case RCLICK_COMMAND_REVEAL_TRACK:
                 currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
                 menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
                 break;
             case RCLICK_COMMAND_STICKY_FORCE:
-                JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+                JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
                 int forceID = (int) source.getClientProperty(RCLICK_COMMAND_STICKY_FORCE_ID);
 
                 if (source.isSelected()) {
@@ -997,7 +1022,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
                 break;
             case RCLICK_COMMAND_ADD_FACILITY:
-                JMenuItem eventSource = (JMenuItem) e.getSource();
+                JMenuItem eventSource = (JMenuItem) evt.getSource();
                 StratconFacility facility = (StratconFacility) eventSource
                         .getClientProperty(RCLICK_COMMAND_ADD_FACILITY);
                 StratconFacility newFacility = facility.clone();
