@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -176,10 +175,10 @@ public class StratconRulesManager {
         AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
 
         switch (moraleLevel) {
-            case STALEMATE -> scenarioRolls = (int) round(scenarioRolls * 1.25);
-            case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.5);
-            case DOMINATING -> scenarioRolls = scenarioRolls * 2;
-            case OVERWHELMING -> scenarioRolls = scenarioRolls * 3;
+            case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.33);
+            case DOMINATING -> scenarioRolls = (int) round(scenarioRolls * 1.66);
+            case OVERWHELMING -> scenarioRolls = scenarioRolls * 2;
+            default -> {}
         }
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
@@ -1016,7 +1015,7 @@ public class StratconRulesManager {
                 if (availableForceIDs.isEmpty()) {
                     ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
                     if (!combatTeams.isEmpty()) {
-                        combatTeam = ObjectUtility.getRandomItem(combatTeams);
+                        combatTeam = getRandomItem(combatTeams);
 
                         forceID = combatTeam.getForceId();
                     } else {
@@ -1465,31 +1464,27 @@ public class StratconRulesManager {
             return FAILED;
         }
 
-        Skill tactics = commander.getSkill(S_TACTICS);
-
-        if (tactics == null) {
-            reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementCommanderNoSkill.text"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
-
-            ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
-
-            generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
-
-            return INTERCEPTED;
-        }
 
         roll = d6(2);
-        int baseTargetNumber = 9;
-        int targetNumber = baseTargetNumber - tactics.getFinalSkillValue();
+        int targetNumber = 9;
+        Skill tactics = commander.getSkill(S_TACTICS);
+
+        if (tactics != null) {
+            targetNumber -= tactics.getFinalSkillValue();
+        } else {
+            // Effectively a -1 penalty for being unskilled
+            targetNumber++;
+        }
 
         if (roll >= targetNumber) {
             reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementEvasionSuccessful.text"),
+            String reportString = tactics != null
+                ? resources.getString("reinforcementEvasionSuccessful.text")
+                :  resources.getString("reinforcementEvasionSuccessful.noSkill");
+            reportStatus.append(String.format(reportString,
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG, roll, targetNumber));
+
 
             campaign.addReport(reportStatus.toString());
 
