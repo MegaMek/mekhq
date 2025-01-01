@@ -85,10 +85,7 @@ public class GenerateResupplyContents {
             final int targetCargoTonnagePlayerConvoy = resupply.getTargetCargoTonnagePlayerConvoy();
             final double playerCargoCapacity = resupply.getTotalPlayerCargoCapacity();
 
-            logger.info("targetCargoTonnagePlayerConvoy: " + targetCargoTonnagePlayerConvoy);
-            logger.info("playerCargoCapacity: " + playerCargoCapacity);
             targetCargoTonnage = min(targetCargoTonnagePlayerConvoy, playerCargoCapacity);
-            logger.info("targetCargoTonnage: " + targetCargoTonnage);
         }
 
         List<Part> partsPool = resupply.getPartsPool();
@@ -104,8 +101,6 @@ public class GenerateResupplyContents {
             case DROP_TYPE_ARMOR -> targetCargoTonnage * resupply.getFocusArmor();
             case DROP_TYPE_AMMO -> targetCargoTonnage * resupply.getFocusAmmo();
         };
-
-        logger.info("availableSpace: " + availableSpace);
 
         if (availableSpace == 0) {
             return;
@@ -170,14 +165,6 @@ public class GenerateResupplyContents {
 
         resupply.getConvoyContents().addAll(droppedItems);
         calculateConvoyWorth(resupply);
-
-        double totalWeight = 0;
-
-        for (Part part : resupply.getConvoyContents()) {
-            totalWeight += part.getTonnage() > 0 ? part.getTonnage() : RESUPPLY_MINIMUM_PART_WEIGHT;
-        }
-
-        logger.info("totalWeight: " + totalWeight);
     }
 
     /**
