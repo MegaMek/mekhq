@@ -109,7 +109,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        Person speaker = campaign.getSeniorAdminCommandPerson();
+        Person speaker = campaign.getSeniorAdminPerson(0);
         String speakerName = (speaker != null) ? speaker.getFullTitle() : campaign.getName();
 
         // Add speaker image (icon)

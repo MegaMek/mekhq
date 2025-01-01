@@ -675,7 +675,7 @@ public class StratconScenarioWizard extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get commandLiaison details
-        Person commandLiaison = campaign.getSeniorAdminCommandPerson();
+        Person commandLiaison = campaign.getSeniorAdminPerson(0);
         String speakerName = (commandLiaison != null) ? commandLiaison.getFullTitle() : campaign.getName();
 
         // Add commandLiaison image (icon)

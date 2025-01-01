@@ -2797,19 +2797,59 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This method finds and returns the most senior command administrator.
-     * It checks for both primary and secondary roles of the administrator.
-     * In case of multiple administrators with the command role, it uses the
-     * {@code outRanksUsingSkillTiebreaker} method to decide the seniority.
+     * Finds and returns the most senior administrator for a specific type of administrative role.
+     * Seniority is determined using the {@code outRanksUsingSkillTiebreaker} method when there are
+     * multiple eligible administrators for the specified role.
      *
-     * @return the senior administrator with a command role, or {@code null} if no such
-     * administrator exists.
+     * <p>The method checks both the primary and secondary roles of each administrator to determine eligibility.
+     * The role types are specified using integer constants:</p>
+     * <ul>
+     *   <li>{@code 0} - Command Administrator</li>
+     *   <li>{@code 1} - Logistics Administrator</li>
+     *   <li>{@code 2} - Transport Administrator</li>
+     *   <li>{@code 3} - HR Administrator</li>
+     * </ul>
+     *
+     * @param type an integer representing the type of administrative role to check for. This should match one of the
+     *             predefined constants: {@code TYPE_COMMAND}, {@code TYPE_LOGISTICS}, {@code TYPE_TRANSPORT},
+     *             or {@code TYPE_HR}. Passing an invalid type will result in an {@link IllegalStateException}.
+     *
+     * @return the most senior {@link Person} with the specified administrative role, or {@code null}
+     *         if no eligible administrator is found.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>The method iterates through all administrators returned by {@link #getAdmins()}.</li>
+     *   <li>For each administrator, it checks if their primary or secondary role matches the specified type.</li>
+     *   <li>If no eligible administrator exists, the method returns {@code null}.</li>
+     *   <li>If multiple administrators are eligible, the one with the highest seniority is returned.</li>
+     *   <li>The seniority is determined by the {@link Person#outRanksUsingSkillTiebreaker(Person, Person)} method.</li>
+     * </ul>
+     *
+     * @throws IllegalStateException if an invalid type is provided (not 0-3).
      */
-    public @Nullable Person getSeniorAdminCommandPerson() {
+    public @Nullable Person getSeniorAdminPerson(int type) {
+        final int TYPE_COMMAND = 0;
+        final int TYPE_LOGISTICS = 1;
+        final int TYPE_TRANSPORT = 2;
+        final int TYPE_HR = 3;
+
         Person seniorAdmin = null;
 
         for (Person person : getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorCommand() || person.getSecondaryRole().isAdministratorCommand()) {
+            boolean isEligible = switch (type) {
+                case TYPE_COMMAND -> person.getPrimaryRole().isAdministratorCommand()
+                    || person.getSecondaryRole().isAdministratorCommand();
+                case TYPE_LOGISTICS -> person.getPrimaryRole().isAdministratorLogistics()
+                    || person.getSecondaryRole().isAdministratorLogistics();
+                case TYPE_TRANSPORT -> person.getPrimaryRole().isAdministratorTransport()
+                    || person.getSecondaryRole().isAdministratorTransport();
+                case TYPE_HR -> person.getPrimaryRole().isAdministratorHR()
+                    || person.getSecondaryRole().isAdministratorHR();
+                default -> throw new IllegalStateException("Unexpected value: " + type);
+            };
+
+            if (isEligible) {
                 if (seniorAdmin == null) {
                     seniorAdmin = person;
                     continue;
