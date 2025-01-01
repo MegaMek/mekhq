@@ -6,6 +6,8 @@ MEKHQ VERSION HISTORY:
 + Fix #5572: don't attempt to sum NaN tonnage equipment
 + PR #5577: Leadership Units & Support Point Scarcity Hot Fixes
 + PR #5582: Updated Rank Systems Version in ranks.xml
++ Fix #5188, #5410: Corrected GUI Theme Retrieval to Use selectedTheme
+
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
