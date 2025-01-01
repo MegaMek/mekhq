@@ -129,16 +129,34 @@ public class DialogAbandonedConvoy extends JDialog {
 
         add(mainPanel, BorderLayout.CENTER);
 
+        // Create a container panel to hold both the button panel and the new panel
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS)); // Stack vertically
+
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-
         JButton confirmButton = new JButton(resources.getString("logisticsDestroyed.text"));
         confirmButton.addActionListener(e -> dispose());
-
         buttonPanel.add(confirmButton);
 
-        // Add button panel to dialog
-        add(buttonPanel, BorderLayout.SOUTH);
+        // Add the button panel to the container
+        containerPanel.add(buttonPanel);
+
+        // New panel (to be added below the button panel)
+        JPanel infoPanel = new JPanel();
+        infoPanel.setBorder(BorderFactory.createEtchedBorder());
+        infoPanel.setLayout(new BorderLayout());
+
+        JLabel newPanelLabel = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                LEFT_WIDTH + RIGHT_WIDTH, resources.getString("documentation.prompt")));
+        infoPanel.add(newPanelLabel, BorderLayout.CENTER);
+
+        // Add the new panel to the container (below the button panel)
+        containerPanel.add(infoPanel);
+
+        // Add the container panel to the dialog (at the bottom of the layout)
+        add(containerPanel, BorderLayout.SOUTH);
 
         // Dialog settings
         pack();
