@@ -27,6 +27,7 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy;
 
 import java.util.UUID;
 
@@ -34,7 +35,6 @@ import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy.abandonedConvoyDialog;
 
 /**
  * Utility class for managing resupply operations and events in MekHQ campaigns.
@@ -75,30 +75,29 @@ public class ResupplyUtilities {
      */
     public static void processAbandonedConvoy(Campaign campaign, AtBContract contract,
                                               AtBDynamicScenario scenario) {
-        Force convoy = null;
-        for (Integer forceId : scenario.getPlayerTemplateForceIDs()) {
-            try {
-                Force force = campaign.getForce(forceId);
+        final int scenarioId = scenario.getId();
 
-                if (force.isConvoyForce()) {
-                    convoy = force;
+        for (Force force : campaign.getAllForces()) {
+            Force parentForce = force.getParentForce();
 
-                    for (UUID unitID : force.getAllUnits(false)) {
-                        Unit unit = campaign.getUnit(unitID);
+            if (parentForce != null && (force.getParentForce().isConvoyForce())) {
+                continue;
+            }
 
-                        for (Person crewMember : unit.getCrew()) {
-                            decideCrewMemberFate(campaign, crewMember);
-                        }
+            if (force.isConvoyForce() && force.getScenarioId() == scenarioId) {
+                new DialogAbandonedConvoy(campaign, contract, force);
 
-                        campaign.removeUnit(unitID);
+                for (UUID unitID : force.getAllUnits(false)) {
+                    Unit unit = campaign.getUnit(unitID);
+
+                    for (Person crewMember : unit.getCrew()) {
+                        decideCrewMemberFate(campaign, crewMember);
                     }
+
+                    campaign.removeUnit(unitID);
                 }
-            } catch (Exception ex) {
-                logger.warn(ex.getMessage(), ex);
             }
         }
-
-        abandonedConvoyDialog(campaign, contract, convoy);
     }
 
     /**

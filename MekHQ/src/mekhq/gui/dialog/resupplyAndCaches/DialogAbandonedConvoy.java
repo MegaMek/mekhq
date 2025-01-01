@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.gui.baseComponents.AbstractMHQNagDialog.getSpeakerDescription;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -40,37 +40,30 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * in the MekHQ game. The dialog includes detailed information and visuals, like the convoy
  * commander or speaker, a status update message, and employer details.
  */
-public class DialogAbandonedConvoy {
+public class DialogAbandonedConvoy extends JDialog {
+    final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
+    final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
+
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
-    /**
-     * Displays a dialog to inform the player about an abandoned convoy.
-     * <p>
-     * This method constructs and shows a dialog that:
-     * - Fetches title and content from a resource bundle.
-     * - Retrieves speaker information based on the convoy's force commander or default context.
-     * - Displays a status message formatted with current game details.
-     * - Includes buttons to handle user confirmation.
-     *
-     * @param campaign    the current {@link Campaign} object representing the player's campaign.
-     * @param contract    the {@link AtBContract} object representing the active contract containing
-     *                    details about the employer and mission.
-     * @param targetConvoy an optional {@link Force} object representing the convoy's details.
-     *                     If null, the dialog uses default values for the speaker and visuals.
-     */
-    public static void abandonedConvoyDialog(Campaign campaign, AtBContract contract,
-                                             @Nullable Force targetConvoy) {
-        final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
+    public DialogAbandonedConvoy(Campaign campaign, AtBContract contract, @Nullable Force targetConvoy) {
+        setTitle(resources.getString("incomingTransmission.title"));
 
-        // Retrieves the title from the resources
-        String title = resources.getString("dialog.title");
+        final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-        // Create a custom dialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
+        // Main Panel to hold both boxes
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weighty = 1;
 
-        // Establish the speaker
+        // Left box for speaker details
+        JPanel leftBox = new JPanel();
+        leftBox.setLayout(new BoxLayout(leftBox, BoxLayout.Y_AXIS));
+        leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Get speaker details
         Person speaker = null;
         if (targetConvoy != null) {
             UUID speakerId = targetConvoy.getForceCommanderID();
@@ -89,56 +82,69 @@ public class DialogAbandonedConvoy {
             }
         }
 
-        // An ImageIcon to hold the faction icon
-        ImageIcon speakerIcon;
-        if (targetConvoy == null) {
-            speakerIcon = getFactionLogo(campaign, contract.getEmployerCode(),
-                true);
-        } else {
-            speakerIcon = getSpeakerIcon(campaign, speaker);
+        // Add speaker image (icon)
+        ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
+        if (speakerIcon != null) {
+            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
         }
+        JLabel imageLabel = new JLabel();
+        imageLabel.setIcon(speakerIcon);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        // Speaker description (below the icon)
+        StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
+        JLabel leftDescription = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                LEFT_WIDTH, speakerDescription));
+        leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Create and display the message
+        // Add the image and description to the leftBox
+        leftBox.add(imageLabel);
+        leftBox.add(Box.createRigidArea(new Dimension(0, INSERT_SIZE)));
+        leftBox.add(leftDescription);
+
+        // Add leftBox to mainPanel
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 0;
+        mainPanel.add(leftBox, constraints);
+
+        // Right box: Just a message
+        JPanel rightBox = new JPanel(new BorderLayout());
+        rightBox.setBorder(BorderFactory.createEtchedBorder());
+
         String message = String.format(
             resources.getString("statusUpdateAbandoned" + randomInt(20) + ".text"),
             campaign.getCommanderAddress(false));
 
-        // Create a panel to display the icon and the message
-        JLabel description = new JLabel(
+        JLabel rightDescription = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), message));
-        description.setHorizontalAlignment(JLabel.CENTER);
+                RIGHT_WIDTH, message));
+        rightBox.add(rightDescription);
 
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            String.format(resources.getString("dialogBorderTitle.text"), speakerName)));
-        descriptionPanel.add(description);
-        dialog.add(descriptionPanel, BorderLayout.CENTER);
+        // Add rightBox to mainPanel
+        constraints.gridx = 1;
+        constraints.weightx = 1; // Allow horizontal stretching
+        mainPanel.add(rightBox, constraints);
 
-        // Create a panel to display the icon and the message
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(speakerIcon);
-        panel.add(imageLabel, BorderLayout.CENTER);
-        panel.add(descriptionPanel, BorderLayout.SOUTH);
+        add(mainPanel, BorderLayout.CENTER);
 
-        // Create the buttons and add their action listeners.
-        JButton optionConfirm = new JButton(resources.getString("logisticsDestroyed.text"));
-        optionConfirm.addActionListener(evt -> dialog.dispose());
-
-        // Create a panel for buttons and add buttons to it
+        // Buttons panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(optionConfirm);
 
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        JButton confirmButton = new JButton(resources.getString("logisticsDestroyed.text"));
+        confirmButton.addActionListener(e -> dispose());
 
-        dialog.setResizable(false);
-        dialog.pack();
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        buttonPanel.add(confirmButton);
+
+        // Add button panel to dialog
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        // Dialog settings
+        pack();
+        setModal(true);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setVisible(true);
     }
 }
