@@ -21,7 +21,13 @@ package mekhq.utilities;
 
 import mekhq.MekHQ;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,9 +49,22 @@ public class Internationalization {
         return instance;
     }
 
+    private static class UTF8Control extends ResourceBundle.Control {
+        @Override
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
+            throws IOException {
+            // The below is one approach; there are multiple ways to do this
+            String resourceName = toResourceName(toBundleName(baseName, locale), "properties");
+            try (InputStream is = loader.getResourceAsStream(resourceName);
+                 InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                return new PropertyResourceBundle(isr);
+            }
+        }
+    }
+
     ResourceBundle getResourceBundle(String bundleName) {
         return resourceBundles.computeIfAbsent(bundleName, k ->
-            ResourceBundle.getBundle(PREFIX + bundleName, MekHQ.getMHQOptions().getLocale()));
+            ResourceBundle.getBundle(PREFIX + bundleName, MekHQ.getMHQOptions().getLocale(), new UTF8Control()));
     }
 
     /**
