@@ -8680,8 +8680,8 @@ public class Campaign implements ITechManager {
             if (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 getShoppingList().addShoppingItem(partToBuy, toBuy, this);
+                bought += 1;
             }
-            bought += 1;
         }
         return bought;
     }
