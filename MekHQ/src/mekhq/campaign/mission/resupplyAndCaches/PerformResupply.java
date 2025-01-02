@@ -40,6 +40,7 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.dialog.resupplyAndCaches.DialogInterception;
 import mekhq.gui.dialog.resupplyAndCaches.DialogItinerary;
+import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -59,7 +60,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceCo
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption.createPlayerConvoyOptionalDialog;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus.createResupplyFocusDialog;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent.dialogConvoyRoleplayEvent;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogSwindled.swindledDialog;
@@ -146,7 +146,7 @@ public class PerformResupply {
             // If we're on a guerrilla contract, the player may be approached by smugglers, instead,
             // which won't use player convoys.
             if (!isGuerrilla) {
-                createPlayerConvoyOptionalDialog(resupply, isIndependent);
+                new DialogPlayerConvoyOption(resupply, isIndependent);
 
                 // If the player is on an Independent contract and refuses to use their own transports,
                 // then no resupply occurs.

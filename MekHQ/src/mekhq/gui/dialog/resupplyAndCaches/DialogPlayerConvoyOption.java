@@ -25,11 +25,11 @@ import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
 
+import static mekhq.gui.baseComponents.AbstractMHQNagDialog.getSpeakerDescription;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
@@ -38,7 +38,11 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * The dialog dynamically generates content, localized messages, and speaker visuals to
  * guide the player's decision.
  */
-public class DialogPlayerConvoyOption {
+public class DialogPlayerConvoyOption extends JDialog {
+    final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
+    final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
+    final int INSERT_SIZE = UIUtil.scaleForGUI(10);
+
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
     /**
@@ -79,20 +83,24 @@ public class DialogPlayerConvoyOption {
      *                                is mandatory. If true, the optional decision is bypassed, and the
      *                                dialog displays a notice reflecting the forced choice.
      */
-    public static void createPlayerConvoyOptionalDialog(Resupply resupply, boolean forcedUseOfPlayerConvoy) {
+    public DialogPlayerConvoyOption(Resupply resupply, boolean forcedUseOfPlayerConvoy) {
         final Campaign campaign = resupply.getCampaign();
 
-        final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
+        setTitle(resources.getString("incomingTransmission.title"));
 
-        // Retrieves the title from the resources
-        String title = resources.getString("dialog.title");
+        // Main Panel to hold both boxes
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weighty = 1;
 
-        // Create a custom dialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
+        // Left box for speaker details
+        JPanel leftBox = new JPanel();
+        leftBox.setLayout(new BoxLayout(leftBox, BoxLayout.Y_AXIS));
+        leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Establish the speaker
+        // Get speaker details
         Person speaker = campaign.getSeniorAdminPerson(1);
 
         String speakerName;
@@ -102,11 +110,37 @@ public class DialogPlayerConvoyOption {
             speakerName = campaign.getName();
         }
 
-        // An ImageIcon to hold the faction icon
-        ImageIcon speakerIcon = ResupplyDialogUtilities.getSpeakerIcon(campaign, speaker);
-        speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        // Add speaker image (icon)
+        ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
+        if (speakerIcon != null) {
+            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        }
+        JLabel imageLabel = new JLabel();
+        imageLabel.setIcon(speakerIcon);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Create and display the message
+        // Speaker description (below the icon)
+        StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
+        JLabel leftDescription = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                LEFT_WIDTH, speakerDescription));
+        leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Add the image and description to the leftBox
+        leftBox.add(imageLabel);
+        leftBox.add(Box.createRigidArea(new Dimension(0, INSERT_SIZE)));
+        leftBox.add(leftDescription);
+
+        // Add leftBox to mainPanel
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 0;
+        mainPanel.add(leftBox, constraints);
+
+        // Right box: Just a message
+        JPanel rightBox = new JPanel(new BorderLayout());
+        rightBox.setBorder(BorderFactory.createEtchedBorder());
+
         int playerConvoyCount = resupply.getPlayerConvoys().size();
         String pluralizer = playerConvoyCount != 1 ? "s" : "";
         String messageResource;
@@ -121,59 +155,65 @@ public class DialogPlayerConvoyOption {
             resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTotalPlayerCargoCapacity(),
             playerConvoyCount, pluralizer, pluralizer);
 
-        // Create a panel to display the icon and the message
-        JLabel description = new JLabel(
+        JLabel rightDescription = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), message));
-        description.setHorizontalAlignment(JLabel.CENTER);
+                RIGHT_WIDTH, message));
+        rightBox.add(rightDescription);
 
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            String.format(resources.getString("dialogBorderTitle.text"), speakerName)));
-        descriptionPanel.add(description);
-        dialog.add(descriptionPanel, BorderLayout.CENTER);
+        // Add rightBox to mainPanel
+        constraints.gridx = 1;
+        constraints.weightx = 1; // Allow horizontal stretching
+        mainPanel.add(rightBox, constraints);
 
-        // Create a panel to display the icon and the message
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(speakerIcon);
-        panel.add(imageLabel, BorderLayout.CENTER);
-        panel.add(descriptionPanel, BorderLayout.SOUTH);
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Create a container panel to hold both the button panel and the new panel
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS)); // Stack vertically
+
+        // Buttons panel
+        JPanel buttonPanel = new JPanel();
 
         // Create the buttons and add their action listener.
         JButton acceptButton = new JButton(resources.getString("confirmAccept.text"));
         acceptButton.addActionListener(e -> {
-            dialog.dispose();
+            dispose();
             resupply.setUsePlayerConvoy(true);
         });
         acceptButton.setEnabled(playerConvoyCount > 0);
+        buttonPanel.add(acceptButton);
 
         JButton refuseButton = new JButton(resources.getString("confirmRefuse.text"));
         refuseButton.addActionListener(e -> {
-            dialog.dispose();
+            dispose();
             resupply.setUsePlayerConvoy(false);
         });
-
-        // Create a panel for buttons and add buttons to it
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(acceptButton);
         buttonPanel.add(refuseButton);
 
-        // Add a WindowListener to handle the close operation
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                resupply.setUsePlayerConvoy(false);
-            }
-        });
+        // Add the button panel to the container
+        containerPanel.add(buttonPanel);
 
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        // New panel (to be added below the button panel)
+        JPanel infoPanel = new JPanel(new BorderLayout());
+        JLabel lblInfo = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                RIGHT_WIDTH + LEFT_WIDTH,
+                String.format(resources.getString("documentation.prompt"))));
+        lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        infoPanel.add(lblInfo, BorderLayout.CENTER);
+        infoPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        dialog.setResizable(false);
-        dialog.pack();
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        // Add the new panel to the container (below the button panel)
+        containerPanel.add(infoPanel);
+
+        // Add the container panel to the dialog (at the bottom of the layout)
+        add(containerPanel, BorderLayout.SOUTH);
+
+        // Dialog settings
+        pack();
+        setModal(true);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setVisible(true);
     }
 }
