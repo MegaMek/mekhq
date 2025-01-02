@@ -309,7 +309,7 @@ public class Campaign implements ITechManager {
      * such as by identifying the most senior administrator for a given role.</p>
      */
     public enum AdministratorSpecialization {
-        COMMAND, LOGISTICS, TRANSPORT, HR;
+        COMMAND, LOGISTICS, TRANSPORT, HR
     }
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",

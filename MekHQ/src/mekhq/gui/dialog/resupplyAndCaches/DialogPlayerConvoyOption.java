@@ -146,7 +146,7 @@ public class DialogPlayerConvoyOption extends JDialog {
         String pluralizer = playerConvoyCount != 1 ? "s" : "";
         String messageResource;
 
-        String message = "";
+        String message;
         if (forcedUseOfPlayerConvoy) {
             messageResource = resources.getString("usePlayerConvoyForced.text");
 
