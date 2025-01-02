@@ -26,6 +26,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -43,6 +45,7 @@ import megamek.common.verifier.*;
 import megamek.logging.MMLogger;
 import megameklab.MMLConstants;
 import megameklab.ui.EntitySource;
+import megameklab.ui.FileNameManager;
 import megameklab.ui.battleArmor.BABuildTab;
 import megameklab.ui.battleArmor.BAEquipmentTab;
 import megameklab.ui.battleArmor.BAStructureTab;
@@ -70,6 +73,7 @@ import megameklab.ui.supportVehicle.SVArmorTab;
 import megameklab.ui.supportVehicle.SVBuildTab;
 import megameklab.ui.supportVehicle.SVEquipmentTab;
 import megameklab.ui.supportVehicle.SVStructureTab;
+import megameklab.ui.util.MegaMekLabFileSaver;
 import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
@@ -81,6 +85,7 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 public class MekLabTab extends CampaignGuiTab {
     private static final MMLogger logger = MMLogger.create(MekLabTab.class);
+    protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekLabTab");
 
     CampaignGUI campaignGUI;
 
@@ -100,6 +105,7 @@ public class MekLabTab extends CampaignGuiTab {
     private JLabel lblCost;
 
     private JButton btnRefit;
+    private JButton btnSaveForLater;
     private JButton btnClear;
     private JButton btnRemove;
 
@@ -110,11 +116,13 @@ public class MekLabTab extends CampaignGuiTab {
     private JLabel lblTons;
 
     private JPanel shoppingPanel;
+    private MegaMekLabFileSaver fileSaver;
 
     // region Constructors
     public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
+        this.fileSaver = new MegaMekLabFileSaver(logger, resources.getString("dialog.saveAs.title"));
         this.repaint();
     }
     // endregion Constructors
@@ -139,6 +147,12 @@ public class MekLabTab extends CampaignGuiTab {
             }
             campaignGUI.refitUnit(refit, true);
         });
+        btnSaveForLater = new JButton("Save For Later");
+        btnSaveForLater.addActionListener(evt -> {
+            Entity entity = labPanel.getEntity();
+            fileSaver.saveUnitAs(this.getFrame(), entity);
+        });
+
         btnClear = new JButton("Clear Changes");
         btnClear.addActionListener(evt -> resetUnit());
         btnRemove = new JButton("Remove from Lab");
@@ -188,6 +202,8 @@ public class MekLabTab extends CampaignGuiTab {
         c.gridy++;
         c.insets = new Insets(0, 5, 2, 5);
         summaryPane.add(btnRefit, c);
+        c.gridy++;
+        summaryPane.add(btnSaveForLater, c);
         c.gridy++;
         summaryPane.add(btnClear, c);
         c.gridy++;
@@ -333,6 +349,7 @@ public class MekLabTab extends CampaignGuiTab {
         if (tonnage < testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Unit is overweight.");
+            btnSaveForLater.setEnabled(true);
             // } else if (entity.getWeight() > testEntity.calculateWeight()) {
             // Taharqa: We are now going to allow users to build underweight
             // units, we will just give
@@ -342,15 +359,19 @@ public class MekLabTab extends CampaignGuiTab {
         } else if (sb.length() > 0) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText(sb.toString());
+            btnSaveForLater.setEnabled(true);
         } else if (null != refit.checkFixable()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText(refit.checkFixable());
+            btnSaveForLater.setEnabled(true);
         } else if (refit.getRefitClass() == Refit.NO_CHANGE && entity.getWeight() == testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Nothing to change.");
+            btnSaveForLater.setEnabled(false);
         } else {
             btnRefit.setEnabled(true);
             btnRefit.setToolTipText(null);
+            btnSaveForLater.setEnabled(true);
         }
 
         lblName.setText("<html><b>" + unit.getName() + "</b></html>");
@@ -482,9 +503,11 @@ public class MekLabTab extends CampaignGuiTab {
         }
     }
 
-    private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
+    private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource, FileNameManager {
 
         private boolean refreshRequired = false;
+        private String fileName = "";
+        private String originalName = "";
 
         @Override
         public abstract Entity getEntity();
@@ -495,6 +518,23 @@ public class MekLabTab extends CampaignGuiTab {
         public void scheduleRefresh() {
             refreshRequired = true;
             SwingUtilities.invokeLater(this::performRefresh);
+        }
+
+        @Override
+        public String getFileName() {
+            return fileName;
+        }
+
+        @Override
+        public boolean hasEntityNameChanged() {
+            return !MegaMekLabFileSaver.createUnitFilename(getEntity()).equals(originalName);
+        }
+
+        @Override
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+            // If the filename is reloaded, restart tracking of the unit name changing.
+            this.originalName = MegaMekLabFileSaver.createUnitFilename(getEntity());
         }
 
         private void performRefresh() {
