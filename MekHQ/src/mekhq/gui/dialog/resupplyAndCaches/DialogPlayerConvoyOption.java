@@ -145,15 +145,20 @@ public class DialogPlayerConvoyOption extends JDialog {
         String pluralizer = playerConvoyCount != 1 ? "s" : "";
         String messageResource;
 
+        String message = "";
         if (forcedUseOfPlayerConvoy) {
             messageResource = resources.getString("usePlayerConvoyForced.text");
+
+            message = String.format(messageResource, campaign.getCommanderAddress(false),
+                resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTotalPlayerCargoCapacity(),
+                playerConvoyCount, pluralizer, pluralizer);
         } else {
             messageResource = resources.getString("usePlayerConvoyOptional.text");
-        }
 
-        String message = String.format(messageResource, campaign.getCommanderAddress(false),
-            resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTotalPlayerCargoCapacity(),
-            playerConvoyCount, pluralizer, pluralizer);
+            message = String.format(messageResource, campaign.getCommanderAddress(false),
+                resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTotalPlayerCargoCapacity(),
+                playerConvoyCount, pluralizer, resupply.getTargetCargoTonnage(), pluralizer);
+        }
 
         JLabel rightDescription = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
