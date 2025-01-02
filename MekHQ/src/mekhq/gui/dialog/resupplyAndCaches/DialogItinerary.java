@@ -20,6 +20,7 @@ package mekhq.gui.dialog.resupplyAndCaches;
 
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -99,7 +100,7 @@ public class DialogItinerary {
         ImageIcon speakerIcon;
 
         if (resupplyType.equals(RESUPPLY_LOOT) || resupplyType.equals(RESUPPLY_CONTRACT_END)) {
-            speaker = campaign.getSeniorAdminPerson(1);
+            speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS);
 
             if (speaker != null) {
                 speakerName = speaker.getFullTitle();

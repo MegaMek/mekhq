@@ -26,6 +26,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -675,7 +676,7 @@ public class StratconScenarioWizard extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get commandLiaison details
-        Person commandLiaison = campaign.getSeniorAdminPerson(0);
+        Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         String speakerName = (commandLiaison != null) ? commandLiaison.getFullTitle() : campaign.getName();
 
         // Add commandLiaison image (icon)

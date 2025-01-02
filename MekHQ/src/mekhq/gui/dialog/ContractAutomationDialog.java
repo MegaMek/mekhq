@@ -2,6 +2,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
@@ -41,7 +42,7 @@ public class ContractAutomationDialog extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        Person speaker = campaign.getSeniorAdminPerson(2);
+        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.TRANSPORT);
 
         String speakerName;
         if (speaker != null) {

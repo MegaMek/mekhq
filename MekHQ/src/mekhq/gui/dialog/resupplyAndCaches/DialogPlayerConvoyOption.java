@@ -20,6 +20,7 @@ package mekhq.gui.dialog.resupplyAndCaches;
 
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.personnel.Person;
 
@@ -101,7 +102,7 @@ public class DialogPlayerConvoyOption extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        Person speaker = campaign.getSeniorAdminPerson(1);
+        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS);
 
         String speakerName;
         if (speaker != null) {
