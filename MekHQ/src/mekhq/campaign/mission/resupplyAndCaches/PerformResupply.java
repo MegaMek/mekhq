@@ -38,10 +38,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.dialog.resupplyAndCaches.DialogInterception;
-import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
-import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
-import mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent;
+import mekhq.gui.dialog.resupplyAndCaches.*;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -62,7 +59,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceCo
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogSwindled.swindledDialog;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -239,7 +235,7 @@ public class PerformResupply {
         int swindleChance = contract.getMoraleLevel().ordinal();
 
         if (Compute.randomInt(10) < swindleChance) {
-            swindledDialog(resupply);
+            new DialogSwindled(resupply);
         } else {
             final Campaign campaign = resupply.getCampaign();
 

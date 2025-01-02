@@ -155,10 +155,10 @@ public class ResupplyDialogUtilities {
      * @return a {@link String} containing the enemy faction reference.
      */
     public static String getEnemyFactionReference(Resupply resupply) {
-        final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        String enemyFactionReference = contract.getEnemy().getFullName(campaign.getGameYear());
+        String enemyFactionReference = contract.getEnemyBotName();
+
         if (!enemyFactionReference.contains("Clan")) {
             enemyFactionReference = "the " + enemyFactionReference;
         }
