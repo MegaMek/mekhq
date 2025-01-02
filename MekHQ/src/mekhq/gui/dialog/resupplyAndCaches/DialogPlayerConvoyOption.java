@@ -30,7 +30,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.pickLogisticsRepresentative;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
@@ -94,7 +93,7 @@ public class DialogPlayerConvoyOption {
         dialog.setLayout(new BorderLayout());
 
         // Establish the speaker
-        Person speaker = pickLogisticsRepresentative(campaign);
+        Person speaker = campaign.getSeniorAdminPerson(1);
 
         String speakerName;
         if (speaker != null) {

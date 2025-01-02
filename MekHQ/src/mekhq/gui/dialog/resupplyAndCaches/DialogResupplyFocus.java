@@ -28,7 +28,6 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.pickLogisticsRepresentative;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
@@ -86,7 +85,7 @@ public class DialogResupplyFocus {
         dialog.setLayout(new BorderLayout());
 
         // Establish the speaker
-        Person speaker = pickLogisticsRepresentative(campaign);
+        Person speaker = campaign.getSeniorAdminPerson(1);
 
         String speakerName;
         if (speaker != null) {

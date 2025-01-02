@@ -43,14 +43,17 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RES
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_SMUGGLER;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.*;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.createPartsReport;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.formatColumnData;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
+import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * The {@code DialogItinerary} class generates and displays dialogs related to resupply operations.
  * These include normal resupply, looting, contract-ending resupply, and smuggler-related resupplies.
  */
-public class DialogItinerary {
+public class DialogItinerary extends JDialog {
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
     /**
@@ -73,7 +76,7 @@ public class DialogItinerary {
      *                operation, including the campaign context, contract, convoy details, and
      *                resupply type.
      */
-    public static void itineraryDialog(Resupply resupply) {
+    public DialogItinerary(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
         final ResupplyType resupplyType = resupply.getResupplyType();
@@ -85,9 +88,9 @@ public class DialogItinerary {
 
         // Create a custom dialog
         JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        setTitle(title);
+        setLayout(new BorderLayout());
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // Establish the speaker
         Person speaker;
@@ -95,7 +98,7 @@ public class DialogItinerary {
         ImageIcon speakerIcon;
 
         if (resupplyType.equals(RESUPPLY_LOOT) || resupplyType.equals(RESUPPLY_CONTRACT_END)) {
-            speaker = pickLogisticsRepresentative(campaign);
+            speaker = campaign.getSeniorAdminPerson(1);
 
             if (speaker != null) {
                 speakerName = speaker.getFullTitle();
@@ -109,12 +112,12 @@ public class DialogItinerary {
             speakerName = resources.getString("guerrillaSpeaker.text");
 
             speakerIcon = getFactionLogo(campaign, "PIR", true);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIconToWidth(speakerIcon, 200);
         } else {
             speakerName = contract.getEmployerName(campaign.getGameYear());
 
             speakerIcon = getFactionLogo(campaign, contract.getEmployerCode(), true);
-            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+            speakerIcon = scaleImageIconToWidth(speakerIcon, 200);
         }
 
         StringBuilder message = new StringBuilder(getInitialDescription(resupply));
@@ -205,13 +208,13 @@ public class DialogItinerary {
         }
 
         // Add the scroll pane for content and button panel to the dialog
-        dialog.add(scrollPane, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        dialog.pack();
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        pack();
+        setModal(true);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     /**
