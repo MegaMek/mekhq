@@ -125,10 +125,12 @@ public class ScenarioTableModel extends DataTableModel {
                     AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
                     StratconCampaignState campaignState = contract.getStratconCampaignState();
 
-                    for (StratconTrackState track : campaignState.getTracks()) {
-                        for (StratconScenario stratconScenario : track.getScenarios().values()) {
-                            if (Objects.equals(stratconScenario.getBackingScenario(), scenario)) {
-                                return track.getDisplayableName();
+                    if (campaignState != null) {
+                        for (StratconTrackState track : campaignState.getTracks()) {
+                            for (StratconScenario stratconScenario : track.getScenarios().values()) {
+                                if (Objects.equals(stratconScenario.getBackingScenario(), scenario)) {
+                                    return track.getDisplayableName();
+                                }
                             }
                         }
                     }
