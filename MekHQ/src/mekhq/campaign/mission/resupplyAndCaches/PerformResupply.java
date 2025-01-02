@@ -41,6 +41,7 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.dialog.resupplyAndCaches.DialogInterception;
 import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
+import mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -61,7 +62,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceCo
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent.dialogConvoyRoleplayEvent;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogSwindled.swindledDialog;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -435,7 +435,8 @@ public class PerformResupply {
                     + Compute.randomInt(50) + STATUS_AFTERWARD);
             }
 
-            dialogConvoyRoleplayEvent(campaign, convoy, eventText);
+            new DialogRoleplayEvent(campaign, convoy, eventText);
+            completeSuccessfulDelivery(resupply, convoyContents);
         }
     }
 

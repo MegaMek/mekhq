@@ -78,7 +78,6 @@ public class DialogInterception extends JDialog{
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-
         setTitle(resources.getString("incomingTransmission.title"));
 
         // Main Panel to hold both boxes
