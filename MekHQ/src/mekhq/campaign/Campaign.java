@@ -2823,7 +2823,7 @@ public class Campaign implements ITechManager {
      *   <li>For each administrator, it checks if their primary or secondary role matches the specified type.</li>
      *   <li>If no eligible administrator exists, the method returns {@code null}.</li>
      *   <li>If multiple administrators are eligible, the one with the highest seniority is returned.</li>
-     *   <li>The seniority is determined by the {@link Person#outRanksUsingSkillTiebreaker(Person, Person)} method.</li>
+     *   <li>The seniority is determined by the {@code outRanksUsingSkillTiebreaker} method.</li>
      * </ul>
      *
      * @throws IllegalStateException if an invalid type is provided (not 0-3).
