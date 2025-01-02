@@ -153,7 +153,7 @@ public class SetupForces {
      */
     private Player getCleanPlayer() {
         var campaignPlayer = campaign.getPlayer();
-        var player = new Player(campaignPlayer.getId(), campaignPlayer.getName());
+        var player = new Player(campaignPlayer.getId(), campaign.getName());
         player.setCamouflage(campaign.getCamouflage().clone());
         player.setColour(campaign.getColour());
         player.setStartingPos(scenario.getStartingPos());
