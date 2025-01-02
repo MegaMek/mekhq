@@ -1286,16 +1286,36 @@ public class Unit implements ITechnology {
 
     /**
      * Calculates and returns the total cargo capacity of a fully crewed entity.
-     * If the entity is not fully crewed, the cargo capacity will be returned as 0.
-     * The capacity is calculated based on the sum capacity of CargoBay and
-     * StandardSeatCargoBay type Bays in the entity, and from non-damaged
-     * EquipmentParts (with the 'part name' following the pattern "Cargo (X ton)" or
-     * "Cargo (X tons)"). Any erroneous cases are logged.
+     * If the entity is not fully crewed, the method returns a cargo capacity of 0.
      *
-     * @return The total cargo capacity of the fully crewed entity,
-     *         or 0 if the entity is not fully crewed.
-     * @throws NumberFormatException If the equipment part named "Cargo (X ton)" or
-     *         "Cargo (X tons)" does not contain a valid number for X.
+     * <p>The total cargo capacity is calculated as the sum of:</p>
+     * <ul>
+     *   <li>The capacities of all {@link CargoBay} and {@link StandardSeatCargoBay}
+     *       type bays in the entity</li>
+     *   <li>The capacities of specific {@link EquipmentPart} items with names matching
+     *       recognized patterns.</li>
+     * </ul>
+     *
+     * <p>The following naming patterns are supported for equipment parts:</p>
+     * <ul>
+     *   <li><b>"Cargo (X ton)"</b>: The capacity is determined from the numeric value X.</li>
+     *   <li><b>"Cargo (X tons)"</b>: Works the same as the first pattern and is plural-sensitive.</li>
+     *   <li><b>"Cargo Container (X ton)"</b>: Specific to cargo containers, determines the capacity from X.</li>
+     *   <li><b>"Cargo Container (X tons)"</b>: Same as above, but with plural handling.</li>
+     * </ul>
+     *
+     * <p>Equipment parts are only included in the calculation if they meet the following criteria:</p>
+     * <ul>
+     *   <li>The part is an instance of {@link EquipmentPart}.</li>
+     *   <li>The part is not in need of repairs (i.e., {@code !part.needsFixing()}).</li>
+     *   <li>The part is not mounted on a destroyed location.</li>
+     * </ul>
+     *
+     * <p>Any invalid or unparsable values from equipment parts' names are logged as errors,
+     * but these errors do not interrupt or halt execution.</p>
+     *
+     * @return The total cargo capacity of the entity if it is fully crewed, or 0 if the entity
+     *         is not fully crewed.
      */
     public double getCargoCapacity() {
         if (!isFullyCrewed()) {
@@ -1309,18 +1329,35 @@ public class Unit implements ITechnology {
             }
         }
 
+        // Pattern for general "Cargo (`x` tons)"
         Pattern cargoPattern = Pattern.compile("Cargo \\((.*) ton(s)?\\)");
+
+        // Updated pattern for "Cargo Container (`x` tons)"
+        Pattern containerPattern = Pattern.compile("Cargo Container \\((.*) ton(s)?\\)");
 
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart && !(part.needsFixing() || part.isMountedOnDestroyedLocation())) {
-                Matcher matcher = cargoPattern.matcher(part.getName());
+                // Match for cargo
+                Matcher cargoMatcher = cargoPattern.matcher(part.getName());
 
-                if (matcher.find()) {
+                if (cargoMatcher.find()) {
                     try {
-                        double partCapacity = Double.parseDouble(matcher.group(1));
+                        double partCapacity = Double.parseDouble(cargoMatcher.group(1));
                         capacity += partCapacity;
                     } catch (NumberFormatException e) {
-                        logger.error(String.format("Failed to parse %s as double", matcher.group(1)));
+                        logger.error(String.format("Failed to parse %s as double", cargoMatcher.group(1)));
+                    }
+                }
+
+                // Match for cargo container
+                Matcher containerMatcher = containerPattern.matcher(part.getName());
+
+                if (containerMatcher.find()) {
+                    try {
+                        double partCapacity = Double.parseDouble(containerMatcher.group(1));
+                        capacity += partCapacity;
+                    } catch (NumberFormatException e) {
+                        logger.error(String.format("Failed to parse %s as double", containerMatcher.group(1)));
                     }
                 }
             }
