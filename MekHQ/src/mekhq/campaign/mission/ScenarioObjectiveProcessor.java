@@ -433,9 +433,8 @@ public class ScenarioObjectiveProcessor {
                     } else {
                         int dropSize = 0;
                         for (int x = 0; x < numBonuses; x++) {
-                            if (contract.doBonusRoll(tracker.getCampaign())) {
-                                dropSize++;
-                            }
+                            dropSize += contract.doBonusRoll(tracker.getCampaign(), true)
+                                ? 1 : 0;
                         }
 
                         if (dropSize > 0) {

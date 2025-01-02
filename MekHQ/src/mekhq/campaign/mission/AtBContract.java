@@ -764,29 +764,28 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Performs a bonus roll with varying outcomes based on the roll results.
+     * Performs a bonus roll to determine and execute a random campaign bonus.
+     * The roll is simulated using 1d6, and the outcome triggers different bonus
+     * effects based on the roll value. The effects may involve recruiting
+     * dependents, adding new units, or other benefits as determined by the
+     * campaign options and roll outcome.
      *
-     * <p>The outcomes are as follows:
-     * <ul>
-     *     <li>1: Adds 1 - 6 (randomized) new dependents to the campaign, if the campaign options allow.
-     *     Otherwise this result is identical to 3</li>
-     *     <li>2: Recruits a new Ronin for the campaign.</li>
-     *     <li>3: Returns {@code true} (indicating a supply drop).</li>
-     *     <li>4: Adds a new tank unit to the campaign.</li>
-     *     <li>5: Adds a new aerospace fighter unit to the campaign.</li>
-     *     <li>6: Adds a new MEK unit to the campaign.</li>
-     * </ul>
+     * @param campaign       the current {@link Campaign} instance.
+     * @param isPostScenario a {@code boolean} indicating if this roll occurs post-scenario
+     *                       (used to determine specific behaviors for roll = 3).
      *
-     * @param campaign the campaign to modify based on the bonus roll.
-     * @throws IllegalStateException if the bonus roll result is not between 1 and 6 (inclusive).
+     * @return {@code true} if specific post-scenario behavior is triggered (roll = 3),
+     *         otherwise {@code false}.
+     *
+     * @throws IllegalStateException if an unexpected roll value is encountered.
      */
-    public void doBonusRoll(Campaign campaign) {
+    public boolean doBonusRoll(Campaign campaign, boolean isPostScenario) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         int number;
         int roll = d6();
 
-        switch (roll) {
+        return switch (roll) {
             case 1 -> { /* 1d6 dependents */
                 if (campaignOptions.isUseRandomDependentAddition()) {
                     number = d6();
@@ -800,35 +799,46 @@ public class AtBContract extends Contract {
                     campaign.addReport("Bonus: Ronin");
                     recruitRonin(campaign);
                 }
+                yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
                 recruitRonin(campaign);
+                yield false;
             }
             case 3 -> { // Resupply
                 if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
                     campaign.addReport("Bonus: Ronin");
                     recruitRonin(campaign);
+                    yield false;
                 } else {
-                    campaign.addReport("Bonus: Support Point");
-                    stratconCampaignState.setSupportPoints(1);
+                    if (isPostScenario) {
+                        yield true;
+                    } else {
+                        campaign.addReport("Bonus: Support Point");
+                        stratconCampaignState.setSupportPoints(1);
+                        yield false;
+                    }
                 }
             }
             case 4 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, UnitType.TANK);
+                yield false;
             }
             case 5 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
+                yield false;
             }
             case 6 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, MEK);
+                yield false;
             }
             default -> throw new IllegalStateException(
                 "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
-        }
+        };
     }
 
     /**
@@ -911,7 +921,7 @@ public class AtBContract extends Contract {
             switch (getContractType().generateEventType()) {
                 case EVT_BONUSROLL:
                     campaign.addReport("<b>Special Event:</b> ");
-                    doBonusRoll(campaign);
+                    doBonusRoll(campaign, false);
                     break;
                 case EVT_SPECIAL_SCENARIO:
                     campaign.addReport("<b>Special Event:</b> Special scenario this month");
