@@ -207,7 +207,7 @@ public class MekHQ implements GameListener {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
             // TODO: complete integration of Suite Preferences, including GUIPreferences
-            selectedTheme = new ObservableString("selectedTheme", GUIPreferences.UI_THEME);
+            selectedTheme = new ObservableString("selectedTheme", "");
             selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
             preferences.manage(new StringPreference(selectedTheme));
 
