@@ -7,6 +7,10 @@ MEKHQ VERSION HISTORY:
 + PR #5577: Leadership Units & Support Point Scarcity Hot Fixes
 + PR #5582: Updated Rank Systems Version in ranks.xml
 + Fix #5188, #5410: Corrected GUI Theme Retrieval to Use selectedTheme
++ PR #5585: Replaced Placeholder Challenge Skulls with Final
++ Fix #5584: Fixed NPE in ScenarioTableModel
++ Fix #5590: Fixed Incorrect Cargo Sizes for Resupplies
++ PR #5595: Fixed Abandoned Convoys; Updated Abandoned Convoy Dialog
 
 
 0.50.02 (2024-12-30 2130 UTC)
