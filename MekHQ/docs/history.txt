@@ -1,6 +1,32 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.03-SNAPSHOT
++ PR #5568: Spare parts rules reference adjustment
++ PR #5559: Refactored Combat Team Handling in Scenarios for Better null Safety
++ Fix #5572: don't attempt to sum NaN tonnage equipment
++ PR #5577: Leadership Units & Support Point Scarcity Hot Fixes
++ PR #5582: Updated Rank Systems Version in ranks.xml
++ Fix #5188, #5410: Corrected GUI Theme Retrieval to Use selectedTheme
++ PR #5585: Replaced Placeholder Challenge Skulls with Final
++ Fix #5584: Fixed NPE in ScenarioTableModel
++ Fix #5590: Fixed Incorrect Cargo Sizes for Resupplies
++ PR #5595: Fixed Abandoned Convoys; Updated Abandoned Convoy Dialog
++ PR #5597: Added Better Tooltips for Force Roles
++ PR #5598: Updated Resupply & Contract Automation Dialogs; Fixed Multiple Resupply Bugs
++ PR #5599: Improved Loot Good Event Language
++ PR #5600: Added Clarification to Reinforcement Dialog
++ Fix MM #5547: spelling, fixes issue 
++ PR #5602: Adjusted AtB Bonus Events
++ Fix MM ##5138: fixes capitalization of names
++ PR #5606: fix moons listed for Tantara
++ PR #5610: Corrected StratCon Menu Actions for Scenario and Force Management
++ PR #5611: Corrected Default Theme to Empty String
++ Fix #3352: add additional sortable columns to the contract table
++ PR #5614: Fixed Cargo Capacity Calculation with New Container Pattern
++ PR #5617: Restrict Distance Label to AtB Contracts Only
++ PR #5619: Refactored PostScenarioDialogHandler to use Generic Scenario
++ PR #5620: Autologistics Reporting fixes
+
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

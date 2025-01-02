@@ -84,6 +84,7 @@ public class GenerateResupplyContents {
         if (usePlayerConvoys) {
             final int targetCargoTonnagePlayerConvoy = resupply.getTargetCargoTonnagePlayerConvoy();
             final double playerCargoCapacity = resupply.getTotalPlayerCargoCapacity();
+
             targetCargoTonnage = min(targetCargoTonnagePlayerConvoy, playerCargoCapacity);
         }
 
@@ -156,11 +157,9 @@ public class GenerateResupplyContents {
 
                 double partWeight = potentialPart.getTonnage();
                 partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
-                availableSpace -= partWeight * WEIGHT_MULTIPLIER;
 
-                if (availableSpace >= 0) {
-                    droppedItems.add(potentialPart);
-                }
+                availableSpace -= partWeight * WEIGHT_MULTIPLIER;
+                droppedItems.add(potentialPart);
             }
         }
 

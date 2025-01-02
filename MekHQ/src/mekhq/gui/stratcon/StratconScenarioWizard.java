@@ -26,6 +26,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -87,23 +88,71 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Selects a scenario on a particular track in a particular campaign.
+     * Configures and sets the current Stratcon scenario, updating the associated track and campaign states
+     * as well as preparing the available forces and units for the scenario.
+     *
+     * @param scenario       the {@link StratconScenario} to be set as the current scenario.
+     * @param trackState     the {@link StratconTrackState} representing the state of the scenario's track.
+     * @param campaignState  the {@link StratconCampaignState} representing the state of the overall campaign.
+     * @param isPrimaryForce a boolean flag indicating whether the primary force is being assigned for this scenario.
+     *                       <ul>
+     *                         <li>{@code true}: Indicates that the primary force is being deployed.</li>
+     *                         <li>{@code false}: Indicates that the scenario is being configured without primary force assignment.</li>
+     *                       </ul>
+     *
+     * <p>Functionality and Process:</p>
+     * <ul>
+     *   <li>Sets the provided scenario as the {@code currentScenario}.</li>
+     *   <li>Updates the {@link StratconCampaignState}, {@link StratconTrackState}, and clears previous force/unit lists.</li>
+     *   <li>Initializes the user interface by calling {@link #setUI(boolean)}, passing the {@code isPrimaryForce} parameter.</li>
+     * </ul>
      */
     public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState,
-            StratconCampaignState campaignState) {
+            StratconCampaignState campaignState, boolean isPrimaryForce) {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
         availableForceLists.clear();
         availableUnitLists.clear();
 
-        setUI();
+        setUI(isPrimaryForce);
     }
 
     /**
-     * Sets up the UI as appropriate for the currently selected scenario.
+     * Configures and initializes the user interface for the scenario setup wizard.
+     * This method dynamically assembles various UI components based on the scenario's state and
+     * whether the primary force is being assigned.
+     *
+     * @param isPrimaryForce a boolean flag indicating whether the primary force is being assigned:
+     *                       <ul>
+     *                         <li>{@code true}: Configures the UI with additional components for leadership and defensive points.</li>
+     *                         <li>{@code false}: Configures the UI for scenarios without primary force-specific components.</li>
+     *                       </ul>
+     *
+     * <p>Process and Behavior:</p>
+     * <ol>
+     *   <li>Sets the dialog window's title based on resource strings.</li>
+     *   <li>Clears the existing content pane to rebuild the UI.</li>
+     *   <li>Uses a {@link JPanel} with {@link GridBagLayout} to organize UI components.</li>
+     *   <li>Adds components for instructions and force assignment.</li>
+     *   <li>If {@code isPrimaryForce} is {@code true}, adds special UI components such as:
+     *       <ul>
+     *         <li>Leadership unit selection, sorted by force name (if leadership skill is greater than 0).</li>
+     *         <li>Defensive points configuration.</li>
+     *       </ul>
+     *   </li>
+     *   <li>Adds navigation buttons for controlling the wizard flow (Next, Back, Cancel, etc.).</li>
+     *   <li>Wraps all content in a {@link JScrollPane} to handle large UI layouts with scrollbars.</li>
+     *   <li>Finalizes the UI setup with {@code pack()} and {@code validate()} for proper rendering.</li>
+     * </ol>
+     *
+     * <p>Roles and Responsibilities:</p>
+     * <ul>
+     *   <li>Handles complex UI layouts dynamically based on scenario state and user input requirements.</li>
+     *   <li>Ensures scalability for larger content using scrollbars.</li>
+     * </ul>
      */
-    private void setUI() {
+    private void setUI(boolean isPrimaryForce) {
         setTitle(resources.getString("scenarioSetupWizard.title"));
         getContentPane().removeAll();
 
@@ -121,23 +170,20 @@ public class StratconScenarioWizard extends JDialog {
 
         // Move to the next row
         gbc.gridy++;
-        boolean reinforcements = Objects.requireNonNull(currentScenario.getCurrentState()) != ScenarioState.UNRESOLVED;
 
         // Add UI for assigning forces
-        setAssignForcesUI(gbc, reinforcements);
+        setAssignForcesUI(gbc, isPrimaryForce);
 
         // Handle optional UI for eligible leadership, defensive points, etc.
-        if (!reinforcements) {
+        if (isPrimaryForce) {
             gbc.gridy++;
             int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
             List<Unit> eligibleLeadershipUnits = getEligibleLeadershipUnits(
                 campaign, currentScenario.getPrimaryForceIDs(), leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
-            if (!eligibleLeadershipUnits.isEmpty() && leadershipSkill > 0) {
-                setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-                gbc.gridy++;
-            }
+            setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
+            gbc.gridy++;
 
             if (currentScenario.getNumDefensivePoints() > 0) {
                 setDefensiveUI(gbc);
@@ -148,7 +194,7 @@ public class StratconScenarioWizard extends JDialog {
         // Add navigation buttons
         gbc.gridx = 0;
         gbc.gridy++;
-        setNavigationButtons(gbc);
+        setNavigationButtons(gbc, isPrimaryForce);
 
         // Wrap contentPanel in a scroll pane
         JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -224,13 +270,55 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that sets up the "assign forces to scenario" UI elements.
+     * Configures and populates the user interface for assigning forces to the scenario.
+     * This method dynamically creates UI panels, one for each eligible force template, and displays
+     * the available forces for selection based on the reinforcement or primary force status.
+     *
+     * @param gbc            the {@link GridBagConstraints} to manage the layout of the force assignment UI.
+     * @param isPrimaryForce a boolean flag indicating whether the UI is being configured for the primary force assignment:
+     *                       <ul>
+     *                         <li>{@code true}: Lists player forces designated as primary forces.</li>
+     *                         <li>{@code false}: Lists reinforcement forces that may require support points.</li>
+     *                       </ul>
+     *
+     * <p>Process and Behavior:</p>
+     * <ol>
+     *   <li>Retrieves a list of eligible force templates based on the value of {@code isPrimaryForce}.
+     *       <ul>
+     *         <li>For primary forces, {@link StratconScenarioTemplate#getAllPrimaryPlayerForces()} is used.</li>
+     *         <li>For reinforcement forces, {@link StratconScenarioTemplate#getAllPlayerReinforcementForces()} is used.</li>
+     *       </ul>
+     *   </li>
+     *   <li>For each eligible force template:
+     *       <ul>
+     *         <li>Creates a panel to hold UI components specific to that force.</li>
+     *         <li>Adds instructional text for reinforcements if applicable, which adapts based on the available support points.</li>
+     *         <li>If not a primary force:
+     *             <ul>
+     *               <li>Constructs a force selection list populated with available reinforcements.</li>
+     *               <li>Tracks the selection through listener events, enabling force selection updates dynamically.</li>
+     *               <li>Displays detailed information about the selected force beside the force list.</li>
+     *             </ul>
+     *         </li>
+     *         <li>Attaches the created force panel to the main content panel managed by the {@code GridBagConstraints}.</li>
+     *       </ul>
+     *   </li>
+     *   <li>Updates the {@code availableForceLists} map with force templates and their associated UI components for later reference.</li>
+     *   <li>Increments the layout constraints for the force panel to ensure proper stacking in the UI layout.</li>
+     * </ol>
+     *
+     * <p>Roles and Responsibilities:</p>
+     * <ul>
+     *   <li>Adds and configures force-related UI elements dynamically, adapting to the scenario's configuration.</li>
+     *   <li>Handles player force assignment and manages user input for reinforcement and primary force selection.</li>
+     *   <li>Links the force selection lists to the backing logic for dynamic interaction and validation.</li>
+     * </ul>
      */
-    private void setAssignForcesUI(GridBagConstraints gbc, boolean reinforcements) {
+    private void setAssignForcesUI(GridBagConstraints gbc, boolean isPrimaryForce) {
         // Get eligible templates depending on reinforcement status
-        List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements
-            ? currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces()
-            : currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
+        List<ScenarioForceTemplate> eligibleForceTemplates = isPrimaryForce
+            ? currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces()
+            : currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces();
 
         for (ScenarioForceTemplate forceTemplate : eligibleForceTemplates) {
             // Create a panel for each force template
@@ -245,30 +333,30 @@ public class StratconScenarioWizard extends JDialog {
                 ? resources.getString("selectReinforcementsForTemplate.Text")
                 : resources.getString("selectReinforcementsForTemplateNoSupportPoints.Text");
 
-            String labelText = reinforcements ? reinforcementMessage
-                : resources.getString("selectForceForTemplate.Text");
+            JLabel assignForceListInstructions = new JLabel(reinforcementMessage);
 
-            JLabel assignForceListInstructions = new JLabel(labelText);
-            forcePanel.add(assignForceListInstructions, localGbc);
+            if (!isPrimaryForce) {
+                forcePanel.add(assignForceListInstructions, localGbc);
 
-            // Add a list to display available forces
-            localGbc.gridy = 1;
-            JLabel selectedForceInfo = new JLabel();
-            JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
-            availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            // Add a listener to handle changes to the selected force
-            availableForceList
-                    .addListSelectionListener(e -> {
-                        availableForceSelectorChanged(e, selectedForceInfo, reinforcements);
-                        btnCommit.setEnabled(true);
-                    });
+                // Add a list to display available forces
+                localGbc.gridy = 1;
+                JLabel selectedForceInfo = new JLabel();
+                JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
+                availableForceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                // Add a listener to handle changes to the selected force
+                availableForceList
+                        .addListSelectionListener(e -> {
+                            availableForceSelectorChanged(e, selectedForceInfo, isPrimaryForce);
+                            btnCommit.setEnabled(true);
+                        });
 
-            // Store the list in the map for later reference
-            availableForceLists.put(forceTemplate.getForceName(), availableForceList);
+                // Store the list in the map for later reference
+                availableForceLists.put(forceTemplate.getForceName(), availableForceList);
 
-            // Add the selected force info to the panel
-            localGbc.gridx = 1;
-            forcePanel.add(selectedForceInfo, localGbc);
+                // Add the selected force info to the panel
+                localGbc.gridx = 1;
+                forcePanel.add(selectedForceInfo, localGbc);
+            }
 
             // Add the forcePanel to contentPanel (not getContentPane)
             contentPanel.add(forcePanel, gbc);
@@ -417,12 +505,12 @@ public class StratconScenarioWizard extends JDialog {
      * Worker function that builds an "html-enabled" string indicating the brief
      * status of a force
      */
-    private String buildForceStatus(Force f, boolean showForceCost) {
+    private String buildForceStatus(Force f, boolean hideForceCost) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(f.getFullName());
         sb.append(": ");
-        if (showForceCost) {
+        if (!hideForceCost) {
             sb.append(buildForceCost(f.getId()));
         }
         sb.append("<br/>");
@@ -489,26 +577,46 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Creates and configures the "Commit" navigation button and adds it to the content panel.
-     * The behavior of the button is determined based on the state of the current scenario:
+     * Creates and configures the navigation buttons, specifically the "Commit" button,
+     * and adds it to the UI layout. The behavior of the "Commit" button is determined
+     * based on whether the scenario involves primary force assignment or reinforcements.
+     *
+     * @param constraints    the {@link GridBagConstraints} used to define the position and
+     *                       alignment of the button within the panel.
+     * @param isPrimaryForce a boolean flag indicating the purpose of the button:
+     *                       <ul>
+     *                         <li>{@code true}: The "Commit" button triggers a direct commit
+     *                             for scenarios involving the primary force.</li>
+     *                         <li>{@code false}: The "Commit" button opens the reinforcement
+     *                             confirmation dialog and is only enabled when sufficient
+     *                             support points are available.</li>
+     *                       </ul>
+     *
+     * <p>Behavior and Functionality:</p>
      * <ul>
-     *   <li>If the scenario state is {@code UNRESOLVED}, the button triggers the immediate commit
-     *       action via {@link #btnCommitClicked(ActionEvent, Integer, boolean)}.</li>
-     *   <li>If the scenario state requires reinforcements, the button opens the
-     *       {@link #reinforcementConfirmDialog()} and is only enabled if there are enough
-     *       support points available.</li>
+     *   <li>When {@code isPrimaryForce} is {@code true}:
+     *       <ul>
+     *         <li>The "Commit" button invokes the {@link #btnCommitClicked(ActionEvent, Integer, boolean)}
+     *             method to directly complete the action.</li>
+     *       </ul>
+     *   </li>
+     *   <li>When {@code isPrimaryForce} is {@code false}:
+     *       <ul>
+     *         <li>The button opens the {@link #reinforcementConfirmDialog()}, which handles
+     *             reinforcement confirmation logic.</li>
+     *         <li>The button is only enabled if the current campaign has sufficient support points,
+     *             as determined by {@link StratconCampaignState#getSupportPoints()}.</li>
+     *       </ul>
+     *   </li>
+     *   <li>The button is added to the content panel, with its position controlled by the provided
+     *       {@link GridBagConstraints}, ensuring proper alignment within the UI layout.</li>
      * </ul>
-     *
-     * <p>The button is added to the layout using the provided {@link GridBagConstraints},
-     * which defines its position and alignment within the panel.</p>
-     *
-     * @param constraints the {@link GridBagConstraints} used for positioning the button within the panel.
      */
-    private void setNavigationButtons(GridBagConstraints constraints) {
+    private void setNavigationButtons(GridBagConstraints constraints, boolean isPrimaryForce) {
         // Create the commit button
         btnCommit = new JButton("Commit");
         btnCommit.setActionCommand("COMMIT_CLICK");
-        if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
+        if (isPrimaryForce) {
             btnCommit.addActionListener(evt -> btnCommitClicked(evt,
                 null, false));
         } else {
@@ -568,7 +676,7 @@ public class StratconScenarioWizard extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get commandLiaison details
-        Person commandLiaison = campaign.getSeniorAdminCommandPerson();
+        Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         String speakerName = (commandLiaison != null) ? commandLiaison.getFullTitle() : campaign.getName();
 
         // Add commandLiaison image (icon)
@@ -645,7 +753,11 @@ public class StratconScenarioWizard extends JDialog {
 
         int availableSupportPoints = currentCampaignState.getSupportPoints();
         JSpinner spnSupportPointCost = new JSpinner(
-            new SpinnerNumberModel(1, 1, availableSupportPoints, 1));
+            new SpinnerNumberModel(
+                availableSupportPoints > 0 ? 1 : 0,
+                availableSupportPoints > 0 ? 1 : 0,
+                availableSupportPoints,
+                1));
         spnSupportPointCost.setToolTipText(resources.getString("reinforcementConfirmation.spinnerLabel.tooltip"));
         spnSupportPointCost.setMaximumSize(spnSupportPointCost.getPreferredSize());
         spnSupportPointCost.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -815,18 +927,18 @@ public class StratconScenarioWizard extends JDialog {
         // now and the scenario gets published to the campaign and may be played immediately
         // from the briefing room that being said, give the player a chance to commit reinforcements too
         if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            // if we've already generated forces and applied modifiers, no need to do it
-            // twice
+            // if we've already generated forces and applied modifiers, no need to do it twice
             if (!currentScenario.getBackingScenario().isFinalized()) {
                 AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(),
                         currentCampaignState.getContract(), campaign);
                 StratconRulesManager.setScenarioParametersFromBiome(currentTrackState, currentScenario);
             }
 
-            StratconRulesManager.commitPrimaryForces(campaign, currentScenario, currentTrackState);
-            setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
+            setCurrentScenario(currentScenario, currentTrackState, currentCampaignState, true);
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
-            // if we've just committed reinforcements then simply close it down
+            StratconRulesManager.commitPrimaryForces(campaign, currentScenario, currentTrackState);
+            setVisible(true);
+        // if we've just committed reinforcements then simply close it down
         } else {
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
             setVisible(false);
@@ -838,12 +950,38 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Event handler for when the user makes a selection on the available force
-     * selector.
+     * Handles the event triggered when the user makes a selection in the available force selector UI component.
+     * This method updates the provided status label to display detailed information about the selected forces
+     * and refreshes the UI to reflect the changes.
      *
-     * @param e The event fired.
+     * @param e               the {@link ListSelectionEvent} representing the user's selection action.
+     *                        This event contains the source list and the selection details.
+     * @param forceStatusLabel the {@link JLabel} used to display the status of the selected forces.
+     * @param isPrimaryForce  a boolean flag indicating whether the selected forces are part of the primary force:
+     *                        <ul>
+     *                          <li>{@code true}: Displays details relevant to the primary force (e.g., leadership, roles).</li>
+     *                          <li>{@code false}: Displays details relevant to reinforcement forces (e.g., support point requirements).</li>
+     *                        </ul>
+     *
+     * <p>Behavior and Process:</p>
+     * <ul>
+     *   <li>Verifies that the event source is a {@link JList}. If the source is not a {@code JList}, the method returns immediately.</li>
+     *   <li>Retrieves the list of selected forces from the {@code JList}.</li>
+     *   <li>Builds an HTML-formatted string with status details for each selected force using the
+     *       {@link #buildForceStatus(Force, boolean)} method.</li>
+     *   <li>Updates the provided status label with the constructed HTML string, effectively updating the displayed information.</li>
+     *   <li>Refreshes the UI by calling {@link #pack()} to ensure the dialog adjusts properly to any layout changes.</li>
+     * </ul>
+     *
+     * <p>Roles and Responsibilities:</p>
+     * <ul>
+     *   <li>Processes the user's selection of forces in the UI and dynamically updates the status display accordingly.</li>
+     *   <li>Ensures that the appropriate details (based on whether the forces are primary or reinforcements) are shown in the UI.</li>
+     *   <li>Maintains a responsive UI by packing the dialog after the update, adjusting its layout if necessary.</li>
+     * </ul>
      */
-    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements) {
+    private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel,
+                                               boolean isPrimaryForce) {
         if (!(e.getSource() instanceof JList<?>)) {
             return;
         }
@@ -854,7 +992,7 @@ public class StratconScenarioWizard extends JDialog {
         statusBuilder.append("<html>");
 
         for (Force force : sourceList.getSelectedValuesList()) {
-            statusBuilder.append(buildForceStatus(force, reinforcements));
+            statusBuilder.append(buildForceStatus(force, isPrimaryForce));
         }
 
         statusBuilder.append("</html>");

@@ -37,6 +37,7 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -45,8 +46,6 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -93,13 +92,13 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
+import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -765,30 +764,30 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Performs a bonus roll with varying outcomes based on the roll results.
+     * Performs a bonus roll to determine and execute a random campaign bonus.
+     * The roll is simulated using 1d6, and the outcome triggers different bonus
+     * effects based on the roll value. The effects may involve recruiting
+     * dependents, adding new units, or other benefits as determined by the
+     * campaign options and roll outcome.
      *
-     * <p>The outcomes are as follows:
-     * <ul>
-     *     <li>1: Adds 1 - 6 (randomized) new dependents to the campaign, if the campaign options allow.
-     *     Otherwise this result is identical to 3</li>
-     *     <li>2: Recruits a new Ronin for the campaign.</li>
-     *     <li>3: Returns {@code true} (indicating a supply drop).</li>
-     *     <li>4: Adds a new tank unit to the campaign.</li>
-     *     <li>5: Adds a new aerospace fighter unit to the campaign.</li>
-     *     <li>6: Adds a new MEK unit to the campaign.</li>
-     * </ul>
+     * @param campaign       the current {@link Campaign} instance.
+     * @param isPostScenario a {@code boolean} indicating if this roll occurs post-scenario
+     *                       (used to determine specific behaviors for roll = 3).
      *
-     * @param campaign the campaign to modify based on the bonus roll.
-     * @return {@code true} if the bonus roll result is a Resupply, otherwise {@code false}.
-     * @throws IllegalStateException if the bonus roll result is not between 1 and 6 (inclusive).
+     * @return {@code true} if specific post-scenario behavior is triggered (roll = 3),
+     *         otherwise {@code false}.
+     *
+     * @throws IllegalStateException if an unexpected roll value is encountered.
      */
-    public boolean doBonusRoll(Campaign campaign) {
+    public boolean doBonusRoll(Campaign campaign, boolean isPostScenario) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         int number;
         int roll = d6();
 
-        switch (roll) {
+        return switch (roll) {
             case 1 -> { /* 1d6 dependents */
-                if (campaign.getCampaignOptions().isUseRandomDependentAddition()) {
+                if (campaignOptions.isUseRandomDependentAddition()) {
                     number = d6();
                     campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
@@ -797,33 +796,49 @@ public class AtBContract extends Contract {
                         campaign.recruitPerson(person);
                     }
                 } else {
-                    return true;
+                    campaign.addReport("Bonus: Ronin");
+                    recruitRonin(campaign);
                 }
+                yield false;
             }
             case 2 -> {
                 campaign.addReport("Bonus: Ronin");
                 recruitRonin(campaign);
+                yield false;
             }
             case 3 -> { // Resupply
-                return true;
+                if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
+                    campaign.addReport("Bonus: Ronin");
+                    recruitRonin(campaign);
+                    yield false;
+                } else {
+                    if (isPostScenario) {
+                        yield true;
+                    } else {
+                        campaign.addReport("Bonus: Support Point");
+                        stratconCampaignState.setSupportPoints(1);
+                        yield false;
+                    }
+                }
             }
             case 4 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, UnitType.TANK);
+                yield false;
             }
             case 5 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
+                yield false;
             }
             case 6 -> {
                 campaign.addReport("Bonus: Unit");
                 addBonusUnit(campaign, MEK);
+                yield false;
             }
             default -> throw new IllegalStateException(
                 "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
-        }
-
-        return false;
+        };
     }
 
     /**
@@ -906,12 +921,7 @@ public class AtBContract extends Contract {
             switch (getContractType().generateEventType()) {
                 case EVT_BONUSROLL:
                     campaign.addReport("<b>Special Event:</b> ");
-                    if (doBonusRoll(campaign)) {
-                        campaign.addReport("Bonus: Captured Supplies");
-                        Resupply resupply = new Resupply(campaign, this, ResupplyType.RESUPPLY_LOOT);
-                        performResupply(resupply, this);
-                    }
-
+                    doBonusRoll(campaign, false);
                     break;
                 case EVT_SPECIAL_SCENARIO:
                     campaign.addReport("<b>Special Event:</b> Special scenario this month");
@@ -1854,8 +1864,10 @@ public class AtBContract extends Contract {
         JPanel panel = new JPanel(new FlowLayout());
 
         // Load and scale the images
-        ImageIcon skullFull = new ImageIcon("data/images/misc/challenge_estimate_full.png");
-        ImageIcon skullHalf = new ImageIcon("data/images/misc/challenge_estimate_half.png");
+        ImageIcon skullFull = scaleImageIconToWidth(
+            new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50);
+        ImageIcon skullHalf = scaleImageIconToWidth(
+            new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50);
 
         int iterations = difficulty;
 

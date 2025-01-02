@@ -64,7 +64,7 @@ public class Resupply {
     private Money convoyContentsValueBase;
     private Money convoyContentsValueCalculated;
 
-    public static final int CARGO_MULTIPLIER = 2;
+    public static final int CARGO_MULTIPLIER = 4;
 
     private static final MMLogger logger = MMLogger.create(Resupply.class);
 

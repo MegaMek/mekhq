@@ -92,7 +92,7 @@ public abstract class Part implements IPartWork, ITechnology {
     protected String name;
     protected int id;
 
-    /** 
+    /**
      * This is the unitTonnage which needs to be tracked for some parts
      * even when off the unit. Actual tonnage is returned via the
      * getTonnage() method
@@ -256,7 +256,7 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         return adjustCostsForCampaignOptions(cost, false);
-    } 
+    }
 
     /**
      * Adjusts the cost of a part based on campaign options
@@ -335,8 +335,8 @@ public abstract class Part implements IPartWork, ITechnology {
     public int getUnitTonnage() {
         return unitTonnage;
     }
-    
-    /** 
+
+    /**
      * @return Is this an item that exists in multiple forms for units of different tonnages?
      */
     public boolean isUnitTonnageMatters() {
@@ -554,13 +554,13 @@ public abstract class Part implements IPartWork, ITechnology {
         // parts that are reserved for refit or being worked on are never the same
         // status
         if (isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement() || hasParentPart()
-                || otherPart.isReservedForRefit() || otherPart.isBeingWorkedOn() 
+                || otherPart.isReservedForRefit() || otherPart.isBeingWorkedOn()
                 || otherPart.isReservedForReplacement() || otherPart.hasParentPart()) {
             return false;
         }
         return getQuality() == otherPart.getQuality()
                 && getHits() == otherPart.getHits()
-                && getSkillMin() == otherPart.getSkillMin() 
+                && getSkillMin() == otherPart.getSkillMin()
                 && getDaysToArrival() == otherPart.getDaysToArrival();
     }
 
@@ -903,7 +903,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public TargetRoll getAllModsForMaintenance() {
-        // according to StratOps you get a -1 mod when checking on individual parts
+        // according to Campaign Ops [p.197] you get a -1 mod when performing a maintenance check on individual parts
         // but we will make this user customizable
         final TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
         mods.addModifier(Availability.getTechModifier(getTechRating()),
@@ -1103,7 +1103,7 @@ public abstract class Part implements IPartWork, ITechnology {
             sj.add(getUnitTonnage() + " tons");
         }
 
-        if (includeRepairDetails && hits > 0) {            
+        if (includeRepairDetails && hits > 0) {
             sj.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().isPayForRepairs()) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");

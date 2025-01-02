@@ -29,6 +29,8 @@ import mekhq.campaign.mission.atb.scenario.*;
 import java.time.LocalDate;
 import java.util.*;
 
+import static mekhq.campaign.mission.AtBScenario.NO_COMBAT_TEAM;
+
 public class AtBScenarioFactory {
     private static final MMLogger logger = MMLogger.create(AtBScenarioFactory.class);
 
@@ -128,7 +130,7 @@ public class AtBScenarioFactory {
         // If we have an active contract, then we can progress with generation
         Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
 
-        List<AtBScenario> sList;
+        List<AtBScenario> scenarios;
         List<Integer> assignedLances = new ArrayList<>();
         List<Integer> dontGenerateForces;
         boolean hasBaseAttack;
@@ -137,7 +139,7 @@ public class AtBScenarioFactory {
         // We only need to process active AtB contracts that haven't hit their end date
         for (final AtBContract contract : campaign.getActiveAtBContracts()) {
             // region Value Initialization
-            sList = new ArrayList<>();
+            scenarios = new ArrayList<>();
             dontGenerateForces = new ArrayList<>();
             hasBaseAttack = false;
             hasBaseAttackAttacker = false;
@@ -152,12 +154,14 @@ public class AtBScenarioFactory {
             // scenarios
             for (final AtBScenario scenario : contract.getCurrentAtBScenarios()) {
                 // Add any currently assigned combatTeamsTable to the assignedLances
-                assignedLances.add(scenario.getCombatTeamId());
+                if (scenario.getCombatTeamId() != NO_COMBAT_TEAM) {
+                    assignedLances.add(scenario.getCombatTeamId());
+                }
 
                 // Remove any active scenarios from the contract, and add them to the current
                 // scenarios list instead
                 contract.getScenarios().remove(scenario);
-                sList.add(scenario);
+                scenarios.add(scenario);
                 dontGenerateForces.add(scenario.getId());
 
                 // If we have a current base attack (attacker) scenario, no other scenarios
@@ -196,7 +200,7 @@ public class AtBScenarioFactory {
 
                     // If one is generated, then add it to the scenario list
                     if (scenario != null) {
-                        sList.add(scenario);
+                        scenarios.add(scenario);
                         assignedLances.add(combatTeam.getForceId());
 
                         // We care if the scenario is a Base Attack, as one must be generated if the
@@ -257,12 +261,13 @@ public class AtBScenarioFactory {
                         if (atbScenario != null) {
                             if ((combatTeam.getMissionId() == atbScenario.getMissionId())
                                     || (combatTeam.getMissionId() == CombatTeam.NO_MISSION)) {
-                                for (int i = 0; i < sList.size(); i++) {
-                                    if (sList.get(i).getCombatTeamId() == combatTeam.getForceId()) {
+                                for (int i = 0; i < scenarios.size(); i++) {
+                                    if ((scenarios.get(i).getCombatTeamId() != NO_COMBAT_TEAM)
+                                        && (scenarios.get(i).getCombatTeamId() == combatTeam.getForceId())) {
                                         if (dontGenerateForces.contains(atbScenario.getId())) {
                                             dontGenerateForces.remove(atbScenario.getId());
                                         }
-                                        sList.set(i, atbScenario);
+                                        scenarios.set(i, atbScenario);
                                         break;
                                     }
                                 }
@@ -271,10 +276,11 @@ public class AtBScenarioFactory {
                                 // we need to remove any scenario they are assigned to already
                                 campaign.getMission(combatTeam.getMissionId()).getScenarios()
                                         .removeIf(scenario -> (scenario instanceof AtBScenario)
-                                                && (((AtBScenario) scenario).getCombatTeamId() == combatTeam.getForceId()));
+                                            && (((AtBScenario) scenario).getCombatTeamId() != NO_COMBAT_TEAM)
+                                            && (((AtBScenario) scenario).getCombatTeamId() == combatTeam.getForceId()));
                             }
-                            if (!sList.contains(atbScenario)) {
-                                sList.add(atbScenario);
+                            if (!scenarios.contains(atbScenario)) {
+                                scenarios.add(atbScenario);
                             }
                             if (!assignedLances.contains(combatTeam.getForceId())) {
                                 assignedLances.add(combatTeam.getForceId());
@@ -295,7 +301,7 @@ public class AtBScenarioFactory {
             // until it happens.
             // Therefore, all other currently generated scenarios need to be cleared
             if (hasBaseAttackAttacker) {
-                sList.removeIf(atbScenario -> !(atbScenario.isAttacker()
+                scenarios.removeIf(atbScenario -> !(atbScenario.isAttacker()
                         && (atbScenario.getScenarioType() == AtBScenario.BASEATTACK)));
             }
             // endregion Base Attack (Attacker) Generated
@@ -304,8 +310,8 @@ public class AtBScenarioFactory {
             // Finally, sort the scenarios by date and add to the campaign, and generate
             // forces
             // for the scenario if required
-            sList.sort((s1, s2) -> ObjectUtility.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
-            for (AtBScenario atbScenario : sList) {
+            scenarios.sort((s1, s2) -> ObjectUtility.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
+            for (AtBScenario atbScenario : scenarios) {
                 campaign.addScenario(atbScenario, contract);
                 if (!dontGenerateForces.contains(atbScenario.getId())) {
                     atbScenario.setForces(campaign);
