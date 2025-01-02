@@ -37,6 +37,7 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -45,8 +46,6 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -93,7 +92,6 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
@@ -780,16 +778,17 @@ public class AtBContract extends Contract {
      * </ul>
      *
      * @param campaign the campaign to modify based on the bonus roll.
-     * @return {@code true} if the bonus roll result is a Resupply, otherwise {@code false}.
      * @throws IllegalStateException if the bonus roll result is not between 1 and 6 (inclusive).
      */
-    public boolean doBonusRoll(Campaign campaign) {
+    public void doBonusRoll(Campaign campaign) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         int number;
         int roll = d6();
 
         switch (roll) {
             case 1 -> { /* 1d6 dependents */
-                if (campaign.getCampaignOptions().isUseRandomDependentAddition()) {
+                if (campaignOptions.isUseRandomDependentAddition()) {
                     number = d6();
                     campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
@@ -798,7 +797,8 @@ public class AtBContract extends Contract {
                         campaign.recruitPerson(person);
                     }
                 } else {
-                    return true;
+                    campaign.addReport("Bonus: Ronin");
+                    recruitRonin(campaign);
                 }
             }
             case 2 -> {
@@ -806,7 +806,13 @@ public class AtBContract extends Contract {
                 recruitRonin(campaign);
             }
             case 3 -> { // Resupply
-                return true;
+                if (campaignOptions.isUseAtB() && !campaignOptions.isUseStratCon()) {
+                    campaign.addReport("Bonus: Ronin");
+                    recruitRonin(campaign);
+                } else {
+                    campaign.addReport("Bonus: Support Point");
+                    stratconCampaignState.setSupportPoints(1);
+                }
             }
             case 4 -> {
                 campaign.addReport("Bonus: Unit");
@@ -823,8 +829,6 @@ public class AtBContract extends Contract {
             default -> throw new IllegalStateException(
                 "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
         }
-
-        return false;
     }
 
     /**
@@ -907,12 +911,7 @@ public class AtBContract extends Contract {
             switch (getContractType().generateEventType()) {
                 case EVT_BONUSROLL:
                     campaign.addReport("<b>Special Event:</b> ");
-                    if (doBonusRoll(campaign)) {
-                        campaign.addReport("Bonus: Captured Supplies");
-                        Resupply resupply = new Resupply(campaign, this, ResupplyType.RESUPPLY_LOOT);
-                        performResupply(resupply, this);
-                    }
-
+                    doBonusRoll(campaign);
                     break;
                 case EVT_SPECIAL_SCENARIO:
                     campaign.addReport("<b>Special Event:</b> Special scenario this month");
