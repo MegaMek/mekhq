@@ -21,7 +21,6 @@
 package mekhq.campaign.market.contractMarket;
 
 import megamek.common.Entity;
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -30,19 +29,12 @@ import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
-import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.ContractAutomationDialog;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 import java.util.*;
-
-import static megamek.common.icons.AbstractIcon.DEFAULT_ICON_FILENAME;
 
 /**
  * The ContractAutomation class provides a suite of methods
@@ -107,86 +99,6 @@ public class ContractAutomation {
             campaign.addReport(String.format(resources.getString("transitDescription.supplemental"),
                 targetSystem, travelDays));
         }
-    }
-
-    /**
-     * @param campaign The current campaign
-     * @return The highest ranking Admin/Transport character. If none are found, returns {@code null}.
-     */
-    private static @Nullable Person getSpeaker(Campaign campaign) {
-        List<Person> admins = campaign.getAdmins();
-
-        if (admins.isEmpty()) {
-            return null;
-        }
-
-        List<Person> transportAdmins = new ArrayList<>();
-
-        for (Person admin : admins) {
-            if (admin.getPrimaryRole().isAdministratorTransport()
-                || admin.getSecondaryRole().isAdministratorTransport()) {
-                transportAdmins.add(admin);
-            }
-        }
-
-        if (transportAdmins.isEmpty()) {
-            return null;
-        }
-
-        Person speaker = transportAdmins.get(0);
-
-        for (Person admin : transportAdmins) {
-            if (admin.outRanksUsingSkillTiebreaker(campaign, speaker)) {
-                speaker = admin;
-            }
-        }
-
-        return speaker;
-    }
-
-    /**
-     * Gets the name of the individual to be displayed in the dialog.
-     * If the person is {@code null}, it uses the campaign's name.
-     *
-     * @param campaign The current campaign
-     * @param speaker The person who will be speaking, or {@code null}.
-     * @return The name to be displayed.
-     */
-    private static String getSpeakerName(Campaign campaign, @Nullable Person speaker) {
-        if (speaker == null) {
-            return campaign.getName();
-        } else {
-            return speaker.getFullTitle();
-        }
-    }
-
-    /**
-     * Gets the icon representing the speaker.
-     * If the speaker is {@code null}, it defaults to displaying the campaign's icon, or the
-     * campaign's faction icon.
-     *
-     * @param campaign The current campaign
-     * @param speaker The person who is speaking, or {@code null}.
-     * @return The icon of the speaker, campaign, or faction.
-     */
-    private static ImageIcon getSpeakerIcon(Campaign campaign, @Nullable Person speaker) {
-        ImageIcon icon;
-
-        if (speaker == null) {
-            String fallbackIconFilename = campaign.getUnitIcon().getFilename();
-
-            if (fallbackIconFilename == null || fallbackIconFilename.equals(DEFAULT_ICON_FILENAME)) {
-                icon = Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(), true);
-            } else {
-                icon = campaign.getUnitIcon().getImageIcon();
-            }
-        } else {
-            icon = speaker.getPortrait().getImageIcon();
-        }
-
-        Image originalImage = icon.getImage();
-        Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
-        return new ImageIcon(scaledImage);
     }
 
     /**
