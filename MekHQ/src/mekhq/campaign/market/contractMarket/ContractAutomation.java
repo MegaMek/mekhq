@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -36,6 +35,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import mekhq.campaign.universe.Factions;
+import mekhq.gui.dialog.ContractAutomationDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,16 +69,13 @@ public class ContractAutomation {
         }
 
         // Initial setup
-        final Person speaker = getSpeaker(campaign);
-        final String speakerName = getSpeakerName(campaign, speaker);
-        final ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
-
         final String commanderAddress = campaign.getCommanderAddress(false);
 
         // Mothballing
         String message = String.format(resources.getString("mothballDescription.text"), commanderAddress);
 
-        if (createDialog(speakerName, speakerIcon, message)) {
+        ContractAutomationDialog mothballDialog = new ContractAutomationDialog(campaign, message, true);
+        if (mothballDialog.isDialogConfirmed()) {
             campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
         }
 
@@ -99,7 +96,9 @@ public class ContractAutomation {
 
         message = String.format(resources.getString("transitDescription.text"),
             targetSystem, employerName, travelDays, totalCost);
-        if (createDialog(speakerName, speakerIcon, message)) {
+
+        ContractAutomationDialog transitDialog = new ContractAutomationDialog(campaign, message, false);
+        if (transitDialog.isDialogConfirmed()) {
             campaign.getLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.getApp().getCampaigngui().refreshAllTabs();
@@ -188,75 +187,6 @@ public class ContractAutomation {
         Image originalImage = icon.getImage();
         Image scaledImage = originalImage.getScaledInstance(100, -1, Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
-    }
-
-    /**
-     * Displays a dialog for user interaction.
-     * The dialog uses a custom formatted message and includes options for user to confirm or decline.
-     *
-     * @param speakerName The title of the speaker to be displayed.
-     * @param speakerIcon The {@link ImageIcon} of the person speaking.
-     * @param message The message to be displayed in the dialog.
-     * @return {@code true} if the user confirms, {@code false} otherwise.
-     */
-    private static boolean createDialog(String speakerName, ImageIcon speakerIcon, String message) {
-        final int WIDTH = UIUtil.scaleForGUI(400);
-
-        // Custom button text
-        JButton confirmButton = new JButton(resources.getString("generalConfirm.text"));
-        JButton declineButton = new JButton(resources.getString("generalDecline.text"));
-
-        // Create a custom message with a border
-        String descriptionTitle = String.format("<html><b>%s</b></html>", speakerName);
-
-        // Create ImageIcon JLabel
-        JLabel iconLabel = new JLabel(speakerIcon);
-        iconLabel.setHorizontalAlignment(JLabel.CENTER);
-
-        // Create description JPanel
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.PAGE_AXIS));
-        JLabel description = new JLabel(
-            String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
-            WIDTH, message));
-        description.setBorder(BorderFactory.createTitledBorder(descriptionTitle));
-        descriptionPanel.add(description);
-
-        // Create Buttons Panel
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.add(confirmButton);
-        buttonsPanel.add(declineButton);
-
-        // Create main JPanel and add icon and description
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(iconLabel, BorderLayout.NORTH);
-        mainPanel.add(descriptionPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
-
-        // Create JDialog
-        final JDialog dialog = new JDialog();
-        dialog.setTitle(resources.getString("generalTitle.text"));
-        dialog.setModal(true);
-        dialog.setContentPane(mainPanel);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-
-        boolean[] result = new boolean[1];
-
-        // Add functionality to buttons
-        confirmButton.addActionListener(e -> {
-            result[0] = true;
-            dialog.dispose();
-        });
-        declineButton.addActionListener(e -> {
-            result[0] = false;
-            dialog.dispose();
-        });
-
-        dialog.setVisible(true);
-
-        return result[0];
     }
 
     /**
