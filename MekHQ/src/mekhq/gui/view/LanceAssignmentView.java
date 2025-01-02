@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
@@ -90,7 +91,7 @@ public class LanceAssignmentView extends JPanel {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CombatRole) {
-                    list.setToolTipText(((CombatRole) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((CombatRole) value).getToolTipText()));
                 }
                 return this;
             }
