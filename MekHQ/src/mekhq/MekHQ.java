@@ -551,8 +551,7 @@ public class MekHQ implements GameListener {
                 return;
             }
 
-            PostScenarioDialogHandler.handle(
-                campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, control);
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
 
             gameThread.requestStop();
         } catch (Exception ex) {
@@ -587,8 +586,7 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        PostScenarioDialogHandler.handle(
-            campaignGUI, getCampaign(), (AtBScenario) selectedScenario, tracker, control);
+        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker, control);
     }
 
     private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
@@ -699,8 +697,8 @@ public class MekHQ implements GameListener {
                 }
                 return;
             }
-            PostScenarioDialogHandler.handle(
-                campaignGUI, getCampaign(), scenario, tracker, autoResolveConcludedEvent.controlledScenario());
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker,
+                autoResolveConcludedEvent.controlledScenario());
         } catch (Exception ex) {
             logger.error("Error during auto resolve concluded", ex);
         }
