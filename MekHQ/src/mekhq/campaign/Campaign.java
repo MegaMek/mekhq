@@ -300,6 +300,18 @@ public class Campaign implements ITechManager {
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
 
+    /**
+     * Represents the different types of administrative specializations.
+     * Each specialization corresponds to a distinct administrative role
+     * within the organization.
+     *
+     * <p>These specializations are used to determine administrative roles and responsibilities,
+     * such as by identifying the most senior administrator for a given role.</p>
+     */
+    public enum AdministratorSpecialization {
+        COMMAND, LOGISTICS, TRANSPORT, HR
+    }
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
 
@@ -2797,19 +2809,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This method finds and returns the most senior command administrator.
-     * It checks for both primary and secondary roles of the administrator.
-     * In case of multiple administrators with the command role, it uses the
-     * {@code outRanksUsingSkillTiebreaker} method to decide the seniority.
+     * Finds and returns the most senior administrator for a specific type of administrative role.
+     * Seniority is determined using the {@link Person#outRanksUsingSkillTiebreaker} method when
+     * there are multiple eligible administrators for the specified role.
      *
-     * @return the senior administrator with a command role, or {@code null} if no such
-     * administrator exists.
+     * <p>The method evaluates both the primary and secondary roles of each administrator
+     * against the provided {@link AdministratorSpecialization} type.</p>
+     *
+     * <p>The valid types of administrative roles are represented by the {@link AdministratorSpecialization} enum:</p>
+     * <ul>
+     *   <li>{@link AdministratorSpecialization#COMMAND} - Command Administrator</li>
+     *   <li>{@link AdministratorSpecialization#LOGISTICS} - Logistics Administrator</li>
+     *   <li>{@link AdministratorSpecialization#TRANSPORT} - Transport Administrator</li>
+     *   <li>{@link AdministratorSpecialization#HR} - HR Administrator</li>
+     * </ul>
+     *
+     * @param type the {@link AdministratorSpecialization} representing the administrative role to check for.
+     *             Passing a {@code null} type will result in an {@link IllegalStateException}.
+     *
+     * @return the most senior {@link Person} with the specified administrative role, or {@code null}
+     *         if no eligible administrator is found.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>The method iterates through all administrators retrieved by {@link #getAdmins()}.</li>
+     *   <li>For each {@link Person}, it checks if their primary or secondary role matches the specified type
+     *       via utility methods like {@code AdministratorRole#isAdministratorCommand}.</li>
+     *   <li>If no eligible administrators exist, the method returns {@code null}.</li>
+     *   <li>If multiple administrators are eligible, the one with the highest seniority is returned.</li>
+     *   <li>Seniority is determined by the {@link Person#outRanksUsingSkillTiebreaker} method,
+     *       which uses a skill-based tiebreaker when necessary.</li>
+     * </ul>
+     *
+     * @throws IllegalStateException if {@code type} is null or an unsupported value.
      */
-    public @Nullable Person getSeniorAdminCommandPerson() {
+    public @Nullable Person getSeniorAdminPerson(AdministratorSpecialization type) {
         Person seniorAdmin = null;
 
         for (Person person : getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorCommand() || person.getSecondaryRole().isAdministratorCommand()) {
+            boolean isEligible = switch (type) {
+                case COMMAND -> person.getPrimaryRole().isAdministratorCommand()
+                    || person.getSecondaryRole().isAdministratorCommand();
+                case LOGISTICS -> person.getPrimaryRole().isAdministratorLogistics()
+                    || person.getSecondaryRole().isAdministratorLogistics();
+                case TRANSPORT -> person.getPrimaryRole().isAdministratorTransport()
+                    || person.getSecondaryRole().isAdministratorTransport();
+                case HR -> person.getPrimaryRole().isAdministratorHR()
+                    || person.getSecondaryRole().isAdministratorHR();
+            };
+
+            if (isEligible) {
                 if (seniorAdmin == null) {
                     seniorAdmin = person;
                     continue;

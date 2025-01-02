@@ -19,9 +19,9 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -80,8 +80,6 @@ public abstract class AbstractMHQNagDialog extends JDialog {
     protected final transient ResourceBundle resources = ResourceBundle.getBundle(
         "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
 
-    private static final MMLogger logger = MMLogger.create(AbstractMHQNagDialog.class);
-
     /**
      * Constructs an AbstractMHQNagDialog with the provided campaign and nag key.
      *
@@ -109,7 +107,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        Person speaker = campaign.getSeniorAdminCommandPerson();
+        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         String speakerName = (speaker != null) ? speaker.getFullTitle() : campaign.getName();
 
         // Add speaker image (icon)
