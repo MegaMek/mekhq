@@ -364,7 +364,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblTransport, gridBagConstraintsLabels);
 
-        txtTransport = new JLabel(contract.getTransportComp() + "%");
+        txtTransport = new JLabel(contract.getTransportCompString());
         txtTransport.setName("txtTransport");
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
@@ -393,7 +393,7 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                             AbstractContractMarket.CLAUSE_TRANSPORT, campaign);
                     setTransportRerollButtonText((JButton) ev.getSource());
-                    txtTransport.setText(contract.getTransportComp() + "%");
+                    txtTransport.setText(contract.getTransportCompString());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             AbstractContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
                         btn.setEnabled(false);
@@ -411,7 +411,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblSalvageRights, gridBagConstraintsLabels);
 
-        JLabel txtSalvageRights = new JLabel(contract.getSalvagePct() + "%"
+        JLabel txtSalvageRights = new JLabel(contract.getSalvagePctString()
                 + (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
 
@@ -438,7 +438,7 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                         AbstractContractMarket.CLAUSE_SALVAGE, campaign);
                     setSalvageRerollButtonText((JButton) ev.getSource());
-                    txtSalvageRights.setText(contract.getSalvagePct() + "%"
+                    txtSalvageRights.setText(contract.getSalvagePctString()
                         + (contract.isSalvageExchange() ? " (Exchange)" : ""));
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                         AbstractContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
@@ -457,7 +457,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStraightSupport, gridBagConstraintsLabels);
 
-        txtStraightSupport = new JLabel(contract.getStraightSupport() + "%");
+        txtStraightSupport = new JLabel(contract.getStraightSupportString());
         txtStraightSupport.setName("txtStraightSupport");
 
         // Then we determine if we just add it to the main panel, or if we combine it with a button
@@ -486,8 +486,8 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
                             AbstractContractMarket.CLAUSE_SUPPORT, campaign);
                     setSupportRerollButtonText((JButton) ev.getSource());
-                    txtStraightSupport.setText(contract.getStraightSupport() + "%");
-                    txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
+                    txtStraightSupport.setText(contract.getStraightSupportString());
+                    txtBattleLossComp.setText(contract.getBattleLossCompString());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
                             AbstractContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
                         btn.setEnabled(false);
@@ -505,7 +505,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblBattleLossComp, gridBagConstraintsLabels);
 
-        txtBattleLossComp = new JLabel(contract.getBattleLossComp() + "%");
+        txtBattleLossComp = new JLabel(contract.getBattleLossCompString());
         txtBattleLossComp.setName("txtBattleLossComp");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtBattleLossComp, gridBagConstraintsText);
