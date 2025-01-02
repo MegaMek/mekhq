@@ -33,6 +33,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.EQUIPMENT_PURCHASE;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.loadPlayerConvoys;
@@ -53,7 +54,7 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * The {@code DialogItinerary} class generates and displays dialogs related to resupply operations.
  * These include normal resupply, looting, contract-ending resupply, and smuggler-related resupplies.
  */
-public class DialogItinerary extends JDialog {
+public class DialogItinerary {
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
     /**
@@ -76,7 +77,7 @@ public class DialogItinerary extends JDialog {
      *                operation, including the campaign context, contract, convoy details, and
      *                resupply type.
      */
-    public DialogItinerary(Resupply resupply) {
+    public static void itineraryDialog(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
         final ResupplyType resupplyType = resupply.getResupplyType();
@@ -88,9 +89,9 @@ public class DialogItinerary extends JDialog {
 
         // Create a custom dialog
         JDialog dialog = new JDialog();
-        setTitle(title);
-        setLayout(new BorderLayout());
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setTitle(title);
+        dialog.setLayout(new BorderLayout());
+        dialog.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         // Establish the speaker
         Person speaker;
@@ -208,13 +209,13 @@ public class DialogItinerary extends JDialog {
         }
 
         // Add the scroll pane for content and button panel to the dialog
-        add(scrollPane, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(scrollPane, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        pack();
-        setModal(true);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        dialog.pack();
+        dialog.setModal(true);
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 
     /**
