@@ -161,7 +161,7 @@ public class DialogItinerary {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        // Create the buttons and add their action listeners.
+        // Create the buttons and add their action listeners
         JButton confirmButton = new JButton(resources.getString("confirmAccept.text"));
         confirmButton.addActionListener(e -> {
             dialog.dispose();
@@ -208,9 +208,25 @@ public class DialogItinerary {
             case RESUPPLY_LOOT -> buttonPanel.add(okButton);
         }
 
-        // Add the scroll pane for content and button panel to the dialog
+        // Create a new panel to show additional information below the button panel
+        JPanel infoPanel = new JPanel();
+        infoPanel.setBorder(BorderFactory.createEtchedBorder());
+        JLabel lblInfo = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s<br>%s</div></html>",
+                DIALOG_WIDTH,
+                String.format(resources.getString("roleplayItems.prompt")),
+                String.format(resources.getString("documentation.prompt"))));
+        infoPanel.add(lblInfo);
+
+        // Create a container panel to hold both buttonPanel and infoPanel
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS)); // Stack them vertically
+        southPanel.add(buttonPanel);
+        southPanel.add(infoPanel);
+
+        // Add the scroll pane for content and south panel to the dialog
         dialog.add(scrollPane, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(southPanel, BorderLayout.SOUTH);
 
         dialog.pack();
         dialog.setModal(true);
@@ -254,17 +270,17 @@ public class DialogItinerary {
 
         // These are all roleplay items that have no tangible benefit
         if (rationPacks > 0) {
-            partsReport.add(resources.getString("resourcesRations.text")
-                + " x" + rationPacks);
+            partsReport.add("<i>" + resources.getString("resourcesRations.text")
+                + " x" + rationPacks + "</i>");
         }
 
         if (medicalSupplies > 0) {
-            partsReport.add(resources.getString("resourcesMedical.text")
-                + " x" + medicalSupplies);
+            partsReport.add("<i>" + resources.getString("resourcesMedical.text")
+                + " x" + medicalSupplies + "</i>");
         }
 
-        partsReport.add(resources.getString("resourcesRoleplay" + randomInt(50)
-            + ".text") + " x" + randomInt((int) Math.ceil((double) rationPacks / 5)));
+        partsReport.add("<i>" + resources.getString("resourcesRoleplay" + randomInt(50)
+            + ".text") + " x" + (randomInt((int) Math.ceil((double) rationPacks / 5)) + 1) + "</i>");
     }
 
     /**
