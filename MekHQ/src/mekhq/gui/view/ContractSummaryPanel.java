@@ -234,7 +234,8 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtLocation, gridBagConstraintsText);
 
-        if (Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
+        if (contract instanceof AtBContract
+            && Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
             JLabel lblDistance = new JLabel(resourceMap.getString("lblDistance.text"));
             lblDistance.setName("lblDistance");
             gridBagConstraintsLabels.gridy = ++y;
