@@ -261,6 +261,11 @@ public class ContractMarketDialog extends JDialog {
             final int days = (int) Math.ceil(path.getTotalTime(c.getStartDate(),
                     campaign.getLocation().getTransitTime()));
             row.add(Integer.toString(days));
+            row.add(String.valueOf(c.getLength()));
+            row.add(c.getTransportCompString());
+            row.add(c.getSalvagePctString());
+            row.add(c.getStraightSupportString());
+            row.add(c.getBattleLossCompString());
             row.add(c.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
             data.add(row);
         }
@@ -270,6 +275,11 @@ public class ContractMarketDialog extends JDialog {
         colNames.add("Enemy");
         colNames.add("Mission Type");
         colNames.add("Transit Time");
+        colNames.add("Contract Length (months)");
+        colNames.add("Transport Terms");
+        colNames.add("Salvage Rights");
+        colNames.add("Straight Support");
+        colNames.add("Battle Loss Compensation");
         colNames.add("Estimated Profit");
 
         tableContracts = new JTable();
@@ -411,6 +421,11 @@ public class ContractMarketDialog extends JDialog {
             final int days = (int) Math.ceil(path.getTotalTime(c.getStartDate(),
                     campaign.getLocation().getTransitTime()));
             row.add(Integer.toString(days));
+            row.add(String.valueOf(c.getLength()));
+            row.add(c.getTransportCompString());
+            row.add(c.getSalvagePctString());
+            row.add(c.getStraightSupportString());
+            row.add(c.getBattleLossCompString());
             row.add(c.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
             ((DefaultTableModel) tableContracts.getModel()).addRow(row);
         });
