@@ -3895,11 +3895,11 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-
                             if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
+
+                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
