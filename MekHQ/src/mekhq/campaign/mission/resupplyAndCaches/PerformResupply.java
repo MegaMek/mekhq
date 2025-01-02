@@ -40,6 +40,7 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.dialog.resupplyAndCaches.DialogInterception;
 import mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption;
+import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -60,7 +61,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceCo
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus.createResupplyFocusDialog;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent.dialogConvoyRoleplayEvent;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogSwindled.swindledDialog;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
@@ -156,7 +156,7 @@ public class PerformResupply {
             }
 
             // Then allow the player to pick a focus
-            createResupplyFocusDialog(resupply);
+            new DialogResupplyFocus(resupply);
         }
 
         // With the focus chosen, we determine the contents of the convoy
