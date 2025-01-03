@@ -52,16 +52,18 @@ public class HtmlGameLogger {
             <head>
                 <title>Simulation Game Log</title>
                 <meta charset="UTF-8">
-            """);
-            appendRaw("""
                 <!-- CSS -->
                 <style>
+                .datetimelog {
+                    font-size: 0.6em;
+                    color: #666;
+                }
                 </style>
             </head>
             <body>
             """
             );
-            appendRaw("<h1>Log file opened " + LocalDateTime.now() + "</h1>");
+            appendRaw("<p class=\"datetimelog\">Log file opened " + LocalDateTime.now() + "</p>");
         }
 
     }

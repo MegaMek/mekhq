@@ -21,6 +21,7 @@ package mekhq.campaign.autoresolve.component;
 
 import megamek.ai.utility.Memory;
 import megamek.common.Entity;
+import megamek.common.ToHitData;
 import megamek.common.alphaStrike.ASDamageVector;
 import megamek.common.alphaStrike.ASRange;
 import megamek.common.strategicBattleSystems.SBFFormation;
@@ -105,7 +106,6 @@ public class Formation extends SBFFormation {
         return highStressEpisode;
     }
 
-
     /**
      * Checks if the formation is crippled. Rules as described on Interstellar Operations BETA pg 242 - Crippling Damage
      * @return true in case it is crippled
@@ -170,7 +170,7 @@ public class Formation extends SBFFormation {
     @Override
     public int getSkill() {
         if (getUnits().isEmpty()) {
-            return 0;
+            return ToHitData.AUTOMATIC_FAIL;
         }
         return getUnits().stream().mapToInt(SBFUnit::getSkill).sum() / getUnits().size();
     }
@@ -178,12 +178,11 @@ public class Formation extends SBFFormation {
     @Override
     public int getTactics() {
         if (getUnits().isEmpty()) {
-            return 0;
+            return ToHitData.AUTOMATIC_FAIL;
         }
         var movement = getMovement();
         var skill = getSkill();
-        var tactics = Math.max(0, 10 - movement + skill - 4);
-        return tactics;
+        return Math.max(0, 6 - movement + skill);
     }
 
     @Override

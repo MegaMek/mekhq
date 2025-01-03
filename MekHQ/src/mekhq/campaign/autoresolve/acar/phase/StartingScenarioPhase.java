@@ -21,6 +21,7 @@ package mekhq.campaign.autoresolve.acar.phase;
 
 import megamek.common.enums.GamePhase;
 import mekhq.campaign.autoresolve.acar.SimulationManager;
+import mekhq.campaign.autoresolve.acar.report.StartingScenarioPhaseReporter;
 
 public class StartingScenarioPhase extends PhaseHandler {
 
@@ -35,5 +36,9 @@ public class StartingScenarioPhase extends PhaseHandler {
         getSimulationManager().calculatePlayerInitialCounts();
         getSimulationManager().getGame().setupTeams();
         getSimulationManager().getGame().setupDeployment();
+
+        var reporter = new StartingScenarioPhaseReporter(getSimulationManager().getGame(), getSimulationManager()::addReport);
+        reporter.startingScenarioHeader();
+        reporter.formationsSetup(getSimulationManager());
     }
 }
