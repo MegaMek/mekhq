@@ -303,6 +303,7 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
         lblOverhead.setName("lblOverhead");
+        lblOverhead.setToolTipText(wordWrap(resourceMap.getString("lblOverhead.tooltip")));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblOverhead, gridBagConstraintsLabels);
 
@@ -313,6 +314,7 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblCommand = new JLabel(resourceMap.getString("lblCommand.text"));
         lblCommand.setName("lblCommand");
+        lblCommand.setToolTipText(wordWrap(resourceMap.getString("lblCommand.tooltip")));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblCommand, gridBagConstraintsLabels);
 
@@ -362,6 +364,7 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
         lblTransport.setName("lblTransport");
+        lblTransport.setToolTipText(wordWrap(resourceMap.getString("lblTransport.tooltip")));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblTransport, gridBagConstraintsLabels);
 
@@ -409,6 +412,7 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
         lblSalvageRights.setName("lblSalvageRights");
+        lblSalvageRights.setToolTipText(wordWrap(resourceMap.getString("lblSalvageRights.tooltip")));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblSalvageRights, gridBagConstraintsLabels);
 
@@ -455,6 +459,7 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
         lblStraightSupport.setName("lblStraightSupport");
+        lblStraightSupport.setToolTipText(wordWrap(resourceMap.getString("lblStraightSupport.tooltip")));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblStraightSupport, gridBagConstraintsLabels);
 
@@ -503,6 +508,7 @@ public class ContractSummaryPanel extends JPanel {
 
         JLabel lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
         lblBattleLossComp.setName("lblBattleLossComp");
+        lblBattleLossComp.setToolTipText(wordWrap(resourceMap.getString("lblBattleLossComp.tooltip")));
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblBattleLossComp, gridBagConstraintsLabels);
 
