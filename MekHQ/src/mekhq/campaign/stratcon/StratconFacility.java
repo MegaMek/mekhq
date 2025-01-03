@@ -65,7 +65,7 @@ public class StratconFacility implements Cloneable {
     private List<String> sharedModifiers = new ArrayList<>();
     private List<String> localModifiers = new ArrayList<>();
     private String capturedDefinition;
-    private boolean revealTrack;
+    private boolean increaseScanRange;
     private int scenarioOddsModifier;
     private int monthlySPModifier;
     private boolean preventAerospace;
@@ -93,7 +93,7 @@ public class StratconFacility implements Cloneable {
         clone.sharedModifiers = new ArrayList<>(sharedModifiers);
         clone.localModifiers = new ArrayList<>(localModifiers);
         clone.setCapturedDefinition(capturedDefinition);
-        clone.revealTrack = revealTrack;
+        clone.increaseScanRange = increaseScanRange;
         clone.scenarioOddsModifier = scenarioOddsModifier;
         clone.monthlySPModifier = monthlySPModifier;
         clone.preventAerospace = preventAerospace;
@@ -112,7 +112,7 @@ public class StratconFacility implements Cloneable {
         setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
         setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
         setOwner(facility.getOwner());
-        setRevealTrack(facility.getRevealTrack());
+        setIncreaseScanRange(facility.getIncreaseScanRange());
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
         setMonthlySPModifier(facility.getMonthlySPModifier());
         setPreventAerospace(facility.preventAerospace());
@@ -237,12 +237,12 @@ public class StratconFacility implements Cloneable {
         this.capturedDefinition = capturedDefinition;
     }
 
-    public boolean getRevealTrack() {
-        return revealTrack;
+    public boolean getIncreaseScanRange() {
+        return increaseScanRange;
     }
 
-    public void setRevealTrack(boolean revealTrack) {
-        this.revealTrack = revealTrack;
+    public void setIncreaseScanRange(boolean increaseScanRange) {
+        this.increaseScanRange = increaseScanRange;
     }
 
     public int getScenarioOddsModifier() {

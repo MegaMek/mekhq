@@ -3,7 +3,7 @@
 	<displayableName>Data Center</displayableName>
 	<facilityType>DataCenter</facilityType>
 	<owner>Allied</owner>
-	<revealTrack>true</revealTrack>
-	<userDescription>This facility reveals all information about this track as long as it is active.</userDescription>
+	<increaseScanRange>true</increaseScanRange>
+	<userDescription>Increases the scan range of all friendly forces by 1.</userDescription>
 	<visible>true</visible>
 </StratconFacility>
