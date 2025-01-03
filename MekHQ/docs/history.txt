@@ -26,6 +26,7 @@ MEKHQ VERSION HISTORY:
 + PR #5617: Restrict Distance Label to AtB Contracts Only
 + PR #5619: Refactored PostScenarioDialogHandler to use Generic Scenario
 + PR #5620: Autologistics Reporting fixes
++ PR #5624: Updated Frontline Deployment Instructions 
 
 
 0.50.02 (2024-12-30 2130 UTC)
