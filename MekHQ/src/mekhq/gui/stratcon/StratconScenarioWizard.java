@@ -373,7 +373,7 @@ public class StratconScenarioWizard extends JDialog {
         // Label with defensive posture instructions
         gbc.anchor = GridBagConstraints.WEST;
         JLabel lblDefensivePostureInstructions = new JLabel(
-            resources.getString("lblDefensivePostureInstructions.Text"));
+            resources.getString("lblFrontlineInstructions.text"));
         contentPanel.add(lblDefensivePostureInstructions, gbc);
 
         gbc.gridy++;
