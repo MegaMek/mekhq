@@ -1302,7 +1302,9 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGetMul.setEnabled(canStartGame);
         btnClearAssignedUnits.setEnabled(canStartGame);
         btnResolveScenario.setEnabled(canStartGame);
-        btnAutoResolveScenario.setEnabled(canStartGame);
+        if (scenario instanceof AtBScenario) {
+            btnAutoResolveScenario.setEnabled(canStartGame);
+        }
         btnPrintRS.setEnabled(canStartGame);
     }
 
