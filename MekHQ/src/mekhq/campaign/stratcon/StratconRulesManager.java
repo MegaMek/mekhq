@@ -1220,7 +1220,7 @@ public class StratconRulesManager {
      * and scenarios within the scan range, and updating necessary game states such as fatigue
      * and force assignments. It does not include assigning the force to specific scenarios.</p>
      *
-     * <h3>Behavior:</h3>
+     * <strong>Behavior:</strong>
      * <ul>
      *   <li>If the force's deployment coordinates are unrevealed, fatigue is increased for the force.</li>
      *   <li>Ensures that fatigue is increased only once during the deployment process.</li>
@@ -1230,7 +1230,7 @@ public class StratconRulesManager {
      *   <li>Assigns the deployed force to the specified coordinates and clears their previous track assignments.</li>
      * </ul>
      *
-     * <h3>Notes:</h3>
+     * <strong>Notes:</strong>
      * <ul>
      *   <li>Scout or patrol roles may increase the scan range.</li>
      *   <li>The method uses a breadth-first search (BFS) approach to traverse the hex grid and reveal neighbors
