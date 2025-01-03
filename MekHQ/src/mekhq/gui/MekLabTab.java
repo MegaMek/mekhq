@@ -150,6 +150,8 @@ public class MekLabTab extends CampaignGuiTab {
         btnSaveForLater = new JButton("Save For Later");
         btnSaveForLater.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
+            UnitUtil.compactCriticals(entity);
+            labPanel.refreshAll(); // The crits may have moved
             fileSaver.saveUnitAs(this.getFrame(), entity);
         });
 
