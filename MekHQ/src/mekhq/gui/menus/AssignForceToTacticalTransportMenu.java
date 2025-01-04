@@ -42,7 +42,7 @@ public class AssignForceToTacticalTransportMenu extends JScrollableMenu {
 
         //TODO
         //setText(resources.getString(""));
-        setText("Assign unit to Preferred Transport");
+        setText("Assign Unit to Tactical Transport");
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
         }
@@ -110,7 +110,7 @@ public class AssignForceToTacticalTransportMenu extends JScrollableMenu {
                     }
 
                 }
-                Set<Unit> oldTransports = transport.loadTransport(transporterType, units);
+                Set<Unit> oldTransports = transport.loadTacticalTransport(transporterType, units);
                 if (!oldTransports.isEmpty()) {
                     oldTransports.forEach(oldTransport -> campaign.updateTransportInTacticalTransports(oldTransport));
                 }

@@ -574,13 +574,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 HashSet<Unit> extraUnits = new HashSet<>();
                 for (Unit unit : units) {
                     if (null != unit && null != scenario) {
-                        if (unit.hasTransportedUnits()) {
+                        if (unit.hasShipTransportedUnits()) {
                             // Prompt the player to also deploy any units transported by this one
                             int optionChoice = JOptionPane.showConfirmDialog(null,
                                     TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
                                     TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                             if (optionChoice == JOptionPane.YES_OPTION) {
-                                extraUnits.addAll(unit.getTransportedUnits());
+                                extraUnits.addAll(unit.getShipTransportedUnits());
                             }
                         }
                         scenario.addUnit(unit.getId());
@@ -1795,7 +1795,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         .unloadFromTransportShip(currentUnit);
             }
             // If the unit IS a transport, unassign all units from it
-            if (currentUnit.hasTransportedUnits()) {
+            if (currentUnit.hasShipTransportedUnits()) {
                 currentUnit.unloadTransportShip();
             }
         }

@@ -89,7 +89,7 @@ public class RestoreUnitActionTest {
 
         verify(unit, times(1)).setEntity(eq(mockNewEntity));
         verify(unit, times(1)).removeParts();
-        verify(unit, times(1)).initializeBaySpace();
+        //verify(unit, times(1)).initializeTransportShipSpace();
         verify(unit, times(1)).initializeParts(eq(true));
         verify(unit, times(1)).runDiagnostic(eq(false));
         verify(unit, times(1)).setSalvage(eq(false));

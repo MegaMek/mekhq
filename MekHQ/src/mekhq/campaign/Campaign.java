@@ -1332,8 +1332,9 @@ public class Campaign implements ITechManager {
             addTransportShip(u);
         }
 
+        u.initializeShipTransportSpace();
+        u.initializeTacticalTransportSpace();
 
-        u.initializeTacticalTransportCapacity();
         if (!u.getTacticalTransportCapabilities().isEmpty()){
             addTacticalTransporter(u);
         }
@@ -1417,10 +1418,10 @@ public class Campaign implements ITechManager {
     public void removeTransportShip(Unit unit) {
         // If we remove a transport ship from the campaign,
         // we need to remove any transported units from it
-        if (transportShips.remove(unit) && unit.hasTransportedUnits()) {
-            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
+        if (transportShips.remove(unit) && unit.hasShipTransportedUnits()) {
+            List<Unit> transportedUnits = new ArrayList<>(unit.getShipTransportedUnits());
             for (Unit transportedUnit : transportedUnits) {
-                unit.removeTransportedUnit(transportedUnit);
+                unit.removeShipTransportedUnit(transportedUnit);
             }
         }
     }
@@ -1435,10 +1436,10 @@ public class Campaign implements ITechManager {
     public void removeTacticalTransporter(Unit unit) {
         // If we remove a transport ship from the campaign,
         // we need to remove any transported units from it
-        if (transportShips.remove(unit) && unit.hasTransportedUnits()) {
-            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
+        if (transportShips.remove(unit) && unit.hasShipTransportedUnits()) {
+            List<Unit> transportedUnits = new ArrayList<>(unit.getShipTransportedUnits());
             for (Unit transportedUnit : transportedUnits) {
-                unit.removeTransportedUnit(transportedUnit);
+                unit.removeShipTransportedUnit(transportedUnit);
             }
         }
         //for (Class<? extends Transporter> transporterType : unit.getTacticalTransportCapabilities()) {
@@ -1536,8 +1537,8 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        unit.initializeBaySpace();
-        unit.initializeTacticalTransportCapacity();
+        unit.getShipTransportDetail().initializeTransportCapacity(unit.getEntity().getTransports());
+        unit.getTacticalTransportDetail().initializeTransportCapacity(unit.getEntity().getTransports());
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 

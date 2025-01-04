@@ -43,59 +43,59 @@ public class UnitTransportTest {
         Unit transport = new Unit();
 
         // We start with empty transport bays
-        assertFalse(transport.hasTransportedUnits());
-        assertNotNull(transport.getTransportedUnits());
-        assertTrue(transport.getTransportedUnits().isEmpty());
+        assertFalse(transport.hasShipTransportedUnits());
+        assertNotNull(transport.getShipTransportedUnits());
+        assertTrue(transport.getShipTransportedUnits().isEmpty());
 
         // Create a fake unit to transport
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
 
         // Add a transported unit
-        transport.addTransportedUnit(mockUnit);
+        transport.addShipTransportedUnit(mockUnit);
 
         // Now we should have units
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(1, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockUnit));
+        assertTrue(transport.hasShipTransportedUnits());
+        assertEquals(1, transport.getShipTransportedUnits().size());
+        assertTrue(transport.getShipTransportedUnits().contains(mockUnit));
 
         // Adding the same unit again...
-        transport.addTransportedUnit(mockUnit);
+        transport.addShipTransportedUnit(mockUnit);
 
         // ... should leave everything the same.
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(1, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockUnit));
+        assertTrue(transport.hasShipTransportedUnits());
+        assertEquals(1, transport.getShipTransportedUnits().size());
+        assertTrue(transport.getShipTransportedUnits().contains(mockUnit));
 
         Unit mockOtherUnit = mock(Unit.class);
         when(mockOtherUnit.getId()).thenReturn(UUID.randomUUID());
 
         // We should not be able to remove an unknown unit
-        transport.removeTransportedUnit(mockOtherUnit);
+        transport.removeShipTransportedUnit(mockOtherUnit);
 
         // But we can add at least one more unit...
-        transport.addTransportedUnit(mockOtherUnit);
+        transport.addShipTransportedUnit(mockOtherUnit);
 
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(2, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockUnit));
-        assertTrue(transport.getTransportedUnits().contains(mockOtherUnit));
+        assertTrue(transport.hasShipTransportedUnits());
+        assertEquals(2, transport.getShipTransportedUnits().size());
+        assertTrue(transport.getShipTransportedUnits().contains(mockUnit));
+        assertTrue(transport.getShipTransportedUnits().contains(mockOtherUnit));
 
         // ... and removing the first...
-        assertTrue(transport.removeTransportedUnit(mockUnit));
+        assertTrue(transport.removeShipTransportedUnit(mockUnit));
 
         // ... should leave us with just that one other unit.
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(1, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockOtherUnit));
+        assertTrue(transport.hasShipTransportedUnits());
+        assertEquals(1, transport.getShipTransportedUnits().size());
+        assertTrue(transport.getShipTransportedUnits().contains(mockOtherUnit));
 
         // ... and clearing out our transport bays...
-        transport.clearTransportedUnits();
+        transport.clearShipTransportedUnits();
 
         // ... should leave us empty again.
-        assertFalse(transport.hasTransportedUnits());
-        assertNotNull(transport.getTransportedUnits());
-        assertTrue(transport.getTransportedUnits().isEmpty());
+        assertFalse(transport.hasShipTransportedUnits());
+        assertNotNull(transport.getShipTransportedUnits());
+        assertTrue(transport.getShipTransportedUnits().isEmpty());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class UnitTransportTest {
         Unit transport = new Unit();
 
         // No units? No aeros.
-        assertFalse(transport.hasTransportedUnits());
+        assertFalse(transport.hasShipTransportedUnits());
         assertFalse(transport.isCarryingSmallerAero());
         assertFalse(transport.isCarryingGround());
 
@@ -114,10 +114,10 @@ public class UnitTransportTest {
         when(mockGroundUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockGroundUnit.getEntity()).thenReturn(mockGroundEntity);
 
-        transport.addTransportedUnit(mockGroundUnit);
+        transport.addShipTransportedUnit(mockGroundUnit);
 
         // No aeros, just a ground unit
-        assertTrue(transport.hasTransportedUnits());
+        assertTrue(transport.hasShipTransportedUnits());
         assertFalse(transport.isCarryingSmallerAero());
         assertTrue(transport.isCarryingGround());
 
@@ -128,17 +128,17 @@ public class UnitTransportTest {
         when(mockAeroUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockAeroUnit.getEntity()).thenReturn(mockAeroEntity);
 
-        transport.addTransportedUnit(mockAeroUnit);
+        transport.addShipTransportedUnit(mockAeroUnit);
 
         // Now we have an areo
-        assertTrue(transport.hasTransportedUnits());
+        assertTrue(transport.hasShipTransportedUnits());
         assertTrue(transport.isCarryingSmallerAero());
         assertTrue(transport.isCarryingGround());
 
         // Removing the ground unit should not affect our aero calculation
-        transport.removeTransportedUnit(mockGroundUnit);
+        transport.removeShipTransportedUnit(mockGroundUnit);
 
-        assertTrue(transport.hasTransportedUnits());
+        assertTrue(transport.hasShipTransportedUnits());
         assertTrue(transport.isCarryingSmallerAero());
         assertFalse(transport.isCarryingGround());
     }
@@ -158,7 +158,7 @@ public class UnitTransportTest {
         transporters.add(mockASFBay);
         when(mockVengeance.getTransportBays()).thenReturn(bays);
         when(mockVengeance.getTransports()).thenReturn(transporters);
-        transport.initializeBaySpace();
+        //transport.initializeTransportShipSpace();
 
         // Add an aero unit
         Entity aero = new AeroSpaceFighter();
@@ -179,7 +179,7 @@ public class UnitTransportTest {
         when(randomUnit.hasTransportShipAssignment()).thenReturn(false);
 
         // Try removing a ship that's not on our transport.
-        transport.removeTransportedUnit(randomUnit);
+        transport.removeShipTransportedUnit(randomUnit);
 
         // The unit should NOT have its assignment changed.
         verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
@@ -199,7 +199,7 @@ public class UnitTransportTest {
         when(randomUnit.getTransportShipAssignment()).thenReturn(new TransportShipAssignment(transport1, 0));
 
         // Try removing a ship that's on somebody else's transport
-        transport0.removeTransportedUnit(randomUnit);
+        transport0.removeShipTransportedUnit(randomUnit);
 
         // The unit should NOT have its assignment changed.
         verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
