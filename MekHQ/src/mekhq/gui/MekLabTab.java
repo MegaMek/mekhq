@@ -153,6 +153,8 @@ public class MekLabTab extends CampaignGuiTab {
             UnitUtil.compactCriticals(entity);
             labPanel.refreshAll(); // The crits may have moved
             fileSaver.saveUnitAs(this.getFrame(), entity);
+            // Refresh unit cache so newly-saved file is available for refits.
+            MekSummaryCache.refreshUnitData(false);
         });
 
         btnClear = new JButton("Clear Changes");
