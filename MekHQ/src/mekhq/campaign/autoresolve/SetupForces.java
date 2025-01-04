@@ -1,33 +1,31 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
- *  This file is part of MekHQ.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- *  MekHQ is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
  *
- *  MekHQ is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.autoresolve.converter;
+package mekhq.campaign.autoresolve;
 
 import io.sentry.Sentry;
 import megamek.common.*;
 import megamek.common.alphaStrike.conversion.ASConverter;
+import megamek.common.autoresolve.acar.SimulationContext;
+import megamek.common.autoresolve.converter.ConsolidateForces;
+import megamek.common.autoresolve.converter.ForceToFormationConverter;
 import megamek.common.force.Forces;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoresolve.acar.SimulationContext;
 import mekhq.campaign.copy.CrewRefBreak;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -44,7 +42,7 @@ import java.util.*;
 /**
  * @author Luana Coppio
  */
-public class SetupForces {
+public class SetupForces extends megamek.common.autoresolve.converter.SetupForces {
     private static final MMLogger logger = MMLogger.create(SetupForces.class);
 
     private final Campaign campaign;
@@ -61,7 +59,7 @@ public class SetupForces {
      * Create the forces for the game object, using the campaign, units and scenario
      * @param game The game object to setup the forces in
      */
-    public void createForcesOnGame(SimulationContext game) {
+    public void createForcesOnSimulation(SimulationContext game) {
         setupPlayer(game);
         setupBots(game);
         ConsolidateForces.consolidateForces(game);

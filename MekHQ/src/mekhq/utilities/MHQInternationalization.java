@@ -17,23 +17,22 @@
  *  along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.autoresolve.acar.phase;
+package mekhq.utilities;
 
-import megamek.common.enums.GamePhase;
-import mekhq.campaign.autoresolve.acar.SimulationManager;
 
-public class InitiativePhase  extends PhaseHandler {
+import megamek.common.internationalization.Internationalization;
 
-    public InitiativePhase(SimulationManager gameManager) {
-        super(gameManager, GamePhase.INITIATIVE);
+/**
+ * Class to handle MHQInternationalization (you will find online material on that looking for i18n)
+ * It makes use of some short names to make it easier to use since it is used in many places
+ */
+public class MHQInternationalization extends Internationalization {
+
+    static {
+        instance = new MHQInternationalization("mekhq.resources.messages");
     }
 
-    @Override
-    protected void executePhase() {
-        getSimulationManager().calculatePlayerInitialCounts();
-        getSimulationManager().resetPlayersDone();
-        getSimulationManager().rollInitiative();
-        getSimulationManager().incrementAndSendGameRound();
-        getSimulationManager().getInitiativeHelper().writeInitiativeReport();
+    protected MHQInternationalization(String defaultBundle) {
+        super(defaultBundle);
     }
 }

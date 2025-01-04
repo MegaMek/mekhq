@@ -20,16 +20,17 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.autoresolve.Resolver;
+import megamek.common.autoresolve.acar.SimulationOptions;
+import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoresolve.Resolver;
-import mekhq.campaign.autoresolve.acar.SimulationOptions;
-import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
+import mekhq.campaign.autoresolve.SetupForces;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
-import mekhq.utilities.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
@@ -146,6 +147,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
 
     private JProgressBar createProgressBar() {
         setProgressBar(new JProgressBar(0, 100));
+
         getProgressBar().setString(resources.getString("AutoResolveMethod.progress.0"));
         getProgressBar().setValue(0);
         getProgressBar().setStringPainted(true);
@@ -192,7 +194,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
         progressBar.setValue(progress);
         var factor = clamp(numberOfSimulations / 25, 3, 99);
         int i = (int) (factor * ((float) progress / progressBar.getMaximum()));
-        getProgressBar().setString(Internationalization.getTextAt("GUI", progressText.get(i)));
+        getProgressBar().setString(resources.getString(progressText.get(i)));
     }
 
     public static int clamp(long value, int min, int max) {
@@ -216,14 +218,14 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
         @Override
         public Integer doInBackground() {
             String message;
-            String title = Internationalization.getText("AutoResolveDialog.title");
+            String title = resources.getString("AutoResolveDialog.title");
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             var simulatedVictories = calculateNumberOfVictories();
             stopWatch.stop();
 
             if (simulatedVictories.getRuns() == 0 && simulatedVictories.getRuns() < numberOfSimulations) {
-                message = Internationalization.getText("AutoResolveDialog.messageFailedCalc");
+                message = resources.getString("AutoResolveDialog.messageFailedCalc");
                 logger.debug("No combat scenarios were simulated, possible error!");
             } else {
                 var timePerRun = stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors());
@@ -235,7 +237,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
                     timePerRun,
                     stopWatch.toString());
 
-                message = Internationalization.getFormattedText("AutoResolveDialog.messageSimulated",
+                message = MHQInternationalization.getFormattedText("AutoResolveDialog.messageSimulated",
                     simulatedVictories.getRuns(),
                     simulatedVictories.getVictories(),
                     simulatedVictories.getLosses(),
@@ -268,7 +270,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
             for (int i = 0; i < numberOfSimulations; i++) {
                 futures.add(executor.submit(() -> {
                     var autoResolveConcludedEvent = new Resolver(
-                        campaign, units, scenario, new SimulationOptions(campaign.getGameOptions()))
+                        new SetupForces(campaign, units, scenario), new SimulationOptions(campaign.getGameOptions()))
                         .resolveSimulation();
                     setProgress(Math.min(100 * runCounter.incrementAndGet() / numberOfSimulations, 100));
                     return autoResolveConcludedEvent;
