@@ -208,11 +208,13 @@ public class GenerateResupplyContents {
      */
     private static void calculateConvoyWorth(Resupply resupply) {
         List<Part> convoyContents = resupply.getConvoyContents();
-        Money value = Money.zero();
+        Money sellValue = Money.zero();
+        Money buyValue = Money.zero();
         for (Part part : convoyContents) {
-            value = value.plus(part.getActualValue());
+            sellValue = sellValue.plus(part.getActualValue());
+            buyValue = buyValue.plus(part.getStickerPrice());
         }
-        resupply.setConvoyContentsValueBase(value);
+        resupply.setConvoyContentsValueBase(buyValue);
 
         ResupplyType resupplyType = resupply.getResupplyType();
         if (resupplyType.equals(ResupplyType.RESUPPLY_LOOT)) {
@@ -222,7 +224,7 @@ public class GenerateResupplyContents {
 
         // Smugglers always double the cost of the supplies they're offering
         if (resupplyType.equals(ResupplyType.RESUPPLY_SMUGGLER)) {
-            resupply.setConvoyContentsValueCalculated(value.multipliedBy(2));
+            resupply.setConvoyContentsValueCalculated(sellValue.multipliedBy(2));
             return ;
         }
 
@@ -255,6 +257,6 @@ public class GenerateResupplyContents {
             case OVERWHELMING -> 1.75;
         };
 
-        resupply.setConvoyContentsValueCalculated(value.multipliedBy(multiplier));
+        resupply.setConvoyContentsValueCalculated(sellValue.multipliedBy(multiplier));
     }
 }
