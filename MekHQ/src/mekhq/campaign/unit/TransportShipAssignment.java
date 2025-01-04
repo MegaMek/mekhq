@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * Represents an assignment to a specific bay on a transport ship.
  */
-public class TransportShipAssignment {
+public class TransportShipAssignment{
     private final Unit transportShip;
     private final int bayNumber;
 

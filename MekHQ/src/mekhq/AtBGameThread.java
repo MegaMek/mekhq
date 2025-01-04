@@ -250,7 +250,7 @@ public class AtBGameThread extends GameThread {
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
-                    if (unit.hasTransportedUnits()) {
+                    if (unit.hasShipTransportedUnits()) {
                         // Store this unit as a potential transport to load
                         potentialTransports.get(TransportShipAssignment.class).put(unit.getId(), new ArrayList<>());
                     }
@@ -422,14 +422,14 @@ public class AtBGameThread extends GameThread {
                         // Let the player choose to load DropShips, Small Craft, fighters, and/or
                         // ground units on each transport
                         //TODO add new stuff
-                        if (transportShip.getTransportedUnits().stream()
+                        if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.DROPSHIP)) {
                             loadDropShips = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
                                     String.format(AtBGameThread.LOAD_DROPSHIP_DIALOG_TEXT, transportShip.getName()),
                                     AtBGameThread.LOAD_DROPSHIP_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                         }
 
-                        if (transportShip.getTransportedUnits().stream()
+                        if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT)) {
                             loadSmallCraft = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
                                     String.format(AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TEXT, transportShip.getName()),

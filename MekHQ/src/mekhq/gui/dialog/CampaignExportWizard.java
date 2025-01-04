@@ -517,7 +517,7 @@ public class CampaignExportWizard extends JDialog {
             // and cargo units
             unit.setTransportShipAssignment(null);
 
-            if (unit.hasTransportedUnits()) {
+            if (unit.hasShipTransportedUnits()) {
                 unit.unloadTransportShip();
             }
 
