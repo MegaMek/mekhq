@@ -46,6 +46,7 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
+import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -1312,6 +1313,25 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
+                Unit[] unitsArr = units.toArray(new Unit[0]);
+                //AssignForceToTacticalTransportMenu assignForceToTransportMenu = new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr);
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr));
+                if (units.stream().allMatch(Unit::hasTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+                    menuItem = new JMenuItem("Unassign Unit from Preferred Transport");
+                    menuItem.addActionListener(evt -> {
+                        Set<Unit> transportsToUpdate = new HashSet<>();
+                        for (Unit transportedUnit : units) {
+                            transportsToUpdate.add(transportedUnit.getTransportAssignment().getTransport());
+                            transportedUnit.getTransportAssignment().getTransport().unloadFromTransport(transportedUnit);
+                        }
+
+                        for (Unit transportToUpdate : transportsToUpdate) {
+                            gui.getCampaign().updateTransportInTacticalTransports(transportToUpdate);
+                        }
+                    });
+                    menuItem.setEnabled(true);
+                    popup.add(menuItem);
+                }
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);
@@ -1570,7 +1590,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 shipMenuItem.setEnabled(true);
                                 singleUnitMenu.add(shipMenuItem);
                                 singleUnitMenu.setEnabled(true);
-                            }
+                                }
                         } else {
                             // Add this ship to the appropriate submenu(s). Most transports will fit into
                             // multiple
@@ -1676,6 +1696,26 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Unassign Unit from Transport Ship");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP + unitIds);
                 menuItem.addActionListener(this);
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
+            }
+
+            Unit[] unitsArr = units.toArray(new Unit[0]);
+            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr));
+
+            if (units.stream().allMatch(Unit::hasTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+                menuItem = new JMenuItem("Unassign Unit from Preferred Transport");
+                menuItem.addActionListener(evt -> {
+                    Set<Unit> transportsToUpdate = new HashSet<>();
+                    for (Unit transportedUnit : units) {
+                        transportsToUpdate.add(transportedUnit.getTransportAssignment().getTransport());
+                        transportedUnit.getTransportAssignment().getTransport().unloadFromTransport(transportedUnit);
+                    }
+
+                    for (Unit transportToUpdate : transportsToUpdate) {
+                        gui.getCampaign().updateTransportInTacticalTransports(transportToUpdate);
+                    }
+                });
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }

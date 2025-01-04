@@ -184,6 +184,7 @@ public class Campaign implements ITechManager {
     // that we can assign units to transports
     private final Hangar units = new Hangar();
     private final Set<Unit> transportShips = new HashSet<>();
+    private final Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> tacticalTransporters = new HashMap<>();
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
@@ -1331,6 +1332,12 @@ public class Campaign implements ITechManager {
             addTransportShip(u);
         }
 
+
+        u.initializeTacticalTransportCapacity();
+        if (!u.getTacticalTransportCapabilities().isEmpty()){
+            addTacticalTransporter(u);
+        }
+
         // Assign an entity ID to our new unit
         if (Entity.NONE == u.getEntity().getId()) {
             u.getEntity().setId(game.getNextEntityId());
@@ -1351,6 +1358,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Adds an entry to the list of transporters . We'll use this
+     * to assign units later
+     *
+     * @param unit - The unit we want to add to this Map
+     */
+    public void addTacticalTransporter(Unit unit) {
+        for (Class<? extends Transporter> transporterType : unit.getTacticalTransportCapabilities()) {
+            addTacticalTransporterToCapacityMap(unit, transporterType);
+        }
+    }
+
+    private void addTacticalTransporterToCapacityMap(Unit unit, Class<? extends Transporter> transporterType) {
+        double capacity = unit.getCurrentTacticalTransportCapacity(transporterType);
+        Map<Double, Set<UUID>> capacityMap = tacticalTransporters.getOrDefault(transporterType, new HashMap<Double, Set<UUID>>());
+        Set<UUID> unitIds = capacityMap.getOrDefault(capacity, new HashSet<UUID>());
+        unitIds.add(unit.getId());
+        capacityMap.put(capacity, unitIds);
+        tacticalTransporters.put(transporterType, capacityMap);
+    }
+
+    /**
+     * This will update the transport in the transports list with new capacities
+     * @param transport
+     */
+    public void updateTransportInTacticalTransports(Unit transport) {
+        for (Class<? extends Transporter> transporterType : transport.getTacticalTransportCapabilities()) {
+            if (tacticalTransporters.containsKey(transporterType)) {
+                for (Double capacity : tacticalTransporters.get(transporterType).keySet()) {
+                    if (tacticalTransporters.get(transporterType).get(capacity).contains(transport.getId())) {
+                        if (capacity == transport.getCurrentTacticalTransportCapacity(transporterType)) {
+                            break; // The transport is already stored with the correct capacity
+                        } else {
+                            tacticalTransporters.get(transporterType).get(capacity).remove(transport.getId());
+                        }
+                    } else if (capacity == transport.getCurrentTacticalTransportCapacity(transporterType)) {
+                        addTacticalTransporterToCapacityMap(transport, transporterType);
+                    }
+                }
+            }
+            else {
+                logger.error("Invalid transporter type: " + transporterType);
+            }
+        }
+    }
+
+
+
+
+
+    /**
      * Deletes an entry from the list of transit-capable transport ships. This gets
      * updated when
      * the ship is removed from the campaign for one reason or another
@@ -1366,6 +1423,37 @@ public class Campaign implements ITechManager {
                 unit.removeTransportedUnit(transportedUnit);
             }
         }
+    }
+
+    /**
+     * Deletes an entry from the list of transit-capable transport ships. This gets
+     * updated when
+     * the ship is removed from the campaign for one reason or another
+     *
+     * @param unit - The ship we want to remove from this Set
+     */
+    public void removeTacticalTransporter(Unit unit) {
+        // If we remove a transport ship from the campaign,
+        // we need to remove any transported units from it
+        if (transportShips.remove(unit) && unit.hasTransportedUnits()) {
+            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
+            for (Unit transportedUnit : transportedUnits) {
+                unit.removeTransportedUnit(transportedUnit);
+            }
+        }
+        //for (Class<? extends Transporter> transporterType : unit.getTacticalTransportCapabilities()) {
+            //if (tacticalTransporters.containsKey(transporterType)) {
+                //if (tacticalTransporters.get(transporterType).remove(unit.getId())
+                //        && unit.hasTacticalTransportedUnits()) {
+                //    for (Unit transportedUnit : unit.getTacticalTransportedUnits()) {
+                //        unit.removeTacticalTransportedUnit(transportedUnit);
+                   // }//TODO
+                //}
+           // }
+
+       // }
+
+
     }
 
     /**
@@ -1449,12 +1537,17 @@ public class Campaign implements ITechManager {
         en.setExternalIdAsString(unit.getId().toString());
 
         unit.initializeBaySpace();
+        unit.initializeTacticalTransportCapacity();
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 
         // If this is a ship, add it to the list of potential transports
         if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
             addTransportShip(unit);
+        }
+
+        if (!unit.getTacticalTransportCapabilities().isEmpty()){
+            addTacticalTransporter(unit);
         }
 
         unit.initializeParts(true);
@@ -8082,6 +8175,51 @@ public class Campaign implements ITechManager {
      */
     public Set<Unit> getTransportShips() {
         return Collections.unmodifiableSet(transportShips);
+    }
+
+    /**
+     * Returns list of transports
+     *
+     * @return units that have space for that transport type
+     */
+    public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTacticalTransports() {
+        return Collections.unmodifiableMap(tacticalTransporters);
+    }
+
+    /**
+     * Returns list of transports
+     *
+     * @param transporterType class of Transporter
+     * @return units that have that transport type
+     */
+    public Set<Unit> getTacticalTransportsByType(Class<? extends Transporter> transporterType) {
+        return getTacticalTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
+    }
+
+    /**
+     * Returns list of transports that can transport a unit of given size
+     *
+     * @param transporterType class of Transporter
+     * @param unitSize the size of the unit (usually 1)
+     * @return units that have space for that transport type
+     */
+    public Set<Unit> getTacticalTransportsByType(Class<? extends Transporter> transporterType, double unitSize) {
+        Set<Unit> units = new HashSet<>();
+        Map<Double, Set<UUID>> capacityMap = getTacticalTransports().get(transporterType);
+        for (Double capacity : capacityMap.keySet()) {
+            if (Double.compare(capacity, unitSize) >= 0) {
+                for (UUID uuid : capacityMap.get(capacity)) {
+                    units.add(getUnit(uuid));
+                }
+            }
+        }
+        return units;
+    }
+
+
+
+    public boolean hasTacticalTransports() {
+        return !tacticalTransporters.isEmpty();
     }
 
     public void doMaintenance(Unit u) {

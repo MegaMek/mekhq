@@ -148,14 +148,16 @@ public class UnitTransportTest {
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);
         Unit transport = new Unit();
-        ASFBay mockASFBay = mock(ASFBay.class);
-        when(mockASFBay.getCapacity()).thenReturn(100.0);
+        ASFBay mockASFBay = new ASFBay(100, 1 ,0);
         transport.setEntity(mockVengeance);
 
         // Initialize bays
         Vector<Bay> bays = new Vector<>();
         bays.add(mockASFBay);
+        Vector<Transporter> transporters = new Vector<>();
+        transporters.add(mockASFBay);
         when(mockVengeance.getTransportBays()).thenReturn(bays);
+        when(mockVengeance.getTransports()).thenReturn(transporters);
         transport.initializeBaySpace();
 
         // Add an aero unit

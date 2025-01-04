@@ -432,6 +432,12 @@ public class CampaignXmlParser {
                     s.addUnit(unit.getId());
                 }
             }
+
+            //Update the campaign transport availability if this is a transport.
+            //If it's empty we should be able to just ignore it
+            if (unit.hasTacticalTransportedUnits()) {
+                retVal.updateTransportInTacticalTransports(unit);
+            }
         });
 
         logger.info(String.format("[Campaign Load] Pilot references fixed in %dms",
