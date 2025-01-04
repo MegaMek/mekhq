@@ -40,6 +40,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.apache.commons.csv.CSVFormat;
@@ -1276,6 +1277,64 @@ public class Utilities {
             } else if (loadGround) {
                 sendLoadEntity(client, id, trnId, cargo);
             }
+        }
+    }
+
+    /**
+     * Handles loading a player's transported units onto their transports once a
+     * megamek scenario has actually started.
+     *
+     *
+     * @param trnId          - The MM id of the transport entity we want to load
+     * @param toLoad         - Map of entity ids and transport assignments for the units we want to load
+     * @param client         - the player's Client instance
+     * @param loadTactical  - Should "tactical"-ly transported units be loaded?
+     */
+    public static void loadPlayerTransports(int trnId, Map<Integer, ? extends ITransportAssignment> toLoad, Client client,
+                                            boolean loadTactical) {
+        if (!loadTactical) {
+            // Nothing to do. Get outta here!
+            return;
+        }
+        Entity transport = client.getEntity(trnId);
+        // Reset transporter status, as currentSpace might still retain updates from
+        // when the Unit
+        // was assigned to the Transport on the TO&E tab
+        transport.resetTransporter();
+        for (int id : toLoad.keySet()) {
+            Entity cargo = client.getEntity(id);
+            if (cargo == null) {
+                continue;
+            }
+
+            ITransportAssignment transportAssignment = toLoad.get(id);
+
+            // Find a bay with space in it and update that space so the next unit can
+            // process, unless the unit isn't being loaded into a bay
+            if (transportAssignment.hasTransportedLocation()
+                    && Bay.class.isAssignableFrom(transportAssignment.getTransportedLocation().getClass())) {
+                Bay bay = (Bay) transportAssignment.getTransportedLocation();
+                cargo.setTargetBay(bay.getBayNumber());
+            } else {
+                if (transportAssignment.hasTransporterType()
+                        && Bay.class.isAssignableFrom(transportAssignment.getTransporterType())) {
+                    cargo.setTargetBay(selectBestBayFor(cargo, transport));
+                }
+            }
+        }
+
+        // Reset transporter status again so that sendLoadEntity can process correctly
+        transport.resetTransporter();
+        for (int id : toLoad.keySet()) {
+            Entity cargo = client.getEntity(id);
+            if (!transport.canLoad(cargo, false)) {
+                continue;
+            }
+
+            //Transported units should deploy on their transport's turn
+            cargo.setDeployRound(transport.getDeployRound());
+
+            sendLoadEntity(client, id, trnId, cargo);
         }
     }
 
