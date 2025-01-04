@@ -645,6 +645,8 @@ public class MekHQ implements GameListener {
      */
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
 
+        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
             var proceed = AutoResolveChanceDialog
                 .showSimulationProgressDialog(
@@ -732,7 +734,7 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
-        final String theme = themeName.isBlank() ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
 
         Runnable runnable = () -> {
             try {
