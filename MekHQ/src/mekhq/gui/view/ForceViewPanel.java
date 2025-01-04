@@ -591,6 +591,12 @@ public class ForceViewPanel extends JScrollablePanel {
                 toReturn += "<br><i>" + "Infantry Bays: " + (int) unit.getCurrentInfantryCapacity() + " tons free.</i>";
             }
         }
+        //Let's get preferred transport too
+        if (unit.hasTransportAssignment()) {
+            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += unit.getTransportAssignment().getTransport().getName();
+            toReturn += "</i>";
+        }
         toReturn += "</font></html>";
         return toReturn;
     }

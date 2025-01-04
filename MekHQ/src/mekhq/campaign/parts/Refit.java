@@ -238,7 +238,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * only be {@link mekhq.campaign.Campaign Campaign} when merging parts.
      *
      * This is only used by RefitTest.java
-     * 
+     *
      * @return A mutable {@link List} of old parts in the refit.
      */
     @Deprecated
@@ -251,7 +251,7 @@ public class Refit extends Part implements IAcquisitionWork {
      * only be {@link mekhq.campaign.Campaign Campaign} when merging parts.
      *
      * This is only used by RefitTest.java
-     * 
+     *
      * @return A mutable {@link List} of new part IDs in the refit.
      */
     @Deprecated
@@ -327,13 +327,13 @@ public class Refit extends Part implements IAcquisitionWork {
             return;
         }
         time = 0;
-        sameArmorType = newEntity.getArmorType(newEntity.firstArmorIndex()) 
+        sameArmorType = newEntity.getArmorType(newEntity.firstArmorIndex())
                 == oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex());
         // SVs with standard SV armor need to check for change in BAR/tech rating
         if (newEntity.isSupportVehicle()
                 && (newEntity.getArmorType(newEntity.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD)) {
-           
-            sameArmorType = (newEntity.getBARRating(newEntity.firstArmorIndex()) 
+
+            sameArmorType = (newEntity.getBARRating(newEntity.firstArmorIndex())
                     == oldUnit.getEntity().getArmorType(oldUnit.getEntity().firstArmorIndex()))
                     && (newEntity.getArmorTechRating() == oldUnit.getEntity().getArmorTechRating());
         }
@@ -398,14 +398,14 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 boolean acceptableReplacement = (oldPart instanceof MissingPart)
                     && ((MissingPart) oldPart).isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because 
+                // We're not going to require replacing the life support system just because
                 // the number of bay personnel changes.
-                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) 
+                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport)
                     && (newPart instanceof AeroLifeSupport) && !crewSizeChanged();
                 if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
 
                     // need a special check for location and armor amount for armor
-                    if ((oldPart instanceof Armor) && (newPart instanceof Armor) 
+                    if ((oldPart instanceof Armor) && (newPart instanceof Armor)
                             && (oldPart.getLocation() != newPart.getLocation()
                                     || ((Armor) oldPart).isRearMounted() != ((Armor) newPart).isRearMounted()
                                     || ((Armor) oldPart).getTotalAmount() != ((Armor) newPart).getTotalAmount())) {
@@ -457,9 +457,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 boolean acceptableReplacement = (oldPart instanceof MissingPart)
                     && ((MissingPart) oldPart).isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because 
+                // We're not going to require replacing the life support system just because
                 // the number of bay personnel changes.
-                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) 
+                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport)
                     && (newPart instanceof AeroLifeSupport) && !crewSizeChanged();
                 if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
 
@@ -481,7 +481,7 @@ public class Refit extends Part implements IAcquisitionWork {
                         // save this in case we fail to find equipment in the same location.
                         int loc = newPart.getLocation();
                         boolean rear = ((EquipmentPart) newPart).isRearFacing();
-                        boolean oldIsDifferent = (oldPart instanceof EquipmentPart) 
+                        boolean oldIsDifferent = (oldPart instanceof EquipmentPart)
                             && ((oldPart.getLocation() != loc) || (((EquipmentPart) oldPart).isRearFacing() != rear));
                         boolean oldIsDifferentMissing = (oldPart instanceof MissingEquipmentPart)
                             && ((oldPart.getLocation() != loc) || (((MissingEquipmentPart) oldPart).isRearFacing() != rear));
@@ -512,7 +512,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     // Use equivalent MissingEquipmentPart install time
                     time += movedPart.getMissingPart().getBaseTime();
                 }
-                
+
             } else {
                 // it's a new part
                 // dont actually add the part itself but rather its missing equivalent
@@ -632,7 +632,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (newPart instanceof MissingEnginePart) {
                 Engine oldEngine = oldUnit.getEntity().getEngine();
                 Engine newEngine = newUnit.getEntity().getEngine();
-                if (oldEngine.getRating() != newEngine.getRating() 
+                if (oldEngine.getRating() != newEngine.getRating()
                         || oldEngine.getEngineType() != newEngine.getEngineType()) {
                     updateRefitClass(customJob ? CLASS_E : CLASS_D);
                 }
@@ -1084,11 +1084,11 @@ public class Refit extends Part implements IAcquisitionWork {
             time = WORKMONTH * 3;
         } else if (newEntity instanceof Dropship || newEntity instanceof Jumpship) {
             time = WORKMONTH;
-        } else if (newEntity instanceof Mek || newEntity instanceof Aero) { 
+        } else if (newEntity instanceof Mek || newEntity instanceof Aero) {
             // ConvFighter and SmallCraft are derived from Aero
-            time = WORKWEEK * 2; 
+            time = WORKWEEK * 2;
         } else if (newEntity instanceof BattleArmor || newEntity instanceof Tank || newEntity instanceof ProtoMek) {
-            time = WORKWEEK; 
+            time = WORKWEEK;
         } else {
             time = WORKWEEK * 2; // Default to same as Mek
             logger.error("Unit " + newEntity.getModel() + " did not set its time correctly.");
@@ -1393,10 +1393,10 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
-    
+
     /**
-     * Aborts this refit and releases the various marked parts to be used for other purposes. 
-     * 
+     * Aborts this refit and releases the various marked parts to be used for other purposes.
+     *
      * TODO: WeaverThree - Is it safe to call this on an un-started refit? Looks like no.
      */
     public void cancel() {
@@ -1533,10 +1533,11 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         // dont forget to switch entities!
-        // ----------------- from here on oldUnit refers to the new entity ------------------------- 
+        // ----------------- from here on oldUnit refers to the new entity -------------------------
         oldUnit.setEntity(newEntity);
         // Bay capacities might have changed - reset them
         oldUnit.initializeBaySpace();
+        oldUnit.initializeTacticalTransportCapacity();
 
         // set up new parts
         ArrayList<Part> newParts = new ArrayList<>();
@@ -1554,8 +1555,8 @@ public class Refit extends Part implements IAcquisitionWork {
             // Only Aerospace Fighters are expected to have heat sink parts (Meks handled
             // separately) SmallCraft, DropShip, JumpShip, WarShip, and SpaceStation use
             // SpacecraftCoolingSystem instead
-            expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() 
-                    - ((Aero) newEntity).getPodHeatSinks() 
+            expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks()
+                    - ((Aero) newEntity).getPodHeatSinks()
                     - untrackedHeatSinkCount(newEntity);
         }
         for (Part part : newUnitParts) {
@@ -1714,8 +1715,8 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Writes the configuration for the new side of the refit to a 
-     * .mtf or .blk file in the customs directory. 
+     * Writes the configuration for the new side of the refit to a
+     * .mtf or .blk file in the customs directory.
      * @throws EntityLoadingException
      */
     public void saveCustomization() throws EntityLoadingException {
@@ -1746,13 +1747,13 @@ public class Refit extends Part implements IAcquisitionWork {
             String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
             String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
             fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
-            
+
             // if this file already exists then don't overwrite it or we might break another unit
             if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                 throw new IOException("A file already exists with the custom name " + fileNameCampaign
                         + ". Please choose a different name. (Unit name and/or model)");
             }
-            
+
             if (newEntity instanceof Mek) {
                 try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                         PrintStream p = new PrintStream(out)) {
@@ -1836,7 +1837,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * @return Have we failed a refit check? If so, the quality of the parts will decrease. 
+     * @return Have we failed a refit check? If so, the quality of the parts will decrease.
      * unless it's a refurbishment, at least.
      */
     public boolean hasFailedCheck() {
@@ -1868,7 +1869,7 @@ public class Refit extends Part implements IAcquisitionWork {
         // Refit kit bonus added below in getAllMods
     }
 
-    
+
     /**
      * @param tech - a Person whose attribute may modify this roll
      * @return a TargetRoll describing all of our difficulty modifiers
@@ -1927,7 +1928,7 @@ public class Refit extends Part implements IAcquisitionWork {
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                    "The customization of " + oldUnit.getEntity().getShortName() 
+                    "The customization of " + oldUnit.getEntity().getShortName()
                     + " will take <b>" + getTimeLeft() + " additional minutes</b> to complete.");
         }
     }
@@ -1981,7 +1982,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
     /**
      * A refit has the same base and actual time
-     * @return minutes to complete refit 
+     * @return minutes to complete refit
      */
     @Override
     public int getBaseTime() {
@@ -2935,7 +2936,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Gets a value indicating whether or not this refit is a custom job. 
+     * Gets a value indicating whether or not this refit is a custom job.
      * If false, this is a Refit Kit (CamOps 212).\
      * @return is custom job?
      */
@@ -2944,7 +2945,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * @return Has a refit kit for this refit been found (if applicable). 
+     * @return Has a refit kit for this refit been found (if applicable).
      */
     public boolean kitFound() {
         return kitFound;

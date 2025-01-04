@@ -61,7 +61,7 @@ public class RestoreUnitAction implements IUnitAction {
     /**
      * Creates a new {@code RestoreUnitAction} instance using
      * the provided {@link IEntityCopyFactory}.
-     * 
+     *
      * @param entityCopyFactory The factory to create entity copies with.
      */
     public RestoreUnitAction(IEntityCopyFactory entityCopyFactory) {
@@ -84,7 +84,7 @@ public class RestoreUnitAction implements IUnitAction {
 
     /**
      * Restore a unit by swapping out its entity and replacing its parts.
-     * 
+     *
      * @param campaign  The campaign which owns the unit.
      * @param unit      The unit to restore.
      * @param newEntity The new entity to assign to the unit.
@@ -108,6 +108,7 @@ public class RestoreUnitAction implements IUnitAction {
         unit.removeParts();
 
         unit.initializeBaySpace();
+        unit.initializeTacticalTransportCapacity();
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
@@ -117,7 +118,7 @@ public class RestoreUnitAction implements IUnitAction {
 
     /**
      * Copies the C3 network setup from the source to the target.
-     * 
+     *
      * @param source The source {@link Entity}.
      * @param target The target {@link Entity}.
      */
@@ -150,7 +151,7 @@ public class RestoreUnitAction implements IUnitAction {
 
     /**
      * Restores a unit using the old per-part logic.
-     * 
+     *
      * @param campaign The campaign which owns the unit.
      * @param unit     The unit to restore.
      */
@@ -235,7 +236,7 @@ public class RestoreUnitAction implements IUnitAction {
     public interface IEntityCopyFactory {
         /**
          * Gets a copy of the entity.
-         * 
+         *
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
@@ -250,7 +251,7 @@ public class RestoreUnitAction implements IUnitAction {
     private static class FileSystemEntityCopyFactory implements IEntityCopyFactory {
         /**
          * Get a copy of the entity from the {@link MekSummaryCache}.
-         * 
+         *
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
