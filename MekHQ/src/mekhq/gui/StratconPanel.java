@@ -373,6 +373,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
         g2D.setFont(newFont);
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
@@ -406,7 +408,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     }
 
                     // draw fog of war if applicable
-                    if (!currentTrack.coordsRevealed(x, y)) {
+                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
                         BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR,
                                 ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
@@ -553,6 +555,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         Polygon graphHex = generateGraphHex();
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
@@ -566,7 +570,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                 (scenario.isStrategicObjective()
                                         && currentTrack.getRevealedCoords().contains(currentCoords))
                                 ||
-                                currentTrack.isGmRevealed())) {
+                                currentTrack.isGmRevealed() || trackRevealed)) {
                     g2D.setColor(MekHQ.getMHQOptions().getFontColorNegative());
 
                     BufferedImage scenarioImage = getImage(StratconBiomeManifest.FORCE_HOSTILE, ImageType.TerrainTile);
@@ -612,12 +616,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         Polygon graphHex = generateGraphHex();
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 StratconFacility facility = currentTrack.getFacility(currentCoords);
 
-                if ((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
+                if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == Allied ? Color.CYAN : Color.RED);
 
                     BufferedImage facilityImage = getFacilityImage(facility);
@@ -869,7 +875,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
         infoBuilder.append("<br/>");
 
-        boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
+        boolean coordsRevealed = currentTrack.hasActiveTrackReveal()
+                || currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
             infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
                 .append("'><i>Recon Complete</i></span><br/>");

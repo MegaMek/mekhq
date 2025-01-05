@@ -435,6 +435,13 @@ public class StratconTrackState {
     }
 
     /**
+     * @return Whether or not this track has a facility on it that reveals the track.
+     */
+    public boolean hasActiveTrackReveal() {
+        return getFacilities().values().stream().anyMatch(StratconFacility::getRevealTrack);
+    }
+
+    /**
      * Determines the number of facilities on this track that actively reveal the track.
      *
      * <p>This method iterates through all facilities associated with the track and counts
