@@ -172,12 +172,14 @@ public class PartsStore {
             } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_MASC)) {
                 if (et.hasSubType(MiscType.S_SUPERCHARGER)) {
                     for (int rating = 10; rating <= 400; rating += 5) {
-                        for (double eton = 0.5; eton <= 10.5; eton += 0.5) {
+                        // eton 0.5 to 10.5 inclusive
+                        for (int i = 1; i <= 21; i++) {
+                            double eton = i * 0.5;
                             double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
-                            double minweight = weight * 0.5f;
+                            double minweight = weight * 0.5;
                             minweight = Math.ceil(
                                     (TestEntity.ceilMaxHalf(minweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
-                            double maxweight = weight * 2.0f;
+                            double maxweight = weight * 2.0;
                             maxweight = Math.ceil(
                                     (TestEntity.ceilMaxHalf(maxweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
                             if (eton < minweight || eton > maxweight) {
