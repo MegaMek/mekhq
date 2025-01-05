@@ -35,6 +35,7 @@ import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
+import mekhq.gui.sorter.*;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -54,6 +55,9 @@ import org.jfree.data.xy.XYDataset;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -102,6 +106,12 @@ public final class FinancesTab extends CampaignGuiTab {
 
         financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
+        // make column headers in the table clickable and sortable
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(financeTable.getModel());
+        sorter.setComparator(FinanceTableModel.COL_DEBIT, new FormattedNumberSorter());
+        sorter.setComparator(FinanceTableModel.COL_CREDIT, new FormattedNumberSorter());
+        sorter.setComparator(FinanceTableModel.COL_BALANCE, new FormattedNumberSorter());
+        financeTable.setRowSorter(sorter);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         FinanceTableMouseAdapter.connect(getCampaignGui(), financeTable, financeModel);
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);

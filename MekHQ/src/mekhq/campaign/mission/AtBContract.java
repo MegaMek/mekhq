@@ -1875,7 +1875,7 @@ public class AtBContract extends Contract {
             iterations = 5;
         }
 
-        if (iterations % 2 == 1) {
+        if (iterations % 2 != 0) {
             iterations--;
             iterations /= 2;
 

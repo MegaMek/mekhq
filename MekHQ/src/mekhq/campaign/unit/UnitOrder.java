@@ -213,6 +213,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         // TODO: Fix weight classes
         // TODO: aero large craft
         // TODO: support vehicles
+        // see EntityWeightClass.java in megamek for weight classes
         if (entity instanceof Mek) {
             if (!((Mek) entity).isIndustrial()) {
                 target.addModifier(0, "BattleMek");
@@ -232,6 +233,18 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 case EntityWeightClass.WEIGHT_ASSAULT:
                 default:
                     target.addModifier(3, "Assault");
+            }
+        } else if (entity instanceof SupportTank) {
+            switch (entity.getWeightClass()) {
+                case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                    target.addModifier(-1, "Small Support");
+                    break;
+                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                    target.addModifier(0, "Medium Support");
+                    break;
+                case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+                    target.addModifier(1, "Large Support");
+                    break;
             }
         } else if (entity instanceof BattleArmor) {
             target.addModifier(0, "BattleArmor");
@@ -262,7 +275,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                     target.addModifier(3, "Assault");
             }
         } else if (entity instanceof ConvFighter) {
-            target.addModifier(+0, "Conventional Fighter");
+            target.addModifier(0, "Conventional Fighter");
         } else if (entity instanceof Aero) {
             target.addModifier(0, "Aerospace Fighter");
             switch (entity.getWeightClass()) {
