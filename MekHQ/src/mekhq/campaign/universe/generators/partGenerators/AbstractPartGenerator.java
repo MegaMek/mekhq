@@ -87,7 +87,7 @@ public abstract class AbstractPartGenerator {
      *                   unassigned. Implementors are required to clone the parts as required.
      * @return a warehouse containing the generated parts
      */
-    public abstract Warehouse generateWarehouse(final List<Part> inputParts);
+    public abstract Warehouse generateWarehouse(List<Part> inputParts);
 
     /**
      * This creates a clone of the input part, with it not being omni-podded if it was originally.

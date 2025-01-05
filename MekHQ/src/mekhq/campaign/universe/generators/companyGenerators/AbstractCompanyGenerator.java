@@ -373,9 +373,9 @@ public abstract class AbstractCompanyGenerator {
      * @param numMekWarriors the number of MekWarriors in their force, used to
      *                       determine their rank
      */
-    protected abstract void generateCommandingOfficerRank(final Faction faction,
-            final CompanyGenerationPersonTracker tracker,
-            final int numMekWarriors);
+    protected abstract void generateCommandingOfficerRank(Faction faction,
+            CompanyGenerationPersonTracker tracker,
+            int numMekWarriors);
 
     /**
      * This generates the initial officer list and assigns the type
@@ -953,9 +953,9 @@ public abstract class AbstractCompanyGenerator {
      * @return the MekSummary generated from the provided parameters, or null if
      *         generation fails
      */
-    protected abstract @Nullable MekSummary generateMekSummary(final Campaign campaign,
-            final AtBRandomMekParameters parameters,
-            final Faction faction);
+    protected abstract @Nullable MekSummary generateMekSummary(Campaign campaign,
+            AtBRandomMekParameters parameters,
+            Faction faction);
 
     /**
      * @param campaign    the campaign to generate for
