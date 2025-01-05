@@ -360,7 +360,9 @@ public class PartsStore {
     }
 
     private void stockGyros(Campaign c) {
-        for (double i = 0.5; i <= 8.0; i += 0.5) {
+        // values of 0.5 to 8.0 inclusive
+        for (int r = 1; r <= 16; r++) {
+            double i = r * 0.5;
             // standard at intervals of 1.0, up to 4
             if (i % 1.0 == 0 && i <= 4.0) {
                 parts.add(new MekGyro(0, Mek.GYRO_STANDARD, i, false, c));
@@ -371,7 +373,7 @@ public class PartsStore {
                 parts.add(new MekGyro(0, Mek.GYRO_COMPACT, i, false, c));
             }
             // XL at 0.5 intervals up to 2
-            if (i % 0.5 == 0 && i <= 2.0) {
+            if (i <= 2.0) {
                 parts.add(new MekGyro(0, Mek.GYRO_XL, i, false, c));
             }
             // Heavy duty at 2.0 intervals
