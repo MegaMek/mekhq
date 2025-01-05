@@ -142,7 +142,8 @@ public class ResupplyUtilities {
      * @return the estimated cargo requirement in tons.
      */
     public static int estimateCargoRequirements(Campaign campaign, AtBContract contract) {
-        return (int) ceil(calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER);
+        double targetTonnage = calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER;
+        return (int) Math.ceil(targetTonnage);
     }
 
     /**
