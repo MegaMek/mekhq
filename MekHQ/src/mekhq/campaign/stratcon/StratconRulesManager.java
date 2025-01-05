@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import org.apache.commons.math3.util.Pair;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -1213,20 +1214,61 @@ public class StratconRulesManager {
     }
 
     /**
-     * Process the deployment of a force to the given coordinates on the given
-     * track.
-     * This does not include assigning the force to any scenarios
+     * Processes the deployment of a force to the specified coordinates on the given track.
+     *
+     * <p>This includes revealing the deployed coordinates, identifying and revealing facilities
+     * and scenarios within the scan range, and updating necessary game states such as fatigue
+     * and force assignments. It does not include assigning the force to specific scenarios.</p>
+     *
+     * <strong>Behavior:</strong>
+     * <ul>
+     *   <li>If the force's deployment coordinates are unrevealed, fatigue is increased for the force.</li>
+     *   <li>Ensures that fatigue is increased only once during the deployment process.</li>
+     *   <li>Reveals all coordinates, facilities, and scenarios within the force's scan range.</li>
+     *   <li>Handles cloaked scenarios by activating them and updating game states as necessary.</li>
+     *   <li>Updates the track's revealed coordinates to include the deployment and adjacent areas within range.</li>
+     *   <li>Assigns the deployed force to the specified coordinates and clears their previous track assignments.</li>
+     * </ul>
+     *
+     * <strong>Notes:</strong>
+     * <ul>
+     *   <li>Scout or patrol roles may increase the scan range.</li>
+     *   <li>The method uses a breadth-first search (BFS) approach to traverse the hex grid and reveal neighbors
+     *       within the scan range efficiently, avoiding redundant processing using a visited set.</li>
+     * </ul>
+     *
+     * @param coords    The coordinates where the force is being deployed.
+     * @param forceID   The ID of the force being deployed.
+     * @param campaign  The current campaign context, used to retrieve combat teams and update game events.
+     * @param track     The current track state where the deployment is happening.
+     * @param sticky    Whether the force should be persistently assigned to the track.
+     *
+     * @throws IllegalStateException if the force or the associated combat team is missing or invalid.
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
-            StratconTrackState track, boolean sticky) {
-        // plan of action:
-        // increase fatigue if the coordinates are not currently unrevealed reveal deployed coordinates
-        // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
-        // reveal scenarios in deployed coordinates (and all adjacent coordinates for scout lances)
-
+                                              StratconTrackState track, boolean sticky) {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
+        // BFS queue for coordinates, tracks distance from the starting point
+        Queue<Pair<StratconCoords, Integer>> queue = new LinkedList<>();
+        // Keep a set of visited coordinates to avoid redundancy
+        Set<StratconCoords> visited = new HashSet<>();
+
+        // Start with the initial deployment coordinate at distance 0
+        queue.add(new Pair<>(coords, 0));
+        visited.add(coords);
+
+        // Determine scan range
+        int scanRange = track.getScanRangeIncrease();
+
+        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+
+        if (combatTeam != null && combatTeam.getRole().isPatrol()) {
+            scanRange++;
+        }
+
+        // Process starting point
         if (!track.getRevealedCoords().contains(coords)) {
             increaseFatigue(forceID, campaign);
             hasFatigueIncreased = true;
@@ -1234,9 +1276,9 @@ public class StratconRulesManager {
 
         track.getRevealedCoords().add(coords);
 
-        StratconFacility facility = track.getFacility(coords);
-        if (facility != null) {
-            facility.setVisible(true);
+        StratconFacility targetFacility = track.getFacility(coords);
+        if (targetFacility != null) {
+            targetFacility.setVisible(true);
         }
 
         StratconScenario scenario = track.getScenario(coords);
@@ -1247,34 +1289,40 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+        // Traverse neighboring coordinates up to the specified distance
+        while (!queue.isEmpty()) {
+            Pair<StratconCoords, Integer> current = queue.poll();
+            StratconCoords currentCoords = current.getKey();
+            int distance = current.getValue();
 
-        // This may return null if we're deploying a force that isn't a Combat Team for whatever reason
-        if (combatTeam != null) {
-            if (combatTeam.getRole().isPatrol()) {
+            // Only process neighbors if they're within the max distance
+            if (distance < scanRange) {
                 for (int direction = 0; direction < 6; direction++) {
-                    StratconCoords checkCoords = coords.translate(direction);
+                    StratconCoords checkCoords = currentCoords.translate(direction);
 
-                    facility = track.getFacility(checkCoords);
-                    if (facility != null) {
-                        facility.setVisible(true);
+                    // Skip already visited coordinates
+                    if (visited.contains(checkCoords)) {
+                        continue;
                     }
 
-                    scenario = track.getScenario(checkCoords);
-                    // if we've revealed a scenario and it's "cloaked"
-                    // we have to activate it
-                    if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
-                        scenario.getBackingScenario().setCloaked(false);
-                        setScenarioDates(0, track, campaign, scenario);
-                        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
+                    // Mark as visited
+                    visited.add(checkCoords);
+                    queue.add(new Pair<>(checkCoords, distance + 1)); // Add the neighbor with incremented distance
+
+                    // Process facilities
+                    targetFacility = track.getFacility(checkCoords);
+                    if (targetFacility != null) {
+                        targetFacility.setVisible(true);
                     }
 
-                    if ((!track.getRevealedCoords().contains(checkCoords)) && (!hasFatigueIncreased)) {
+                    // Increase fatigue only once
+                    if (!track.getRevealedCoords().contains(checkCoords) && !hasFatigueIncreased) {
                         increaseFatigue(forceID, campaign);
                         hasFatigueIncreased = true;
                     }
 
-                    track.getRevealedCoords().add(coords.translate(direction));
+                    // Mark the current coordinate as revealed
+                    track.getRevealedCoords().add(checkCoords);
                 }
             }
         }
