@@ -56,8 +56,7 @@ public class TransportAssignment implements ITransportAssignment {
      * @param transport new transport, or null if none
      * @return true if a unit was provided, false if it was null
      */
-    @Override
-    public boolean setTransport(Unit newTransport) {
+    protected boolean setTransport(Unit newTransport) {
         this.transport = newTransport;
         return hasTransport();
     }
@@ -72,8 +71,7 @@ public class TransportAssignment implements ITransportAssignment {
         return transporterType != null;
     }
 
-    @Override
-    public boolean setTransporterType(Class<? extends Transporter> transporterType) {
+    protected boolean setTransporterType(Class<? extends Transporter> transporterType) {
         this.transporterType = transporterType;
         return hasTransporterType();
     }
@@ -98,8 +96,7 @@ public class TransportAssignment implements ITransportAssignment {
      *
      * @return true if a location was provided, false if it was null
      */
-    @Override
-    public boolean setTransportedLocation(@Nullable Transporter transportedLocation) {
+    protected boolean setTransportedLocation(@Nullable Transporter transportedLocation) {
         this.transportedLocation = transportedLocation;
         return hasTransportedLocation();
     }

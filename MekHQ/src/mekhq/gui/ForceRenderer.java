@@ -130,7 +130,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             String tacticalTransport = "";
             if (unit.hasTransportAssignment()) {
                 transport.append("<br>Transported by: ")
-                    .append(unit.getTransportAssignment().getTransport().getName());
+                    .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }
 
             String text = name + ", " + unitName + c3network + transport + tacticalTransport;

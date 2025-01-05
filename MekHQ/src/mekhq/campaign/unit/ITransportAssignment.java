@@ -33,47 +33,30 @@ public interface ITransportAssignment {
      * The transport that is assigned, or null if none
      * @return
      */
-    public @Nullable Unit getTransport();
+    @Nullable Unit getTransport();
 
-    public boolean hasTransport();
+    boolean hasTransport();
 
-    /**
-     * Change the transport assignment to have a new transport
-     * @param transport new transport, or null if none
-     * @return true if a unit was provided, false if it was null
-     */
-    public boolean setTransport(@Nullable Unit transport);
+    Class<? extends Transporter> getTransporterType();
 
-    public Class<? extends Transporter> getTransporterType();
-
-    public boolean hasTransporterType();
-
-    public boolean setTransporterType(Class<? extends Transporter> transporterType);
-
-
+    boolean hasTransporterType();
 
     /**
      * Where is this unit being transported?
      * @return The transporter this unit is in
      */
-    public @Nullable Transporter getTransportedLocation();
+    @Nullable Transporter getTransportedLocation();
 
     /**
      * Is this unit in a specific location?
      * @return true if it is
      */
-    public boolean hasTransportedLocation();
-
-    /**
-     * Set where this unit should be transported
-     * @return true if a location was provided, false if it was null
-     */
-    public boolean setTransportedLocation(@Nullable Transporter transportedLocation);
+    boolean hasTransportedLocation();
 
     /**
      * Convert location to hash to assist with saving/loading
      * @return hash int, or null if none
      */
-    public @Nullable int hashTransportedLocation();
+    @Nullable int hashTransportedLocation();
 
 }

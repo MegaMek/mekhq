@@ -319,7 +319,7 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                     if (!(isTransported) && unit.hasTransportAssignment()) {
-                        Unit transport = unit.getTransportAssignment().getTransport();
+                        Unit transport = unit.getTacticalTransportAssignment().getTransport();
 
                         if (potentialTransports.get(TransportAssignment.class).containsKey(transport.getId())) {
                             potentialTransports.get(TransportAssignment.class).get(transport.getId()).add(unit.getId());
@@ -499,12 +499,12 @@ public class AtBGameThread extends GameThread {
                                 Unit transportedUnit = campaign.getUnit(cargoId);
                                 if (transportedUnit != null && transport.getEntity().canLoad(transportedUnit.getEntity())) { //transportedUnit.getTransportAssignment().getTransporterType()) {
                                     // Convert the list of Unit UUIDs to MM EntityIds
-                                    toLoad.put(transportedUnit.getEntity().getId(), transportedUnit.getTransportAssignment());
+                                    toLoad.put(transportedUnit.getEntity().getId(), transportedUnit.getTacticalTransportAssignment());
                                     if (scenario.getPlayerTransportLinkages().containsKey(transportId)) {
                                         scenario.addPlayerTransportRelationship(transportId, transportedUnit.getId());
                                     }
-                                    if (transportedUnit.getTech() != null && transportedUnit.getTransportAssignment().hasTransporterType()
-                                            && Bay.class.isAssignableFrom(transportedUnit.getTransportAssignment().getTransporterType())) {
+                                    if (transportedUnit.getTech() != null && transportedUnit.getTacticalTransportAssignment().hasTransporterType()
+                                            && Bay.class.isAssignableFrom(transportedUnit.getTacticalTransportAssignment().getTransporterType())) {
                                         cargoTechs.add(transportedUnit.getTech());
                                     }
                                 }

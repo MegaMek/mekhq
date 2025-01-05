@@ -594,7 +594,7 @@ public class ForceViewPanel extends JScrollablePanel {
         //Let's get preferred transport too
         if (unit.hasTransportAssignment()) {
             toReturn += "<br><i>" + "Transported by: ";
-            toReturn += unit.getTransportAssignment().getTransport().getName();
+            toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
             toReturn += "</i>";
         }
         toReturn += "</font></html>";

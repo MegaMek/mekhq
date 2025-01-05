@@ -26,8 +26,7 @@ import java.util.Objects;
 /**
  * Represents an assignment to a specific bay on a transport ship.
  */
-public class TransportShipAssignment{
-    private final Unit transportShip;
+public class TransportShipAssignment extends TransportAssignment{
     private final int bayNumber;
 
     /**
@@ -36,15 +35,19 @@ public class TransportShipAssignment{
      * @param bayNumber The bay number on the transport ship.
      */
     public TransportShipAssignment(Unit transportShip, int bayNumber) {
-        this.transportShip = Objects.requireNonNull(transportShip);
+        super(transportShip);
         this.bayNumber = bayNumber;
+
+        if (getTransportShip().getEntity() != null) {
+            setTransportedLocation(transportShip.getEntity().getBayById(bayNumber));
+        }
     }
 
     /**
      * Gets the transport ship for this assignment.
      */
     public Unit getTransportShip() {
-        return transportShip;
+        return transport;
     }
 
     /**
