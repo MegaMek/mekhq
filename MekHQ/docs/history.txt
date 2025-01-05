@@ -26,8 +26,21 @@ MEKHQ VERSION HISTORY:
 + PR #5617: Restrict Distance Label to AtB Contracts Only
 + PR #5619: Refactored PostScenarioDialogHandler to use Generic Scenario
 + PR #5620: Autologistics Reporting fixes
-+ PR #5624: Updated Frontline Deployment Instructions 
-
++ PR #5624: Updated Frontline Deployment Instructions
++ Fix #5612: Add defensive check on cancel button
++ PR #5625: Updated StratCon Data Center to Increase Scan Range Instead of Sector Reveal
++ Fix #5604: Save refit config from MHQ MekLab tab
++ Fix #5328: Adjust acquisition modifiers for support vehicles
++ Fix #4876: Add sortable columns in the finance tab
++ PR #5644: Fixed Value Display in Resupplies
++ Fix #5646: Spelling Mistakes
++ PR #5650: Address potential int and double issue from SpotBugs
++ PR #5651: Don't use floats in for loops
++ PR #5652: Adds synchronization to getForces since setForces is synchronized
++ PR #5653: Keep odd number checks using modulus
++ Fix #5604: Save refit config from MHQ MekLab tab
++ PR ##5618: Enable Auto-Resolve Button Conditionally for Scenarios
++ PR ##5616: Adds some helpful tooltips for contracts
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
