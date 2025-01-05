@@ -55,7 +55,7 @@ jobs:
           path: ./mekhq/MekHQ/build/reports/
 
       - name: CodeCov.io Coverage Report
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           directory: ./mekhq/MekHQ/build/reports/jacoco/test
           fail_ci_if_error: false
