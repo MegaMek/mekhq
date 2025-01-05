@@ -1,5 +1,6 @@
 package mekhq.campaign.unit;
 
+import megamek.common.Bay;
 import megamek.common.Entity;
 import megamek.common.Transporter;
 import megamek.common.UnitType;
@@ -21,16 +22,30 @@ public class ShipTransportDetail extends AbstractTransportDetail {
 
     @Override
     protected void initializeTransportDetail() {
-        if (hasTransportedUnits()) {
+        if (hasTransportedUnits() && transport.getEntity() != null) {
             //Let's remove capacity for what we're already transporting
             for (Unit transportedUnit : getTransportedUnits()) {
                 if (transportedUnit.hasTransportShipAssignment()) {
                     TransportShipAssignment transportAssignment = transportedUnit.getTransportShipAssignment();
                     if (Objects.equals(transportAssignment.getTransportShip(), transport)) {
-                        Class<? extends Transporter> transporterType = transport.getEntity().getBayById(transportAssignment.getBayNumber()).getClass();
-                        setCurrentTransportCapacity(transporterType,
-                            getCurrentTransportCapacity(transporterType)
-                                - transportedUnit.transportCapacityUsage(transporterType));
+                        try {
+                            Class<? extends Transporter> transporterType;
+                            if (transportedUnit.getEntity() != null && transportedUnit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                                transporterType = transport.getEntity().getCollarById(transportAssignment.getBayNumber()).getClass();
+                            }
+                            else {
+                                transporterType = transport.getEntity().getBayById(transportAssignment.getBayNumber()).getClass();
+                            }
+                            setCurrentTransportCapacity(transporterType,
+                                getCurrentTransportCapacity(transporterType)
+                                    - transportedUnit.transportCapacityUsage(transporterType));
+                        }
+                        catch (NullPointerException e) {
+                            logger.error(String.format("NullPointerException: Unable to get bays by number. Transport: %s Bay Assignment: %s)", transport.getName(), transportAssignment.getBayNumber()));
+                            for (Bay bay : transport.getEntity().getTransportBays()) {
+                                logger.error(String.format("Bay Number: %s Bay Type: %s", bay.getBayNumber(), bay.getClass()));
+                            }
+                        }
                     }
                 }
             }
@@ -58,11 +73,18 @@ public class ShipTransportDetail extends AbstractTransportDetail {
                 unitWeight = unit.getEntity().getWeight();
             }
 
+            Class<? extends Transporter> transporterType;
             int bayNumber = Utilities.selectBestBayFor(unit.getEntity(), transport.getEntity());
             addTransportedUnit(unit);
             unit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumber));
 
-            Class<? extends Transporter> transporterType = transport.getEntity().getBayById(bayNumber).getClass();
+            if ((unit.getEntity() != null) && unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                transporterType = transport.getEntity().getCollarById(bayNumber).getClass();
+            }
+            else {
+                transporterType = transport.getEntity().getBayById(bayNumber).getClass();
+            }
+
             setCurrentTransportCapacity(transporterType,
                 getCurrentTransportCapacity(transporterType) - unit.transportCapacityUsage(transporterType));
         }
@@ -109,5 +131,13 @@ public class ShipTransportDetail extends AbstractTransportDetail {
         });
 
         initializeTransportCapacity(transport.getEntity().getTransports());
+    }
+
+    /**
+     * TransportDetails are meant to be used with transportAssignment
+     * @return the TransportAssignement used by the class
+     */
+    static Class<?> getRelatedTransportAssignmentType() {
+        return TransportShipAssignment.class;
     }
 }

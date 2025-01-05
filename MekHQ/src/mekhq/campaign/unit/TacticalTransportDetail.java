@@ -20,7 +20,7 @@ public class TacticalTransportDetail extends AbstractTransportDetail {
             //Let's remove capacity for what we're already transporting
             for (Unit transportedUnit : getTransportedUnits()) {
                 if (transportedUnit.hasTransportAssignment()) {
-                    ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment();
+                    ITransportAssignment transportAssignment = transportedUnit.getTacticalTransportAssignment();
                     if (Objects.equals(transportAssignment.getTransport(), transport)) {
                         setCurrentTransportCapacity(transportAssignment.getTransporterType(),
                             getCurrentTransportCapacity(transportAssignment.getTransporterType())
@@ -83,17 +83,17 @@ public class TacticalTransportDetail extends AbstractTransportDetail {
     public Unit loadTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
         Unit oldTransport = null;
 
-        if (transportedUnit.hasTransportAssignment() && !Objects.equals(transportedUnit.getTransportAssignment().getTransport(), this)) {
-            oldTransport = transportedUnit.getTransportAssignment().getTransport();
+        if (transportedUnit.hasTransportAssignment() && !Objects.equals(transportedUnit.getTacticalTransportAssignment().getTransport(), transport)) {
+            oldTransport = transportedUnit.getTacticalTransportAssignment().getTransport();
             if (transport.getEntity() != null) {
                 oldTransport.unloadFromTransport(transportedUnit);
             }
         }
         if (transportedLocation != null) {
-            transportedUnit.setTransportAssignment(new TransportAssignment(transport, transportedLocation));
+            transportedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transportedLocation));
         }
         else if (transporterType != null){
-            transportedUnit.setTransportAssignment(new TransportAssignment(transport, transporterType));
+            transportedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transporterType));
         } else {
             logger.error(String.format("Cannot load transport (%s) with unit (%s) without a transported location or transporter!", transport.getId(), transportedUnit.getId()));
             return oldTransport;
@@ -126,8 +126,8 @@ public class TacticalTransportDetail extends AbstractTransportDetail {
         // then update its transport  assignment (provided the
         // assignment is actually to us!).
         if (transportedUnit.hasTransportAssignment()
-            && transportedUnit.getTransportAssignment().getTransport().equals(transport)) {
-            transportedUnit.setTransportAssignment(null);
+            && transportedUnit.getTacticalTransportAssignment().getTransport().equals(transport)) {
+            transportedUnit.setTacticalTransportAssignment(null);
         }
     }
 
@@ -144,11 +144,19 @@ public class TacticalTransportDetail extends AbstractTransportDetail {
         // And now reset the Transported values for all the units we just booted
         campaign.getHangar().forEachUnit(u -> {
             if (u.hasTransportAssignment()
-                && Objects.equals(transport, u.getTransportAssignment().getTransport())) {
-                u.setTransportAssignment(null);
+                && Objects.equals(transport, u.getTacticalTransportAssignment().getTransport())) {
+                u.setTacticalTransportAssignment(null);
             }
         });
 
         initializeTransportCapacity(transport.getEntity().getTransports());
+    }
+
+    /**
+     * TransportDetails are meant to be used with transportAssignment
+     * @return the TransportAssignement used by the class
+     */
+    static Class<?> getRelatedTransportAssignmentType() {
+        return TransportAssignment.class;
     }
 }
