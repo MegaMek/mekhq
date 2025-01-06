@@ -112,8 +112,6 @@ public class Procurement {
             }
         }
 
-        logger.info(successfulParts);
-
         return successfulParts;
     }
 
