@@ -45,7 +45,6 @@ import java.util.Map.Entry;
 
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.ROUTED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
@@ -333,17 +332,13 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         AtBMoraleLevel morale = contract.getMoraleLevel();
 
-        if (morale.isRouted()) {
-            completeSuccessfulDelivery(resupply, convoyContents);
-        }
-
-        int interceptionChance = morale.ordinal();
-
         // There isn't any chance of an interception if the enemy is Routed, so early-exit
-        if (interceptionChance == ROUTED.ordinal()) {
+        if (morale.isRouted()) {
             completeSuccessfulDelivery(resupply, convoyContents);
             return;
         }
+
+        int interceptionChance = morale.ordinal();
 
         // This chance is modified by convoy weight, for player convoys this is easy - we just
         // calculate the weight of all units in the convoy. For NPC convoys, we need to get a bit
