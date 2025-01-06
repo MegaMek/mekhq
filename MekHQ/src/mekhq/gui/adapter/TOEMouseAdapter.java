@@ -98,14 +98,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String DEPLOY_UNIT = "DEPLOY_UNIT";
     private static final String GOTO_UNIT = "GOTO_UNIT";
     private static final String REMOVE_UNIT = "REMOVE_UNIT";
-    private static final String UNASSIGN_FROM_SHIP = "UNASSIGN_FROM_SHIP";
     private static final String UNDEPLOY_UNIT = "UNDEPLOY_UNIT";
 
     private static final String COMMAND_ADD_UNIT = "ADD_UNIT|FORCE|";
     private static final String COMMAND_ASSIGN_TO_SHIP = "ASSIGN_TO_SHIP|UNIT|";
     private static final String COMMAND_REMOVE_UNIT = "REMOVE_UNIT|UNIT|empty|";
     private static final String COMMAND_DEPLOY_UNIT = "DEPLOY_UNIT|UNIT|";
-    private static final String COMMAND_UNASSIGN_FROM_SHIP = "UNASSIGN_FROM_SHIP|UNIT|empty|";
     private static final String COMMAND_UNDEPLOY_UNIT = "UNDEPLOY_UNIT|UNIT|empty|";
     private static final String COMMAND_GOTO_UNIT = "GOTO_UNIT|UNIT|empty|";
 
@@ -180,7 +178,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
 
     private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
-    private static final String UNASSIGN_FORCE_TRN_TITLE = "Unassign Force from Transport Ship";
     private static final String MEK_CARRIERS = "Mek Transports";
     private static final String PROTOMEK_CARRIERS = "ProtoMek Transports";
     private static final String LVEE_CARRIERS = "Light Vehicle Transports";
@@ -328,15 +325,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     gui.getTOETab().refreshForceView();
                 }
             }
-        } else if (command.contains(UNASSIGN_FROM_SHIP)) { //TODO
-            for (Unit u : units) {
-                if (u.hasTransportShipAssignment()) {
-                    Unit oldShip = u.getTransportShipAssignment().getTransportShip();
-                    oldShip.unloadFromTransportShip(u);
-                    MekHQ.triggerEvent(new UnitChangedEvent(oldShip));
-                }
-            }
-            gui.getTOETab().refreshForceView();
         } else if (command.contains(TOEMouseAdapter.ADD_UNIT)) {
             if (null != singleForce) {
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
@@ -575,7 +563,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 HashSet<Unit> extraUnits = new HashSet<>();
                 for (Unit unit : units) {
                     if (null != unit && null != scenario) {
-                        if (unit.hasShipTransportedUnits()) {
+                        if (unit.hasShipTransportedUnits()) { //I don't think units are deployed through this anymore
                             // Prompt the player to also deploy any units transported by this one
                             int optionChoice = JOptionPane.showConfirmDialog(null,
                                     TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
@@ -1171,43 +1159,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             // Attempt to Assign all units in the selected force(s) to a transport ship.
             // This checks to see if the ship is in a basic state that can accept units.
             // Capacity gets checked once the action is submitted.
-            menu = new JMenu(TOEMouseAdapter.ASSIGN_FORCE_TRN_TITLE);
-            // Add submenus for different types of transports
-            JMenu m_trn = new JMenu(TOEMouseAdapter.MEK_CARRIERS);
-            JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMEK_CARRIERS);
-            JMenu lv_trn = new JMenu(TOEMouseAdapter.LVEE_CARRIERS);
-            JMenu hv_trn = new JMenu(TOEMouseAdapter.HVEE_CARRIERS);
-            JMenu shv_trn = new JMenu(TOEMouseAdapter.SHVEE_CARRIERS);
-            JMenu ba_trn = new JMenu(TOEMouseAdapter.BA_CARRIERS);
-            JMenu i_trn = new JMenu(TOEMouseAdapter.INFANTRY_CARRIERS);
-            JMenu a_trn = new JMenu(TOEMouseAdapter.ASF_CARRIERS);
-            JMenu sc_trn = new JMenu(TOEMouseAdapter.SC_CARRIERS);
-            JMenu ds_trn = new JMenu(TOEMouseAdapter.DS_CARRIERS);
-            JMenu singleUnitMenu = new JMenu();
-
             if (!unitsInForces.isEmpty()) {
-                Unit unit = unitsInForces.get(0);
-                StringBuilder unitIds = new StringBuilder(unit.getId().toString());
-                boolean allUnitsSameType = false;
-                double unitWeight = 0;
-                int singleUnitType = -1;
-                for (int i = 1; i < unitsInForces.size(); i++) {
-                    unitIds.append('|').append(unitsInForces.get(i).getId().toString());
-                }
-
-                // Check to see if all selected units are of the same type
-                for (int i = 0; i < UnitType.SIZE; i++) {
-                    if (StaticChecks.areAllUnitsSameType(unitsInForces, i)) {
-                        singleUnitType = i;
-                        allUnitsSameType = true;
-                        singleUnitMenu.setText(String.format(TOEMouseAdapter.VARIABLE_TRANSPORT,
-                                UnitType.getTypeName(singleUnitType)));
-                        break;
-                    }
-                }
-
                 Unit[] unitsArr = units.toArray(new Unit[0]);
-                //AssignForceToTacticalTransportMenu assignForceToTransportMenu = new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr);
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), unitsArr));
                 unassignShipTransportMenuClass(units, popup);
 
@@ -1417,25 +1370,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(menu, missionMenu);
                 }
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
-
-                // First, only display the Assign to Ship command if your command has at least 1
-                // valid transport
-                boolean allUnitsSameType = false;
-                double unitWeight = 0;
-                int singleUnitType = -1;
-
-                JMenu singleUnitMenu = new JMenu();
-
-                // Check to see if all selected units are of the same type
-                for (int i = 0; i < UnitType.SIZE; i++) {
-                    if (StaticChecks.areAllUnitsSameType(units, i)) {
-                        singleUnitType = i;
-                        allUnitsSameType = true;
-                        singleUnitMenu.setText(String.format(TOEMouseAdapter.VARIABLE_TRANSPORT,
-                                UnitType.getTypeName(singleUnitType)));
-                        break;
-                    }
-                }
             }
 
             if (StaticChecks.areAllUnitsDeployed(units)) {
@@ -1546,29 +1480,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
-    /**
-     * Worker function that creates a new instance of a JMenuItem for a set of
-     * transport ship characteristics
-     * Used to have a single ship appear on multiple menu entries defined by type of
-     * unit transported
-     * Displays the remaining capacity in bays of the specified type
-     *
-     * @param shipName String name of this ship.
-     * @param shipId   Unique id of this ship. Used to fill out
-     *                 actionPerformed(ActionEvent)
-     * @param unitIds  String of units delimited by | used to fill out
-     *                 actionPerformed(ActionEvent)
-     * @param capacity Double representing the capacity of the designated bay type
-     */
-
-    private JMenuItem transportMenuItem(String shipName, UUID shipId, String unitIds, double capacity) {
-        JMenuItem menuItem = new JMenuItem(shipName + " , Space available: " + capacity);
-        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + shipId + '|' + unitIds);
-        menuItem.addActionListener(this);
-
-        return menuItem;
-    }
-
     private void unassignShipTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
         if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
             JMenuItem menuItem = new JMenuItem("Unassign Unit from Transport Ship");
@@ -1598,10 +1509,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(transportAssignmentType);
             transportsToUpdate.add(transportAssignment.getTransport());
             transportAssignment.getTransport().getTransportedUnitsSummaryType(transportedUnitsSummaryType).unloadTransport(units);
+            MekHQ.triggerEvent(new UnitChangedEvent(transportedUnit));
         }
 
         for (Unit transportToUpdate : transportsToUpdate) {
             gui.getCampaign().updateTransportInTransports(transportedUnitsSummaryType, transportToUpdate);
+            MekHQ.triggerEvent(new UnitChangedEvent(transportToUpdate));
 
         }
     }
