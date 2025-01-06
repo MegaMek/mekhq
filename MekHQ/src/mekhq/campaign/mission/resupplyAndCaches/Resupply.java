@@ -21,6 +21,7 @@ import mekhq.campaign.universe.Faction;
 import java.math.BigInteger;
 import java.util.*;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
@@ -545,9 +546,11 @@ public class Resupply {
                         }
 
                         int dropWeight = part instanceof MissingPart ? 10 : 1;
+                        dropWeight = (int) floor(dropWeight * getPartMultiplier(part));
+
                         PartDetails partDetails = new PartDetails(part, dropWeight);
 
-                        processedParts.merge(part.toString(), partDetails, (oldValue, newValue) -> {
+                        processedParts.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
                             oldValue.setWeight(oldValue.getWeight() + newValue.getWeight());
                             return oldValue;
                         });
@@ -561,6 +564,29 @@ public class Resupply {
         }
 
         return processedParts;
+    }
+
+    /**
+     * Generates a key for the given part based on its name and tonnage.
+     *
+     * <p>The key is a combination of the part's name and its tonnage, separated by a colon.
+     * For specific part types such as {@link AmmoBin} and {@link Armor}, the tonnage is
+     * always set to a value of 5, regardless of the actual tonnage.</p>
+     *
+     * @param part The {@link Part} for which the key is generated. Must not be {@code null}.
+     * @return A unique key in the format {@code "partName:partTonnage"}, where
+     *         {@code partName} is the name of the part and {@code partTonnage} is the
+     *         tonnage of the part or a fixed value of 5 for {@link AmmoBin} and {@link Armor}.
+     */
+    private static String getPartKey(Part part) {
+        String partName = part.getName();
+        double partTonnage = part.getTonnage();
+
+        if (part instanceof AmmoBin || part instanceof Armor) {
+            partTonnage = 5;
+        }
+
+        return partName + ':' + partTonnage;
     }
 
     /**
@@ -648,28 +674,54 @@ public class Resupply {
     }
 
     /**
-     * Applies warehouse weight modifiers to the collected parts list by comparing the
-     * in-campaign warehouse spare parts with the current list. Removes parts from the pool
-     * if the warehouse already contains enough resources to offset demand.
+     * Adjusts the provided parts list by applying warehouse weight modifiers.
      *
-     * @param partsList   A map of part names and their respective part details to modify.
+     * <p>This method compares the in-campaign warehouse's spare parts inventory with the given
+     * parts list and reduces the weight (quantity) of parts in the list based on the warehouse
+     * stock. If the warehouse contains enough resources to fully satisfy the demand for a part,
+     * the part is removed from the parts list.</p>
+     *
+     * <p>The adjustments are performed as follows:
+     * <ul>
+     *     <li>For each part in the warehouse:
+     *         <ul>
+     *             <li>The weight of the part in the part list is reduced by the quantity available
+     *             in the warehouse.</li>
+     *             <li>If the weight becomes zero or negative, the part is flagged for removal.</li>
+     *         </ul>
+     *     </li>
+     *     <li>All flagged parts are then removed from the part list.</li>
+     * </ul>
+     * </p>
+     *
+     * @param partsList A map containing part identifiers (keys) and their corresponding {@link PartDetails}.
+     *                  The map will be modified to reflect the warehouse adjustments.
      */
     private void applyWarehouseWeightModifiers(Map<String, PartDetails> partsList) {
-        // Because of how AmmoBins work, we're always considering the campaign to have 0 rounds
-        // of ammo in storage, we could avoid this, but I don't think it's necessary.
+        // Adjust based on the quantity in the warehouse
         for (Part part : campaign.getWarehouse().getSpareParts()) {
-            PartDetails targetPart = partsList.get(part.toString());
-            if (targetPart != null) {
-                int spareCount = part.getQuantity();
-                double multiplier = getPartMultiplier(part);
+            int weight = part.getQuantity();
+            PartDetails partDetails = new PartDetails(part, weight);
 
-                double targetPartCount = targetPart.getWeight() * multiplier;
-                if ((targetPartCount - spareCount) < 1) {
-                    partsList.remove(part.toString());
-                } else {
-                    targetPart.setWeight(min(1, targetPartCount - spareCount));
-                }
+            partsList.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
+                oldValue.setWeight(oldValue.getWeight() - newValue.getWeight());
+                return oldValue;
+            });
+        }
+
+        // Remove any items that now have 0 (or negative) tickets left in the pool
+        List<String> removalList = new ArrayList<>();
+        for (PartDetails partDetails : partsList.values()) {
+            Part part = partDetails.getPart();
+            double weight = partDetails.getWeight();
+
+            if (weight <= 0) {
+                removalList.add(getPartKey(part));
             }
+        }
+
+        for (String removalKey : removalList) {
+            partsList.remove(removalKey);
         }
     }
 
