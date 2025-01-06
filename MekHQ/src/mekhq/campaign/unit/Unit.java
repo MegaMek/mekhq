@@ -1322,48 +1322,55 @@ public class Unit implements ITechnology {
             return 0;
         }
 
-        double capacity = 0;
+        double capacity = 0.0;
+
+        // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
             if (bay instanceof CargoBay || bay instanceof StandardSeatCargoBay) {
                 capacity += bay.getCapacity();
             }
         }
 
-        // Pattern for general "Cargo (`x` tons)"
+        // Define the patterns
         Pattern cargoPattern = Pattern.compile("Cargo \\((.*) ton(s)?\\)");
-
-        // Updated pattern for "Cargo Container (`x` tons)"
         Pattern containerPattern = Pattern.compile("Cargo Container \\((.*) ton(s)?\\)");
 
+        // Iterate over parts
         for (Part part : getParts()) {
-            if (part instanceof EquipmentPart && !(part.needsFixing() || part.isMountedOnDestroyedLocation())) {
-                // Match for cargo
-                Matcher cargoMatcher = cargoPattern.matcher(part.getName());
-
-                if (cargoMatcher.find()) {
-                    try {
-                        double partCapacity = Double.parseDouble(cargoMatcher.group(1));
-                        capacity += partCapacity;
-                    } catch (NumberFormatException e) {
-                        logger.error(String.format("Failed to parse %s as double", cargoMatcher.group(1)));
-                    }
-                }
-
-                // Match for cargo container
-                Matcher containerMatcher = containerPattern.matcher(part.getName());
-
-                if (containerMatcher.find()) {
-                    try {
-                        double partCapacity = Double.parseDouble(containerMatcher.group(1));
-                        capacity += partCapacity;
-                    } catch (NumberFormatException e) {
-                        logger.error(String.format("Failed to parse %s as double", containerMatcher.group(1)));
-                    }
-                }
+            if (part instanceof EquipmentPart
+                && !(part.needsFixing() || part.isMountedOnDestroyedLocation())) {
+                capacity += extractCapacityFromPart(part, cargoPattern);
+                capacity += extractCapacityFromPart(part, containerPattern);
             }
         }
 
         return capacity;
+    }
+
+    /**
+     * Extracts the cargo capacity value from a part's name based on the given pattern.
+     * <p>
+     * The method attempts to match the part's name using the provided regular expression pattern.
+     * If a match is found, it parses the extracted value (after replacing commas with dots)
+     * to a {@code double}. If parsing fails, a log entry is created and zero capacity is returned.
+     * </p>
+     *
+     * @param part    the {@link Part} whose name is to be matched; must not be null.
+     * @param pattern the {@link Pattern} used to extract the cargo capacity from the part's name; must not be null.
+     * @return the extracted capacity as a {@code double}. If no match is found or parsing fails, returns {@code 0.0}.
+     * @throws NullPointerException if {@code part} or {@code pattern} is null.
+     */
+    private double extractCapacityFromPart(Part part, Pattern pattern) {
+        Matcher matcher = pattern.matcher(part.getName());
+        if (matcher.find()) {
+            try {
+                // Replace ',' with '.' and parse the capacity to account for localization
+                return Double.parseDouble(matcher.group(1).replace(",", "."));
+            } catch (NumberFormatException e) {
+                logger.error(String.format("Failed to parse %s as double", matcher.group(1)));
+            }
+        }
+        return 0.0;
     }
 
     public double getRefrigeratedCargoCapacity() {
