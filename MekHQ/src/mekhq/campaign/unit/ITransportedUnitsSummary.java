@@ -9,7 +9,7 @@ import mekhq.campaign.Campaign;
 import java.util.Set;
 import java.util.Vector;
 
-public interface ITransportDetail {
+public interface ITransportedUnitsSummary {
 
     /**
      * Gets a value indicating whether or not this unit is

@@ -116,7 +116,7 @@ public class Unit implements ITechnology {
     // This is the transport assigned for scenario deployments
     private ITransportAssignment tacticalTransportAssignment;
     //Contains what kind of transport it is, what units it's carrying, and the remaining capacity
-    Set<AbstractTransportDetail> transportDetails = new HashSet<>();
+    Set<AbstractTransportedUnitsSummary> transportedUnitsSummaries = new HashSet<>();
 
 
     // assignments
@@ -302,34 +302,34 @@ public class Unit implements ITechnology {
 
     public void initializeShipTransportSpace() {
         // Initialize the bay capacity
-        initializeTransportSpace(ShipTransportDetail.class);
+        initializeTransportSpace(ShipTransportedUnitsSummary.class);
     }
 
     public void initializeTacticalTransportSpace() {
-        initializeTransportSpace(TacticalTransportDetail.class);
+        initializeTransportSpace(TacticalTransportedUnitsSummary.class);
     }
 
-    public ShipTransportDetail getShipTransportDetail() {
-        return (ShipTransportDetail) getTransportDetail(ShipTransportDetail.class);
+    public ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
+        return (ShipTransportedUnitsSummary) getTransportedUnitsSummaryType(ShipTransportedUnitsSummary.class);
     }
 
-    public TacticalTransportDetail getTacticalTransportDetail() {
-        return (TacticalTransportDetail) getTransportDetail(TacticalTransportDetail.class);
+    public TacticalTransportedUnitsSummary getTacticalTransportedUnitsSummary() {
+        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummaryType(TacticalTransportedUnitsSummary.class);
     }
 
-    private void initializeTransportSpace(Class<? extends AbstractTransportDetail> transportDetailType) {
+    private void initializeTransportSpace(Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
         // Initialize the capacity
         //getTransportDetails(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
-        if (hasTransportDetails(transportDetailType)) {
+        if (hasTransportedUnitsType(transportedUnitsSummaryType)) {
              if (getEntity() != null) {
-                 getTransportDetail(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
+                 getTransportedUnitsSummaryType(transportedUnitsSummaryType).initializeTransportCapacity(getEntity().getTransports());
              }
         } else {
             try {
-                Constructor<? extends AbstractTransportDetail> constructor = transportDetailType.getConstructor(new Class[]{Unit.class});
-                addTransportDetails(constructor.newInstance(this));
+                Constructor<? extends AbstractTransportedUnitsSummary> constructor = transportedUnitsSummaryType.getConstructor(new Class[]{Unit.class});
+                addTransportedUnitType(constructor.newInstance(this));
             } catch (NoSuchMethodException e) {
-                logger.error(String.format("Could not find constructor to initialize transport space for %s", transportDetailType.getName()));
+                logger.error(String.format("Could not find constructor to initialize transport space for %s", transportedUnitsSummaryType.getName()));
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             } catch (InstantiationException e) {
@@ -340,30 +340,30 @@ public class Unit implements ITechnology {
         }
     }
 
-    public boolean hasTransportDetails(Class<? extends AbstractTransportDetail> transportDetailType) {
-        for(AbstractTransportDetail transportDetail : transportDetails) {
-            if (transportDetail.getClass() == transportDetailType) {
+    public boolean hasTransportedUnitsType(Class<? extends AbstractTransportedUnitsSummary> transportedUnitType) {
+        for(AbstractTransportedUnitsSummary transportedUnitsSummary : transportedUnitsSummaries) {
+            if (transportedUnitsSummary.getClass() == transportedUnitType) {
                 return true;
             }
         }
         return false;
     }
 
-    public AbstractTransportDetail getTransportDetail(Class<? extends AbstractTransportDetail> transportDetailType) {
-        for(AbstractTransportDetail transportDetail : transportDetails) {
-            if (transportDetail.getClass() == transportDetailType) {
-                return transportDetail;
+    public AbstractTransportedUnitsSummary getTransportedUnitsSummaryType(Class<? extends AbstractTransportedUnitsSummary> transportedUnitType) {
+        for(AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
+            if (transportedUnitSummary.getClass() == transportedUnitType) {
+                return transportedUnitSummary;
             }
         }
         return null;
     }
 
-    private void addTransportDetails(AbstractTransportDetail transportDetail) {
-        transportDetails.add(transportDetail);
+    private void addTransportedUnitType(AbstractTransportedUnitsSummary transportedUnitType) {
+        transportedUnitsSummaries.add(transportedUnitType);
     }
 
-    private void fixTransportedUnitReferences(AbstractTransportDetail transportDetail, Set<Unit> newTransportedUnits) {
-        transportDetail.replaceTransportedUnits(newTransportedUnits);
+    private void fixTransportedUnitReferences(AbstractTransportedUnitsSummary currentTransportedUnits, Set<Unit> newTransportedUnits) {
+        currentTransportedUnits.replaceTransportedUnits(newTransportedUnits);
     }
 
     public void setEntity(Entity en) {
@@ -423,14 +423,14 @@ public class Unit implements ITechnology {
      * transporting units.
      */
     public boolean hasShipTransportedUnits() {
-        return getShipTransportDetail().hasTransportedUnits();
+        return getShipTransportedUnitsSummary().hasTransportedUnits();
     }
 
     /**
      * @return the set of units being transported by this unit.
      */
     public Set<Unit> getShipTransportedUnits() {
-        return getShipTransportDetail().getTransportedUnits();
+        return getShipTransportedUnitsSummary().getTransportedUnits();
     }
 
     /**
@@ -439,7 +439,7 @@ public class Unit implements ITechnology {
      * @param unit The unit being transported by this instance.
      */
     public void addShipTransportedUnit(Unit unit) {
-        getShipTransportDetail().addTransportedUnit(unit);
+        getShipTransportedUnitsSummary().addTransportedUnit(unit);
     }
 
     /**
@@ -462,14 +462,14 @@ public class Unit implements ITechnology {
      * @return True if the unit was removed from our bays, otherwise false.
      */
     public boolean removeShipTransportedUnit(Unit unit) {
-        return getShipTransportDetail().removeTransportedUnit(unit);
+        return getShipTransportedUnitsSummary().removeTransportedUnit(unit);
     }
 
     /**
      * Clears the set of units being transported by this unit.
      */
     public void clearShipTransportedUnits() {
-        getShipTransportDetail().clearTransportedUnits();
+        getShipTransportedUnitsSummary().clearTransportedUnits();
     }
 
     /**
@@ -477,7 +477,7 @@ public class Unit implements ITechnology {
      * units
      */
     public boolean isCarryingSmallerAero() {
-        return getShipTransportDetail().getTransportedUnits().stream().anyMatch(u -> u.getEntity().isAero()
+        return getShipTransportedUnitsSummary().getTransportedUnits().stream().anyMatch(u -> u.getEntity().isAero()
                 && !u.getEntity().isLargeCraft()
                 && (u.getEntity().getUnitType() != UnitType.SMALL_CRAFT));
     }
@@ -486,7 +486,7 @@ public class Unit implements ITechnology {
      * Gets a value indicating whether or not we are transporting any ground units.
      */
     public boolean isCarryingGround() {
-        return getShipTransportDetail().getTransportedUnits().stream().anyMatch(u -> !u.getEntity().isAero());
+        return getShipTransportedUnitsSummary().getTransportedUnits().stream().anyMatch(u -> !u.getEntity().isAero());
     }
 
     public int getSite() {
@@ -1604,12 +1604,12 @@ public class Unit implements ITechnology {
     // Get only collars to which a DropShip has been assigned
     // Capacity
     public int getCurrentDocks() {
-        return (int) Math.floor(getShipTransportDetail().getCurrentTransportCapacity(DockingCollar.class));
+        return (int) Math.floor(getShipTransportedUnitsSummary().getCurrentTransportCapacity(DockingCollar.class));
     }
 
     // Used to assign a Dropship to a collar on a specific Jumpship in the TO&E
     public void setDocks(int docks) {
-        getShipTransportDetail().setCurrentTransportCapacity(DockingCollar.class, docks);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(DockingCollar.class, docks);
     }
 
     public double getLightVehicleCapacity() {
@@ -1624,12 +1624,12 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a light tank has been assigned
     public double getCurrentLightVehicleCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(LightVehicleBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(LightVehicleBay.class);
     }
 
     // Used to assign a tank to a bay on a specific transport ship in the TO&E
     public void setLightVehicleCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(LightVehicleBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(LightVehicleBay.class, bays);
     }
 
     public double getHeavyVehicleCapacity() {
@@ -1644,12 +1644,12 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a heavy tank has been assigned
     public double getCurrentHeavyVehicleCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(HeavyVehicleBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(HeavyVehicleBay.class);
     }
 
     // Used to assign a tank to a bay on a specific transport ship in the TO&E
     public void setHeavyVehicleCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(HeavyVehicleBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(HeavyVehicleBay.class, bays);
     }
 
     public double getSuperHeavyVehicleCapacity() {
@@ -1664,12 +1664,12 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a super heavy tank has been assigned
     public double getCurrentSuperHeavyVehicleCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(SuperHeavyVehicleBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(SuperHeavyVehicleBay.class);
     }
 
     // Used to assign a tank to a bay on a specific transport ship in the TO&E
     public void setSuperHeavyVehicleCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(SuperHeavyVehicleBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(SuperHeavyVehicleBay.class, bays);
     }
 
     public double getBattleArmorCapacity() {
@@ -1684,12 +1684,12 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a ba squad has been assigned
     public double getCurrentBattleArmorCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(BattleArmorBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(BattleArmorBay.class);
     }
 
     // Used to assign a ba squad to a bay on a specific transport ship in the TO&E
     public void setBattleArmorCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(BattleArmorBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(BattleArmorBay.class, bays);
     }
 
     public double getInfantryCapacity() {
@@ -1704,14 +1704,14 @@ public class Unit implements ITechnology {
 
     // Return the unused tonnage of any conventional infantry bays
     public double getCurrentInfantryCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(InfantryBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(InfantryBay.class);
     }
 
     // Used to assign an infantry unit to a bay on a specific transport ship in the
     // TO&E
     // Tonnage consumed depends on the platoon/squad weight
     public void setInfantryCapacity(double tonnage) {
-        getShipTransportDetail().setCurrentTransportCapacity(InfantryBay.class, tonnage);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(InfantryBay.class, tonnage);
     }
 
     public double getASFCapacity() {
@@ -1746,13 +1746,13 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a small craft has been assigned
     public double getCurrentSmallCraftCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(SmallCraftBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(SmallCraftBay.class);
     }
 
     // Used to assign a small craft to a bay on a specific transport ship in the
     // TO&E
     public void setSmallCraftCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(SmallCraftBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(SmallCraftBay.class, bays);
     }
 
     public double getMekCapacity() {
@@ -1767,12 +1767,12 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a mek has been assigned
     public double getCurrentMekCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(MekBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(MekBay.class);
     }
 
     // Used to assign a mek or LAM to a bay on a specific transport ship in the TO&E
     public void setMekCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(MekBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(MekBay.class, bays);
     }
 
     public double getProtoMekCapacity() {
@@ -1787,12 +1787,12 @@ public class Unit implements ITechnology {
 
     // Get only bays to which a protomek has been assigned
     public double getCurrentProtoMekCapacity() {
-        return getShipTransportDetail().getCurrentTransportCapacity(ProtoMekBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(ProtoMekBay.class);
     }
 
     // Used to assign a Protomek to a bay on a specific transport ship in the TO&E
     public void setProtoCapacity(double bays) {
-        getShipTransportDetail().setCurrentTransportCapacity(ProtoMekBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(ProtoMekBay.class, bays);
     }
 
     /**
@@ -1811,7 +1811,7 @@ public class Unit implements ITechnology {
             unitsVector.add(unit);
         }
 
-        return getShipTransportDetail().loadTransportShip(unitsVector, transporterType);
+        return getShipTransportedUnitsSummary().loadTransportShip(unitsVector, transporterType);
     }
 
     /**
@@ -1837,7 +1837,7 @@ public class Unit implements ITechnology {
      * @param u The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
-        getShipTransportDetail().unloadFromTransportShip(u);
+        getShipTransportedUnitsSummary().unloadFromTransportShip(u);
     }
 
     /**
@@ -1846,7 +1846,7 @@ public class Unit implements ITechnology {
      *
      */
     public void unloadTransportShip() {
-        getShipTransportDetail().unloadTransportedUnits(campaign);
+        getShipTransportedUnitsSummary().unloadTransportedUnits(campaign);
     }
 
     // Transport Assignments
@@ -1858,7 +1858,7 @@ public class Unit implements ITechnology {
      * @return
      */
     public double getCurrentShipTransportCapacity(Class<? extends Transporter> transporterType ){
-        return getShipTransportDetail().getCurrentTransportCapacity(transporterType);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
     }
 
     /**
@@ -1894,7 +1894,7 @@ public class Unit implements ITechnology {
      * @return
      */
     public double getCurrentTacticalTransportCapacity(Class<? extends Transporter> transporterType ){
-        return getTacticalTransportDetail().getCurrentTransportCapacity(transporterType);
+        return getTacticalTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
     }
 
     /**
@@ -1903,35 +1903,35 @@ public class Unit implements ITechnology {
      * @param transporterType class of Transporter
      * @return
      */
-    public double getCurrentTransportCapacity(Class<? extends AbstractTransportDetail> transportDetailType, Class<? extends Transporter> transporterType ){
-        return getTransportDetail(transportDetailType).getCurrentTransportCapacity(transporterType);
+    public double getCurrentTransportCapacity(Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType, Class<? extends Transporter> transporterType ){
+        return getTransportedUnitsSummaryType(transportedUnitsSummaryType).getCurrentTransportCapacity(transporterType);
     }
 
     public void setCurrentShipTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
-        getShipTransportDetail().setCurrentTransportCapacity(transporterType, capacity);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
 
     public void setCurrentTacticalTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
-        getTacticalTransportDetail().setCurrentTransportCapacity(transporterType, capacity);
+        getTacticalTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
 
     public Set<Class<? extends Transporter>> getShipTransportCapabilities() {
-        return getShipTransportDetail().getTransportCapabilities();
+        return getShipTransportedUnitsSummary().getTransportCapabilities();
     }
 
     public Set<Class<? extends Transporter>> getTacticalTransportCapabilities() {
-        return getTacticalTransportDetail().getTransportCapabilities();
+        return getTacticalTransportedUnitsSummary().getTransportCapabilities();
     }
 
     public boolean hasTacticalTransportedUnits() {
-        return getTacticalTransportDetail().hasTransportedUnits();
+        return getTacticalTransportedUnitsSummary().hasTransportedUnits();
     }
 
     /**
      * @return the set of units being transported by this unit.
      */
     public Set<Unit> getTacticalTransportedUnits() {
-        return getTacticalTransportDetail().getTransportedUnits();
+        return getTacticalTransportedUnitsSummary().getTransportedUnits();
     }
 
     /**
@@ -1943,7 +1943,7 @@ public class Unit implements ITechnology {
      * @return the old transport of the unit, or null if it didn't have one
      */
     private void addTacticalTransportedUnit(Unit transportedUnit) {
-        getTacticalTransportDetail().addTransportedUnit(Objects.requireNonNull(transportedUnit));
+        getTacticalTransportedUnitsSummary().addTransportedUnit(Objects.requireNonNull(transportedUnit));
     }
 
 
@@ -1954,7 +1954,7 @@ public class Unit implements ITechnology {
      * @return True if the unit was removed, otherwise false.
      */
     private boolean removeTacticalTransportedUnit(Unit unit) {
-        return getTacticalTransportDetail().removeTransportedUnit(unit);
+        return getTacticalTransportedUnitsSummary().removeTransportedUnit(unit);
     }
 
     /**
@@ -1965,7 +1965,7 @@ public class Unit implements ITechnology {
      * @param transportedUnit The unit that we wish to unload from this transport
      */
     public void unloadFromTransport(Unit transportedUnit) {
-        getTacticalTransportDetail().unloadFromTransport(transportedUnit);
+        getTacticalTransportedUnitsSummary().unloadFromTransport(transportedUnit);
     }
 
     /** TODO comment fixing
@@ -1980,7 +1980,7 @@ public class Unit implements ITechnology {
      * @return the old transports of the units, or an empty set if none
      */
     public Set<Unit> loadTacticalTransport(Class<? extends Transporter> transporterType, Unit... units) {
-        return getTacticalTransportDetail().loadTransport(units, null, transporterType);
+        return getTacticalTransportedUnitsSummary().loadTransport(units, null, transporterType);
     }
 
     /** TODO comment fixing
@@ -1995,7 +1995,7 @@ public class Unit implements ITechnology {
      * @return the old transport of the unit, or an empty set if none
      */
     public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
-        return getTacticalTransportDetail().loadTransport(transportedUnit, transportedLocation, transporterType);
+        return getTacticalTransportedUnitsSummary().loadTransport(transportedUnit, transportedLocation, transporterType);
     }
 
     /**
@@ -2003,7 +2003,7 @@ public class Unit implements ITechnology {
      * This removes all units assigned to the transport from it
      */
     public void unloadTacticalTransport() {
-        getTacticalTransportDetail().unloadTransportedUnits(campaign);
+        getTacticalTransportedUnitsSummary().unloadTransportedUnits(campaign);
     }
 
     /**
@@ -6172,9 +6172,9 @@ public class Unit implements ITechnology {
             }
         }
 
-        if (!getShipTransportDetail().getTransportedUnits().isEmpty()) {
+        if (!getShipTransportedUnitsSummary().getTransportedUnits().isEmpty()) {
             Set<Unit> newTransportedUnits = new HashSet<>();
-            for (Unit transportedUnit : getShipTransportDetail().getTransportedUnits()) {
+            for (Unit transportedUnit : getShipTransportedUnitsSummary().getTransportedUnits()) {
                 if (transportedUnit instanceof UnitRef) {
                     Unit realUnit = campaign.getHangar().getUnit(transportedUnit.getId());
                     if (realUnit != null) {
@@ -6188,7 +6188,7 @@ public class Unit implements ITechnology {
                     newTransportedUnits.add(transportedUnit);
                 }
             }
-            getShipTransportDetail().replaceTransportedUnits(newTransportedUnits);
+            getShipTransportedUnitsSummary().replaceTransportedUnits(newTransportedUnits);
             initializeShipTransportSpace();
         }
 
@@ -6219,7 +6219,7 @@ public class Unit implements ITechnology {
 
         if (hasTacticalTransportedUnits()) {
             Set<Unit> oldTransportedUnits = new HashSet<>(getTacticalTransportedUnits());
-            getTacticalTransportDetail().clearTransportedUnits();
+            getTacticalTransportedUnitsSummary().clearTransportedUnits();
             for (Unit tacticalTransportedUnit : oldTransportedUnits) {
                 if (tacticalTransportedUnit instanceof UnitRef) {
                     Unit realUnit = campaign.getHangar().getUnit(tacticalTransportedUnit.getId());
