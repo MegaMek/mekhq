@@ -66,6 +66,8 @@ public class Resupply {
     private Money convoyContentsValueCalculated;
 
     public static final int CARGO_MULTIPLIER = 4;
+    public static final int RESUPPLY_AMMO_TONNAGE = 1;
+    public static final int RESUPPLY_ARMOR_TONNAGE = 5;
 
     private static final MMLogger logger = MMLogger.create(Resupply.class);
 
@@ -571,19 +573,21 @@ public class Resupply {
      *
      * <p>The key is a combination of the part's name and its tonnage, separated by a colon.
      * For specific part types such as {@link AmmoBin} and {@link Armor}, the tonnage is
-     * always set to a value of 5, regardless of the actual tonnage.</p>
+     * always set to a set value, regardless of the actual tonnage.</p>
      *
      * @param part The {@link Part} for which the key is generated. Must not be {@code null}.
      * @return A unique key in the format {@code "partName:partTonnage"}, where
      *         {@code partName} is the name of the part and {@code partTonnage} is the
-     *         tonnage of the part or a fixed value of 5 for {@link AmmoBin} and {@link Armor}.
+     *         tonnage of the part or a fixed value for {@link AmmoBin} and {@link Armor}.
      */
     private static String getPartKey(Part part) {
         String partName = part.getName();
         double partTonnage = part.getTonnage();
 
-        if (part instanceof AmmoBin || part instanceof Armor) {
-            partTonnage = 5;
+        if (part instanceof AmmoBin) {
+            partTonnage = RESUPPLY_AMMO_TONNAGE;
+        } else if (part instanceof Armor) {
+            partTonnage = RESUPPLY_ARMOR_TONNAGE;
         }
 
         return partName + ':' + partTonnage;

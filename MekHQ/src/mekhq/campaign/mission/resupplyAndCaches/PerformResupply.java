@@ -51,6 +51,8 @@ import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.getResupplyContents;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsMajorityVTOLForces;
@@ -166,10 +168,10 @@ public class PerformResupply {
 
         double totalTonnage = 0;
         for (Part part : resupply.getConvoyContents()) {
-            if (part instanceof AmmoBin || part instanceof Armor) {
-                // Ammo and Armor are delivered in batches of 5t,
-                // so we need to make sure we're treating them as 5t no matter their actual weight.
-                totalTonnage += 5;
+            if (part instanceof AmmoBin) {
+                totalTonnage += RESUPPLY_AMMO_TONNAGE;
+            } else if (part instanceof Armor) {
+                totalTonnage += RESUPPLY_ARMOR_TONNAGE;
             } else {
                 totalTonnage += part.getTonnage();
             }
@@ -212,9 +214,9 @@ public class PerformResupply {
         for (Part part : contents) {
             if (part instanceof AmmoBin) {
                 campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(),
-                    ((AmmoBin) part).getFullShots() * 5);
+                    ((AmmoBin) part).getFullShots() * RESUPPLY_AMMO_TONNAGE);
             } else if (part instanceof Armor) {
-                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
+                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
                 ((Armor) part).setAmount(quantity);
                 campaign.getWarehouse().addPart(part, true);
             } else {
@@ -289,10 +291,10 @@ public class PerformResupply {
                 double tonnage = part.getTonnage();
                 tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
-                if (part instanceof AmmoBin || part instanceof Armor) {
-                    // Ammo and Armor are delivered in batches of 5t,
-                    // so we need to make sure we're treating them as 5t no matter their actual weight.
-                    tonnage = 5;
+                if (part instanceof AmmoBin) {
+                    tonnage = RESUPPLY_AMMO_TONNAGE;
+                } else if (part instanceof Armor) {
+                    tonnage = RESUPPLY_ARMOR_TONNAGE;
                 }
 
                 if (cargoCapacity - tonnage >= 0) {

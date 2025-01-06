@@ -47,6 +47,8 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -216,10 +218,10 @@ public class Loot {
             double partWeight = part.getTonnage();
             partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
 
-            if (part instanceof AmmoBin || part instanceof Armor) {
-                // Ammo and Armor are delivered in batches of 5t,
-                // so we need to make sure we're treating them as 5t no matter their actual weight.
-                partWeight = 5;
+            if (part instanceof AmmoBin) {
+                partWeight = RESUPPLY_AMMO_TONNAGE;
+            } else if (part instanceof Armor) {
+                partWeight = RESUPPLY_ARMOR_TONNAGE;
             }
 
             if (isResupply) {
