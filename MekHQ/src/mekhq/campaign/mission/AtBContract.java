@@ -417,7 +417,7 @@ public class AtBContract extends Contract {
      *
      * <p>
      * This method iterates through all combat teams in the specified campaign, ignoring combat teams with
-     * auxiliary or training roles. For each valid combat team, it retrieves the associated force and evaluates
+     * the auxiliary role. For each valid combat team, it retrieves the associated force and evaluates
      * all units within that force. The unit contribution to the total is determined based on its type:
      * <ul>
      *   <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACEFIGHTER:</b> Adds 1 for non-clan factions,
@@ -438,7 +438,7 @@ public class AtBContract extends Contract {
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
         for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-            if (combatTeam.getRole().isAuxiliary() || combatTeam.getRole().isTraining()) {
+            if (combatTeam.getRole().isAuxiliary()) {
                 continue;
             }
 

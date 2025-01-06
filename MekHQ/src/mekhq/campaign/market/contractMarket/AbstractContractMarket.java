@@ -28,7 +28,6 @@ import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
 /**
@@ -211,7 +210,6 @@ public abstract class AbstractContractMarket {
         // Calculate base formation size and effective unit force
         Faction faction = campaign.getFaction();
         int lanceLevelFormationSize = getStandardForceSize(faction);
-        int companyLevelFormationSize = getStandardForceSize(faction, COMPANY.getDepth());
 
         int effectiveForces = Math.max(getEffectiveNumUnits(campaign) / lanceLevelFormationSize, 1);
 
@@ -226,13 +224,12 @@ public abstract class AbstractContractMarket {
 
         // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces,
-                companyLevelFormationSize), 1);
+            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
         }
 
         // Apply variance based on a die roll
         int varianceRoll = d6(2);
-        double varianceFactor = calculateVarianceFactor(companyLevelFormationSize, varianceRoll);
+        double varianceFactor = calculateVarianceFactor(varianceRoll);
 
         // Adjust available forces based on variance, ensuring minimum clamping
         int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
@@ -242,45 +239,49 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Calculates the variance factor based on the given roll value and the size of a company-level formation.
+     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
      *
      * <p>
-     * The method determines the variance factor by applying a multiplier to the company-level formation size,
-     * depending on the specific roll value. A custom multiplier is assigned for rolls 2-4 and 10-12,
-     * while the default multiplier (1.0) is applied for roll values between 5 and 9.
-     * </p>
+     * The variance factor is determined by applying a multiplier to the fixed formation size divisor.
+     * The multiplier varies based on the roll value:
+     * <ul>
+     *   <li><b>Roll 2:</b> Multiplier is 0.75.</li>
+     *   <li><b>Roll 3:</b> Multiplier is 0.5.</li>
+     *   <li><b>Roll 4:</b> Multiplier is 0.25.</li>
+     *   <li><b>Rolls 10, 11, 12:</b> Multipliers are 1.25, 1.5, and 1.75 respectively.</li>
+     *   <li><b>Rolls 5-9:</b> Default multiplier is 1.0 (no change).</li>
+     * </ul>
      *
-     * @param roll                      the roll value used to determine the multiplier
-     * @param companyLevelFormationSize the size of a company-level formation
+     * @param roll the roll value used to determine the multiplier
      * @return the calculated variance factor as a double
      */
-    private double calculateVarianceFactor(int roll, int companyLevelFormationSize) {
+    private double calculateVarianceFactor(int roll) {
+        final int DIVIDER = 3;
         return switch (roll) {
-            case 2 -> companyLevelFormationSize * 0.75;
-            case 3 -> companyLevelFormationSize * 0.5;
-            case 4 -> companyLevelFormationSize * 0.25;
-            case 10 -> companyLevelFormationSize * 1.25;
-            case 11 -> companyLevelFormationSize * 1.5;
-            case 12 -> companyLevelFormationSize * 1.75;
-            default -> companyLevelFormationSize; // 5-9
+            case 2 -> DIVIDER * 0.75;
+            case 3 -> DIVIDER * 0.5;
+            case 4 -> DIVIDER * 0.25;
+            case 10 -> DIVIDER * 1.25;
+            case 11 -> DIVIDER * 1.5;
+            case 12 -> DIVIDER * 1.75;
+            default -> DIVIDER; // 5-9
         };
     }
 
     /**
-     * Calculates the bypass variance reduction based on the available forces and the size of a
-     * company-level formation.
+     * Calculates the bypass variance reduction based on the available forces.
      *
      * <p>
-     * The calculation is performed by dividing the available forces by the company-level formation size
-     * and rounding down to the nearest whole number.
+     * The reduction is calculated by dividing the available forces by a fixed factor of 3
+     * and rounding down to the nearest whole number. This value is used in scenarios where
+     * variance adjustments are bypassed.
      * </p>
      *
-     * @param availableForces           the total number of forces available
-     * @param companyLevelFormationSize the size of a company-level formation
+     * @param availableForces the total number of forces available
      * @return the bypass variance reduction as an integer
      */
-    private int calculateBypassVarianceReduction(int availableForces, int companyLevelFormationSize) {
-        return (int) Math.floor((double) availableForces / companyLevelFormationSize);
+    private int calculateBypassVarianceReduction(int availableForces) {
+        return (int) Math.floor((double) availableForces / 3);
     }
 
     /**
