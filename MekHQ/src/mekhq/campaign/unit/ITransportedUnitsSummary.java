@@ -101,7 +101,7 @@ public interface ITransportedUnitsSummary {
      * @param transportedUnits Units we wish to load
      * @return the old transports the transportedUnits were assigned to, or an empty set
      */
-    Set<Unit> loadTransport(Unit... transportedUnits);
+    //Set<Unit> loadTransport(Unit... transportedUnits);
 
     /**
      * Main method to be used for unloading units from a transport
@@ -113,15 +113,6 @@ public interface ITransportedUnitsSummary {
      * Fixes references after loading
      */
     void fixReferences(Campaign campaign, Unit unit);
-
-    /**
-     * TransportDetails are meant to be used with transportAssignment
-     * @return the TransportAssignement used by the class
-     */
-    static Class<?> getRelatedTransportAssignmentType() {
-        return ITransportAssignment.class;
-    }
-
 
     /**
      * Calculates transport bay space required by an infantry platoon,

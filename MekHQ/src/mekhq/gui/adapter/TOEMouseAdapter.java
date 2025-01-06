@@ -26,6 +26,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -38,9 +39,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.unit.HangarSorter;
-import mekhq.campaign.unit.ShipTransportedUnitsSummary;
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -1210,40 +1209,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 Unit[] unitsArr = units.toArray(new Unit[0]);
                 //AssignForceToTacticalTransportMenu assignForceToTransportMenu = new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr);
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), unitsArr));
-                if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-                    menuItem = new JMenuItem("Unassign Unit from Transport Ship");
-                    menuItem.addActionListener(evt -> {
-                        Set<Unit> transportsToUpdate = new HashSet<>();
-                        for (Unit transportedUnit : units) {
-                            transportsToUpdate.add(transportedUnit.getTransportShipAssignment().getTransport());
-                            transportedUnit.getTransportShipAssignment().getTransport().unloadFromTransportShip(transportedUnit);
-                        }
-
-                        for (Unit transportToUpdate : transportsToUpdate) {
-                            gui.getCampaign().updateTransportInTransports(ShipTransportedUnitsSummary.class, transportToUpdate);
-                        }
-                    });
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
-                }
+                unassignShipTransportMenuClass(units, popup);
 
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr));
-                if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-                    menuItem = new JMenuItem("Unassign Unit from Tactical Transport");
-                    menuItem.addActionListener(evt -> {
-                        Set<Unit> transportsToUpdate = new HashSet<>();
-                        for (Unit transportedUnit : units) {
-                            transportsToUpdate.add(transportedUnit.getTacticalTransportAssignment().getTransport());
-                            transportedUnit.getTacticalTransportAssignment().getTransport().unloadFromTacticalTransport(transportedUnit);
-                        }
-
-                        for (Unit transportToUpdate : transportsToUpdate) {
-                            gui.getCampaign().updateTransportInTacticalTransports(transportToUpdate);
-                        }
-                    });
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
-                }
+                unassignTacticalTransportMenuClass(units, popup);
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);
@@ -1491,41 +1460,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             Unit[] unitsArr = units.toArray(new Unit[0]);
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), unitsArr));
-            if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Unassign Unit from Transport Ship");
-                menuItem.addActionListener(evt -> {
-                    Set<Unit> transportsToUpdate = new HashSet<>();
-                    for (Unit transportedUnit : units) {
-                        transportsToUpdate.add(transportedUnit.getTransportShipAssignment().getTransport());
-                        transportedUnit.getTransportShipAssignment().getTransport().unloadFromTransportShip(transportedUnit);
-                    }
-
-                    for (Unit transportToUpdate : transportsToUpdate) {
-                        gui.getCampaign().updateTransportInTransports(ShipTransportedUnitsSummary.class, transportToUpdate);
-                    }
-                });
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
-            }
+            unassignShipTransportMenuClass(units, popup);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr));
-
-            if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Unassign Unit from Tactical Transport");
-                menuItem.addActionListener(evt -> {
-                    Set<Unit> transportsToUpdate = new HashSet<>();
-                    for (Unit transportedUnit : units) {
-                        transportsToUpdate.add(transportedUnit.getTacticalTransportAssignment().getTransport());
-                        transportedUnit.getTacticalTransportAssignment().getTransport().unloadFromTacticalTransport(transportedUnit);
-                    }
-
-                    for (Unit transportToUpdate : transportsToUpdate) {
-                        gui.getCampaign().updateTransportInTacticalTransports(transportToUpdate);
-                    }
-                });
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
-            }
+            unassignTacticalTransportMenuClass(units, popup);
 
             if (!multipleSelection) {
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
@@ -1629,5 +1567,42 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         menuItem.addActionListener(this);
 
         return menuItem;
+    }
+
+    private void unassignShipTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
+        if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            JMenuItem menuItem = new JMenuItem("Unassign Unit from Transport Ship");
+            menuItem.addActionListener(evt -> {
+                unassignTransportAction(TransportShipAssignment.class, ShipTransportedUnitsSummary.class,
+                    units.toArray(new Unit[0]));});
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
+        }
+    }
+
+    private void unassignTacticalTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
+        if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            JMenuItem menuItem = new JMenuItem("Unassign Unit from Tactical Transport");
+            menuItem.addActionListener(evt -> {
+                unassignTransportAction(TransportAssignment.class, TacticalTransportedUnitsSummary.class,
+                    units.toArray(new Unit[0]));
+            });
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
+        }
+    }
+
+    private void unassignTransportAction(Class<? extends ITransportAssignment> transportAssignmentType, Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType, Unit... units) {
+        Set<Unit> transportsToUpdate = new HashSet<>();
+        for (Unit transportedUnit : units) {
+            ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(transportAssignmentType);
+            transportsToUpdate.add(transportAssignment.getTransport());
+            transportAssignment.getTransport().getTransportedUnitsSummaryType(transportedUnitsSummaryType).unloadTransport(units);
+        }
+
+        for (Unit transportToUpdate : transportsToUpdate) {
+            gui.getCampaign().updateTransportInTransports(transportedUnitsSummaryType, transportToUpdate);
+
+        }
     }
 }

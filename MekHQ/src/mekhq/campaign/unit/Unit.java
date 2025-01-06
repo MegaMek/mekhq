@@ -390,6 +390,16 @@ public class Unit implements ITechnology {
         this.id = i;
     }
 
+    public ITransportAssignment getTransportAssignment(Class<? extends ITransportAssignment> transportAssignmentType) {
+        if (transportAssignmentType.equals(TransportAssignment.class)) {
+            return getTacticalTransportAssignment();
+        }
+        if (transportAssignmentType.equals(TransportShipAssignment.class)) {
+            return getTransportShipAssignment();
+        }
+        return null;
+    }
+
     // A set of methods for working with transport ship assignment for this unit
 
     /**
