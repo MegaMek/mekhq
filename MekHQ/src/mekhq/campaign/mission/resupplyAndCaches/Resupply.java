@@ -701,6 +701,12 @@ public class Resupply {
         // Adjust based on the quantity in the warehouse
         for (Part part : campaign.getWarehouse().getSpareParts()) {
             int weight = part.getQuantity();
+
+            // We don't want empty AmmoStorage to reduce Resupply weighting
+            if (part instanceof AmmoStorage && (((AmmoStorage) part).getShots() == 0)) {
+                continue;
+            }
+
             PartDetails partDetails = new PartDetails(part, weight);
 
             partsList.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
