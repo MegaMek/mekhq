@@ -1,7 +1,9 @@
 package mekhq.gui.menus;
 
 import megamek.common.Transporter;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.unit.TacticalTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 
@@ -45,7 +47,12 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         Set<Unit> oldTransports = transport.loadTacticalTransport(transporterType, units);
         if (!oldTransports.isEmpty()) {
             oldTransports.forEach(oldTransport -> campaign.updateTransportInTransports(transportDetailType, oldTransport));
+            oldTransports.forEach(oldTransport -> MekHQ.triggerEvent(new UnitChangedEvent(transport)));
+        }
+        for (Unit unit : units) {
+            MekHQ.triggerEvent(new UnitChangedEvent(unit));
         }
         campaign.updateTransportInTransports(transportDetailType, transport);
+        MekHQ.triggerEvent(new UnitChangedEvent(transport));
     }
 }
