@@ -2,18 +2,17 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
 
 import java.util.*;
 
-public abstract class AbstractTransportDetail implements ITransportDetail {
+public abstract class AbstractTransportedUnitsSummary implements ITransportedUnitsSummary {
     protected final MMLogger logger = MMLogger.create(this.getClass());
 
     protected Unit transport;
     private Set<Unit> transportedUnits = new HashSet<>();
     private Map<Class<? extends Transporter>, Double> transportCapacity = new HashMap<>();
 
-    AbstractTransportDetail(Unit transport) {
+    AbstractTransportedUnitsSummary(Unit transport) {
         this.transport = transport;
         if (transport.getEntity() != null) {
             initializeTransportCapacity(transport.getEntity().getTransports());

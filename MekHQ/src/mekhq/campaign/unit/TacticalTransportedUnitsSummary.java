@@ -8,9 +8,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class TacticalTransportDetail extends AbstractTransportDetail {
+public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
 
-    public TacticalTransportDetail(Unit transport) {
+    public TacticalTransportedUnitsSummary(Unit transport) {
         super(transport);
     }
 
@@ -161,6 +161,6 @@ public class TacticalTransportDetail extends AbstractTransportDetail {
     }
 
     public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
-        return AbstractTransportDetail.mapEntityToTransporters(unit);
+        return AbstractTransportedUnitsSummary.mapEntityToTransporters(unit);
     }
 }

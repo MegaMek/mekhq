@@ -2,7 +2,7 @@ package mekhq.gui.menus;
 
 import megamek.common.Transporter;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.ShipTransportDetail;
+import mekhq.campaign.unit.ShipTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 
 import java.awt.event.ActionEvent;
@@ -12,7 +12,7 @@ import java.util.Set;
 public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
     public AssignForceToShipTransportMenu(Campaign campaign, Unit... units) {
-        super(ShipTransportDetail.class, campaign, units);
+        super(ShipTransportedUnitsSummary.class, campaign, units);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
         Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(transportDetailType).keySet());
 
         for (Unit unit : units) {
-            Set<Class<? extends Transporter>> unitTransporterTypes = ShipTransportDetail.mapEntityToTransporters(unit.getEntity());
+            Set<Class<? extends Transporter>> unitTransporterTypes = ShipTransportedUnitsSummary.mapEntityToTransporters(unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {

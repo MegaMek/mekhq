@@ -184,8 +184,8 @@ public class Campaign implements ITechManager {
     // that we can assign units to transports
     private final Hangar units = new Hangar();
     //private final Set<Unit> transportShips = new HashSet<>();
-    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, ShipTransportDetail.class);
-    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, TacticalTransportDetail.class);
+    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, ShipTransportedUnitsSummary.class);
+    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, TacticalTransportedUnitsSummary.class);
     //private final Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> tacticalTransporters = new HashMap<>();
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
@@ -1381,7 +1381,7 @@ public class Campaign implements ITechManager {
      * This will update the transport in the transports list with new capacities
      * @param transport
      */
-    public void updateTransportInTransports(Class<? extends AbstractTransportDetail> transportDetailType, Unit transport) {
+    public void updateTransportInTransports(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, Unit transport) {
         getCampaignTransporterMap(transportDetailType).updateTransportInTransporterMap(transport);
     }
 
@@ -1487,8 +1487,8 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        unit.getShipTransportDetail().initializeTransportCapacity(unit.getEntity().getTransports());
-        unit.getTacticalTransportDetail().initializeTransportCapacity(unit.getEntity().getTransports());
+        unit.getShipTransportedUnitsSummary().initializeTransportCapacity(unit.getEntity().getTransports());
+        unit.getTacticalTransportedUnitsSummary().initializeTransportCapacity(unit.getEntity().getTransports());
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 
@@ -8119,11 +8119,11 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private CampaignTransporterMap getCampaignTransporterMap(Class<? extends AbstractTransportDetail> transportDetailType) {
-        if (transportDetailType == TacticalTransportDetail.class) {
+    private CampaignTransporterMap getCampaignTransporterMap(Class<? extends AbstractTransportedUnitsSummary> transportDetailType) {
+        if (transportDetailType == TacticalTransportedUnitsSummary.class) {
             return tacticalTransporters;
         }
-        else if (transportDetailType == ShipTransportDetail.class) {
+        else if (transportDetailType == ShipTransportedUnitsSummary.class) {
             return shipTransporters;
         }
         return null;
@@ -8143,7 +8143,7 @@ public class Campaign implements ITechManager {
      *
      * @return units that have space for that transport type
      */
-    public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTransports(Class<? extends AbstractTransportDetail> transportDetailType) {
+    public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTransports(Class<? extends AbstractTransportedUnitsSummary> transportDetailType) {
         return getCampaignTransporterMap(transportDetailType).getTransporters();
     }
 
@@ -8163,7 +8163,7 @@ public class Campaign implements ITechManager {
      * @param transporterType class of Transporter
      * @return units that have that transport type
      */
-    public Set<Unit> getTransportsByType(Class<? extends AbstractTransportDetail> transportDetailType, Class<? extends Transporter> transporterType) {
+    public Set<Unit> getTransportsByType(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, Class<? extends Transporter> transporterType) {
         return getCampaignTransporterMap(transportDetailType).getTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
     }
 
@@ -8173,7 +8173,7 @@ public class Campaign implements ITechManager {
      * @param transporterType class of Transporter
      * @return units that have that transport type
      */
-    public Set<Unit> getTransportsByType(Class<? extends AbstractTransportDetail> transportDetailType, Class<? extends Transporter> transporterType, double unitSize) {
+    public Set<Unit> getTransportsByType(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, Class<? extends Transporter> transporterType, double unitSize) {
         return getCampaignTransporterMap(transportDetailType).getTransportsByType(transporterType, unitSize);
     }
 
@@ -8190,11 +8190,11 @@ public class Campaign implements ITechManager {
      * @param transportDetailType class of the TransportDetail
      * @return true if it has transporters, false otherwise
      */
-    public boolean hasTransports(Class<? extends AbstractTransportDetail> transportDetailType) {
-        if (transportDetailType.equals(TacticalTransportDetail.class)) {
+    public boolean hasTransports(Class<? extends AbstractTransportedUnitsSummary> transportDetailType) {
+        if (transportDetailType.equals(TacticalTransportedUnitsSummary.class)) {
             return hasTacticalTransports();
         }
-        else if (transportDetailType.equals(ShipTransportDetail.class)) {
+        else if (transportDetailType.equals(ShipTransportedUnitsSummary.class)) {
             return hasShipTransports();
         }
         return false;

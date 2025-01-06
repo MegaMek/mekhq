@@ -2,7 +2,7 @@ package mekhq.gui.menus;
 
 import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.AbstractTransportDetail;
+import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 
@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 public abstract class AssignForceToTransportMenu extends JScrollableMenu {
 
     final Campaign campaign;
-    final Class<? extends AbstractTransportDetail> transportDetailType;
+    final Class<? extends AbstractTransportedUnitsSummary> transportDetailType;
 
     // region Constructors
-    public AssignForceToTransportMenu(Class<? extends AbstractTransportDetail> transportDetailType, final Campaign campaign, final Unit... units) {
+    public AssignForceToTransportMenu(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, final Campaign campaign, final Unit... units) {
         super(transportDetailType.getName());
         this.campaign = campaign;
         this.transportDetailType = transportDetailType;

@@ -6,13 +6,13 @@ import mekhq.campaign.Campaign;
 
 import java.util.*;
 
-public class ShipTransportDetail extends AbstractTransportDetail {
+public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
 
     /**
      * Initialize the transport details for a transport ship
      * @param transporters
      */
-    public ShipTransportDetail(Unit transport) {
+    public ShipTransportedUnitsSummary(Unit transport) {
         super(transport);
     }
 
@@ -139,7 +139,7 @@ public class ShipTransportDetail extends AbstractTransportDetail {
     }
 
     public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
-        Set<Class<? extends Transporter>> transporters = AbstractTransportDetail.mapEntityToTransporters(unit);
+        Set<Class<? extends Transporter>> transporters = AbstractTransportedUnitsSummary.mapEntityToTransporters(unit);
         transporters.remove(InfantryCompartment.class);
         transporters.remove(BattleArmorHandles.class);
         transporters.remove(BattleArmorHandlesTank.class);

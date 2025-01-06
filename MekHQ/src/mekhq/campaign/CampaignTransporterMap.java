@@ -2,7 +2,7 @@ package mekhq.campaign;
 
 import megamek.common.Transporter;
 import megamek.logging.MMLogger;
-import mekhq.campaign.unit.AbstractTransportDetail;
+import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
@@ -12,11 +12,11 @@ public class CampaignTransporterMap {
 
     private final Campaign campaign;
     private final Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> transportersMap = new HashMap<>();
-    private Class<? extends AbstractTransportDetail> transportDetailType;
+    private Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType;
 
-    public CampaignTransporterMap(Campaign campaign, Class<? extends AbstractTransportDetail> transportDetailType){
+    public CampaignTransporterMap(Campaign campaign, Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType){
         this.campaign = campaign;
-        this.transportDetailType = transportDetailType;
+        this.transportedUnitsSummaryType = transportedUnitsSummaryType;
     }
 
     /**
@@ -26,13 +26,13 @@ public class CampaignTransporterMap {
      * @param transport - The unit we want to add to this Map
      */
     public void addTransporter(Unit transport) {
-        for (Class<? extends Transporter> transporterType : transport.getTransportDetail(transportDetailType).getTransportCapabilities()) {
+        for (Class<? extends Transporter> transporterType : transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType).getTransportCapabilities()) {
             addTransporterToCapacityMap(transport, transporterType);
         }
     }
 
     private void addTransporterToCapacityMap(Unit transport, Class<? extends Transporter> transporterType) {
-        double capacity = transport.getTransportDetail(transportDetailType).getCurrentTransportCapacity(transporterType);
+        double capacity = transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType).getCurrentTransportCapacity(transporterType);
         Map<Double, Set<UUID>> capacityMap = transportersMap.getOrDefault(transporterType, new HashMap<Double, Set<UUID>>());
         Set<UUID> unitIds = capacityMap.getOrDefault(capacity, new HashSet<UUID>());
         unitIds.add(transport.getId());
@@ -45,17 +45,17 @@ public class CampaignTransporterMap {
      * @param transport
      */
     public void updateTransportInTransporterMap(Unit transport) {
-        AbstractTransportDetail transportDetail = transport.getTransportDetail(transportDetailType);
-        for (Class<? extends Transporter> transporterType : transportDetail.getTransportCapabilities()) {
+        AbstractTransportedUnitsSummary transportedUnitsSummary = transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType);
+        for (Class<? extends Transporter> transporterType : transportedUnitsSummary.getTransportCapabilities()) {
             if (transportersMap.containsKey(transporterType)) {
                 for (Double capacity : transportersMap.get(transporterType).keySet()) {
                     if (transportersMap.get(transporterType).get(capacity).contains(transport.getId())) {
-                        if (capacity == transportDetail.getCurrentTransportCapacity(transporterType)) {
+                        if (capacity == transportedUnitsSummary.getCurrentTransportCapacity(transporterType)) {
                             break; // The transport is already stored with the correct capacity
                         } else {
                             transportersMap.get(transporterType).get(capacity).remove(transport.getId());
                         }
-                    } else if (capacity == transportDetail.getCurrentTransportCapacity(transporterType)) {
+                    } else if (capacity == transportedUnitsSummary.getCurrentTransportCapacity(transporterType)) {
                         addTransporterToCapacityMap(transport, transporterType);
                     }
                 }
@@ -115,10 +115,10 @@ public class CampaignTransporterMap {
 
         // If we remove a transport ship from the campaign,
         // we need to remove any transported units from it
-        if (transport.getTransportDetail(transportDetailType).hasTransportedUnits()) {
-            List<Unit> transportedUnits = new ArrayList<>(transport.getTransportDetail(transportDetailType).getTransportedUnits());
+        if (transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType).hasTransportedUnits()) {
+            List<Unit> transportedUnits = new ArrayList<>(transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType).getTransportedUnits());
             for (Unit transportedUnit : transportedUnits) {
-                transport.getTransportDetail(transportDetailType).removeTransportedUnit(transportedUnit);
+                transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType).removeTransportedUnit(transportedUnit);
             }
         }
     }

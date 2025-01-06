@@ -107,8 +107,8 @@ public class RestoreUnitAction implements IUnitAction {
 
         unit.removeParts();
 
-        unit.getShipTransportDetail().initializeTransportCapacity(unit.getEntity().getTransports());
-        unit.getTacticalTransportDetail().initializeTransportCapacity(unit.getEntity().getTransports());
+        unit.getShipTransportedUnitsSummary().initializeTransportCapacity(unit.getEntity().getTransports());
+        unit.getTacticalTransportedUnitsSummary().initializeTransportCapacity(unit.getEntity().getTransports());
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
