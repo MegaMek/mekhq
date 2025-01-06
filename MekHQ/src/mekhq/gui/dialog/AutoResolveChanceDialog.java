@@ -26,7 +26,7 @@ import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.logging.MMLogger;
 import megamek.server.victory.VictoryResult;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoresolve.SetupForces;
+import mekhq.campaign.autoresolve.AtBSetupForces;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
@@ -108,8 +108,10 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
     public static int showSimulationProgressDialog(JFrame frame, int numberOfSimulations, List<Unit> units, AtBScenario scenario, Campaign campaign) {
         var dialog = new AutoResolveChanceDialog(frame, numberOfSimulations, units, scenario, campaign);
         dialog.initialize();
+        dialog.setModal(true);
         dialog.getTask().execute();
         dialog.setVisible(true);
+
         return dialog.getReturnCode();
     }
 
@@ -148,7 +150,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
     private JProgressBar createProgressBar() {
         setProgressBar(new JProgressBar(0, 100));
 
-        getProgressBar().setString(resources.getString("AutoResolveMethod.progress.0"));
+        getProgressBar().setString(MHQInternationalization.getText("AutoResolveMethod.progress.0"));
         getProgressBar().setValue(0);
         getProgressBar().setStringPainted(true);
         getProgressBar().setVisible(true);
@@ -194,7 +196,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
         progressBar.setValue(progress);
         var factor = clamp(numberOfSimulations / 25, 3, 99);
         int i = (int) (factor * ((float) progress / progressBar.getMaximum()));
-        getProgressBar().setString(resources.getString(progressText.get(i)));
+        getProgressBar().setString(MHQInternationalization.getText(progressText.get(i)));
     }
 
     public static int clamp(long value, int min, int max) {
@@ -218,14 +220,14 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
         @Override
         public Integer doInBackground() {
             String message;
-            String title = resources.getString("AutoResolveDialog.title");
+            String title = MHQInternationalization.getText("AutoResolveDialog.title");
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             var simulatedVictories = calculateNumberOfVictories();
             stopWatch.stop();
 
             if (simulatedVictories.getRuns() == 0 && simulatedVictories.getRuns() < numberOfSimulations) {
-                message = resources.getString("AutoResolveDialog.messageFailedCalc");
+                message = MHQInternationalization.getText("AutoResolveDialog.messageFailedCalc");
                 logger.debug("No combat scenarios were simulated, possible error!");
             } else {
                 var timePerRun = stopWatch.getTime() / (numberOfSimulations / Runtime.getRuntime().availableProcessors());
@@ -270,7 +272,7 @@ public class AutoResolveChanceDialog extends AbstractMHQDialog implements Proper
             for (int i = 0; i < numberOfSimulations; i++) {
                 futures.add(executor.submit(() -> {
                     var autoResolveConcludedEvent = new Resolver(
-                        new SetupForces(campaign, units, scenario), new SimulationOptions(campaign.getGameOptions()))
+                        new AtBSetupForces(campaign, units, scenario), new SimulationOptions(campaign.getGameOptions()))
                         .resolveSimulation();
                     setProgress(Math.min(100 * runCounter.incrementAndGet() / numberOfSimulations, 100));
                     return autoResolveConcludedEvent;

@@ -21,12 +21,13 @@ import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.autoresolve.acar.SimulationContext;
 import megamek.common.autoresolve.converter.ConsolidateForces;
 import megamek.common.autoresolve.converter.ForceToFormationConverter;
+import megamek.common.autoresolve.converter.SingleElementConsolidateForces;
+import megamek.common.copy.CrewRefBreak;
 import megamek.common.force.Forces;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.copy.CrewRefBreak;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -42,14 +43,14 @@ import java.util.*;
 /**
  * @author Luana Coppio
  */
-public class SetupForces extends megamek.common.autoresolve.converter.SetupForces {
-    private static final MMLogger logger = MMLogger.create(SetupForces.class);
+public class AtBSetupForces extends megamek.common.autoresolve.converter.SetupForces {
+    private static final MMLogger logger = MMLogger.create(AtBSetupForces.class);
 
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
 
-    public SetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         this.campaign = campaign;
         this.units = units;
         this.scenario = scenario;
@@ -62,7 +63,7 @@ public class SetupForces extends megamek.common.autoresolve.converter.SetupForce
     public void createForcesOnSimulation(SimulationContext game) {
         setupPlayer(game);
         setupBots(game);
-        ConsolidateForces.consolidateForces(game);
+        ConsolidateForces.consolidateForces(game, new SingleElementConsolidateForces());
         convertForcesIntoFormations(game);
     }
 
@@ -432,7 +433,6 @@ public class SetupForces extends megamek.common.autoresolve.converter.SetupForce
                 || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
 
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
-            game.getPlayer(entity.getOwnerId()).changeInitialBV(entity.calculateBattleValue());
 
             // Restore forces from MULs or other external sources from the forceString, if
             // any

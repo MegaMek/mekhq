@@ -31,8 +31,8 @@ public enum AutoResolveMethod {
     private final String toolTipText;
 
     AutoResolveMethod(final String name, final String toolTipText) {
-        this.name = MHQInternationalization.getTextAt("mekhq.resources.AutoResolveMethod", name);
-        this.toolTipText = Internationalization.getTextAt("mekhq.resources.AutoResolveMethod", toolTipText);
+        this.name = MHQInternationalization.getText(name);
+        this.toolTipText = Internationalization.getText(toolTipText);
     }
 
     public String getToolTipText() {

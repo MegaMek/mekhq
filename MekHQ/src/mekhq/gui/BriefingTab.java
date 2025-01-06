@@ -814,15 +814,15 @@ public final class BriefingTab extends CampaignGuiTab {
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
         // and it uses that to preselect the option that is currently set in the campaign options
         Object[] options = new Object[]{
-            MHQInternationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.PRINCESS.text"),
-            MHQInternationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.ABSTRACT_COMBAT.text"),
+            MHQInternationalization.getText("AutoResolveMethod.PRINCESS.text"),
+            MHQInternationalization.getText("AutoResolveMethod.ABSTRACT_COMBAT.text"),
         };
 
         var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
 
         var selectedOption = JOptionPane.showOptionDialog(getFrame(),
-            MHQInternationalization.getTextAt("megamek.client.AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.text"),
-            MHQInternationalization.getTextAt("megamek.client.AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.title"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[preSelectedOptionIndex]);
 
