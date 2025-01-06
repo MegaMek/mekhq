@@ -478,19 +478,6 @@ public class AtBContract extends Contract {
         logger.info(String.format("Current Morale: %s (%s)",
             getMoraleLevel().toString(), getMoraleLevel().ordinal()));
 
-        // Clan Overconfidence Modifier:
-        final LocalDate THE_GREAT_REFUSAL = LocalDate.of(3060, 4, 12);
-
-        int clanOverconfidenceModifier = 0;
-        if (campaign.getLocalDate().isBefore(THE_GREAT_REFUSAL)) {
-            if (getEnemy().isClan() && !getEmployerFaction().isClan()) {
-                clanOverconfidenceModifier++;
-            }
-        }
-
-        targetNumber.addModifier(clanOverconfidenceModifier, "clanOverconfidenceModifier");
-        logger.info(String.format("Confidence: +%s", clanOverconfidenceModifier));
-
         // Reliability:
         int reliability = getEnemyQuality();
 
