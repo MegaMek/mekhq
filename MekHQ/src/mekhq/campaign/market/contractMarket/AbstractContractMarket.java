@@ -196,7 +196,6 @@ public abstract class AbstractContractMarket {
      * </ul>
      * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
      * team while not exceeding the maximum deployable combat teams.
-     * </p>
      *
      * @param campaign        the campaign containing relevant options and faction information
      * @param contract        the contract that specifies details such as subcontract status
