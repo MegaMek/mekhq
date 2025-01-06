@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.unit.ShipTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
@@ -437,6 +438,10 @@ public class CampaignXmlParser {
             //If it's empty we should be able to just ignore it
             if (unit.hasTacticalTransportedUnits()) {
                 retVal.updateTransportInTacticalTransports(unit);
+            }
+
+            if (unit.hasShipTransportedUnits()) {
+                retVal.updateTransportInTransports(ShipTransportedUnitsSummary.class, unit);
             }
         });
 

@@ -1846,7 +1846,7 @@ public class Unit implements ITechnology {
      *
      */
     public void unloadTransportShip() {
-        getShipTransportedUnitsSummary().unloadTransportedUnits(campaign);
+        getShipTransportedUnitsSummary().clearTransportedUnits(campaign);
     }
 
     // Transport Assignments
@@ -1865,7 +1865,7 @@ public class Unit implements ITechnology {
      * Gets a value indicating whether or not this unit is assigned
      * to a transport.
      */
-    public boolean hasTransportAssignment() {
+    public boolean hasTacticalTransportAssignment() {
         return (tacticalTransportAssignment != null);
     }
 
@@ -1964,7 +1964,7 @@ public class Unit implements ITechnology {
      *
      * @param transportedUnit The unit that we wish to unload from this transport
      */
-    public void unloadFromTransport(Unit transportedUnit) {
+    public void unloadFromTacticalTransport(Unit transportedUnit) {
         getTacticalTransportedUnitsSummary().unloadFromTransport(transportedUnit);
     }
 
@@ -1995,7 +1995,7 @@ public class Unit implements ITechnology {
      * @return the old transport of the unit, or an empty set if none
      */
     public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
-        return getTacticalTransportedUnitsSummary().loadTransport(transportedUnit, transportedLocation, transporterType);
+        return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation, transporterType, transportedUnit);
     }
 
     /**
@@ -2003,7 +2003,7 @@ public class Unit implements ITechnology {
      * This removes all units assigned to the transport from it
      */
     public void unloadTacticalTransport() {
-        getTacticalTransportedUnitsSummary().unloadTransportedUnits(campaign);
+        getTacticalTransportedUnitsSummary().clearTransportedUnits(campaign);
     }
 
     /**
@@ -2131,7 +2131,7 @@ public class Unit implements ITechnology {
         }
         // START new transports
         // If this entity is assigned to a transport, write that
-        if (hasTransportAssignment()) {
+        if (hasTacticalTransportAssignment()) {
             String transportedLocation = "";
             if (getTacticalTransportAssignment().hasTransportedLocation()) {
                 transportedLocation += " transportedLocation=\"" + getTacticalTransportAssignment().getTransportedLocation() + "\"";
@@ -6157,89 +6157,21 @@ public class Unit implements ITechnology {
             mothballInfo.fixReferences(campaign);
         }
 
-        if (hasTransportShipAssignment()
-                && (getTransportShipAssignment().getTransportShip() instanceof UnitRef)) {
-            Unit transportShip = campaign.getHangar().getUnit(getTransportShipAssignment().getTransportShip().getId());
-            if (transportShip != null) {
-                setTransportShipAssignment(new TransportShipAssignment(transportShip,
-                    getTransportShipAssignment().getBayNumber()));
-            } else {
-                logger.error(
-                        String.format("Unit %s ('%s') references missing transport ship %s",
-                                getId(), getName(), getTransportShipAssignment().getTransportShip().getId()));
-
-                setTransportShipAssignment(null);
-            }
+        if (hasTransportShipAssignment()) {
+            getTransportShipAssignment().fixReferences(campaign, this);
         }
 
-        if (!getShipTransportedUnitsSummary().getTransportedUnits().isEmpty()) {
-            Set<Unit> newTransportedUnits = new HashSet<>();
-            for (Unit transportedUnit : getShipTransportedUnitsSummary().getTransportedUnits()) {
-                if (transportedUnit instanceof UnitRef) {
-                    Unit realUnit = campaign.getHangar().getUnit(transportedUnit.getId());
-                    if (realUnit != null) {
-                        newTransportedUnits.add(realUnit);
-                    } else {
-                        logger.error(
-                                String.format("Unit %s ('%s') references missing transported unit %s",
-                                        getId(), getName(), transportedUnit.getId()));
-                    }
-                } else {
-                    newTransportedUnits.add(transportedUnit);
-                }
-            }
-            getShipTransportedUnitsSummary().replaceTransportedUnits(newTransportedUnits);
+        if (hasTacticalTransportAssignment()) {
+            getTacticalTransportAssignment().fixReferences(campaign, this);
+        }
+
+        if (hasShipTransportedUnits()) {
+            getShipTransportedUnitsSummary().fixReferences(campaign, this);
             initializeShipTransportSpace();
         }
 
-        if ((getTacticalTransportAssignment() != null)
-            && (getTacticalTransportAssignment().getTransport() instanceof UnitRef)) {
-            Unit transport = campaign.getHangar().getUnit(getTacticalTransportAssignment().getTransport().getId());
-            if (transport != null) {
-                if (getTacticalTransportAssignment().hasTransportedLocation()) {
-                    setTacticalTransportAssignment(new TransportAssignment(transport, getTacticalTransportAssignment().getTransportedLocation()));
-                } else if (getTacticalTransportAssignment().hasTransporterType()) {
-                    setTacticalTransportAssignment(new TransportAssignment(transport, getTacticalTransportAssignment().getTransporterType()));
-                }
-                else {
-                    setTacticalTransportAssignment(new TransportAssignment(transport));
-                    logger.warn(
-                        String.format("Unit %s ('%s') is missing a transportedLocation " +
-                                "and transporterType for tactical transport %s",
-                                getId(), getName(), getTacticalTransportAssignment().getTransport().getId()));
-                }
-            } else {
-                logger.error(
-                    String.format("Unit %s ('%s') references missing transport %s",
-                        getId(), getName(), getTacticalTransportAssignment().getTransport().getId()));
-
-                setTacticalTransportAssignment(null);
-            }
-        }
-
         if (hasTacticalTransportedUnits()) {
-            Set<Unit> oldTransportedUnits = new HashSet<>(getTacticalTransportedUnits());
-            getTacticalTransportedUnitsSummary().clearTransportedUnits();
-            for (Unit tacticalTransportedUnit : oldTransportedUnits) {
-                if (tacticalTransportedUnit instanceof UnitRef) {
-                    Unit realUnit = campaign.getHangar().getUnit(tacticalTransportedUnit.getId());
-                    if (realUnit != null) {
-                        if (realUnit.hasTransportAssignment()) {
-                            loadTacticalTransport(realUnit.getTacticalTransportAssignment().getTransporterType(), realUnit);
-                        } else {
-                            logger.error(
-                                String.format("Unit %s ('%s') references tactical transported unit %s which has no transport assignment",
-                                    getId(), getName(), tacticalTransportedUnit.getId()));
-                        }
-                    } else {
-                        logger.error(
-                            String.format("Unit %s ('%s') references missing tactical transported unit %s",
-                                getId(), getName(), tacticalTransportedUnit.getId()));
-                    }
-                } else {
-                    loadTacticalTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(), tacticalTransportedUnit);
-                }
-            }
+            getTacticalTransportedUnitsSummary().fixReferences(campaign, this);
             initializeTacticalTransportSpace();
         }
     }

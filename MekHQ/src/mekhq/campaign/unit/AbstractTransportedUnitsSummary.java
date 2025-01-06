@@ -19,7 +19,46 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         }
     }
 
+    /**
+     * Main method to be used for loading units onto a transport
+     *
+     * @param transportedUnits Units we wish to load
+     * @return the old transports the transportedUnits were assigned to, or an empty set
+     */
+    @Override
+    public Set<Unit> loadTransport(Unit... transportedUnits) {
+        HashSet<Unit> oldTransports = new HashSet<>();
 
+        return oldTransports;
+    }
+
+    /**
+     * Main method to be used for unloading units from a transport
+     *
+     * @param transportedUnits Units we wish to unload
+     */
+    @Override
+    public void unloadTransport(Unit... transportedUnits) {
+        for (Unit transportedUnit : transportedUnits) {
+            unloadTransport(transportedUnit);
+        }
+    }
+
+    protected Unit loadTransport(Unit transportedUnit) {
+        Unit oldTransport = null;
+        return oldTransport;
+    }
+
+    protected void unloadTransport(Unit transportedUnit) {
+        Objects.requireNonNull(transportedUnit);
+
+        // Remove this unit from our collection of transported units.
+        removeTransportedUnit(transportedUnit);
+        if (transport.getEntity() != null) {
+            transport.getEntity().unload(transportedUnit.getEntity()); //TODO fix this?
+            initializeTransportCapacity(transport.getEntity().getTransports());
+        }
+    }
 
     /**
      * Recalculates transport capacity
@@ -28,6 +67,8 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     @Override
     public void initializeTransportCapacity(Vector<Transporter> transporters) {
         transportCapacity.clear();
+        Set<Entity> oldTransportedEntities = clearTransportedEntities();
+        loadTransportedEntities();
         if (transporters != null && !transporters.isEmpty()) {
             for (Transporter transporter : transporters) {
                 if (transportCapacity.containsKey(transporter.getClass())) {
@@ -144,6 +185,46 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     public void clearTransportedUnits() {
         if (!transportedUnits.isEmpty()) {
             transportedUnits.clear();
+        }
+
+        clearTransportedEntities();
+    }
+
+    protected Set<Entity> clearTransportedEntities() {
+        Set<Entity> transportedEntities = new HashSet<>();
+        if (transport.getEntity() != null) {
+            for (Entity transportedEntity : transport.getEntity().getUnloadableUnits()) {
+                //transport.getEntity().unload(transportedEntity);
+                transportedEntities.add(transportedEntity);
+            }
+
+            transport.getEntity().resetTransporter();
+        }
+        return transportedEntities;
+    }
+
+    protected void loadTransportedEntities() {
+        if (transport.getEntity() != null) {
+            for (Unit transportedUnit : getTransportedUnits()) {
+                if (transportedUnit.getEntity() != null) {
+                    transport.getEntity().resetBays();
+                    loadEntity(transportedUnit.getEntity());
+                }
+            }
+        }
+    }
+
+    protected void restoreTransportedEntities(Set<Entity> transportedEntities) {
+        if (transport.getEntity() != null) {
+            for (Entity transportedEntity : transportedEntities) {
+                //loadEntity(transportedEntity);
+            }
+        }
+    }
+
+    protected void loadEntity(Entity transportedEntity) {
+        if (transport.getEntity() != null && transportedEntity != null) {
+            transport.getEntity().load(transportedEntity, false);
         }
     }
 

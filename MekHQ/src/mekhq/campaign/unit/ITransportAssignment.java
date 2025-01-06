@@ -23,6 +23,7 @@ package mekhq.campaign.unit;
 
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 
 /**
  * Represents an assignment on a transport.
@@ -58,5 +59,13 @@ public interface ITransportAssignment {
      * @return hash int, or null if none
      */
     @Nullable int hashTransportedLocation();
+
+    /**
+     * After loading UnitRefs need converted to Units
+     * @see Unit::fixReferences(Campaign campaign)
+     * @param campaign Campaign we need to fix references for
+     * @param unit Unit we need to fix references for
+     */
+    void fixReferences(Campaign campaign, Unit unit);
 
 }

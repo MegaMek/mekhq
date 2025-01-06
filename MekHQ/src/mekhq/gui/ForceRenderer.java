@@ -128,7 +128,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                         .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
             String tacticalTransport = "";
-            if (unit.hasTransportAssignment()) {
+            if (unit.hasTacticalTransportAssignment()) {
                 transport.append("<br>Transported by: ")
                     .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }

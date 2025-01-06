@@ -592,7 +592,7 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
         //Let's get preferred transport too
-        if (unit.hasTransportAssignment()) {
+        if (unit.hasTacticalTransportAssignment()) {
             toReturn += "<br><i>" + "Transported by: ";
             toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
             toReturn += "</i>";

@@ -48,14 +48,21 @@ public class CampaignTransporterMap {
         AbstractTransportedUnitsSummary transportedUnitsSummary = transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType);
         for (Class<? extends Transporter> transporterType : transportedUnitsSummary.getTransportCapabilities()) {
             if (transportersMap.containsKey(transporterType)) {
-                for (Double capacity : transportersMap.get(transporterType).keySet()) {
+                Set<Double> oldCapacities = transportersMap.get(transporterType).keySet();
+                Double newCapacity = transportedUnitsSummary.getCurrentTransportCapacity(transporterType);
+                //First, if this is a new capacity for the map, let's manually add it
+                if (!oldCapacities.contains(newCapacity)) {
+                    addTransporterToCapacityMap(transport, transporterType);
+                }
+                //Then we iterate through the existing capacities in the map, and either remove or add this transport as needed
+                for (Double capacity : oldCapacities) {
                     if (transportersMap.get(transporterType).get(capacity).contains(transport.getId())) {
-                        if (capacity == transportedUnitsSummary.getCurrentTransportCapacity(transporterType)) {
-                            break; // The transport is already stored with the correct capacity
+                        if (Objects.equals(capacity, newCapacity)) {
+                            continue; // The transport is already stored with the correct capacity
                         } else {
                             transportersMap.get(transporterType).get(capacity).remove(transport.getId());
                         }
-                    } else if (capacity == transportedUnitsSummary.getCurrentTransportCapacity(transporterType)) {
+                    } else if (Objects.equals(capacity, newCapacity)) {
                         addTransporterToCapacityMap(transport, transporterType);
                     }
                 }
