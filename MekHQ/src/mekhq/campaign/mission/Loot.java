@@ -33,8 +33,10 @@ import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -213,6 +215,12 @@ public class Loot {
         for (Part part : parts) {
             double partWeight = part.getTonnage();
             partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
+
+            if (part instanceof AmmoBin || part instanceof Armor) {
+                // Ammo and Armor are delivered in batches of 5t,
+                // so we need to make sure we're treating them as 5t no matter their actual weight.
+                partWeight = 5;
+            }
 
             if (isResupply) {
                 if (cargo - partWeight < 0) {

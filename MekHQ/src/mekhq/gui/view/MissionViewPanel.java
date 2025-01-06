@@ -994,7 +994,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblCargoRequirement, gridBagConstraints);
 
             txtCargoRequirement.setName("txtCargoRequirement");
-            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t");
+            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t+");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;

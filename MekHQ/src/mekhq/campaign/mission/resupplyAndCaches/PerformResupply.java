@@ -167,7 +167,13 @@ public class PerformResupply {
 
         double totalTonnage = 0;
         for (Part part : resupply.getConvoyContents()) {
-            totalTonnage += part.getTonnage() * (part instanceof Armor || part instanceof AmmoBin ? 5 : 1);
+            if (part instanceof AmmoBin || part instanceof Armor) {
+                // Ammo and Armor are delivered in batches of 5t,
+                // so we need to make sure we're treating them as 5t no matter their actual weight.
+                totalTonnage += 5;
+            } else {
+                totalTonnage += part.getTonnage();
+            }
         }
 
         logger.info("totalTonnage: " + totalTonnage);
@@ -255,7 +261,6 @@ public class PerformResupply {
     public static void loadPlayerConvoys(Resupply resupply) {
         // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
         // weight by five when picking these items.
-        final int WEIGHT_MULTIPLIER = 5;
         final Campaign campaign = resupply.getCampaign();
         final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
 
@@ -286,7 +291,9 @@ public class PerformResupply {
                 tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
                 if (part instanceof AmmoBin || part instanceof Armor) {
-                    tonnage *= WEIGHT_MULTIPLIER;
+                    // Ammo and Armor are delivered in batches of 5t,
+                    // so we need to make sure we're treating them as 5t no matter their actual weight.
+                    tonnage = 5;
                 }
 
                 if (cargoCapacity - tonnage >= 0) {
