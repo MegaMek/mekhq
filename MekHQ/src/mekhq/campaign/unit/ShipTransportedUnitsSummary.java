@@ -32,9 +32,9 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
                             else {
                                 transporterType = transport.getEntity().getBayById(transportAssignment.getBayNumber()).getClass();
                             }
-                            setCurrentTransportCapacity(transporterType,
-                                getCurrentTransportCapacity(transporterType)
-                                    - transportedUnit.transportCapacityUsage(transporterType));
+                            //setCurrentTransportCapacity(transporterType,
+                            //    getCurrentTransportCapacity(transporterType)
+                            //       - transportedUnit.transportCapacityUsage(transporterType));
                         }
                         catch (NullPointerException e) {
                             logger.error(String.format("NullPointerException: Unable to get bays by number. Transport: %s Bay Assignment: %s)", transport.getName(), transportAssignment.getBayNumber()));
@@ -49,56 +49,34 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
     }
 
     /**
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
-     * this data
-     * will be used to actually load the unit into a bay on the transport.
+     * Main method to be used for loading units onto a transport
      *
-     * @param units Vector of units that we wish to load into this transport
+     * @param transportedUnits Units we wish to load
+     * @return the old transports the transportedUnits were assigned to, or an empty set
      */
-    public Set<Unit> loadTransportShip(Vector<Unit> units, Class<? extends Transporter> transporterType) {
-        Set<Unit> oldTransports = new HashSet<>();
-        for (Unit unit : units) {
-            int bayNumber = Utilities.selectBestBayFor(unit.getEntity(), transport.getEntity());
-            addTransportedUnit(unit);
-            if(unit.hasTransportShipAssignment() && !Objects.equals(unit.getTransportShipAssignment().getTransportShip(), transport)) {
-                oldTransports.add(unit.getTransportShipAssignment().getTransportShip());
-            }
-            unit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumber));
-
-            if ((unit.getEntity() != null)) {
-                // This shouldn't happen, but it'd be really annoying to debug if it did
-                if ((unit.getEntity().getBayById(bayNumber) != null && unit.getEntity().getBayById(bayNumber).getClass() != transporterType)) {
-                    logger.warn(String.format("Unit was assigned a bay number for a different transport type than the unit is assigned! " +
-                        "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
-                        transport.getName(), unit.getName(), transporterType, bayNumber));
-                }
-            }
-
-            setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - unit.transportCapacityUsage(transporterType));
-        }
-
-        return oldTransports;
+    @Override
+    public Set<Unit> loadTransport(Unit... transportedUnits) {
+        return super.loadTransport(transportedUnits);
     }
 
     /**
-     * Bay unloading utility used when removing units from bay-equipped transport
-     * units
-     * and/or moving them to a new transport
+     * Main method to be used for unloading units from a transport
      *
-     * @param transportedUnit The unit that we wish to unload from this transport
+     * @param transportedUnits Units we wish to unload
      */
-    public void unloadFromTransportShip(Unit transportedUnit) {
-        Objects.requireNonNull(transportedUnit);
+    @Override
+    public void unloadTransport(Unit... transportedUnits) {
+        super.unloadTransport(transportedUnits);
+    }
 
-        // Remove this unit from our collection of transported units.
-        removeTransportedUnit(transportedUnit);
-        if (transport.getEntity() != null) {
-            initializeTransportCapacity(transport.getEntity().getTransports());
-        }
+    @Override
+    protected Unit loadTransport(Unit transportedUnit) {
+        return super.loadTransport(transportedUnit);
+    }
+
+    @Override
+    protected void unloadTransport(Unit transportedUnit) {
+        super.unloadTransport(transportedUnit);
 
         // And if the unit is being transported by us,
         // then update its transport ship assignment (provided the
@@ -112,11 +90,83 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
     }
 
     /**
+     * Bay loading utility used when assigning units to bay-equipped transport units
+     * For each passed-in unit, this will find the first available, transport bay
+     * and set
+     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
+     * this data
+     * will be used to actually load the unit into a bay on the transport.
+     *
+     * @param transportedUnits Vector of units that we wish to load into this transport
+     */
+    public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, Class<? extends Transporter> transporterType) {
+        Set<Unit> oldTransports = new HashSet<>();
+        Set<Entity> oldTransportedEntities = clearTransportedEntities();
+        loadTransportedEntities();
+        for (Unit transportedUnit : transportedUnits) {
+            Unit oldTransport = loadTransport(transporterType, transportedUnit);
+            if (oldTransport != null) {
+                oldTransports.add(oldTransport);
+            }
+        }
+        transport.initializeShipTransportSpace();;
+        restoreTransportedEntities(oldTransportedEntities);
+        return oldTransports;
+    }
+
+    private Unit loadTransport(Class<? extends Transporter> transporterType, Unit transportedUnit) {
+        Unit oldTransport = null;
+        int bayNumber = Utilities.selectBestBayFor(transportedUnit.getEntity(), transport.getEntity());
+
+        Class<? extends Transporter> oldTransporterType = null;
+        if(transportedUnit.hasTransportShipAssignment()) {
+            oldTransport = transportedUnit.getTransportShipAssignment().getTransportShip();
+            oldTransporterType = transportedUnit.getTransportShipAssignment().getTransporterType();
+            if (oldTransport.getEntity() != null) {
+                oldTransport.unloadFromTransportShip(transportedUnit);
+            }
+        }
+
+        transportedUnit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumber));
+
+        if ((transportedUnit.getEntity() != null)) {
+            if (transport.getEntity() != null) {
+                loadEntity(transportedUnit.getEntity());
+            }
+            // This shouldn't happen, but it'd be really annoying to debug if it did
+            if ((transportedUnit.getEntity().getBayById(bayNumber) != null && transportedUnit.getEntity().getBayById(bayNumber).getClass() != transporterType)) {
+                logger.warn(String.format("Unit was assigned a bay number for a different transport type than the unit is assigned! " +
+                    "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
+                    transport.getName(), transportedUnit.getName(), transporterType, bayNumber));
+            }
+        }
+
+        addTransportedUnit(transportedUnit);
+        if (!Objects.equals(oldTransport, transport)
+            && (transportedUnit.getTransportShipAssignment().getTransporterType() != oldTransporterType)) {
+            setCurrentTransportCapacity(transporterType,
+                getCurrentTransportCapacity(transporterType) - transportedUnit.transportCapacityUsage(transporterType));
+        }
+        return oldTransport;
+    }
+
+    /**
+     * Bay unloading utility used when removing units from bay-equipped transport
+     * units
+     * and/or moving them to a new transport
+     *
+     * @param transportedUnit The unit that we wish to unload from this transport
+     */
+    public void unloadFromTransportShip(Unit transportedUnit) {
+        unloadTransport(transportedUnit);
+    }
+
+    /**
      * Bay unloading utility used when removing a bay-equipped Transport unit
      * This removes all units assigned to the transport from it
      */
     @Override
-    public void unloadTransportedUnits(Campaign campaign) {
+    public void clearTransportedUnits(Campaign campaign) {
         clearTransportedUnits();
 
         // And now reset the Transported values for all the units we just booted
@@ -128,6 +178,32 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         });
 
         initializeTransportCapacity(transport.getEntity().getTransports());
+    }
+
+    /**
+     * Fixes references after loading
+     *
+     * @param campaign
+     * @param unit
+     */
+    @Override
+    public void fixReferences(Campaign campaign, Unit unit) {
+        Set<Unit> newTransportedUnits = new HashSet<>();
+        for (Unit transportedUnit : getTransportedUnits()) {
+            if (transportedUnit instanceof Unit.UnitRef) {
+                Unit realUnit = campaign.getHangar().getUnit(transportedUnit.getId());
+                if (realUnit != null) {
+                    newTransportedUnits.add(realUnit);
+                } else {
+                    logger.error(
+                        String.format("Unit %s ('%s') references missing transported unit %s",
+                            unit.getId(), unit.getName(), transportedUnit.getId()));
+                }
+            } else {
+                newTransportedUnits.add(transportedUnit);
+            }
+        }
+        replaceTransportedUnits(newTransportedUnits);
     }
 
     /**

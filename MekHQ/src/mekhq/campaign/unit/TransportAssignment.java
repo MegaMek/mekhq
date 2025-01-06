@@ -2,8 +2,15 @@ package mekhq.campaign.unit;
 
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class TransportAssignment implements ITransportAssignment {
+    protected final MMLogger logger = MMLogger.create(this.getClass());
+
     Unit transport;
     Transporter transportedLocation;
     Class<? extends Transporter> transporterType;
@@ -109,5 +116,41 @@ public class TransportAssignment implements ITransportAssignment {
     @Override
     public int hashTransportedLocation() {
         return getTransportedLocation().hashCode();
+    }
+
+    /**
+     * After loading UnitRefs need converted to Units
+     *
+     * @param campaign Campaign we need to fix references for
+     * @see Unit::fixReferences(Campaign campaign)
+     */
+    @Override
+    public void fixReferences(Campaign campaign, Unit unit) {
+            if (getTransport() instanceof Unit.UnitRef) {
+            Unit transport = campaign.getHangar().getUnit(getTransport().getId());
+            if (transport != null) {
+                if (hasTransportedLocation()) {
+                    setTransport(transport);
+                    //setTransportedLocation(getTransportedLocation());
+                    //setTransporterType(hasTransportedLocation() ? getTransportedLocation().getClass() : null);
+                } else if (hasTransporterType()) {
+                    setTransport(transport);
+                    //setTransporterType(getTransporterType());
+                }
+                else {
+                    setTransport(transport);
+                    logger.warn(
+                        String.format("Unit %s ('%s') is missing a transportedLocation " +
+                                "and transporterType for tactical transport %s",
+                            unit.getId(), unit.getName(), getTransport().getId()));
+                }
+            } else {
+                logger.error(
+                    String.format("Unit %s ('%s') references missing transport %s",
+                        unit.getId(), unit.getName(), getTransport().getId()));
+
+                unit.setTacticalTransportAssignment(null);
+            }
+        }
     }
 }

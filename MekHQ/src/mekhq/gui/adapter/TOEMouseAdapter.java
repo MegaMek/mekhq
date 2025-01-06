@@ -39,6 +39,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.HangarSorter;
+import mekhq.campaign.unit.ShipTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
@@ -48,7 +49,6 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.AssignForceToShipTransportMenu;
 import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
-import mekhq.gui.menus.AssignForceToTransportMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -1207,24 +1207,34 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                if (StaticChecks.areAllUnitsTransported(unitsInForces)) {
-                    menuItem = new JMenuItem(TOEMouseAdapter.UNASSIGN_FORCE_TRN_TITLE);
-                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP + unitIds);
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
-                }
                 Unit[] unitsArr = units.toArray(new Unit[0]);
                 //AssignForceToTacticalTransportMenu assignForceToTransportMenu = new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr);
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), unitsArr));
+                if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+                    menuItem = new JMenuItem("Unassign Unit from Transport Ship");
+                    menuItem.addActionListener(evt -> {
+                        Set<Unit> transportsToUpdate = new HashSet<>();
+                        for (Unit transportedUnit : units) {
+                            transportsToUpdate.add(transportedUnit.getTransportShipAssignment().getTransport());
+                            transportedUnit.getTransportShipAssignment().getTransport().unloadFromTransportShip(transportedUnit);
+                        }
+
+                        for (Unit transportToUpdate : transportsToUpdate) {
+                            gui.getCampaign().updateTransportInTransports(ShipTransportedUnitsSummary.class, transportToUpdate);
+                        }
+                    });
+                    menuItem.setEnabled(true);
+                    popup.add(menuItem);
+                }
+
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr));
-                if (units.stream().allMatch(Unit::hasTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-                    menuItem = new JMenuItem("Unassign Unit from Preferred Transport");
+                if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+                    menuItem = new JMenuItem("Unassign Unit from Tactical Transport");
                     menuItem.addActionListener(evt -> {
                         Set<Unit> transportsToUpdate = new HashSet<>();
                         for (Unit transportedUnit : units) {
                             transportsToUpdate.add(transportedUnit.getTacticalTransportAssignment().getTransport());
-                            transportedUnit.getTacticalTransportAssignment().getTransport().unloadFromTransport(transportedUnit);
+                            transportedUnit.getTacticalTransportAssignment().getTransport().unloadFromTacticalTransport(transportedUnit);
                         }
 
                         for (Unit transportToUpdate : transportsToUpdate) {
@@ -1479,25 +1489,34 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (StaticChecks.areAllUnitsTransported(units) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            Unit[] unitsArr = units.toArray(new Unit[0]);
+            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), unitsArr));
+            if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
                 menuItem = new JMenuItem("Unassign Unit from Transport Ship");
-                menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNASSIGN_FROM_SHIP + unitIds);
-                menuItem.addActionListener(this);
+                menuItem.addActionListener(evt -> {
+                    Set<Unit> transportsToUpdate = new HashSet<>();
+                    for (Unit transportedUnit : units) {
+                        transportsToUpdate.add(transportedUnit.getTransportShipAssignment().getTransport());
+                        transportedUnit.getTransportShipAssignment().getTransport().unloadFromTransportShip(transportedUnit);
+                    }
+
+                    for (Unit transportToUpdate : transportsToUpdate) {
+                        gui.getCampaign().updateTransportInTransports(ShipTransportedUnitsSummary.class, transportToUpdate);
+                    }
+                });
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
 
-            Unit[] unitsArr = units.toArray(new Unit[0]);
-            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), unitsArr));
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), unitsArr));
 
-            if (units.stream().allMatch(Unit::hasTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Unassign Unit from Preferred Transport");
+            if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
+                menuItem = new JMenuItem("Unassign Unit from Tactical Transport");
                 menuItem.addActionListener(evt -> {
                     Set<Unit> transportsToUpdate = new HashSet<>();
                     for (Unit transportedUnit : units) {
                         transportsToUpdate.add(transportedUnit.getTacticalTransportAssignment().getTransport());
-                        transportedUnit.getTacticalTransportAssignment().getTransport().unloadFromTransport(transportedUnit);
+                        transportedUnit.getTacticalTransportAssignment().getTransport().unloadFromTacticalTransport(transportedUnit);
                     }
 
                     for (Unit transportToUpdate : transportsToUpdate) {

@@ -21,6 +21,8 @@
 
 package mekhq.campaign.unit;
 
+import mekhq.campaign.Campaign;
+
 import java.util.Objects;
 
 /**
@@ -57,6 +59,29 @@ public class TransportShipAssignment extends TransportAssignment{
         return bayNumber;
     }
 
+    /**
+     * After loading UnitRefs need converted to Units
+     *
+     * @param campaign Campaign we need to fix references for
+     * @param unit
+     * @see Unit::fixReferences(Campaign campaign)
+     */
+    @Override
+    public void fixReferences(Campaign campaign, Unit unit) {
+        if (getTransportShip() instanceof Unit.UnitRef){
+            Unit transportShip = campaign.getHangar().getUnit(getTransportShip().getId());
+            if (transportShip != null) {
+                setTransport(transportShip);
+            } else {
+                logger.error(
+                    String.format("Unit %s ('%s') references missing transport ship %s",
+                        unit.getId(), unit.getName(), getTransportShip().getId()));
+
+                unit.setTransportShipAssignment(null);
+            }
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -69,6 +94,7 @@ public class TransportShipAssignment extends TransportAssignment{
                     && (getBayNumber() == other.getBayNumber());
         }
     }
+
 
     @Override
     public int hashCode() {

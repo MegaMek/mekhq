@@ -318,7 +318,7 @@ public class AtBGameThread extends GameThread {
                             isTransported = true;
                         }
                     }
-                    if (!(isTransported) && unit.hasTransportAssignment()) {
+                    if (!(isTransported) && unit.hasTacticalTransportAssignment()) {
                         Unit transport = unit.getTacticalTransportAssignment().getTransport();
 
                         if (potentialTransports.get(TransportAssignment.class).containsKey(transport.getId())) {

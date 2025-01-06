@@ -1374,7 +1374,7 @@ public class Campaign implements ITechManager {
      * @param transport
      */
     public void updateTransportInTacticalTransports(Unit transport) {
-        tacticalTransporters.updateTransportInTransporterMap(transport);
+        updateTransportInTransports(TacticalTransportedUnitsSummary.class, transport);
     }
 
     /**

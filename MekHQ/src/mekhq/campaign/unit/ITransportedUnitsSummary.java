@@ -94,7 +94,25 @@ public interface ITransportedUnitsSummary {
      *
      * @param campaign used to remove this unit as a transport from any other units in the campaign
      */
-    void unloadTransportedUnits(Campaign campaign);
+    void clearTransportedUnits(Campaign campaign);
+
+    /**
+     * Main method to be used for loading units onto a transport
+     * @param transportedUnits Units we wish to load
+     * @return the old transports the transportedUnits were assigned to, or an empty set
+     */
+    Set<Unit> loadTransport(Unit... transportedUnits);
+
+    /**
+     * Main method to be used for unloading units from a transport
+     * @param transportedUnits Units we wish to unload
+     */
+    void unloadTransport(Unit... transportedUnits);
+
+    /**
+     * Fixes references after loading
+     */
+    void fixReferences(Campaign campaign, Unit unit);
 
     /**
      * TransportDetails are meant to be used with transportAssignment
