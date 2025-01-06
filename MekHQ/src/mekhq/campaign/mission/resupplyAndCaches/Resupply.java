@@ -389,7 +389,7 @@ public class Resupply {
         // Next, we determine the tonnage cap. This is the maximum tonnage the employer is willing to support.
         final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
         final int formationSize = getStandardForceSize(campaign.getFaction());
-        final int tonnageCap = contract.getRequiredLances() * formationSize * INDIVIDUAL_TONNAGE_ALLOWANCE;
+        final int tonnageCap = contract.getRequiredCombatTeams() * formationSize * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
         // Then we determine the size of each individual 'drop'. This uses the lowest of
         // unitTonnage and tonnageCap and divides that by 100

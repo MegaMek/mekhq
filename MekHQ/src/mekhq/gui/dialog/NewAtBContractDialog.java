@@ -20,17 +20,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.swing.*;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -51,6 +40,13 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * @author Neoancient
@@ -509,7 +505,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     @Override
     protected void btnOKActionPerformed(ActionEvent evt) {
-        
+
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
@@ -544,7 +540,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setDesc(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
-        contract.setRequiredLances(AtBContract.calculateRequiredLances(campaign));
+        contract.setRequiredCombatTeams(AtBContract.calculateRequiredLances(campaign));
 
         contract.setEnemyCode(getCurrentEnemyCode());
         contract.setAllySkill(comboAllySkill.getSelectedItem());

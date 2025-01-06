@@ -120,8 +120,8 @@ public class SupportPointNegotiation {
                                                      List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
         int maxSupportPoints = isInitialNegotiation
-            ? contract.getRequiredLances() * 3
-            : contract.getRequiredLances();
+            ? contract.getRequiredCombatTeams() * 3
+            : contract.getRequiredCombatTeams();
 
         Iterator<Person> iterator = adminTransport.iterator();
 
