@@ -1,6 +1,6 @@
 package mekhq.campaign.unit;
 
-import megamek.common.Transporter;
+import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
@@ -158,5 +158,95 @@ public abstract class AbstractTransportDetail implements ITransportDetail {
         for (Unit newUnit : newTransportedUnits) {
             addTransportedUnit(newUnit);
         }
+    }
+
+    /**
+     *
+     * @see Bay and its subclass's canLoad(Entity unit) methods
+     * @param entity
+     * @return the transporter types that could potentially transport this entity
+     */
+    public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
+        Set<Class<? extends Transporter>> transporters = new HashSet<>();
+
+        Class<? extends Entity> entityType = unit.getClass();
+        if (ProtoMek.class.isAssignableFrom(entityType)) {
+            transporters.add(ProtoMekBay.class);
+            transporters.add(ProtoMekClampMount.class);
+        }
+        else if (Aero.class.isAssignableFrom(entityType)) {
+            if ((unit.isFighter())) {
+                transporters.add(ASFBay.class);
+            }
+            if ((unit.isFighter()) || unit.isSmallCraft()) {
+                transporters.add(SmallCraftBay.class);
+            }
+            if (unit.hasETypeFlag(Entity.ETYPE_DROPSHIP) && (unit.getWeight() <= 5000)) {
+                transporters.add(DropshuttleBay.class);
+            }
+            if (unit.hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                transporters.add(NavalRepairFacility.class);
+                transporters.add(ReinforcedRepairFacility.class);
+            }
+            if (unit instanceof Dropship && !((Dropship) unit).isDockCollarDamaged()) {
+                transporters.add(DockingCollar.class);
+            }
+        }
+        else if (Tank.class.isAssignableFrom(entityType)) {
+            if (unit.getWeight() <= 50) {
+                transporters.add(LightVehicleBay.class);
+            }
+
+            if (unit.getWeight() <= 100) {
+                transporters.add(HeavyVehicleBay.class);
+            }
+
+            if (unit.getWeight() <= 100) {
+                transporters.add(SuperHeavyVehicleBay.class);
+            }
+        }
+        else if (Mek.class.isAssignableFrom(entityType)) {
+            boolean loadableQuadVee = (unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_MEK);
+            boolean loadableLAM = (unit instanceof LandAirMek) && (unit.getConversionMode() != LandAirMek.CONV_MODE_FIGHTER);
+            boolean loadableOtherMek = (unit instanceof Mek) && !(unit instanceof QuadVee) && !(unit instanceof LandAirMek);
+            if (loadableQuadVee || loadableLAM || loadableOtherMek) {
+                transporters.add(MekBay.class);
+
+            } else {
+                if ((unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_VEHICLE)) {
+                    if (unit.getWeight() <= 50) {
+                        transporters.add(LightVehicleBay.class);
+                    }
+
+                    if (unit.getWeight() <= 100) {
+                        transporters.add(HeavyVehicleBay.class);
+                    }
+
+                    if (unit.getWeight() <= 100) {
+                        transporters.add(SuperHeavyVehicleBay.class);
+                    }
+                }
+            }
+        }
+        else if (Infantry.class.isAssignableFrom(entityType)) {
+            transporters.add(InfantryBay.class);
+            transporters.add(InfantryCompartment.class);
+
+            if (BattleArmor.class.isAssignableFrom(entityType)) {
+                transporters.add(BattleArmorBay.class);
+                BattleArmor baUnit = (BattleArmor) unit;
+
+                if (baUnit.canDoMechanizedBA()) {
+                    transporters.add(BattleArmorHandles.class);
+                    transporters.add(BattleArmorHandlesTank.class);
+
+                    if (baUnit.hasMagneticClamps()) {
+                        transporters.add(ClampMountMek.class);
+                        transporters.add(ClampMountTank.class);
+                    }
+                }
+            }
+        }
+        return transporters;
     }
 }

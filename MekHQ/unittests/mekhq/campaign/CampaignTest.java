@@ -178,7 +178,7 @@ public class CampaignTest {
         assertTrue(campaign.getTransportShips().contains(mockUnit));
 
         // Remove the mock transport
-        campaign.removeTransportShip(mockUnit);
+        campaign.removeShipTransporter(mockUnit);
 
         // Ensure it was removed
         assertTrue(campaign.getTransportShips().isEmpty());
