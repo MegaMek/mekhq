@@ -2,12 +2,13 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 
+import javax.swing.*;
 import java.util.*;
 
 public abstract class AbstractTransportedUnitsSummary implements ITransportedUnitsSummary {
     protected final MMLogger logger = MMLogger.create(this.getClass());
-
     protected Unit transport;
     private Set<Unit> transportedUnits = new HashSet<>();
     private Map<Class<? extends Transporter>, Double> transportCapacity = new HashMap<>();
@@ -25,7 +26,6 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @param transportedUnits Units we wish to load
      * @return the old transports the transportedUnits were assigned to, or an empty set
      */
-    @Override
     public Set<Unit> loadTransport(Unit... transportedUnits) {
         HashSet<Unit> oldTransports = new HashSet<>();
 
@@ -42,11 +42,6 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         for (Unit transportedUnit : transportedUnits) {
             unloadTransport(transportedUnit);
         }
-    }
-
-    protected Unit loadTransport(Unit transportedUnit) {
-        Unit oldTransport = null;
-        return oldTransport;
     }
 
     protected void unloadTransport(Unit transportedUnit) {
@@ -238,6 +233,16 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         for (Unit newUnit : newTransportedUnits) {
             addTransportedUnit(newUnit);
         }
+    }
+
+
+
+    /**
+     * TransportDetails are meant to be used with transportAssignment
+     * @return the TransportAssignement used by the class
+     */
+    Class<? extends ITransportAssignment> getRelatedTransportAssignmentType() {
+        return ITransportAssignment.class;
     }
 
     /**

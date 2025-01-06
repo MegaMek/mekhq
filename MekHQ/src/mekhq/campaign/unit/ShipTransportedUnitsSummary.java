@@ -70,11 +70,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
     }
 
     @Override
-    protected Unit loadTransport(Unit transportedUnit) {
-        return super.loadTransport(transportedUnit);
-    }
-
-    @Override
     protected void unloadTransport(Unit transportedUnit) {
         super.unloadTransport(transportedUnit);
 
@@ -208,9 +203,11 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
     /**
      * TransportDetails are meant to be used with transportAssignment
+     *
      * @return the TransportAssignement used by the class
      */
-    static Class<?> getRelatedTransportAssignmentType() {
+    @Override
+    Class<? extends ITransportAssignment> getRelatedTransportAssignmentType() {
         return TransportShipAssignment.class;
     }
 
