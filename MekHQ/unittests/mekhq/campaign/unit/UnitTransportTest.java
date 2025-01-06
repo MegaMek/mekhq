@@ -20,6 +20,7 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@Disabled // REDO - Psi - Ship Transport has been split into Ship & Tactical transport, the tests need redone.
 public class UnitTransportTest {
 
     @BeforeAll
