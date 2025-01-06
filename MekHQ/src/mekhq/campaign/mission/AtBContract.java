@@ -478,29 +478,18 @@ public class AtBContract extends Contract {
         logger.info(String.format("Current Morale: %s (%s)",
             getMoraleLevel().toString(), getMoraleLevel().ordinal()));
 
-        // Confidence:
-        int enemySkillRating = getEnemySkill().getAdjustedValue() - 2;
-        int allySkillRating = getAllySkill().getAdjustedValue() - 2;
-
-        if (getCommandRights().isIndependent()) {
-            allySkillRating = (campaign.getCampaignOptions().getUnitRatingMethod().isFMMR() ? getAllySkill()
-                : campaign.getReputation().getAverageSkillLevel()).getAdjustedValue();
-            allySkillRating -= 2;
-        }
-
+        // Clan Overconfidence Modifier:
         final LocalDate THE_GREAT_REFUSAL = LocalDate.of(3060, 4, 12);
 
+        int clanOverconfidenceModifier = 0;
         if (campaign.getLocalDate().isBefore(THE_GREAT_REFUSAL)) {
             if (getEnemy().isClan() && !getEmployerFaction().isClan()) {
-                enemySkillRating++;
-            } else if (!getEnemy().isClan() && getEmployerFaction().isClan()) {
-                allySkillRating++;
+                clanOverconfidenceModifier++;
             }
         }
 
-        int confidence = enemySkillRating - allySkillRating;
-        targetNumber.addModifier(confidence, "confidence");
-        logger.info(String.format("Confidence: %s", confidence >= 0 ? "+" + confidence : confidence));
+        targetNumber.addModifier(clanOverconfidenceModifier, "clanOverconfidenceModifier");
+        logger.info(String.format("Confidence: +%s", clanOverconfidenceModifier));
 
         // Reliability:
         int reliability = getEnemyQuality();
@@ -570,13 +559,13 @@ public class AtBContract extends Contract {
 
             if (scenarioStatus.isOverallVictory()) {
                 victories++;
-            } else if (scenarioStatus.isOverallDefeat() || scenarioStatus.isRefusedEngagement()) {
+            } else if (scenarioStatus.isOverallDefeat()) {
                 defeats++;
             }
 
             if (scenarioStatus.isDecisiveVictory()) {
                 victories++;
-            } else if (scenarioStatus.isDecisiveDefeat()) {
+            } else if (scenarioStatus.isDecisiveDefeat() || scenarioStatus.isRefusedEngagement()) {
                 defeats++;
             } else if (scenarioStatus.isPyrrhicVictory()) {
                 victories--;
@@ -611,18 +600,12 @@ public class AtBContract extends Contract {
         // Morale level determination based on roll value
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
 
-        if (roll < 2) {
-            setMoraleLevel(moraleLevels[max(getMoraleLevel().ordinal() - 2, 0)]);
-            logger.info("Result: Morale Level -2");
-        } else if (roll < 5) {
+        if (roll < 5) {
             setMoraleLevel(moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)]);
             logger.info("Result: Morale Level -1");
-        } else if ((roll > 12)) {
-            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
-            logger.info("Result: Morale Level +1");
         } else if ((roll > 9)) {
             setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
-            logger.info("Result: Morale Level +2");
+            logger.info("Result: Morale Level +1");
         } else {
             logger.info("Result: Morale Unchanged");
         }
