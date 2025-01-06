@@ -300,10 +300,6 @@ public class CampaignSummary {
 
         if (comparison > 0) {
             report.append("<font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                    .append("'>");
-        } else if (comparison == 0) {
-            report.append("<font color='")
                     .append(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                     .append("'>");
         }
