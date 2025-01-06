@@ -488,29 +488,8 @@ public class AtBContract extends Contract {
 
         reliability = switch (reliability) {
             case DRAGOON_F -> -1;
-            case DRAGOON_D -> {
-                if (Compute.randomInt(1) == 0) {
-                    yield -1;
-                } else {
-                    yield 0;
-                }
-            }
-            case DRAGOON_C -> 0;
-            case DRAGOON_B -> {
-                if (Compute.randomInt(1) == 0) {
-                    yield 0;
-                } else {
-                    yield +1;
-                }
-            }
-            case DRAGOON_A -> +1;
-            default -> { // DRAGOON_ASTAR
-                if (Compute.randomInt(1) == 0) {
-                    yield +1;
-                } else {
-                    yield +2;
-                }
-            }
+            case DRAGOON_A, DRAGOON_ASTAR -> +1;
+            default -> 0; // DRAGOON_D, DRAGOON_C, DRAGOON_B
         };
 
         if (enemy.isRebel()
@@ -563,15 +542,15 @@ public class AtBContract extends Contract {
 
         if (victories > defeats) {
             if (victories >= (defeats * 2)) {
-                performanceModifier -= 4;
-            } else {
                 performanceModifier -= 2;
+            } else {
+                performanceModifier -= 1;
             }
         } else if (defeats > victories) {
             if (defeats >= (victories * 2)) {
-                performanceModifier += 4;
-            } else {
                 performanceModifier += 2;
+            } else {
+                performanceModifier += 1;
             }
         }
 
