@@ -310,11 +310,11 @@ public class Unit implements ITechnology {
     }
 
     public ShipTransportDetail getShipTransportDetail() {
-        return (ShipTransportDetail) getTransportDetails(ShipTransportDetail.class);
+        return (ShipTransportDetail) getTransportDetail(ShipTransportDetail.class);
     }
 
     public TacticalTransportDetail getTacticalTransportDetail() {
-        return (TacticalTransportDetail) getTransportDetails(TacticalTransportDetail.class);
+        return (TacticalTransportDetail) getTransportDetail(TacticalTransportDetail.class);
     }
 
     private void initializeTransportSpace(Class<? extends AbstractTransportDetail> transportDetailType) {
@@ -322,7 +322,7 @@ public class Unit implements ITechnology {
         //getTransportDetails(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
         if (hasTransportDetails(transportDetailType)) {
              if (getEntity() != null) {
-                 getTransportDetails(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
+                 getTransportDetail(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
              }
         } else {
             try {
@@ -340,7 +340,7 @@ public class Unit implements ITechnology {
         }
     }
 
-    private boolean hasTransportDetails(Class<? extends AbstractTransportDetail> transportDetailType) {
+    public boolean hasTransportDetails(Class<? extends AbstractTransportDetail> transportDetailType) {
         for(AbstractTransportDetail transportDetail : transportDetails) {
             if (transportDetail.getClass() == transportDetailType) {
                 return true;
@@ -349,7 +349,7 @@ public class Unit implements ITechnology {
         return false;
     }
 
-    private AbstractTransportDetail getTransportDetails(Class<? extends AbstractTransportDetail> transportDetailType) {
+    public AbstractTransportDetail getTransportDetail(Class<? extends AbstractTransportDetail> transportDetailType) {
         for(AbstractTransportDetail transportDetail : transportDetails) {
             if (transportDetail.getClass() == transportDetailType) {
                 return transportDetail;
@@ -1805,8 +1805,13 @@ public class Unit implements ITechnology {
      *
      * @param units Vector of units that we wish to load into this transport
      */
-    public void loadTransportShip(Vector<Unit> units) {
-        getShipTransportDetail().loadTransportShip(units);
+    public Set<Unit> loadShipTransport(Class<? extends Transporter> transporterType, Unit... units) {
+        Vector<Unit> unitsVector = new Vector<>();
+        for (Unit unit : units) {
+            unitsVector.add(unit);
+        }
+
+        return getShipTransportDetail().loadTransportShip(unitsVector, transporterType);
     }
 
     /**
@@ -1892,12 +1897,26 @@ public class Unit implements ITechnology {
         return getTacticalTransportDetail().getCurrentTransportCapacity(transporterType);
     }
 
+    /**
+     * Returns the current capacity
+     *
+     * @param transporterType class of Transporter
+     * @return
+     */
+    public double getCurrentTransportCapacity(Class<? extends AbstractTransportDetail> transportDetailType, Class<? extends Transporter> transporterType ){
+        return getTransportDetail(transportDetailType).getCurrentTransportCapacity(transporterType);
+    }
+
     public void setCurrentShipTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
         getShipTransportDetail().setCurrentTransportCapacity(transporterType, capacity);
     }
 
     public void setCurrentTacticalTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
         getTacticalTransportDetail().setCurrentTransportCapacity(transporterType, capacity);
+    }
+
+    public Set<Class<? extends Transporter>> getShipTransportCapabilities() {
+        return getShipTransportDetail().getTransportCapabilities();
     }
 
     public Set<Class<? extends Transporter>> getTacticalTransportCapabilities() {

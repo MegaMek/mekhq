@@ -2,17 +2,17 @@ package mekhq.gui.menus;
 
 import megamek.common.Transporter;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.TacticalTransportDetail;
+import mekhq.campaign.unit.ShipTransportDetail;
 import mekhq.campaign.unit.Unit;
 
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMenu {
+public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
-    public AssignForceToTacticalTransportMenu(Campaign campaign, Unit... units) {
-        super(TacticalTransportDetail.class, campaign, units);
+    public AssignForceToShipTransportMenu(Campaign campaign, Unit... units) {
+        super(ShipTransportDetail.class, campaign, units);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(transportDetailType).keySet());
 
         for (Unit unit : units) {
-            Set<Class<? extends Transporter>> unitTransporterTypes = TacticalTransportDetail.mapEntityToTransporters(unit.getEntity());
+            Set<Class<? extends Transporter>> unitTransporterTypes = ShipTransportDetail.mapEntityToTransporters(unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {
@@ -42,7 +42,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
             }
 
         }
-        Set<Unit> oldTransports = transport.loadTacticalTransport(transporterType, units);
+        Set<Unit> oldTransports = transport.loadShipTransport(transporterType, units);
         if (!oldTransports.isEmpty()) {
             oldTransports.forEach(oldTransport -> campaign.updateTransportInTransports(transportDetailType, oldTransport));
         }

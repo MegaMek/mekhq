@@ -1,6 +1,6 @@
 package mekhq.campaign.unit;
 
-import megamek.common.Transporter;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 
@@ -158,5 +158,9 @@ public class TacticalTransportDetail extends AbstractTransportDetail {
      */
     static Class<?> getRelatedTransportAssignmentType() {
         return TransportAssignment.class;
+    }
+
+    public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
+        return AbstractTransportDetail.mapEntityToTransporters(unit);
     }
 }

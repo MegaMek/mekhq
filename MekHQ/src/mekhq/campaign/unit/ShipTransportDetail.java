@@ -1,14 +1,10 @@
 package mekhq.campaign.unit;
 
-import megamek.common.Bay;
-import megamek.common.Entity;
-import megamek.common.Transporter;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 
-import java.util.Objects;
-import java.util.Vector;
+import java.util.*;
 
 public class ShipTransportDetail extends AbstractTransportDetail {
 
@@ -61,33 +57,31 @@ public class ShipTransportDetail extends AbstractTransportDetail {
      * will be used to actually load the unit into a bay on the transport.
      *
      * @param units Vector of units that we wish to load into this transport
-     * @param entity Entity of the unit we're loading
      */
-    public void loadTransportShip(Vector<Unit> units) {
+    public Set<Unit> loadTransportShip(Vector<Unit> units, Class<? extends Transporter> transporterType) {
+        Set<Unit> oldTransports = new HashSet<>();
         for (Unit unit : units) {
-            int unitType = unit.getEntity().getUnitType();
-            double unitWeight;
-            if (unit.getEntity().getUnitType() == UnitType.INFANTRY) {
-                unitWeight = ITransportDetail.calcInfantryBayWeight(unit.getEntity());
-            } else {
-                unitWeight = unit.getEntity().getWeight();
-            }
-
-            Class<? extends Transporter> transporterType;
             int bayNumber = Utilities.selectBestBayFor(unit.getEntity(), transport.getEntity());
             addTransportedUnit(unit);
+            if(unit.hasTransportShipAssignment() && !Objects.equals(unit.getTransportShipAssignment().getTransportShip(), transport)) {
+                oldTransports.add(unit.getTransportShipAssignment().getTransportShip());
+            }
             unit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumber));
 
-            if ((unit.getEntity() != null) && unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-                transporterType = transport.getEntity().getCollarById(bayNumber).getClass();
-            }
-            else {
-                transporterType = transport.getEntity().getBayById(bayNumber).getClass();
+            if ((unit.getEntity() != null)) {
+                // This shouldn't happen, but it'd be really annoying to debug if it did
+                if ((unit.getEntity().getBayById(bayNumber) != null && unit.getEntity().getBayById(bayNumber).getClass() != transporterType)) {
+                    logger.warn(String.format("Unit was assigned a bay number for a different transport type than the unit is assigned! " +
+                        "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
+                        transport.getName(), unit.getName(), transporterType, bayNumber));
+                }
             }
 
             setCurrentTransportCapacity(transporterType,
                 getCurrentTransportCapacity(transporterType) - unit.transportCapacityUsage(transporterType));
         }
+
+        return oldTransports;
     }
 
     /**
@@ -102,6 +96,9 @@ public class ShipTransportDetail extends AbstractTransportDetail {
 
         // Remove this unit from our collection of transported units.
         removeTransportedUnit(transportedUnit);
+        if (transport.getEntity() != null) {
+            initializeTransportCapacity(transport.getEntity().getTransports());
+        }
 
         // And if the unit is being transported by us,
         // then update its transport ship assignment (provided the
@@ -140,4 +137,16 @@ public class ShipTransportDetail extends AbstractTransportDetail {
     static Class<?> getRelatedTransportAssignmentType() {
         return TransportShipAssignment.class;
     }
+
+    public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
+        Set<Class<? extends Transporter>> transporters = AbstractTransportDetail.mapEntityToTransporters(unit);
+        transporters.remove(InfantryCompartment.class);
+        transporters.remove(BattleArmorHandles.class);
+        transporters.remove(BattleArmorHandlesTank.class);
+        transporters.remove(ClampMountMek.class);
+        transporters.remove(ClampMountTank.class);
+
+        return transporters;
+    }
+
 }
