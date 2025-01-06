@@ -325,17 +325,19 @@ public class Unit implements ITechnology {
                  getTransportedUnitsSummaryType(transportedUnitsSummaryType).initializeTransportCapacity(getEntity().getTransports());
              }
         } else {
-            try {
-                Constructor<? extends AbstractTransportedUnitsSummary> constructor = transportedUnitsSummaryType.getConstructor(new Class[]{Unit.class});
-                addTransportedUnitType(constructor.newInstance(this));
-            } catch (NoSuchMethodException e) {
-                logger.error(String.format("Could not find constructor to initialize transport space for %s", transportedUnitsSummaryType.getName()));
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+            if (campaign != null && campaign.getGame() != null) {
+                try {
+                    Constructor<? extends AbstractTransportedUnitsSummary> constructor = transportedUnitsSummaryType.getConstructor(new Class[]{Unit.class});
+                    addTransportedUnitType(constructor.newInstance(this));
+                } catch (NoSuchMethodException e) {
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                } catch (InvocationTargetException e) {
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                } catch (InstantiationException e) {
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                } catch (IllegalAccessException e) {
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                }
             }
         }
     }
