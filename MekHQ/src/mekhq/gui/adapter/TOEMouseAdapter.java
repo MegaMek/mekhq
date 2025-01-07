@@ -1653,7 +1653,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Undeploy Unit (GM)");
+                menuItem = new JMenuItem("Undeploy Unit");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
 
