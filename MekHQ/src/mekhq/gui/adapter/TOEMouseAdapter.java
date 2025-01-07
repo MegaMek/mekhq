@@ -60,7 +60,8 @@ import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 
-public class TOEMouseAdapter extends JPopupMenuAdapter {
+public class
+TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
 
     private final CampaignGUI gui;
@@ -1144,7 +1145,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Force (GM)");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
+
+                boolean enable = true;
+                for (Force individualForce : forces) {
+                    int scenarioId = individualForce.getScenarioId();
+                    Scenario scenario = gui.getCampaign().getScenario(scenarioId);
+
+                    if (scenario != null && scenario.getHasTrack()) {
+                        enable = false;
+                        break;
+                    }
+                }
+                menuItem.setEnabled(gui.getCampaign().isGM() && enable);
                 popup.add(menuItem);
             }
 
@@ -1645,7 +1657,19 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem("Undeploy Unit (GM)");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
+
+                boolean enable = true;
+                for (Unit individualUnit : units) {
+                    int scenarioId = individualUnit.getScenarioId();
+                    Scenario scenario = gui.getCampaign().getScenario(scenarioId);
+
+                    if (scenario != null && scenario.getHasTrack()) {
+                        enable = false;
+                        break;
+                    }
+                }
+
+                menuItem.setEnabled(gui.getCampaign().isGM() && enable);
                 popup.add(menuItem);
             }
 
