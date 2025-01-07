@@ -1,6 +1,7 @@
 package mekhq.campaign.unit;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
@@ -60,9 +61,8 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @param transporters What transporters are we tracking the details of?
      */
     @Override
-    public void initializeTransportCapacity(Vector<Transporter> transporters) {
+    public void initializeTransportCapacity(@Nullable Vector<Transporter> transporters) {
         transportCapacity.clear();
-        Set<Entity> oldTransportedEntities = clearTransportedEntities();
         loadTransportedEntities();
         if (transporters != null && !transporters.isEmpty()) {
             for (Transporter transporter : transporters) {
@@ -74,11 +74,9 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
                 }
             }
 
-            initializeTransportDetail();
+
         }
     }
-
-    protected abstract void initializeTransportDetail();
 
     /**
      * If this unit is capable of transporting another unit, return true
@@ -205,14 +203,6 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
                     transport.getEntity().resetBays();
                     loadEntity(transportedUnit.getEntity());
                 }
-            }
-        }
-    }
-
-    protected void restoreTransportedEntities(Set<Entity> transportedEntities) {
-        if (transport.getEntity() != null) {
-            for (Entity transportedEntity : transportedEntities) {
-                //loadEntity(transportedEntity);
             }
         }
     }

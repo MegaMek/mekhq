@@ -4,6 +4,7 @@ import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.Transporter;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 
 import java.util.Set;

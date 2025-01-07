@@ -16,38 +16,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         super(transport);
     }
 
-    @Override
-    protected void initializeTransportDetail() {
-        if (hasTransportedUnits() && transport.getEntity() != null) {
-            //Let's remove capacity for what we're already transporting
-            for (Unit transportedUnit : getTransportedUnits()) {
-                if (transportedUnit.hasTransportShipAssignment()) {
-                    TransportShipAssignment transportAssignment = transportedUnit.getTransportShipAssignment();
-                    if (Objects.equals(transportAssignment.getTransportShip(), transport)) {
-                        try {
-                            Class<? extends Transporter> transporterType;
-                            if (transportedUnit.getEntity() != null && transportedUnit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-                                transporterType = transport.getEntity().getCollarById(transportAssignment.getBayNumber()).getClass();
-                            }
-                            else {
-                                transporterType = transport.getEntity().getBayById(transportAssignment.getBayNumber()).getClass();
-                            }
-                            //setCurrentTransportCapacity(transporterType,
-                            //    getCurrentTransportCapacity(transporterType)
-                            //       - transportedUnit.transportCapacityUsage(transporterType));
-                        }
-                        catch (NullPointerException e) {
-                            logger.error(String.format("NullPointerException: Unable to get bays by number. Transport: %s Bay Assignment: %s)", transport.getName(), transportAssignment.getBayNumber()));
-                            for (Bay bay : transport.getEntity().getTransportBays()) {
-                                logger.error(String.format("Bay Number: %s Bay Type: %s", bay.getBayNumber(), bay.getClass()));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Main method to be used for loading units onto a transport
      *
@@ -108,7 +76,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
             }
         }
         transport.initializeShipTransportSpace();;
-        restoreTransportedEntities(oldTransportedEntities);
         return oldTransports;
     }
 
