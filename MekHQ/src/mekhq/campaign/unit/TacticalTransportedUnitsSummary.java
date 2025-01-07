@@ -14,24 +14,6 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         super(transport);
     }
 
-    @Override
-    protected void initializeTransportDetail() {
-        if (hasTransportedUnits() && transport.getEntity() != null) {
-            //Let's remove capacity for what we're already transporting
-            for (Unit transportedUnit : getTransportedUnits()) {
-                if (transportedUnit.hasTacticalTransportAssignment()) {
-                    ITransportAssignment transportAssignment = transportedUnit.getTacticalTransportAssignment();
-                    if (Objects.equals(transportAssignment.getTransport(), transport)) {
-                        //setCurrentTransportCapacity(transportAssignment.getTransporterType(),
-                        //    getCurrentTransportCapacity(transportAssignment.getTransporterType())
-                        //        - transportedUnit.transportCapacityUsage(transportAssignment.getTransporterType()));
-                    }
-                }
-
-            }
-        }
-    }
-
     /**
      * Main method to be used for loading units onto a transport
      *
@@ -104,7 +86,6 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
             }
         }
         transport.initializeTacticalTransportSpace();
-        restoreTransportedEntities(oldTransportedEntities);
         return oldTransports;
     }
 
