@@ -23,14 +23,13 @@ import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.unit.Unit;
 
 import java.time.LocalDate;
 import java.util.*;
+
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.UNRESOLVED;
 
 /**
  * Class that handles scenario metadata and interaction at the StratCon level
@@ -455,5 +454,78 @@ public class StratconScenario implements IStratconDisplayable {
         }
 
         return null;
+    }
+
+    /**
+     * Resets the state of the current scenario for the given campaign. This includes updating the
+     * scenario state, clearing associated forces and units, and detaching them from the scenario.
+     * It also ensures that the scenario's backing contract and campaign state remain consistent.
+     *
+     * @param campaign The {@link Campaign} object for which the scenario needs to be reset.
+     * <p>
+     * The method performs the following:
+     * <ul>
+     *     <li>Resets the scenario's state to {@code UNRESOLVED}.</li>
+     *     <li>Clears any leadership budget and failed reinforcements associated with the scenario.</li>
+     *     <li>Resets the list of primary forces linked to the scenario.</li>
+     *     <li>If the scenario has a backing {@link AtBDynamicScenario}, it fetches the corresponding contract and
+     *         {@link StratconCampaignState} to handle associated track and force assignments:</li>
+     *     <ul>
+     *         <li>Clears all forces and units assigned to the scenario, detaching them appropriately.</li>
+     *         <li>Undeploys all units and clears scenario IDs for the forces and units associated with the scenario.</li>
+     *         <li>Unassigns the force from the {@link StratconTrackState} and triggers a
+     *             {@link DeploymentChangedEvent} for updates.</li>
+     *     </ul>
+     * </ul>
+     *
+     * Note:
+     * <ul>
+     *     <li>If the backing scenario ID is invalid or the contract is null, the method exits early
+     *         and performs no further actions.</li>
+     * </ul>
+     */
+    public void resetScenario(Campaign campaign) {
+        setCurrentState(UNRESOLVED);
+        setAvailableLeadershipBudget(0);
+        setFailedReinforcements(new HashSet<>());
+        setPrimaryForceIDs(new ArrayList<>());
+
+        int backingScenarioId = getBackingScenarioID();
+        Scenario backingScenario = campaign.getScenario(backingScenarioId);
+
+        if (backingScenarioId != -1 && backingScenario instanceof AtBDynamicScenario) {
+            AtBContract contract = ((AtBDynamicScenario) backingScenario).getContract(campaign);
+            if (contract == null) {
+                return;
+            }
+            StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+            StratconTrackState track = getTrackForScenario(campaign, campaignState);
+            for (Force force : campaign.getAllForces()) {
+                if (force.getScenarioId() == backingScenarioId) {
+                    force.clearScenarioIds(campaign, true);
+                    backingScenario.removeForce(force.getId());
+
+                    for (UUID uid : force.getAllUnits(false)) {
+                        Unit unit = campaign.getUnit(uid);
+                        if (unit != null) {
+                            backingScenario.removeUnit(unit.getId());
+                            unit.undeploy();
+                        }
+                    }
+
+                    track.unassignForce(force.getId());
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(force, backingScenario));
+                }
+            }
+
+            for (Unit unit : campaign.getUnits()) {
+                if (unit.getScenarioId() == backingScenarioId) {
+                    backingScenario.removeUnit(unit.getId());
+                    unit.undeploy();
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(unit, backingScenario));
+                }
+            }
+        }
     }
 }
