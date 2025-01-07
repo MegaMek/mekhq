@@ -183,10 +183,8 @@ public class Campaign implements ITechManager {
     // and more still - we're tracking DropShips and WarShips in a separate set so
     // that we can assign units to transports
     private final Hangar units = new Hangar();
-    //private final Set<Unit> transportShips = new HashSet<>();
     CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, ShipTransportedUnitsSummary.class);
     CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, TacticalTransportedUnitsSummary.class);
-    //private final Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> tacticalTransporters = new HashMap<>();
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
@@ -1379,7 +1377,8 @@ public class Campaign implements ITechManager {
 
     /**
      * This will update the transport in the transports list with new capacities
-     * @param transport
+     * @param transportDetailType type (Class) of TransportedUnitsSummary we're interested at
+     * @param transport Unit
      */
     public void updateTransportInTransports(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, Unit transport) {
         getCampaignTransporterMap(transportDetailType).updateTransportInTransporterMap(transport);
@@ -8130,7 +8129,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns list of transports
+     * Returns a Map that maps Transporter types to another
+     * Map that maps capacity (Double) to UUID of transports
      *
      * @return units that have space for that transport type
      */
@@ -8139,8 +8139,11 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns list of transports
+     * Returns a Map that maps Transporter types to another
+     * Map that maps capacity (Double) to UUID of transports
+     * for the specific TransportedUnitSummary type
      *
+     * @param transportDetailType type (Class) of TransportedUnitSummary
      * @return units that have space for that transport type
      */
     public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTransports(Class<? extends AbstractTransportedUnitsSummary> transportDetailType) {
@@ -8167,10 +8170,16 @@ public class Campaign implements ITechManager {
         return getCampaignTransporterMap(transportDetailType).getTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
     }
 
+
     /**
-     * Returns list of transports
+     * Returns list of transports for the specified
+     * AbstractTransportedUnitSummary class/subclass
+     * that has transport capacity for the
+     * Transporter class/subclass
      *
-     * @param transporterType class of Transporter
+     * @param transportDetailType type (Class) of TransportedUnitSummary
+     * @param transporterType type (Class) of Transporter
+     * @param unitSize capacity that the transport must be capable of
      * @return units that have that transport type
      */
     public Set<Unit> getTransportsByType(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, Class<? extends Transporter> transporterType, double unitSize) {
