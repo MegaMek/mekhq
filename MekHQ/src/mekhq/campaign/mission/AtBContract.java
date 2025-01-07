@@ -464,31 +464,35 @@ public class AtBContract extends Contract {
         boolean routContinue = randomInt(4) == 0;
 
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
-        if (routEnd != null && !routContinue) {
+        if (routEnd != null) {
+            if (routContinue) {
+                return;
+            }
+
             if (today.isAfter(routEnd)) {
-                int roll = d6(1);
+                int roll = randomInt(8);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate.
                 // This works with the regenerated Scenario Odds to crease very high intensity
                 // spikes in otherwise low-key Garrison-type contracts.
                 AtBMoraleLevel newMoraleLevel = switch (roll) {
-                    case 1, 2 -> AtBMoraleLevel.ADVANCING;
-                    case 3, 4 -> AtBMoraleLevel.DOMINATING;
-                    case 5, 6 -> AtBMoraleLevel.OVERWHELMING;
+                    case 0,1 -> AtBMoraleLevel.STALEMATE;
+                    case 2,3,4,5 -> AtBMoraleLevel.ADVANCING;
+                    case 6,7 -> AtBMoraleLevel.DOMINATING;
+                    case 8 -> AtBMoraleLevel.OVERWHELMING;
                     default -> AtBMoraleLevel.STALEMATE;
                 };
 
                 // If we have a StratCon enabled contract, regenerate Scenario Odds
-                StratconCampaignState campaignState = getStratconCampaignState();
-                if (campaignState != null) {
+                if (stratconCampaignState != null) {
                     StratconContractDefinition contractDefinition = getContractDefinition(getContractType());
 
                     if (contractDefinition != null) {
                         List<Integer> definedScenarioOdds = contractDefinition.getScenarioOdds();
 
-                        int scenarioOddsMultiplier = randomInt(10) == 0 ? 2 : 1;
+                        int scenarioOddsMultiplier = randomInt(20) == 0 ? 2 : 1;
 
-                        for (StratconTrackState trackState : campaignState.getTracks()) {
+                        for (StratconTrackState trackState : stratconCampaignState.getTracks()) {
                             int baseScenarioOdds = getRandomItem(definedScenarioOdds);
 
                             trackState.setScenarioOdds(baseScenarioOdds * scenarioOddsMultiplier);
@@ -496,14 +500,12 @@ public class AtBContract extends Contract {
                     }
                 }
 
-                setMoraleLevel(newMoraleLevel);
+                moraleLevel = newMoraleLevel;
                 routEnd = null;
 
                 updateEnemy(campaign, today); // mix it up a little
-
-            } else {
-                setMoraleLevel(AtBMoraleLevel.ROUTED);
             }
+
             return;
         }
 
@@ -601,18 +603,18 @@ public class AtBContract extends Contract {
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
 
         if (roll < 5) {
-            setMoraleLevel(moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)]);
+            moraleLevel = moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)];
             logger.info("Result: Morale Level -1");
         } else if ((roll > 9)) {
-            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
+            moraleLevel = moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)];
             logger.info("Result: Morale Level +1");
         } else {
             logger.info("Result: Morale Unchanged");
         }
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
-        if (getMoraleLevel().isRouted()) {
-            if (getContractType().isGarrisonType()) {
+        if (moraleLevel.isRouted()) {
+            if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
             } else {
                 campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
