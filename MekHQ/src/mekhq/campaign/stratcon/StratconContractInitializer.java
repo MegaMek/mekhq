@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Random;
 
 import static java.lang.Math.min;
+import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateInitialSupportPoints;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -222,7 +223,7 @@ public class StratconContractInitializer {
         }
 
         // Determine starting Support Points
-        campaign.negotiateAdditionalSupportPoints();
+        negotiateInitialSupportPoints(campaign, contract);
 
         // Roll to see if a hidden cache is present
         if (campaign.getLocalDate().isAfter(LocalDate.of(2900, 1, 1))) {

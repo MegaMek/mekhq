@@ -200,7 +200,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         contentPane.add(dayGrid, BorderLayout.CENTER);
 
         // Create the date label
-        JLabel dateLabel = new JLabel(resources.getString("dateField.text"), JLabel.CENTER);
+        JLabel dateLabel = new JLabel(String.format(resources.getString("dateField.text")));
 
         // Set up the date input text field with the current campaign date.
         dateField = new JFormattedTextField(this.date);
@@ -567,10 +567,11 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     private boolean updateDateFromDateField() {
         LocalDate newDate = parseDate(dateField.getText());
+
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(null,
                 "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
-                    JOptionPane.WARNING_MESSAGE);
+                JOptionPane.WARNING_MESSAGE);
             return false;
         }
 

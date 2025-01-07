@@ -20,7 +20,9 @@ package mekhq.campaign.mission.atb.scenario;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
@@ -64,7 +66,10 @@ public class StandUpBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+
+        addEnemyForce(enemyEntities, weightClass, campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), getEnemyHome(), getEnemyHome(), enemyEntities), campaign);
     }
 

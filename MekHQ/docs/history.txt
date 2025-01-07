@@ -1,6 +1,48 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.02-SNAPSHOT
+0.50.03-SNAPSHOT
++ PR #5568: Spare parts rules reference adjustment
++ PR #5559: Refactored Combat Team Handling in Scenarios for Better null Safety
++ Fix #5572: don't attempt to sum NaN tonnage equipment
++ PR #5577: Leadership Units & Support Point Scarcity Hot Fixes
++ PR #5582: Updated Rank Systems Version in ranks.xml
++ Fix #5188, #5410: Corrected GUI Theme Retrieval to Use selectedTheme
++ PR #5585: Replaced Placeholder Challenge Skulls with Final
++ Fix #5584: Fixed NPE in ScenarioTableModel
++ Fix #5590: Fixed Incorrect Cargo Sizes for Resupplies
++ PR #5595: Fixed Abandoned Convoys; Updated Abandoned Convoy Dialog
++ PR #5597: Added Better Tooltips for Force Roles
++ PR #5598: Updated Resupply & Contract Automation Dialogs; Fixed Multiple Resupply Bugs
++ PR #5599: Improved Loot Good Event Language
++ PR #5600: Added Clarification to Reinforcement Dialog
++ Fix MM #5547: spelling, fixes issue 
++ PR #5602: Adjusted AtB Bonus Events
++ Fix MM ##5138: fixes capitalization of names
++ PR #5606: fix moons listed for Tantara
++ PR #5610: Corrected StratCon Menu Actions for Scenario and Force Management
++ PR #5611: Corrected Default Theme to Empty String
++ Fix #3352: add additional sortable columns to the contract table
++ PR #5614: Fixed Cargo Capacity Calculation with New Container Pattern
++ PR #5617: Restrict Distance Label to AtB Contracts Only
++ PR #5619: Refactored PostScenarioDialogHandler to use Generic Scenario
++ PR #5620: Autologistics Reporting fixes
++ PR #5624: Updated Frontline Deployment Instructions
++ Fix #5612: Add defensive check on cancel button
++ PR #5625: Updated StratCon Data Center to Increase Scan Range Instead of Sector Reveal
++ Fix #5604: Save refit config from MHQ MekLab tab
++ Fix #5328: Adjust acquisition modifiers for support vehicles
++ Fix #4876: Add sortable columns in the finance tab
++ PR #5644: Fixed Value Display in Resupplies
++ Fix #5646: Spelling Mistakes
++ PR #5650: Address potential int and double issue from SpotBugs
++ PR #5651: Don't use floats in for loops
++ PR #5652: Adds synchronization to getForces since setForces is synchronized
++ PR #5653: Keep odd number checks using modulus
++ Fix #5604: Save refit config from MHQ MekLab tab
++ PR ##5618: Enable Auto-Resolve Button Conditionally for Scenarios
++ PR ##5616: Adds some helpful tooltips for contracts
+
+0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
 + PR #5206: Re-enabled CamOps Contract Market Method
 + PR #5207: Re-enabled Confirm Preset Option for New Campaign Preset Picker
@@ -157,6 +199,47 @@ MEKHQ VERSION HISTORY:
 + Fix #5480: AutoLogistics requesting incorrect parts when variants of the same part exist in some cases
 + Fix #5479: AutoLogistics orders reset values
 + PR #5509: ACAR Improvements- Damage delivery more granular, fixed error with morale never checking
++ PR #5528: Updated Space Scenario OpFor Deployment & Arrival
++ PR #5526: Renamed 'requiredScenario' to 'turningPoint' in StratCon
++ PR #5525: Refactored Support Point Negotiation into a Dedicated Class; Fixed Initial Support Point Pool Bug
++ Fix #5515: Added "Refused Engagement" ScenarioStatus
++ Fix #5517: Refactored Personnel Filtering Logic for Field Kitchens...Again
++ Fix #5519: Fixed Recon Scenario Spawn; Fixed Bugs Related to Role Name Changes
++ Fix #5529: Fixed Training Logic to Handle Empty Skill Lists
++ PR #5532: ACAR Documentation
++ PR #5522: Implemented Nag Dialog Visual & Code Improvements
++ PR #5514: Added Travel Description Report to Transit Automation
++ Fix #5221: Adjusted Required Scenario Distribution to More Evenly Award CVP;
+             Reduced Scenario Sizes for House & Integrated Commands
++ PR #5540: Refactored Pilot Starting Age Calculation
++ PR #5541: Further Adjustments to Starting Ages
++ PR #5536: Corrected Auxiliary Deployment Restrictions
++ PR #5537: Corrected Reinforcement Interception Map Type
++ Fix #5534: Fixed Typo in Resupply Roleplay Event
++ Fix #5535: Adjusted Force Role Weighting in DropShip Defense Scenario Templates
++ PR #5545: Temporarily Disabled Non-Launch Ready Options
++ Fix #5498: Corrected Loading & Unloading of Prior Failed Entrance Exams
++ Fix #5543: Refactored ScenarioType Parsing Logic
++ Fix #5542: Remove User Preferences Handling from BatchXPDialog
++ PR #5551: Refactored Initial Education Logic
++ PR #5557: Refactored Ally and Enemy Rating Calculations for Contracts
++ Fix #5556: Refactored Combat Roles for Clarity
++ PR #5560: Fixed Support Point Negotiation Report
++ PR #5561: Added Missing in-House Bootcamps for NCOs, Warrant Officers, and Officers
++ PR #5562: Fixed Entrance Exam Logic and Added Tooltip Display
++ PR #5563: Log jvm parameters
++ PR #5565: Refactored StratCon Reinforcement Dialog & Added GM Reinforcement Option
++ PR #5566: Refactored Nag Dialog Checks to Improve Performance
++ Fix #5667: Reworked Morale Logic
++ PR #5670: Refactored Font Color Handling for Cargo Report
++ Fix #5662: Restore Default Font Color when Leadership Selection Valid
++ Fix #5661: Removed Hardcoded Primary Ally Modifier Chances
++ Fix #5648: Expanded and Fixed Cargo Capacity Logic
++ PR #5674: Expand Special Unit Generation in AtB Unit Market
++ Fix #5668, #5640: Multiple Resupply Bug Fixes
++ PR #5676: Corrected Transportation Unit Type Check
++ Fix #5663: Addresses where the financeTable is empty
++ Fix #5664: Expanded Contract Automation Functionality to Manually Created AtB Contracts
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

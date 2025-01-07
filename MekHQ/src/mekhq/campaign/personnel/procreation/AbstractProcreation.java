@@ -43,6 +43,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
+
 /**
  * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the
  * common logic for procreation, and is implemented by classes defining how to determine if a female
@@ -466,11 +468,7 @@ public abstract class AbstractProcreation {
             baby.setLoyalty(Compute.d6(3) + 2);
 
             // set education based on age
-            if(baby.getAge(today) < 16) {
-                baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-            } else {
-                baby.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-            }
+            setInitialEducationLevel(campaign, baby);
 
             // Create reports and log the birth
             logAndUpdateFamily(campaign, today, mother, baby, father);

@@ -66,6 +66,7 @@ public class StratconFacility implements Cloneable {
     private List<String> localModifiers = new ArrayList<>();
     private String capturedDefinition;
     private boolean revealTrack;
+    private boolean increaseScanRange;
     private int scenarioOddsModifier;
     private int monthlySPModifier;
     private boolean preventAerospace;
@@ -94,6 +95,7 @@ public class StratconFacility implements Cloneable {
         clone.localModifiers = new ArrayList<>(localModifiers);
         clone.setCapturedDefinition(capturedDefinition);
         clone.revealTrack = revealTrack;
+        clone.increaseScanRange = increaseScanRange;
         clone.scenarioOddsModifier = scenarioOddsModifier;
         clone.monthlySPModifier = monthlySPModifier;
         clone.preventAerospace = preventAerospace;
@@ -113,6 +115,7 @@ public class StratconFacility implements Cloneable {
         setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
         setOwner(facility.getOwner());
         setRevealTrack(facility.getRevealTrack());
+        setIncreaseScanRange(facility.getIncreaseScanRange());
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
         setMonthlySPModifier(facility.getMonthlySPModifier());
         setPreventAerospace(facility.preventAerospace());
@@ -243,6 +246,14 @@ public class StratconFacility implements Cloneable {
 
     public void setRevealTrack(boolean revealTrack) {
         this.revealTrack = revealTrack;
+    }
+
+    public boolean getIncreaseScanRange() {
+        return increaseScanRange;
+    }
+
+    public void setIncreaseScanRange(boolean increaseScanRange) {
+        this.increaseScanRange = increaseScanRange;
     }
 
     public int getScenarioOddsModifier() {

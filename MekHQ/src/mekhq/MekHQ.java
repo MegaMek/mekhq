@@ -76,6 +76,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.UUID;
 
@@ -206,7 +207,7 @@ public class MekHQ implements GameListener {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
             // TODO: complete integration of Suite Preferences, including GUIPreferences
-            selectedTheme = new ObservableString("selectedTheme", GUIPreferences.UI_THEME);
+            selectedTheme = new ObservableString("selectedTheme", "");
             selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
             preferences.manage(new StringPreference(selectedTheme));
 
@@ -305,6 +306,9 @@ public class MekHQ implements GameListener {
 
         // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
+
+        // log jvm parameters
+        logger.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
     public static void initializeLogging(final String originProject) {
@@ -547,8 +551,7 @@ public class MekHQ implements GameListener {
                 return;
             }
 
-            PostScenarioDialogHandler.handle(
-                campaignGUI, getCampaign(), (AtBScenario) currentScenario, tracker, control);
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
 
             gameThread.requestStop();
         } catch (Exception ex) {
@@ -583,8 +586,7 @@ public class MekHQ implements GameListener {
             return;
         }
 
-        PostScenarioDialogHandler.handle(
-            campaignGUI, getCampaign(), (AtBScenario) selectedScenario, tracker, control);
+        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker, control);
     }
 
     private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
@@ -695,8 +697,8 @@ public class MekHQ implements GameListener {
                 }
                 return;
             }
-            PostScenarioDialogHandler.handle(
-                campaignGUI, getCampaign(), scenario, tracker, autoResolveConcludedEvent.controlledScenario());
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker,
+                autoResolveConcludedEvent.controlledScenario());
         } catch (Exception ex) {
             logger.error("Error during auto resolve concluded", ex);
         }
@@ -754,7 +756,7 @@ public class MekHQ implements GameListener {
 
     public static void updateGuiScaling() {
         System.setProperty("flatlaf.uiScale", Double.toString(GUIPreferences.getInstance().getGUIScale()));
-        setLookAndFeel(GUIPreferences.getInstance().getUITheme());
+        setLookAndFeel(selectedTheme.getValue());
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

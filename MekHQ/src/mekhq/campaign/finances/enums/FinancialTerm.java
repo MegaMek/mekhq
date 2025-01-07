@@ -133,7 +133,7 @@ public enum FinancialTerm {
                 // twelve months if today is in an even quarter or nine months otherwise
                 return endsToday(yesterday, today) ? today.plusMonths(6)
                         : today.with(IsoFields.DAY_OF_QUARTER, 1)
-                                .plusMonths(((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 1) ? 12 : 9);
+                                .plusMonths((today.get(IsoFields.QUARTER_OF_YEAR) % 2 != 0) ? 12 : 9);
             case ANNUALLY:
             default:
                 // First, use today if the term would end today or otherwise adjust to the first
@@ -163,7 +163,7 @@ public enum FinancialTerm {
                 return today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR);
             case SEMIANNUALLY:
                 return (today.get(IsoFields.QUARTER_OF_YEAR) != yesterday.get(IsoFields.QUARTER_OF_YEAR))
-                        && ((today.get(IsoFields.QUARTER_OF_YEAR) % 2) == 1);
+                        && (today.get(IsoFields.QUARTER_OF_YEAR) % 2 != 0);
             case ANNUALLY:
             default:
                 return today.getYear() != yesterday.getYear();

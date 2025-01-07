@@ -400,7 +400,7 @@ public class StratconTab extends CampaignGuiTab {
             }
         }
 
-        // special case text reminding player to complete required scenarios
+        // special case text reminding player to complete Turning Point scenarios
         if (!campaignState.getContract().getCommandRights().isIndependent()) {
             boolean contractIsActive = campaignState.getContract().isActiveOn(getCampaignGui().getCampaign().getLocalDate());
 
@@ -412,7 +412,7 @@ public class StratconTab extends CampaignGuiTab {
                 sb.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>").append(OBJECTIVE_FAILED);
             }
 
-            sb.append(" Maintain Campaign Victory Point count above 0 by completing required scenarios")
+            sb.append(" Maintain Campaign Victory Point count above 0 by completing Turning Point scenarios")
                 .append("</span><br/>");
         }
 

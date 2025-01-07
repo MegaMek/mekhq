@@ -140,7 +140,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             EntityWeightClass.WEIGHT_HEAVY
     };
 
-    public static final int NO_LANCE = -1;
+    public static final int NO_COMBAT_TEAM = -1;
 
     private boolean attacker;
     private int combatTeamId; // -1 if scenario is not generated for a specific lance (special scenario, big
@@ -207,7 +207,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public AtBScenario() {
         super();
-        combatTeamId = -1;
+        combatTeamId = NO_COMBAT_TEAM;
         combatRole = CombatRole.RESERVE;
         alliesPlayer = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
@@ -224,7 +224,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         SB = StratconBiomeManifest.getInstance();
     }
 
-    public void initialize(Campaign c, CombatTeam lance, boolean attacker, LocalDate date) {
+    public void initialize(Campaign campaign, CombatTeam combatTeam, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
         alliesPlayer = new ArrayList<>();
@@ -235,16 +235,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         survivalBonus = new ArrayList<>();
         entityIds = new HashMap<>();
 
-        if (null == lance) {
-            combatTeamId = -1;
+        if (null == combatTeam) {
+            combatTeamId = NO_COMBAT_TEAM;
             combatRole = CombatRole.RESERVE;
         } else {
-            this.combatTeamId = lance.getForceId();
-            combatRole = lance.getRole();
-            setMissionId(lance.getMissionId());
+            this.combatTeamId = combatTeam.getForceId();
+            combatRole = combatTeam.getRole();
+            setMissionId(combatTeam.getMissionId());
 
-            for (UUID id : c.getForce(lance.getForceId()).getAllUnits(true)) {
-                entityIds.put(id, c.getUnit(id).getEntity());
+            for (UUID id : campaign.getForce(combatTeam.getForceId()).getAllUnits(true)) {
+                entityIds.put(id, campaign.getUnit(id).getEntity());
             }
         }
 
@@ -265,7 +265,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             setName(getScenarioTypeDescription());
         }
 
-        initBattle(c);
+        initBattle(campaign);
     }
 
     public String getDesc() {
@@ -702,7 +702,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardScenarioForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (combatRole.isScouting() || combatRole.isTraining()) {
+        if (combatRole.isPatrol() || combatRole.isTraining()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;
@@ -832,7 +832,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                     getContract(campaign).getEnemy()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
-            } else if (getCombatRole().isScouting()) {
+            } else if (getCombatRole().isPatrol()) {
                 /*
                  * Set allied forces to deploy in (6 - speed) turns just as player's units,
                  * but only if not deploying by DropShip.
@@ -888,7 +888,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+
+        if (combatTeam != null) {
+            addEnemyForce(enemyEntities, combatTeam.getWeightClass(campaign), campaign);
+        }
         addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities), campaign);
     }
 
@@ -1975,7 +1979,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return combatRole;
     }
 
-    public CombatTeam getCombatTeamById(Campaign campaign) {
+    public @Nullable CombatTeam getCombatTeamById(Campaign campaign) {
+        if (combatTeamId == NO_COMBAT_TEAM) {
+            return null;
+        }
+
         return campaign.getCombatTeamsTable().get(combatTeamId);
     }
 

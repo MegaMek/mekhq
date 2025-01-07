@@ -1210,9 +1210,9 @@ public class CampaignOptions {
         additionalStrategyDeployment = 1;
         adjustPaymentForStrategy = false;
         atbBattleChance = new int[CombatRole.values().length - 1];
-        atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 40;
-        atbBattleChance[CombatRole.GARRISON.ordinal()] = 20;
-        atbBattleChance[CombatRole.RECON.ordinal()] = 60;
+        atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
+        atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
+        atbBattleChance[CombatRole.PATROL.ordinal()] = 60;
         atbBattleChance[CombatRole.TRAINING.ordinal()] = 10;
         generateChases = true;
 
@@ -6358,9 +6358,9 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
-                    retVal.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[CombatRole.GARRISON.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[CombatRole.RECON.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.MANEUVER.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.FRONTLINE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[CombatRole.PATROL.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
                     retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));

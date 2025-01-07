@@ -422,7 +422,7 @@ public class CombatTeam {
          */
 
         switch (role) {
-            case FRONTLINE: {
+            case MANEUVER: {
                 roll = Compute.randomInt(40) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,
@@ -460,7 +460,7 @@ public class CombatTeam {
                             getBattleDate(campaign.getLocalDate()));
                 }
             }
-            case RECON: {
+            case PATROL: {
                 roll = Compute.randomInt(60) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,
@@ -498,7 +498,7 @@ public class CombatTeam {
                             getBattleDate(campaign.getLocalDate()));
                 }
             }
-            case GARRISON: {
+            case FRONTLINE: {
                 roll = Compute.randomInt(20) + battleTypeMod;
                 if (roll < 1) {
                     return AtBScenarioFactory.createScenario(campaign, this,

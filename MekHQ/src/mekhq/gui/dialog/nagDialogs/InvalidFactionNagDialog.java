@@ -21,96 +21,64 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
-import java.time.LocalDate;
-import java.util.Objects;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.InvalidFactionNagLogic.isFactionInvalid;
 
 /**
- * This class represents a nag dialog displayed when a campaign's faction has become extinct.
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A dialog used to notify the user about an invalid faction in the current campaign.
+ *
+ * <p>
+ * This nag dialog is triggered when the campaign's selected faction is determined to be invalid
+ * for the current campaign date. It evaluates the validity of the faction based on the campaign
+ * date and displays a localized message warning the user about the issue.
+ * </p>
+ *
+ * <strong>Features:</strong>
+ * <ul>
+ *   <li>Checks whether the campaign's faction is valid based on the current in-game date.</li>
+ *   <li>Displays a warning dialog to alert the user when an invalid faction is detected.</li>
+ *   <li>Extends {@link AbstractMHQNagDialog} to ensure consistent behavior with other nag dialogs.</li>
+ * </ul>
  */
 public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "InvalidFactionNagDialog";
-    private static String DIALOG_TITLE = "InvalidFactionNagDialog.title";
-    private static String DIALOG_BODY = "InvalidFactionNagDialog.text";
-
     /**
-     * Checks if the given campaign's faction is valid.
+     * Constructs an {@code InvalidFactionNagDialog} for the given campaign.
      *
-     * @param campaign the campaign to check
-     * @return {@code true} if the campaign's faction is invalid, {@code false} otherwise
+     * <p>
+     * This dialog initializes with the campaign information and sets a localized
+     * message to notify the user about the potential issue involving an invalid faction.
+     * The message includes the commander's address for better clarity.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} associated with this nag dialog.
+     *                 The campaign provides the faction and other details for evaluation.
      */
-    static boolean isFactionInvalid(Campaign campaign) {
-        Faction campaignFaction = campaign.getFaction();
+    public InvalidFactionNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_INVALID_FACTION);
 
-        if (!campaign.getFaction().validIn(campaign.getLocalDate())) {
-            return true;
-        }
-
-        // this is a special handler for FedSuns as they're the main culprit behind the issue of users having invalid factions.
-        // FS and LA campaigns won't trigger the above conditional, because those factions aren't technically ended when the FedSuns forms
-        // they just become dormant.
-        if (Objects.equals(campaignFaction.getShortName(), "LA")) {
-            return lyranAllianceSpecialHandler(campaign);
-        }
-
-        // this is another special handler for FedSuns as they're the main culprit behind the issue of users having invalid factions.
-        if (Objects.equals(campaignFaction.getShortName(), "FS")) {
-            return federatedSunsSpecialHandler(campaign);
-        }
-
-        return false;
+        final String DIALOG_BODY = "InvalidFactionNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Checks if the given campaign falls within the inactive date range of the Federated Suns.
+     * Checks if a nag dialog should be displayed for an invalid faction in the given campaign.
      *
-     * @param campaign The current campaign.
-     * @return Returns {@code true} if the campaign falls within the active date range, otherwise {@code false}.
-     */
-    static boolean federatedSunsSpecialHandler(Campaign campaign) {
-        boolean isAfterActiveDate = campaign.getLocalDate().isAfter(LocalDate.of(3040, 1, 18));
-        boolean isBeforeInactiveDate = campaign.getLocalDate().isBefore(LocalDate.of(3057, 9, 18));
-
-        return isAfterActiveDate && isBeforeInactiveDate;
-    }
-
-    /**
-     * Checks if the given campaign falls within the inactive date range of the Lyran Alliance.
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for an invalid faction has not been ignored in the user options.</li>
+     *     <li>If the faction associated with the campaign is considered invalid.</li>
+     * </ul>
      *
-     * @param campaign The current campaign.
-     * @return Returns {@code true} if the campaign falls within the active date range, otherwise {@code false}.
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    static boolean lyranAllianceSpecialHandler(Campaign campaign) {
-        // the dates picked are chosen as these are when mhq does the bulk of the faction ownership transfers
-        boolean isAfterActiveDate = campaign.getLocalDate().isAfter(LocalDate.of(3040, 1, 18));
-        boolean isBeforeInactiveDate = campaign.getLocalDate().isBefore(LocalDate.of(3067, 4, 20));
+    public static boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_INVALID_FACTION;
 
-        return isAfterActiveDate && isBeforeInactiveDate;
-    }
-
-    //region Constructors
-    /**
-     * Creates a new instance of the {@link InvalidFactionNagDialog} class.
-     *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
-     */
-    public InvalidFactionNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INVALID_FACTION);
-    }
-    //endregion Constructors
-
-    /**
-     * Checks if there is a nag message to display.
-     *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
-     */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey()) && (isFactionInvalid(getCampaign()));
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && (isFactionInvalid(campaign));
     }
 }

@@ -155,11 +155,11 @@ import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -300,6 +300,18 @@ public class Campaign implements ITechManager {
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
+
+    /**
+     * Represents the different types of administrative specializations.
+     * Each specialization corresponds to a distinct administrative role
+     * within the organization.
+     *
+     * <p>These specializations are used to determine administrative roles and responsibilities,
+     * such as by identifying the most senior administrator for a given role.</p>
+     */
+    public enum AdministratorSpecialization {
+        COMMAND, LOGISTICS, TRANSPORT, HR
+    }
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -2118,6 +2130,21 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Retrieves a filtered list of personnel who have at least one combat profession.
+     * <p>
+     * This method filters the list of all personnel to include only those whose primary
+     * or secondary role is designated as a combat role.
+     * </p>
+     *
+     * @return a {@link List} of {@link Person} objects representing combat-capable personnel
+     */
+    public List<Person> getActiveCombatPersonnel() {
+        return getActivePersonnel().stream()
+            .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only active Dependents.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
@@ -2783,19 +2810,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This method finds and returns the most senior command administrator.
-     * It checks for both primary and secondary roles of the administrator.
-     * In case of multiple administrators with the command role, it uses the
-     * {@code outRanksUsingSkillTiebreaker} method to decide the seniority.
+     * Finds and returns the most senior administrator for a specific type of administrative role.
+     * Seniority is determined using the {@link Person#outRanksUsingSkillTiebreaker} method when
+     * there are multiple eligible administrators for the specified role.
      *
-     * @return the senior administrator with a command role, or {@code null} if no such
-     * administrator exists.
+     * <p>The method evaluates both the primary and secondary roles of each administrator
+     * against the provided {@link AdministratorSpecialization} type.</p>
+     *
+     * <p>The valid types of administrative roles are represented by the {@link AdministratorSpecialization} enum:</p>
+     * <ul>
+     *   <li>{@link AdministratorSpecialization#COMMAND} - Command Administrator</li>
+     *   <li>{@link AdministratorSpecialization#LOGISTICS} - Logistics Administrator</li>
+     *   <li>{@link AdministratorSpecialization#TRANSPORT} - Transport Administrator</li>
+     *   <li>{@link AdministratorSpecialization#HR} - HR Administrator</li>
+     * </ul>
+     *
+     * @param type the {@link AdministratorSpecialization} representing the administrative role to check for.
+     *             Passing a {@code null} type will result in an {@link IllegalStateException}.
+     *
+     * @return the most senior {@link Person} with the specified administrative role, or {@code null}
+     *         if no eligible administrator is found.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>The method iterates through all administrators retrieved by {@link #getAdmins()}.</li>
+     *   <li>For each {@link Person}, it checks if their primary or secondary role matches the specified type
+     *       via utility methods like {@code AdministratorRole#isAdministratorCommand}.</li>
+     *   <li>If no eligible administrators exist, the method returns {@code null}.</li>
+     *   <li>If multiple administrators are eligible, the one with the highest seniority is returned.</li>
+     *   <li>Seniority is determined by the {@link Person#outRanksUsingSkillTiebreaker} method,
+     *       which uses a skill-based tiebreaker when necessary.</li>
+     * </ul>
+     *
+     * @throws IllegalStateException if {@code type} is null or an unsupported value.
      */
-    public @Nullable Person getSeniorAdminCommandPerson() {
+    public @Nullable Person getSeniorAdminPerson(AdministratorSpecialization type) {
         Person seniorAdmin = null;
 
         for (Person person : getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorCommand() || person.getSecondaryRole().isAdministratorCommand()) {
+            boolean isEligible = switch (type) {
+                case COMMAND -> person.getPrimaryRole().isAdministratorCommand()
+                    || person.getSecondaryRole().isAdministratorCommand();
+                case LOGISTICS -> person.getPrimaryRole().isAdministratorLogistics()
+                    || person.getSecondaryRole().isAdministratorLogistics();
+                case TRANSPORT -> person.getPrimaryRole().isAdministratorTransport()
+                    || person.getSecondaryRole().isAdministratorTransport();
+                case HR -> person.getPrimaryRole().isAdministratorHR()
+                    || person.getSecondaryRole().isAdministratorHR();
+            };
+
+            if (isEligible) {
                 if (seniorAdmin == null) {
                     seniorAdmin = person;
                     continue;
@@ -3881,21 +3945,20 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            scenario.convertToStub(this, ScenarioStatus.DEFEAT);
-                            addReport("Failure to deploy for " + scenario.getName() + " resulted in defeat.");
-
                             if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
+
+                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
                     } else {
-                        scenario.convertToStub(this, ScenarioStatus.DEFEAT);
+                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         contract.addPlayerMinorBreach();
 
                         addReport("Failure to deploy for " + scenario.getName()
-                                + " resulted in defeat and a minor contract breach.");
+                                + " resulted in a minor contract breach.");
                     }
                 }
             }
@@ -3911,9 +3974,9 @@ public class Campaign implements ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
-                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = s.getCombatTeamId();
+            for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
+                if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(getLocalDate())) {
+                    int forceId = atBScenario.getCombatTeamId();
                     if ((combatTeams.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
@@ -3927,20 +3990,20 @@ public class Campaign implements ITechManager {
                         }
 
                         if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(s.getId(), this);
-                            s.addForces(forceId);
+                            forceIds.get(forceId).setScenarioId(atBScenario.getId(), this);
+                            atBScenario.addForces(forceId);
 
                             addReport(MessageFormat.format(
                                     resources.getString("atbScenarioTodayWithForce.format"),
-                                    s.getName(), forceIds.get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
+                                    atBScenario.getName(), forceIds.get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
                         } else {
                             addReport(MessageFormat.format(
-                                    resources.getString("atbScenarioToday.format"), s.getName()));
+                                    resources.getString("atbScenarioToday.format"), atBScenario.getName()));
                         }
                     } else {
                         addReport(MessageFormat.format(
-                                resources.getString("atbScenarioToday.format"), s.getName()));
+                                resources.getString("atbScenarioToday.format"), atBScenario.getName()));
                     }
                 }
             }
@@ -4013,8 +4076,8 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfMonth() == 1)) {
-            negotiateAdditionalSupportPoints();
+        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)) {
+            negotiateAdditionalSupportPoints(this);
         }
 
         processNewDayATBScenarios();
@@ -4027,87 +4090,6 @@ public class Campaign implements ITechManager {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Handles monthly negotiation of additional support points for active AtB Contracts.
-     * Admin/Transport personnel skill levels and contract start dates are considered during negotiations.
-     * Side effects include state changes and report generation.
-     */
-    public void negotiateAdditionalSupportPoints() {
-        // Fetch a list of all Admin/Transport personnel
-        List<Person> adminTransport = new ArrayList<>();
-
-        for (Person person : getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorTransport()
-                || person.getSecondaryRole().isAdministratorTransport()) {
-                adminTransport.add(person);
-            }
-        }
-
-        // Sort that list based on skill
-        adminTransport.sort((person1, person2) -> {
-            Skill person1Skill = person1.getSkill(S_ADMIN);
-            int person1SkillValue = person1Skill.getLevel() + person1Skill.getBonus();
-
-            Skill person2Skill = person2.getSkill(S_ADMIN);
-            int person2SkillValue = person2Skill.getLevel() + person2Skill.getBonus();
-
-            return Double.compare(person1SkillValue, person2SkillValue);
-        });
-
-        // Fetch a list of all active AtB Contracts and sort that list oldest -> newest
-        List<AtBContract> activeContracts = getActiveAtBContracts();
-
-        List<AtBContract> sortedContracts = activeContracts.stream()
-            .sorted(Comparator.comparing(AtBContract::getStartDate))
-            .toList();
-
-        // Loop through available contracts, rolling for additional Support Points until we run
-        // out of Admin/Transport personnel, or we run out of active contracts
-        for (AtBContract contract : sortedContracts) {
-            if (adminTransport.isEmpty()) {
-                break;
-            }
-
-            int negoatiatedSupportPoints = 0;
-            int maximumSupportPointsNegotiated = contract.getRequiredLances();
-
-            int availableAdmins = adminTransport.size();
-
-            for (int i = 0; i < availableAdmins; i++) {
-                Person assignedAdmin = adminTransport.get(0);
-                adminTransport.remove(0);
-
-                int targetNumber = assignedAdmin.getSkill(S_ADMIN).getFinalSkillValue();
-                int roll = Compute.d6(2);
-
-                if (roll >= targetNumber) {
-                    negoatiatedSupportPoints++;
-
-                    int marginOfSuccess = (roll - targetNumber) / 4;
-
-                    negoatiatedSupportPoints += marginOfSuccess;
-                }
-
-                if (negoatiatedSupportPoints >= maximumSupportPointsNegotiated) {
-                    negoatiatedSupportPoints = maximumSupportPointsNegotiated;
-                    break;
-                }
-            }
-
-            if (negoatiatedSupportPoints > 0) {
-                contract.getStratconCampaignState().addSupportPoints(negoatiatedSupportPoints);
-
-                addReport(String.format(resources.getString("stratConWeeklySupportPoints.text"),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                    negoatiatedSupportPoints, CLOSING_SPAN_TAG, contract.getName()));
-            } else {
-                addReport(String.format(resources.getString("stratConWeeklySupportPointsFailed.text"),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    CLOSING_SPAN_TAG, contract.getName()));
             }
         }
     }
@@ -5005,15 +4987,12 @@ public class Campaign implements ITechManager {
             int personnelCount;
 
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-                personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                    .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
-                    .count();
+                personnelCount = getActiveCombatPersonnel().size();
             } else {
-                personnelCount = (int) getActivePersonnel().stream()
-                    .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                    .count();
+                personnelCount = getActivePersonnel().size();
             }
+
+            personnelCount -= getCurrentPrisoners().size();
             fieldKitchenWithinCapacity = personnelCount <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;
@@ -8751,8 +8730,8 @@ public class Campaign implements ITechManager {
             if (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 getShoppingList().addShoppingItem(partToBuy, toBuy, this);
+                bought += 1;
             }
-            bought += 1;
         }
         return bought;
     }

@@ -16,19 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
-import static mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog.checkForOutstandingScenarios;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.hasOutStandingScenarios;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -38,12 +41,15 @@ import static org.mockito.Mockito.when;
  * This class is a test class for the {@link OutstandingScenariosNagDialog} class.
  * It contains tests for various scenarios related to the {@code checkForOutstandingScenarios} method
  */
-class OutstandingScenariosNagDialogTest {
-    // Mock objects for the tests
+class OutstandingScenariosNagLogicTest {
     private Campaign campaign;
+    private CampaignOptions campaignOptions;
     private AtBContract contract;
     private AtBScenario scenario1, scenario2;
     private LocalDate today;
+
+    protected final transient ResourceBundle resources = ResourceBundle.getBundle(
+        "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
 
     /**
      * Test setup for each test, runs before each test.
@@ -51,80 +57,48 @@ class OutstandingScenariosNagDialogTest {
      */
     @BeforeEach
     void init() {
-        // Initialize the mock objects
         campaign = mock(Campaign.class);
+        campaignOptions = mock(CampaignOptions.class);
         contract = mock(AtBContract.class);
         scenario1 = mock(AtBScenario.class);
         scenario2 = mock(AtBScenario.class);
-        today = LocalDate.now();
+        today = LocalDate.of(3025, 1, 1);
 
-        // When the Campaign mock calls 'getLocalDate()' return today's date
-        when(campaign.getLocalDate()).thenReturn(today);
-    }
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(campaignOptions.isUseStratCon()).thenReturn(false);
 
-    /**
-     * Initializes an {@link AtBContract} containing two instances of {@link AtBScenario}.
-     */
-    private void initializeContractWithTwoScenarios() {
         when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
+        when(campaign.getLocalDate()).thenReturn(today);
         when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
     }
 
-    // In the following tests the checkForOutstandingScenarios() method is called, and its response
-    // is checked against expected behavior
-
     @Test
-    void noContracts() {
-        when(campaign.getActiveAtBContracts(true)).thenReturn(new ArrayList<>());
-
-        assertFalse(checkForOutstandingScenarios(campaign));
-    }
-
-    @Test
-    void noScenarios() {
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
-        when(contract.getCurrentAtBScenarios()).thenReturn(new ArrayList<>());
-
-        assertFalse(checkForOutstandingScenarios(campaign));
-    }
-
-    @Test
-    void noOutstandingScenarios() {
-        initializeContractWithTwoScenarios();
-
-        when(scenario1.getDate()).thenReturn(today.plusDays(1));
-        when(scenario2.getDate()).thenReturn(today.plusDays(1));
-
-        assertFalse(checkForOutstandingScenarios(campaign));
-    }
-
-    @Test
-    void oneOutstandingScenarioFirst() {
-        initializeContractWithTwoScenarios();
-
-        when(scenario1.getDate()).thenReturn(today);
-        when(scenario2.getDate()).thenReturn(today.plusDays(1));
-
-        assertTrue(checkForOutstandingScenarios(campaign));
-    }
-
-    @Test
-    void oneOutstandingScenarioSecond() {
-        initializeContractWithTwoScenarios();
-
-        when(scenario1.getDate()).thenReturn(today.plusDays(1));
-        when(scenario2.getDate()).thenReturn(today);
-
-        assertTrue(checkForOutstandingScenarios(campaign));
-    }
-
-    @Test
-    void twoOutstandingScenarios() {
-        initializeContractWithTwoScenarios();
-
+    public void twoScenariosDueToday() {
         when(scenario1.getDate()).thenReturn(today);
         when(scenario2.getDate()).thenReturn(today);
+        when(scenario1.getHasTrack()).thenReturn(false);
+        when(scenario2.getHasTrack()).thenReturn(false);
 
-        assertTrue(checkForOutstandingScenarios(campaign));
+        assertTrue(hasOutStandingScenarios(campaign));
+    }
+
+    @Test
+    public void oneScenariosDueToday() {
+        when(scenario1.getDate()).thenReturn(today);
+        when(scenario2.getDate()).thenReturn(today.plusDays(1));
+        when(scenario1.getHasTrack()).thenReturn(false);
+        when(scenario2.getHasTrack()).thenReturn(false);
+
+        assertTrue(hasOutStandingScenarios(campaign));
+    }
+
+    @Test
+    public void noScenariosDueToday() {
+        when(scenario1.getDate()).thenReturn(today.plusDays(1));
+        when(scenario2.getDate()).thenReturn(today.plusDays(1));
+        when(scenario1.getHasTrack()).thenReturn(false);
+        when(scenario2.getHasTrack()).thenReturn(false);
+
+        assertFalse(hasOutStandingScenarios(campaign));
     }
 }

@@ -71,7 +71,6 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
@@ -923,9 +922,10 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
-            CombatTeam assignedLance = ((AtBScenario) scenario).getCombatTeamById(getCampaign());
-            if (assignedLance != null) {
-                int assignedForceId = assignedLance.getForceId();
+
+            CombatTeam combatTeam = ((AtBScenario) scenario).getCombatTeamById(getCampaign());
+            if (combatTeam != null) {
+                int assignedForceId = combatTeam.getForceId();
                 int cmdrStrategy = 0;
                 Person commander = getCampaign().getPerson(CombatTeam.findCommander(assignedForceId, getCampaign()));
                 if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
@@ -1302,7 +1302,9 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGetMul.setEnabled(canStartGame);
         btnClearAssignedUnits.setEnabled(canStartGame);
         btnResolveScenario.setEnabled(canStartGame);
-        btnAutoResolveScenario.setEnabled(canStartGame);
+        if (scenario instanceof AtBScenario) {
+            btnAutoResolveScenario.setEnabled(canStartGame);
+        }
         btnPrintRS.setEnabled(canStartGame);
     }
 

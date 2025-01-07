@@ -76,14 +76,11 @@ public class GenerateResupplyContents {
      * @param usePlayerConvoys Indicates whether player convoy cargo capacity should be applied.
      */
     static void getResupplyContents(Resupply resupply, DropType dropType, boolean usePlayerConvoys) {
-        // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
-        // weight by five when picking these items.
-        final int WEIGHT_MULTIPLIER = dropType == DropType.DROP_TYPE_PARTS ? 1 : 5;
-
         double targetCargoTonnage = resupply.getTargetCargoTonnage();
         if (usePlayerConvoys) {
             final int targetCargoTonnagePlayerConvoy = resupply.getTargetCargoTonnagePlayerConvoy();
             final double playerCargoCapacity = resupply.getTotalPlayerCargoCapacity();
+
             targetCargoTonnage = min(targetCargoTonnagePlayerConvoy, playerCargoCapacity);
         }
 
@@ -111,7 +108,8 @@ public class GenerateResupplyContents {
             case DROP_TYPE_AMMO -> ammoBinPool;
         };
 
-        while ((availableSpace > 0) && (!relevantPartsPool.isEmpty())) {
+        double currentLoad = 0;
+        while ((currentLoad < availableSpace) && (!relevantPartsPool.isEmpty())) {
             Part potentialPart = switch(dropType) {
                 case DROP_TYPE_PARTS -> getRandomDrop(partsPool, negotiatorSkill);
                 case DROP_TYPE_ARMOR -> getRandomDrop(armorPool, negotiatorSkill);
@@ -154,13 +152,17 @@ public class GenerateResupplyContents {
                     case DROP_TYPE_AMMO -> ammoBinPool.remove(potentialPart);
                 }
 
-                double partWeight = potentialPart.getTonnage();
-                partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
-                availableSpace -= partWeight * WEIGHT_MULTIPLIER;
+                // Ammo and Armor are delivered in batches of 5t,
+                // so we need to make sure we're treating them as 5t no matter their actual weight.
+                double partWeight = 5;
 
-                if (availableSpace >= 0) {
-                    droppedItems.add(potentialPart);
+                if (dropType == DropType.DROP_TYPE_PARTS) {
+                    partWeight = potentialPart.getTonnage();
+                    partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
                 }
+
+                currentLoad += partWeight;
+                droppedItems.add(potentialPart);
             }
         }
 
@@ -209,11 +211,13 @@ public class GenerateResupplyContents {
      */
     private static void calculateConvoyWorth(Resupply resupply) {
         List<Part> convoyContents = resupply.getConvoyContents();
-        Money value = Money.zero();
+        Money sellValue = Money.zero();
+        Money buyValue = Money.zero();
         for (Part part : convoyContents) {
-            value = value.plus(part.getActualValue());
+            sellValue = sellValue.plus(part.getActualValue());
+            buyValue = buyValue.plus(part.getStickerPrice());
         }
-        resupply.setConvoyContentsValueBase(value);
+        resupply.setConvoyContentsValueBase(buyValue);
 
         ResupplyType resupplyType = resupply.getResupplyType();
         if (resupplyType.equals(ResupplyType.RESUPPLY_LOOT)) {
@@ -223,7 +227,7 @@ public class GenerateResupplyContents {
 
         // Smugglers always double the cost of the supplies they're offering
         if (resupplyType.equals(ResupplyType.RESUPPLY_SMUGGLER)) {
-            resupply.setConvoyContentsValueCalculated(value.multipliedBy(2));
+            resupply.setConvoyContentsValueCalculated(sellValue.multipliedBy(2));
             return ;
         }
 
@@ -256,6 +260,6 @@ public class GenerateResupplyContents {
             case OVERWHELMING -> 1.75;
         };
 
-        resupply.setConvoyContentsValueCalculated(value.multipliedBy(multiplier));
+        resupply.setConvoyContentsValueCalculated(sellValue.multipliedBy(multiplier));
     }
 }

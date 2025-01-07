@@ -27,6 +27,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -49,8 +50,8 @@ public class PostScenarioDialogHandler {
      * @param tracker The tracker that contains all the information about the scenario resolution.
      * @param control Whether the player controlled the battlefield at the end of the scenario.
      */
-    public static void handle(
-        CampaignGUI campaignGUI, Campaign campaign, AtBScenario currentScenario, ResolveScenarioTracker tracker, boolean control) {
+    public static void handle(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario,
+                              ResolveScenarioTracker tracker, boolean control) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
         postCombatMissingInActionToPrisonerOfWarStatus(campaign, tracker, control);
@@ -83,7 +84,7 @@ public class PostScenarioDialogHandler {
         }
     }
 
-    private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign, AtBScenario currentScenario) {
+    private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario) {
         if (!campaign.getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
                 campaign.getMission(currentScenario.getMissionId()), false);

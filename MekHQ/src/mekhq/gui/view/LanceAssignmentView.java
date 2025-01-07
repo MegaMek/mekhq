@@ -44,6 +44,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
+import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
+import static mekhq.campaign.mission.enums.CombatRole.PATROL;
+import static mekhq.campaign.mission.enums.CombatRole.TRAINING;
+
 /**
  * Against the Bot
  * Shows how many lances are required to be deployed on active contracts and
@@ -85,7 +91,7 @@ public class LanceAssignmentView extends JPanel {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof CombatRole) {
-                    list.setToolTipText(((CombatRole) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((CombatRole) value).getToolTipText()));
                 }
                 return this;
             }
@@ -294,7 +300,8 @@ class RequiredLancesTableModel extends DataTableModel {
     public RequiredLancesTableModel(final Campaign campaign) {
         this.campaign = campaign;
         data = new ArrayList<AtBContract>();
-        columnNames = new String[]{"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
+        columnNames = new String[]{"Contract", "Total", MANEUVER.toString(), FRONTLINE.toString(),
+            PATROL.toString(), TRAINING.toString()};
     }
 
     @Override

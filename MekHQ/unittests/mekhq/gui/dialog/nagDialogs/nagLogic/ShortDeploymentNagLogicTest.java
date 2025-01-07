@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.nagDialogs;
+package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
@@ -28,7 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.gui.dialog.nagDialogs.ShortDeploymentNagDialog.checkDeploymentRequirementsMet;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.DeploymentShortfallNagLogic.hasDeploymentShortfall;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -39,11 +39,9 @@ import static org.mockito.Mockito.when;
  * It contains tests for various scenarios related to the {@code checkDeploymentRequirementsMet}
  * method
  */
-public class ShortDeploymentNagDialogTest {
+public class ShortDeploymentNagLogicTest {
     // Mock objects for the tests
     private Campaign campaign;
-    // I know 'location' can be converted to a local variable, but it makes sense to keep all the
-    // mock objects in one place
     private CurrentLocation location;
     private LocalDate monday, sunday;
     private AtBContract contract;
@@ -68,14 +66,11 @@ public class ShortDeploymentNagDialogTest {
         when(campaign.getLocation()).thenReturn(location);
     }
 
-    // In the following tests the checkDeploymentRequirementsMet() method is called, and its
-    // response is checked against expected behavior
-
     @Test
     void notOnPlanet() {
         when(campaign.getLocation().isOnPlanet()).thenReturn(false);
 
-        assertFalse(checkDeploymentRequirementsMet(campaign));
+        assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
@@ -83,7 +78,7 @@ public class ShortDeploymentNagDialogTest {
         when(campaign.getLocation().isOnPlanet()).thenReturn(true);
         when(campaign.getLocalDate()).thenReturn(monday);
 
-        assertFalse(checkDeploymentRequirementsMet(campaign));
+        assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
@@ -93,7 +88,7 @@ public class ShortDeploymentNagDialogTest {
 
         when(campaign.getActiveAtBContracts()).thenReturn(new ArrayList<>());
 
-        assertFalse(checkDeploymentRequirementsMet(campaign));
+        assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
@@ -104,7 +99,7 @@ public class ShortDeploymentNagDialogTest {
         when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
         when(campaign.getDeploymentDeficit(contract)).thenReturn(0);
 
-        assertFalse(checkDeploymentRequirementsMet(campaign));
+        assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
@@ -115,7 +110,7 @@ public class ShortDeploymentNagDialogTest {
         when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
         when(campaign.getDeploymentDeficit(contract)).thenReturn(-3);
 
-        assertFalse(checkDeploymentRequirementsMet(campaign));
+        assertFalse(hasDeploymentShortfall(campaign));
     }
 
     @Test
@@ -126,6 +121,6 @@ public class ShortDeploymentNagDialogTest {
         when(campaign.getActiveAtBContracts()).thenReturn(List.of(contract));
         when(campaign.getDeploymentDeficit(contract)).thenReturn(1);
 
-        assertTrue(checkDeploymentRequirementsMet(campaign));
+        assertTrue(hasDeploymentShortfall(campaign));
     }
 }

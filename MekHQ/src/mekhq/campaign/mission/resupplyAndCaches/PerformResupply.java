@@ -38,29 +38,28 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
+import mekhq.gui.dialog.resupplyAndCaches.*;
 
 import java.util.*;
 import java.util.Map.Entry;
 
-import static java.lang.Math.floor;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.ROUTED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.getResupplyContents;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsMajorityVTOLForces;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogInterception.dialogInterception;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogPlayerConvoyOption.createPlayerConvoyOptionalDialog;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus.createResupplyFocusDialog;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogRoleplayEvent.dialogConvoyRoleplayEvent;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogSwindled.swindledDialog;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -144,7 +143,7 @@ public class PerformResupply {
             // If we're on a guerrilla contract, the player may be approached by smugglers, instead,
             // which won't use player convoys.
             if (!isGuerrilla) {
-                createPlayerConvoyOptionalDialog(resupply, isIndependent);
+                new DialogPlayerConvoyOption(resupply, isIndependent);
 
                 // If the player is on an Independent contract and refuses to use their own transports,
                 // then no resupply occurs.
@@ -154,7 +153,7 @@ public class PerformResupply {
             }
 
             // Then allow the player to pick a focus
-            createResupplyFocusDialog(resupply);
+            new DialogResupplyFocus(resupply);
         }
 
         // With the focus chosen, we determine the contents of the convoy
@@ -169,7 +168,13 @@ public class PerformResupply {
 
         double totalTonnage = 0;
         for (Part part : resupply.getConvoyContents()) {
-            totalTonnage += part.getTonnage() * (part instanceof Armor || part instanceof AmmoBin ? 5 : 1);
+            if (part instanceof AmmoBin) {
+                totalTonnage += RESUPPLY_AMMO_TONNAGE;
+            } else if (part instanceof Armor) {
+                totalTonnage += RESUPPLY_ARMOR_TONNAGE;
+            } else {
+                totalTonnage += part.getTonnage();
+            }
         }
 
         logger.info("totalTonnage: " + totalTonnage);
@@ -209,9 +214,9 @@ public class PerformResupply {
         for (Part part : contents) {
             if (part instanceof AmmoBin) {
                 campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(),
-                    ((AmmoBin) part).getFullShots() * 5);
+                    ((AmmoBin) part).getFullShots() * RESUPPLY_AMMO_TONNAGE);
             } else if (part instanceof Armor) {
-                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
+                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
                 ((Armor) part).setAmount(quantity);
                 campaign.getWarehouse().addPart(part, true);
             } else {
@@ -237,7 +242,7 @@ public class PerformResupply {
         int swindleChance = contract.getMoraleLevel().ordinal();
 
         if (Compute.randomInt(10) < swindleChance) {
-            swindledDialog(resupply);
+            new DialogSwindled(resupply);
         } else {
             final Campaign campaign = resupply.getCampaign();
 
@@ -257,7 +262,6 @@ public class PerformResupply {
     public static void loadPlayerConvoys(Resupply resupply) {
         // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
         // weight by five when picking these items.
-        final int WEIGHT_MULTIPLIER = 5;
         final Campaign campaign = resupply.getCampaign();
         final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
 
@@ -287,8 +291,10 @@ public class PerformResupply {
                 double tonnage = part.getTonnage();
                 tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
-                if (part instanceof AmmoBin || part instanceof Armor) {
-                    tonnage *= WEIGHT_MULTIPLIER;
+                if (part instanceof AmmoBin) {
+                    tonnage = RESUPPLY_AMMO_TONNAGE;
+                } else if (part instanceof Armor) {
+                    tonnage = RESUPPLY_ARMOR_TONNAGE;
                 }
 
                 if (cargoCapacity - tonnage >= 0) {
@@ -328,17 +334,13 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         AtBMoraleLevel morale = contract.getMoraleLevel();
 
-        if (morale.isRouted()) {
-            completeSuccessfulDelivery(resupply, convoyContents);
-        }
-
-        int interceptionChance = morale.ordinal();
-
         // There isn't any chance of an interception if the enemy is Routed, so early-exit
-        if (interceptionChance == ROUTED.ordinal()) {
+        if (morale.isRouted()) {
             completeSuccessfulDelivery(resupply, convoyContents);
             return;
         }
+
+        int interceptionChance = morale.ordinal();
 
         // This chance is modified by convoy weight, for player convoys this is easy - we just
         // calculate the weight of all units in the convoy. For NPC convoys, we need to get a bit
@@ -433,7 +435,8 @@ public class PerformResupply {
                     + Compute.randomInt(50) + STATUS_AFTERWARD);
             }
 
-            dialogConvoyRoleplayEvent(campaign, convoy, eventText);
+            new DialogRoleplayEvent(campaign, convoy, eventText);
+            completeSuccessfulDelivery(resupply, convoyContents);
         }
     }
 
@@ -452,83 +455,6 @@ public class PerformResupply {
             CLOSING_SPAN_TAG));
 
         makeDelivery(resupply, convoyContents);
-    }
-
-    /**
-     * Determines if a convoy only contains VTOL or similar units.
-     *
-     * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param convoy   the {@link Force} representing the convoy to check.
-     * @return {@code true} if the convoy only contains VTOL units, {@code false} otherwise.
-     */
-    private static boolean forceContainsOnlyVTOLForces(Campaign campaign, Force convoy) {
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAirborneVTOLorWIGE()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Determines if a convoy contains a majority of VTOL (or similar) units.
-     *
-     * <p>This is calculated by checking if at least half of the units are VTOLs or similarly
-     * airborne types.</p>
-     *
-     * @param campaign      the {@link Campaign} instance the convoy belongs to.
-     * @param convoy  the {@link Force} representing the convoy being evaluated.
-     * @return {@code true} if the VTOL units constitute at least half of the units, {@code false} otherwise.
-     */
-    private static boolean forceContainsMajorityVTOLForces(Campaign campaign, Force convoy) {
-        Vector<UUID> allUnits = convoy.getAllUnits(false);
-        int convoySize = allUnits.size();
-        int vtolCount = 0;
-
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAirborneVTOLorWIGE()) {
-                vtolCount++;
-            }
-        }
-
-        return vtolCount >= floor((double) convoySize / 2);
-    }
-
-
-    /**
-     * Determines if a convoy only contains aerial units, such as aerospace or conventional fighters.
-     *
-     * @param campaign the {@link Campaign} instance the convoy belongs to.
-     * @param convoy   the {@link Force} representing the convoy to check.
-     * @return {@code true} if the convoy only contains aerial units, {@code false} otherwise.
-     */
-    private static boolean forceContainsOnlyAerialForces(Campaign campaign, Force convoy) {
-        for (UUID unitId : convoy.getAllUnits(false)) {
-            Entity entity = getEntityFromUnitId(campaign, unitId);
-
-            if (entity == null) {
-                continue;
-            }
-
-            if (!entity.isAerospace() && !entity.isConventionalFighter()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -558,7 +484,7 @@ public class PerformResupply {
         final AtBContract contract = resupply.getContract();
 
         // Trigger a dialog to inform the user an interception has taken place
-        dialogInterception(resupply, targetConvoy);
+        new DialogInterception(resupply, targetConvoy);
 
         // Determine which scenario template to use based on convoy state
         String templateAddress = GENERIC;

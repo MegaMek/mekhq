@@ -165,7 +165,7 @@ public class TrainingCombatTeams {
                     }
                 }
 
-                if (educatorSkills.isEmpty()) {
+                if (educatorSkills.isEmpty() || skillsBeingTrained.isEmpty()) {
                     campaign.addReport(String.format(resources.getString("notLearningAnything.text"),
                             trainee.getHyperlinkedFullTitle(), commander.getFullTitle(),
                             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
@@ -207,6 +207,10 @@ public class TrainingCombatTeams {
         } else {
             int newEducationTime = trainee.getEduEducationTime() + WEEK_DURATION;
             trainee.setEduEducationTime(newEducationTime);
+
+            if (skillsBeingTrained.isEmpty()) {
+                return;
+            }
 
             // The lowest skill is improved first
             skillsBeingTrained.sort(Comparator.comparingInt(Skill::getExperienceLevel));

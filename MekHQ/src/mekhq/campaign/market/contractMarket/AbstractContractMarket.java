@@ -12,6 +12,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
@@ -25,6 +26,8 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
@@ -245,7 +248,7 @@ public abstract class AbstractContractMarket {
         } else if (roll <= 9) {
             return SkillLevel.REGULAR;
         } else if (roll <= 11) {
-            return SkillLevel.VETERAN;
+            return VETERAN;
         } else {
             return SkillLevel.ELITE;
         }
@@ -382,65 +385,187 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    /**
+     * Sets the ally rating (skill and quality) for the contract.
+     * The ally rating is determined by modifiers influenced by the employer faction,
+     * contract type, historical context, and a random roll.
+     *
+     * <p>The calculated ally skill and quality ratings are assigned to the contract.</p>
+     *
+     * @param contract the contract for which the ally rating is being set.
+     * @param year     the year of the contract, used for calculating historical modifiers.
+     */
     protected void setAllyRating(AtBContract contract, int year) {
-        int mod = 0;
-        if (contract.getEnemy().isRebelOrPirate()) {
-            mod -= 1;
-        }
+        int mod = calculateFactionModifiers(contract.getEmployerFaction());
+        mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
 
-        if (contract.getContractType().isGuerrillaWarfare() || contract.getContractType().isCadreDuty()) {
-            mod -= 3;
-        } else if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isSecurityDuty()) {
-            mod -= 2;
-        }
-
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mod -= 1;
-        }
-
-        if (contract.getEnemy().isIndependent()) {
-            mod -= 2;
-        }
-
-        if (contract.getContractType().isPlanetaryAssault()) {
-            mod += 1;
-        }
-
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan() && !contract.isAttacker()) {
-            // facing front-line units
-            mod += 1;
-        }
+        // Assign ally skill rating
         contract.setAllySkill(getSkillRating(d6(2) + mod));
-        if (year > 2950 && year < 3039 &&
-            !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            mod -= 1;
+
+        // Apply historical modifiers
+        if (!contract.getEmployerFaction().isClan()) {
+            mod += calculateHistoricalModifiers(year);
+        } else {
+            // Apply Clan clamping
+            if (contract.isAttacker()) {
+                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setAllySkill(VETERAN);
+                }
+            } else {
+                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setAllySkill(SkillLevel.REGULAR);
+                }
+            }
         }
+
+        // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
     }
 
+    /**
+     * Sets the enemy rating (skill and quality) for the contract.
+     * The enemy rating is determined by modifiers based on the enemy faction,
+     * whether the faction is attacking or defending, historical context, and a random roll.
+     *
+     * <p>The calculated enemy skill and quality ratings are assigned to the contract.</p>
+     *
+     * @param contract the contract for which the enemy rating is being set.
+     * @param year     the year of the contract, used for calculating historical modifiers.
+     */
     protected void setEnemyRating(AtBContract contract, int year) {
-        int mod = 0;
-        if (contract.getEnemy().isRebelOrPirate()) {
-            mod -= 2;
-        }
-        if (contract.getContractType().isGuerrillaWarfare()) {
-            mod += 2;
-        }
-        if (contract.getContractType().isPlanetaryAssault()) {
+        Faction enemyFaction = Factions.getInstance().getFaction(contract.getEnemyCode());
+        int mod = calculateFactionModifiers(enemyFaction);
+
+        // Adjust modifiers based on attack/defense roles
+        if (!contract.isAttacker()) {
             mod += 1;
         }
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mod -= 1;
-        }
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            mod += contract.isAttacker() ? 2 : 4;
-        }
+
+        // Assign enemy skill rating
         contract.setEnemySkill(getSkillRating(d6(2) + mod));
-        if (year > 2950 && year < 3039 &&
-            !Factions.getInstance().getFaction(contract.getEnemyCode()).isClan()) {
+
+        // Apply historical modifiers
+        if (!enemyFaction.isClan()) {
+            mod += calculateHistoricalModifiers(year);
+        } else {
+            // Apply Clan clamping
+            if (!contract.isAttacker()) {
+                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setAllySkill(VETERAN);
+                }
+            } else {
+                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setAllySkill(SkillLevel.REGULAR);
+                }
+            }
+        }
+
+        // Assign enemy quality rating
+        contract.setEnemyQuality(getQualityRating(d6(2) + mod));
+    }
+
+    /**
+     * Calculates the modifiers for a faction based on its attributes, such as whether it is:
+     * a rebel, pirate, independent, a minor power, or a Clan faction.
+     *
+     * <p>Faction modifiers are determined as follows:</p>
+     * <ul>
+     *   <li>Rebel or Pirate factions receive a penalty of -3.</li>
+     *   <li>Independent factions receive a penalty of -2.</li>
+     *   <li>Minor powers receive a penalty of -1.</li>
+     *   <li>Clan factions receive a bonus of +4.</li>
+     * </ul>
+     *
+     * @param faction the faction for which the modifiers are being calculated.
+     * @return the calculated modifier for the faction.
+     */
+    private int calculateFactionModifiers(Faction faction) {
+        int mod = 0;
+
+        if (faction.isRebelOrPirate()) {
+            mod -= 3;
+        }
+
+        if (faction.isIndependent()) {
+            mod -= 2;
+        }
+
+        if (faction.isMinorPower()) {
             mod -= 1;
         }
-        contract.setEnemyQuality(getQualityRating(d6(2) + mod));
+
+        if (faction.isClan()) {
+            mod += 4;
+        }
+
+        return mod;
+    }
+
+    /**
+     * Calculates the modifiers for a contract based on its type and whether the faction
+     * is in an attacker role or defender role.
+     *
+     * <p>Contract type modifiers are determined as follows:</p>
+     * <ul>
+     *   <li>Guerrilla Warfare or Cadre Duty incurs a penalty of -3.</li>
+     *   <li>Garrison Duty or Security Duty incurs a penalty of -2.</li>
+     *   <li>An attacking faction receives a bonus of +1.</li>
+     * </ul>
+     *
+     * @param contractType the type of the contract (e.g., Guerrilla Warfare, Cadre Duty, etc.).
+     * @param isAttacker   a boolean indicating whether the faction is in an attacker role.
+     * @return the calculated modifier for the contract type.
+     */
+    private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
+        int mod = 0;
+
+        if (contractType.isGuerrillaWarfare() || contractType.isCadreDuty()) {
+            mod -= 3;
+        } else if (contractType.isGarrisonDuty() || contractType.isSecurityDuty()) {
+            mod -= 2;
+        }
+
+        if (isAttacker) {
+            mod += 1;
+        }
+
+        return mod;
+    }
+
+    /**
+     * Calculates modifiers based on the historical period in which the given year falls.
+     * Modifiers are applied to non-Clan factions based on the progressive degradation or
+     * recovery of combat capabilities during the Succession Wars and Renaissance periods.
+     *
+     * <p>The modifiers are determined as follows:</p>
+     * <ul>
+     *   <li>The Second Succession War (2830-2865): a penalty of -1.</li>
+     *   <li>The Third Succession War (2866-3038): a penalty of -2.</li>
+     *   <li>The Renaissance start period (3039-3049): a penalty of -1.</li>
+     * </ul>
+     *
+     * @param year the year of the contract, which determines the historical period.
+     * @return the calculated historical modifier to be applied.
+     */
+    private int calculateHistoricalModifiers(int year) {
+        final int SECOND_SUCCESSION_WAR_START = 2830;
+        final int THIRD_SUCCESSION_WAR_START = 2866;
+        final int RENAISSANCE_START = 3039;
+        final int RENAISSANCE_END = 3049;
+
+        int mod = 0;
+
+        if ((year >= SECOND_SUCCESSION_WAR_START) && (year < THIRD_SUCCESSION_WAR_START)) {
+            mod -= 1;
+        } else if ((year >= THIRD_SUCCESSION_WAR_START) && (year < RENAISSANCE_START)) {
+            mod -= 2;
+        } else if (year >= RENAISSANCE_START) {
+            if (year < RENAISSANCE_END) {
+                mod -= 1;
+            }
+        }
+
+        return mod;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

@@ -301,10 +301,6 @@ public class CampaignSummary {
 
         if (comparison > 0) {
             report.append("<font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                    .append("'>");
-        } else if (comparison == 0) {
-            report.append("<font color='")
                     .append(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                     .append("'>");
         }
@@ -374,18 +370,14 @@ public class CampaignSummary {
      */
     public String getFacilityReport() {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int personnelCount;
 
+        int personnelCount;
         if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-            personnelCount = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
-                .count();
+            personnelCount = campaign.getActiveCombatPersonnel().size();
         } else {
-            personnelCount = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> !(person.getPrisonerStatus().isFree() && person.getPrimaryRole().isNone()))
-                .count();
+            personnelCount = campaign.getActivePersonnel().size();
         }
+        personnelCount -= campaign.getCurrentPrisoners().size();
 
         StringBuilder report = new StringBuilder();
 
