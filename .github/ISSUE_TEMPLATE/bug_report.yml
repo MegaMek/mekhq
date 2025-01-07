@@ -102,7 +102,7 @@ body:
           required: true
         - label: "I have filled and provided all necessary information above"
           required: true
-        - label: "I have included any and all Custom units and CPNX files (if applicable)"
+        - label: "I have included any and all logs, custom units, and CPNX (save) files"
           required: true
         - label: "I have asked on MegaMek Discord about this issue"
           required: true
