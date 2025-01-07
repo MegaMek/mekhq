@@ -3,6 +3,7 @@ package mekhq.campaign.unit;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -77,8 +78,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      */
     public Set<Unit> loadTransport(Unit[] units, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
-        Set<Entity> oldTransportedEntities = clearTransportedEntities();
-        loadTransportedEntities();
+        //Set<Entity> oldTransportedEntities = clearTransportedEntities();
         for (Unit transportedUnit : units) {
             Unit oldTransport = loadTransport(transportedLocation, transporterType, transportedUnit);
             if (oldTransport != null) {
@@ -133,7 +133,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         if (!Objects.equals(oldTransport, transport)
             && (transportedUnit.getTacticalTransportAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - transportedUnit.transportCapacityUsage(transporterType));
+                getCurrentTransportCapacity(transporterType) - CampaignTransportType.transportCapacityUsage(transporterType,transportedUnit.getEntity()));
         }
         return oldTransport;
     }
@@ -197,26 +197,5 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
                 loadTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(), tacticalTransportedUnit);
             }
         }
-    }
-
-    /**
-     * TransportDetails are meant to be used with transportAssignment
-     *
-     * @return the TransportAssignement used by the class
-     */
-    @Override
-    Class<? extends ITransportAssignment> getRelatedTransportAssignmentType() {
-        return TransportAssignment.class;
-    }
-
-    /**
-     * Helps the menus need to check less when generating
-     *
-     * @see Bay and its subclass's canLoad(Entity unit) methods
-     * @param unit the unit we want to get the Transporter types that could potentially hold it
-     * @return the transporter types that could potentially transport this entity
-     */
-    public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
-        return AbstractTransportedUnitsSummary.mapEntityToTransporters(unit);
     }
 }

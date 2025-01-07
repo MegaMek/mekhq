@@ -27,6 +27,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -57,6 +58,8 @@ import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
@@ -1484,8 +1487,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
             JMenuItem menuItem = new JMenuItem("Unassign Unit from Transport Ship");
             menuItem.addActionListener(evt -> {
-                unassignTransportAction(TransportShipAssignment.class, ShipTransportedUnitsSummary.class,
-                    units.toArray(new Unit[0]));});
+                unassignTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0]));});
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
@@ -1495,25 +1497,25 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
             JMenuItem menuItem = new JMenuItem("Unassign Unit from Tactical Transport");
             menuItem.addActionListener(evt -> {
-                unassignTransportAction(TransportAssignment.class, TacticalTransportedUnitsSummary.class,
-                    units.toArray(new Unit[0]));
+                unassignTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
             });
             menuItem.setEnabled(true);
             popup.add(menuItem);
         }
     }
 
-    private void unassignTransportAction(Class<? extends ITransportAssignment> transportAssignmentType, Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType, Unit... units) {
+    private void unassignTransportAction(CampaignTransportType campaignTransportType, Unit... units) {
         Set<Unit> transportsToUpdate = new HashSet<>();
         for (Unit transportedUnit : units) {
-            ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(transportAssignmentType);
+            ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(campaignTransportType.getTransportAssignmentType());
             transportsToUpdate.add(transportAssignment.getTransport());
-            transportAssignment.getTransport().getTransportedUnitsSummaryType(transportedUnitsSummaryType).unloadTransport(units);
+            transportAssignment.getTransport().getTransportedUnitsSummaryType(campaignTransportType).unloadTransport(transportedUnit);
             MekHQ.triggerEvent(new UnitChangedEvent(transportedUnit));
         }
 
         for (Unit transportToUpdate : transportsToUpdate) {
-            gui.getCampaign().updateTransportInTransports(transportedUnitsSummaryType, transportToUpdate);
+            transportToUpdate.getTransportedUnitsSummaryType(campaignTransportType).initializeTransportCapacity(transportToUpdate.getEntity().getTransports());
+            gui.getCampaign().updateTransportInTransports(campaignTransportType, transportToUpdate);
             MekHQ.triggerEvent(new UnitChangedEvent(transportToUpdate));
 
         }

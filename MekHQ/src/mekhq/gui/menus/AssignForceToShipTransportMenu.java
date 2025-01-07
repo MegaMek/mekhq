@@ -11,18 +11,20 @@ import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+
 public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
     public AssignForceToShipTransportMenu(Campaign campaign, Unit... units) {
-        super(ShipTransportedUnitsSummary.class, campaign, units);
+        super(SHIP_TRANSPORT, campaign, units);
     }
 
     @Override
     protected Set<Class<? extends Transporter>> filterTransporterTypeMenus(final Unit... units) {
-        Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(transportDetailType).keySet());
+        Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(campaignTransportType).keySet());
 
         for (Unit unit : units) {
-            Set<Class<? extends Transporter>> unitTransporterTypes = ShipTransportedUnitsSummary.mapEntityToTransporters(unit.getEntity());
+            Set<Class<? extends Transporter>> unitTransporterTypes = SHIP_TRANSPORT.mapEntityToTransporters(unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {
@@ -46,13 +48,13 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
         }
         Set<Unit> oldTransports = transport.loadShipTransport(transporterType, units);
         if (!oldTransports.isEmpty()) {
-            oldTransports.forEach(oldTransport -> campaign.updateTransportInTransports(transportDetailType, oldTransport));
+            oldTransports.forEach(oldTransport -> campaign.updateTransportInTransports(campaignTransportType, oldTransport));
             oldTransports.forEach(oldTransport -> MekHQ.triggerEvent(new UnitChangedEvent(transport)));
         }
         for (Unit unit : units) {
             MekHQ.triggerEvent(new UnitChangedEvent(unit));
         }
-        campaign.updateTransportInTransports(transportDetailType, transport);
+        campaign.updateTransportInTransports(campaignTransportType, transport);
         MekHQ.triggerEvent(new UnitChangedEvent(transport));
     }
 
