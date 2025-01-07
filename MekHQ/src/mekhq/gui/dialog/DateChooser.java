@@ -66,6 +66,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
     private static final MMLogger logger = MMLogger.create(DateChooser.class);
 
+    private static final LocalDate MIN_DATE = LocalDate.of(3470, 1, 1);
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
     private static final String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
@@ -566,11 +567,31 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     private boolean updateDateFromDateField() {
         LocalDate newDate = parseDate(dateField.getText());
+
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this,
+            JOptionPane.showMessageDialog(null,
                 "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
-                    JOptionPane.WARNING_MESSAGE);
+                JOptionPane.WARNING_MESSAGE);
             return false;
+        }
+
+        if (newDate.isBefore(MIN_DATE)) {
+            int choice = JOptionPane.showOptionDialog(
+                null,
+                resources.getString("minDate.body"),
+                resources.getString("minDate.title"),
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null, // Use default icon
+                new String[]{
+                    resources.getString("minDate.confirm"),
+                    resources.getString("minDate.cancel")},
+                resources.getString("minDate.cancel")
+            );
+
+            if (choice != JOptionPane.YES_OPTION) {
+                return false;
+            }
         }
 
         setDate(newDate);
