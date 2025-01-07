@@ -66,7 +66,6 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 public class DateChooser extends JDialog implements ActionListener, FocusListener, KeyListener {
     private static final MMLogger logger = MMLogger.create(DateChooser.class);
 
-    private static final LocalDate MIN_DATE = LocalDate.of(3470, 1, 1);
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
     private static final String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
