@@ -45,13 +45,14 @@ import java.util.Map.Entry;
 
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.ROUTED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_AMMO;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_ARMOR;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.DropType.DROP_TYPE_PARTS;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.getResupplyContents;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsMajorityVTOLForces;
@@ -167,7 +168,13 @@ public class PerformResupply {
 
         double totalTonnage = 0;
         for (Part part : resupply.getConvoyContents()) {
-            totalTonnage += part.getTonnage() * (part instanceof Armor || part instanceof AmmoBin ? 5 : 1);
+            if (part instanceof AmmoBin) {
+                totalTonnage += RESUPPLY_AMMO_TONNAGE;
+            } else if (part instanceof Armor) {
+                totalTonnage += RESUPPLY_ARMOR_TONNAGE;
+            } else {
+                totalTonnage += part.getTonnage();
+            }
         }
 
         logger.info("totalTonnage: " + totalTonnage);
@@ -207,9 +214,9 @@ public class PerformResupply {
         for (Part part : contents) {
             if (part instanceof AmmoBin) {
                 campaign.getQuartermaster().addAmmo(((AmmoBin) part).getType(),
-                    ((AmmoBin) part).getFullShots() * 5);
+                    ((AmmoBin) part).getFullShots() * RESUPPLY_AMMO_TONNAGE);
             } else if (part instanceof Armor) {
-                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * 5);
+                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
                 ((Armor) part).setAmount(quantity);
                 campaign.getWarehouse().addPart(part, true);
             } else {
@@ -255,7 +262,6 @@ public class PerformResupply {
     public static void loadPlayerConvoys(Resupply resupply) {
         // Ammo and Armor are delivered in batches of 5, so we need to make sure to multiply their
         // weight by five when picking these items.
-        final int WEIGHT_MULTIPLIER = 5;
         final Campaign campaign = resupply.getCampaign();
         final Map<Force, Double> playerConvoys = resupply.getPlayerConvoys();
 
@@ -285,8 +291,10 @@ public class PerformResupply {
                 double tonnage = part.getTonnage();
                 tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
-                if (part instanceof AmmoBin || part instanceof Armor) {
-                    tonnage *= WEIGHT_MULTIPLIER;
+                if (part instanceof AmmoBin) {
+                    tonnage = RESUPPLY_AMMO_TONNAGE;
+                } else if (part instanceof Armor) {
+                    tonnage = RESUPPLY_ARMOR_TONNAGE;
                 }
 
                 if (cargoCapacity - tonnage >= 0) {
@@ -326,17 +334,13 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         AtBMoraleLevel morale = contract.getMoraleLevel();
 
-        if (morale.isRouted()) {
-            completeSuccessfulDelivery(resupply, convoyContents);
-        }
-
-        int interceptionChance = morale.ordinal();
-
         // There isn't any chance of an interception if the enemy is Routed, so early-exit
-        if (interceptionChance == ROUTED.ordinal()) {
+        if (morale.isRouted()) {
             completeSuccessfulDelivery(resupply, convoyContents);
             return;
         }
+
+        int interceptionChance = morale.ordinal();
 
         // This chance is modified by convoy weight, for player convoys this is easy - we just
         // calculate the weight of all units in the convoy. For NPC convoys, we need to get a bit
