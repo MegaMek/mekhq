@@ -173,7 +173,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // except if there is already a non-cloaked scenario here.
         if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
             menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Manage Force Assignment");
+            menuItemManageForceAssignments.setText("Manage Deployment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
@@ -185,7 +185,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             if (backingScenario != null && !backingScenario.isCloaked()) {
                 menuItemManageScenario = new JMenuItem();
-                menuItemManageScenario.setText("Manage Reinforcements");
+
+                if (scenario.getCurrentState().equals(UNRESOLVED)) {
+                    menuItemManageScenario.setText("Manage Deployment");
+                } else {
+                    menuItemManageScenario.setText("Manage Reinforcements");
+                }
+
                 menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 menuItemManageScenario.addActionListener(this);
                 rightClickMenu.add(menuItemManageScenario);
@@ -268,9 +274,9 @@ public class StratconPanel extends JPanel implements ActionListener {
                 rightClickMenu.add(removeScenarioItem);
 
                 JMenuItem resetDeploymentItem = new JMenuItem();
-                removeScenarioItem.setText("Reset Deployment (GM)");
-                removeScenarioItem.setActionCommand(RCLICK_COMMAND_RESET_DEPLOYMENT);
-                removeScenarioItem.addActionListener(this);
+                resetDeploymentItem.setText("Reset Deployment (GM)");
+                resetDeploymentItem.setActionCommand(RCLICK_COMMAND_RESET_DEPLOYMENT);
+                resetDeploymentItem.addActionListener(this);
                 rightClickMenu.add(resetDeploymentItem);
             }
         }

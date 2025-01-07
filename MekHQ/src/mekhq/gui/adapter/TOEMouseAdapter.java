@@ -60,8 +60,7 @@ import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 
-public class
-TOEMouseAdapter extends JPopupMenuAdapter {
+public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
 
     private final CampaignGUI gui;
