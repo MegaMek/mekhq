@@ -4492,76 +4492,76 @@ public class Unit implements ITechnology {
         addDriver(p, false);
     }
 
-    public void addDriver(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void addDriver(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        drivers.add(p);
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        drivers.add(person);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void addGunner(Person p) {
         addGunner(p, false);
     }
 
-    public void addGunner(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void addGunner(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        gunners.add(p);
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        gunners.add(person);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void addVesselCrew(Person p) {
         addVesselCrew(p, false);
     }
 
-    public void addVesselCrew(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void addVesselCrew(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        vesselCrew.add(p);
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        vesselCrew.add(person);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void setNavigator(Person p) {
         setNavigator(p, false);
     }
 
-    public void setNavigator(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void setNavigator(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        navigator = p;
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        navigator = person;
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public boolean isTechOfficer(@Nullable Person p) {
@@ -4572,19 +4572,19 @@ public class Unit implements ITechnology {
         setTechOfficer(p, false);
     }
 
-    public void setTechOfficer(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void setTechOfficer(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        techOfficer = p;
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        techOfficer = person;
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void setTech(Person p) {
@@ -4648,7 +4648,7 @@ public class Unit implements ITechnology {
             ServiceLogger.addedToTOEForce(getCampaign(), person, getCampaign().getLocalDate(),
                     getCampaign().getForceFor(this));
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     /**
@@ -4681,7 +4681,7 @@ public class Unit implements ITechnology {
                 engineer = null;
             }
             resetPilotAndEntity();
-            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
+            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
         }
 
         if (log) {
