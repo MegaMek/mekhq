@@ -503,7 +503,9 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                updateEnemy(campaign, today); // mix it up a little
+                if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
+                    updateEnemy(campaign, today); // mix it up a little
+                }
             }
 
             return;
