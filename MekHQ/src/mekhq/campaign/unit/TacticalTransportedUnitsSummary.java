@@ -67,31 +67,31 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         }
     }
 
-    /** TODO comment fixing
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
-     * this data
+    /**
+     * Transporter loading utility used when assigning units to transport units
+     * For each passed-in unit, this will assign the unit to the type of
+     * Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param units Vector of units that we wish to load into this transport
-     * @return the old transports of the units, or an empty set if none
+     * @param transporterType type (Class) of bay or Transporter
+     * @param units units being loaded
+     * @return old transports; what were  the units' previous transport, if they had one
      */
     public Set<Unit> loadTransport(Class<? extends Transporter> transporterType, Unit... units) {
         return loadTransport(units, null, transporterType);
     }
 
-    /** TODO comment fixing
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
-     * this data
+
+    /**
+     * Transporter loading utility used when assigning units to transport units
+     * For each passed-in unit, this will assign the unit to the specified bay,
+     * or the type of Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param units Vector of units that we wish to load into this transport
-     * @return the old transports of the units, or an empty set if none
+     * @param units units being loaded
+     * @param transportedLocation specific bay (Transporter), or null
+     * @param transporterType type (Class) of bay or Transporter
+     * @return old transports; what were  the units' previous transport, if they had one
      */
     public Set<Unit> loadTransport(Unit[] units, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
@@ -108,17 +108,17 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         return oldTransports;
     }
 
+
     /**
-     * TODO comment fixing
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
-     * this data
+     * Transporter loading utility used when assigning units to transport units
+     * For the passed in unit, this will assign the unit to the specified bay,
+     * or the type of Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param unit Unit we wish to load
-     * @return the old transport of the unit, or an empty set if none
+     * @param transportedLocation specific bay, or null
+     * @param transporterType type (Class) of bay or Transporter
+     * @param transportedUnit unit being loaded
+     * @return old transport; what was the unit's previous transport, if it had one
      */
     public Unit loadTransport(@Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType, Unit transportedUnit) {
         Unit oldTransport = null;
@@ -228,6 +228,13 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         return TransportAssignment.class;
     }
 
+    /**
+     * Helps the menus need to check less when generating
+     *
+     * @see Bay and its subclass's canLoad(Entity unit) methods
+     * @param unit the unit we want to get the Transporter types that could potentially hold it
+     * @return the transporter types that could potentially transport this entity
+     */
     public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
         return AbstractTransportedUnitsSummary.mapEntityToTransporters(unit);
     }

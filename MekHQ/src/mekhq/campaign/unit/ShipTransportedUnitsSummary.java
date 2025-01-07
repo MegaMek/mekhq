@@ -10,7 +10,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
     /**
      * Initialize the transport details for a transport ship
-     * @param transporters
+     * @param transport unit this summary is about
      */
     public ShipTransportedUnitsSummary(Unit transport) {
         super(transport);
@@ -84,15 +84,18 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         }
     }
 
+
     /**
      * Bay loading utility used when assigning units to bay-equipped transport units
      * For each passed-in unit, this will find the first available, transport bay
      * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
+     * both the target bay and the transport ship. Once in the MM lobby,
      * this data
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param transportedUnits Vector of units that we wish to load into this transport
+     * @param transportedUnits units being loaded
+     * @param transporterType type (Class) of bay or Transporter
+     * @return old transports; what were  the units' previous transport, if they had one?
      */
     public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, Class<? extends Transporter> transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
@@ -211,6 +214,13 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         return TransportShipAssignment.class;
     }
 
+    /**
+     * Helps the menus need to check less when generating
+     *
+     * @see Bay and its subclass's canLoad(Entity unit) methods
+     * @param unit the unit we want to get the Transporter types that could potentially hold it
+     * @return the transporter types that could potentially transport this entity
+     */
     public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
         Set<Class<? extends Transporter>> transporters = AbstractTransportedUnitsSummary.mapEntityToTransporters(unit);
         transporters.remove(InfantryCompartment.class);

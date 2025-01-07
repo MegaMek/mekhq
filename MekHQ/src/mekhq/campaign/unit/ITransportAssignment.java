@@ -62,7 +62,7 @@ public interface ITransportAssignment {
 
     /**
      * After loading UnitRefs need converted to Units
-     * @see Unit::fixReferences(Campaign campaign)
+     * @see Unit#fixReferences(Campaign campaign)
      * @param campaign Campaign we need to fix references for
      * @param unit Unit we need to fix references for
      */

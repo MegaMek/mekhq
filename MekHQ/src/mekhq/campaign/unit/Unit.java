@@ -1815,6 +1815,7 @@ public class Unit implements ITechnology {
      * this data
      * will be used to actually load the unit into a bay on the transport.
      *
+     * @param transporterType type (Class) of Transporter to transport the units in
      * @param units Vector of units that we wish to load into this transport
      */
     public Set<Unit> loadShipTransport(Class<? extends Transporter> transporterType, Unit... units) {
@@ -1949,10 +1950,8 @@ public class Unit implements ITechnology {
     /**
      * Adds a unit to our set of transported units.
      *
-     * @param unit The unit being transported by this instance.
-     * @param transportedLocation Where this unit is being transported
-     * @param transporterType the type of transporter this unit is in
-     * @return the old transport of the unit, or null if it didn't have one
+     * @param transportedUnit The unit being transported by this instance.
+
      */
     private void addTacticalTransportedUnit(Unit transportedUnit) {
         getTacticalTransportedUnitsSummary().addTransportedUnit(Objects.requireNonNull(transportedUnit));
@@ -1980,30 +1979,29 @@ public class Unit implements ITechnology {
         getTacticalTransportedUnitsSummary().unloadFromTransport(transportedUnit);
     }
 
-    /** TODO comment fixing
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
-     * this data
+    /**
+     * Transporter loading utility used when assigning units to transport units
+     * For each passed-in unit, this will assign the unit to the specified bay,
+     * or the type of Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param units Vector of units that we wish to load into this transport
+     * @param transporterType type (Class) of bay or Transporter
+     * @param units units being loaded
      * @return the old transports of the units, or an empty set if none
      */
     public Set<Unit> loadTacticalTransport(Class<? extends Transporter> transporterType, Unit... units) {
         return getTacticalTransportedUnitsSummary().loadTransport(units, null, transporterType);
     }
 
-    /** TODO comment fixing
-     * Bay loading utility used when assigning units to bay-equipped transport units
-     * For each passed-in unit, this will find the first available, transport bay
-     * and set
-     * both the target bay and the UUID of the transport ship. Once in the MM lobby,
-     * this data
+    /**
+     * Transporter loading utility used when assigning units to transport units
+     * For each passed-in unit, this will assign the unit to the specified bay,
+     * or the type of Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param unit Unit we wish to load
+     * @param transportedUnit Unit we wish to load
+     * @param transportedLocation specific bay (Transporter), or null
+     * @param transporterType type (Class) of bay or Transporter
      * @return the old transport of the unit, or an empty set if none
      */
     public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
@@ -2020,8 +2018,9 @@ public class Unit implements ITechnology {
 
     /**
      * Most slots are 1:1, infantry use their tonnage in some cases
-     * @param unit
-     * @return how much capacity this unit uses when being transported
+     *
+     * @param transporterType type (Class) of Transporter
+     * @return how much capacity this unit uses when being transported in this kind of transporter
      */
     public double transportCapacityUsage(Class< ? extends Transporter> transporterType) { //TODO This shouldn't be here, help me find a new home for this!
         if (InfantryBay.class.isAssignableFrom(transporterType)

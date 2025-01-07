@@ -63,8 +63,8 @@ public class TransportShipAssignment extends TransportAssignment{
      * After loading UnitRefs need converted to Units
      *
      * @param campaign Campaign we need to fix references for
-     * @param unit
-     * @see Unit::fixReferences(Campaign campaign)
+     * @param unit the unit that needs references fixed
+     * @see Unit#fixReferences(Campaign campaign)
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
