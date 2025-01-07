@@ -33,16 +33,17 @@ public class CampaignTransporterMap {
 
     private void addTransporterToCapacityMap(Unit transport, Class<? extends Transporter> transporterType) {
         double capacity = transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType).getCurrentTransportCapacity(transporterType);
-        Map<Double, Set<UUID>> capacityMap = transportersMap.getOrDefault(transporterType, new HashMap<Double, Set<UUID>>());
-        Set<UUID> unitIds = capacityMap.getOrDefault(capacity, new HashSet<UUID>());
+        Map<Double, Set<UUID>> capacityMap = transportersMap.getOrDefault(transporterType, new HashMap<>());
+        Set<UUID> unitIds = capacityMap.getOrDefault(capacity, new HashSet<>());
         unitIds.add(transport.getId());
         capacityMap.put(capacity, unitIds);
         transportersMap.put(transporterType, capacityMap);
     }
 
     /**
-     * This will update the transport in the transports list with new capacities
-     * @param transport
+     * This will update the transport in the transport capacity
+     * map with new capacities
+     * @param transport Unit to get update our stored capacity
      */
     public void updateTransportInTransporterMap(Unit transport) {
         AbstractTransportedUnitsSummary transportedUnitsSummary = transport.getTransportedUnitsSummaryType(transportedUnitsSummaryType);
@@ -57,9 +58,7 @@ public class CampaignTransporterMap {
                 //Then we iterate through the existing capacities in the map, and either remove or add this transport as needed
                 for (Double capacity : oldCapacities) {
                     if (transportersMap.get(transporterType).get(capacity).contains(transport.getId())) {
-                        if (Objects.equals(capacity, newCapacity)) {
-                            continue; // The transport is already stored with the correct capacity
-                        } else {
+                        if (!Objects.equals(capacity, newCapacity)) { // If it's correct, we don't need to change it
                             transportersMap.get(transporterType).get(capacity).remove(transport.getId());
                         }
                     } else if (Objects.equals(capacity, newCapacity)) {
@@ -68,7 +67,7 @@ public class CampaignTransporterMap {
                 }
             }
             else {
-                logger.error("Invalid transporter type: " + transporterType);
+                logger.error(String.format("Invalid transporter type %s", transporterType));
             }
         }
     }
@@ -78,7 +77,8 @@ public class CampaignTransporterMap {
     }
 
     /**
-     * Returns list of transports
+     * Returns a Map that maps Transporter types to another
+     * Map that maps capacity (Double) to UUID of transports
      *
      * @return units that have space for that transport type
      */

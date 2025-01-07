@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.ShipTransportedUnitsSummary;
+import mekhq.campaign.unit.TacticalTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
@@ -437,7 +438,7 @@ public class CampaignXmlParser {
             //Update the campaign transport availability if this is a transport.
             //If it's empty we should be able to just ignore it
             if (unit.hasTacticalTransportedUnits()) {
-                retVal.updateTransportInTacticalTransports(unit);
+                retVal.updateTransportInTransports(TacticalTransportedUnitsSummary.class, unit);
             }
 
             if (unit.hasShipTransportedUnits()) {
