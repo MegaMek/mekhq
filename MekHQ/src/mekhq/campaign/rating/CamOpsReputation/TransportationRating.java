@@ -261,8 +261,7 @@ public class TransportationRating {
             Entity entity = unit.getEntity();
 
             // Skip the unit if it doesn't meet the specific criteria
-            if (!(entity.isDropShip()) && !(entity.isJumpShip())
-                    && !(entity.isWarShip()) && !(entity.isSmallCraft())) {
+            if (!entity.isSmallCraft() && !entity.isLargeCraft()) {
                 continue;
             }
 
