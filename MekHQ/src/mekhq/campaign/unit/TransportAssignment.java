@@ -60,7 +60,7 @@ public class TransportAssignment implements ITransportAssignment {
     /**
      * Change the transport assignment to have a new transport
      *
-     * @param transport new transport, or null if none
+     * @param newTransport transport, or null if none
      * @return true if a unit was provided, false if it was null
      */
     protected boolean setTransport(Unit newTransport) {
@@ -122,7 +122,8 @@ public class TransportAssignment implements ITransportAssignment {
      * After loading UnitRefs need converted to Units
      *
      * @param campaign Campaign we need to fix references for
-     * @see Unit::fixReferences(Campaign campaign)
+     * @param unit the unit that needs references fixed
+     * @see Unit#fixReferences(Campaign campaign)
      */
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {

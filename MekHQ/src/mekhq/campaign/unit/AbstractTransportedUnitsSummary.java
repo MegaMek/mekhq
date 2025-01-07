@@ -246,9 +246,10 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     /**
+     * Helps the menus need to check less when generating
      *
      * @see Bay and its subclass's canLoad(Entity unit) methods
-     * @param entity
+     * @param unit the unit we want to get the Transporter types that could potentially hold it
      * @return the transporter types that could potentially transport this entity
      */
     public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
