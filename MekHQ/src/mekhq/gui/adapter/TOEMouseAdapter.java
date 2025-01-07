@@ -1142,7 +1142,7 @@ TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllForcesDeployed(forces)) {
-                menuItem = new JMenuItem("Undeploy Force (GM)");
+                menuItem = new JMenuItem("Undeploy Force");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
 
@@ -1156,7 +1156,7 @@ TOEMouseAdapter extends JPopupMenuAdapter {
                         break;
                     }
                 }
-                menuItem.setEnabled(gui.getCampaign().isGM() && enable);
+                menuItem.setEnabled(enable);
                 popup.add(menuItem);
             }
 
@@ -1669,7 +1669,7 @@ TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                menuItem.setEnabled(gui.getCampaign().isGM() && enable);
+                menuItem.setEnabled(enable);
                 popup.add(menuItem);
             }
 
