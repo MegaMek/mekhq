@@ -1925,9 +1925,7 @@ public class StratconRulesManager {
         // by default, certain conditions may make this bigger
         scenario.setRequiredPlayerLances(1);
 
-        // do an appropriate allied force if the contract calls for it
-        // do any attached or integrated units
-        setAlliedForceModifier(scenario, contract);
+        // do any facility or global modifiers
         applyFacilityModifiers(scenario, track, coords);
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
@@ -2010,50 +2008,6 @@ public class StratconRulesManager {
                 modifier.setAdditionalBriefingText('(' + facility.getDisplayableName() + ") "
                     + modifier.getAdditionalBriefingText());
                 scenario.getBackingScenario().addScenarioModifier(modifier);
-            }
-        }
-    }
-
-    /**
-     * Set up the appropriate primary allied force modifier, if any
-     *
-     * @param contract The scenario's contract.
-     */
-    private static void setAlliedForceModifier(StratconScenario scenario, AtBContract contract) {
-        int alliedUnitOdds = 0;
-
-        // first, we determine the odds of having an allied unit present
-        // TODO: move this override out to the contract definition
-        if (contract.getContractType().isReliefDuty()) {
-            alliedUnitOdds = 50;
-        } else {
-            switch (contract.getCommandRights()) {
-                case INTEGRATED:
-                    alliedUnitOdds = 50;
-                    break;
-                case HOUSE:
-                    alliedUnitOdds = 30;
-                    break;
-                case LIAISON:
-                    alliedUnitOdds = 10;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-
-        // if an allied unit is present, then we want to make sure that
-        // it's ground units for ground battles
-        if (randomInt(100) <= alliedUnitOdds) {
-            if ((backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere)
-                    || (backingScenario.getTemplate().mapParameters.getMapLocation() == Space)) {
-                backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
-            } else {
-                backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
             }
         }
     }
