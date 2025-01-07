@@ -2,6 +2,7 @@ package mekhq.gui.menus;
 
 import megamek.common.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -15,13 +16,13 @@ import java.util.stream.Stream;
 public abstract class AssignForceToTransportMenu extends JScrollableMenu {
 
     final Campaign campaign;
-    final Class<? extends AbstractTransportedUnitsSummary> transportDetailType;
+    final CampaignTransportType campaignTransportType;
 
     // region Constructors
-    public AssignForceToTransportMenu(Class<? extends AbstractTransportedUnitsSummary> transportDetailType, final Campaign campaign, final Unit... units) {
-        super(transportDetailType.getName());
+    public AssignForceToTransportMenu(CampaignTransportType campaignTransportType, final Campaign campaign, final Unit... units) {
+        super(campaignTransportType.getName());
         this.campaign = campaign;
-        this.transportDetailType = transportDetailType;
+        this.campaignTransportType = campaignTransportType;
         initialize(units);
     }
     // endregion Constructors
@@ -34,7 +35,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
          * 3) No transports available
          */
         if ((units.length == 0) || (Stream.of(units).anyMatch(unit -> !unit.isAvailable()))
-            || (!campaign.hasTransports(transportDetailType))) {
+            || (!campaign.hasTransports(campaignTransportType))) {
             return;
         }
 
@@ -45,7 +46,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
 
         //TODO
         //setText(resources.getString(""));
-        setText(String.format("Assign Unit to %s Transport", transportDetailType.getName()));
+        setText(String.format("Assign Unit to %s Transport", campaignTransportType.getName()));
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
         }
@@ -64,10 +65,10 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         for (Class<? extends Transporter> transporterType : filterTransporterTypeMenus(units)) {
             double requiredTransportCapacity = 0.0;
             for (Unit unit : units) {
-                requiredTransportCapacity += unit.transportCapacityUsage(transporterType);
+                requiredTransportCapacity += CampaignTransportType.transportCapacityUsage(transporterType, unit.getEntity());
             }
 
-            Set<Unit> transports = campaign.getTransportsByType(transportDetailType, transporterType, requiredTransportCapacity);
+            Set<Unit> transports = campaign.getTransportsByType(campaignTransportType, transporterType, requiredTransportCapacity);
 
             if (!transports.isEmpty()) {
                 //TODO
@@ -89,7 +90,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         for (Unit transport : transports) {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
             transportMenu.setText(transport.getName()
-                + " | Space Remaining: " + transport.getCurrentTransportCapacity(transportDetailType, transporterType)); //TODO
+                + " | Space Remaining: " + transport.getCurrentTransportCapacity(campaignTransportType, transporterType)); //TODO
             //TODO hacky implementation
             transportMenu.addActionListener(evt -> { transportMenuAction(evt, transporterType, transport, units); });
 

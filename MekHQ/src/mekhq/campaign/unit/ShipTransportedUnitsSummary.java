@@ -3,6 +3,7 @@ package mekhq.campaign.unit;
 import megamek.common.*;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
     @Override
     public void unloadTransport(Unit... transportedUnits) {
         super.unloadTransport(transportedUnits);
+
     }
 
     @Override
@@ -46,9 +48,8 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         // assignment is actually to us!).
         if (transportedUnit.hasTransportShipAssignment()
             && transportedUnit.getTransportShipAssignment().getTransportShip().equals(transport)) {
-
             transportedUnit.setTransportShipAssignment(null);
-            initializeTransportCapacity(transport.getEntity().getTransports());
+
         }
     }
 
@@ -67,15 +68,14 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      */
     public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, Class<? extends Transporter> transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
-        Set<Entity> oldTransportedEntities = clearTransportedEntities();
-        loadTransportedEntities();
+        //Set<Entity> oldTransportedEntities = clearTransportedEntities();
         for (Unit transportedUnit : transportedUnits) {
             Unit oldTransport = loadTransport(transporterType, transportedUnit);
             if (oldTransport != null) {
                 oldTransports.add(oldTransport);
             }
         }
-        transport.initializeShipTransportSpace();;
+        transport.initializeShipTransportSpace();
         return oldTransports;
     }
 
@@ -96,7 +96,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
         if ((transportedUnit.getEntity() != null)) {
             if (transport.getEntity() != null) {
-                loadEntity(transportedUnit.getEntity());
+                //loadEntity(transportedUnit.getEntity());
             }
             // This shouldn't happen, but it'd be really annoying to debug if it did
             if ((transportedUnit.getEntity().getBayById(bayNumber) != null && transportedUnit.getEntity().getBayById(bayNumber).getClass() != transporterType)) {
@@ -110,7 +110,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         if (!Objects.equals(oldTransport, transport)
             && (transportedUnit.getTransportShipAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - transportedUnit.transportCapacityUsage(transporterType));
+                getCurrentTransportCapacity(transporterType) - CampaignTransportType.transportCapacityUsage(transporterType, transportedUnit.getEntity()));
         }
         return oldTransport;
     }
@@ -170,33 +170,4 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         }
         replaceTransportedUnits(newTransportedUnits);
     }
-
-    /**
-     * TransportDetails are meant to be used with transportAssignment
-     *
-     * @return the TransportAssignement used by the class
-     */
-    @Override
-    Class<? extends ITransportAssignment> getRelatedTransportAssignmentType() {
-        return TransportShipAssignment.class;
-    }
-
-    /**
-     * Helps the menus need to check less when generating
-     *
-     * @see Bay and its subclass's canLoad(Entity unit) methods
-     * @param unit the unit we want to get the Transporter types that could potentially hold it
-     * @return the transporter types that could potentially transport this entity
-     */
-    public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
-        Set<Class<? extends Transporter>> transporters = AbstractTransportedUnitsSummary.mapEntityToTransporters(unit);
-        transporters.remove(InfantryCompartment.class);
-        transporters.remove(BattleArmorHandles.class);
-        transporters.remove(BattleArmorHandlesTank.class);
-        transporters.remove(ClampMountMek.class);
-        transporters.remove(ClampMountTank.class);
-
-        return transporters;
-    }
-
 }

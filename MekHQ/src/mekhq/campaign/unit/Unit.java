@@ -42,6 +42,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
@@ -79,6 +80,8 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.*;
@@ -302,58 +305,56 @@ public class Unit implements ITechnology {
 
     public void initializeShipTransportSpace() {
         // Initialize the bay capacity
-        initializeTransportSpace(ShipTransportedUnitsSummary.class);
+        initializeTransportSpace(SHIP_TRANSPORT);
     }
 
     public void initializeTacticalTransportSpace() {
-        initializeTransportSpace(TacticalTransportedUnitsSummary.class);
+        initializeTransportSpace(TACTICAL_TRANSPORT);
     }
 
     public ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
-        return (ShipTransportedUnitsSummary) getTransportedUnitsSummaryType(ShipTransportedUnitsSummary.class);
+        return (ShipTransportedUnitsSummary) getTransportedUnitsSummaryType(SHIP_TRANSPORT);
     }
 
     public TacticalTransportedUnitsSummary getTacticalTransportedUnitsSummary() {
-        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummaryType(TacticalTransportedUnitsSummary.class);
+        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummaryType(TACTICAL_TRANSPORT);
     }
 
-    private void initializeTransportSpace(Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
+    private void initializeTransportSpace(CampaignTransportType campaignTransportType) {
         // Initialize the capacity
         //getTransportDetails(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
-        if (hasTransportedUnitsType(transportedUnitsSummaryType)) {
-             if (getEntity() != null) {
-                 getTransportedUnitsSummaryType(transportedUnitsSummaryType).initializeTransportCapacity(getEntity().getTransports());
-             }
-        } else {
-            if (campaign != null && campaign.getGame() != null) {
+        if (getEntity() != null) {
+            if (hasTransportedUnitsType(campaignTransportType)) {
+                     getTransportedUnitsSummaryType(campaignTransportType).initializeTransportCapacity(getEntity().getTransports());
+            } else {
                 try {
-                    Constructor<? extends AbstractTransportedUnitsSummary> constructor = transportedUnitsSummaryType.getConstructor(new Class[]{Unit.class});
+                    Constructor<? extends AbstractTransportedUnitsSummary> constructor = campaignTransportType.getTransportedUnitsSummaryType().getConstructor(new Class[]{Unit.class});
                     addTransportedUnitType(constructor.newInstance(this));
                 } catch (NoSuchMethodException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
                 } catch (InvocationTargetException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
                 } catch (InstantiationException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
                 } catch (IllegalAccessException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", transportedUnitsSummaryType.getName(), e.toString()));
+                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
                 }
             }
         }
     }
 
-    public boolean hasTransportedUnitsType(Class<? extends AbstractTransportedUnitsSummary> transportedUnitType) {
+    public boolean hasTransportedUnitsType(CampaignTransportType campaignTransportType) {
         for(AbstractTransportedUnitsSummary transportedUnitsSummary : transportedUnitsSummaries) {
-            if (transportedUnitsSummary.getClass() == transportedUnitType) {
+            if (transportedUnitsSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return true;
             }
         }
         return false;
     }
 
-    public AbstractTransportedUnitsSummary getTransportedUnitsSummaryType(Class<? extends AbstractTransportedUnitsSummary> transportedUnitType) {
+    public AbstractTransportedUnitsSummary getTransportedUnitsSummaryType(CampaignTransportType campaignTransportType) {
         for(AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
-            if (transportedUnitSummary.getClass() == transportedUnitType) {
+            if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
             }
         }
@@ -393,10 +394,10 @@ public class Unit implements ITechnology {
     }
 
     public ITransportAssignment getTransportAssignment(Class<? extends ITransportAssignment> transportAssignmentType) {
-        if (transportAssignmentType.equals(TransportAssignment.class)) {
+        if (transportAssignmentType.equals(TACTICAL_TRANSPORT.getTransportAssignmentType())) {
             return getTacticalTransportAssignment();
         }
-        if (transportAssignmentType.equals(TransportShipAssignment.class)) {
+        if (transportAssignmentType.equals(SHIP_TRANSPORT.getTransportAssignmentType())) {
             return getTransportShipAssignment();
         }
         return null;
@@ -1828,21 +1829,6 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Calculates transport bay space required by an infantry platoon,
-     * which is not the same as the flat weight of that platoon
-     *
-     * @param unit The Entity that we need the weight for
-     */
-    public double calcInfantryBayWeight(Entity unit) {
-        PlatoonType type = PlatoonType.getPlatoonType(unit);
-        if ((unit instanceof Infantry) && (type == PlatoonType.MECHANIZED)) {
-            return type.getWeight() * ((Infantry) unit).getSquadCount();
-        } else {
-            return type.getWeight();
-        }
-    }
-
-    /**
      * Bay unloading utility used when removing units from bay-equipped transport
      * units
      * and/or moving them to a new transport
@@ -1916,8 +1902,8 @@ public class Unit implements ITechnology {
      * @param transporterType class of Transporter
      * @return
      */
-    public double getCurrentTransportCapacity(Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType, Class<? extends Transporter> transporterType ){
-        return getTransportedUnitsSummaryType(transportedUnitsSummaryType).getCurrentTransportCapacity(transporterType);
+    public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType, Class<? extends Transporter> transporterType ){
+        return getTransportedUnitsSummaryType(campaignTransportType).getCurrentTransportCapacity(transporterType);
     }
 
     public void setCurrentShipTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
@@ -2014,22 +2000,6 @@ public class Unit implements ITechnology {
      */
     public void unloadTacticalTransport() {
         getTacticalTransportedUnitsSummary().clearTransportedUnits(campaign);
-    }
-
-    /**
-     * Most slots are 1:1, infantry use their tonnage in some cases
-     *
-     * @param transporterType type (Class) of Transporter
-     * @return how much capacity this unit uses when being transported in this kind of transporter
-     */
-    public double transportCapacityUsage(Class< ? extends Transporter> transporterType) { //TODO This shouldn't be here, help me find a new home for this!
-        if (InfantryBay.class.isAssignableFrom(transporterType)
-            || InfantryCompartment.class.isAssignableFrom(transporterType)) {
-            if (Infantry.class.isAssignableFrom(getEntity().getClass())) {
-                return calcInfantryBayWeight(getEntity());
-            }
-        }
-        return 1.0;
     }
     // End Transport Assignments
 

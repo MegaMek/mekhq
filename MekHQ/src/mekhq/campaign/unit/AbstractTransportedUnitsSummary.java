@@ -51,8 +51,8 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         // Remove this unit from our collection of transported units.
         removeTransportedUnit(transportedUnit);
         if (transport.getEntity() != null) {
-            transport.getEntity().unload(transportedUnit.getEntity()); //TODO fix this?
-            initializeTransportCapacity(transport.getEntity().getTransports());
+            //transport.getEntity().unload(transportedUnit.getEntity()); //TODO fix this?
+            //initializeTransportCapacity(transport.getEntity().getTransports());
         }
     }
 
@@ -63,6 +63,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     @Override
     public void initializeTransportCapacity(@Nullable Vector<Transporter> transporters) {
         transportCapacity.clear();
+        clearTransportedEntities();
         loadTransportedEntities();
         if (transporters != null && !transporters.isEmpty()) {
             for (Transporter transporter : transporters) {
@@ -73,8 +74,6 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
                     transportCapacity.put(transporter.getClass(), transporter.getUnused());
                 }
             }
-
-
         }
     }
 
@@ -187,7 +186,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         Set<Entity> transportedEntities = new HashSet<>();
         if (transport.getEntity() != null) {
             for (Entity transportedEntity : transport.getEntity().getUnloadableUnits()) {
-                //transport.getEntity().unload(transportedEntity);
+                transport.getEntity().unload(transportedEntity);
                 transportedEntities.add(transportedEntity);
             }
 
@@ -209,7 +208,12 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
 
     protected void loadEntity(Entity transportedEntity) {
         if (transport.getEntity() != null && transportedEntity != null) {
-            transport.getEntity().load(transportedEntity, false);
+            if (transport.getEntity().canLoad(transportedEntity, false)) {
+                transport.getEntity().load(transportedEntity, false);
+            }
+            else {
+                logger.error(String.format("Could not load entity %s onto unit %s", transportedEntity.getDisplayName(), transport.getName()));
+            }
         }
     }
 
@@ -223,106 +227,5 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         for (Unit newUnit : newTransportedUnits) {
             addTransportedUnit(newUnit);
         }
-    }
-
-
-
-    /**
-     * TransportDetails are meant to be used with transportAssignment
-     * @return the TransportAssignement used by the class
-     */
-    Class<? extends ITransportAssignment> getRelatedTransportAssignmentType() {
-        return ITransportAssignment.class;
-    }
-
-    /**
-     * Helps the menus need to check less when generating
-     *
-     * @see Bay and its subclass's canLoad(Entity unit) methods
-     * @param unit the unit we want to get the Transporter types that could potentially hold it
-     * @return the transporter types that could potentially transport this entity
-     */
-    public static Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
-        Set<Class<? extends Transporter>> transporters = new HashSet<>();
-
-        Class<? extends Entity> entityType = unit.getClass();
-        if (ProtoMek.class.isAssignableFrom(entityType)) {
-            transporters.add(ProtoMekBay.class);
-            transporters.add(ProtoMekClampMount.class);
-        }
-        else if (Aero.class.isAssignableFrom(entityType)) {
-            if ((unit.isFighter())) {
-                transporters.add(ASFBay.class);
-            }
-            if ((unit.isFighter()) || unit.isSmallCraft()) {
-                transporters.add(SmallCraftBay.class);
-            }
-            if (unit.hasETypeFlag(Entity.ETYPE_DROPSHIP) && (unit.getWeight() <= 5000)) {
-                transporters.add(DropshuttleBay.class);
-            }
-            if (unit.hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                transporters.add(NavalRepairFacility.class);
-                transporters.add(ReinforcedRepairFacility.class);
-            }
-            if (unit instanceof Dropship && !((Dropship) unit).isDockCollarDamaged()) {
-                transporters.add(DockingCollar.class);
-            }
-        }
-        else if (Tank.class.isAssignableFrom(entityType)) {
-            if (unit.getWeight() <= 50) {
-                transporters.add(LightVehicleBay.class);
-            }
-
-            if (unit.getWeight() <= 100) {
-                transporters.add(HeavyVehicleBay.class);
-            }
-
-            if (unit.getWeight() <= 100) {
-                transporters.add(SuperHeavyVehicleBay.class);
-            }
-        }
-        else if (Mek.class.isAssignableFrom(entityType)) {
-            boolean loadableQuadVee = (unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_MEK);
-            boolean loadableLAM = (unit instanceof LandAirMek) && (unit.getConversionMode() != LandAirMek.CONV_MODE_FIGHTER);
-            boolean loadableOtherMek = (unit instanceof Mek) && !(unit instanceof QuadVee) && !(unit instanceof LandAirMek);
-            if (loadableQuadVee || loadableLAM || loadableOtherMek) {
-                transporters.add(MekBay.class);
-
-            } else {
-                if ((unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_VEHICLE)) {
-                    if (unit.getWeight() <= 50) {
-                        transporters.add(LightVehicleBay.class);
-                    }
-
-                    if (unit.getWeight() <= 100) {
-                        transporters.add(HeavyVehicleBay.class);
-                    }
-
-                    if (unit.getWeight() <= 100) {
-                        transporters.add(SuperHeavyVehicleBay.class);
-                    }
-                }
-            }
-        }
-        else if (Infantry.class.isAssignableFrom(entityType)) {
-            transporters.add(InfantryBay.class);
-            transporters.add(InfantryCompartment.class);
-
-            if (BattleArmor.class.isAssignableFrom(entityType)) {
-                transporters.add(BattleArmorBay.class);
-                BattleArmor baUnit = (BattleArmor) unit;
-
-                if (baUnit.canDoMechanizedBA()) {
-                    transporters.add(BattleArmorHandles.class);
-                    transporters.add(BattleArmorHandlesTank.class);
-
-                    if (baUnit.hasMagneticClamps()) {
-                        transporters.add(ClampMountMek.class);
-                        transporters.add(ClampMountTank.class);
-                    }
-                }
-            }
-        }
-        return transporters;
     }
 }

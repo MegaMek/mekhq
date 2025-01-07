@@ -81,6 +81,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
@@ -438,11 +440,11 @@ public class CampaignXmlParser {
             //Update the campaign transport availability if this is a transport.
             //If it's empty we should be able to just ignore it
             if (unit.hasTacticalTransportedUnits()) {
-                retVal.updateTransportInTransports(TacticalTransportedUnitsSummary.class, unit);
+                retVal.updateTransportInTransports(TACTICAL_TRANSPORT, unit);
             }
 
             if (unit.hasShipTransportedUnits()) {
-                retVal.updateTransportInTransports(ShipTransportedUnitsSummary.class, unit);
+                retVal.updateTransportInTransports(SHIP_TRANSPORT, unit);
             }
         });
 
