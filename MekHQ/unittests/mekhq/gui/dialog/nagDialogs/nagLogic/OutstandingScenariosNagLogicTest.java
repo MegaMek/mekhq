@@ -20,7 +20,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.gui.dialog.nagDialogs.OutstandingScenariosNagDialog;
