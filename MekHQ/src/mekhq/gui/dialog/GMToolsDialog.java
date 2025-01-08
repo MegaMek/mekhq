@@ -43,7 +43,7 @@ import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
@@ -64,7 +64,7 @@ import java.util.function.Predicate;
 
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 
-public class GMToolsDialog extends AbstractMHQDialog {
+public class GMToolsDialog extends AbstractMHQDialogBasic {
     private static final MMLogger logger = MMLogger.create(GMToolsDialog.class);
 
     // region Variable Declarations

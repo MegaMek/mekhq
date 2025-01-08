@@ -28,7 +28,7 @@ import mekhq.campaign.autoresolve.acar.SimulationOptions;
 import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.utilities.Internationalization;
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AutoResolveChanceDialog extends AbstractMHQDialog implements PropertyChangeListener {
+public class AutoResolveChanceDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(AutoResolveChanceDialog.class);
 
     private JProgressBar progressBar;

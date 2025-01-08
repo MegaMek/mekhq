@@ -48,7 +48,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
@@ -65,7 +65,7 @@ import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTIO
 import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
 import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
-public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChangeListener {
+public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
 
     // region Variable Declarations

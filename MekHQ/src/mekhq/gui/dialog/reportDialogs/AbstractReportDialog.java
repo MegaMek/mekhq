@@ -18,7 +18,7 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
 import javax.swing.*;
@@ -30,7 +30,7 @@ import java.awt.*;
  *
  * Inheriting classes must call initialize() in their constructors and override getText.
  */
-public abstract class AbstractReportDialog extends AbstractMHQDialog {
+public abstract class AbstractReportDialog extends AbstractMHQDialogBasic {
     //region Constructors
     protected AbstractReportDialog(final JFrame frame, final String name, final String title) {
         super(frame, name, title);
