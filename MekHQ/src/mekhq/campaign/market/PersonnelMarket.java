@@ -18,25 +18,8 @@
  */
 package mekhq.campaign.market;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import mekhq.campaign.universe.PlanetarySystem;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
+import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
@@ -49,10 +32,16 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
-import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.*;
 
 public class PersonnelMarket {
     private static final MMLogger logger = MMLogger.create(PersonnelMarket.class);
@@ -105,68 +94,110 @@ public class PersonnelMarket {
         setType(ev.getOptions().getPersonnelMarketName());
     }
 
-    /*
-     * Generate new personnel to be added to the
-     * market availability pool
+    /**
+     * Generates new personnel for the current day, adding them to the campaign's personnel market if applicable.
+     * The method handles removing outdated personnel, checking hiring hall and capital conditions,
+     * and updating the personnel pool.
+     * <p>
+     * The process includes:
+     * <ul>
+     *     <li>Removing personnel already listed for the day.</li>
+     *     <li>Clearing the personnel list entirely if it does not meet hiring hall or capital
+     *     requirements (based on campaign settings).</li>
+     *     <li>Generating new personnel through the associated generation method, if applicable.</li>
+     *     <li>Triggering updates in the personnel market with an event.</li>
+     *     <li>Optionally generating a personnel market report, if this is enabled in campaign options.</li>
+     * </ul>
+     *
+     * @param campaign The {@link Campaign} related to the current gameplay context. Used to
+     *                determine the campaign's current planetary system, date, settings, factions, and more.
      */
     public void generatePersonnelForDay(Campaign campaign) {
-        List<String> capitals = Factions.getInstance().getFactions().stream()
-                .filter(faction -> faction.validIn(campaign.getLocalDate()))
-                .map(faction -> faction.getStartingPlanet(campaign.getLocalDate()))
-                .collect(Collectors.toList());
+        PlanetarySystem location = campaign.getLocation().getCurrentSystem();
+        LocalDate today = campaign.getLocalDate();
 
-        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        // Determine conditions
+        boolean isOnPlanet = campaign.getLocation().isOnPlanet();
+        boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly();
+        boolean isHiringHall = location.isHiringHall(today);
+        boolean isCapital = location.getFactionSet(today).stream()
+            .anyMatch(faction -> location.equals(faction.getStartingPlanet(campaign, today)));
 
-        boolean updated = false;
-
+        // Remove existing personnel for the day
         if (!personnel.isEmpty()) {
             removePersonnelForDay(campaign);
-            if (campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
-                    && !currentSystem.isHiringHall(campaign.getLocalDate())
-                    && !capitals.contains(currentSystem.getId())) {
+
+            // If only capitals/hiring halls are allowed and the location fails both conditions, clear personnel
+            if (isOnPlanet || (useCapitalsHiringHallsOnly && !isHiringHall && !isCapital)) {
                 removeAll();
+                return;
             }
         }
 
-        if (null != method) {
-            List<Person> newPersonnel = new ArrayList<>();
-
-            if (!campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
-                    || currentSystem.isHiringHall(campaign.getLocalDate())
-                    || capitals.contains(currentSystem.getId())) {
-                newPersonnel = method.generatePersonnelForDay(campaign);
-            }
-
-            if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
+        // Generate new personnel if `method` is defined and conditions allow
+        boolean updated = false;
+        if (method != null && (!useCapitalsHiringHallsOnly || isHiringHall || isCapital)) {
+            List<Person> newPersonnel = method.generatePersonnelForDay(campaign);
+            if (newPersonnel != null && !newPersonnel.isEmpty()) {
                 personnel.addAll(newPersonnel);
                 updated = true;
+
+                // Notify about new personnel in the market
                 MekHQ.triggerEvent(new MarketNewPersonnelEvent(newPersonnel));
             }
         }
 
-        if (updated && campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
-            if (campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops") && !personnel.isEmpty()) {
-                stringBuilder.append(':');
-                Person person = personnel.get(0);
-                String expLevel = SkillType.getExperienceLevelName(person.getExperienceLevel(campaign, false));
-                if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {
-                    stringBuilder.append("<br>An ");
-                } else {
-                    stringBuilder.append("<br>A ");
-                }
-                stringBuilder.append("<b> ")
-                    .append(SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)))
-                    .append(' ')
-                    .append(person.getPrimaryRole().toString())
-                    .append("</b>")
-                    .append(" named ")
-                    .append(person.getFullName())
-                    .append(" is available.");
-            }
-            campaign.addReport(stringBuilder.toString());
+        // Skip further processing if no personnel are present
+        if (personnel.isEmpty()) {
+            return;
         }
+
+        // Generate campaign reports if the personnel market was updated
+        if (updated && campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+            generatePersonnelReport(campaign);
+        }
+    }
+
+    /**
+     * Generates and adds a report to the campaign about new personnel added to the personnel market.
+     * <p>
+     * If the corresponding option is enabled in the campaign settings, this function produces a detailed,
+     * user-facing report about the most notable individual in the new personnel pool. The report includes
+     * their experience level, primary role, and name.
+     * <p>
+     * The generated report is in HTML format and provides easy access to the personnel market interface.
+     *
+     * @param campaign The {@link Campaign} to which the report will be added.
+     */
+    private void generatePersonnelReport(Campaign campaign) {
+        StringBuilder report = new StringBuilder();
+        report.append("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
+
+        if (campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops")) {
+            report.append(':');
+
+            // Add details about the first personnel's experience, primary role, and name
+            Person person = personnel.get(0);
+            int experienceLevel = person.getExperienceLevel(campaign, false);
+            String expLevel = SkillType.getExperienceLevelName(experienceLevel);
+
+            if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {
+                report.append("<br>An ");
+            } else {
+                report.append("<br>A ");
+            }
+
+            report.append("<b>")
+                .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+                .append(' ')
+                .append(person.getPrimaryRole())
+                .append("</b>")
+                .append(" named ")
+                .append(person.getFullName())
+                .append(" is available.");
+        }
+
+        campaign.addReport(report.toString());
     }
 
     /*
