@@ -19,8 +19,8 @@
 package mekhq.campaign.unit;
 
 import megamek.common.*;
+import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -32,17 +32,28 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@Disabled // REDO - Psi - Ship Transport has been split into Ship & Tactical transport, the tests need redone.
+// TODO - Psi - Ship Transport has been split into Ship & Tactical transport, the tests need redone.
 public class UnitTransportTest {
 
     @BeforeAll
     static void before() {
         EquipmentType.initializeTypes();
+
+
     }
 
     @Test
     public void basicTransportedUnits() {
+        Game mockGame = mock(Game.class);
+        Campaign mockCampaign = mock(Campaign.class);
+
+
         Unit transport = new Unit();
+        when(mockCampaign.getGame()).thenReturn(mockGame);
+        //when(transport.getCampaign()).thenReturn(mockCampaign);
+        mockCampaign.importUnit(transport);
+
+
 
         // We start with empty transport bays
         assertFalse(transport.hasShipTransportedUnits());
@@ -147,11 +158,12 @@ public class UnitTransportTest {
 
     @Test
     public void testUnitTypeForAerosMatchesAeroBayType() {
+        Campaign campaign = mock(Campaign.class);
+
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);
-        Unit transport = new Unit();
+        Unit transport = new Unit(mockVengeance,campaign);
         ASFBay mockASFBay = new ASFBay(100, 1 ,0);
-        transport.setEntity(mockVengeance);
 
         // Initialize bays
         Vector<Bay> bays = new Vector<>();
@@ -160,7 +172,8 @@ public class UnitTransportTest {
         transporters.add(mockASFBay);
         when(mockVengeance.getTransportBays()).thenReturn(bays);
         when(mockVengeance.getTransports()).thenReturn(transporters);
-        //transport.initializeTransportShipSpace();
+        mockASFBay.setGame(mock(Game.class));
+        transport.initializeShipTransportSpace();
 
         // Add an aero unit
         Entity aero = new AeroSpaceFighter();
@@ -197,8 +210,10 @@ public class UnitTransportTest {
 
         Unit transport1 = mock(Unit.class);
         Unit randomUnit = mock(Unit.class);
+        TransportShipAssignment transportAssignment = mock(TransportShipAssignment.class);
         when(randomUnit.hasTransportShipAssignment()).thenReturn(true);
-        when(randomUnit.getTransportShipAssignment()).thenReturn(new TransportShipAssignment(transport1, 0));
+        when(randomUnit.getTransportShipAssignment()).thenReturn(transportAssignment);
+        when(transportAssignment.getTransport()).thenReturn(transport1);
 
         // Try removing a ship that's on somebody else's transport
         transport0.removeShipTransportedUnit(randomUnit);
