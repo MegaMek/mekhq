@@ -1380,7 +1380,7 @@ public class Campaign implements ITechManager {
 
     /**
      * This will update the transport in the transports list with new capacities
-     * @param transportDetailType type (Class) of TransportedUnitsSummary we're interested at
+     * @param campaignTransportType type (Class) of TransportedUnitsSummary we're interested at
      * @param transport Unit
      */
     public void updateTransportInTransports(CampaignTransportType campaignTransportType, Unit transport) {
@@ -8121,11 +8121,11 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private CampaignTransporterMap getCampaignTransporterMap(CampaignTransportType transportDetailType) {
-        if (transportDetailType.isTacticalTransport()) {
+    private CampaignTransporterMap getCampaignTransporterMap(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isTacticalTransport()) {
             return tacticalTransporters;
         }
-        else if (transportDetailType.isShipTransport()) {
+        else if (campaignTransportType.isShipTransport()) {
             return shipTransporters;
         }
         return null;
@@ -8146,7 +8146,7 @@ public class Campaign implements ITechManager {
      * Map that maps capacity (Double) to UUID of transports
      * for the specific TransportedUnitSummary type
      *
-     * @param transportDetailType type (Class) of TransportedUnitSummary
+     * @param campaignTransportType type (Class) of TransportedUnitSummary
      * @return units that have space for that transport type
      */
     public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTransports(CampaignTransportType campaignTransportType) {
@@ -8180,7 +8180,7 @@ public class Campaign implements ITechManager {
      * that has transport capacity for the
      * Transporter class/subclass
      *
-     * @param transportDetailType type (Class) of TransportedUnitSummary
+     * @param campaignTransportType type (Class) of TransportedUnitSummary
      * @param transporterType type (Class) of Transporter
      * @param unitSize capacity that the transport must be capable of
      * @return units that have that transport type
@@ -8199,14 +8199,14 @@ public class Campaign implements ITechManager {
 
     /**
      * Do we have transports for the kind of transport?
-     * @param transportDetailType class of the TransportDetail
+     * @param campaignTransportType class of the TransportDetail
      * @return true if it has transporters, false otherwise
      */
-    public boolean hasTransports(CampaignTransportType transportDetailType) {
-        if (transportDetailType.isTacticalTransport()) {
+    public boolean hasTransports(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isTacticalTransport()) {
             return hasTacticalTransports();
         }
-        else if (transportDetailType.isShipTransport()) {
+        else if (campaignTransportType.isShipTransport()) {
             return hasShipTransports();
         }
         return false;

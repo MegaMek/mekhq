@@ -322,23 +322,20 @@ public class Unit implements ITechnology {
 
     private void initializeTransportSpace(CampaignTransportType campaignTransportType) {
         // Initialize the capacity
-        //getTransportDetails(transportDetailType).initializeTransportCapacity(getEntity().getTransports());
-        if (getEntity() != null) {
-            if (hasTransportedUnitsType(campaignTransportType)) {
-                     getTransportedUnitsSummaryType(campaignTransportType).initializeTransportCapacity(getEntity().getTransports());
-            } else {
-                try {
-                    Constructor<? extends AbstractTransportedUnitsSummary> constructor = campaignTransportType.getTransportedUnitsSummaryType().getConstructor(new Class[]{Unit.class});
-                    addTransportedUnitType(constructor.newInstance(this));
-                } catch (NoSuchMethodException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
-                } catch (InvocationTargetException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
-                } catch (InstantiationException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
-                } catch (IllegalAccessException e) {
-                    logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
-                }
+        if (hasTransportedUnitsType(campaignTransportType)) {
+                 getTransportedUnitsSummaryType(campaignTransportType).initializeTransportCapacity(getEntity().getTransports());
+        } else {
+            try {
+                Constructor<? extends AbstractTransportedUnitsSummary> constructor = campaignTransportType.getTransportedUnitsSummaryType().getConstructor(new Class[]{Unit.class});
+                addTransportedUnitType(constructor.newInstance(this));
+            } catch (NoSuchMethodException e) {
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
+            } catch (InvocationTargetException e) {
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
+            } catch (InstantiationException e) {
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
+            } catch (IllegalAccessException e) {
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s", campaignTransportType.getName(), e.toString()));
             }
         }
     }
@@ -403,6 +400,42 @@ public class Unit implements ITechnology {
         return null;
     }
 
+    // Generic Transport Methods
+
+    /**
+     * For the given transport type, is this unit
+     * transporting any other units?
+     * @param campaignTransportType Transport Type (Enum) we're checking
+     * @return true if it has transported units
+     * @see CampaignTransportType
+     */
+    public boolean hasTransportedUnits(CampaignTransportType campaignTransportType) {
+        if (hasTransportedUnitsType(campaignTransportType)) {
+            return getTransportedUnitsSummaryType(campaignTransportType).hasTransportedUnits();
+        }
+        return false;
+    }
+
+    /**
+     * For the given transport type, return the
+     * set of units it's transporting, or an
+     * empty set
+     * @param campaignTransportType Transport Type (Enum) we're checking
+     * @return Set of Units this transport is carrying, or an empty set
+     */
+    public Set<Unit> getTransportedUnits(CampaignTransportType campaignTransportType) {
+        if (hasTransportedUnits(campaignTransportType)) {
+            return getTransportedUnitsSummaryType(campaignTransportType).getTransportedUnits();
+        }
+        return new HashSet<Unit>();
+    }
+
+    void addTransportedUnit(CampaignTransportType campaignTransportType, Unit unit) {
+        getTransportedUnitsSummaryType(campaignTransportType).addTransportedUnit(unit);
+    }
+
+    // End Generic Transport Methods
+
     // A set of methods for working with transport ship assignment for this unit
 
     /**
@@ -436,14 +469,14 @@ public class Unit implements ITechnology {
      * transporting units.
      */
     public boolean hasShipTransportedUnits() {
-        return getShipTransportedUnitsSummary().hasTransportedUnits();
+        return hasTransportedUnits(SHIP_TRANSPORT);
     }
 
     /**
      * @return the set of units being transported by this unit.
      */
     public Set<Unit> getShipTransportedUnits() {
-        return getShipTransportedUnitsSummary().getTransportedUnits();
+        return getTransportedUnits(SHIP_TRANSPORT);
     }
 
     /**
@@ -452,7 +485,7 @@ public class Unit implements ITechnology {
      * @param unit The unit being transported by this instance.
      */
     public void addShipTransportedUnit(Unit unit) {
-        getShipTransportedUnitsSummary().addTransportedUnit(unit);
+        addTransportedUnit(SHIP_TRANSPORT, unit);
     }
 
     /**
@@ -1923,7 +1956,10 @@ public class Unit implements ITechnology {
     }
 
     public boolean hasTacticalTransportedUnits() {
-        return getTacticalTransportedUnitsSummary().hasTransportedUnits();
+        if (hasTransportedUnitsType(TACTICAL_TRANSPORT)) {
+            return getTacticalTransportedUnitsSummary().hasTransportedUnits();
+        }
+        return false;
     }
 
     /**
