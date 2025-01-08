@@ -244,6 +244,10 @@ public class StratconRulesManager {
                     continue;
                 }
 
+                if (force.isDeployed()) {
+                    continue;
+                }
+
                 int operationalStatus = 0;
                 int unitCount = 0;
 
@@ -2145,13 +2149,6 @@ public class StratconRulesManager {
                 continue;
             }
 
-            // If the combat team is currently deployed, they aren't eligible to be deployed
-            StratconCampaignState campaignState = contract.getStratconCampaignState();
-
-            if (campaignState.isForceDeployedHere(combatTeam.getForceId())) {
-                continue;
-            }
-
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
             CombatRole combatRole = combatTeam.getRole();
             if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
@@ -2215,6 +2212,10 @@ public class StratconRulesManager {
             Force force = campaign.getForce(formation.getForceId());
 
             if (force == null) {
+                continue;
+            }
+
+            if (force.isDeployed()) {
                 continue;
             }
 
