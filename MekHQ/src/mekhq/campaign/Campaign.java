@@ -8190,16 +8190,6 @@ public class Campaign implements ITechManager {
      * @param transporterType class of Transporter
      * @return units that have that transport type
      */
-    public Set<Unit> getTacticalTransportsByType(Class<? extends Transporter> transporterType) {
-        return tacticalTransporters.getTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
-    }
-
-    /**
-     * Returns list of transports
-     *
-     * @param transporterType class of Transporter
-     * @return units that have that transport type
-     */
     public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, Class<? extends Transporter> transporterType) {
         return getCampaignTransporterMap(campaignTransportType).getTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
     }

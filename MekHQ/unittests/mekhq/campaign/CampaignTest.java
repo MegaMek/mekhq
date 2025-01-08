@@ -174,7 +174,7 @@ public class CampaignTest {
         AbstractTransportedUnitsSummary mockTransportedUnitsSummary = mock(campaignTransportType.getTransportedUnitsSummaryType());
         when(mockTransportedUnitsSummary.getTransportCapabilities()).thenReturn(new HashSet<>(List.of(Bay.class)));
 
-        when(mockUnit.getTransportedUnitsSummaryType(campaignTransportType)).thenReturn(mockTransportedUnitsSummary);
+        when(mockUnit.getTransportedUnitsSummary(campaignTransportType)).thenReturn(mockTransportedUnitsSummary);
 
         // Add our mock transport
         campaign.importUnit(mockUnit);

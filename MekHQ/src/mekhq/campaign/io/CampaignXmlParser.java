@@ -34,6 +34,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
@@ -439,12 +440,10 @@ public class CampaignXmlParser {
 
             //Update the campaign transport availability if this is a transport.
             //If it's empty we should be able to just ignore it
-            if (unit.hasTacticalTransportedUnits()) {
-                retVal.updateTransportInTransports(TACTICAL_TRANSPORT, unit);
-            }
-
-            if (unit.hasShipTransportedUnits()) {
-                retVal.updateTransportInTransports(SHIP_TRANSPORT, unit);
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (unit.hasTransportedUnits(campaignTransportType)) {
+                    retVal.updateTransportInTransports(campaignTransportType, unit);
+                }
             }
         });
 

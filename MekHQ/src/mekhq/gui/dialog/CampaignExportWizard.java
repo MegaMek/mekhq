@@ -46,6 +46,7 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
@@ -518,13 +519,12 @@ public class CampaignExportWizard extends JDialog {
             unit.setTransportShipAssignment(null);
             unit.setTransportShipAssignment(null);
 
-            if (unit.hasShipTransportedUnits()) {
-                unit.unloadTransportShip();
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (unit.hasTransportedUnits(campaignTransportType)) {
+                    unit.unloadTransport(campaignTransportType);
+                }
             }
 
-            if (unit.hasTacticalTransportedUnits()) {
-                unit.unloadTacticalTransport();
-            }
 
             // make an attempt to re-construct the force structure in the destination
             // campaign

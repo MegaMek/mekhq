@@ -25,7 +25,6 @@ import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
-import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
@@ -313,17 +312,17 @@ public class Unit implements ITechnology {
     }
 
     public ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
-        return (ShipTransportedUnitsSummary) getTransportedUnitsSummaryType(SHIP_TRANSPORT);
+        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(SHIP_TRANSPORT);
     }
 
     public TacticalTransportedUnitsSummary getTacticalTransportedUnitsSummary() {
-        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummaryType(TACTICAL_TRANSPORT);
+        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummary(TACTICAL_TRANSPORT);
     }
 
     private void initializeTransportSpace(CampaignTransportType campaignTransportType) {
         // Initialize the capacity
         if (hasTransportedUnitsType(campaignTransportType)) {
-                 getTransportedUnitsSummaryType(campaignTransportType).initializeTransportCapacity(getEntity().getTransports());
+                 getTransportedUnitsSummary(campaignTransportType).initializeTransportCapacity(getEntity().getTransports());
         } else {
             try {
                 Constructor<? extends AbstractTransportedUnitsSummary> constructor = campaignTransportType.getTransportedUnitsSummaryType().getConstructor(new Class[]{Unit.class});
@@ -340,7 +339,12 @@ public class Unit implements ITechnology {
         }
     }
 
-    public boolean hasTransportedUnitsType(CampaignTransportType campaignTransportType) {
+    /**
+     * check to make sure the transported unit summary type exists
+     * @param campaignTransportType the transported unit type we're checking
+     * @return true if it exists, false if it doesn't
+     */
+    private boolean hasTransportedUnitsType(CampaignTransportType campaignTransportType) {
         for(AbstractTransportedUnitsSummary transportedUnitsSummary : transportedUnitsSummaries) {
             if (transportedUnitsSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return true;
@@ -349,7 +353,12 @@ public class Unit implements ITechnology {
         return false;
     }
 
-    public AbstractTransportedUnitsSummary getTransportedUnitsSummaryType(CampaignTransportType campaignTransportType) {
+    /**
+     * For the provided campaign transport type, what's this unit's transported units summary
+     * @param campaignTransportType what kind of transport type are we checking
+     * @return transported units summary of that type, or null
+     */
+    public AbstractTransportedUnitsSummary getTransportedUnitsSummary(CampaignTransportType campaignTransportType) {
         for(AbstractTransportedUnitsSummary transportedUnitSummary : transportedUnitsSummaries) {
             if (transportedUnitSummary.getClass() == campaignTransportType.getTransportedUnitsSummaryType()) {
                 return transportedUnitSummary;
@@ -390,11 +399,16 @@ public class Unit implements ITechnology {
         this.id = i;
     }
 
-    public ITransportAssignment getTransportAssignment(Class<? extends ITransportAssignment> transportAssignmentType) {
-        if (transportAssignmentType.equals(TACTICAL_TRANSPORT.getTransportAssignmentType())) {
+    /**
+     * For the given campaign transport type type, what's this unit's assignment
+     * @param campaignTransportType Transport Type (Enum) we're checking
+     * @return specified transport assignment for this unit, or null if it doesn't have one of this type
+     */
+    public ITransportAssignment getTransportAssignment(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isTacticalTransport()) {
             return getTacticalTransportAssignment();
         }
-        if (transportAssignmentType.equals(SHIP_TRANSPORT.getTransportAssignmentType())) {
+        if (campaignTransportType.isShipTransport()) {
             return getTransportShipAssignment();
         }
         return null;
@@ -411,7 +425,7 @@ public class Unit implements ITechnology {
      */
     public boolean hasTransportedUnits(CampaignTransportType campaignTransportType) {
         if (hasTransportedUnitsType(campaignTransportType)) {
-            return getTransportedUnitsSummaryType(campaignTransportType).hasTransportedUnits();
+            return getTransportedUnitsSummary(campaignTransportType).hasTransportedUnits();
         }
         return false;
     }
@@ -425,13 +439,18 @@ public class Unit implements ITechnology {
      */
     public Set<Unit> getTransportedUnits(CampaignTransportType campaignTransportType) {
         if (hasTransportedUnits(campaignTransportType)) {
-            return getTransportedUnitsSummaryType(campaignTransportType).getTransportedUnits();
+            return getTransportedUnitsSummary(campaignTransportType).getTransportedUnits();
         }
         return new HashSet<Unit>();
     }
 
+    /**
+     * For the given campaign transport type, add a unit to our transported units summary
+     * @param campaignTransportType Transport Type (Enum) we're checking
+     * @param unit transported unit we're adding
+     */
     void addTransportedUnit(CampaignTransportType campaignTransportType, Unit unit) {
-        getTransportedUnitsSummaryType(campaignTransportType).addTransportedUnit(unit);
+        getTransportedUnitsSummary(campaignTransportType).addTransportedUnit(unit);
     }
 
     // End Generic Transport Methods
@@ -1910,7 +1929,7 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Sets the transport ship assignment for this unit.
+     * Sets the transport assignment for this unit.
      *
      * @param assignment The transport ship assignment, or null if this unit
      *                   is not being transported.
@@ -1936,13 +1955,23 @@ public class Unit implements ITechnology {
      * @return
      */
     public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType, Class<? extends Transporter> transporterType ){
-        return getTransportedUnitsSummaryType(campaignTransportType).getCurrentTransportCapacity(transporterType);
+        return getTransportedUnitsSummary(campaignTransportType).getCurrentTransportCapacity(transporterType);
     }
 
+    /**
+     * Set the transport capacity for the specified transporter type to a specific capacity
+     * @param transporterType type (class) of transporter we want to set the capacity
+     * @param capacity how much this transporter should be able to transport
+     */
     public void setCurrentShipTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
         getShipTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
 
+    /**
+     * Set the transport capacity for the specified transporter type to a specific capacity
+     * @param transporterType type (class) of transporter we want to set the capacity
+     * @param capacity how much this transporter should be able to transport
+     */
     public void setCurrentTacticalTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
         getTacticalTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
@@ -2030,12 +2059,13 @@ public class Unit implements ITechnology {
         return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation, transporterType, transportedUnit);
     }
 
+
     /**
      * Bay unloading utility used when removing a bay-equipped Transport unit
      * This removes all units assigned to the transport from it
      */
-    public void unloadTacticalTransport() {
-        getTacticalTransportedUnitsSummary().clearTransportedUnits(campaign);
+    public void unloadTransport(CampaignTransportType campaignTransportType) {
+        getTransportedUnitsSummary(campaignTransportType).clearTransportedUnits(campaign);
     }
     // End Transport Assignments
 
@@ -6182,14 +6212,11 @@ public class Unit implements ITechnology {
             getTacticalTransportAssignment().fixReferences(campaign, this);
         }
 
-        if (hasShipTransportedUnits()) {
-            getShipTransportedUnitsSummary().fixReferences(campaign, this);
-            initializeShipTransportSpace();
-        }
-
-        if (hasTacticalTransportedUnits()) {
-            getTacticalTransportedUnitsSummary().fixReferences(campaign, this);
-            initializeTacticalTransportSpace();
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (hasTransportedUnits(campaignTransportType)) {
+                getTransportedUnitsSummary(campaignTransportType).fixReferences(campaign, this);
+                initializeTransportSpace(campaignTransportType);
+            }
         }
     }
 
