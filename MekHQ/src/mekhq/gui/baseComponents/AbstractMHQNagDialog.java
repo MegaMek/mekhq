@@ -22,16 +22,13 @@ import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -221,58 +218,6 @@ public abstract class AbstractMHQNagDialog extends JDialog {
 
         repaint();
         pack();
-    }
-
-    /**
-     * Assembles the speaker description based on the provided speaker and campaign details.
-     *
-     * <p>
-     * The description includes:
-     * <ul>
-     *   <li>The speaker's title and roles (both primary and secondary, if applicable).</li>
-     *   <li>The force associated with the speaker.</li>
-     *   <li>A fallback to the campaign name if the speaker is not available.</li>
-     * </ul>
-     *
-     * @param campaign    The current campaign.
-     * @param speaker     The {@link Person} representing the speaker, or {@code null} to use fallback data.
-     * @param speakerName The name/title to use for the speaker if one exists.
-     * @return A {@link StringBuilder} containing the formatted HTML description of the speaker.
-     */
-    public static StringBuilder getSpeakerDescription(Campaign campaign, Person speaker, String speakerName) {
-        StringBuilder speakerDescription = new StringBuilder();
-
-        if (speaker != null) {
-            speakerDescription.append("<b>").append(speakerName).append("</b>");
-
-            boolean isClan = campaign.getFaction().isClan();
-
-            PersonnelRole primaryRole = speaker.getPrimaryRole();
-            if (!primaryRole.isNone()) {
-                speakerDescription.append("<br>").append(primaryRole.getName(isClan));
-            }
-
-            PersonnelRole secondaryRole = speaker.getSecondaryRole();
-            if (!secondaryRole.isNone()) {
-                speakerDescription.append("<br>").append(secondaryRole.getName(isClan));
-            }
-
-            Unit assignedUnit = speaker.getUnit();
-            if (assignedUnit != null) {
-                int forceId = assignedUnit.getForceId();
-
-                if (forceId != FORCE_NONE) {
-                    Force force = campaign.getForce(forceId);
-
-                    if (force != null) {
-                        speakerDescription.append("<br>").append(force.getName());
-                    }
-                }
-            }
-        } else {
-            speakerDescription.append("<b>").append(campaign.getName()).append("</b>");
-        }
-        return speakerDescription;
     }
 
     /**
