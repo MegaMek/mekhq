@@ -258,9 +258,9 @@ public class MHQDialogImmersive extends JDialog {
      */
     private void populateButtonPanel(List<ButtonLabelTooltipPair> buttons) {
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            JButton button = new JButton(buttonStrings.getBtnLabel());
+            JButton button = new JButton(buttonStrings.btnLabel());
 
-            String tooltip = buttonStrings.getBtnTooltip();
+            String tooltip = buttonStrings.btnTooltip();
             if (tooltip != null) {
                 button.setToolTipText(tooltip);
             }
@@ -378,10 +378,7 @@ public class MHQDialogImmersive extends JDialog {
      * This class is useful for scenarios where you want to pair a button's display label
      * with an optional tooltip message.
      */
-    public static class ButtonLabelTooltipPair {
-        private final String btnLabel;
-        private final String btnTooltip;
-
+    public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip) {
         /**
          * Constructs a ButtonLabelTooltipPair with the given label and tooltip.
          *
@@ -402,7 +399,8 @@ public class MHQDialogImmersive extends JDialog {
          *
          * @return The button label as a {@link String}.
          */
-        public String getBtnLabel() {
+        @Override
+        public String btnLabel() {
             return btnLabel;
         }
 
@@ -411,7 +409,8 @@ public class MHQDialogImmersive extends JDialog {
          *
          * @return The button tooltip as a {@link String}, or {@code null} if no tooltip is set.
          */
-        public @Nullable String getBtnTooltip() {
+        @Override
+        public @Nullable String btnTooltip() {
             return btnTooltip;
         }
     }
