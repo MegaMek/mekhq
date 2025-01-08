@@ -128,7 +128,7 @@ public class PersonnelMarket {
             removePersonnelForDay(campaign);
 
             // If only capitals/hiring halls are allowed and the location fails both conditions, clear personnel
-            if (isOnPlanet || (useCapitalsHiringHallsOnly && !isHiringHall && !isCapital)) {
+            if (!isOnPlanet || (useCapitalsHiringHallsOnly && !isHiringHall && !isCapital)) {
                 removeAll();
                 return;
             }
