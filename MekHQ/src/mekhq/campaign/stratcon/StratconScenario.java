@@ -474,6 +474,7 @@ public class StratconScenario implements IStratconDisplayable {
      *         <li>-- Undeploys all units and clears scenario IDs for the forces and units associated with the scenario.</li>
      *         <li>-- Unassigns the force from the {@link StratconTrackState} and triggers a
      *             {@link DeploymentChangedEvent} for updates.</li>
+     * </ul>
      *
      * <strong>Note:</strong>
      *     <li>If the backing scenario ID is invalid or the contract is null, the method exits early
