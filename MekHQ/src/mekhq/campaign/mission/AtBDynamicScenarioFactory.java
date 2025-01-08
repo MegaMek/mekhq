@@ -1840,7 +1840,7 @@ public class AtBDynamicScenarioFactory {
         if (unitData == null) {
             if (!params.getMissionRoles().isEmpty()) {
                 logger.warn(String.format("Unable to randomly generate %s %s with roles: %s",
-                        EntityWeightClass.getClassName(params.getWeightClass()),
+                        params.getWeightClass(),
                         getTypeName(TANK),
                         params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
             }
