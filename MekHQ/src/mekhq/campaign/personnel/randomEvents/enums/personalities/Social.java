@@ -109,58 +109,6 @@ public enum Social {
 
     // region File I/O
     /**
-     * Parses a given string and returns the corresponding Social enum.
-     * Accepts either the ENUM ordinal value or its name
-     *
-     * @param social the string to be parsed
-     * @return the Social enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               Social
-     */
-    @Deprecated
-    public static Social parseFromString(final String social) {
-        return switch (social) {
-            case "0", "None" -> NONE;
-            // Minor Characteristics
-            case "1", "Apathetic" -> APATHETIC;
-            case "2", "Authentic" -> AUTHENTIC;
-            case "3", "Blunt" -> BLUNT;
-            case "4", "Callous" -> CALLOUS;
-            case "5", "Condescending" -> CONDESCENDING;
-            case "6", "Considerate" -> CONSIDERATE;
-            case "7", "Disingenuous" -> DISINGENUOUS;
-            case "8", "Dismissive" -> DISMISSIVE;
-            case "9", "Encouraging" -> ENCOURAGING;
-            case "10", "Erratic" -> ERRATIC;
-            case "11", "Empathetic" -> EMPATHETIC;
-            case "12", "Friendly" -> FRIENDLY;
-            case "13", "Inspiring" -> INSPIRING;
-            case "14", "Indifferent" -> INDIFFERENT;
-            case "15", "Introverted" -> INTROVERTED;
-            case "16", "Irritable" -> IRRITABLE;
-            case "17", "Neglectful" -> NEGLECTFUL;
-            case "18", "Petty" -> PETTY;
-            case "19", "Persuasive" -> PERSUASIVE;
-            case "20", "Receptive" -> RECEPTIVE;
-            case "21", "Sincere" -> SINCERE;
-            case "22", "Supportive" -> SUPPORTIVE;
-            case "23", "Tactful" -> TACTFUL;
-            case "24", "Untrustworthy" -> UNTRUSTWORTHY;
-            // Major Characteristics
-            case "25", "Altruistic" -> ALTRUISTIC;
-            case "26", "Compassionate" -> COMPASSIONATE;
-            case "27", "Gregarious" -> GREGARIOUS;
-            case "28", "Narcissistic" -> NARCISSISTIC;
-            case "29", "Pompous" -> POMPOUS;
-            case "30", "Scheming" -> SCHEMING;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromString: "
-                                + social);
-        };
-    }
-
-    /**
      * Returns the {@link Social} associated with the given ordinal.
      *
      * @param ordinal the ordinal value of the {@link Social}
@@ -168,13 +116,11 @@ public enum Social {
      * {@code NONE} if not found
      */
     public static Social fromOrdinal(int ordinal) {
-        for (Social social : values()) {
-            if (social.ordinal() == ordinal) {
-                return social;
-            }
+        if ((ordinal >= 0) && (ordinal < values().length)) {
+            return values()[ordinal];
         }
 
-        final MMLogger logger = MMLogger.create(Social.class);
+        MMLogger logger = MMLogger.create(Social.class);
         logger.error(String.format("Unknown Social ordinal: %s - returning NONE.", ordinal));
 
         return NONE;
