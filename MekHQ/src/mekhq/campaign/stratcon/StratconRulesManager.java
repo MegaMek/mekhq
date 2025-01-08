@@ -66,6 +66,7 @@ import static megamek.common.Coords.ALL_DIRECTIONS;
 import static megamek.common.UnitType.*;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -594,7 +595,7 @@ public class StratconRulesManager {
         }
 
         // Finally, finish scenario set up
-        AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
+        finalizeScenario(backingScenario, contract, campaign);
         setScenarioParametersFromBiome(track, scenario);
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
@@ -973,9 +974,11 @@ public class StratconRulesManager {
         // afterward
         StratconScenario revealedScenario = track.getScenario(coords);
         if (revealedScenario != null) {
+            if (!revealedScenario.getBackingScenario().isFinalized()) {
+                finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+                setScenarioParametersFromBiome(track, revealedScenario);
+            }
             revealedScenario.addPrimaryForce(forceID);
-            AtBDynamicScenarioFactory.finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
-            setScenarioParametersFromBiome(track, revealedScenario);
             commitPrimaryForces(campaign, revealedScenario, track);
             return;
         }
