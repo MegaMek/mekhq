@@ -476,9 +476,8 @@ public class StratconScenario implements IStratconDisplayable {
      *             {@link DeploymentChangedEvent} for updates.</li>
      * </ul>
      *
-     * <strong>Note:</strong>
-     *     <li>If the backing scenario ID is invalid or the contract is null, the method exits early
-     *         and performs no further actions.</li>
+     * <strong>Note:</strong> If the backing scenario ID is invalid or the contract is null, the
+     *                method exits early and performs no further actions.
      */
     public void resetScenario(Campaign campaign) {
         setCurrentState(UNRESOLVED);
