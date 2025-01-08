@@ -83,5 +83,8 @@
 		<modifier>
 			EnemyASFAce02.xml
 		</modifier-->
+        <modifier>
+            PrimaryAlliesAir.xml
+        </modifier>
 	</modifiers>
 </scenarioModifierManifest>

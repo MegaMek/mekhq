@@ -1043,6 +1043,7 @@ public class StratconScenarioWizard extends JDialog {
             selectionCountLabel.setForeground(MekHQ.getMHQOptions().getFontColorNegative());
             btnCommit.setEnabled(false);
         } else {
+            selectionCountLabel.setForeground(null);
             btnCommit.setEnabled(true);
         }
 

@@ -38,7 +38,7 @@ body:
     id: attached-files
     attributes:
       label: "Attach Files"
-      description: "Please provide all the logs from the logs folder (zipped) and any other relevant files."
+      description: "Please provide all the logs from the logs folder (zipped), Custom Units, and you CPNX file."
       placeholder: "Drag and drop or click to upload relevant files."
 
   - type: dropdown
@@ -100,7 +100,9 @@ body:
       options:
         - label: "I confirm this is a single, unique issue that hasn't been reported before"
           required: true
-        - label: "I have included all necessary information and files to help reproduce this issue"
+        - label: "I have filled and provided all necessary information above"
+          required: true
+        - label: "I have included any and all logs, custom units, and CPNX (save) files"
           required: true
         - label: "I have asked on MegaMek Discord about this issue"
           required: true

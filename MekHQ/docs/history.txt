@@ -229,7 +229,17 @@ MEKHQ VERSION HISTORY:
 + PR #5562: Fixed Entrance Exam Logic and Added Tooltip Display
 + PR #5563: Log jvm parameters
 + PR #5565: Refactored StratCon Reinforcement Dialog & Added GM Reinforcement Option
-+ PR #5566: Refactored Nag Dialog Checks to Improve Performance 
++ PR #5566: Refactored Nag Dialog Checks to Improve Performance
++ Fix #5667: Reworked Morale Logic
++ PR #5670: Refactored Font Color Handling for Cargo Report
++ Fix #5662: Restore Default Font Color when Leadership Selection Valid
++ Fix #5661: Removed Hardcoded Primary Ally Modifier Chances
++ Fix #5648: Expanded and Fixed Cargo Capacity Logic
++ PR #5674: Expand Special Unit Generation in AtB Unit Market
++ Fix #5668, #5640: Multiple Resupply Bug Fixes
++ PR #5676: Corrected Transportation Unit Type Check
++ Fix #5663: Addresses where the financeTable is empty
++ Fix #5664: Expanded Contract Automation Functionality to Manually Created AtB Contracts
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)
