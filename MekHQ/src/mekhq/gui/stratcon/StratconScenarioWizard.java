@@ -32,7 +32,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconRulesManager.*;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -46,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.*;
@@ -907,6 +907,7 @@ public class StratconScenarioWizard extends JDialog {
         currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
 
         translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
+        scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
 
         this.getParent().repaint();
 
