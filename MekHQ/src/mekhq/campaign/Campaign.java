@@ -7852,7 +7852,7 @@ public class Campaign implements ITechManager {
                 getFinances().credit(TransactionType.CONTRACT_PAYMENT, getLocalDate(), remainingMoney,
                         "Repaying payment overages for " + contract.getName());
                 addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
-                        + " to replay payment overages occurred during the contract " + contract.getName());
+                        + " to repay payment overages occurred during the contract " + contract.getName());
             }
 
             // This relies on the mission being a Contract, and AtB to be on
