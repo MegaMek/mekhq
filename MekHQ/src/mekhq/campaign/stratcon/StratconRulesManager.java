@@ -188,7 +188,7 @@ public class StratconRulesManager {
                 break;
             }
 
-            if (autoAssignLances && (campaignState.getWeeklyScenarios().size() >= availableForceIDs.size())) {
+            if (autoAssignLances && (scenarioIndex >= availableForceIDs.size())) {
                 break;
             }
 
@@ -960,7 +960,7 @@ public class StratconRulesManager {
             return;
         }
 
-        boolean isRecon = combatTeam.getRole().isPatrol();
+        boolean isPatrol = combatTeam.getRole().isPatrol();
 
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
@@ -983,15 +983,6 @@ public class StratconRulesManager {
             return;
         }
 
-        if (isRecon) {
-            StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
-
-            if (newCoords != null) {
-                coords = newCoords;
-            }
-        }
-
-        // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
 
@@ -1000,12 +991,23 @@ public class StratconRulesManager {
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario;
-            boolean autoAssignLances = !isRecon;
 
-            Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
+            // If we're not deploying on top of an enemy facility, migrate the scenario
+            if (!isNonAlliedFacility && isPatrol) {
+                StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
+
+                if (newCoords != null) {
+                    coords = newCoords;
+                }
+            }
+
+            // Patrols only get autoAssigned to the scenario if they're dropped on top of a non-allied facility
+            boolean autoAssignLances = !isPatrol || isNonAlliedFacility;
 
             // Do we already have forces deployed to the target coordinates?
             // If so, assign them to the scenario.
+            Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
+
             if (preDeployedForce != null && !preDeployedForce.isEmpty()) {
                 scenario = generateScenarioForExistingForces(coords,
                     track.getAssignedCoordForces().get(coords), contract, campaign, track);
