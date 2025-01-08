@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.enums.CampaignTransportType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1111,7 +1112,12 @@ public class Refit extends Part implements IAcquisitionWork {
         oldUnit.setRefit(this);
         // Bay space might change, and either way all cargo needs to be unloaded while
         // the refit is in progress
-        oldUnit.unloadTransportShip();
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (unit.hasTransportedUnits(campaignTransportType)) {
+                oldUnit.unloadTransport(campaignTransportType);
+            }
+        }
+
         newEntity.setOwner(oldUnit.getEntity().getOwner());
 
         // We don't want to require waiting for a refit kit if all that is missing is

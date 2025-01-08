@@ -26,7 +26,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -1507,14 +1506,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private void unassignTransportAction(CampaignTransportType campaignTransportType, Unit... units) {
         Set<Unit> transportsToUpdate = new HashSet<>();
         for (Unit transportedUnit : units) {
-            ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(campaignTransportType.getTransportAssignmentType());
+            ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(campaignTransportType);
             transportsToUpdate.add(transportAssignment.getTransport());
-            transportAssignment.getTransport().getTransportedUnitsSummaryType(campaignTransportType).unloadTransport(transportedUnit);
+            transportAssignment.getTransport().getTransportedUnitsSummary(campaignTransportType).unloadTransport(transportedUnit);
             MekHQ.triggerEvent(new UnitChangedEvent(transportedUnit));
         }
 
         for (Unit transportToUpdate : transportsToUpdate) {
-            transportToUpdate.getTransportedUnitsSummaryType(campaignTransportType).initializeTransportCapacity(transportToUpdate.getEntity().getTransports());
+            transportToUpdate.getTransportedUnitsSummary(campaignTransportType).initializeTransportCapacity(transportToUpdate.getEntity().getTransports());
             gui.getCampaign().updateTransportInTransports(campaignTransportType, transportToUpdate);
             MekHQ.triggerEvent(new UnitChangedEvent(transportToUpdate));
 
