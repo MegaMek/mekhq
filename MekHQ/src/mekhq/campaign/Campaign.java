@@ -3997,12 +3997,22 @@ public class Campaign implements ITechManager {
                                     atBScenario.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
                         } else {
-                            addReport(MessageFormat.format(
-                                    resources.getString("atbScenarioToday.format"), atBScenario.getName()));
+                            if (atBScenario.getHasTrack()) {
+                                addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                    atBScenario.getName()));
+                            } else {
+                                addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                                    atBScenario.getName()));
+                            }
                         }
                     } else {
-                        addReport(MessageFormat.format(
-                                resources.getString("atbScenarioToday.format"), atBScenario.getName()));
+                        if (atBScenario.getHasTrack()) {
+                            addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                atBScenario.getName()));
+                        } else {
+                            addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                                atBScenario.getName()));
+                        }
                     }
                 }
             }
