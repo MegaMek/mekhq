@@ -34,10 +34,9 @@ import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.Board;
 import megamek.common.annotations.Nullable;
-import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulatedClient;
-import megamek.common.autoresolve.acar.SimulationOptions;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
@@ -57,10 +56,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.AutoResolveChanceDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
@@ -648,20 +645,23 @@ public class MekHQ implements GameListener {
         this.autosaveService.requestBeforeMissionAutosave(getCampaign());
 
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
-            var proceed = AutoResolveChanceDialog
-                .showSimulationProgressDialog(
+            var proceed = megamek.client.ui.dialogs.AutoResolveChanceDialog
+                .showDialog(
                     getCampaigngui().getFrame(),
                     getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
-                    units,
-                    scenario,
-                    getCampaign()) == JOptionPane.YES_OPTION;
+                    Runtime.getRuntime().availableProcessors(),
+                    getCampaign().getPlayer().getTeam(),
+                    new AtBSetupForces(getCampaign(), units, scenario),
+                    new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
         }
 
-        var event = new Resolver(new AtBSetupForces(getCampaign(), units, scenario),new SimulationOptions(getCampaign().getGameOptions()))
-            .resolveSimulation();
+        var event = megamek.client.ui.dialogs.AutoResolveProgressDialog.showDialog(
+            getCampaigngui().getFrame(),
+            new AtBSetupForces(getCampaign(), units, scenario),
+            new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(getCampaigngui().getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);

@@ -21,6 +21,7 @@ import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.autoresolve.acar.SimulationContext;
 import megamek.common.autoresolve.converter.ConsolidateForces;
 import megamek.common.autoresolve.converter.ForceToFormationConverter;
+import megamek.common.autoresolve.converter.SetupForces;
 import megamek.common.autoresolve.converter.SingleElementConsolidateForces;
 import megamek.common.copy.CrewRefBreak;
 import megamek.common.force.Forces;
@@ -43,7 +44,7 @@ import java.util.*;
 /**
  * @author Luana Coppio
  */
-public class AtBSetupForces extends megamek.common.autoresolve.converter.SetupForces {
+public class AtBSetupForces extends SetupForces {
     private static final MMLogger logger = MMLogger.create(AtBSetupForces.class);
 
     private final Campaign campaign;

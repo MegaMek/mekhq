@@ -355,7 +355,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        resolver = new Resolver(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty());
+        resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty(), new Board(30, 30));
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 
