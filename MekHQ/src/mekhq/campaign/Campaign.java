@@ -1363,11 +1363,26 @@ public class Campaign implements ITechManager {
     /**
      * Adds an entry to the list of tactical transporters . We'll use this
      * to assign units later
-     *@see CampaignTransporterMap
+     * @see CampaignTransporterMap
      * @param unit - The unit we want to add to this Map
      */
     public void addTacticalTransporter(Unit unit) {
         tacticalTransporters.addTransporter(unit);
+    }
+
+    /**
+     * Adds an entry to the list specified transporters list. We'll use this
+     * to assign units later
+     * @see CampaignTransporterMap
+     * @param campaignTransportType Transport Type (enum) we're checking
+     * @param unit unit with transport capabilities
+     */
+    public void addCampaignTransport(CampaignTransportType campaignTransportType, Unit unit) {
+        if (campaignTransportType.isShipTransport()) {
+            shipTransporters.addTransporter(unit);
+        } else if (campaignTransportType.isTacticalTransport()) {
+            tacticalTransporters.addTransporter(unit);
+        }
     }
 
     /**
@@ -1380,11 +1395,27 @@ public class Campaign implements ITechManager {
 
     /**
      * This will update the transport in the transports list with new capacities
-     * @param campaignTransportType type (Class) of TransportedUnitsSummary we're interested at
+     * @param campaignTransportType type (Class) of TransportedUnitsSummary we're interested in
      * @param transport Unit
      */
     public void updateTransportInTransports(CampaignTransportType campaignTransportType, Unit transport) {
         getCampaignTransporterMap(campaignTransportType).updateTransportInTransporterMap(transport);
+    }
+
+    /**
+     * Deletes an entry from the list of specified list of transports. This gets
+     * updated when
+     * the transport is removed from the campaign for one reason or another
+     * @see CampaignTransporterMap
+     * @param campaignTransportType Transport Type (enum) we're checking
+     * @param unit - The ship we want to remove from this Set
+     */
+    public void removeCampaignTransporter(CampaignTransportType campaignTransportType, Unit unit) {
+        if (campaignTransportType.isShipTransport()) {
+            removeShipTransporter(unit);
+        } else if (campaignTransportType.isTacticalTransport()) {
+            removeTacticalTransporter(unit);
+        }
     }
 
     /**

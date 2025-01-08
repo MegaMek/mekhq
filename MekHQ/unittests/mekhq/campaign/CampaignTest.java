@@ -18,6 +18,7 @@
  */
 package mekhq.campaign;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,13 +29,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import megamek.common.Bay;
+import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import megamek.common.Dropship;
@@ -46,6 +47,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -150,40 +153,50 @@ public class CampaignTest {
         assertEquals(expected, testCampaign.getTechs(true));
     }
 
-    @Test
-    @Disabled // REDO - Psi - This is inaccurate. Transport ships is no longer stored as a list of ships.
-    void testTransportShips() {
+    @ParameterizedTest
+    @EnumSource(value = CampaignTransportType.class)
+    void testTransportShips(CampaignTransportType campaignTransportType) {
         Campaign campaign = spy(new Campaign());
 
         // New campaigns have no transports
-        //assertTrue(campaign.getTransportShips().isEmpty());
+        assertTrue(campaign.getTransports(campaignTransportType).isEmpty());
+        campaign.hasTransports(campaignTransportType);
 
         // Create a mock transport
         Dropship mockTransport = mock(Dropship.class);
+
         UUID mockId = UUID.randomUUID();
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(mockId);
         when(mockUnit.getEntity()).thenReturn(mockTransport);
 
+        // Create mock transport capacity info for transport
+        AbstractTransportedUnitsSummary mockTransportedUnitsSummary = mock(campaignTransportType.getTransportedUnitsSummaryType());
+        when(mockTransportedUnitsSummary.getTransportCapabilities()).thenReturn(new HashSet<>(List.of(Bay.class)));
+
+        when(mockUnit.getTransportedUnitsSummaryType(campaignTransportType)).thenReturn(mockTransportedUnitsSummary);
+
         // Add our mock transport
-        //campaign.addTransportShip(mockUnit);
+        campaign.importUnit(mockUnit);
+        campaign.addCampaignTransport(campaignTransportType, mockUnit);
 
         // Ensure our mock transport exists
-        //assertEquals(1, campaign.getTransportShips().size());
-        //assertTrue(campaign.getTransportShips().contains(mockUnit));
+        assertEquals(1, campaign.getTransports(campaignTransportType).size());
+        assertTrue(campaign.getTransportsByType(campaignTransportType, Bay.class).contains(mockUnit));
 
         // Add our mock transport a second time
-        //campaign.addTransportShip(mockUnit);
+        campaign.addCampaignTransport(campaignTransportType, mockUnit);
 
         // Ensure our mock transport exists only once
-        //assertEquals(1, campaign.getTransportShips().size());
-        //assertTrue(campaign.getTransportShips().contains(mockUnit));
+        assertEquals(1, campaign.getTransports(campaignTransportType).size());
+        assertTrue(campaign.getTransportsByType(campaignTransportType, Bay.class).contains(mockUnit));
 
         // Remove the mock transport
-        campaign.removeShipTransporter(mockUnit);
+        campaign.removeCampaignTransporter(campaignTransportType, mockUnit);
 
         // Ensure it was removed
-        //assertTrue(campaign.getTransportShips().isEmpty());
+        campaign.hasTransports(campaignTransportType);
+        assertTrue(campaign.getTransports(campaignTransportType).isEmpty());
     }
 
     @Test
