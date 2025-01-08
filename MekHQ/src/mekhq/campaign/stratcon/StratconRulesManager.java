@@ -1282,11 +1282,21 @@ public class StratconRulesManager {
         }
 
         StratconScenario scenario = track.getScenario(coords);
-        // if we're deploying on top of a scenario, and it's "cloaked" then we have to activate it
-        if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
-            scenario.getBackingScenario().setCloaked(false);
-            setScenarioDates(0, track, campaign, scenario); // must be called before commitPrimaryForces
-            MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
+
+        if (scenario != null) {
+            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+            if (backingScenario != null) {
+                if (backingScenario.isCloaked()) {
+                    backingScenario.setCloaked(false);
+                }
+
+                if (backingScenario.getDate() == null) {
+                    setScenarioDates(0, track, campaign, scenario);
+                }
+
+                MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
+            }
         }
 
         // Traverse neighboring coordinates up to the specified distance
