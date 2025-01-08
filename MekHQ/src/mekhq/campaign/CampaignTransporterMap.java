@@ -115,9 +115,15 @@ public class CampaignTransporterMap {
      * @param transport - The unit we want to remove from this Set
      */
     public void removeTransport(Unit transport) {
-        for (Map<Double, Set<UUID>> capacityMap : transportersMap.values()) {
-            for (Double capacity : capacityMap.keySet()) {
-                capacityMap.get(capacity).remove(transport.getId());
+        for ( Class<? extends Transporter> transporterType : transportersMap.keySet()) {
+            for (Double capacity : transportersMap.get(transporterType).keySet()) {
+                transportersMap.get(transporterType).get(capacity).remove(transport.getId());
+                if (transportersMap.get(transporterType).get(capacity).isEmpty()) {
+                    transportersMap.get(transporterType).remove(capacity);
+                }
+            }
+            if (transportersMap.get(transporterType).isEmpty()) {
+                transportersMap.remove(transporterType);
             }
         }
 
