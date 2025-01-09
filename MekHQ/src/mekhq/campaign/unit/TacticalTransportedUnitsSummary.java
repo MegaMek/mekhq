@@ -104,7 +104,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
             oldTransport = transportedUnit.getTacticalTransportAssignment().getTransport();
             oldTransporterType = transportedUnit.getTacticalTransportAssignment().getTransporterType();
             if (oldTransport.getEntity() != null) {
-                oldTransport.unloadFromTacticalTransport(transportedUnit);
+                oldTransport.unloadTacticalTransport(transportedUnit);
             }
         }
         if (transportedLocation != null) {

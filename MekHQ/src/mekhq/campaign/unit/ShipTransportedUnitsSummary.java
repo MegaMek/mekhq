@@ -63,7 +63,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      */
     public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, Class<? extends Transporter> transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
-        //Set<Entity> oldTransportedEntities = clearTransportedEntities();
         for (Unit transportedUnit : transportedUnits) {
             Unit oldTransport = loadTransport(transporterType, transportedUnit);
             if (oldTransport != null) {

@@ -1471,14 +1471,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
      */
     private void clearTransportAssignment(@Nullable Unit currentUnit) {
         if (currentUnit != null) {
-            if (currentUnit.hasTransportShipAssignment()) {
-                currentUnit.getTransportShipAssignment()
-                        .getTransportShip()
-                        .unloadFromTransportShip(currentUnit);
-            }
-            // If the unit IS a transport, unassign all units from it
-            if (currentUnit.hasShipTransportedUnits()) {
-                currentUnit.unloadTransportShip();
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (currentUnit.hasTransportAssignment(campaignTransportType)) {
+                    Unit oldTransport = currentUnit.unloadFromTransport(campaignTransportType);
+                    oldTransport.initializeTransportSpace(campaignTransportType);
+                    gui.getCampaign().updateTransportInTransports(campaignTransportType, oldTransport);
+                }
+
+                if (currentUnit.hasTransportedUnits(campaignTransportType)) {
+                    currentUnit.unloadTransport(campaignTransportType);
+                }
             }
         }
     }
@@ -1507,17 +1509,14 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private void unassignTransportAction(CampaignTransportType campaignTransportType, Unit... units) {
         Set<Unit> transportsToUpdate = new HashSet<>();
         for (Unit transportedUnit : units) {
-            ITransportAssignment transportAssignment = transportedUnit.getTransportAssignment(campaignTransportType);
-            transportsToUpdate.add(transportAssignment.getTransport());
-            transportAssignment.getTransport().getTransportedUnitsSummary(campaignTransportType).unloadTransport(transportedUnit);
+            transportsToUpdate.add(transportedUnit.unloadFromTransport(campaignTransportType));
             MekHQ.triggerEvent(new UnitChangedEvent(transportedUnit));
         }
 
         for (Unit transportToUpdate : transportsToUpdate) {
-            transportToUpdate.getTransportedUnitsSummary(campaignTransportType).initializeTransportCapacity(transportToUpdate.getEntity().getTransports());
+            transportToUpdate.initializeTransportSpace(campaignTransportType);
             gui.getCampaign().updateTransportInTransports(campaignTransportType, transportToUpdate);
             MekHQ.triggerEvent(new UnitChangedEvent(transportToUpdate));
-
         }
     }
 }

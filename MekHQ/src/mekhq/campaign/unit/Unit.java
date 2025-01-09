@@ -503,6 +503,17 @@ public class Unit implements ITechnology {
         }
     }
 
+    /**
+     * Unloads a unit from a transport of the provided campaign transport type
+     * @param campaignTransportType type (enum) of transport type we want to unload from
+     * @return transport the unit was assigned to
+     */
+    public Unit unloadFromTransport(CampaignTransportType campaignTransportType) {
+        Unit oldTransport = getTransportAssignment(campaignTransportType).getTransport();
+        oldTransport.getTransportedUnitsSummary(campaignTransportType).unloadTransport(this);
+        return oldTransport;
+    }
+
     // End Generic Transport Methods
 
     // A set of methods for working with transport ship assignment for this unit
@@ -2076,7 +2087,7 @@ public class Unit implements ITechnology {
      *
      * @param transportedUnit The unit that we wish to unload from this transport
      */
-    public void unloadFromTacticalTransport(Unit transportedUnit) {
+    public void unloadTacticalTransport(Unit transportedUnit) {
         getTacticalTransportedUnitsSummary().unloadFromTransport(transportedUnit);
     }
 
