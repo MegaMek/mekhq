@@ -33,8 +33,10 @@ import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.enums.ScenarioType;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -45,6 +47,8 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import static mekhq.campaign.mission.resupplyAndCaches.GenerateResupplyContents.RESUPPLY_MINIMUM_PART_WEIGHT;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -213,6 +217,12 @@ public class Loot {
         for (Part part : parts) {
             double partWeight = part.getTonnage();
             partWeight = partWeight == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : partWeight;
+
+            if (part instanceof AmmoBin) {
+                partWeight = RESUPPLY_AMMO_TONNAGE;
+            } else if (part instanceof Armor) {
+                partWeight = RESUPPLY_ARMOR_TONNAGE;
+            }
 
             if (isResupply) {
                 if (cargo - partWeight < 0) {

@@ -135,6 +135,11 @@ public class Contract extends Mission {
         this.employer = s;
     }
 
+    /**
+     * Returns the contract length in months.
+     *
+     * @return the number and corresponding length of the contact in months as an integer
+    */
     public int getLength() {
         return nMonths;
     }
@@ -183,12 +188,20 @@ public class Contract extends Mission {
         return transportComp;
     }
 
+    public String getTransportCompString() {
+        return String.valueOf(transportComp) + "%";
+    }
+
     public void setTransportComp(int s) {
         transportComp = s;
     }
 
     public int getStraightSupport() {
         return straightSupport;
+    }
+
+    public String getStraightSupportString() {
+        return String.valueOf(straightSupport) + "%";
     }
 
     public void setStraightSupport(int s) {
@@ -215,12 +228,20 @@ public class Contract extends Mission {
         return battleLossComp;
     }
 
+    public String getBattleLossCompString() {
+        return String.valueOf(battleLossComp) + "%";
+    }
+
     public void setBattleLossComp(int s) {
         battleLossComp = Math.max(0, Math.min(100, s));
     }
 
     public int getSalvagePct() {
         return salvagePct;
+    }
+
+    public String getSalvagePctString() {
+        return String.valueOf(salvagePct) + "%";
     }
 
     public void setSalvagePct(int s) {

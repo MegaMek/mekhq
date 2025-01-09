@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -50,6 +49,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+import org.apache.commons.math3.util.Pair;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -176,10 +176,10 @@ public class StratconRulesManager {
         AtBMoraleLevel moraleLevel = contract.getMoraleLevel();
 
         switch (moraleLevel) {
-            case STALEMATE -> scenarioRolls = (int) round(scenarioRolls * 1.25);
-            case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.5);
-            case DOMINATING -> scenarioRolls = scenarioRolls * 2;
-            case OVERWHELMING -> scenarioRolls = scenarioRolls * 3;
+            case ADVANCING -> scenarioRolls = (int) round(scenarioRolls * 1.33);
+            case DOMINATING -> scenarioRolls = (int) round(scenarioRolls * 1.66);
+            case OVERWHELMING -> scenarioRolls = scenarioRolls * 2;
+            default -> {}
         }
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
@@ -684,13 +684,13 @@ public class StratconRulesManager {
         if (template == null || !template.getStratConScenarioType().isResupply()) {
             ContractCommandRights commandRights = contract.getCommandRights();
             switch (commandRights) {
-                case INTEGRATED, HOUSE -> {
+                case INTEGRATED -> {
                     scenario.setTurningPoint(true);
                     if (randomInt(4) == 0) {
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
-                case LIAISON -> {
+                case HOUSE, LIAISON -> {
                     if (randomInt(4) == 0) {
                         scenario.setTurningPoint(true);
                         setAttachedUnitsModifier(scenario, contract);
@@ -1016,7 +1016,7 @@ public class StratconRulesManager {
                 if (availableForceIDs.isEmpty()) {
                     ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
                     if (!combatTeams.isEmpty()) {
-                        combatTeam = ObjectUtility.getRandomItem(combatTeams);
+                        combatTeam = getRandomItem(combatTeams);
 
                         forceID = combatTeam.getForceId();
                     } else {
@@ -1214,20 +1214,61 @@ public class StratconRulesManager {
     }
 
     /**
-     * Process the deployment of a force to the given coordinates on the given
-     * track.
-     * This does not include assigning the force to any scenarios
+     * Processes the deployment of a force to the specified coordinates on the given track.
+     *
+     * <p>This includes revealing the deployed coordinates, identifying and revealing facilities
+     * and scenarios within the scan range, and updating necessary game states such as fatigue
+     * and force assignments. It does not include assigning the force to specific scenarios.</p>
+     *
+     * <strong>Behavior:</strong>
+     * <ul>
+     *   <li>If the force's deployment coordinates are unrevealed, fatigue is increased for the force.</li>
+     *   <li>Ensures that fatigue is increased only once during the deployment process.</li>
+     *   <li>Reveals all coordinates, facilities, and scenarios within the force's scan range.</li>
+     *   <li>Handles cloaked scenarios by activating them and updating game states as necessary.</li>
+     *   <li>Updates the track's revealed coordinates to include the deployment and adjacent areas within range.</li>
+     *   <li>Assigns the deployed force to the specified coordinates and clears their previous track assignments.</li>
+     * </ul>
+     *
+     * <strong>Notes:</strong>
+     * <ul>
+     *   <li>Scout or patrol roles may increase the scan range.</li>
+     *   <li>The method uses a breadth-first search (BFS) approach to traverse the hex grid and reveal neighbors
+     *       within the scan range efficiently, avoiding redundant processing using a visited set.</li>
+     * </ul>
+     *
+     * @param coords    The coordinates where the force is being deployed.
+     * @param forceID   The ID of the force being deployed.
+     * @param campaign  The current campaign context, used to retrieve combat teams and update game events.
+     * @param track     The current track state where the deployment is happening.
+     * @param sticky    Whether the force should be persistently assigned to the track.
+     *
+     * @throws IllegalStateException if the force or the associated combat team is missing or invalid.
      */
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
-            StratconTrackState track, boolean sticky) {
-        // plan of action:
-        // increase fatigue if the coordinates are not currently unrevealed reveal deployed coordinates
-        // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
-        // reveal scenarios in deployed coordinates (and all adjacent coordinates for scout lances)
-
+                                              StratconTrackState track, boolean sticky) {
         // we want to ensure we only increase Fatigue once
         boolean hasFatigueIncreased = false;
 
+        // BFS queue for coordinates, tracks distance from the starting point
+        Queue<Pair<StratconCoords, Integer>> queue = new LinkedList<>();
+        // Keep a set of visited coordinates to avoid redundancy
+        Set<StratconCoords> visited = new HashSet<>();
+
+        // Start with the initial deployment coordinate at distance 0
+        queue.add(new Pair<>(coords, 0));
+        visited.add(coords);
+
+        // Determine scan range
+        int scanRange = track.getScanRangeIncrease();
+
+        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+
+        if (combatTeam != null && combatTeam.getRole().isPatrol()) {
+            scanRange++;
+        }
+
+        // Process starting point
         if (!track.getRevealedCoords().contains(coords)) {
             increaseFatigue(forceID, campaign);
             hasFatigueIncreased = true;
@@ -1235,9 +1276,9 @@ public class StratconRulesManager {
 
         track.getRevealedCoords().add(coords);
 
-        StratconFacility facility = track.getFacility(coords);
-        if (facility != null) {
-            facility.setVisible(true);
+        StratconFacility targetFacility = track.getFacility(coords);
+        if (targetFacility != null) {
+            targetFacility.setVisible(true);
         }
 
         StratconScenario scenario = track.getScenario(coords);
@@ -1248,34 +1289,40 @@ public class StratconRulesManager {
             MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
         }
 
-        CombatTeam combatTeam = campaign.getCombatTeamsTable().get(forceID);
+        // Traverse neighboring coordinates up to the specified distance
+        while (!queue.isEmpty()) {
+            Pair<StratconCoords, Integer> current = queue.poll();
+            StratconCoords currentCoords = current.getKey();
+            int distance = current.getValue();
 
-        // This may return null if we're deploying a force that isn't a Combat Team for whatever reason
-        if (combatTeam != null) {
-            if (combatTeam.getRole().isPatrol()) {
+            // Only process neighbors if they're within the max distance
+            if (distance < scanRange) {
                 for (int direction = 0; direction < 6; direction++) {
-                    StratconCoords checkCoords = coords.translate(direction);
+                    StratconCoords checkCoords = currentCoords.translate(direction);
 
-                    facility = track.getFacility(checkCoords);
-                    if (facility != null) {
-                        facility.setVisible(true);
+                    // Skip already visited coordinates
+                    if (visited.contains(checkCoords)) {
+                        continue;
                     }
 
-                    scenario = track.getScenario(checkCoords);
-                    // if we've revealed a scenario and it's "cloaked"
-                    // we have to activate it
-                    if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
-                        scenario.getBackingScenario().setCloaked(false);
-                        setScenarioDates(0, track, campaign, scenario);
-                        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
+                    // Mark as visited
+                    visited.add(checkCoords);
+                    queue.add(new Pair<>(checkCoords, distance + 1)); // Add the neighbor with incremented distance
+
+                    // Process facilities
+                    targetFacility = track.getFacility(checkCoords);
+                    if (targetFacility != null) {
+                        targetFacility.setVisible(true);
                     }
 
-                    if ((!track.getRevealedCoords().contains(checkCoords)) && (!hasFatigueIncreased)) {
+                    // Increase fatigue only once
+                    if (!track.getRevealedCoords().contains(checkCoords) && !hasFatigueIncreased) {
                         increaseFatigue(forceID, campaign);
                         hasFatigueIncreased = true;
                     }
 
-                    track.getRevealedCoords().add(coords.translate(direction));
+                    // Mark the current coordinate as revealed
+                    track.getRevealedCoords().add(checkCoords);
                 }
             }
         }
@@ -1465,31 +1512,27 @@ public class StratconRulesManager {
             return FAILED;
         }
 
-        Skill tactics = commander.getSkill(S_TACTICS);
-
-        if (tactics == null) {
-            reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementCommanderNoSkill.text"),
-                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                CLOSING_SPAN_TAG));
-            campaign.addReport(reportStatus.toString());
-
-            ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
-
-            generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
-
-            return INTERCEPTED;
-        }
 
         roll = d6(2);
-        int baseTargetNumber = 9;
-        int targetNumber = baseTargetNumber - tactics.getFinalSkillValue();
+        int targetNumber = 9;
+        Skill tactics = commander.getSkill(S_TACTICS);
+
+        if (tactics != null) {
+            targetNumber -= tactics.getFinalSkillValue();
+        } else {
+            // Effectively a -1 penalty for being unskilled
+            targetNumber++;
+        }
 
         if (roll >= targetNumber) {
             reportStatus.append(' ');
-            reportStatus.append(String.format(resources.getString("reinforcementEvasionSuccessful.text"),
+            String reportString = tactics != null
+                ? resources.getString("reinforcementEvasionSuccessful.text")
+                :  resources.getString("reinforcementEvasionSuccessful.noSkill");
+            reportStatus.append(String.format(reportString,
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 CLOSING_SPAN_TAG, roll, targetNumber));
+
 
             campaign.addReport(reportStatus.toString());
 
@@ -1882,9 +1925,7 @@ public class StratconRulesManager {
         // by default, certain conditions may make this bigger
         scenario.setRequiredPlayerLances(1);
 
-        // do an appropriate allied force if the contract calls for it
-        // do any attached or integrated units
-        setAlliedForceModifier(scenario, contract);
+        // do any facility or global modifiers
         applyFacilityModifiers(scenario, track, coords);
         applyGlobalModifiers(scenario, contract.getStratconCampaignState());
 
@@ -1967,50 +2008,6 @@ public class StratconRulesManager {
                 modifier.setAdditionalBriefingText('(' + facility.getDisplayableName() + ") "
                     + modifier.getAdditionalBriefingText());
                 scenario.getBackingScenario().addScenarioModifier(modifier);
-            }
-        }
-    }
-
-    /**
-     * Set up the appropriate primary allied force modifier, if any
-     *
-     * @param contract The scenario's contract.
-     */
-    private static void setAlliedForceModifier(StratconScenario scenario, AtBContract contract) {
-        int alliedUnitOdds = 0;
-
-        // first, we determine the odds of having an allied unit present
-        // TODO: move this override out to the contract definition
-        if (contract.getContractType().isReliefDuty()) {
-            alliedUnitOdds = 50;
-        } else {
-            switch (contract.getCommandRights()) {
-                case INTEGRATED:
-                    alliedUnitOdds = 50;
-                    break;
-                case HOUSE:
-                    alliedUnitOdds = 30;
-                    break;
-                case LIAISON:
-                    alliedUnitOdds = 10;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-
-        // if an allied unit is present, then we want to make sure that
-        // it's ground units for ground battles
-        if (randomInt(100) <= alliedUnitOdds) {
-            if ((backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere)
-                    || (backingScenario.getTemplate().mapParameters.getMapLocation() == Space)) {
-                backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_AIR_UNITS));
-            } else {
-                backingScenario.addScenarioModifier(
-                        AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_ALLIED_GROUND_UNITS));
             }
         }
     }

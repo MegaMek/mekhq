@@ -19,12 +19,10 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.OffBoardDirection;
+import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
@@ -92,7 +90,9 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
             addBotForce(allyEntitiesForce, campaign);
         }
 
-        addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign), campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+        addEnemyForce(enemyEntities, weightClass, campaign);
         BotForce botForce = getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities);
 
         try {

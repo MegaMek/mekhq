@@ -75,10 +75,10 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
+import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 
 /**
@@ -1014,7 +1014,7 @@ public class Unit implements ITechnology {
         // make sure we take note of existing hits to start and as we cycle through
         // locations
         int existingHits = getHitCriticals(type, equipmentNum);
-        int neededHits = Math.max(0, hits - existingHits);
+        int neededHits = max(0, hits - existingHits);
         int usedHits = 0;
         for (int loc = 0; loc < getEntity().locations(); loc++) {
             if (neededHits > usedHits) {
@@ -1285,43 +1285,64 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Calculates and returns the total cargo capacity of a fully crewed entity.
-     * If the entity is not fully crewed, the cargo capacity will be returned as 0.
-     * The capacity is calculated based on the sum capacity of CargoBay and
-     * StandardSeatCargoBay type Bays in the entity, and from non-damaged
-     * EquipmentParts (with the 'part name' following the pattern "Cargo (X ton)" or
-     * "Cargo (X tons)"). Any erroneous cases are logged.
+     * Computes the total cargo capacity of the entity, accounting for transport bays
+     * and mounted equipment designated for cargo, only if the entity is fully crewed.
      *
-     * @return The total cargo capacity of the fully crewed entity,
-     *         or 0 if the entity is not fully crewed.
-     * @throws NumberFormatException If the equipment part named "Cargo (X ton)" or
-     *         "Cargo (X tons)" does not contain a valid number for X.
+     * <p>The total cargo capacity is the sum of the following:</p>
+     * <ul>
+     *   <li>The usable capacities of transport bays that are instances of {@link CargoBay},
+     *       {@link RefrigeratedCargoBay}, or {@link InsulatedCargoBay}, adjusted for damage.</li>
+     *   <li>The tonnage of mounted equipment marked as cargo (via the {@code F_CARGO} flag),
+     *       provided the equipment is operable and located in valid entity sections.</li>
+     * </ul>
+     *
+     * <p><strong>Important Considerations:</strong></p>
+     * <ul>
+     *   <li>The method returns a cargo capacity of zero if the entity is not fully crewed.</li>
+     *   <li>Capabilities of transport bays or mounted equipment that are damaged beyond operability
+     *       or located in destroyed sections are not included in the calculation.</li>
+     *   <li>The computation assumes no external conditions affect the equipment or bays beyond the
+     *       immediate considerations of damage and operability.</li>
+     * </ul>
+     *
+     * @return The total cargo capacity of the entity if it is fully crewed; otherwise, {@code 0.0}.
      */
     public double getCargoCapacity() {
         if (!isFullyCrewed()) {
-            return 0;
+            return 0.0;
         }
 
-        double capacity = 0;
+        double capacity = 0.0;
+
+        // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
-            if (bay instanceof CargoBay || bay instanceof StandardSeatCargoBay) {
-                capacity += bay.getCapacity();
+            double bayCapacity = bay.getCapacity();
+            double bayDamage = bay.getBayDamage();
+
+            double actualCapacity = max(0, bayCapacity - bayDamage);
+
+            if (bay instanceof CargoBay) {
+                capacity += actualCapacity;
+                continue;
+            }
+
+            if (bay instanceof RefrigeratedCargoBay) {
+                capacity += actualCapacity;
+                continue;
+            }
+
+            if (bay instanceof InsulatedCargoBay) {
+                capacity += actualCapacity;
             }
         }
 
-        Pattern cargoPattern = Pattern.compile("Cargo \\((.*) ton(s)?\\)");
-
-        for (Part part : getParts()) {
-            if (part instanceof EquipmentPart && !(part.needsFixing() || part.isMountedOnDestroyedLocation())) {
-                Matcher matcher = cargoPattern.matcher(part.getName());
-
-                if (matcher.find()) {
-                    try {
-                        double partCapacity = Double.parseDouble(matcher.group(1));
-                        capacity += partCapacity;
-                    } catch (NumberFormatException e) {
-                        logger.error(String.format("Failed to parse %s as double", matcher.group(1)));
-                    }
+        // Add capacities from mounted equipment
+        for (Mounted<?> mounted : entity.getMisc()) {
+            if (mounted.getType().hasFlag(F_CARGO)) {
+                // isOperable doesn't check if the mounted location still exists, so we check for
+                // that first.
+                if ((entity.getInternal(mounted.getLocation()) > 0) && (mounted.isOperable())) {
+                    capacity += mounted.getTonnage();
                 }
             }
         }
@@ -4105,9 +4126,9 @@ public class Unit implements ITechnology {
         // when they customize in MM but we should put an option in MM to ignore those
         // limits
         // and set it to true when we start up through MHQ
-        entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
-        entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
+        entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), 0);
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             // Use tacops crew hits calculations and current size versus maximum size
             entity.getCrew().setCurrentSize(nCrew + nGunners + nDrivers);
@@ -4165,11 +4186,11 @@ public class Unit implements ITechnology {
             artillery += pilot.getGunneryInjuryMod();
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
-        crew.setPiloting(Math.min(Math.max(pilotingMek, 0), 8));
-        crew.setGunnery(Math.min(Math.max(gunneryMek, 0), 7));
-        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
-        crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
+        crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
+        crew.setGunnery(Math.min(max(gunneryMek, 0), 7));
+        crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
+        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 7));
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
@@ -4205,13 +4226,13 @@ public class Unit implements ITechnology {
                 && p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
             artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
         }
-        entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), slot);
-        entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), slot);
+        entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), slot);
         // also set RPG gunnery skills in case present in game options
-        entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
+        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
@@ -4773,7 +4794,7 @@ public class Unit implements ITechnology {
      * @param t The time (in minutes) remaining to mothball or activate the unit.
      */
     public void setMothballTime(int t) {
-        mothballTime = Math.max(t, 0);
+        mothballTime = max(t, 0);
     }
 
     /**

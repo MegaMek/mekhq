@@ -23,6 +23,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
@@ -107,12 +108,15 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+
         if (isAttacker()) {
-            addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign),
-                    EntityWeightClass.WEIGHT_ASSAULT, 2, 0, campaign);
+            addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 2,
+                0, campaign);
         } else {
-            addEnemyForce(enemyEntities, getCombatTeamById(campaign).getWeightClass(campaign),
-                    EntityWeightClass.WEIGHT_HEAVY, 0, 0, campaign);
+            addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_HEAVY, 0,
+                0, campaign);
         }
 
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);

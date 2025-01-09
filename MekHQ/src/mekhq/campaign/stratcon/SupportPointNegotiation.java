@@ -17,14 +17,14 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 /**
  * This class handles Support Point negotiations for StratCon.
  * <p>
- * It includes functionality to negotiate both initial and monthly support points for contracts,
+ * It includes functionality to negotiate both initial and weekly support points for contracts,
  * based on the skill levels of available Admin/Transport personnel.
  *
  * <p>The workflow includes:</p>
  * <ul>
  *     <li>Filtering and sorting Admin/Transport personnel by their skill levels.</li>
  *     <li>Negotiating support points for either a single contract (initial negotiation) or all
- *     active contracts (monthly negotiation).</li>
+ *     active contracts (weekly negotiation).</li>
  *     <li>Calculating support points based on dice rolls and personnel skill levels.</li>
  *     <li>Generating appropriate campaign reports reflecting the success or failure of negotiations.</li>
  * </ul>
@@ -34,7 +34,7 @@ public class SupportPointNegotiation {
         MekHQ.getMHQOptions().getLocale());
 
     /**
-     * Negotiates monthly additional support points for all active AtB contracts.
+     * Negotiates weekly additional support points for all active AtB contracts.
      *
      * <p>Uses available Admin/Transport personnel to negotiate support points for contracts, with older contracts
      * being processed first. Personnel are removed from the available pool as they are assigned to contracts.
@@ -119,7 +119,9 @@ public class SupportPointNegotiation {
     private static void processContractSupportPoints(Campaign campaign, AtBContract contract,
                                                      List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
-        int maxSupportPoints = contract.getRequiredLances();
+        int maxSupportPoints = isInitialNegotiation
+            ? contract.getRequiredLances() * 3
+            : contract.getRequiredLances();
 
         Iterator<Person> iterator = adminTransport.iterator();
 
@@ -152,7 +154,7 @@ public class SupportPointNegotiation {
                 pluralizer));
         } else {
             campaign.addReport(String.format(
-                resources.getString("supportPoints.monthly"),
+                resources.getString("supportPoints.weekly"),
                 spanOpeningWithCustomColor(fontColor),
                 negotiatedSupportPoints,
                 CLOSING_SPAN_TAG,
@@ -172,6 +174,9 @@ public class SupportPointNegotiation {
         for (Person person : campaign.getAdmins()) {
             if (person.getPrimaryRole().isAdministratorTransport()
                 || person.getSecondaryRole().isAdministratorTransport()) {
+                // Each character gets to roll three times, so we add them to the list three times.
+                adminTransport.add(person);
+                adminTransport.add(person);
                 adminTransport.add(person);
             }
         }
@@ -216,14 +221,14 @@ public class SupportPointNegotiation {
      * Adds a report to the campaign log indicating the absence of Admin/Transport personnel for support point negotiations.
      *
      * <p>If a contract is specified, the report is related to that contract. Otherwise, the report is general
-     * (e.g., for monthly negotiations).</p>
+     * (e.g., for weekly negotiations).</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
      * @param contract An optional {@link AtBContract} instance representing the affected contract (can be {@code null}).
      */
     private static void addReportNoPersonnel(Campaign campaign, @Nullable AtBContract contract) {
         String reportKey = String.format("supportPoints.%s.noAdministrators",
-            contract == null ? "monthly" : "initial");
+            contract == null ? "weekly" : "initial");
 
         if (contract == null) {
             campaign.addReport(String.format(resources.getString(reportKey),

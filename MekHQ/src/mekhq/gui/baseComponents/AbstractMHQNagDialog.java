@@ -19,9 +19,9 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -80,8 +80,6 @@ public abstract class AbstractMHQNagDialog extends JDialog {
     protected final transient ResourceBundle resources = ResourceBundle.getBundle(
         "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
 
-    private static final MMLogger logger = MMLogger.create(AbstractMHQNagDialog.class);
-
     /**
      * Constructs an AbstractMHQNagDialog with the provided campaign and nag key.
      *
@@ -98,10 +96,10 @@ public abstract class AbstractMHQNagDialog extends JDialog {
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1;
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weighty = 1;
 
         // Left box for speaker details
         JPanel leftBox = new JPanel();
@@ -109,7 +107,7 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        Person speaker = campaign.getSeniorAdminCommandPerson();
+        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
         String speakerName = (speaker != null) ? speaker.getFullTitle() : campaign.getName();
 
         // Add speaker image (icon)
@@ -134,10 +132,10 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         leftBox.add(leftDescription);
 
         // Add leftBox to mainPanel
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0;
-        mainPanel.add(leftBox, gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 0;
+        mainPanel.add(leftBox, constraints);
 
         // Right box: Just a message
         JPanel rightBox = new JPanel(new BorderLayout());
@@ -148,9 +146,9 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
-        gbc.gridx = 1;
-        gbc.weightx = 1; // Allow horizontal stretching
-        mainPanel.add(rightBox, gbc);
+        constraints.gridx = 1;
+        constraints.weightx = 1; // Allow horizontal stretching
+        mainPanel.add(rightBox, constraints);
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -166,7 +164,6 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         advanceDayButton.addActionListener(e -> {
             advanceDaySelected = true;
             MekHQ.getMHQOptions().setNagDialogIgnore(this.nagKey, ignoreFutureNags.isSelected());
-            logger.info("Nag dialog cancelled: (" + nagKey + ':' + ignoreFutureNags.isSelected() + ')');
             dispose();
         });
 
@@ -174,7 +171,6 @@ public abstract class AbstractMHQNagDialog extends JDialog {
         cancelButton.addActionListener(e -> {
             advanceDaySelected = false;
             MekHQ.getMHQOptions().setNagDialogIgnore(this.nagKey, ignoreFutureNags.isSelected());
-            logger.info("Nag dialog cancelled: (" + nagKey + ':' + ignoreFutureNags.isSelected() + ')');
             dispose();
         });
 

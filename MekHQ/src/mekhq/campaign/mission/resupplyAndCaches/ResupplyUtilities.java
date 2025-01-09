@@ -19,7 +19,7 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Compute;
-import megamek.logging.MMLogger;
+import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -27,14 +27,19 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy;
 
 import java.util.UUID;
+import java.util.Vector;
 
-import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
-import static mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy.abandonedConvoyDialog;
+import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 /**
  * Utility class for managing resupply operations and events in MekHQ campaigns.
@@ -54,8 +59,6 @@ import static mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy.abandoned
  * <p>This utility is central to the logistics and event-handling systems present in MekHQ's resupply mechanics.</p>
  */
 public class ResupplyUtilities {
-    private static final MMLogger logger = MMLogger.create(ResupplyUtilities.class);
-
     /**
      * Processes an abandoned convoy, managing the removal of units and determining the fate of the
      * convoy's crew members.
@@ -75,30 +78,29 @@ public class ResupplyUtilities {
      */
     public static void processAbandonedConvoy(Campaign campaign, AtBContract contract,
                                               AtBDynamicScenario scenario) {
-        Force convoy = null;
-        for (Integer forceId : scenario.getPlayerTemplateForceIDs()) {
-            try {
-                Force force = campaign.getForce(forceId);
+        final int scenarioId = scenario.getId();
 
-                if (force.isConvoyForce()) {
-                    convoy = force;
+        for (Force force : campaign.getAllForces()) {
+            Force parentForce = force.getParentForce();
 
-                    for (UUID unitID : force.getAllUnits(false)) {
-                        Unit unit = campaign.getUnit(unitID);
+            if (parentForce != null && (force.getParentForce().isConvoyForce())) {
+                continue;
+            }
 
-                        for (Person crewMember : unit.getCrew()) {
-                            decideCrewMemberFate(campaign, crewMember);
-                        }
+            if (force.isConvoyForce() && force.getScenarioId() == scenarioId) {
+                new DialogAbandonedConvoy(campaign, contract, force);
 
-                        campaign.removeUnit(unitID);
+                for (UUID unitID : force.getAllUnits(false)) {
+                    Unit unit = campaign.getUnit(unitID);
+
+                    for (Person crewMember : unit.getCrew()) {
+                        decideCrewMemberFate(campaign, crewMember);
                     }
+
+                    campaign.removeUnit(unitID);
                 }
-            } catch (Exception ex) {
-                logger.warn(ex.getMessage(), ex);
             }
         }
-
-        abandonedConvoyDialog(campaign, contract, convoy);
     }
 
     /**
@@ -142,6 +144,86 @@ public class ResupplyUtilities {
      * @return the estimated cargo requirement in tons.
      */
     public static int estimateCargoRequirements(Campaign campaign, AtBContract contract) {
-        return (int) ceil(calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER);
+        double targetTonnage = calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER;
+
+        // Armor and ammo are always delivered in blocks, so cargo will never be less than the sum
+        // of those blocks
+        return max(RESUPPLY_AMMO_TONNAGE + RESUPPLY_ARMOR_TONNAGE, (int) Math.ceil(targetTonnage));
+    }
+
+    /**
+     * Determines if a convoy only contains VTOL or similar units.
+     *
+     * @param campaign the {@link Campaign} instance the convoy belongs to.
+     * @param convoy   the {@link Force} representing the convoy to check.
+     * @return {@code true} if the convoy only contains VTOL units, {@code false} otherwise.
+     */
+    public static boolean forceContainsOnlyVTOLForces(Campaign campaign, Force convoy) {
+        for (UUID unitId : convoy.getAllUnits(false)) {
+            Entity entity = getEntityFromUnitId(campaign, unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            if (!entity.isAirborneVTOLorWIGE()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines if a convoy contains a majority of VTOL (or similar) units.
+     *
+     * <p>This is calculated by checking if at least half of the units are VTOLs or similarly
+     * airborne types.</p>
+     *
+     * @param campaign      the {@link Campaign} instance the convoy belongs to.
+     * @param convoy  the {@link Force} representing the convoy being evaluated.
+     * @return {@code true} if the VTOL units constitute at least half of the units, {@code false} otherwise.
+     */
+    public static boolean forceContainsMajorityVTOLForces(Campaign campaign, Force convoy) {
+        Vector<UUID> allUnits = convoy.getAllUnits(false);
+        int convoySize = allUnits.size();
+        int vtolCount = 0;
+
+        for (UUID unitId : convoy.getAllUnits(false)) {
+            Entity entity = getEntityFromUnitId(campaign, unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            if (!entity.isAirborneVTOLorWIGE()) {
+                vtolCount++;
+            }
+        }
+
+        return vtolCount >= floor((double) convoySize / 2);
+    }
+
+    /**
+     * Determines if a convoy only contains aerial units, such as aerospace or conventional fighters.
+     *
+     * @param campaign the {@link Campaign} instance the convoy belongs to.
+     * @param convoy   the {@link Force} representing the convoy to check.
+     * @return {@code true} if the convoy only contains aerial units, {@code false} otherwise.
+     */
+    public static boolean forceContainsOnlyAerialForces(Campaign campaign, Force convoy) {
+        for (UUID unitId : convoy.getAllUnits(false)) {
+            Entity entity = getEntityFromUnitId(campaign, unitId);
+
+            if (entity == null) {
+                continue;
+            }
+
+            if (!entity.isAerospace() && !entity.isConventionalFighter()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

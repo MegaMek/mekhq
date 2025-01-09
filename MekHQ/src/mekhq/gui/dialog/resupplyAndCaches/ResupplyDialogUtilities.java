@@ -56,34 +56,6 @@ import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
  */
 public class ResupplyDialogUtilities {
     /**
-     * Finds the most suitable logistics representative from the campaign's logistics personnel.
-     *
-     * <p>This method iterates through the list of logistics personnel in the
-     * {@link Campaign}, selecting the one with the highest rank. If there's a tie
-     *  in the ranks, skill levels serve as a tiebreaker.</p>
-     *
-     * @param campaign the {@link Campaign} instance containing the logistics personnel.
-     * @return the highest-ranked {@link Person} among the campaign's logistics personnel,
-     *         or {@code null} if there are no logistics personnel.
-     */
-    static @Nullable Person pickLogisticsRepresentative(Campaign campaign) {
-        Person highestRankedCharacter = null;
-
-        for (Person person : campaign.getLogisticsPersonnel()) {
-            if (highestRankedCharacter == null) {
-                highestRankedCharacter = person;
-                continue;
-            }
-
-            if (person.outRanksUsingSkillTiebreaker(campaign, highestRankedCharacter)) {
-                highestRankedCharacter = person;
-            }
-        }
-
-        return highestRankedCharacter;
-    }
-
-    /**
      * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon
      * for the campaign is returned instead.
      *
@@ -183,10 +155,10 @@ public class ResupplyDialogUtilities {
      * @return a {@link String} containing the enemy faction reference.
      */
     public static String getEnemyFactionReference(Resupply resupply) {
-        final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        String enemyFactionReference = contract.getEnemy().getFullName(campaign.getGameYear());
+        String enemyFactionReference = contract.getEnemyBotName();
+
         if (!enemyFactionReference.contains("Clan")) {
             enemyFactionReference = "the " + enemyFactionReference;
         }

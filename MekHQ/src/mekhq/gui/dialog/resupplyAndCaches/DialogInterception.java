@@ -32,7 +32,9 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static megamek.common.Compute.randomInt;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyAerialForces;
+import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceContainsOnlyVTOLForces;
+import static mekhq.gui.baseComponents.AbstractMHQNagDialog.getSpeakerDescription;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -42,7 +44,11 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * localized resources to generate the content dynamically and includes relevant visual elements
  * like the speaker's icon, title, and mission details.
  */
-public class DialogInterception {
+public class DialogInterception extends JDialog{
+    final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
+    final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
+    final int INSERT_SIZE = UIUtil.scaleForGUI(10);
+
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
 
     /**
@@ -68,21 +74,25 @@ public class DialogInterception {
      *                     in the interception. If {@code null}, the dialog will use default values
      *                     for the speaker and faction visuals.
      */
-    public static void dialogInterception(Resupply resupply, @Nullable Force targetConvoy) {
+    public DialogInterception(Resupply resupply, @Nullable Force targetConvoy) {
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
+        setTitle(resources.getString("incomingTransmission.title"));
 
-        // Retrieves the title from the resources
-        String title = resources.getString("dialog.title");
+        // Main Panel to hold both boxes
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weighty = 1;
 
-        // Create a custom dialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
+        // Left box for speaker details
+        JPanel leftBox = new JPanel();
+        leftBox.setLayout(new BoxLayout(leftBox, BoxLayout.Y_AXIS));
+        leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Establish the speaker
+        // Get speaker details
         Person speaker = null;
         if (targetConvoy != null) {
             UUID speakerId = targetConvoy.getForceCommanderID();
@@ -91,67 +101,112 @@ public class DialogInterception {
 
         String speakerName;
         if (speaker != null) {
-            speakerName = speaker.getFullTitle() + " - " + targetConvoy.getName();
+            speakerName = speaker.getFullTitle();
         } else {
             if (targetConvoy == null) {
                 speakerName = String.format(resources.getString("dialogBorderConvoySpeakerDefault.text"),
                     contract.getEmployerName(campaign.getGameYear()));
             } else {
-                speakerName = targetConvoy.getName();
+                speakerName = campaign.getName();
             }
         }
 
-        // An ImageIcon to hold the faction icon
-        ImageIcon speakerIcon;
-        if (targetConvoy == null) {
-            speakerIcon = getFactionLogo(campaign, contract.getEmployerCode(),
-                true);
-        } else {
-            speakerIcon = getSpeakerIcon(campaign, speaker);
+        // Add speaker image (icon)
+        ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
+        if (speakerIcon != null) {
+            speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        }
+        JLabel imageLabel = new JLabel();
+        imageLabel.setIcon(speakerIcon);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Speaker description (below the icon)
+        StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
+        JLabel leftDescription = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                LEFT_WIDTH, speakerDescription));
+        leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Add the image and description to the leftBox
+        leftBox.add(imageLabel);
+        leftBox.add(Box.createRigidArea(new Dimension(0, INSERT_SIZE)));
+        leftBox.add(leftDescription);
+
+        // Add leftBox to mainPanel
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 0;
+        mainPanel.add(leftBox, constraints);
+
+        // Right box: Just a message
+        JPanel rightBox = new JPanel(new BorderLayout());
+        rightBox.setBorder(BorderFactory.createEtchedBorder());
+
+        String message = "";
+
+        if (targetConvoy != null) {
+            if (forceContainsOnlyVTOLForces(campaign, targetConvoy)
+                || forceContainsOnlyAerialForces(campaign, targetConvoy)) {
+                message = String.format(
+                    resources.getString("statusUpdateIntercepted.boilerplate"),
+                        campaign.getCommanderAddress(false),
+                        resources.getString("interceptionInstructions.text"));
+            }
         }
 
-        speakerIcon = scaleImageIconToWidth(speakerIcon, 100);
+        if (message.isBlank()) {
+            message = String.format(
+                resources.getString("statusUpdateIntercepted" + randomInt(20) + ".text"),
+                    campaign.getCommanderAddress(false),
+                    resources.getString("interceptionInstructions.text"));
+        }
 
-        // Create and display the message
-        String message = String.format(
-            resources.getString("statusUpdateIntercepted" + randomInt(20) + ".text"),
-            campaign.getCommanderAddress(false),
-            resources.getString("interceptionInstructions.text"));
-
-        // Create a panel to display the icon and the message
-        JLabel description = new JLabel(
+        JLabel rightDescription = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                UIUtil.scaleForGUI(DIALOG_WIDTH), message));
-        description.setHorizontalAlignment(JLabel.CENTER);
+                RIGHT_WIDTH, message));
+        rightBox.add(rightDescription);
 
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setBorder(BorderFactory.createTitledBorder(
-            String.format(resources.getString("dialogBorderTitle.text"), speakerName)));
-        descriptionPanel.add(description);
-        dialog.add(descriptionPanel, BorderLayout.CENTER);
+        // Add rightBox to mainPanel
+        constraints.gridx = 1;
+        constraints.weightx = 1; // Allow horizontal stretching
+        mainPanel.add(rightBox, constraints);
 
-        // Create a panel to display the icon and the message
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(speakerIcon);
-        panel.add(imageLabel, BorderLayout.CENTER);
-        panel.add(descriptionPanel, BorderLayout.SOUTH);
+        add(mainPanel, BorderLayout.CENTER);
 
-        // Create the buttons and add their action listeners.
-        JButton optionConfirm = new JButton(resources.getString("logisticsReceived.text"));
-        optionConfirm.addActionListener(evt -> dialog.dispose());
+        // Create a container panel to hold both the button panel and the new panel
+        JPanel containerPanel = new JPanel();
+        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS)); // Stack vertically
 
-        // Create a panel for buttons and add buttons to it
+        // Buttons panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(optionConfirm);
+        JButton confirmButton = new JButton(resources.getString("logisticsReceived.text"));
+        confirmButton.addActionListener(e -> dispose());
+        buttonPanel.add(confirmButton);
 
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        // Add the button panel to the container
+        containerPanel.add(buttonPanel);
 
-        dialog.setResizable(false);
-        dialog.pack();
-        dialog.setModal(true);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        // New panel (to be added below the button panel)
+        JPanel infoPanel = new JPanel(new BorderLayout());
+        JLabel lblInfo = new JLabel(
+            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
+                RIGHT_WIDTH + LEFT_WIDTH,
+                String.format(resources.getString("documentation.prompt"))));
+        lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        infoPanel.add(lblInfo, BorderLayout.CENTER);
+        infoPanel.setBorder(BorderFactory.createEtchedBorder());
+
+        // Add the new panel to the container (below the button panel)
+        containerPanel.add(infoPanel);
+
+        // Add the container panel to the dialog (at the bottom of the layout)
+        add(containerPanel, BorderLayout.SOUTH);
+
+        // Dialog settings
+        pack();
+        setModal(true);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setVisible(true);
     }
 }

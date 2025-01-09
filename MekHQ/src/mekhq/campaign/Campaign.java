@@ -300,6 +300,18 @@ public class Campaign implements ITechManager {
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
 
+    /**
+     * Represents the different types of administrative specializations.
+     * Each specialization corresponds to a distinct administrative role
+     * within the organization.
+     *
+     * <p>These specializations are used to determine administrative roles and responsibilities,
+     * such as by identifying the most senior administrator for a given role.</p>
+     */
+    public enum AdministratorSpecialization {
+        COMMAND, LOGISTICS, TRANSPORT, HR
+    }
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
 
@@ -2797,19 +2809,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This method finds and returns the most senior command administrator.
-     * It checks for both primary and secondary roles of the administrator.
-     * In case of multiple administrators with the command role, it uses the
-     * {@code outRanksUsingSkillTiebreaker} method to decide the seniority.
+     * Finds and returns the most senior administrator for a specific type of administrative role.
+     * Seniority is determined using the {@link Person#outRanksUsingSkillTiebreaker} method when
+     * there are multiple eligible administrators for the specified role.
      *
-     * @return the senior administrator with a command role, or {@code null} if no such
-     * administrator exists.
+     * <p>The method evaluates both the primary and secondary roles of each administrator
+     * against the provided {@link AdministratorSpecialization} type.</p>
+     *
+     * <p>The valid types of administrative roles are represented by the {@link AdministratorSpecialization} enum:</p>
+     * <ul>
+     *   <li>{@link AdministratorSpecialization#COMMAND} - Command Administrator</li>
+     *   <li>{@link AdministratorSpecialization#LOGISTICS} - Logistics Administrator</li>
+     *   <li>{@link AdministratorSpecialization#TRANSPORT} - Transport Administrator</li>
+     *   <li>{@link AdministratorSpecialization#HR} - HR Administrator</li>
+     * </ul>
+     *
+     * @param type the {@link AdministratorSpecialization} representing the administrative role to check for.
+     *             Passing a {@code null} type will result in an {@link IllegalStateException}.
+     *
+     * @return the most senior {@link Person} with the specified administrative role, or {@code null}
+     *         if no eligible administrator is found.
+     *
+     * <p><b>Behavior:</b></p>
+     * <ul>
+     *   <li>The method iterates through all administrators retrieved by {@link #getAdmins()}.</li>
+     *   <li>For each {@link Person}, it checks if their primary or secondary role matches the specified type
+     *       via utility methods like {@code AdministratorRole#isAdministratorCommand}.</li>
+     *   <li>If no eligible administrators exist, the method returns {@code null}.</li>
+     *   <li>If multiple administrators are eligible, the one with the highest seniority is returned.</li>
+     *   <li>Seniority is determined by the {@link Person#outRanksUsingSkillTiebreaker} method,
+     *       which uses a skill-based tiebreaker when necessary.</li>
+     * </ul>
+     *
+     * @throws IllegalStateException if {@code type} is null or an unsupported value.
      */
-    public @Nullable Person getSeniorAdminCommandPerson() {
+    public @Nullable Person getSeniorAdminPerson(AdministratorSpecialization type) {
         Person seniorAdmin = null;
 
         for (Person person : getAdmins()) {
-            if (person.getPrimaryRole().isAdministratorCommand() || person.getSecondaryRole().isAdministratorCommand()) {
+            boolean isEligible = switch (type) {
+                case COMMAND -> person.getPrimaryRole().isAdministratorCommand()
+                    || person.getSecondaryRole().isAdministratorCommand();
+                case LOGISTICS -> person.getPrimaryRole().isAdministratorLogistics()
+                    || person.getSecondaryRole().isAdministratorLogistics();
+                case TRANSPORT -> person.getPrimaryRole().isAdministratorTransport()
+                    || person.getSecondaryRole().isAdministratorTransport();
+                case HR -> person.getPrimaryRole().isAdministratorHR()
+                    || person.getSecondaryRole().isAdministratorHR();
+            };
+
+            if (isEligible) {
                 if (seniorAdmin == null) {
                     seniorAdmin = person;
                     continue;
@@ -3895,11 +3944,11 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-
                             if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
                             }
+
+                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
                         } else {
                             scenario.clearAllForcesAndPersonnel(this);
                         }
@@ -3924,9 +3973,9 @@ public class Campaign implements ITechManager {
             contract.checkEvents(this);
 
             // If there is a standard battle set for today, deploy the lance.
-            for (final AtBScenario s : contract.getCurrentAtBScenarios()) {
-                if ((s.getDate() != null) && s.getDate().equals(getLocalDate())) {
-                    int forceId = s.getCombatTeamId();
+            for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
+                if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(getLocalDate())) {
+                    int forceId = atBScenario.getCombatTeamId();
                     if ((combatTeams.get(forceId) != null) && !forceIds.get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
@@ -3940,20 +3989,20 @@ public class Campaign implements ITechManager {
                         }
 
                         if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(s.getId(), this);
-                            s.addForces(forceId);
+                            forceIds.get(forceId).setScenarioId(atBScenario.getId(), this);
+                            atBScenario.addForces(forceId);
 
                             addReport(MessageFormat.format(
                                     resources.getString("atbScenarioTodayWithForce.format"),
-                                    s.getName(), forceIds.get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
+                                    atBScenario.getName(), forceIds.get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
                         } else {
                             addReport(MessageFormat.format(
-                                    resources.getString("atbScenarioToday.format"), s.getName()));
+                                    resources.getString("atbScenarioToday.format"), atBScenario.getName()));
                         }
                     } else {
                         addReport(MessageFormat.format(
-                                resources.getString("atbScenarioToday.format"), s.getName()));
+                                resources.getString("atbScenarioToday.format"), atBScenario.getName()));
                     }
                 }
             }
@@ -4026,7 +4075,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfMonth() == 1)) {
+        if (campaignOptions.isUseStratCon() && (currentDay.getDayOfWeek() == DayOfWeek.MONDAY)) {
             negotiateAdditionalSupportPoints(this);
         }
 
@@ -8680,8 +8729,8 @@ public class Campaign implements ITechManager {
             if (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 getShoppingList().addShoppingItem(partToBuy, toBuy, this);
+                bought += 1;
             }
-            bought += 1;
         }
         return bought;
     }
