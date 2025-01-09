@@ -39,8 +39,23 @@ MEKHQ VERSION HISTORY:
 + PR #5652: Adds synchronization to getForces since setForces is synchronized
 + PR #5653: Keep odd number checks using modulus
 + Fix #5604: Save refit config from MHQ MekLab tab
-+ PR ##5618: Enable Auto-Resolve Button Conditionally for Scenarios
-+ PR ##5616: Adds some helpful tooltips for contracts
++ PR #5618: Enable Auto-Resolve Button Conditionally for Scenarios
++ PR #5616: Adds some helpful tooltips for contracts
++ PR #5682: Refactored Crew Assignment Event Handling
++ PR #5684: Added Report for Returning StratCon Forces
++ PR #5690: Added Potential Difficulty Spikes to Garrison-Type Contracts
++ PR #5692: Removed Undeploy Option (again); Added Reset Scenario Deployment Option
++ PR #5693: Removed SP Cost for GM Reinforcement Attempts in StratCon
++ PR #5698: Fixed Multiple StratCon Bugs
++ PR #5700: Refactored Scenario Reporting for Legacy AtB and StratCon Differentiation
++ PR #5701: Corrected Weight Class Initialization of Artillery Units
++ Fix #5688: Fixed Typo in Payment Overages Message
++ Fix #5628: Fixed Personality Loading
++ Fix #5612: Fixed Unit Name Reset
++ Fix #5705: Refactored Personnel Market Generation & Fixed Capital/Hiring Hall Checks
++ PR #5707: Corrected Available Force Check
++ PR #5708: Added a Soft Cap to Support Point Generation
++ Fix #5570: Fixed Maternity Leave Date Handling
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
