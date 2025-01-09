@@ -58,6 +58,7 @@ MEKHQ VERSION HISTORY:
 + Fix #5570: Fixed Maternity Leave Date Handling
 + PR #5699: Moved ACAR Module to MegaMek
 + PR #5709: Added MHQDialogImmersive for Immersive Dialog Functionality that Immersively Improves Immersion
++ Fix #3752: Added Handling for Unsupported Unit Types
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
