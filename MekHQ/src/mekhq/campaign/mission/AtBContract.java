@@ -441,10 +441,6 @@ public class AtBContract extends Contract {
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
         for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
-            if (combatTeam.getRole().isAuxiliary()) {
-                continue;
-            }
-
             Force force = combatTeam.getForce(campaign);
 
             if (force == null) {

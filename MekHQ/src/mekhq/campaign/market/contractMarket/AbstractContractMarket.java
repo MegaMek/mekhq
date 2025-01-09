@@ -234,8 +234,13 @@ public abstract class AbstractContractMarket {
         // Adjust available forces based on variance, ensuring minimum clamping
         int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
 
+        // We don't want to spawn a contract with 0 required forces.
+        if (adjustedForces < 1) {
+            adjustedForces = 1;
+        }
+
         // Return the clamped value, ensuring it does not exceed max-deployable forces
-        return Math.max(adjustedForces, maxDeployableCombatTeams);
+        return Math.min(adjustedForces, maxDeployableCombatTeams);
     }
 
     /**

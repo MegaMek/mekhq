@@ -484,15 +484,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        int baseRequiredLances = calculateRequiredCombatTeams(campaign, contract, true);
-        int requiredLances = contract.getRequiredCombatTeams();
-
-        multiplier *= (double) requiredLances / baseRequiredLances;
-
-        int maxDeployedLances = calculateMaxDeployableCombatTeams(campaign);
-        if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
-            multiplier *= (double) maxDeployedLances / (double) requiredLances;
-        }
+        // This reduces pay based on the percentage of the players' forces being used.
+        int requiredCombatTeams = contract.getRequiredCombatTeams();
+        int totalCombatTeams = campaign.getAllCombatTeams().size();
+        multiplier *= (double) requiredCombatTeams / totalCombatTeams;
 
         return multiplier;
     }
