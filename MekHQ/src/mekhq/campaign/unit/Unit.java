@@ -487,6 +487,12 @@ public class Unit implements ITechnology {
         return null;
     }
 
+    /**
+     * Set this unit's transport assignment to the provided assignment, if possible
+     * @param campaignTransportType type (enum) of transport type
+     * @param assignment the assignment we're setting for this unit
+     * @see CampaignTransportType
+     */
     public void setTransportAssignment(CampaignTransportType campaignTransportType, ITransportAssignment assignment) {
         if (campaignTransportType.isShipTransport()) {
             if (assignment.getClass().isAssignableFrom(campaignTransportType.getTransportAssignmentType())) {
