@@ -484,13 +484,26 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        // This reduces pay based on the percentage of the players' forces being used.
+        // Adjust pay based on the percentage of the players' forces required by the contract
         int requiredCombatTeams = contract.getRequiredCombatTeams();
-        int totalCombatTeams = campaign.getAllCombatTeams().size();
+        double totalCombatTeams = campaign.getAllCombatTeams().size();
+        totalCombatTeams /= COMBAT_FORCE_DIVIDER;
 
         if (totalCombatTeams > 0) {
             multiplier *= (double) requiredCombatTeams / totalCombatTeams;
         }
+
+        // Adjust pay based on difficulty if FG3 is enabled
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            double skulls = contract.calculateContractDifficulty(campaign);
+            skulls -= 5; // 5 skulls (or 2.5) is equivalent to the player force, so no modifier.
+
+            if (skulls != 0) {
+                skulls *= 0.05; // each half-skull is a 5% pay change
+                multiplier *= (1 + skulls);
+            }
+        }
+
 
         return multiplier;
     }

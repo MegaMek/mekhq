@@ -41,6 +41,12 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
 
+    /**
+     * The portion of combat teams we expect to be performing combat actions.
+     * This is one in 'x' where 'x' is the value set here.
+     */
+    static final double COMBAT_FORCE_DIVIDER = 2;
+
 
     protected List<Contract> contracts = new ArrayList<>();
     protected int lastId = 0;
@@ -234,7 +240,6 @@ public abstract class AbstractContractMarket {
         // Adjust available forces based on variance, ensuring minimum clamping
         int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
 
-        // We don't want to spawn a contract with 0 required forces.
         if (adjustedForces < 1) {
             adjustedForces = 1;
         }
@@ -261,15 +266,14 @@ public abstract class AbstractContractMarket {
      * @return the calculated variance factor as a double
      */
     private double calculateVarianceFactor(int roll) {
-        final int DIVIDER = 3;
         return switch (roll) {
-            case 2 -> DIVIDER * 0.75;
-            case 3 -> DIVIDER * 0.5;
-            case 4 -> DIVIDER * 0.25;
-            case 10 -> DIVIDER * 1.25;
-            case 11 -> DIVIDER * 1.5;
-            case 12 -> DIVIDER * 1.75;
-            default -> DIVIDER; // 5-9
+            case 2 -> COMBAT_FORCE_DIVIDER * 0.25;
+            case 3 -> COMBAT_FORCE_DIVIDER * 0.5;
+            case 4 -> COMBAT_FORCE_DIVIDER * 0.75;
+            case 10 -> COMBAT_FORCE_DIVIDER * 1.25;
+            case 11 -> COMBAT_FORCE_DIVIDER * 1.5;
+            case 12 -> COMBAT_FORCE_DIVIDER * 1.75;
+            default -> COMBAT_FORCE_DIVIDER; // 5-9
         };
     }
 
