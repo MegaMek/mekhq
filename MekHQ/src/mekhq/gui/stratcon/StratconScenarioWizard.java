@@ -789,12 +789,7 @@ public class StratconScenarioWizard extends JDialog {
         JButton reinforceButtonGM = new JButton(resources.getString("reinforcementConfirmation.confirmButton.gm"));
         reinforceButtonGM.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.gm.tooltip"));
         reinforceButtonGM.addActionListener(evt -> {
-            int spentSupportPoints = (int) spnSupportPointCost.getValue();
-            int finalTargetNumber = targetNumber - ((spentSupportPoints - 1) * 2);
-
-            currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
-
-            btnCommitClicked(evt, finalTargetNumber, true);
+            btnCommitClicked(evt, 0, true);
             dialog.dispose();
         });
         reinforceButtonGM.setVisible(campaign.isGM());
