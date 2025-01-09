@@ -4,10 +4,17 @@ import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents an assignment on a transport. Currently only used by TACTICAL_TRANSPORT
+ * but this could be used by other transport types.
+ * @see TacticalTransportedUnitsSummary
+ * @see CampaignTransportType#TACTICAL_TRANSPORT
+ */
 public class TransportAssignment implements ITransportAssignment {
     protected final MMLogger logger = MMLogger.create(this.getClass());
 

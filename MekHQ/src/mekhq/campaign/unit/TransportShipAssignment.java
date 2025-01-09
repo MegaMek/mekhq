@@ -22,11 +22,16 @@
 package mekhq.campaign.unit;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 
 import java.util.Objects;
 
 /**
  * Represents an assignment to a specific bay on a transport ship.
+ * Currently only used by SHIP_TRANSPORT
+ * but this could be used by other transport types.
+ * @see ShipTransportedUnitsSummary
+ * @see CampaignTransportType#SHIP_TRANSPORT
  */
 public class TransportShipAssignment extends TransportAssignment{
     private final int bayNumber;

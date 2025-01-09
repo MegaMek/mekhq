@@ -8,6 +8,13 @@ import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 
+/**
+ * It is time consuming to determine what transporter types we can load a unit into when
+ * in a popup menu. This class is for keeping just enough information in memory that we
+ * can quickly determine which transporters can fit a unit.
+ *
+ * @see CampaignTransportType
+ */
 public class CampaignTransporterMap {
     private static final MMLogger logger = MMLogger.create(CampaignTransporterMap.class);
 

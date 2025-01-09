@@ -27,6 +27,8 @@ import mekhq.campaign.Campaign;
 
 /**
  * Represents an assignment on a transport.
+ * @see ITransportedUnitsSummary
+ * @see mekhq.campaign.enums.CampaignTransportType
  */
 public interface ITransportAssignment {
 

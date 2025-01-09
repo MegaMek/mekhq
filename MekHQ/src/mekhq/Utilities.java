@@ -1289,6 +1289,8 @@ public class Utilities {
      * @param toLoad         - Map of entity ids and transport assignments for the units we want to load
      * @param client         - the player's Client instance
      * @param loadTactical  - Should "tactical"-ly transported units be loaded?
+     * @see mekhq.campaign.enums.CampaignTransportType#TACTICAL_TRANSPORT
+     * @see ITransportAssignment
      */
     public static void loadPlayerTransports(int trnId, Map<Integer, ? extends ITransportAssignment> toLoad, Client client,
                                             boolean loadTactical) {

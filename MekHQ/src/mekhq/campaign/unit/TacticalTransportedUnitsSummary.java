@@ -9,21 +9,16 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
+ * @see AbstractTransportedUnitsSummary
+ * @see CampaignTransportType#TACTICAL_TRANSPORT
+ *
+ */
 public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
 
     public TacticalTransportedUnitsSummary(Unit transport) {
         super(transport);
-    }
-
-    /**
-     * Main method to be used for loading units onto a transport
-     *
-     * @param transportedUnits Units we wish to load
-     * @return the old transports the transportedUnits were assigned to, or an empty set
-     */
-    @Override
-    public Set<Unit> loadTransport(Unit... transportedUnits) {
-        return super.loadTransport(transportedUnits);
     }
 
     /**
