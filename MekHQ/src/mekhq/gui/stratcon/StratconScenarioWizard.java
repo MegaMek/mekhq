@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,13 +28,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
-import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType;
-import mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -48,15 +45,16 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.SkillType.S_LEADER;
-import static mekhq.campaign.stratcon.StratconRulesManager.BASE_LEADERSHIP_BUDGET;
+import static mekhq.campaign.stratcon.StratconRulesManager.*;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
 import static mekhq.campaign.stratcon.StratconRulesManager.calculateReinforcementTargetNumber;
 import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
 import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
-import static mekhq.gui.baseComponents.AbstractMHQNagDialog.getSpeakerDescription;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -557,7 +555,7 @@ public class StratconScenarioWizard extends JDialog {
         StringBuilder costBuilder = new StringBuilder();
         costBuilder.append('(');
 
-        switch (StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
+        switch (getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
             case REGULAR:
                 costBuilder.append(resources.getString("regular.text"));
                 break;
@@ -789,12 +787,7 @@ public class StratconScenarioWizard extends JDialog {
         JButton reinforceButtonGM = new JButton(resources.getString("reinforcementConfirmation.confirmButton.gm"));
         reinforceButtonGM.setToolTipText(resources.getString("reinforcementConfirmation.confirmButton.gm.tooltip"));
         reinforceButtonGM.addActionListener(evt -> {
-            int spentSupportPoints = (int) spnSupportPointCost.getValue();
-            int finalTargetNumber = targetNumber - ((spentSupportPoints - 1) * 2);
-
-            currentCampaignState.setSupportPoints(currentCampaignState.getSupportPoints() - spentSupportPoints);
-
-            btnCommitClicked(evt, finalTargetNumber, true);
+            btnCommitClicked(evt, 0, true);
             dialog.dispose();
         });
         reinforceButtonGM.setVisible(campaign.isGM());
@@ -858,23 +851,9 @@ public class StratconScenarioWizard extends JDialog {
         // go through all the force lists and add the selected forces to the scenario
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
-                if (templateID.equals(ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID)) {
-                    if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-                        currentScenario.addForce(force, templateID, campaign);
-                    }
-                } else if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
-                    ReinforcementEligibilityType reinforcementType = StratconRulesManager.getReinforcementType(
-                        force.getId(), currentTrackState,
-                        campaign, currentCampaignState);
-
-                    // if we failed to deploy as reinforcements, move on to the next force
-                    if (reinforcementTargetNumber == null) {
-                        // If we've passed a null value into a reinforcement attempt, treat it as
-                        // an impossibly large number, so that it's clear something is wrong.
-                        reinforcementTargetNumber = 999;
-                        logger.error("null reinforcementTargetNumber incorrectly passed into" +
-                            " btnCommitClicked for reinforcement attempt");
-                    }
+                if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                    ReinforcementEligibilityType reinforcementType = getReinforcementType(
+                        force.getId(), currentTrackState, campaign, currentCampaignState);
 
                     ReinforcementResultsType reinforcementResults = processReinforcementDeployment(force,
                         reinforcementType, currentCampaignState, currentScenario, campaign,
@@ -923,30 +902,14 @@ public class StratconScenarioWizard extends JDialog {
                     forceID, campaign, currentTrackState, false);
         }
 
-        // scenarios that haven't had primary forces committed yet get those committed
-        // now and the scenario gets published to the campaign and may be played immediately
-        // from the briefing room that being said, give the player a chance to commit reinforcements too
-        if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            // if we've already generated forces and applied modifiers, no need to do it twice
-            if (!currentScenario.getBackingScenario().isFinalized()) {
-                AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(),
-                        currentCampaignState.getContract(), campaign);
-                StratconRulesManager.setScenarioParametersFromBiome(currentTrackState, currentScenario);
-            }
-
-            setCurrentScenario(currentScenario, currentTrackState, currentCampaignState, true);
-            currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
-            StratconRulesManager.commitPrimaryForces(campaign, currentScenario, currentTrackState);
-            setVisible(true);
-        // if we've just committed reinforcements then simply close it down
-        } else {
-            currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
-            setVisible(false);
-        }
+        currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
 
         translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
+        scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
 
         this.getParent().repaint();
+
+        dispose();
     }
 
     /**

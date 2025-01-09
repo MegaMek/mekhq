@@ -30,7 +30,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.acar.SimulatedClient;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -368,6 +368,11 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
+                // MekHQ doesn't support gun emplacements, so we don't want the player salvaging them
+                if (wreck instanceof GunEmplacement) {
+                    continue;
+                }
+
                 if (wreck.isDropShip() && scenario.getBoardType() != Scenario.T_SPACE) {
                     double dropShipBonusPercentage =
                         (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
