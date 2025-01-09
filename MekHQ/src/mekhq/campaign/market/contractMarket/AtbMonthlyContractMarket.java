@@ -487,7 +487,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         // This reduces pay based on the percentage of the players' forces being used.
         int requiredCombatTeams = contract.getRequiredCombatTeams();
         int totalCombatTeams = campaign.getAllCombatTeams().size();
-        multiplier *= (double) requiredCombatTeams / totalCombatTeams;
+
+        if (totalCombatTeams > 0) {
+            multiplier *= (double) requiredCombatTeams / totalCombatTeams;
+        }
 
         return multiplier;
     }
