@@ -227,7 +227,7 @@ public class GenerateResupplyContents {
 
         // Smugglers always double the cost of the supplies they're offering
         if (resupplyType.equals(ResupplyType.RESUPPLY_SMUGGLER)) {
-            resupply.setConvoyContentsValueCalculated(sellValue.multipliedBy(2));
+            resupply.setConvoyContentsValueCalculated(buyValue.multipliedBy(2));
             return ;
         }
 
