@@ -133,8 +133,7 @@ public class ResolverTest {
     @Mock
     private BotForce botForce;
 
-    @InjectMocks
-    private Resolver resolver;
+
 
     @BeforeEach
     public void setup() {
@@ -355,7 +354,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty(), new Board(30, 30));
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 
