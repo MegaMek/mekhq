@@ -1,34 +1,34 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
- *  This file is part of MekHQ.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- *  MekHQ is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
  *
- *  MekHQ is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.autoresolve.converter;
+package mekhq.campaign.autoresolve;
 
 import io.sentry.Sentry;
 import megamek.common.*;
 import megamek.common.alphaStrike.conversion.ASConverter;
+import megamek.common.autoresolve.acar.SimulationContext;
+import megamek.common.autoresolve.converter.ConsolidateForces;
+import megamek.common.autoresolve.converter.ForceToFormationConverter;
+import megamek.common.autoresolve.converter.SetupForces;
+import megamek.common.autoresolve.converter.SingleElementConsolidateForces;
+import megamek.common.copy.CrewRefBreak;
 import megamek.common.force.Forces;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.autoresolve.acar.SimulationContext;
-import mekhq.campaign.copy.CrewRefBreak;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -44,14 +44,14 @@ import java.util.*;
 /**
  * @author Luana Coppio
  */
-public class SetupForces {
-    private static final MMLogger logger = MMLogger.create(SetupForces.class);
+public class AtBSetupForces extends SetupForces {
+    private static final MMLogger logger = MMLogger.create(AtBSetupForces.class);
 
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
 
-    public SetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
         this.campaign = campaign;
         this.units = units;
         this.scenario = scenario;
@@ -61,10 +61,10 @@ public class SetupForces {
      * Create the forces for the game object, using the campaign, units and scenario
      * @param game The game object to setup the forces in
      */
-    public void createForcesOnGame(SimulationContext game) {
+    public void createForcesOnSimulation(SimulationContext game) {
         setupPlayer(game);
         setupBots(game);
-        ConsolidateForces.consolidateForces(game);
+        ConsolidateForces.consolidateForces(game, new SingleElementConsolidateForces());
         convertForcesIntoFormations(game);
     }
 
@@ -153,7 +153,7 @@ public class SetupForces {
      */
     private Player getCleanPlayer() {
         var campaignPlayer = campaign.getPlayer();
-        var player = new Player(campaignPlayer.getId(), campaignPlayer.getName());
+        var player = new Player(campaignPlayer.getId(), campaign.getName());
         player.setCamouflage(campaign.getCamouflage().clone());
         player.setColour(campaign.getColour());
         player.setStartingPos(scenario.getStartingPos());
@@ -434,7 +434,6 @@ public class SetupForces {
                 || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
 
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
-            game.getPlayer(entity.getOwnerId()).changeInitialBV(entity.calculateBattleValue());
 
             // Restore forces from MULs or other external sources from the forceString, if
             // any

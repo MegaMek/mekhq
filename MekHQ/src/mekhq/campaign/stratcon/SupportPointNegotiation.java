@@ -123,6 +123,26 @@ public class SupportPointNegotiation {
             ? contract.getRequiredLances() * 3
             : contract.getRequiredLances();
 
+        StratconCampaignState campaignState = contract.getStratconCampaignState();
+
+        if (campaignState == null) {
+            return;
+        }
+
+        if (campaignState.getSupportPoints() >= maxSupportPoints) {
+            String pluralizer = (maxSupportPoints > 1) || (maxSupportPoints == 0) ? "s" : "";
+
+            campaign.addReport(String.format(
+                resources.getString("supportPoints.maximum"),
+                contract.getName(),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                CLOSING_SPAN_TAG,
+                negotiatedSupportPoints,
+                pluralizer));
+
+            return;
+        }
+
         Iterator<Person> iterator = adminTransport.iterator();
 
         while (iterator.hasNext() && negotiatedSupportPoints < maxSupportPoints) {
@@ -139,7 +159,7 @@ public class SupportPointNegotiation {
 
         // Add points to the contract if positive
         if (negotiatedSupportPoints > 0) {
-            contract.getStratconCampaignState().addSupportPoints(negotiatedSupportPoints);
+            campaignState.addSupportPoints(negotiatedSupportPoints);
         }
 
         // Add a report

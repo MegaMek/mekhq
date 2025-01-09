@@ -949,7 +949,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtMorale.setName("txtMorale");
 
-        if (contract.getContractType().isGarrisonType() && contract.getMoraleLevel().isRouted()) {
+        if (contract.getContractType().isGarrisonDuty() && contract.getMoraleLevel().isRouted()) {
             txtMorale.setText(resourceMap.getString("txtGarrisonMoraleRouted.text"));
             txtMorale.setToolTipText(wordWrap(resourceMap.getString("txtGarrisonMoraleRouted.tooltip")));
         } else {

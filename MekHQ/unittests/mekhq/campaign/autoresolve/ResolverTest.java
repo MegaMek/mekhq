@@ -21,14 +21,15 @@ package mekhq.campaign.autoresolve;
 
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
+import megamek.common.autoresolve.Resolver;
+import megamek.common.autoresolve.acar.SimulationOptions;
+import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.autoresolve.acar.SimulationOptions;
-import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -60,9 +61,7 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -356,7 +355,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        resolver = new Resolver(campaign, units, scenario, SimulationOptions.empty());
+        resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty(), new Board(30, 30));
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 

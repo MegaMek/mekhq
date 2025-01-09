@@ -37,6 +37,7 @@ import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -477,7 +478,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     gui.getFrame(), "Name for this unit?", "Unit Name",
                     JOptionPane.QUESTION_MESSAGE, null, null,
                     selectedUnit.getFluffName());
-            selectedUnit.setFluffName((fluffName != null) ? fluffName : "");
+            String oldFluffName = selectedUnit.getFluffName();
+            selectedUnit.setFluffName((fluffName != null) ? fluffName : oldFluffName);
             if (fluffName != null) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
@@ -1008,10 +1010,19 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (oneDeployed) {
-                    menuItem = new JMenuItem("Undeploy Unit (GM)");
+                    menuItem = new JMenuItem("Undeploy Unit");
                     menuItem.setActionCommand(COMMAND_UNDEPLOY);
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
+
+                    boolean enable = true;
+                    int scenarioId = unit.getScenarioId();
+                    Scenario scenario = gui.getCampaign().getScenario(scenarioId);
+
+                    if (scenario != null && scenario.getHasTrack()) {
+                        enable = false;
+                    }
+
+                    menuItem.setEnabled(enable);
                     menu.add(menuItem);
                 }
 
