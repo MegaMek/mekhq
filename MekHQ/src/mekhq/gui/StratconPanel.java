@@ -66,6 +66,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     private static final String RCLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RCLICK_COMMAND_ADD_FACILITY = "AddFacility";
     private static final String RCLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
+    private static final String RCLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
 
     /**
      * What to do when drawing a hex
@@ -172,7 +173,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // except if there is already a non-cloaked scenario here.
         if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
             menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Manage Force Assignment");
+            menuItemManageForceAssignments.setText("Manage Deployment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
@@ -184,7 +185,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             if (backingScenario != null && !backingScenario.isCloaked()) {
                 menuItemManageScenario = new JMenuItem();
-                menuItemManageScenario.setText("Manage Reinforcements");
+
+                if (scenario.getCurrentState().equals(UNRESOLVED)) {
+                    menuItemManageScenario.setText("Manage Deployment");
+                } else {
+                    menuItemManageScenario.setText("Manage Reinforcements");
+                }
+
                 menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 menuItemManageScenario.addActionListener(this);
                 rightClickMenu.add(menuItemManageScenario);
@@ -209,26 +216,26 @@ public class StratconPanel extends JPanel implements ActionListener {
             rightClickMenu.addSeparator();
 
             menuItemGMReveal = new JMenuItem();
-            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector" : "Reveal Sector");
+            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector (GM)" : "Reveal Sector (GM)");
             menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
             menuItemGMReveal.addActionListener(this);
             rightClickMenu.add(menuItemGMReveal);
 
             if (currentTrack.getFacility(coords) != null) {
                 menuItemRemoveFacility = new JMenuItem();
-                menuItemRemoveFacility.setText("Remove Facility");
+                menuItemRemoveFacility.setText("Remove Facility (GM)");
                 menuItemRemoveFacility.setActionCommand(RCLICK_COMMAND_REMOVE_FACILITY);
                 menuItemRemoveFacility.addActionListener(this);
                 rightClickMenu.add(menuItemRemoveFacility);
 
                 menuItemSwitchOwner = new JMenuItem();
-                menuItemSwitchOwner.setText("Switch Owner");
+                menuItemSwitchOwner.setText("Switch Owner (GM)");
                 menuItemSwitchOwner.setActionCommand(RCLICK_COMMAND_CAPTURE_FACILITY);
                 menuItemSwitchOwner.addActionListener(this);
                 rightClickMenu.add(menuItemSwitchOwner);
             } else {
                 menuItemAddFacility = new JMenu();
-                menuItemAddFacility.setText("Add Facility");
+                menuItemAddFacility.setText("Add Facility (GM)");
 
                 JMenu menuItemAddAlliedFacility = new JMenu();
                 menuItemAddAlliedFacility.setText("Allied");
@@ -261,10 +268,16 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             if (scenario != null) {
                 JMenuItem removeScenarioItem = new JMenuItem();
-                removeScenarioItem.setText("Remove Scenario");
+                removeScenarioItem.setText("Remove Scenario (GM)");
                 removeScenarioItem.setActionCommand(RCLICK_COMMAND_REMOVE_SCENARIO);
                 removeScenarioItem.addActionListener(this);
                 rightClickMenu.add(removeScenarioItem);
+
+                JMenuItem resetDeploymentItem = new JMenuItem();
+                resetDeploymentItem.setText("Reset Deployment (GM)");
+                resetDeploymentItem.setActionCommand(RCLICK_COMMAND_RESET_DEPLOYMENT);
+                resetDeploymentItem.addActionListener(this);
+                rightClickMenu.add(resetDeploymentItem);
             }
         }
     }
@@ -1079,6 +1092,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (scenario != null) {
                     campaign.removeScenario(scenario.getBackingScenario());
+                }
+                break;
+            case RCLICK_COMMAND_RESET_DEPLOYMENT:
+                StratconScenario scenarioToReset = getSelectedScenario();
+
+                if (scenarioToReset != null) {
+                    scenarioToReset.resetScenario(campaign);
                 }
                 break;
         }
