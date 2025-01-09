@@ -478,7 +478,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     gui.getFrame(), "Name for this unit?", "Unit Name",
                     JOptionPane.QUESTION_MESSAGE, null, null,
                     selectedUnit.getFluffName());
-            selectedUnit.setFluffName((fluffName != null) ? fluffName : "");
+            String oldFluffName = selectedUnit.getFluffName();
+            selectedUnit.setFluffName((fluffName != null) ? fluffName : oldFluffName);
             if (fluffName != null) {
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
