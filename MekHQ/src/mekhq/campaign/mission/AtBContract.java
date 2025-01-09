@@ -27,7 +27,6 @@ import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
@@ -54,6 +53,7 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -81,7 +81,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
+import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.MEK;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.REGULAR;
@@ -93,6 +95,7 @@ import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.rating.IUnitRating.*;
+import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
@@ -458,18 +461,53 @@ public class AtBContract extends Contract {
     public void checkMorale(Campaign campaign, LocalDate today) {
         // Check whether enemy forces have been reinforced, and whether any current rout continues
         // beyond its expected date
-        boolean routContinue = Compute.randomInt(4) == 0;
+        boolean routContinue = randomInt(4) == 0;
 
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
-        if (routEnd != null && !routContinue) {
+        if (routEnd != null) {
+            if (routContinue) {
+                return;
+            }
+
             if (today.isAfter(routEnd)) {
-                setMoraleLevel(AtBMoraleLevel.STALEMATE);
+                int roll = randomInt(8);
+
+                // We use variable morale levels to spike morale up to a value above Stalemate.
+                // This works with the regenerated Scenario Odds to crease very high intensity
+                // spikes in otherwise low-key Garrison-type contracts.
+                AtBMoraleLevel newMoraleLevel = switch (roll) {
+                    case 0,1 -> AtBMoraleLevel.STALEMATE;
+                    case 2,3,4,5 -> AtBMoraleLevel.ADVANCING;
+                    case 6,7 -> AtBMoraleLevel.DOMINATING;
+                    case 8 -> AtBMoraleLevel.OVERWHELMING;
+                    default -> AtBMoraleLevel.STALEMATE;
+                };
+
+                // If we have a StratCon enabled contract, regenerate Scenario Odds
+                if (stratconCampaignState != null) {
+                    StratconContractDefinition contractDefinition = getContractDefinition(getContractType());
+
+                    if (contractDefinition != null) {
+                        List<Integer> definedScenarioOdds = contractDefinition.getScenarioOdds();
+
+                        int scenarioOddsMultiplier = randomInt(20) == 0 ? 2 : 1;
+
+                        for (StratconTrackState trackState : stratconCampaignState.getTracks()) {
+                            int baseScenarioOdds = getRandomItem(definedScenarioOdds);
+
+                            trackState.setScenarioOdds(baseScenarioOdds * scenarioOddsMultiplier);
+                        }
+                    }
+                }
+
+                moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                updateEnemy(campaign, today); // mix it up a little
-            } else {
-                setMoraleLevel(AtBMoraleLevel.ROUTED);
+                if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
+                    updateEnemy(campaign, today); // mix it up a little
+                }
             }
+
             return;
         }
 
@@ -567,18 +605,18 @@ public class AtBContract extends Contract {
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
 
         if (roll < 5) {
-            setMoraleLevel(moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)]);
+            moraleLevel = moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)];
             logger.info("Result: Morale Level -1");
         } else if ((roll > 9)) {
-            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
+            moraleLevel = moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)];
             logger.info("Result: Morale Level +1");
         } else {
             logger.info("Result: Morale Unchanged");
         }
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
-        if (getMoraleLevel().isRouted()) {
-            if (getContractType().isGarrisonType()) {
+        if (moraleLevel.isRouted()) {
+            if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
             } else {
                 campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
@@ -818,7 +856,7 @@ public class AtBContract extends Contract {
         String faction = employerCode;
         int quality = allyQuality;
 
-        if (Compute.randomInt(2) > 0) {
+        if (randomInt(2) > 0) {
             faction = enemyCode;
             quality = enemyQuality;
         }
@@ -1007,7 +1045,7 @@ public class AtBContract extends Contract {
 
     public LocalDate getRandomDayOfMonth(LocalDate today) {
         return LocalDate.of(today.getYear(), today.getMonth(),
-                Compute.randomInt(today.getMonth().length(today.isLeapYear())) + 1);
+                randomInt(today.getMonth().length(today.isLeapYear())) + 1);
     }
 
     public boolean contractExtended(final Campaign campaign) {
@@ -1481,7 +1519,7 @@ public class AtBContract extends Contract {
     public void acceptContract(Campaign campaign) {
         if (campaign.getCampaignOptions().isUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(this, campaign,
-                    StratconContractDefinition.getContractDefinition(getContractType()));
+                    getContractDefinition(getContractType()));
         }
     }
 
