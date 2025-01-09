@@ -2686,6 +2686,9 @@ public class StratconRulesManager {
      * return date is on or before the given date.
      */
     public static void processTrackForceReturnDates(StratconTrackState track, Campaign campaign) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+            MekHQ.getMHQOptions().getLocale());
+
         List<Integer> forcesToUndeploy = new ArrayList<>();
         LocalDate date = campaign.getLocalDate();
 
@@ -2700,6 +2703,9 @@ public class StratconRulesManager {
                     && (force != null) && !track.getBackingScenariosMap().containsKey(force.getScenarioId())
                     && !track.getStickyForces().contains(forceID)) {
                 forcesToUndeploy.add(forceID);
+
+                campaign.addReport(String.format(resources.getString("force.undeployed"),
+                    force.getName()));
             }
         }
 
