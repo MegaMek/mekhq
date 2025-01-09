@@ -404,21 +404,6 @@ public class Unit implements ITechnology {
         this.id = i;
     }
 
-    /**
-     * For the given campaign transport type type, what's this unit's assignment
-     * @param campaignTransportType Transport Type (Enum) we're checking
-     * @return specified transport assignment for this unit, or null if it doesn't have one of this type
-     */
-    public ITransportAssignment getTransportAssignment(CampaignTransportType campaignTransportType) {
-        if (campaignTransportType.isTacticalTransport()) {
-            return getTacticalTransportAssignment();
-        }
-        if (campaignTransportType.isShipTransport()) {
-            return getTransportShipAssignment();
-        }
-        return null;
-    }
-
     // Generic Transport Methods
 
     /**
@@ -456,6 +441,60 @@ public class Unit implements ITechnology {
      */
     void addTransportedUnit(CampaignTransportType campaignTransportType, Unit unit) {
         getTransportedUnitsSummary(campaignTransportType).addTransportedUnit(unit);
+    }
+
+    /**
+     * For the given campaign transport type, remove a unit to our transported units summary
+     * @param campaignTransportType Transport Type (Enum) we're checking
+     * @param unit transported unit we're adding
+     */
+    boolean removeTransportedUnit(CampaignTransportType campaignTransportType, Unit unit) {
+        return getTransportedUnitsSummary(campaignTransportType).removeTransportedUnit(unit);
+    }
+
+    /**
+     * Clears the set of units being transported by this unit.
+     */
+    public void clearTransportedUnits(CampaignTransportType campaignTransportType) {
+        getTransportedUnitsSummary(campaignTransportType).clearTransportedUnits();
+    }
+
+    /**
+     * Does this unit have a transport assignment for this campaign transport type?
+     * @param campaignTransportType the transport type (enum) we're interested in
+     * @return true if there is a transport assignment of that type, false if not
+     */
+    public boolean hasTransportAssignment(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isShipTransport()) {
+            return hasTransportShipAssignment();
+        } else if (campaignTransportType.isTacticalTransport()) {
+            return hasTacticalTransportAssignment();
+        }
+        return false;
+    }
+
+    /**
+     * Returns the transport assignment for the given transport type, or null if none is provided
+     * @param campaignTransportType the transport type (enum) we're interested in
+     * @return corresponding transport assignment, or null if there isn't one
+     */
+    public ITransportAssignment getTransportAssignment(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isShipTransport()) {
+            return transportShipAssignment;
+        } else if (campaignTransportType.isTacticalTransport()) {
+            return tacticalTransportAssignment;
+        }
+        return null;
+    }
+
+    public void setTransportAssignment(CampaignTransportType campaignTransportType, ITransportAssignment assignment) {
+        if (campaignTransportType.isShipTransport()) {
+            if (assignment.getClass().isAssignableFrom(campaignTransportType.getTransportAssignmentType())) {
+                setTransportShipAssignment((TransportShipAssignment) assignment);
+            }
+        } else if (campaignTransportType.isTacticalTransport()) {
+            setTacticalTransportAssignment(assignment);
+        }
     }
 
     // End Generic Transport Methods
