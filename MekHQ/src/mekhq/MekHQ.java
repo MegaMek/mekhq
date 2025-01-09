@@ -27,13 +27,17 @@ import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.ui.dialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.Board;
 import megamek.common.annotations.Nullable;
+import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
@@ -43,10 +47,7 @@ import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.autoresolve.Resolver;
-import mekhq.campaign.autoresolve.acar.SimulatedClient;
-import mekhq.campaign.autoresolve.acar.SimulationOptions;
-import mekhq.campaign.autoresolve.event.AutoResolveConcludedEvent;
+import mekhq.campaign.autoresolve.AtBSetupForces;
 import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
@@ -55,16 +56,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.AutoResolveChanceDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.helpDialogs.AutoResolveSimulationLogDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import mekhq.utilities.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -535,8 +534,8 @@ public class MekHQ implements GameListener {
 
         try {
             boolean control = yourSideControlsTheBattlefieldDialogAsk(
-                Internationalization.getText("ResolveDialog.control.message"),
-                Internationalization.getText("ResolveDialog.control.title"));
+                MHQInternationalization.getText("ResolveDialog.control.message"),
+                MHQInternationalization.getText("ResolveDialog.control.title"));
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
@@ -567,8 +566,8 @@ public class MekHQ implements GameListener {
             return;
         }
         boolean control = yourSideControlsTheBattlefieldDialogAsk(
-            Internationalization.getText("ResolveDialog.control.message"),
-            Internationalization.getText("ResolveDialog.control.title"));
+            MHQInternationalization.getText("ResolveDialog.control.message"),
+            MHQInternationalization.getText("ResolveDialog.control.title"));
 
         ResolveScenarioTracker tracker = new ResolveScenarioTracker(selectedScenario, getCampaign(), control);
 
@@ -643,43 +642,47 @@ public class MekHQ implements GameListener {
      */
     public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
 
+        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
-            var proceed = AutoResolveChanceDialog
-                .showSimulationProgressDialog(
+            var proceed = megamek.client.ui.dialogs.AutoResolveChanceDialog
+                .showDialog(
                     getCampaigngui().getFrame(),
                     getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
-                    units,
-                    scenario,
-                    getCampaign()) == JOptionPane.YES_OPTION;
+                    Runtime.getRuntime().availableProcessors(),
+                    getCampaign().getPlayer().getTeam(),
+                    new AtBSetupForces(getCampaign(), units, scenario),
+                    new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
         }
 
-        var event = new Resolver(getCampaign(), units, scenario, new SimulationOptions(getCampaign().getGameOptions()))
-            .resolveSimulation();
+        var event = megamek.client.ui.dialogs.AutoResolveProgressDialog.showDialog(
+            getCampaigngui().getFrame(),
+            new AtBSetupForces(getCampaign(), units, scenario),
+            new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(getCampaigngui().getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);
         autoResolveBattleReport.setVisible(true);
 
-        autoResolveConcluded(event);
+        autoResolveConcluded(event, scenario);
     }
 
     /**
      * This method is called when the auto resolve game is over.
      * @param autoResolveConcludedEvent The event that contains the results of the auto resolve game.
      */
-    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent) {
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario) {
         try {
             String message = autoResolveConcludedEvent.controlledScenario() ?
-                Internationalization.getText("AutoResolveDialog.message.victory") :
-                Internationalization.getText("AutoResolveDialog.message.defeat");
+                MHQInternationalization.getText("AutoResolveDialog.message.victory") :
+                MHQInternationalization.getText("AutoResolveDialog.message.defeat");
             String title = autoResolveConcludedEvent.controlledScenario() ?
-                Internationalization.getText("AutoResolveDialog.victory") :
-                Internationalization.getText("AutoResolveDialog.defeat");
+                MHQInternationalization.getText("AutoResolveDialog.victory") :
+                MHQInternationalization.getText("AutoResolveDialog.defeat");
             boolean control = yourSideControlsTheBattlefieldDialogAsk(message, title);
-            var scenario = autoResolveConcludedEvent.getScenario();
 
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
             tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame()));
@@ -731,7 +734,7 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
-        final String theme = themeName.isBlank() ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
 
         Runnable runnable = () -> {
             try {

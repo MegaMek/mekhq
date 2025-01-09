@@ -19,33 +19,57 @@
 
 package mekhq.utilities;
 
-import mekhq.MekHQ;
 
+import megamek.MegaMek;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Class to handle internationalization (you will find online material on that looking for i18n)
+ * Class to handle MHQInternationalization (you will find online material on that looking for i18n)
  * It makes use of some short names to make it easier to use since it is used in many places
  */
-public class Internationalization {
+public class MHQInternationalization {
 
-    private static final String PREFIX = "mekhq.resources.";
-    protected static final String DEFAULT = "messages";
+    private final String defaultBundle;
     private final ConcurrentHashMap<String, ResourceBundle> resourceBundles = new ConcurrentHashMap<>();
-    private static final Internationalization instance = new Internationalization();
+    protected static MHQInternationalization instance;
 
-    protected Internationalization() {
+    static {
+        instance = new MHQInternationalization("mekhq.resources.GUI");
     }
 
-    public static Internationalization getInstance() {
+    public static MHQInternationalization getInstance() {
         return instance;
+    }
+
+    protected MHQInternationalization(String defaultBundle) {
+        this.defaultBundle = defaultBundle;
+    }
+
+    private static class UTF8Control extends ResourceBundle.Control {
+        @Override
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
+            throws IOException {
+            // The below is one approach; there are multiple ways to do this
+            String resourceName = toResourceName(toBundleName(baseName, locale), "properties");
+            try (InputStream is = loader.getResourceAsStream(resourceName);
+                 InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                return new PropertyResourceBundle(isr);
+            }
+        }
     }
 
     ResourceBundle getResourceBundle(String bundleName) {
         return resourceBundles.computeIfAbsent(bundleName, k ->
-            ResourceBundle.getBundle(PREFIX + bundleName, MekHQ.getMHQOptions().getLocale()));
+            ResourceBundle.getBundle(bundleName, MegaMek.getMMOptions().getLocale(), new UTF8Control()));
     }
 
     /**
@@ -55,8 +79,8 @@ public class Internationalization {
      * @return the localized string
      */
     public static String getTextAt(String bundleName, String key) {
-        if (Internationalization.getInstance().getResourceBundle(bundleName).containsKey(key)) {
-            return Internationalization.getInstance().getResourceBundle(bundleName).getString(key);
+        if (getInstance().getResourceBundle(bundleName).containsKey(key)) {
+            return getInstance().getResourceBundle(bundleName).getString(key);
         }
         return "!" + key + "!";
     }
@@ -67,7 +91,7 @@ public class Internationalization {
      * @return the localized string
      */
     public static String getText(String key) {
-        return getTextAt(DEFAULT, key);
+        return getTextAt(getInstance().defaultBundle, key);
     }
 
     /**
@@ -77,7 +101,7 @@ public class Internationalization {
      * @return the localized string
      */
     public static String getFormattedText(String key, Object... args) {
-        return MessageFormat.format(getFormattedTextAt(DEFAULT, key), args);
+        return MessageFormat.format(getFormattedTextAt(getInstance().defaultBundle, key), args);
     }
 
     /**
@@ -90,6 +114,5 @@ public class Internationalization {
     public static String getFormattedTextAt(String bundleName, String key, Object... args) {
         return MessageFormat.format(getTextAt(bundleName, key), args);
     }
-
 
 }
