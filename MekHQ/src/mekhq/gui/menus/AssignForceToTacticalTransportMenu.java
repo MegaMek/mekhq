@@ -4,7 +4,6 @@ import megamek.common.Transporter;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.unit.TacticalTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 
 import java.awt.event.ActionEvent;
@@ -13,6 +12,9 @@ import java.util.Set;
 
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 
+/**
+ * Menu for assigning a force to a specific Tactical transport
+ */
 public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMenu {
 
     public AssignForceToTacticalTransportMenu(Campaign campaign, Unit... units) {
@@ -42,7 +44,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
     protected void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
-                return; //TODO error popup
+                return;
             }
 
         }

@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Generic menu for displaying transports for the units in the force selected (or an individual unit)
+ */
 public abstract class AssignForceToTransportMenu extends JScrollableMenu {
 
     final Campaign campaign;
@@ -70,7 +73,6 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             Set<Unit> transports = campaign.getTransportsByType(campaignTransportType, transporterType, requiredTransportCapacity);
 
             if (!transports.isEmpty()) {
-                //TODO
                 JScrollableMenu transporterTypeMenu = new JScrollableMenu(transporterType.getName(), transporterType.getName());
                 Set<JMenuItem> transportMenus = createTransportMenus(transporterType, transports, units);
                 for (JMenuItem transportMenu : transportMenus) {

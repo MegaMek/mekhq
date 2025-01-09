@@ -132,11 +132,9 @@ public class TransportAssignment implements ITransportAssignment {
             if (transport != null) {
                 if (hasTransportedLocation()) {
                     setTransport(transport);
-                    //setTransportedLocation(getTransportedLocation());
-                    //setTransporterType(hasTransportedLocation() ? getTransportedLocation().getClass() : null);
+
                 } else if (hasTransporterType()) {
                     setTransport(transport);
-                    //setTransporterType(getTransporterType());
                 }
                 else {
                     setTransport(transport);
