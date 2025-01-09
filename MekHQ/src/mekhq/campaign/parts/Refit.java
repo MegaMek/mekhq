@@ -1113,7 +1113,7 @@ public class Refit extends Part implements IAcquisitionWork {
         // Bay space might change, and either way all cargo needs to be unloaded while
         // the refit is in progress
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            if (unit.hasTransportedUnits(campaignTransportType)) {
+            if (oldUnit.hasTransportedUnits(campaignTransportType)) {
                 oldUnit.unloadTransport(campaignTransportType);
             }
         }
