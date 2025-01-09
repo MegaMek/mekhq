@@ -15,6 +15,9 @@ import java.util.stream.Stream;
 
 /**
  * Generic menu for displaying transports for the units in the force selected (or an individual unit)
+ * @see CampaignTransportType
+ * @see mekhq.campaign.unit.AbstractTransportedUnitsSummary
+ * @see mekhq.campaign.unit.ITransportAssignment
  */
 public abstract class AssignForceToTransportMenu extends JScrollableMenu {
 
@@ -22,6 +25,14 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
     final CampaignTransportType campaignTransportType;
 
     // region Constructors
+
+    /**
+     * Constructor for a new Transport Menu
+     * @param campaignTransportType type (Enum) of transport type for this menu
+     * @param campaign current campaign
+     * @param units selected units to try and assign
+     * @see CampaignTransportType
+     */
     public AssignForceToTransportMenu(CampaignTransportType campaignTransportType, final Campaign campaign, final Unit... units) {
         super(campaignTransportType.getName());
         this.campaign = campaign;

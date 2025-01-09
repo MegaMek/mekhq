@@ -7,6 +7,12 @@ import mekhq.campaign.enums.CampaignTransportType;
 
 import java.util.*;
 
+/**
+ * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
+ * @see AbstractTransportedUnitsSummary
+ * @see CampaignTransportType#SHIP_TRANSPORT
+ *
+ */
 public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
 
     /**
@@ -15,17 +21,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      */
     public ShipTransportedUnitsSummary(Unit transport) {
         super(transport);
-    }
-
-    /**
-     * Main method to be used for loading units onto a transport
-     *
-     * @param transportedUnits Units we wish to load
-     * @return the old transports the transportedUnits were assigned to, or an empty set
-     */
-    @Override
-    public Set<Unit> loadTransport(Unit... transportedUnits) {
-        return super.loadTransport(transportedUnits);
     }
 
     /**
@@ -95,9 +90,6 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         transportedUnit.setTransportShipAssignment(new TransportShipAssignment(transport, bayNumber));
 
         if ((transportedUnit.getEntity() != null)) {
-            if (transport.getEntity() != null) {
-                //loadEntity(transportedUnit.getEntity());
-            }
             // This shouldn't happen, but it'd be really annoying to debug if it did
             if ((transportedUnit.getEntity().getBayById(bayNumber) != null && transportedUnit.getEntity().getBayById(bayNumber).getClass() != transporterType)) {
                 logger.warn(String.format("Unit was assigned a bay number for a different transport type than the unit is assigned! " +

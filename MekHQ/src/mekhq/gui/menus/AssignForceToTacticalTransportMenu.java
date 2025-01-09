@@ -3,6 +3,7 @@ package mekhq.gui.menus;
 import megamek.common.Transporter;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.unit.Unit;
 
@@ -14,9 +15,18 @@ import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 
 /**
  * Menu for assigning a force to a specific Tactical transport
+ * @see CampaignTransportType#TACTICAL_TRANSPORT
+ * @see mekhq.campaign.unit.TacticalTransportedUnitsSummary
+ * @see mekhq.campaign.unit.TransportAssignment
  */
 public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMenu {
 
+    /**
+     * Constructor for a new tactical transport Menu
+     * @param campaign current campaign
+     * @param units selected units to try and assign
+     * @see CampaignTransportType#TACTICAL_TRANSPORT
+     */
     public AssignForceToTacticalTransportMenu(Campaign campaign, Unit... units) {
         super(TACTICAL_TRANSPORT, campaign, units);
     }

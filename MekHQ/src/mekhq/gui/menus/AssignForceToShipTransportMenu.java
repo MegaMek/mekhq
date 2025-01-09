@@ -3,6 +3,7 @@ package mekhq.gui.menus;
 import megamek.common.Transporter;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.unit.Unit;
 
@@ -14,9 +15,18 @@ import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 
 /**
  * Menu for assigning a unit to a specific Ship Transport
+ * @see CampaignTransportType#SHIP_TRANSPORT
+ * @see mekhq.campaign.unit.ShipTransportedUnitsSummary
+ * @see mekhq.campaign.unit.TransportShipAssignment
  */
 public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
 
+    /**
+     * Constructor for a new ship transport Menu
+     * @param campaign current campaign
+     * @param units selected units to try and assign
+     * @see CampaignTransportType#SHIP_TRANSPORT
+     */
     public AssignForceToShipTransportMenu(Campaign campaign, Unit... units) {
         super(SHIP_TRANSPORT, campaign, units);
     }

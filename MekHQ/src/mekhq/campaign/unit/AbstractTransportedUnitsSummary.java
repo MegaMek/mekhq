@@ -3,11 +3,12 @@ package mekhq.campaign.unit;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
 
-import javax.swing.*;
 import java.util.*;
 
+/**
+ * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
+ */
 public abstract class AbstractTransportedUnitsSummary implements ITransportedUnitsSummary {
     protected final MMLogger logger = MMLogger.create(this.getClass());
     protected Unit transport;
@@ -19,18 +20,6 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         if (transport.getEntity() != null) {
             initializeTransportCapacity(transport.getEntity().getTransports());
         }
-    }
-
-    /**
-     * Main method to be used for loading units onto a transport
-     *
-     * @param transportedUnits Units we wish to load
-     * @return the old transports the transportedUnits were assigned to, or an empty set
-     */
-    public Set<Unit> loadTransport(Unit... transportedUnits) {
-        HashSet<Unit> oldTransports = new HashSet<>();
-
-        return oldTransports;
     }
 
     /**
@@ -50,10 +39,6 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
 
         // Remove this unit from our collection of transported units.
         removeTransportedUnit(transportedUnit);
-        if (transport.getEntity() != null) {
-            //transport.getEntity().unload(transportedUnit.getEntity()); //TODO fix this?
-            //initializeTransportCapacity(transport.getEntity().getTransports());
-        }
     }
 
     /**
