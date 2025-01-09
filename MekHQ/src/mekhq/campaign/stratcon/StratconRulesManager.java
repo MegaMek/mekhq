@@ -66,6 +66,7 @@ import static megamek.common.Coords.ALL_DIRECTIONS;
 import static megamek.common.UnitType.*;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForceIconOperationalStatus;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
@@ -187,7 +188,7 @@ public class StratconRulesManager {
                 break;
             }
 
-            if (autoAssignLances && (campaignState.getWeeklyScenarios().size() >= availableForceIDs.size())) {
+            if (autoAssignLances && (scenarioIndex >= availableForceIDs.size())) {
                 break;
             }
 
@@ -594,7 +595,7 @@ public class StratconRulesManager {
         }
 
         // Finally, finish scenario set up
-        AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);
+        finalizeScenario(backingScenario, contract, campaign);
         setScenarioParametersFromBiome(track, scenario);
         swapInPlayerUnits(scenario, campaign, FORCE_NONE);
 
@@ -959,7 +960,7 @@ public class StratconRulesManager {
             return;
         }
 
-        boolean isRecon = combatTeam.getRole().isPatrol();
+        boolean isPatrol = combatTeam.getRole().isPatrol();
 
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
@@ -973,22 +974,15 @@ public class StratconRulesManager {
         // afterward
         StratconScenario revealedScenario = track.getScenario(coords);
         if (revealedScenario != null) {
+            if (!revealedScenario.getBackingScenario().isFinalized()) {
+                finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+                setScenarioParametersFromBiome(track, revealedScenario);
+            }
             revealedScenario.addPrimaryForce(forceID);
-            AtBDynamicScenarioFactory.finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
-            setScenarioParametersFromBiome(track, revealedScenario);
             commitPrimaryForces(campaign, revealedScenario, track);
             return;
         }
 
-        if (isRecon) {
-            StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
-
-            if (newCoords != null) {
-                coords = newCoords;
-            }
-        }
-
-        // don't create a scenario on top of allied facilities
         StratconFacility facility = track.getFacility(coords);
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
 
@@ -997,12 +991,23 @@ public class StratconRulesManager {
 
         if (isNonAlliedFacility || spawnScenario) {
             StratconScenario scenario;
-            boolean autoAssignLances = !isRecon;
 
-            Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
+            // If we're not deploying on top of an enemy facility, migrate the scenario
+            if (!isNonAlliedFacility && isPatrol) {
+                StratconCoords newCoords = getUnoccupiedAdjacentCoords(coords, track);
+
+                if (newCoords != null) {
+                    coords = newCoords;
+                }
+            }
+
+            // Patrols only get autoAssigned to the scenario if they're dropped on top of a non-allied facility
+            boolean autoAssignLances = !isPatrol || isNonAlliedFacility;
 
             // Do we already have forces deployed to the target coordinates?
             // If so, assign them to the scenario.
+            Set<Integer> preDeployedForce = track.getAssignedCoordForces().get(coords);
+
             if (preDeployedForce != null && !preDeployedForce.isEmpty()) {
                 scenario = generateScenarioForExistingForces(coords,
                     track.getAssignedCoordForces().get(coords), contract, campaign, track);
@@ -1282,11 +1287,21 @@ public class StratconRulesManager {
         }
 
         StratconScenario scenario = track.getScenario(coords);
-        // if we're deploying on top of a scenario, and it's "cloaked" then we have to activate it
-        if ((scenario != null) && scenario.getBackingScenario().isCloaked()) {
-            scenario.getBackingScenario().setCloaked(false);
-            setScenarioDates(0, track, campaign, scenario); // must be called before commitPrimaryForces
-            MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
+
+        if (scenario != null) {
+            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+            if (backingScenario != null) {
+                if (backingScenario.isCloaked()) {
+                    backingScenario.setCloaked(false);
+                }
+
+                if (backingScenario.getDate() == null) {
+                    setScenarioDates(0, track, campaign, scenario);
+                }
+
+                MekHQ.triggerEvent(new ScenarioChangedEvent(backingScenario));
+            }
         }
 
         // Traverse neighboring coordinates up to the specified distance

@@ -1351,6 +1351,7 @@ public class AtBDynamicScenarioFactory {
         scenario.getScenarioObjectives().clear();
 
         for (ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
+            logger.info("templateObjective:"+ templateObjective.toString());
             ScenarioObjective actualObjective = translateTemplateObjective(scenario, campaign, templateObjective);
 
             scenario.getScenarioObjectives().add(actualObjective);
@@ -1464,7 +1465,7 @@ public class AtBDynamicScenarioFactory {
      * Scale the scenario's objective time limits, if called for, by the number of
      * units that have associated force templates that "contribute to the unit count".
      */
-    private static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
+    public static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
         final int DEFAULT_TIME_LIMIT = 6;
         int primaryUnitCount = 0;
 
