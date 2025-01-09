@@ -81,50 +81,6 @@ public enum Intelligence {
 
     // region File I/O
     /**
-     * Parses a given string and returns the corresponding Quirk enum.
-     * Accepts either the ENUM ordinal value, or its name
-     *
-     * @param quirk the string to be parsed
-     * @return the Greed enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               Quirk
-     */
-    @Deprecated
-    public static Intelligence parseFromString(final String quirk) {
-        return switch (quirk) {
-            case "0", "Brain Dead" -> BRAIN_DEAD;
-            case "1", "Unintelligent" -> UNINTELLIGENT;
-            case "2", "Feeble Minded", "Foolish" -> FOOLISH;
-            case "3", "Simple" -> SIMPLE;
-            case "4", "Slow to Comprehend", "Slow" -> SLOW;
-            case "5", "Uninspired" -> UNINSPIRED;
-            case "6", "Dull" -> DULL;
-            case "7", "Dimwitted" -> DIMWITTED;
-            case "8", "Obtuse" -> OBTUSE;
-            case "9", "Below Average" -> BELOW_AVERAGE;
-            case "10", "Under Performing" -> UNDER_PERFORMING;
-            case "11", "Limited Insight" -> LIMITED_INSIGHT;
-            case "12", "Average" -> AVERAGE;
-            case "13", "Above Average" -> ABOVE_AVERAGE;
-            case "14", "Studious" -> STUDIOUS;
-            case "15", "Discerning" -> DISCERNING;
-            case "16", "Sharp" -> SHARP;
-            case "17", "Quick-Witted" -> QUICK_WITTED;
-            case "18", "Perceptive" -> PERCEPTIVE;
-            case "19", "Bright" -> BRIGHT;
-            case "20", "Clever" -> CLEVER;
-            case "21", "Intellectual" -> INTELLECTUAL;
-            case "22", "Brilliant" -> BRILLIANT;
-            case "23", "Exceptional" -> EXCEPTIONAL;
-            case "24", "Genius" -> GENIUS;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
-                                + quirk);
-        };
-    }
-
-    /**
      * Returns the {@link Intelligence} associated with the given ordinal.
      *
      * @param ordinal the ordinal value of the {@link Intelligence}
@@ -132,13 +88,11 @@ public enum Intelligence {
      * {@code AVERAGE} if not found
      */
     public static Intelligence fromOrdinal(int ordinal) {
-        for (Intelligence intelligence : values()) {
-            if (intelligence.ordinal() == ordinal) {
-                return intelligence;
-            }
+        if ((ordinal >= 0) && (ordinal < values().length)) {
+            return values()[ordinal];
         }
 
-        final MMLogger logger = MMLogger.create(Intelligence.class);
+        MMLogger logger = MMLogger.create(Intelligence.class);
         logger.error(String.format("Unknown Intelligence ordinal: %s - returning AVERAGE.", ordinal));
 
         return AVERAGE;
