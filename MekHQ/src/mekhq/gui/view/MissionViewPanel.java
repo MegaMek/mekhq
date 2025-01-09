@@ -948,8 +948,14 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblMorale, gridBagConstraints);
 
         txtMorale.setName("txtMorale");
-        txtMorale.setText(contract.getMoraleLevel().toString());
-        txtMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
+
+        if (contract.getContractType().isGarrisonDuty() && contract.getMoraleLevel().isRouted()) {
+            txtMorale.setText(resourceMap.getString("txtGarrisonMoraleRouted.text"));
+            txtMorale.setToolTipText(wordWrap(resourceMap.getString("txtGarrisonMoraleRouted.tooltip")));
+        } else {
+            txtMorale.setText(contract.getMoraleLevel().toString());
+            txtMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
+        }
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -994,7 +1000,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblCargoRequirement, gridBagConstraints);
 
             txtCargoRequirement.setName("txtCargoRequirement");
-            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t");
+            txtCargoRequirement.setText(estimateCargoRequirements(campaign, contract) + "t+");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;

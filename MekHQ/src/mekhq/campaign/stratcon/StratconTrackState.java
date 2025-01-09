@@ -282,6 +282,19 @@ public class StratconTrackState {
     }
 
     /**
+     * Handles the unassignment of a force from this track.
+     */
+    public void unassignUnit(int forceID) {
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            removeStickyForce(forceID);
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
+    }
+
+    /**
      * Restores the look up table of force IDs to return dates
      */
     public void restoreReturnDates() {
@@ -432,6 +445,13 @@ public class StratconTrackState {
         if (getObjectivesByCoords().containsKey(coords)) {
             getObjectivesByCoords().get(coords).setCurrentObjectiveCount(StratconStrategicObjective.OBJECTIVE_FAILED);
         }
+    }
+
+    /**
+     * @return Whether or not this track has a facility on it that reveals the track.
+     */
+    public boolean hasActiveTrackReveal() {
+        return getFacilities().values().stream().anyMatch(StratconFacility::getRevealTrack);
     }
 
     /**

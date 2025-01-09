@@ -32,9 +32,11 @@ import mekhq.gui.dialog.resupplyAndCaches.DialogAbandonedConvoy;
 import java.util.UUID;
 import java.util.Vector;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
+import static java.lang.Math.max;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
@@ -143,7 +145,10 @@ public class ResupplyUtilities {
      */
     public static int estimateCargoRequirements(Campaign campaign, AtBContract contract) {
         double targetTonnage = calculateTargetCargoTonnage(campaign, contract) * CARGO_MULTIPLIER;
-        return (int) Math.ceil(targetTonnage);
+
+        // Armor and ammo are always delivered in blocks, so cargo will never be less than the sum
+        // of those blocks
+        return max(RESUPPLY_AMMO_TONNAGE + RESUPPLY_ARMOR_TONNAGE, (int) Math.ceil(targetTonnage));
     }
 
     /**

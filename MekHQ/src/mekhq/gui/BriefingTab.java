@@ -61,7 +61,7 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
-import mekhq.utilities.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -814,15 +814,15 @@ public final class BriefingTab extends CampaignGuiTab {
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
         // and it uses that to preselect the option that is currently set in the campaign options
         Object[] options = new Object[]{
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.PRINCESS.text"),
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.ABSTRACT_COMBAT.text"),
+            MHQInternationalization.getText("AutoResolveMethod.PRINCESS.text"),
+            MHQInternationalization.getText("AutoResolveMethod.ABSTRACT_COMBAT.text"),
         };
 
         var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
 
         var selectedOption = JOptionPane.showOptionDialog(getFrame(),
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.text"),
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.title"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[preSelectedOptionIndex]);
 
@@ -830,7 +830,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        AutoResolveMethod autoResolveMethod = AutoResolveMethod.values()[selectedOption];
+        var autoResolveMethod = AutoResolveMethod.values()[selectedOption];
 
         if (autoResolveMethod == AutoResolveMethod.PRINCESS) {
             runPrincessAutoResolve();
@@ -1302,7 +1302,9 @@ public final class BriefingTab extends CampaignGuiTab {
         btnGetMul.setEnabled(canStartGame);
         btnClearAssignedUnits.setEnabled(canStartGame);
         btnResolveScenario.setEnabled(canStartGame);
-        btnAutoResolveScenario.setEnabled(canStartGame);
+        if (scenario instanceof AtBScenario) {
+            btnAutoResolveScenario.setEnabled(canStartGame);
+        }
         btnPrintRS.setEnabled(canStartGame);
     }
 

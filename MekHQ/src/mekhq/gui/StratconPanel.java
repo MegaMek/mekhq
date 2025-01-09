@@ -66,6 +66,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     private static final String RCLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RCLICK_COMMAND_ADD_FACILITY = "AddFacility";
     private static final String RCLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
+    private static final String RCLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
 
     /**
      * What to do when drawing a hex
@@ -172,7 +173,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // except if there is already a non-cloaked scenario here.
         if (StratconRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
             menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Manage Force Assignment");
+            menuItemManageForceAssignments.setText("Manage Deployment");
             menuItemManageForceAssignments.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
@@ -184,7 +185,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             if (backingScenario != null && !backingScenario.isCloaked()) {
                 menuItemManageScenario = new JMenuItem();
-                menuItemManageScenario.setText("Manage Reinforcements");
+
+                if (scenario.getCurrentState().equals(UNRESOLVED)) {
+                    menuItemManageScenario.setText("Manage Deployment");
+                } else {
+                    menuItemManageScenario.setText("Manage Reinforcements");
+                }
+
                 menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 menuItemManageScenario.addActionListener(this);
                 rightClickMenu.add(menuItemManageScenario);
@@ -209,26 +216,26 @@ public class StratconPanel extends JPanel implements ActionListener {
             rightClickMenu.addSeparator();
 
             menuItemGMReveal = new JMenuItem();
-            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector" : "Reveal Sector");
+            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector (GM)" : "Reveal Sector (GM)");
             menuItemGMReveal.setActionCommand(RCLICK_COMMAND_REVEAL_TRACK);
             menuItemGMReveal.addActionListener(this);
             rightClickMenu.add(menuItemGMReveal);
 
             if (currentTrack.getFacility(coords) != null) {
                 menuItemRemoveFacility = new JMenuItem();
-                menuItemRemoveFacility.setText("Remove Facility");
+                menuItemRemoveFacility.setText("Remove Facility (GM)");
                 menuItemRemoveFacility.setActionCommand(RCLICK_COMMAND_REMOVE_FACILITY);
                 menuItemRemoveFacility.addActionListener(this);
                 rightClickMenu.add(menuItemRemoveFacility);
 
                 menuItemSwitchOwner = new JMenuItem();
-                menuItemSwitchOwner.setText("Switch Owner");
+                menuItemSwitchOwner.setText("Switch Owner (GM)");
                 menuItemSwitchOwner.setActionCommand(RCLICK_COMMAND_CAPTURE_FACILITY);
                 menuItemSwitchOwner.addActionListener(this);
                 rightClickMenu.add(menuItemSwitchOwner);
             } else {
                 menuItemAddFacility = new JMenu();
-                menuItemAddFacility.setText("Add Facility");
+                menuItemAddFacility.setText("Add Facility (GM)");
 
                 JMenu menuItemAddAlliedFacility = new JMenu();
                 menuItemAddAlliedFacility.setText("Allied");
@@ -261,10 +268,16 @@ public class StratconPanel extends JPanel implements ActionListener {
 
             if (scenario != null) {
                 JMenuItem removeScenarioItem = new JMenuItem();
-                removeScenarioItem.setText("Remove Scenario");
+                removeScenarioItem.setText("Remove Scenario (GM)");
                 removeScenarioItem.setActionCommand(RCLICK_COMMAND_REMOVE_SCENARIO);
                 removeScenarioItem.addActionListener(this);
                 rightClickMenu.add(removeScenarioItem);
+
+                JMenuItem resetDeploymentItem = new JMenuItem();
+                resetDeploymentItem.setText("Reset Deployment (GM)");
+                resetDeploymentItem.setActionCommand(RCLICK_COMMAND_RESET_DEPLOYMENT);
+                resetDeploymentItem.addActionListener(this);
+                rightClickMenu.add(resetDeploymentItem);
             }
         }
     }
@@ -373,6 +386,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
         g2D.setFont(newFont);
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
@@ -406,7 +421,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     }
 
                     // draw fog of war if applicable
-                    if (!currentTrack.coordsRevealed(x, y)) {
+                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
                         BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR,
                                 ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
@@ -553,6 +568,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         Polygon graphHex = generateGraphHex();
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
@@ -566,7 +583,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                                 (scenario.isStrategicObjective()
                                         && currentTrack.getRevealedCoords().contains(currentCoords))
                                 ||
-                                currentTrack.isGmRevealed())) {
+                                currentTrack.isGmRevealed() || trackRevealed)) {
                     g2D.setColor(MekHQ.getMHQOptions().getFontColorNegative());
 
                     BufferedImage scenarioImage = getImage(StratconBiomeManifest.FORCE_HOSTILE, ImageType.TerrainTile);
@@ -612,12 +629,14 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         Polygon graphHex = generateGraphHex();
 
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 StratconFacility facility = currentTrack.getFacility(currentCoords);
 
-                if ((facility != null) && (facility.isVisible() || currentTrack.isGmRevealed())) {
+                if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == Allied ? Color.CYAN : Color.RED);
 
                     BufferedImage facilityImage = getFacilityImage(facility);
@@ -869,7 +888,8 @@ public class StratconPanel extends JPanel implements ActionListener {
         infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
         infoBuilder.append("<br/>");
 
-        boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
+        boolean coordsRevealed = currentTrack.hasActiveTrackReveal()
+                || currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
             infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorPositiveHexColor())
                 .append("'><i>Recon Complete</i></span><br/>");
@@ -1072,6 +1092,13 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (scenario != null) {
                     campaign.removeScenario(scenario.getBackingScenario());
+                }
+                break;
+            case RCLICK_COMMAND_RESET_DEPLOYMENT:
+                StratconScenario scenarioToReset = getSelectedScenario();
+
+                if (scenarioToReset != null) {
+                    scenarioToReset.resetScenario(campaign);
                 }
                 break;
         }

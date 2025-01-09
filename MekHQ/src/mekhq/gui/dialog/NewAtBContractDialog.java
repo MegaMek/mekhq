@@ -48,6 +48,8 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import static mekhq.campaign.market.contractMarket.ContractAutomation.contractStartPrompt;
+
 /**
  * @author Neoancient
  */
@@ -566,6 +568,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
 
         setVisible(false);
+
+        contractStartPrompt(campaign, contract);
     }
 
     @Override

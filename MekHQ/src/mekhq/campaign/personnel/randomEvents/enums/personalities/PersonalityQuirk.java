@@ -274,127 +274,6 @@ public enum PersonalityQuirk {
 
     // region File I/O
     /**
-     * Parses a given string and returns the corresponding Quirk enum.
-     * Accepts either the ENUM ordinal value, or its name
-     *
-     * @param quirk the string to be parsed
-     * @return the Greed enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               Quirk
-     */
-    @Deprecated
-    public static PersonalityQuirk parseFromString(final String quirk) {
-        return switch (quirk) {
-            case "0", "none" -> NONE;
-            case "1", "Constantly Adjusting Clothes" -> ADJUSTS_CLOTHES;
-            case "2", "Overly Affectionate" -> AFFECTIONATE;
-            case "3", "Overly Apologetic" -> APOLOGETIC;
-            case "4", "Always Reading" -> BOOKWORM;
-            case "5", "Keeps a Personal Calendar" -> CALENDAR;
-            case "6", "Fond of Scented Candles" -> CANDLES;
-            case "7", "Always Chewing Gum" -> CHEWING_GUM;
-            case "8", "Chronically Late" -> CHRONIC_LATENESS;
-            case "9", "Compulsive Cleaner" -> CLEANER;
-            case "10", "Collects Odd Items" -> COLLECTOR;
-            case "11", "Competitive Nature" -> COMPETITIVE_NATURE;
-            case "12", "Excessive Complimenter" -> COMPLIMENTS;
-            case "13", "Prone to Daydreaming" -> DAYDREAMER;
-            case "14", "Compulsive Doodler" -> DOODLER;
-            case "15", "Talks to Animals" -> DOOLITTLE;
-            case "16", "Overly Dramatic" -> DRAMATIC;
-            case "17", "Unpredictable Eating Habits" -> EATING_HABITS;
-            case "18", "Extreme Environmental Sensitivity" -> ENVIRONMENTAL_SENSITIVITY;
-            case "19", "Excessive Caution" -> EXCESSIVE_CAUTION;
-            case "20", "Over-the-Top Greetings" -> EXCESSIVE_GREETING;
-            case "21", "Intense Eye Contact" -> EYE_CONTACT;
-            case "22", "Eccentric Fashion Choices" -> FASHION_CHOICES;
-            case "23", "Constantly Fidgeting" -> FIDGETS;
-            case "24", "Extreme Personal Fitness Routine" -> FITNESS;
-            case "25", "Fixates on One Topic" -> FIXATES;
-            case "26", "Carries a Flask" -> FLASK;
-            case "27", "Always Tapping Foot" -> FOOT_TAPPER;
-            case "28", "Chronically Forgetful" -> FORGETFUL;
-            case "29", "Overly Formal Speech" -> FORMAL_SPEECH;
-            case "30", "Constantly Rearranges Furniture" -> FURNITURE;
-            case "31", "Constantly Adjusts Glasses" -> GLASSES;
-            case "32", "Always Wearing Gloves" -> GLOVES;
-            case "33", "Excessive Hand Gestures" -> HAND_GESTURES;
-            case "34", "Compulsive Hand-Wringer" -> HAND_WRINGER;
-            case "35", "Overly Enthusiastic Handshake" -> HANDSHAKE;
-            case "36", "Always Wearing Headphones" -> HEADPHONES;
-            case "37", "Frequently Snacking on Healthy Foods" -> HEALTHY_SNACKS;
-            case "38", "Passionate about History" -> HISTORIAN;
-            case "39", "Habitual Hummer" -> HUMMER;
-            case "40", "Obsessed with Hygiene" -> HYGIENIC;
-            case "41", "Unusual Sleep Patterns" -> IRREGULAR_SLEEPER;
-            case "42", "Fond of Puns" -> JOKER;
-            case "43", "Compulsive List Maker" -> LISTS;
-            case "44", "Overly Literal" -> LITERAL;
-            case "45", "Checks Locks Repeatedly" -> LOCKS;
-            case "46", "Tends to Speak in a Measured Pace" -> MEASURED_TALKER;
-            case "47", "Extreme Minimalism" -> MINIMALIST;
-            case "48", "Prefers Using a Specific Mug" -> MUG;
-            case "49", "Constant Nail Biter" -> NAIL_BITER;
-            case "50", "Frequent Nicknaming" -> NICKNAMING;
-            case "51", "Night Owl" -> NIGHT_OWL;
-            case "52", "Compulsive Note-Taking" -> NOTE_TAKER;
-            case "53", "Always Carrying a Notebook" -> NOTEBOOK;
-            case "54", "Carries a Personal Object" -> OBJECT;
-            case "55", "Obsessive Organizational Tendencies" -> ORGANIZATIONAL_TENDENCIES;
-            case "56", "Always Organizing" -> ORGANIZER;
-            case "57", "Fond of Origami" -> ORIGAMI;
-            case "58", "Obsessive Over-Planner" -> OVER_PLANNER;
-            case "59", "Chronic Overexplainer" -> OVEREXPLAINER;
-            case "60", "abitual Pen Clicker" -> PEN_CLICKER;
-            case "61", "Habitual Pen Twirler" -> PEN_TWIRLER;
-            case "62", "Overly Friendly with Equipment" -> PERSONIFICATION;
-            case "63", "Habitual Pessimist" -> PESSIMIST;
-            case "64", "Tends to Use Specific Phrases" -> PHRASES;
-            case "65", "Loves Plants" -> PLANTS;
-            case "66", "Excessive Politeness" -> POLITE;
-            case "67", "Loves Practical Jokes" -> PRACTICAL_JOKER;
-            case "68", "Always Prepared" -> PREPARED;
-            case "69", "Overly Punctual" -> PUNCTUAL;
-            case "70", "Obsessed with Puzzles" -> PUZZLES;
-            case "71", "Collects Quotes" -> QUOTES;
-            case "72", "Rarely Sleeps" -> RARELY_SLEEPS;
-            case "73", "Has a Routine for Small Tasks" -> ROUTINE;
-            case "74", "Constantly Seeking Approval" -> SEEKS_APPROVAL;
-            case "75", "Overly Sentimental" -> SENTIMENTAL;
-            case "76", "Compulsive Sharpening" -> SHARPENING;
-            case "77", "Sings to Themselves" -> SINGS;
-            case "78", "Chronically Skeptical" -> SKEPTICAL;
-            case "79", "Talks in Sleep" -> SLEEP_TALKER;
-            case "80", "Compulsive Smiler" -> SMILER;
-            case "81", "Always Has a Snack" -> SNACKS;
-            case "82", "Compulsive Storytelling" -> STORYTELLING;
-            case "83", "Constantly Stretching" -> STRETCHING;
-            case "84", "Superstitious Rituals" -> SUPERSTITIOUS_RITUALS;
-            case "85", "Highly Supervised Habits" -> SUPERVISED_HABITS;
-            case "86", "Incessant Tech Talk" -> TECH_TALK;
-            case "87", "Phobia of Technology" -> TECHNOPHOBIA;
-            case "88", "Uses Obscure Words" -> THESAURUS;
-            case "89", "Speaks in Third Person" -> THIRD_PERSON;
-            case "90", "Obsessed with Time Management" -> TIME_MANAGEMENT;
-            case "91", "Compulsive Tinkerer" -> TINKERER;
-            case "92", "Habitual Truth-Teller" -> TRUTH_TELLER;
-            case "93", "Unnecessary Caution" -> UNNECESSARY_CAUTION;
-            case "94", "Unpredictable Speech" -> UNPREDICTABLE_SPEECH;
-            case "95", "Unusual Hobbies" -> UNUSUAL_HOBBIES;
-            case "96", "Constantly Checking the Time" -> WATCH;
-            case "97", "Obsessed with Weather" -> WEATHERMAN;
-            case "98", "Frequent Whistler" -> WHISTLER;
-            case "99", "Persistent Worrier" -> WORRIER;
-            case "100", "Writes Everything Down" -> WRITER;
-            case "101", "Constantly Reminiscing" -> BATTLEFIELD_NOSTALGIA;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
-                                + quirk);
-        };
-    }
-
-    /**
      * Returns the {@link PersonalityQuirk} associated with the given ordinal.
      *
      * @param ordinal the ordinal value of the {@link PersonalityQuirk}
@@ -402,13 +281,11 @@ public enum PersonalityQuirk {
      * {@code NONE} if not found
      */
     public static PersonalityQuirk fromOrdinal(int ordinal) {
-        for (PersonalityQuirk quirk : values()) {
-            if (quirk.ordinal() == ordinal) {
-                return quirk;
-            }
+        if ((ordinal >= 0) && (ordinal < values().length)) {
+            return values()[ordinal];
         }
 
-        final MMLogger logger = MMLogger.create(PersonalityQuirk.class);
+        MMLogger logger = MMLogger.create(PersonalityQuirk.class);
         logger.error(String.format("Unknown PersonalityQuirk ordinal: %s - returning NONE.", ordinal));
 
         return NONE;

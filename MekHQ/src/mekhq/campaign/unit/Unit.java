@@ -2,7 +2,7 @@
  * Unit.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2016-2024 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2016-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -75,10 +75,10 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
+import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 
 /**
@@ -1014,7 +1014,7 @@ public class Unit implements ITechnology {
         // make sure we take note of existing hits to start and as we cycle through
         // locations
         int existingHits = getHitCriticals(type, equipmentNum);
-        int neededHits = Math.max(0, hits - existingHits);
+        int neededHits = max(0, hits - existingHits);
         int usedHits = 0;
         for (int loc = 0; loc < getEntity().locations(); loc++) {
             if (neededHits > usedHits) {
@@ -1285,80 +1285,64 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Calculates and returns the total cargo capacity of a fully crewed entity.
-     * If the entity is not fully crewed, the method returns a cargo capacity of 0.
+     * Computes the total cargo capacity of the entity, accounting for transport bays
+     * and mounted equipment designated for cargo, only if the entity is fully crewed.
      *
-     * <p>The total cargo capacity is calculated as the sum of:</p>
+     * <p>The total cargo capacity is the sum of the following:</p>
      * <ul>
-     *   <li>The capacities of all {@link CargoBay} and {@link StandardSeatCargoBay}
-     *       type bays in the entity</li>
-     *   <li>The capacities of specific {@link EquipmentPart} items with names matching
-     *       recognized patterns.</li>
+     *   <li>The usable capacities of transport bays that are instances of {@link CargoBay},
+     *       {@link RefrigeratedCargoBay}, or {@link InsulatedCargoBay}, adjusted for damage.</li>
+     *   <li>The tonnage of mounted equipment marked as cargo (via the {@code F_CARGO} flag),
+     *       provided the equipment is operable and located in valid entity sections.</li>
      * </ul>
      *
-     * <p>The following naming patterns are supported for equipment parts:</p>
+     * <p><strong>Important Considerations:</strong></p>
      * <ul>
-     *   <li><b>"Cargo (X ton)"</b>: The capacity is determined from the numeric value X.</li>
-     *   <li><b>"Cargo (X tons)"</b>: Works the same as the first pattern and is plural-sensitive.</li>
-     *   <li><b>"Cargo Container (X ton)"</b>: Specific to cargo containers, determines the capacity from X.</li>
-     *   <li><b>"Cargo Container (X tons)"</b>: Same as above, but with plural handling.</li>
+     *   <li>The method returns a cargo capacity of zero if the entity is not fully crewed.</li>
+     *   <li>Capabilities of transport bays or mounted equipment that are damaged beyond operability
+     *       or located in destroyed sections are not included in the calculation.</li>
+     *   <li>The computation assumes no external conditions affect the equipment or bays beyond the
+     *       immediate considerations of damage and operability.</li>
      * </ul>
      *
-     * <p>Equipment parts are only included in the calculation if they meet the following criteria:</p>
-     * <ul>
-     *   <li>The part is an instance of {@link EquipmentPart}.</li>
-     *   <li>The part is not in need of repairs (i.e., {@code !part.needsFixing()}).</li>
-     *   <li>The part is not mounted on a destroyed location.</li>
-     * </ul>
-     *
-     * <p>Any invalid or unparsable values from equipment parts' names are logged as errors,
-     * but these errors do not interrupt or halt execution.</p>
-     *
-     * @return The total cargo capacity of the entity if it is fully crewed, or 0 if the entity
-     *         is not fully crewed.
+     * @return The total cargo capacity of the entity if it is fully crewed; otherwise, {@code 0.0}.
      */
     public double getCargoCapacity() {
         if (!isFullyCrewed()) {
-            return 0;
+            return 0.0;
         }
 
-        double capacity = 0;
+        double capacity = 0.0;
+
+        // Add capacities from transport bays
         for (Bay bay : entity.getTransportBays()) {
-            if (bay instanceof CargoBay || bay instanceof StandardSeatCargoBay) {
-                capacity += bay.getCapacity();
+            double bayCapacity = bay.getCapacity();
+            double bayDamage = bay.getBayDamage();
+
+            double actualCapacity = max(0, bayCapacity - bayDamage);
+
+            if (bay instanceof CargoBay) {
+                capacity += actualCapacity;
+                continue;
+            }
+
+            if (bay instanceof RefrigeratedCargoBay) {
+                capacity += actualCapacity;
+                continue;
+            }
+
+            if (bay instanceof InsulatedCargoBay) {
+                capacity += actualCapacity;
             }
         }
 
-        // Pattern for general "Cargo (`x` tons)"
-        Pattern cargoPattern = Pattern.compile("Cargo \\((.*) ton(s)?\\)");
-
-        // Updated pattern for "Cargo Container (`x` tons)"
-        Pattern containerPattern = Pattern.compile("Cargo Container \\((.*) ton(s)?\\)");
-
-        for (Part part : getParts()) {
-            if (part instanceof EquipmentPart && !(part.needsFixing() || part.isMountedOnDestroyedLocation())) {
-                // Match for cargo
-                Matcher cargoMatcher = cargoPattern.matcher(part.getName());
-
-                if (cargoMatcher.find()) {
-                    try {
-                        double partCapacity = Double.parseDouble(cargoMatcher.group(1));
-                        capacity += partCapacity;
-                    } catch (NumberFormatException e) {
-                        logger.error(String.format("Failed to parse %s as double", cargoMatcher.group(1)));
-                    }
-                }
-
-                // Match for cargo container
-                Matcher containerMatcher = containerPattern.matcher(part.getName());
-
-                if (containerMatcher.find()) {
-                    try {
-                        double partCapacity = Double.parseDouble(containerMatcher.group(1));
-                        capacity += partCapacity;
-                    } catch (NumberFormatException e) {
-                        logger.error(String.format("Failed to parse %s as double", containerMatcher.group(1)));
-                    }
+        // Add capacities from mounted equipment
+        for (Mounted<?> mounted : entity.getMisc()) {
+            if (mounted.getType().hasFlag(F_CARGO)) {
+                // isOperable doesn't check if the mounted location still exists, so we check for
+                // that first.
+                if ((entity.getInternal(mounted.getLocation()) > 0) && (mounted.isOperable())) {
+                    capacity += mounted.getTonnage();
                 }
             }
         }
@@ -4142,9 +4126,9 @@ public class Unit implements ITechnology {
         // when they customize in MM but we should put an option in MM to ignore those
         // limits
         // and set it to true when we start up through MHQ
-        entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
-        entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
+        entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), 0);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), 0);
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         if (entity instanceof SmallCraft || entity instanceof Jumpship) {
             // Use tacops crew hits calculations and current size versus maximum size
             entity.getCrew().setCurrentSize(nCrew + nGunners + nDrivers);
@@ -4202,11 +4186,11 @@ public class Unit implements ITechnology {
             artillery += pilot.getGunneryInjuryMod();
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
-        crew.setPiloting(Math.min(Math.max(pilotingMek, 0), 8));
-        crew.setGunnery(Math.min(Math.max(gunneryMek, 0), 7));
-        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
-        crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
+        crew.setPiloting(Math.min(max(pilotingMek, 0), 8));
+        crew.setGunnery(Math.min(max(gunneryMek, 0), 7));
+        crew.setPilotingAero(Math.min(max(pilotingAero, 0), 8));
+        crew.setGunneryAero(Math.min(max(gunneryAero, 0), 7));
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
@@ -4242,13 +4226,13 @@ public class Unit implements ITechnology {
                 && p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
             artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
         }
-        entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), slot);
-        entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), slot);
+        entity.getCrew().setPiloting(Math.min(max(piloting, 0), 8), slot);
+        entity.getCrew().setGunnery(Math.min(max(gunnery, 0), 7), slot);
         // also set RPG gunnery skills in case present in game options
-        entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
+        entity.getCrew().setGunneryL(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunneryM(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunneryB(Math.min(max(gunnery, 0), 7), slot);
+        entity.getCrew().setArtillery(Math.min(max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
 
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
@@ -4508,76 +4492,76 @@ public class Unit implements ITechnology {
         addDriver(p, false);
     }
 
-    public void addDriver(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void addDriver(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        drivers.add(p);
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        drivers.add(person);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void addGunner(Person p) {
         addGunner(p, false);
     }
 
-    public void addGunner(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void addGunner(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        gunners.add(p);
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        gunners.add(person);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void addVesselCrew(Person p) {
         addVesselCrew(p, false);
     }
 
-    public void addVesselCrew(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void addVesselCrew(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        vesselCrew.add(p);
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        vesselCrew.add(person);
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void setNavigator(Person p) {
         setNavigator(p, false);
     }
 
-    public void setNavigator(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void setNavigator(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        navigator = p;
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        navigator = person;
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public boolean isTechOfficer(@Nullable Person p) {
@@ -4588,19 +4572,19 @@ public class Unit implements ITechnology {
         setTechOfficer(p, false);
     }
 
-    public void setTechOfficer(Person p, boolean useTransfers) {
-        Objects.requireNonNull(p);
+    public void setTechOfficer(Person person, boolean useTransfers) {
+        Objects.requireNonNull(person);
 
-        ensurePersonIsRegistered(p);
-        techOfficer = p;
-        p.setUnit(this);
+        ensurePersonIsRegistered(person);
+        techOfficer = person;
+        person.setUnit(this);
         resetPilotAndEntity();
         if (useTransfers) {
-            ServiceLogger.reassignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
         } else {
-            ServiceLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
+            ServiceLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     public void setTech(Person p) {
@@ -4664,7 +4648,7 @@ public class Unit implements ITechnology {
             ServiceLogger.addedToTOEForce(getCampaign(), person, getCampaign().getLocalDate(),
                     getCampaign().getForceFor(this));
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
+        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
     /**
@@ -4697,7 +4681,7 @@ public class Unit implements ITechnology {
                 engineer = null;
             }
             resetPilotAndEntity();
-            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(person, this));
+            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
         }
 
         if (log) {
@@ -4810,7 +4794,7 @@ public class Unit implements ITechnology {
      * @param t The time (in minutes) remaining to mothball or activate the unit.
      */
     public void setMothballTime(int t) {
-        mothballTime = Math.max(t, 0);
+        mothballTime = max(t, 0);
     }
 
     /**

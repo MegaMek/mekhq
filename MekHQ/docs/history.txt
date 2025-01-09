@@ -26,8 +26,39 @@ MEKHQ VERSION HISTORY:
 + PR #5617: Restrict Distance Label to AtB Contracts Only
 + PR #5619: Refactored PostScenarioDialogHandler to use Generic Scenario
 + PR #5620: Autologistics Reporting fixes
-+ PR #5624: Updated Frontline Deployment Instructions 
-
++ PR #5624: Updated Frontline Deployment Instructions
++ Fix #5612: Add defensive check on cancel button
++ PR #5625: Updated StratCon Data Center to Increase Scan Range Instead of Sector Reveal
++ Fix #5604: Save refit config from MHQ MekLab tab
++ Fix #5328: Adjust acquisition modifiers for support vehicles
++ Fix #4876: Add sortable columns in the finance tab
++ PR #5644: Fixed Value Display in Resupplies
++ Fix #5646: Spelling Mistakes
++ PR #5650: Address potential int and double issue from SpotBugs
++ PR #5651: Don't use floats in for loops
++ PR #5652: Adds synchronization to getForces since setForces is synchronized
++ PR #5653: Keep odd number checks using modulus
++ Fix #5604: Save refit config from MHQ MekLab tab
++ PR #5618: Enable Auto-Resolve Button Conditionally for Scenarios
++ PR #5616: Adds some helpful tooltips for contracts
++ PR #5682: Refactored Crew Assignment Event Handling
++ PR #5684: Added Report for Returning StratCon Forces
++ PR #5690: Added Potential Difficulty Spikes to Garrison-Type Contracts
++ PR #5692: Removed Undeploy Option (again); Added Reset Scenario Deployment Option
++ PR #5693: Removed SP Cost for GM Reinforcement Attempts in StratCon
++ PR #5698: Fixed Multiple StratCon Bugs
++ PR #5700: Refactored Scenario Reporting for Legacy AtB and StratCon Differentiation
++ PR #5701: Corrected Weight Class Initialization of Artillery Units
++ Fix #5688: Fixed Typo in Payment Overages Message
++ Fix #5628: Fixed Personality Loading
++ Fix #5612: Fixed Unit Name Reset
++ Fix #5705: Refactored Personnel Market Generation & Fixed Capital/Hiring Hall Checks
++ PR #5707: Corrected Available Force Check
++ PR #5708: Added a Soft Cap to Support Point Generation
++ Fix #5570: Fixed Maternity Leave Date Handling
++ PR #5699: Moved ACAR Module to MegaMek
++ PR #5709: Added MHQDialogImmersive for Immersive Dialog Functionality that Immersively Improves Immersion
++ Fix #3752: Added Handling for Unsupported Unit Types
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
@@ -216,7 +247,18 @@ MEKHQ VERSION HISTORY:
 + PR #5562: Fixed Entrance Exam Logic and Added Tooltip Display
 + PR #5563: Log jvm parameters
 + PR #5565: Refactored StratCon Reinforcement Dialog & Added GM Reinforcement Option
-+ PR #5566: Refactored Nag Dialog Checks to Improve Performance 
++ PR #5566: Refactored Nag Dialog Checks to Improve Performance
++ Fix #5667: Reworked Morale Logic
++ PR #5670: Refactored Font Color Handling for Cargo Report
++ Fix #5662: Restore Default Font Color when Leadership Selection Valid
++ Fix #5661: Removed Hardcoded Primary Ally Modifier Chances
++ Fix #5648: Expanded and Fixed Cargo Capacity Logic
++ PR #5674: Expand Special Unit Generation in AtB Unit Market
++ Fix #5668, #5640: Multiple Resupply Bug Fixes
++ PR #5676: Corrected Transportation Unit Type Check
++ Fix #5663: Addresses where the financeTable is empty
++ Fix #5664: Expanded Contract Automation Functionality to Manually Created AtB Contracts
++ Fix #5728: fixed error with resolver test 
 
 0.50.01 (2024-11-10 1800 UTC)
 + PR #4810: Respecting Trademarks (Mech to Mek)

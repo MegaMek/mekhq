@@ -103,7 +103,7 @@ public enum ScenarioStatus {
     }
 
     public boolean isOverallDefeat() {
-        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat();
+        return isDecisiveDefeat() || isDefeat() || isMarginalDefeat() || isRefusedEngagement();
     }
     // endregion Boolean Comparison Methods
 

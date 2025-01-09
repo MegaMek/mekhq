@@ -203,7 +203,7 @@ public class StratconContractInitializer {
         }
 
         // Determine starting morale
-        if (contract.getContractType().isGarrisonType()) {
+        if (contract.getContractType().isGarrisonDuty()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
 
             LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
