@@ -30,6 +30,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -162,6 +163,7 @@ public class AtBContract extends Contract {
     protected int contractScoreArbitraryModifier;
 
     protected int moraleMod = 0;
+    private Money routedPayout = null;
 
     /* lasts for a month, then removed at next events roll */
     protected boolean priorLogisticsFailure;
@@ -619,8 +621,10 @@ public class AtBContract extends Contract {
             if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
             } else {
-                campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
-                        " The contract will conclude tomorrow.");
+                campaign.addReport("With the enemy routed, any remaining objectives have been" +
+                    " successfully completed. The contract will conclude tomorrow.");
+                int remainingMonths = getMonthsLeft(campaign.getLocalDate().plusDays(1));
+                routedPayout = getMonthlyPayOut().multipliedBy(remainingMonths);
                 setEndDate(today.plusDays(1));
             }
         }
@@ -1134,6 +1138,9 @@ public class AtBContract extends Contract {
         if (routEnd != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
         }
+        if (routedPayout != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routedPayout", routedPayout);
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
@@ -1210,6 +1217,9 @@ public class AtBContract extends Contract {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("routEnd")) {
                     routEnd = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("routedPayout")) {
+                    double value = Double.parseDouble(wn2.getTextContent().trim());
+                    routedPayout = Money.of(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
                     partsAvailabilityLevel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("extensionLength")) {
@@ -2157,5 +2167,9 @@ public class AtBContract extends Contract {
      */
     public void setTransportRoll(int roll) {
         transportRoll = roll;
+    }
+
+    public @Nullable Money getRoutedPayout() {
+        return routedPayout;
     }
 }

@@ -7802,10 +7802,15 @@ public class Campaign implements ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems foolish
-            if ((contract.getStatus().isSuccess())
-                    && (contract.getMonthsLeft(getLocalDate()) > 0)) {
+            if (contract.getStatus().isSuccess()) {
                 remainingMoney = contract.getMonthlyPayOut()
-                        .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+                    .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+
+                if (contract instanceof AtBContract) {
+                    Money routedPayout = ((AtBContract) contract).getRoutedPayout();
+
+                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+                }
             }
 
             // If overage repayment is enabled, we first need to check if the salvage
