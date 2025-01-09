@@ -562,10 +562,6 @@ public abstract class AbstractProcreation {
             if ((today.isAfter(person.getDueDate())) || (today.isEqual(person.getDueDate()))) {
                 birth(campaign, today, person);
 
-                if (person.getStatus().isOnMaternityLeave() && !person.isPregnant()) {
-                    person.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
-                }
-
                 return;
             }
 
@@ -574,11 +570,6 @@ public abstract class AbstractProcreation {
                     && (person.getDueDate().minusWeeks(20).isAfter(today.minusDays(1)))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
                 }
-            }
-
-            // This is added as insurance, in case we ever miss returning the character to active duty
-            if (person.getStatus().isOnMaternityLeave() && !person.isPregnant()) {
-                person.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
             }
 
             return;

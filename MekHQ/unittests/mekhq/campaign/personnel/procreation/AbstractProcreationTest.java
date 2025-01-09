@@ -445,27 +445,47 @@ public class AbstractProcreationTest {
     }
     //endregion Pregnancy Complications
 
-    //region New Day
+    //region Process New Week
+
     @Test
-    public void testProcessNewWeek() {
+    public void testProcessNewWeek_ForNonPregnantMale() {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+
+        final Person mockPerson = mock(Person.class);
+        when(mockPerson.getGender()).thenReturn(Gender.MALE);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        verify(mockPerson, never()).isPregnant();
+        verify(mockProcreation, never()).randomlyProcreates(any(), any());
+    }
+
+    @Test
+    public void testProcessNewWeek_ForPregnantFemale() {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
+
+        final Person mockPerson = mock(Person.class);
+
+        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
+        when(mockPerson.isPregnant()).thenReturn(true);
+        when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 2));
+
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+
+        verify(mockProcreation, never()).birth(any(), any(), any());
+        verify(mockProcreation, never()).randomlyProcreates(any(), any());
+    }
+
+    @Test
+    public void testProcessNewWeek_ForPregnantFemaleWithDueDate() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
         doNothing().when(mockProcreation).birth(any(), any(), any());
 
         final Person mockPerson = mock(Person.class);
 
-        when(mockPerson.getGender()).thenReturn(Gender.MALE);
-        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockPerson, never()).isPregnant();
-        verify(mockProcreation, never()).randomlyProcreates(any(), any());
-
+        // Ensure proper stubbing
         when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
         when(mockPerson.isPregnant()).thenReturn(true);
-        when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 2));
-        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, never()).birth(any(), any(), any());
-        verify(mockProcreation, never()).randomlyProcreates(any(), any());
-
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
+
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(1)).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
