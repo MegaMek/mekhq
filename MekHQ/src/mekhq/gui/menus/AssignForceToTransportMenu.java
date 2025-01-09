@@ -3,9 +3,9 @@ package mekhq.gui.menus;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
+import mekhq.utilities.Internationalization;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -44,9 +44,8 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             return;
         }
 
-        //TODO
-        //setText(resources.getString(""));
-        setText(String.format("Assign Unit to %s Transport", campaignTransportType.getName()));
+        //Assign Unit to {[}campaignTransportTypeName}
+        setText(Internationalization.getTextAt("AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
         }
@@ -77,7 +76,11 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
                 for (JMenuItem transportMenu : transportMenus) {
                     transporterTypeMenu.add(transportMenu);
                 }
-                transporterTypeMenu.setText(transporterType.getName());
+
+                // {name of the bay}
+                transporterTypeMenu.setText(Internationalization.getTextAt("AssignForceToTransport",
+                    "AssignForceToTransportMenu." + transporterType.getSimpleName() + ".text"));
+
                 transporterTypeMenus.add(transporterTypeMenu);
             }
         }
@@ -89,11 +92,13 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         Set<JMenuItem> transportMenus = new HashSet<>();
         for (Unit transport : transports) {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
-            transportMenu.setText(transport.getName()
-                + " | Space Remaining: " + transport.getCurrentTransportCapacity(campaignTransportType, transporterType)); //TODO
-            //TODO hacky implementation
-            transportMenu.addActionListener(evt -> { transportMenuAction(evt, transporterType, transport, units); });
 
+            // {Transport Name} | Space Remaining: {Current Transport Capacity}
+            transportMenu.setText(Internationalization.getFormattedTextAt("AssignForceToTransport",
+                "AssignForceToTransportMenu.transportSpaceRemaining.text",
+                transport.getName(), transport.getCurrentTransportCapacity(campaignTransportType, transporterType)));
+
+            transportMenu.addActionListener(evt -> { transportMenuAction(evt, transporterType, transport, units); });
             transportMenus.add(transportMenu);
         }
         return transportMenus;
