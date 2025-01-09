@@ -1430,9 +1430,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Deletes an entry from the list of transit-capable transport ships. This gets
+     * Deletes an entry from the list of transit-capable transport units. This gets
      * updated when
-     * the ship is removed from the campaign for one reason or another
+     * the unit is removed from the campaign for one reason or another
      *
      * @param unit - The ship we want to remove from this Set
      */

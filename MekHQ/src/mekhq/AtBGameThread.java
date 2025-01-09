@@ -38,6 +38,7 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TransportAssignment;
 import mekhq.campaign.unit.TransportShipAssignment;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.Internationalization;
 
 import javax.swing.*;
 import java.io.File;
@@ -488,8 +489,8 @@ public class AtBGameThread extends GameThread {
 
                         if (transport.hasTacticalTransportedUnits()) {
                             loadTactical = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transport.getName()),
-                                AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                                Internationalization.getFormattedTextAt("AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.text", transport.getName()),
+                                Internationalization.getFormattedTextAt("AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.title"), JOptionPane.YES_NO_OPTION));
                         }
 
                         // Now, send the load commands

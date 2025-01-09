@@ -123,13 +123,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         }
         addTransportedUnit(Objects.requireNonNull(transportedUnit));
 
-        //if ((transportedUnit.getEntity() != null)) {
-        //    if (transport.getEntity() != null) {
-        //        loadEntity(transportedUnit.getEntity());
-        //    }
-        //}
-
-        // If the old transport was TODO
+        // Update Transport Capacities
         if (!Objects.equals(oldTransport, transport)
             && (transportedUnit.getTacticalTransportAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
