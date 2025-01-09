@@ -589,6 +589,7 @@ public class Force {
         List<UUID> eligibleCommanders = getEligibleCommanders(campaign);
 
         if (eligibleCommanders.isEmpty()) {
+            forceCommanderID = null;
             overrideForceCommanderID = null;
             return;
         }
@@ -711,6 +712,7 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideForceCommanderID", overrideForceCommanderID);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "units");
@@ -766,6 +768,8 @@ public class Force {
                     force.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     force.techId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideForceCommanderID")) {
+                    force.overrideForceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
                     force.forceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
