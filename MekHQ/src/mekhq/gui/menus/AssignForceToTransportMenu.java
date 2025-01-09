@@ -5,7 +5,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-import mekhq.utilities.Internationalization;
+import megamek.common.internationalization.Internationalization;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

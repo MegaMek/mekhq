@@ -35,10 +35,8 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
-import mekhq.campaign.unit.TransportAssignment;
-import mekhq.campaign.unit.TransportShipAssignment;
 import mekhq.campaign.unit.Unit;
-import mekhq.utilities.Internationalization;
+import megamek.common.internationalization.Internationalization;
 
 import javax.swing.*;
 import java.io.File;

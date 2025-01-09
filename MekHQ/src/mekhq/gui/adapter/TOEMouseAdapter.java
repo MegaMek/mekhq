@@ -51,7 +51,7 @@ import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
-import mekhq.utilities.Internationalization;
+import megamek.common.internationalization.Internationalization;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
