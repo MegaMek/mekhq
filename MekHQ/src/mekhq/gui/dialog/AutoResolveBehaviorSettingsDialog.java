@@ -9,7 +9,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.dialog.helpDialogs.AutoResolveBehaviorSettingsHelpDialog;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
