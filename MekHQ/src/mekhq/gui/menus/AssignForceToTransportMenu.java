@@ -44,7 +44,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             return;
         }
 
-        //Assign Unit to {[}campaignTransportTypeName}
+        //Assign Unit to {campaignTransportTypeName}
         setText(Internationalization.getTextAt("AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
@@ -98,7 +98,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
                 "AssignForceToTransportMenu.transportSpaceRemaining.text",
                 transport.getName(), transport.getCurrentTransportCapacity(campaignTransportType, transporterType)));
 
-            transportMenu.addActionListener(evt -> { transportMenuAction(evt, transporterType, transport, units); });
+            transportMenu.addActionListener(evt -> transportMenuAction(evt, transporterType, transport, units));
             transportMenus.add(transportMenu);
         }
         return transportMenus;
