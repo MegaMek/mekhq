@@ -1520,8 +1520,9 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        unit.getShipTransportedUnitsSummary().initializeTransportCapacity(unit.getEntity().getTransports());
-        unit.getTacticalTransportedUnitsSummary().initializeTransportCapacity(unit.getEntity().getTransports());
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            unit.initializeTransportSpace(campaignTransportType);
+        }
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 

@@ -185,12 +185,18 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     protected Set<Entity> clearTransportedEntities() {
         Set<Entity> transportedEntities = new HashSet<>();
         if (transport.getEntity() != null) {
-            for (Entity transportedEntity : transport.getEntity().getUnloadableUnits()) {
+            if (transport.getEntity().hasUnloadedUnitsFromBays()) {
+                for (Entity transportedEntity : transport.getEntity().getUnitsUnloadableFromBays()) {
+                    transport.getEntity().unload(transportedEntity);
+                    transportedEntities.add(transportedEntity);
+                }
+            } // We can't just use Entity::getUnloadableUnits(); getUnloadableFromBays() throws NPE in that flow
+            for (Entity transportedEntity : transport.getEntity().getUnitsUnloadableFromNonBays()) {
                 transport.getEntity().unload(transportedEntity);
                 transportedEntities.add(transportedEntity);
             }
 
-            transport.getEntity().resetTransporter();
+                transport.getEntity().resetTransporter();
         }
         return transportedEntities;
     }
