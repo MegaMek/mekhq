@@ -36,8 +36,8 @@ public class GeneralTab {
     // region Variable Declarations
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
-    private JFrame frame;
-    private String name;
+    private final JFrame frame;
+    private final String name;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -46,6 +46,7 @@ public class GeneralTab {
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblReputation;
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
+    private JCheckBox chkGMMode;
     private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
     private JLabel lblDate;
@@ -105,6 +106,9 @@ public class GeneralTab {
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
             0, -200, 200, 1);
 
+        // GM Mode
+        chkGMMode = new CampaignOptionsCheckBox("GMMode");
+
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
@@ -133,6 +137,9 @@ public class GeneralTab {
         panel.add(headerPanel, layout);
 
         layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(chkGMMode, layout);
+
         layout.gridy++;
         panel.add(lblName, layout);
 
@@ -230,6 +237,8 @@ public class GeneralTab {
      * Initialize the components of the {@link GeneralTab} class.
      */
     private void initialize() {
+        chkGMMode = new JCheckBox();
+
         lblName = new JLabel();
         txtName = new JTextField();
 
@@ -381,6 +390,7 @@ public class GeneralTab {
     }
 
     void loadValuesFromCampaignOptions() {
+        chkGMMode.setSelected(campaign.isGM());
         txtName.setText(campaign.getName());
         comboFaction.setSelectedItem(campaign.getFaction());
         unitRatingMethodCombo.setSelectedItem(campaignOptions.getUnitRatingMethod());
@@ -388,5 +398,20 @@ public class GeneralTab {
         date = campaign.getLocalDate();
         camouflage = campaign.getCamouflage();
         unitIcon = campaign.getUnitIcon();
+    }
+
+    void applyCampaignOptionsToCampaign() {
+        campaign.setGMMode(chkGMMode.isSelected());
+        campaign.setName(txtName.getText());
+
+        FactionDisplay newFaction = comboFaction.getSelectedItem();
+        if (newFaction != null) {
+            campaign.setFaction(comboFaction.getSelectedItem().getFaction());
+        }
+        campaignOptions.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
+        campaignOptions.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+        campaign.setLocalDate(date);
+        campaign.setCamouflage(camouflage);
+        campaign.setUnitIcon(unitIcon);
     }
 }

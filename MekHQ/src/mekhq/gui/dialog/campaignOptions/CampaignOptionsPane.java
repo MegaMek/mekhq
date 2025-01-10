@@ -298,6 +298,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     public void applyCampaignOptionsToCampaign() {
+        // Everything assumes general tab will be the first applied.
+        // While this shouldn't break anything, it's not worth moving around.
+        // For all other tabs, it makes sense to apply them in the order they
+        // appear in the dialog; however, this shouldn't make any major difference.
+        generalTab.applyCampaignOptionsToCampaign();
         abilitiesTab.applyCampaignOptionsToCampaign();
         advancementTab.applyCampaignOptionsToCampaign(campaign);
         biographyTab.applyCampaignOptionsToCampaign();
