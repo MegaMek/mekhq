@@ -308,6 +308,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         biographyTab.applyCampaignOptionsToCampaign();
         equipmentAndSuppliesTab.applyCampaignOptionsToCampaign();
         financesTab.applyCampaignOptionsToCampaign();
+        personnelTab.applyCampaignOptionsToCampaign();
     }
 
     public void updateOptions() {
