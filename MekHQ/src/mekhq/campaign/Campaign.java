@@ -5612,7 +5612,7 @@ public class Campaign implements ITechManager {
      * total earnings it will account for that.
      * @param type TransactionType being debited
      * @param quantity total money - it's usually displayed outside of this method
-     * @param description String displayed in the ledger & report
+     * @param description String displayed in the ledger and report
      * @param individualPayouts Map of Person to the Money they're owed
      */
     public void payPersonnel(TransactionType type, Money quantity, String description, Map<Person, Money> individualPayouts) {
