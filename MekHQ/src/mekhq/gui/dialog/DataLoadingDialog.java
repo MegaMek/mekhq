@@ -450,7 +450,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * @param retVal The campaign being checked for unsupported units. This includes the unit list
          *              and the quartermaster who handles the selling process.
          */
-        private static void sellUnsupportedUnits(Campaign retVal) {
+        private void sellUnsupportedUnits(Campaign retVal) {
             List<Unit> soldUnits = new ArrayList<>();
             for (Unit unit : retVal.getUnits()) {
                 Entity entity = unit.getEntity();
