@@ -14,7 +14,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * Generic menu for displaying transports for the units in the force selected (or an individual unit)
+ * Generic menu for displaying transports for the units in the force selected (or an individual unit).
+ *
  * @see CampaignTransportType
  * @see mekhq.campaign.unit.AbstractTransportedUnitsSummary
  * @see mekhq.campaign.unit.ITransportAssignment
@@ -66,6 +67,12 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
     }
 
 
+    /**
+     * Create the menus for selecting a transporter type
+     * to try and load these units into
+     * @param units units being assigned a transport
+     * @return menu of transporter types
+     */
     protected Set<JScrollableMenu> createTransporterTypeMenus(final Unit... units) {
         Set<JScrollableMenu> transporterTypeMenus = new HashSet<>();
         /* Let's get the transport types our campaign has
@@ -117,8 +124,21 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         return transportMenus;
     }
 
+    /**
+     * Different transporter type menus return different transporters
+     * @param units filter the transporter list based on what these units could use
+     * @return transporters that can be used by all these units
+     * @see CampaignTransportType
+     */
     protected abstract Set<Class<? extends Transporter>> filterTransporterTypeMenus(final Unit... units);
 
+    /**
+     * Different transporter type menus do different things when selected
+     * @param evt ActionEvent from the selection happening
+     * @param transporterType transporter type selected in an earlier menu
+     * @param transport transport (Unit) that will load these units
+     * @param units units being assigned to the transport
+     */
     protected abstract void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units);
 
 }

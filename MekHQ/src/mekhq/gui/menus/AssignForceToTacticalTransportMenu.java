@@ -33,6 +33,12 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         super(TACTICAL_TRANSPORT, campaign, units);
     }
 
+    /**
+     * Returns a Set of Transporters that the provided units could all be loaded into
+     * for Tactical Transport.
+     * @param units filter the Transporter list based on what these units could use
+     * @return most Transporter types except cargo and hitches
+     */
     @Override
     protected Set<Class<? extends Transporter>> filterTransporterTypeMenus(final Unit... units) {
         Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(TACTICAL_TRANSPORT).keySet());
@@ -52,6 +58,13 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         return transporterTypes;
     }
 
+    /**
+     * Assign a unit to a Tactical Transport.
+     * @param evt             ActionEvent from the selection happening
+     * @param transporterType transporter type selected in an earlier menu
+     * @param transport       transport (Unit) that will load these units
+     * @param units           units being assigned to the transport
+     */
     @Override
     protected void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units) {
         for (Unit unit : units) {

@@ -33,6 +33,12 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
         super(SHIP_TRANSPORT, campaign, units);
     }
 
+    /**
+     * Returns a Set of Transporters that the provided units could all be loaded into
+     * for Ship Transport.
+     * @param units filter the transporter list based on what these units could use
+     * @return Transporters suitable for long-term or space travel.
+     */
     @Override
     protected Set<Class<? extends Transporter>> filterTransporterTypeMenus(final Unit... units) {
         Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(campaignTransportType).keySet());
@@ -52,6 +58,13 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
         return transporterTypes;
     }
 
+    /**
+     * Assigns the units to the Ship Transport.
+     * @param evt             ActionEvent from the selection happening
+     * @param transporterType transporter type selected in an earlier menu
+     * @param transport       transport (Unit) that will load these units
+     * @param units           units being assigned to the transport
+     */
     @Override
     protected void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units) {
         for (Unit unit : units) {

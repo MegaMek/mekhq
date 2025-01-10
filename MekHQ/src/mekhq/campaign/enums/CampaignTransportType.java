@@ -6,12 +6,37 @@ import mekhq.campaign.unit.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Enum for the different transport types used in MekHQ.
+ * Campaign Transports allow a unit to be
+ * assigned a transport (another unit).
+ * The different transport types primarily differ
+ * in the Transporters they allow.
+ * @see Unit
+ * @see Transporter
+ */
 public enum CampaignTransportType
 {
     //region Enum declarations
+    /**
+     * Units assigned a ship transport, if both units are in the battle
+     * the unit will attempt to load onto the transport when deployed into battle.
+     * Ship transports are intended to be used for long-term travel or space combat
+     * and only allow units to be transported in long-term Transporters like Bays or
+     * Docking Collars.
+     * @see Bay
+     * @see DockingCollar
+     */
     SHIP_TRANSPORT(TransportShipAssignment.class, ShipTransportedUnitsSummary.class) {
-         @Override
-         public Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
+
+        /**
+         * Helps the menus need to check less when generating. Ship Transports can't use short-term
+         * transport types like InfantryCompartments or BattleArmorHandles. Use a Bay! Or DockingCollar
+         * @param unit the unit we want to get the Transporter types that could potentially hold it
+         * @return Transporter types that could potentially transport this entity
+         */
+        @Override
+        public Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
             Set<Class<? extends Transporter>> transporters = super.mapEntityToTransporters(unit);
             transporters.remove(InfantryCompartment.class);
             transporters.remove(BattleArmorHandles.class);
@@ -23,6 +48,15 @@ public enum CampaignTransportType
         }
 
     },
+    /**
+     * Units assigned a tactical transport, if both units are in the battle
+     * the unit will attempt to load onto the transport when deployed into battle.
+     * Tactical Transporters are meant to represent short-term transport - Infantry in
+     * an Infantry compartment, or Battle Armor on Battle Armor Handles. It still allows
+     * units to be loaded into bays though for tactical Dropship assaults.
+     * @see InfantryCompartment
+     * @see BattleArmorHandles
+     */
     TACTICAL_TRANSPORT(TransportAssignment.class, TacticalTransportedUnitsSummary.class);
     // endregion Enum declarations
 
@@ -41,12 +75,32 @@ public enum CampaignTransportType
 
 
     // region Boolean Comparison Methods
+
+    /**
+     * Is this a Ship Transport?
+     * @return true if this is a SHIP_TRANSPORT
+     */
     public boolean isShipTransport() { return this == SHIP_TRANSPORT; }
+
+    /**
+     * Is this a Tactical Transport?
+     * @return true if this is a TACTICAL_TRANSPORT
+     */
     public boolean isTacticalTransport() { return this == TACTICAL_TRANSPORT; }
     // endregion Boolean Comparison Methods
 
     // region Getters
+
+    /**
+     * Different Transport Types use different transport assignments.
+     * @return Transport Assignment class used by this transport type
+     */
     public Class<? extends ITransportAssignment> getTransportAssignmentType() { return transportAssignmentType; }
+
+    /**
+     * Different Transport Types use different transported units summaries.
+     * @return Transported Unit Summary used by this transport type
+     */
     public Class<? extends AbstractTransportedUnitsSummary> getTransportedUnitsSummaryType() { return transportedUnitsSummaryType; }
     // endregion Getters
 
@@ -55,9 +109,9 @@ public enum CampaignTransportType
     /**
      * Helps the menus need to check less when generating
      *
-     * @see Bay and its subclass's canLoad(Entity unit) methods
-     * @param unit the unit we want to get the Transporter types that could potentially hold it
-     * @return the transporter types that could potentially transport this entity
+     * @see Transporter
+     * @param unit unit we want to get the Transporter types that could potentially hold it
+     * @return Transporter types that could potentially transport this entity
      */
     public Set<Class<? extends Transporter>> mapEntityToTransporters(Entity unit) {
         Set<Class<? extends Transporter>> transporters = new HashSet<>();
@@ -94,7 +148,7 @@ public enum CampaignTransportType
                 transporters.add(HeavyVehicleBay.class);
             }
 
-            if (unit.getWeight() <= 100) {
+            if (unit.getWeight() <= 150) {
                 transporters.add(SuperHeavyVehicleBay.class);
             }
         }
