@@ -346,4 +346,28 @@ public class RepairAndMaintenanceTab {
         useUnofficialMaintenance.setSelected(campaignOptions.isUseUnofficialMaintenance());
         logMaintenance.setSelected(campaignOptions.isLogMaintenance());
     }
+
+    void applyCampaignOptionsToCampaign() {
+        // Repair
+        campaignOptions.setEraMods(useEraModsCheckBox.isSelected());
+        campaignOptions.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
+        campaignOptions.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
+        campaignOptions.setQuirks(useQuirksBox.isSelected());
+        campaignOptions.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
+        campaignOptions.setDestroyByMargin(useDamageMargin.isSelected());
+        campaignOptions.setDestroyMargin((int) spnDamageMargin.getValue());
+        campaignOptions.setDestroyPartTarget((int) spnDestroyPartTarget.getValue());
+
+        // Maintenance
+        campaignOptions.setCheckMaintenance(checkMaintenance.isSelected());
+        campaignOptions.setMaintenanceCycleDays((int) spnMaintenanceDays.getValue());
+        campaignOptions.setMaintenanceBonus((int) spnMaintenanceBonus.getValue());
+        campaignOptions.setDefaultMaintenanceTime((int) spnDefaultMaintenanceTime.getValue());
+        campaignOptions.setUseQualityMaintenance(useQualityMaintenance.isSelected());
+        campaignOptions.setReverseQualityNames(reverseQualityNames.isSelected());
+        campaignOptions.setUseRandomUnitQualities(chkUseRandomUnitQualities.isSelected());
+        campaignOptions.setUsePlanetaryModifiers(chkUsePlanetaryModifiers.isSelected());
+        campaignOptions.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
+        campaignOptions.setLogMaintenance(logMaintenance.isSelected());
+    }
 }
