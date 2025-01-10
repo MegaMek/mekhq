@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * Handles the Personnel tab of campaign options

@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
     private final CampaignOptions campaignOptions;

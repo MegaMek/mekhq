@@ -1,17 +1,17 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.panes.campaignOptions.AbilitiesTab.AbilityCategory;
+import mekhq.gui.dialog.campaignOptions.AbilitiesTab.AbilityCategory;
 
 import javax.swing.*;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import static java.lang.Math.round;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final MMLogger logger = MMLogger.create(CampaignOptionsPane.class);
@@ -23,6 +23,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
+
+    private GeneralTab generalTab;
+    private PersonnelTab personnelTab;
+    private BiographyTab biographyTab;
+    private RelationshipsTab relationshipsTab;
+    private TurnoverAndRetentionTab turnoverAndRetentionTab;
+    private AdvancementTab advancementTab;
+    private SkillsTab skillsTab;
+    private AbilitiesTab abilitiesTab;
+    private RepairAndMaintenanceTab repairAndMaintenanceTab;
+    private EquipmentAndSuppliesTab equipmentAndSuppliesTab;
+    private FinancesTab financesTab;
+    private MarketsTab marketsTab;
+    private RulesetsTab rulesetsTab;
 
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign) {
         super(frame, resources, "campaignOptionsDialog");
@@ -78,7 +92,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @return a {@link JScrollPane} containing the General tab
      */
     private JScrollPane createGeneralTab() {
-        GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
+        generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
         JPanel createdGeneralTab = generalTab.createGeneralTab();
         generalTab.loadValuesFromCampaignOptions();
 
@@ -100,7 +114,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane humanResourcesParentTab = new JTabbedPane();
 
         // Personnel
-        PersonnelTab personnelTab = new PersonnelTab(campaignOptions, getFrame(), "personnelTab");
+        personnelTab = new PersonnelTab(campaignOptions, getFrame(), "personnelTab");
 
         JTabbedPane personnelContentTabs = createSubTabs(Map.of(
             "personnelGeneralTab", personnelTab.createGeneralTab(),
@@ -112,7 +126,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         personnelTab.loadValuesFromCampaignOptions();
 
         // Biography
-        BiographyTab biographyTab = new BiographyTab(campaign, getFrame(), "biographyTab");
+        biographyTab = new BiographyTab(campaign, getFrame(), "biographyTab");
 
         JTabbedPane biographyContentTabs = createSubTabs(Map.of(
             "biographyGeneralTab", biographyTab.createGeneralTab(),
@@ -124,7 +138,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         biographyTab.loadValuesFromCampaignOptions();
 
         // Relationships
-        RelationshipsTab relationshipsTab = new RelationshipsTab(campaignOptions, getFrame(), "relationshipsTab");
+        relationshipsTab = new RelationshipsTab(campaignOptions, getFrame(), "relationshipsTab");
 
         JTabbedPane relationshipsContentTabs = createSubTabs(Map.of(
             "marriageTab", relationshipsTab.createMarriageTab(),
@@ -133,7 +147,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         relationshipsTab.loadValuesFromCampaignOptions();
 
         // Turnover and Retention
-        TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions,
+        turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions,
                 getFrame(), "turnoverAndRetentionTab");
 
         JTabbedPane turnoverAndRetentionContentTabs = createSubTabs(Map.of(
@@ -161,20 +175,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Parent Tab
         JTabbedPane advancementParentTab = new JTabbedPane();
 
-        // Experience + Skill Randomization
-        AdvancementTab advancementTab = new AdvancementTab(campaign, getFrame(), "advancementTab");
-        SkillsTab skillsTab = new SkillsTab(campaignOptions, getFrame(), "skillsTab");
-        AbilitiesTab abilitiesTab = new AbilitiesTab(getFrame(), "abilitiesTab");
+        // Advancement
+        advancementTab = new AdvancementTab(campaign, getFrame(), "advancementTab");
 
         JTabbedPane awardsAndRandomizationContentTabs = createSubTabs(Map.of(
             "xpAwardsTab", advancementTab.xpAwardsTab(),
             "randomizationTab", advancementTab.skillRandomizationTab()));
         advancementTab.loadValuesFromCampaignOptions();
 
+        // Skills
+        skillsTab = new SkillsTab(campaignOptions, getFrame(), "skillsTab");
+
         JTabbedPane skillsContentTabs = createSubTabs(Map.of(
             "combatSkillsTab", skillsTab.createSkillsTab(true),
             "supportSkillsTab", skillsTab.createSkillsTab(false)));
         skillsTab.loadValuesFromCampaignOptions();
+
+        // SPAs
+        abilitiesTab = new AbilitiesTab(campaignOptions, getFrame(), "abilitiesTab");
 
         JTabbedPane abilityContentTabs = createSubTabs(Map.of(
             "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITIES),
@@ -206,7 +224,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane equipmentAndSuppliesParentTab = new JTabbedPane();
 
         // Repair and Maintenance
-        RepairAndMaintenanceTab repairAndMaintenanceTab = new RepairAndMaintenanceTab(campaignOptions,
+        repairAndMaintenanceTab = new RepairAndMaintenanceTab(campaignOptions,
                 getFrame(), "repairAndMaintenanceTab");
 
         JTabbedPane repairsAndMaintenanceContentTabs = createSubTabs(Map.of(
@@ -215,14 +233,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         repairAndMaintenanceTab.loadValuesFromCampaignOptions();
 
         // Supplies and Acquisition
-        EquipmentAndSuppliesTab suppliesAndAcquisitionTab = new EquipmentAndSuppliesTab(campaignOptions,
+        equipmentAndSuppliesTab = new EquipmentAndSuppliesTab(campaignOptions,
             getFrame(), "suppliesAndAcquisitionTab");
 
         JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
-            "acquisitionTab", suppliesAndAcquisitionTab.createAcquisitionTab(),
-            "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab(),
-            "techLimitsTab", suppliesAndAcquisitionTab.createTechLimitsTab()));
-        suppliesAndAcquisitionTab.loadValuesFromCampaignOptions();
+            "acquisitionTab", equipmentAndSuppliesTab.createAcquisitionTab(),
+            "planetaryAcquisitionTab", equipmentAndSuppliesTab.createPlanetaryAcquisitionTab(),
+            "techLimitsTab", equipmentAndSuppliesTab.createTechLimitsTab()));
+        equipmentAndSuppliesTab.loadValuesFromCampaignOptions();
 
         // Add tabs
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
@@ -241,7 +259,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane strategicOperationsParentTab = new JTabbedPane();
 
         // Finances
-        FinancesTab financesTab = new FinancesTab(campaign, getFrame(), "financesTab");
+        financesTab = new FinancesTab(campaign, getFrame(), "financesTab");
 
         JTabbedPane financesContentTabs = createSubTabs(Map.of(
             "financesGeneralTab", financesTab.createFinancesGeneralOptionsTab(),
@@ -249,7 +267,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions();
 
         // Markets
-        MarketsTab marketsTab = new MarketsTab(campaignOptions, getFrame(), "marketsTab");
+        marketsTab = new MarketsTab(campaignOptions, getFrame(), "marketsTab");
 
         JTabbedPane marketsContentTabs = createSubTabs(Map.of(
             "personnelMarketTab", marketsTab.createPersonnelMarketTab(),
@@ -258,7 +276,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         marketsTab.loadValuesFromCampaignOptions();
 
         // Rulesets
-        RulesetsTab rulesetsTab = new RulesetsTab(campaignOptions, getFrame(), "rulesetsTab");
+        rulesetsTab = new RulesetsTab(campaignOptions, getFrame(), "rulesetsTab");
 
         JTabbedPane rulesetsContentTabs = createSubTabs(Map.of(
             "stratConGeneralTab", rulesetsTab.createStratConTab(),
@@ -279,11 +297,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
-    private void setOptions() {
-        // TODO this is where we update the dialog based on current campaign settings.
+    public void applyCampaignOptionsToCampaign() {
+        abilitiesTab.applyCampaignOptionsToCampaign();
     }
 
-    private void updateOptions() {
+    public void updateOptions() {
         // TODO this is where we update campaign values based on the dialog values
     }
 }

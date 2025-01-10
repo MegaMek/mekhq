@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -10,7 +10,7 @@ import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RelationshipsTab {
     private final CampaignOptions campaignOptions;

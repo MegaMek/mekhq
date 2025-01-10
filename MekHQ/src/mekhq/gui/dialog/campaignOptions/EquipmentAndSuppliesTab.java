@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class EquipmentAndSuppliesTab {
     // region Variable Declarations

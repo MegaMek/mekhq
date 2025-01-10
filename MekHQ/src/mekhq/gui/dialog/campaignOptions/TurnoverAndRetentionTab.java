@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -7,7 +7,7 @@ import mekhq.campaign.personnel.enums.TurnoverFrequency;
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * This class represents a GUI configuration form with two main tabs: 'Turnover' and 'Fatigue'.

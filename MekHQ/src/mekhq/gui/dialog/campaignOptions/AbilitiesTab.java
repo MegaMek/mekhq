@@ -1,16 +1,17 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.CampaignOptionsGridBagConstraints;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.CampaignOptionsHeaderPanel;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.CampaignOptionsStandardPanel;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsGridBagConstraints;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsHeaderPanel;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsStandardPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,19 +21,24 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static mekhq.campaign.personnel.SpecialAbility.getDefaultSpecialAbilities;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.resources;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.resources;
 
 public class AbilitiesTab {
-    JFrame frame;
-    String name;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
     private Map<String, SpecialAbility> temporarySPATable;
+    private Map<SpecialAbility, Boolean> abilityUsageTable;
 
-    AbilitiesTab(JFrame frame, String name) {
+    AbilitiesTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+        this.campaignOptions = campaignOptions;
         this.frame = frame;
         this.name = name;
+
+        abilityUsageTable = new HashMap<>();
     }
 
     public enum AbilityCategory {
@@ -175,6 +181,11 @@ public class AbilitiesTab {
         // Contents
         JCheckBox chkAbility = new JCheckBox(resources.getString("abilityEnable.text"));
         chkAbility.setSelected(!unusedAbilities.containsValue(ability));
+        // This sets the initial value, while the action listener ensures the SPAs presence in the
+        // table is kept up to date with player changes.
+        abilityUsageTable.put(ability, !unusedAbilities.containsValue(ability));
+        chkAbility.addActionListener(e ->
+            abilityUsageTable.put(ability, chkAbility.isSelected()));
 
         JLabel lblCost = getAbilityCost(ability);
 
@@ -222,7 +233,10 @@ public class AbilitiesTab {
         return panel;
     }
 
-    private static void arrangeSPAPanelLayout(GridBagConstraints layout, JPanel panel, JCheckBox chkAbility, JLabel lblCost, JLabel lblDescription, JLabel lblPrerequisites, JLabel lblIncompatible, JLabel lblRemoves, JButton btnCustomizeAbility) {
+    private static void arrangeSPAPanelLayout(GridBagConstraints layout, JPanel panel,
+                                              JCheckBox chkAbility, JLabel lblCost, JLabel lblDescription,
+                                              JLabel lblPrerequisites, JLabel lblIncompatible,
+                                              JLabel lblRemoves, JButton btnCustomizeAbility) {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
@@ -290,5 +304,17 @@ public class AbilitiesTab {
 
             setName("pnl" + name);
         }
+    }
+
+    void applyCampaignOptionsToCampaign() {
+        Map<String, SpecialAbility> enabledAbilities = new HashMap<>();
+
+        for (SpecialAbility ability : abilityUsageTable.keySet()) {
+            if (abilityUsageTable.get(ability)) {
+                enabledAbilities.put(ability.getName(), ability);
+            }
+        }
+
+        SpecialAbility.replaceSpecialAbilities(enabledAbilities);
     }
 }

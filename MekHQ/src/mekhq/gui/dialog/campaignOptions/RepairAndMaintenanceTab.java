@@ -1,11 +1,11 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.dialog.campaignOptions;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * This class represents the tab for repair and maintenance settings.
