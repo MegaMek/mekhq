@@ -299,6 +299,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     public void applyCampaignOptionsToCampaign() {
         abilitiesTab.applyCampaignOptionsToCampaign();
+        advancementTab.applyCampaignOptionsToCampaign(campaign);
     }
 
     public void updateOptions() {
