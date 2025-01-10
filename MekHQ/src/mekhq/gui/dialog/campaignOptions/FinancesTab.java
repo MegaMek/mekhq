@@ -29,10 +29,10 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
  * Requires a valid {@link Campaign} and {@link JFrame} instances.
  */
 public class FinancesTab {
-    private Campaign campaign;
-    private CampaignOptions campaignOptions;
-    private JFrame frame;
-    private String name;
+    private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
+    private final JFrame frame;
+    private final String name;
 
     //start General Options
     private JPanel pnlGeneralOptions;
@@ -751,5 +751,45 @@ public class FinancesTab {
         spnDamagedPartsValueMultiplier.setValue(campaignOptions.getDamagedPartsValueMultiplier());
         spnUnrepairablePartsValueMultiplier.setValue(campaignOptions.getUnrepairablePartsValueMultiplier());
         spnCancelledOrderRefundMultiplier.setValue(campaignOptions.getCancelledOrderRefundMultiplier());
+    }
+
+    void applyCampaignOptionsToCampaign() {
+        // General Options
+        campaignOptions.setLoanLimits(useLoanLimitsBox.isSelected());
+        campaignOptions.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
+        campaignOptions.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
+        campaignOptions.setShowPeacetimeCost(usePeacetimeCostBox.isSelected());
+        campaignOptions.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
+        campaignOptions.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
+        campaignOptions.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
+        campaignOptions.setPayForParts(payForPartsBox.isSelected());
+        campaignOptions.setPayForRepairs(payForRepairsBox.isSelected());
+        campaignOptions.setPayForUnits(payForUnitsBox.isSelected());
+        campaignOptions.setPayForSalaries(payForSalariesBox.isSelected());
+        campaignOptions.setPayForOverhead(payForOverheadBox.isSelected());
+        campaignOptions.setPayForMaintain(payForMaintainBox.isSelected());
+        campaignOptions.setPayForTransport(payForTransportBox.isSelected());
+        campaignOptions.setPayForRecruitment(payForRecruitmentBox.isSelected());
+        campaignOptions.setSellUnits(sellUnitsBox.isSelected());
+        campaignOptions.setSellParts(sellPartsBox.isSelected());
+        campaignOptions.setUseTaxes(chkUseTaxes.isSelected());
+        campaignOptions.setTaxesPercentage((int) spnTaxesPercentage.getValue());
+        campaignOptions.setUseShareSystem(chkUseShareSystem.isSelected());
+        campaignOptions.setSharesForAll(chkSharesForAll.isSelected());
+
+        // Price Multipliers
+        campaignOptions.setCommonPartPriceMultiplier((float) spnCommonPartPriceMultiplier.getValue());
+        campaignOptions.setInnerSphereUnitPriceMultiplier((float) spnInnerSphereUnitPriceMultiplier.getValue());
+        campaignOptions.setInnerSpherePartPriceMultiplier((float) spnInnerSpherePartPriceMultiplier.getValue());
+        campaignOptions.setClanUnitPriceMultiplier((float) spnClanUnitPriceMultiplier.getValue());
+        campaignOptions.setClanPartPriceMultiplier((float) spnClanPartPriceMultiplier.getValue());
+        campaignOptions.setMixedTechUnitPriceMultiplier((float) spnMixedTechUnitPriceMultiplier.getValue());
+        for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
+            campaignOptions.getUsedPartPriceMultipliers()[i] = (Double) spnUsedPartPriceMultipliers[i]
+                .getValue();
+        }
+        campaignOptions.setDamagedPartsValueMultiplier((float) spnDamagedPartsValueMultiplier.getValue());
+        campaignOptions.setUnrepairablePartsValueMultiplier((float) spnUnrepairablePartsValueMultiplier.getValue());
+        campaignOptions.setCancelledOrderRefundMultiplier((float) spnCancelledOrderRefundMultiplier.getValue());
     }
 }
