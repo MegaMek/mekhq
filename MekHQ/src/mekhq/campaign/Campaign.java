@@ -2,7 +2,7 @@
  * Campaign.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2022 - 2024 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022 - 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -3998,12 +3998,22 @@ public class Campaign implements ITechManager {
                                     atBScenario.getName(), forceIds.get(forceId).getName()));
                             MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), atBScenario));
                         } else {
-                            addReport(MessageFormat.format(
-                                    resources.getString("atbScenarioToday.format"), atBScenario.getName()));
+                            if (atBScenario.getHasTrack()) {
+                                addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                    atBScenario.getName()));
+                            } else {
+                                addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                                    atBScenario.getName()));
+                            }
                         }
                     } else {
-                        addReport(MessageFormat.format(
-                                resources.getString("atbScenarioToday.format"), atBScenario.getName()));
+                        if (atBScenario.getHasTrack()) {
+                            addReport(MessageFormat.format(resources.getString("atbScenarioToday.stratCon"),
+                                atBScenario.getName()));
+                        } else {
+                            addReport(MessageFormat.format(resources.getString("atbScenarioToday.atb"),
+                                atBScenario.getName()));
+                        }
                     }
                 }
             }
@@ -4278,7 +4288,7 @@ public class Campaign implements ITechManager {
      * @param person The {@link Person} for which to process weekly relationship events
      */
     private void processWeeklyRelationshipEvents(Person person) {
-        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
             getDivorce().processNewWeek(this, getLocalDate(), person, false);
             getMarriage().processNewWeek(this, getLocalDate(), person, false);
             getProcreation().processNewWeek(this, getLocalDate(), person);
@@ -4287,9 +4297,9 @@ public class Campaign implements ITechManager {
                 if (campaignOptions.isUseMaternityLeave()) {
                     if ((person.isPregnant())
                             && (person.getStatus().isActive())
-                            && (person.getDueDate().minusWeeks(20).isEqual(getLocalDate()))) {
+                            && (person.getDueDate().minusWeeks(20).isAfter(currentDay.minusDays(1)))) {
 
-                        person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_MATERNITY_LEAVE);
+                        person.changeStatus(this, currentDay, PersonnelStatus.ON_MATERNITY_LEAVE);
                     }
 
                     List<Person> children = person.getGenealogy().getChildren();
@@ -7853,7 +7863,7 @@ public class Campaign implements ITechManager {
                 getFinances().credit(TransactionType.CONTRACT_PAYMENT, getLocalDate(), remainingMoney,
                         "Repaying payment overages for " + contract.getName());
                 addReport("Your account has been debited for " + remainingMoney.absolute().toAmountAndSymbolString()
-                        + " to replay payment overages occurred during the contract " + contract.getName());
+                        + " to repay payment overages occurred during the contract " + contract.getName());
             }
 
             // This relies on the mission being a Contract, and AtB to be on

@@ -2585,44 +2585,61 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.aggression = Aggression.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.aggression = Aggression.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.aggression = Aggression.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.ambition = Ambition.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.ambition = Ambition.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.ambition = Ambition.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.greed = Greed.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.greed = Greed.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.greed = Greed.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.social = Social.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.social = Social.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.social = Social.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
-                    retVal.social = Social.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.personalityQuirk = PersonalityQuirk.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.personalityQuirk = PersonalityQuirk.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.personalityQuirk = PersonalityQuirk.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.intelligence = Intelligence.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.intelligence = Intelligence.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.intelligence = Intelligence.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {

@@ -1141,10 +1141,21 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllForcesDeployed(forces)) {
-                menuItem = new JMenuItem("Undeploy Force (GM)");
+                menuItem = new JMenuItem("Undeploy Force");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_FORCE + forceIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
+
+                boolean enable = true;
+                for (Force individualForce : forces) {
+                    int scenarioId = individualForce.getScenarioId();
+                    Scenario scenario = gui.getCampaign().getScenario(scenarioId);
+
+                    if (scenario != null && scenario.getHasTrack()) {
+                        enable = false;
+                        break;
+                    }
+                }
+                menuItem.setEnabled(enable);
                 popup.add(menuItem);
             }
 
@@ -1642,10 +1653,22 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllUnitsDeployed(units)) {
-                menuItem = new JMenuItem("Undeploy Unit (GM)");
+                menuItem = new JMenuItem("Undeploy Unit");
                 menuItem.setActionCommand(TOEMouseAdapter.COMMAND_UNDEPLOY_UNIT + unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM() || !gui.getCampaign().getCampaignOptions().isUseStratCon());
+
+                boolean enable = true;
+                for (Unit individualUnit : units) {
+                    int scenarioId = individualUnit.getScenarioId();
+                    Scenario scenario = gui.getCampaign().getScenario(scenarioId);
+
+                    if (scenario != null && scenario.getHasTrack()) {
+                        enable = false;
+                        break;
+                    }
+                }
+
+                menuItem.setEnabled(enable);
                 popup.add(menuItem);
             }
 

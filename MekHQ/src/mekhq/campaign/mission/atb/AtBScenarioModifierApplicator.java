@@ -28,8 +28,11 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.Skills;
@@ -41,8 +44,7 @@ import mekhq.campaign.universe.Factions;
 import java.util.UUID;
 
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.generateForce;
-import static mekhq.campaign.mission.AtBDynamicScenarioFactory.randomForceWeight;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.*;
 
 /**
  * Class that handles the application of scenario modifier actions to
@@ -74,9 +76,9 @@ public class AtBScenarioModifierApplicator {
      */
     private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario,
             ScenarioForceTemplate templateToApply) {
-        int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
-        int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign, false);
-        int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario,
+        int effectiveBV = calculateEffectiveBV(scenario, campaign, false);
+        int effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign, false);
+        int deploymentZone = calculateDeploymentZone(templateToApply, scenario,
                 templateToApply.getForceName());
 
         int weightClass = randomForceWeight();
@@ -90,12 +92,13 @@ public class AtBScenarioModifierApplicator {
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
         generatedBotForce.setStartingPos(deploymentZone);
-        AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply, scenario, campaign);
-        AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
+        setDeploymentTurns(generatedBotForce, templateToApply, scenario, campaign);
+        setDestinationZone(generatedBotForce, templateToApply);
 
         // at this point, we have to re-translate the scenario objectives
         // since we're adding a force that could potentially go into any of them
-        AtBDynamicScenarioFactory.translateTemplateObjectives(scenario, campaign);
+        translateTemplateObjectives(scenario, campaign);
+        scaleObjectiveTimeLimits(scenario, campaign);
     }
 
     /**
@@ -380,7 +383,7 @@ public class AtBScenarioModifierApplicator {
 
             // if we're doing it after, we have to translate it individually
             if (timing == EventTiming.PostForceGeneration) {
-                ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario,
+                ScenarioObjective actualObjective = translateTemplateObjective(scenario,
                         campaign, objective);
                 scenario.getScenarioObjectives().add(actualObjective);
             }

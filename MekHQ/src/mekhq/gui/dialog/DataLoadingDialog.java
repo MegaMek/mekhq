@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,8 @@ package mekhq.gui.dialog;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.Entity;
+import megamek.common.GunEmplacement;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
@@ -44,11 +46,12 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
@@ -58,6 +61,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
@@ -65,7 +70,7 @@ import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTIO
 import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
 import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
-public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChangeListener {
+public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
 
     // region Variable Declarations
@@ -422,10 +427,58 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     reputationController.initializeReputation(campaign);
                     campaign.setReputation(reputationController);
                 }
+
+                sellUnsupportedUnits(campaign);
                 // endregion Progress 7
             }
             campaign.setApp(getApplication());
             return campaign;
+        }
+
+
+
+        /**
+         * Sells unsupported units.
+         * <p>
+         * This method checks all units in the specified campaign and determines if they are unsupported.
+         * Currently, only gun emplacements are identified as unsupported and are sold upon campaign load.
+         * If unsupported units are sold, a notification is displayed to the user detailing the sold units,
+         * including their names and IDs. Additionally, personnel assigned to these units are
+         * automatically unassigned.
+         * </p>
+         *
+         * @param retVal The campaign being checked for unsupported units. This includes the unit list
+         *              and the quartermaster who handles the selling process.
+         */
+        private void sellUnsupportedUnits(Campaign retVal) {
+            List<Unit> soldUnits = new ArrayList<>();
+            for (Unit unit : retVal.getUnits()) {
+                Entity entity = unit.getEntity();
+
+                if (entity == null) {
+                    continue;
+                }
+
+                // We don't support Gun Emplacements in mhq.
+                // If the user has somehow acquired one, it is sold on load.
+                if (entity instanceof GunEmplacement) {
+                    soldUnits.add(unit);
+                }
+            }
+
+            if (!soldUnits.isEmpty()) {
+                StringBuilder message = new StringBuilder(resources.getString("unsupportedUnits.body"));
+
+                for (Unit soldUnit : soldUnits) {
+                    retVal.getQuartermaster().sellUnit(soldUnit);
+                    message.append("- ").append(soldUnit.getName()).append("<br>");
+                }
+
+                JOptionPane.showMessageDialog(null,
+                    String.format("<html>%s</html>", message),
+                    resources.getString("unsupportedUnits.title"),
+                    JOptionPane.WARNING_MESSAGE);
+            }
         }
 
         /**

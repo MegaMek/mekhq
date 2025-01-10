@@ -77,6 +77,7 @@ import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
+import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 
 /**
  * This class handles the creation and substantive manipulation of
@@ -671,10 +672,10 @@ public class AtBDynamicScenarioFactory {
                     // Formations composed entirely of Meks, aerospace fighters (but not conventional),
                     // and ground vehicles use weight categories as do SPECIAL_UNIT_TYPE_ATB_MIX.
                     // Formations of other types, plus artillery formations do not use weight classes.
+                    boolean supportsWeightClass = unitTypeSupportsWeightClass(actualUnitType);
                     if ((actualUnitType == SPECIAL_UNIT_TYPE_ATB_MIX
                         || actualUnitType == SPECIAL_UNIT_TYPE_ATB_CIVILIANS
-                        || IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType))
-                        && !forceTemplate.getUseArtillery()) {
+                        || supportsWeightClass)) {
 
                         // Generate a specific weight class for each unit based on the formation weight
                         // class and lower/upper bounds
@@ -1351,6 +1352,7 @@ public class AtBDynamicScenarioFactory {
         scenario.getScenarioObjectives().clear();
 
         for (ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
+            logger.info("templateObjective:"+ templateObjective.toString());
             ScenarioObjective actualObjective = translateTemplateObjective(scenario, campaign, templateObjective);
 
             scenario.getScenarioObjectives().add(actualObjective);
@@ -1464,7 +1466,7 @@ public class AtBDynamicScenarioFactory {
      * Scale the scenario's objective time limits, if called for, by the number of
      * units that have associated force templates that "contribute to the unit count".
      */
-    private static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
+    public static void scaleObjectiveTimeLimits(AtBDynamicScenario scenario, Campaign campaign) {
         final int DEFAULT_TIME_LIMIT = 6;
         int primaryUnitCount = 0;
 
@@ -1840,7 +1842,7 @@ public class AtBDynamicScenarioFactory {
         if (unitData == null) {
             if (!params.getMissionRoles().isEmpty()) {
                 logger.warn(String.format("Unable to randomly generate %s %s with roles: %s",
-                        EntityWeightClass.getClassName(params.getWeightClass()),
+                        params.getWeightClass(),
                         getTypeName(TANK),
                         params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
             }

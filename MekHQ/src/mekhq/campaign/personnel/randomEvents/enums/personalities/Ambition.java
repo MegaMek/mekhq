@@ -109,58 +109,6 @@ public enum Ambition {
 
     // region File I/O
     /**
-     * Parses a given string and returns the corresponding Ambition enum.
-     * Accepts either the ENUM ordinal value or its name
-     *
-     * @param ambition the string to be parsed
-     * @return the Ambition enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               Ambition
-     */
-    @Deprecated
-    public static Ambition parseFromString(final String ambition) {
-        return switch (ambition) {
-            case "0", "None" -> NONE;
-            // Minor Characteristics
-            case "1", "Ambitious" -> AMBITIOUS;
-            case "2", "Arrogant" -> ARROGANT;
-            case "3", "Aspiring" -> ASPIRING;
-            case "4", "Calculating" -> CALCULATING;
-            case "5", "Conniving" -> CONNIVING;
-            case "6", "Controlling" -> CONTROLLING;
-            case "7", "Cutthroat" -> CUTTHROAT;
-            case "8", "Diligent" -> DILIGENT;
-            case "9", "Driven" -> DRIVEN;
-            case "10", "Energetic" -> ENERGETIC;
-            case "11", "Excessive" -> EXCESSIVE;
-            case "12", "Focused" -> FOCUSED;
-            case "13", "Goal-Oriented" -> GOAL_ORIENTED;
-            case "14", "Motivated" -> MOTIVATED;
-            case "15", "Opportunistic" -> OPPORTUNISTIC;
-            case "16", "Overconfident" -> OVERCONFIDENT;
-            case "17", "Persistent" -> PERSISTENT;
-            case "18", "Proactive" -> PROACTIVE;
-            case "19", "Resilient" -> RESILIENT;
-            case "20", "Ruthless" -> RUTHLESS;
-            case "21", "Selfish" -> SELFISH;
-            case "22", "Strategic" -> STRATEGIC;
-            case "23", "Unambitious" -> UNAMBITIOUS;
-            case "24", "Unscrupulous" -> UNSCRUPULOUS;
-            // Major Characteristics
-            case "25", "Dishonest" -> DISHONEST;
-            case "26", "Innovative" -> INNOVATIVE;
-            case "27", "Manipulative" -> MANIPULATIVE;
-            case "28", "Resourceful" -> RESOURCEFUL;
-            case "29", "Tyrannical" -> TYRANNICAL;
-            case "30", "Visionary" -> VISIONARY;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromString: "
-                                + ambition);
-        };
-    }
-
-    /**
      * Returns the {@link Ambition} associated with the given ordinal.
      *
      * @param ordinal the ordinal value of the {@link Ambition}
@@ -168,13 +116,11 @@ public enum Ambition {
      * {@code NONE} if not found
      */
     public static Ambition fromOrdinal(int ordinal) {
-        for (Ambition ambition : values()) {
-            if (ambition.ordinal() == ordinal) {
-                return ambition;
-            }
+        if ((ordinal >= 0) && (ordinal < values().length)) {
+            return values()[ordinal];
         }
 
-        final MMLogger logger = MMLogger.create(Ambition.class);
+        MMLogger logger = MMLogger.create(Ambition.class);
         logger.error(String.format("Unknown Ambition ordinal: %s - returning NONE.", ordinal));
 
         return NONE;

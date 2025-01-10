@@ -41,8 +41,6 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -61,7 +59,7 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
-import mekhq.utilities.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -74,7 +72,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
-import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -489,17 +486,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // exchange remaining support points to Resupplys
-        if (getCampaign().getCampaignOptions().isUseStratCon() && (mission instanceof AtBContract)) {
-            int remainingSupportPoints = ((AtBContract) mission).getStratconCampaignState().getSupportPoints();
-
-            if (remainingSupportPoints > 0) {
-                Resupply resupply = new Resupply(getCampaign(), ((AtBContract) mission),
-                    ResupplyType.RESUPPLY_CONTRACT_END);
-                performResupply(resupply, ((AtBContract) mission), remainingSupportPoints);
-            }
-        }
-
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
         }
@@ -814,15 +800,15 @@ public final class BriefingTab extends CampaignGuiTab {
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
         // and it uses that to preselect the option that is currently set in the campaign options
         Object[] options = new Object[]{
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.PRINCESS.text"),
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.ABSTRACT_COMBAT.text"),
+            MHQInternationalization.getText("AutoResolveMethod.PRINCESS.text"),
+            MHQInternationalization.getText("AutoResolveMethod.ABSTRACT_COMBAT.text"),
         };
 
         var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
 
         var selectedOption = JOptionPane.showOptionDialog(getFrame(),
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.text"),
-            Internationalization.getTextAt("AutoResolveMethod", "AutoResolveMethod.promptForAutoResolveMethod.title"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE, null, options, options[preSelectedOptionIndex]);
 
@@ -830,7 +816,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        AutoResolveMethod autoResolveMethod = AutoResolveMethod.values()[selectedOption];
+        var autoResolveMethod = AutoResolveMethod.values()[selectedOption];
 
         if (autoResolveMethod == AutoResolveMethod.PRINCESS) {
             runPrincessAutoResolve();

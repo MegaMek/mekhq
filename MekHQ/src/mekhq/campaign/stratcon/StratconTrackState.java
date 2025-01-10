@@ -282,6 +282,19 @@ public class StratconTrackState {
     }
 
     /**
+     * Handles the unassignment of a force from this track.
+     */
+    public void unassignUnit(int forceID) {
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            removeStickyForce(forceID);
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
+    }
+
+    /**
      * Restores the look up table of force IDs to return dates
      */
     public void restoreReturnDates() {
