@@ -5137,8 +5137,12 @@ public class Campaign implements ITechManager {
         removeUnitFromForce(unit);
 
         // If this is a ship, remove it from the list of potential transports
-        removeShipTransporter(unit);
-        removeTacticalTransporter(unit);
+        if (getCampaignTransporterMap(SHIP_TRANSPORT).hasTransport(unit)) {
+            removeShipTransporter(unit);
+        }
+        if (getCampaignTransporterMap(TACTICAL_TRANSPORT).hasTransport(unit)) {
+            removeTacticalTransporter(unit);
+        }
 
         // If this unit was assigned to a transport ship, remove it from the transport
         if (unit.hasTransportShipAssignment()) {

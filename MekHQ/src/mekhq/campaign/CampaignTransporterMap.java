@@ -85,6 +85,22 @@ public class CampaignTransporterMap {
     }
 
     /**
+     * true if this transport map contians the unit, false if not
+     * @param unit is in this transport map as a UUID?
+     * @return true if the unit is, false if not
+     */
+    public boolean hasTransport(Unit unit) {
+        for (Class<? extends Transporter> transporterType : transportersMap.keySet()){
+            for (Double capacity : transportersMap.get(transporterType).keySet()) {
+                if (transportersMap.get(transporterType).get(capacity).contains(unit.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns a Map that maps Transporter types to another
      * Map that maps capacity (Double) to UUID of transports
      *
