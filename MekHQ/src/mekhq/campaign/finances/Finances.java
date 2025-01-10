@@ -19,25 +19,6 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -52,6 +33,24 @@ import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -319,12 +318,6 @@ public class Finances {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
                                     payRollCost.toAmountAndSymbolString()));
-
-                    if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
-                        for (Person person : campaign.getActivePersonnel()) {
-                            person.payPersonSalary(campaign);
-                        }
-                    }
                 } else {
                     campaign.addReport(
                             String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
@@ -449,24 +442,10 @@ public class Finances {
             if (debit(TransactionType.SALARIES, date, shares,
                     String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
                 campaign.addReport(resourceMap.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
-
-                if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
-                    int numberOfShares = 0;
-                    boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
-                    for (Person person : campaign.getActivePersonnel()) {
-                        numberOfShares += person.getNumShares(campaign, sharesForAll);
-                    }
-
-                    Money singleShare = shares.dividedBy(numberOfShares);
-                    for (Person person : campaign.getActivePersonnel()) {
-                        person.payPersonShares(campaign, singleShare, sharesForAll);
-                    }
-                }
             } else {
                 /*
                  * This should not happen, as the shares payment should be less than the
-                 * contract
-                 * payment that has just been made.
+                 * contract payment that has just been made.
                  */
                 campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
                         + resourceMap.getString("InsufficientFunds.text"), resourceMap.getString("Shares.text"),

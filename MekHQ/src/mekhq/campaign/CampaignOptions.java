@@ -211,7 +211,6 @@ public class CampaignOptions {
     private TimeInDisplayFormat timeInServiceDisplayFormat;
     private boolean useTimeInRank;
     private TimeInDisplayFormat timeInRankDisplayFormat;
-    private boolean trackTotalEarnings;
     private boolean trackTotalXPEarnings;
     private boolean showOriginFaction;
 
@@ -745,7 +744,6 @@ public class CampaignOptions {
         setTimeInServiceDisplayFormat(TimeInDisplayFormat.YEARS);
         setUseTimeInRank(false);
         setTimeInRankDisplayFormat(TimeInDisplayFormat.MONTHS_YEARS);
-        setTrackTotalEarnings(false);
         setTrackTotalXPEarnings(false);
         setShowOriginFaction(true);
 
@@ -1710,20 +1708,6 @@ public class CampaignOptions {
      */
     public void setTimeInRankDisplayFormat(final TimeInDisplayFormat timeInRankDisplayFormat) {
         this.timeInRankDisplayFormat = timeInRankDisplayFormat;
-    }
-
-    /**
-     * @return whether to track the total earnings of personnel
-     */
-    public boolean isTrackTotalEarnings() {
-        return trackTotalEarnings;
-    }
-
-    /**
-     * @param trackTotalEarnings the new value for whether to track total earnings for personnel
-     */
-    public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
-        this.trackTotalEarnings = trackTotalEarnings;
     }
 
     /**
@@ -4818,7 +4802,6 @@ public class CampaignOptions {
                 getTimeInServiceDisplayFormat().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInRank", isUseTimeInRank());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalEarnings", isTrackTotalEarnings());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", isShowOriginFaction());
         // endregion Expanded Personnel Information
@@ -5506,8 +5489,6 @@ public class CampaignOptions {
                     retVal.setUseTimeInRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("timeInRankDisplayFormat")) {
                     retVal.setTimeInRankDisplayFormat(TimeInDisplayFormat.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalEarnings")) {
-                    retVal.setTrackTotalEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackTotalXPEarnings")) {
                     retVal.setTrackTotalXPEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {

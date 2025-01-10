@@ -8488,7 +8488,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseTimeInRank.doClick();
         }
         comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
-        chkTrackTotalEarnings.setSelected(options.isTrackTotalEarnings());
         chkTrackTotalXPEarnings.setSelected(options.isTrackTotalXPEarnings());
         chkShowOriginFaction.setSelected(options.isShowOriginFaction());
 
@@ -9229,7 +9228,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTimeInServiceDisplayFormat(comboTimeInServiceDisplayFormat.getSelectedItem());
             options.setUseTimeInRank(chkUseTimeInRank.isSelected());
             options.setTimeInRankDisplayFormat(comboTimeInRankDisplayFormat.getSelectedItem());
-            options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
             options.setTrackTotalXPEarnings(chkTrackTotalXPEarnings.isSelected());
             options.setShowOriginFaction(chkShowOriginFaction.isSelected());
 

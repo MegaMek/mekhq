@@ -7830,25 +7830,13 @@ public class Campaign implements ITechManager {
                 ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
                         MekHQ.getMHQOptions().getLocale());
 
-                Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
-                remainingMoney = remainingMoney.minus(shares);
+                if (remainingMoney.isGreaterThan(Money.zero())) {
+                    Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+                    remainingMoney = remainingMoney.minus(shares);
 
-                if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
-                        String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
-                    addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
-
-                    if (getCampaignOptions().isTrackTotalEarnings()) {
-                        boolean sharesForAll = getCampaignOptions().isSharesForAll();
-
-                        int numberOfShares = getActivePersonnel().stream()
-                                .mapToInt(person -> person.getNumShares(this, sharesForAll))
-                                .sum();
-
-                        Money singleShare = shares.dividedBy(numberOfShares);
-
-                        for (Person person : getActivePersonnel()) {
-                            person.payPersonShares(this, singleShare, sharesForAll);
-                        }
+                    if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
+                            String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
+                        addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
                     }
                 }
             }
