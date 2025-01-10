@@ -710,7 +710,6 @@ public class RelationshipsTab {
         spnCheckMutualAncestorsDepth.setValue(campaignOptions.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(campaignOptions.isLogMarriageNameChanges());
         comboRandomMarriageMethod.setSelectedItem(campaignOptions.getRandomMarriageMethod());
-        comboRandomMarriageMethod.setSelectedItem(campaignOptions.getRandomMarriageMethod());
         chkUseRandomClanPersonnelMarriages.setSelected(campaignOptions.isUseRandomClanPersonnelMarriages());
         chkUseRandomPrisonerMarriages.setSelected(campaignOptions.isUsePrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(campaignOptions.getRandomMarriageAgeRange());
@@ -748,5 +747,53 @@ public class RelationshipsTab {
         chkUseRandomPrisonerProcreation.setSelected(campaignOptions.isUseRandomPrisonerProcreation());
         spnRandomProcreationRelationshipDiceSize.setValue(campaignOptions.getRandomProcreationRelationshipDiceSize());
         spnRandomProcreationRelationshiplessDiceSize.setValue(campaignOptions.getRandomProcreationRelationshiplessDiceSize());
+    }
+
+    void applyCampaignOptionsToCampaign() {
+        // Marriage
+        campaignOptions.setUseManualMarriages(chkUseManualMarriages.isSelected());
+        campaignOptions.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
+        campaignOptions.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
+        campaignOptions.setNoInterestInMarriageDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
+        campaignOptions.setCheckMutualAncestorsDepth((int) spnCheckMutualAncestorsDepth.getValue());
+        campaignOptions.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
+        campaignOptions.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());
+        campaignOptions.setUseRandomClanPersonnelMarriages(chkUseRandomClanPersonnelMarriages.isSelected());
+        campaignOptions.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
+        campaignOptions.setRandomMarriageAgeRange((int) spnRandomMarriageAgeRange.getValue());
+        campaignOptions.setRandomMarriageDiceSize((int) spnRandomMarriageDiceSize.getValue());
+        campaignOptions.setRandomSameSexMarriageDiceSize((int) spnRandomSameSexMarriageDiceSize.getValue());
+        campaignOptions.setRandomNewDependentMarriage((int) spnRandomNewDependentMarriage.getValue());
+
+        // Divorce
+        campaignOptions.setUseManualDivorce(chkUseManualDivorce.isSelected());
+        campaignOptions.setUseClanPersonnelDivorce(chkUseClanPersonnelDivorce.isSelected());
+        campaignOptions.setUsePrisonerDivorce(chkUsePrisonerDivorce.isSelected());
+        campaignOptions.setRandomDivorceMethod(comboRandomDivorceMethod.getSelectedItem());
+        campaignOptions.setUseRandomOppositeSexDivorce(chkUseRandomOppositeSexDivorce.isSelected());
+        campaignOptions.setUseRandomSameSexDivorce(chkUseRandomSameSexDivorce.isSelected());
+        campaignOptions.setUseRandomClanPersonnelDivorce(chkUseRandomClanPersonnelDivorce.isSelected());
+        campaignOptions.setUseRandomPrisonerDivorce(chkUseRandomPrisonerDivorce.isSelected());
+        campaignOptions.setRandomDivorceDiceSize((int) spnRandomDivorceDiceSize.getValue());
+
+        // Procreation
+        campaignOptions.setUseManualProcreation(chkUseManualProcreation.isSelected());
+        campaignOptions.setUseClanPersonnelProcreation(chkUseClanPersonnelProcreation.isSelected());
+        campaignOptions.setUsePrisonerProcreation(chkUsePrisonerProcreation.isSelected());
+        campaignOptions.setMultiplePregnancyOccurrences((int) spnMultiplePregnancyOccurrences.getValue());
+        campaignOptions.setBabySurnameStyle(comboBabySurnameStyle.getSelectedItem());
+        campaignOptions.setAssignNonPrisonerBabiesFounderTag(chkAssignNonPrisonerBabiesFounderTag.isSelected());
+        campaignOptions.setAssignChildrenOfFoundersFounderTag(chkAssignChildrenOfFoundersFounderTag.isSelected());
+        campaignOptions.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
+        campaignOptions.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+        campaignOptions.setNoInterestInChildrenDiceSize((int) spnNoInterestInChildrenDiceSize.getValue());
+        campaignOptions.setUseMaternityLeave(chkUseMaternityLeave.isSelected());
+        campaignOptions.setLogProcreation(chkLogProcreation.isSelected());
+        campaignOptions.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
+        campaignOptions.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());
+        campaignOptions.setUseRandomClanPersonnelProcreation(chkUseRandomClanPersonnelProcreation.isSelected());
+        campaignOptions.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
+        campaignOptions.setRandomProcreationRelationshipDiceSize((int) spnRandomProcreationRelationshipDiceSize.getValue());
+        campaignOptions.setRandomProcreationRelationshiplessDiceSize((int) spnRandomProcreationRelationshiplessDiceSize.getValue());
     }
 }
