@@ -1497,6 +1497,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (Person selectedPerson : getSelectedPeople()) {
                 if (!selectedPerson.canPerformRole(gui.getCampaign().getLocalDate(), role, true)) {
                     allCanPerform = false;
+                    break;
                 }
             }
 
@@ -1519,6 +1520,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (Person selectedPerson : getSelectedPeople()) {
                 if (!selectedPerson.canPerformRole(gui.getCampaign().getLocalDate(), role, false)) {
                     allCanPerform = false;
+                    break;
                 }
             }
 
