@@ -73,10 +73,11 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog_new;
+import mekhq.gui.dialog.campaignOptions.SelectPresetDialog;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -97,8 +98,8 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 
+import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * The application's main frame.
@@ -1504,8 +1505,8 @@ public class CampaignGUI extends JPanel {
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
-        final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
-        cod.setVisible(true);
+
+        new CampaignOptionsDialog_new(getFrame(), getCampaign());
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 

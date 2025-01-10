@@ -52,7 +52,8 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog_new;
+import mekhq.gui.dialog.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,9 +67,9 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
+import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
+import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
@@ -348,11 +349,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    CampaignOptionsDialog optionsDialog =
-                        new CampaignOptionsDialog(dialog, getFrame(), campaign, true, application);
-                    optionsDialog.setLocationRelativeTo(getFrame());
-                    optionsDialog.applyPreset(preset);
-                    if (optionsDialog.showDialog().isCancelled()) {
+                    CampaignOptionsDialog_new optionsDialog =
+                        new CampaignOptionsDialog_new(getFrame(), campaign);
+//                    optionsDialog.setLocationRelativeTo(null);
+//                    optionsDialog.applyPreset(preset);
+                    if (optionsDialog.wasCanceled()) {
                         return null;
                     }
                 }

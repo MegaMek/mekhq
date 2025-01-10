@@ -27,15 +27,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsPane;
-import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsPane;
+import mekhq.gui.dialog.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (Original Version, now largely CampaignOptionsPane)
