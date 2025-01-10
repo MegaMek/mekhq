@@ -787,4 +787,53 @@ public class RulesetsTab {
             }
         }
     }
+
+    void applyCampaignOptionsToCampaign() {
+        // Universal
+        campaignOptions.setSkillLevel(comboSkillLevel.getSelectedItem());
+        campaignOptions.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
+        campaignOptions.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
+        campaignOptions.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
+        campaignOptions.setUseDropShips(chkUseDropShips.isSelected());
+        campaignOptions.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
+        campaignOptions.setClanVehicles(chkClanVehicles.isSelected());
+        campaignOptions.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
+        campaignOptions.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
+        campaignOptions.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
+        campaignOptions.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
+        campaignOptions.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
+        campaignOptions.setScenarioModMax((int) spnScenarioModMax.getValue());
+        campaignOptions.setScenarioModChance((int) spnScenarioModChance.getValue());
+        campaignOptions.setScenarioModBV((int) spnScenarioModBV.getValue());
+        campaignOptions.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
+        campaignOptions.setUseLightConditions(chkUseLightConditions.isSelected());
+        campaignOptions.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+        campaignOptions.setFixedMapChance((int) spnFixedMapChance.getValue());
+        campaignOptions.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+        campaignOptions.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
+        campaignOptions.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
+        campaignOptions.setUseStrategy(chkUseStrategy.isSelected());
+        campaignOptions.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
+        campaignOptions.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
+        campaignOptions.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
+
+        // StratCon
+        campaignOptions.setUseStratCon(chkUseStratCon.isSelected());
+        campaignOptions.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
+        campaignOptions.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
+
+        // Legacy
+        campaignOptions.setUseAtB(chkUseAtB.isSelected());
+        campaignOptions.setUseVehicles(chkUseVehicles.isSelected());
+        campaignOptions.setDoubleVehicles(chkDoubleVehicles.isSelected());
+        campaignOptions.setUseAero(chkOpForUsesAero.isSelected());
+        campaignOptions.setOpForAeroChance((int) spnOpForAeroChance.getValue());
+        campaignOptions.setAllowOpForLocalUnits(chkOpForUsesLocalForces.isSelected());
+        campaignOptions.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
+        campaignOptions.setGenerateChases(chkGenerateChases.isSelected());
+
+        for (int i = 0; i < spnAtBBattleChance.length; i++) {
+            campaignOptions.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
+        }
+    }
 }
