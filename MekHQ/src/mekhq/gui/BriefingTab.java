@@ -1297,11 +1297,19 @@ public final class BriefingTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
         final boolean canStartGame = scenario.canStartScenario(getCampaign());
+
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
         btnLoadGame.setEnabled(canStartGame);
         btnGetMul.setEnabled(canStartGame);
-        btnClearAssignedUnits.setEnabled(canStartGame && getCampaign().isGM());
+
+        final boolean hasTrack = scenario.getHasTrack();
+        if (hasTrack) {
+            btnClearAssignedUnits.setEnabled(canStartGame && getCampaign().isGM());
+        } else {
+            btnClearAssignedUnits.setEnabled(canStartGame);
+        }
+
         btnResolveScenario.setEnabled(canStartGame);
         if (scenario instanceof AtBScenario) {
             btnAutoResolveScenario.setEnabled(canStartGame);
