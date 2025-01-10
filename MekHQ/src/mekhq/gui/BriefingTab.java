@@ -687,6 +687,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
 
+            // This handles StratCon undeployment
             if (scenario instanceof AtBScenario) {
                 StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(getCampaign());
 
@@ -696,6 +697,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
             }
 
+            // This handles Legacy AtB undeployment
             scenario.clearAllForcesAndPersonnel(getCampaign());
         }
     }
