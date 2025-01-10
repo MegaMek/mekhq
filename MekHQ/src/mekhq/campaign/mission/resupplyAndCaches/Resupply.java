@@ -524,7 +524,9 @@ public class Resupply {
         final Collection<UUID> unitIds = campaign.getForce(0).getAllUnits(true);
         Map<String, PartDetails> processedParts = new HashMap<>();
 
-        boolean allowClan = (employerIsClan || campaign.getLocalDate().isAfter(BATTLE_OF_TUKAYYID));
+        boolean allowClan = (employerIsClan || campaign.getLocalDate().isAfter(BATTLE_OF_TUKAYYID))
+            && campaign.getCampaignOptions().isAllowClanPurchases();
+        boolean allowInnerSphere = campaign.getCampaignOptions().isAllowISPurchases();
 
         try {
             for (UUID unitId : unitIds) {
@@ -547,8 +549,14 @@ public class Resupply {
                 if (!unit.isSalvage() && (unit.isAvailable() || unit.isDeployed())) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
-                        if (part.isClan() && !allowClan) {
-                            continue;
+                        if (part.isClan()) {
+                            if (!allowClan) {
+                                continue;
+                            }
+                        } else {
+                            if (!allowInnerSphere) {
+                                continue;
+                            }
                         }
 
                         if (isIneligiblePart(part, unit)) {
