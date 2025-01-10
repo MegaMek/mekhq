@@ -27,6 +27,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.education.Academy;
@@ -824,8 +825,37 @@ public class PersonViewPanel extends JScrollablePanel {
             y++;
         }
 
-        // We show the following if track total xp earnings are on for a free person or
-        // if the person has previously tracked total xp earnings
+        // We show the following if track total earnings is on for a free person or if
+        // the
+        // person has previously tracked total earnings
+        if (campaign.getCampaignOptions().isTrackTotalEarnings()
+                && (person.getPrisonerStatus().isFree() || person.getTotalEarnings().isGreaterThan(Money.zero()))) {
+            JLabel lblTotalEarnings1 = new JLabel(resourceMap.getString("lblTotalEarnings1.text"));
+            lblTotalEarnings1.setName("lblTotalEarnings1");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalEarnings1, gridBagConstraints);
+
+            JLabel lblTotalEarnings2 = new JLabel(person.getTotalEarnings().toAmountAndSymbolString());
+            lblTotalEarnings2.setName("lblTotalEarnings2");
+            lblTotalEarnings1.setLabelFor(lblTotalEarnings2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblTotalEarnings2, gridBagConstraints);
+            y++;
+        }
+
+        // We show the following if track total xp earnings is on for a free person or
+        // if the
+        // person has previously tracked total xp earnings
         if (campaign.getCampaignOptions().isTrackTotalXPEarnings()
                 && (person.getPrisonerStatus().isFree() || (person.getTotalXPEarnings() != 0))) {
             JLabel lblTotalXPEarnings1 = new JLabel(resourceMap.getString("lblTotalXPEarnings1.text"));

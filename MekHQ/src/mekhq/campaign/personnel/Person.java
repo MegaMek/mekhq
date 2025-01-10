@@ -146,6 +146,7 @@ public class Person {
     private int totalXPEarnings;
     private int acquisitions;
     private Money salary;
+    private Money totalEarnings;
     private int hits;
     private int hitsPrior;
     private PrisonerStatus prisonerStatus;
@@ -350,6 +351,7 @@ public class Person {
         nTasks = 0;
         doctorId = null;
         salary = Money.of(-1);
+        totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
         prisonerStatus = PrisonerStatus.FREE;
         hits = 0;
@@ -2031,6 +2033,10 @@ public class Person {
             if (!salary.equals(Money.of(-1))) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salary", salary);
             }
+
+            if (!totalEarnings.equals(Money.of(0))) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "totalEarnings", totalEarnings);
+            }
             // Always save a person's status, to make it easy to parse the personnel saved
             // data
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", status.name());
@@ -2390,6 +2396,8 @@ public class Person {
                     retVal.prisonerStatus = PrisonerStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("totalEarnings")) {
+                    retVal.totalEarnings = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
                     retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
@@ -2852,6 +2860,44 @@ public class Person {
             } catch (Exception e) {
                 logger.error("Error disabling edge trigger: {}", edgeTrigger);
             }
+        }
+    }
+
+    /**
+     * @return the person's total earnings
+     */
+    public Money getTotalEarnings() {
+        return totalEarnings;
+    }
+
+    /**
+     * This is used to pay a person. Preventing negative payments
+     * is intentional to ensure we don't accidentally
+     * change someone when trying to give them money.
+     * To charge a person, implement a new method.
+     * (And then add a @see here)
+     *
+     * @param money the amount of money to add to their total earnings
+     */
+    public void payPerson(final Money money) {
+        if (money.isPositiveOrZero()) {
+            totalEarnings = getTotalEarnings().plus((money));
+        }
+    }
+
+    /**
+     * This is used to pay a person their share value based on the value of a single
+     * share
+     *
+     * @param campaign     the campaign the person is a part of
+     * @param money        the value of a single share
+     * @param sharesForAll whether or not all personnel have shares
+     */
+    public void payPersonShares(final Campaign campaign, final Money money,
+            final boolean sharesForAll) {
+        final int shares = getNumShares(campaign, sharesForAll);
+        if (shares > 0) {
+            payPerson(money.multipliedBy(shares));
         }
     }
 

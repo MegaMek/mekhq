@@ -1103,10 +1103,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
 
-                // add expense
-                gui.getCampaign().removeFunds(TransactionType.MISCELLANEOUS, Money.of(payment),
-                        String.format(resources.getString("givePayment.format"),
-                                selectedPerson.getFullName()));
+                // pay person & add expense
+                Map<Person, Money> personMoneyMap = new HashMap<>();
+                personMoneyMap.put(selectedPerson, Money.of(payment));
+                gui.getCampaign().payPersonnel(TransactionType.MISCELLANEOUS,
+                    Money.of(payment),
+                    String.format(resources.getString("givePayment.format"),selectedPerson.getFullName()),
+                    personMoneyMap);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+
 
                 break;
             }
