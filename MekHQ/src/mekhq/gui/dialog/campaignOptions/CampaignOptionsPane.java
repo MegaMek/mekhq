@@ -303,17 +303,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // For all other tabs, it makes sense to apply them in the order they
         // appear in the dialog; however, this shouldn't make any major difference.
         generalTab.applyCampaignOptionsToCampaign();
-        abilitiesTab.applyCampaignOptionsToCampaign();
-        advancementTab.applyCampaignOptionsToCampaign();
-        biographyTab.applyCampaignOptionsToCampaign();
-        equipmentAndSuppliesTab.applyCampaignOptionsToCampaign();
-        financesTab.applyCampaignOptionsToCampaign();
+
+        // Human Resources
         personnelTab.applyCampaignOptionsToCampaign();
+        biographyTab.applyCampaignOptionsToCampaign();
         relationshipsTab.applyCampaignOptionsToCampaign();
-        repairAndMaintenanceTab.applyCampaignOptionsToCampaign();
-        rulesetsTab.applyCampaignOptionsToCampaign();
-        skillsTab.applyCampaignOptionsToCampaign();
         turnoverAndRetentionTab.applyCampaignOptionsToCampaign();
+
+        // Advancement
+        advancementTab.applyCampaignOptionsToCampaign();
+        skillsTab.applyCampaignOptionsToCampaign();
+        abilitiesTab.applyCampaignOptionsToCampaign();
+
+        // Logistics
+        equipmentAndSuppliesTab.applyCampaignOptionsToCampaign();
+        repairAndMaintenanceTab.applyCampaignOptionsToCampaign();
+
+        // Operations
+        financesTab.applyCampaignOptionsToCampaign();
+        rulesetsTab.applyCampaignOptionsToCampaign();
     }
 
     public void updateOptions() {
