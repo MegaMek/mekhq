@@ -1,6 +1,7 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
@@ -698,51 +699,60 @@ public class RelationshipsTab {
     }
 
     void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // Marriage
-        chkUseManualMarriages.setSelected(campaignOptions.isUseManualMarriages());
-        chkUseClanPersonnelMarriages.setSelected(campaignOptions.isUseClanPersonnelMarriages());
-        chkUsePrisonerMarriages.setSelected(campaignOptions.isUsePrisonerMarriages());
-        spnNoInterestInMarriageDiceSize.setValue(campaignOptions.getNoInterestInMarriageDiceSize());
-        spnCheckMutualAncestorsDepth.setValue(campaignOptions.getCheckMutualAncestorsDepth());
-        chkLogMarriageNameChanges.setSelected(campaignOptions.isLogMarriageNameChanges());
-        comboRandomMarriageMethod.setSelectedItem(campaignOptions.getRandomMarriageMethod());
-        chkUseRandomClanPersonnelMarriages.setSelected(campaignOptions.isUseRandomClanPersonnelMarriages());
-        chkUseRandomPrisonerMarriages.setSelected(campaignOptions.isUsePrisonerMarriages());
-        spnRandomMarriageAgeRange.setValue(campaignOptions.getRandomMarriageAgeRange());
-        spnRandomMarriageDiceSize.setValue(campaignOptions.getRandomMarriageDiceSize());
-        spnRandomSameSexMarriageDiceSize.setValue(campaignOptions.getRandomSameSexMarriageDiceSize());
-        spnRandomNewDependentMarriage.setValue(campaignOptions.getRandomNewDependentMarriage());
+        chkUseManualMarriages.setSelected(options.isUseManualMarriages());
+        chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
+        chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
+        spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInMarriageDiceSize());
+        spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
+        chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
+        comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
+        chkUseRandomClanPersonnelMarriages.setSelected(options.isUseRandomClanPersonnelMarriages());
+        chkUseRandomPrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
+        spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
+        spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
+        spnRandomSameSexMarriageDiceSize.setValue(options.getRandomSameSexMarriageDiceSize());
+        spnRandomNewDependentMarriage.setValue(options.getRandomNewDependentMarriage());
 
         // Divorce
-        chkUseManualDivorce.setSelected(campaignOptions.isUseManualDivorce());
-        chkUseClanPersonnelDivorce.setSelected(campaignOptions.isUseClanPersonnelDivorce());
-        chkUsePrisonerDivorce.setSelected(campaignOptions.isUsePrisonerDivorce());
-        comboRandomDivorceMethod.setSelectedItem(campaignOptions.getRandomDivorceMethod());
-        chkUseRandomOppositeSexDivorce.setSelected(campaignOptions.isUseRandomOppositeSexDivorce());
-        chkUseRandomSameSexDivorce.setSelected(campaignOptions.isUseRandomSameSexDivorce());
-        chkUseRandomClanPersonnelDivorce.setSelected(campaignOptions.isUseClanPersonnelDivorce());
-        chkUseRandomPrisonerDivorce.setSelected(campaignOptions.isUsePrisonerDivorce());
-        spnRandomDivorceDiceSize.setValue(campaignOptions.getRandomDivorceDiceSize());
+        chkUseManualDivorce.setSelected(options.isUseManualDivorce());
+        chkUseClanPersonnelDivorce.setSelected(options.isUseClanPersonnelDivorce());
+        chkUsePrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
+        comboRandomDivorceMethod.setSelectedItem(options.getRandomDivorceMethod());
+        chkUseRandomOppositeSexDivorce.setSelected(options.isUseRandomOppositeSexDivorce());
+        chkUseRandomSameSexDivorce.setSelected(options.isUseRandomSameSexDivorce());
+        chkUseRandomClanPersonnelDivorce.setSelected(options.isUseClanPersonnelDivorce());
+        chkUseRandomPrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
+        spnRandomDivorceDiceSize.setValue(options.getRandomDivorceDiceSize());
 
         // Procreation
-        chkUseManualProcreation.setSelected(campaignOptions.isUseManualProcreation());
-        chkUseClanPersonnelProcreation.setSelected(campaignOptions.isUseClanPersonnelProcreation());
-        chkUsePrisonerProcreation.setSelected(campaignOptions.isUsePrisonerProcreation());
-        spnMultiplePregnancyOccurrences.setValue(campaignOptions.getMultiplePregnancyOccurrences());
-        comboBabySurnameStyle.setSelectedItem(campaignOptions.getBabySurnameStyle());
-        chkAssignNonPrisonerBabiesFounderTag.setSelected(campaignOptions.isAssignNonPrisonerBabiesFounderTag());
-        chkAssignChildrenOfFoundersFounderTag.setSelected(campaignOptions.isAssignChildrenOfFoundersFounderTag());
-        chkDetermineFatherAtBirth.setSelected(campaignOptions.isDetermineFatherAtBirth());
-        chkDisplayTrueDueDate.setSelected(campaignOptions.isDisplayTrueDueDate());
-        spnNoInterestInChildrenDiceSize.setValue(campaignOptions.getNoInterestInChildrenDiceSize());
-        chkUseMaternityLeave.setSelected(campaignOptions.isUseMaternityLeave());
-        chkLogProcreation.setSelected(campaignOptions.isLogProcreation());
-        comboRandomProcreationMethod.setSelectedItem(campaignOptions.getRandomProcreationMethod());
-        chkUseRelationshiplessRandomProcreation.setSelected(campaignOptions.isUseRelationshiplessRandomProcreation());
-        chkUseRandomClanPersonnelProcreation.setSelected(campaignOptions.isUseRandomClanPersonnelProcreation());
-        chkUseRandomPrisonerProcreation.setSelected(campaignOptions.isUseRandomPrisonerProcreation());
-        spnRandomProcreationRelationshipDiceSize.setValue(campaignOptions.getRandomProcreationRelationshipDiceSize());
-        spnRandomProcreationRelationshiplessDiceSize.setValue(campaignOptions.getRandomProcreationRelationshiplessDiceSize());
+        chkUseManualProcreation.setSelected(options.isUseManualProcreation());
+        chkUseClanPersonnelProcreation.setSelected(options.isUseClanPersonnelProcreation());
+        chkUsePrisonerProcreation.setSelected(options.isUsePrisonerProcreation());
+        spnMultiplePregnancyOccurrences.setValue(options.getMultiplePregnancyOccurrences());
+        comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
+        chkAssignNonPrisonerBabiesFounderTag.setSelected(options.isAssignNonPrisonerBabiesFounderTag());
+        chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
+        chkDetermineFatherAtBirth.setSelected(options.isDetermineFatherAtBirth());
+        chkDisplayTrueDueDate.setSelected(options.isDisplayTrueDueDate());
+        spnNoInterestInChildrenDiceSize.setValue(options.getNoInterestInChildrenDiceSize());
+        chkUseMaternityLeave.setSelected(options.isUseMaternityLeave());
+        chkLogProcreation.setSelected(options.isLogProcreation());
+        comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
+        chkUseRelationshiplessRandomProcreation.setSelected(options.isUseRelationshiplessRandomProcreation());
+        chkUseRandomClanPersonnelProcreation.setSelected(options.isUseRandomClanPersonnelProcreation());
+        chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
+        spnRandomProcreationRelationshipDiceSize.setValue(options.getRandomProcreationRelationshipDiceSize());
+        spnRandomProcreationRelationshiplessDiceSize.setValue(options.getRandomProcreationRelationshiplessDiceSize());
     }
 
     void applyCampaignOptionsToCampaign() {
