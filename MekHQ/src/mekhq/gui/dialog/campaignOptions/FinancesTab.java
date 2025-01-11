@@ -31,8 +31,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 public class FinancesTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start General Options
     private JPanel pnlGeneralOptions;
@@ -107,11 +105,9 @@ public class FinancesTab {
      * @param frame The parent {@link JFrame} in which this tab is displayed.
      * @param name The name to be given to this tab.
      */
-    FinancesTab(Campaign campaign, JFrame frame, String name) {
+    FinancesTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

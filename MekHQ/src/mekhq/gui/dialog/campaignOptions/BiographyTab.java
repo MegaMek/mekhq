@@ -51,8 +51,6 @@ public class BiographyTab {
     private Campaign campaign;
     private CampaignOptions campaignOptions;
     private RandomOriginOptions randomOriginOptions;
-    private JFrame frame;
-    private String name;
 
     //start General Tab
     private JCheckBox chkUseDylansRandomXP;
@@ -159,16 +157,13 @@ public class BiographyTab {
     /**
      * Initializes a new {@link BiographyTab} with the specified campaign, frame, and name.
      *
+     * @param name     the name of the {@link BiographyTab}
      * @param campaign the campaign associated with the {@link BiographyTab}
-     * @param frame the {@link JFrame} used for displaying the {@link BiographyTab}
-     * @param name the name of the {@link BiographyTab}
      */
-    BiographyTab(Campaign campaign, JFrame frame, String name) {
+    BiographyTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomOriginOptions = campaignOptions.getRandomOriginOptions();
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }
@@ -184,7 +179,7 @@ public class BiographyTab {
         initializeEducationTab();
         initializeNameAndPortraitTab();
 
-        rankSystemsPane = new RankSystemsPane(frame, campaign);
+        rankSystemsPane = new RankSystemsPane(null, campaign);
     }
 
     /**

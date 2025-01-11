@@ -27,8 +27,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
  */
 public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start Turnover Tab
     private JCheckBox chkUseRandomRetirement;
@@ -117,10 +115,8 @@ public class TurnoverAndRetentionTab {
      * @param frame           the {@link JFrame} to be assigned to this tab's frame
      * @param name            the name to be assigned to this tab's name
      */
-    TurnoverAndRetentionTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    TurnoverAndRetentionTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

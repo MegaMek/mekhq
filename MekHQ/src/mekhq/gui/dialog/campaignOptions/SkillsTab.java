@@ -2,7 +2,6 @@ package mekhq.gui.dialog.campaignOptions;
 
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.SkillType;
 
 import javax.swing.*;
@@ -18,9 +17,6 @@ import static mekhq.campaign.personnel.SkillType.isCombatSkill;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
-    private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     private static Map<SkillType, JSpinner> allTargetNumbers;
     private static Map<SkillType, List<JLabel>> allSkillLevels;
@@ -30,11 +26,7 @@ public class SkillsTab {
     private static List<Double> storedValuesSpinners = new ArrayList<>();
     private static List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
-    SkillsTab(CampaignOptions campaignOptions, JFrame frame, String name) {
-        this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
-
+    SkillsTab() {
         initialize();
     }
 

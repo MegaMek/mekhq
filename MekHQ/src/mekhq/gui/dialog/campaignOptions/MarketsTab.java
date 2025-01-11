@@ -20,8 +20,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class MarketsTab {
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start Personnel Market
     private JPanel pnlPersonnelMarketGeneralOptions;
@@ -80,10 +78,8 @@ public class MarketsTab {
     private JCheckBox chkOverageRepaymentInFinalPayment;
     //end Contract Market
 
-    MarketsTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    MarketsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

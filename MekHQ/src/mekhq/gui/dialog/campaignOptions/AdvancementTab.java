@@ -16,8 +16,6 @@ public class AdvancementTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
-    private final JFrame frame;
-    private final String name;
 
     //start XP Awards Tab
     private JLabel lblXpCostMultiplier;
@@ -114,12 +112,10 @@ public class AdvancementTab {
     private JSpinner spnSecondBonus;
     //end Skill Randomization Tab
 
-    AdvancementTab(Campaign campaign, JFrame frame, String name) {
+    AdvancementTab(Campaign campaign) {
         this.campaign = campaign;
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
         this.campaignOptions = campaign.getCampaignOptions();
-        this.frame = frame;
-        this.name = name;
 
         initialize();
         loadValuesFromCampaignOptions();

@@ -26,8 +26,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
  */
 public class PersonnelTab {
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start General Tab
     private JPanel pnlPersonnelGeneralOptions;
@@ -154,10 +152,8 @@ public class PersonnelTab {
     /**
      * Represents a tab for repair and maintenance in an application.
      */
-    PersonnelTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    PersonnelTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

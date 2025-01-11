@@ -14,8 +14,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RelationshipsTab {
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start Marriage Tab
     private JPanel pnlMarriageGeneralOptions;
@@ -89,10 +87,8 @@ public class RelationshipsTab {
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
     //end Procreation Tab
 
-    RelationshipsTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    RelationshipsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

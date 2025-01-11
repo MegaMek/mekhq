@@ -37,7 +37,6 @@ public class GeneralTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final JFrame frame;
-    private final String name;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -66,11 +65,10 @@ public class GeneralTab {
      * @param frame the {@link JFrame} object that contains the tab
      * @param name the name of the tab
      */
-    public GeneralTab(Campaign campaign, JFrame frame, String name) {
+    public GeneralTab(Campaign campaign, JFrame frame) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.frame = frame;
-        this.name = name;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();

@@ -12,8 +12,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
  */
 public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start Repair Tab
     private JCheckBox useEraModsCheckBox;
@@ -47,10 +45,8 @@ public class RepairAndMaintenanceTab {
     /**
      * Represents a tab for repair and maintenance in an application.
      */
-    public RepairAndMaintenanceTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    public RepairAndMaintenanceTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

@@ -3,7 +3,6 @@ package mekhq.gui.dialog.campaignOptions;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -26,18 +25,10 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.getImage
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.resources;
 
 public class AbilitiesTab {
-    private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
-
     private Map<String, SpecialAbility> temporarySPATable;
     private Map<SpecialAbility, Boolean> abilityUsageTable;
 
-    AbilitiesTab(CampaignOptions campaignOptions, JFrame frame, String name) {
-        this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
-
+    AbilitiesTab() {
         abilityUsageTable = new HashMap<>();
     }
 

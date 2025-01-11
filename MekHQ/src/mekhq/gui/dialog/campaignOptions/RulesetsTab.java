@@ -16,8 +16,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RulesetsTab {
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
-    private final String name;
 
     //start Universal Options
     private JLabel lblSkillLevel;
@@ -104,10 +102,8 @@ public class RulesetsTab {
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
 
-    RulesetsTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    RulesetsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }

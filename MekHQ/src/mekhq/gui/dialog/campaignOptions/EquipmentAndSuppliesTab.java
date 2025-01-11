@@ -22,8 +22,6 @@ public class EquipmentAndSuppliesTab {
         MekHQ.getMHQOptions().getLocale());
 
     private CampaignOptions campaignOptions;
-    private JFrame frame;
-    private String name;
 
     //start Acquisition Tab
     private JPanel pnlAcquisitions;
@@ -97,10 +95,8 @@ public class EquipmentAndSuppliesTab {
     private JCheckBox useAmmoByTypeBox;
     //end Tech Limits Tab
 
-    public EquipmentAndSuppliesTab(CampaignOptions campaignOptions, JFrame frame, String name) {
+    public EquipmentAndSuppliesTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-        this.frame = frame;
-        this.name = name;
 
         initialize();
     }
