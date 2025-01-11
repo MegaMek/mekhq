@@ -341,7 +341,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
             presetCampaignOptions.getRandomOriginOptions());
         relationshipsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        turnoverAndRetentionTab.loadValuesFromCampaignOptions();
+        turnoverAndRetentionTab.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
         advancementTab.loadValuesFromCampaignOptions();
