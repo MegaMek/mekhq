@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.death;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -22,7 +22,7 @@ import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;

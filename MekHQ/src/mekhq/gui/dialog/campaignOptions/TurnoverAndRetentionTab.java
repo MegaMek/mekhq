@@ -1,7 +1,7 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 
 import javax.swing.*;

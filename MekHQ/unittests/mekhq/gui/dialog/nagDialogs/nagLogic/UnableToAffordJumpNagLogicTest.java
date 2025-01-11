@@ -19,9 +19,9 @@
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.dialog.nagDialogs.UnableToAffordJumpNagDialog;

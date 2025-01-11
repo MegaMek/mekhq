@@ -20,8 +20,8 @@ package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
+import mekhq.CampaignPreset;
 import mekhq.MekHQ;
-import mekhq.campaign.CampaignPreset;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
 
 import javax.swing.*;

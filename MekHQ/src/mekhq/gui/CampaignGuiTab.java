@@ -21,7 +21,7 @@ package mekhq.gui;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.gui.enums.MHQTabType;
 
 import javax.swing.*;

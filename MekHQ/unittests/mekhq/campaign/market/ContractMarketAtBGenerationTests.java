@@ -18,11 +18,7 @@
  */
 package mekhq.campaign.market;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.*;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;

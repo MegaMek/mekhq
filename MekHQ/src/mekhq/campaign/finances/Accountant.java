@@ -22,8 +22,8 @@ package mekhq.campaign.finances;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;

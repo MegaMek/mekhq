@@ -2,7 +2,7 @@ package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
 

@@ -1,6 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 
 import javax.swing.*;
 import java.awt.*;

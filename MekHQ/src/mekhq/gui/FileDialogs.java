@@ -18,10 +18,10 @@
  */
 package mekhq.gui;
 
+import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;

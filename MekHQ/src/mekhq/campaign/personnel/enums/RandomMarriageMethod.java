@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.marriage.RandomMarriage;

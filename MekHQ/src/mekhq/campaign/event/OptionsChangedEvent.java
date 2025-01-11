@@ -19,7 +19,7 @@
 package mekhq.campaign.event;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 
 import java.util.Objects;
 

@@ -22,7 +22,7 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;

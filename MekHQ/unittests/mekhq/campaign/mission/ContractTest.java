@@ -21,8 +21,8 @@
 package mekhq.campaign.mission;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.rating.UnitRatingMethod;

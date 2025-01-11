@@ -22,7 +22,7 @@ import megamek.Version;
 import megamek.common.AmmoType;
 import megamek.common.BombType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.work.IAcquisitionWork;

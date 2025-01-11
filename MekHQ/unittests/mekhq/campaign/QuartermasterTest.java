@@ -24,7 +24,6 @@ import megamek.common.EquipmentTypeLookup;
 import megamek.common.Infantry;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.EventSpy;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.PartArrivedEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Finances;

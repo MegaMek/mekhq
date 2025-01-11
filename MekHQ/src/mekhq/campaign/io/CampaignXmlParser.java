@@ -34,7 +34,6 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;

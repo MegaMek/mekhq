@@ -3,7 +3,7 @@ package mekhq.gui.dialog.campaignOptions;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 

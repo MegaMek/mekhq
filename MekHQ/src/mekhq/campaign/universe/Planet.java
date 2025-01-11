@@ -30,7 +30,7 @@ import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.adapter.*;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
 
 import java.time.LocalDate;

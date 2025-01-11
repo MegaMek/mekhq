@@ -2,7 +2,7 @@ package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Skills;

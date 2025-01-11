@@ -20,7 +20,7 @@ package mekhq.campaign.finances;
 
 import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.Contract;
 
 import java.util.stream.Collectors;

@@ -1,7 +1,7 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;

@@ -20,7 +20,7 @@ package mekhq.campaign.market;
 
 import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AtBContract;

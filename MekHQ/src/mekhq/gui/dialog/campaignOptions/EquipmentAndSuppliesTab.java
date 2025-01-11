@@ -5,7 +5,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.SkillType;
 

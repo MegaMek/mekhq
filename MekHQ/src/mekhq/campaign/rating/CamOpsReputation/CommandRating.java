@@ -20,7 +20,7 @@ package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;

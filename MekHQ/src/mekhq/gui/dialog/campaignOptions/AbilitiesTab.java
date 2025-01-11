@@ -11,9 +11,11 @@ import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptions
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsGridBagConstraints;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsHeaderPanel;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsStandardPanel;
+import mekhq.utilities.MHQXMLUtility;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -298,6 +300,11 @@ public class AbilitiesTab {
     }
 
     void applyCampaignOptionsToCampaign() {
+        Map<String, SpecialAbility> enabledAbilities = getEnabledAbilities();
+        SpecialAbility.replaceSpecialAbilities(enabledAbilities);
+    }
+
+    private Map<String, SpecialAbility> getEnabledAbilities() {
         Map<String, SpecialAbility> enabledAbilities = new HashMap<>();
 
         for (SpecialAbility ability : abilityUsageTable.keySet()) {
@@ -305,7 +312,18 @@ public class AbilitiesTab {
                 enabledAbilities.put(ability.getName(), ability);
             }
         }
+        return enabledAbilities;
+    }
 
-        SpecialAbility.replaceSpecialAbilities(enabledAbilities);
+    void writeToXML(final PrintWriter pw, int indent) {
+        Map<String, SpecialAbility> enabledAbilities = getEnabledAbilities();
+
+        if (!enabledAbilities.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "abilitiesTab");
+            for (final String key : enabledAbilities.keySet()) {
+                enabledAbilities.get(key).writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "abilitiesTab");
+        }
     }
 }

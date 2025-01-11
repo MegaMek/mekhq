@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.death;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;

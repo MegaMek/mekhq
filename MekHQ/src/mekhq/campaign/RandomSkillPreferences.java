@@ -22,7 +22,6 @@ package mekhq.campaign;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;

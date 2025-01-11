@@ -22,7 +22,6 @@ import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;

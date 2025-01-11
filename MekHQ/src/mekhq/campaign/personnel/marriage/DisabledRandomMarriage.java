@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.personnel.marriage;
 
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 public class DisabledRandomMarriage extends AbstractMarriage {

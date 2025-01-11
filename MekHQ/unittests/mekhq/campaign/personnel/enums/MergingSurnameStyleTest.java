@@ -23,7 +23,7 @@ import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

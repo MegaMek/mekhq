@@ -23,8 +23,6 @@ import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
-import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.ShoppingList;
@@ -34,6 +32,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
 public class RefitTest {

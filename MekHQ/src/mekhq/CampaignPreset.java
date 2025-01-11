@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -24,9 +24,9 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;

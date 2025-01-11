@@ -36,7 +36,7 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;

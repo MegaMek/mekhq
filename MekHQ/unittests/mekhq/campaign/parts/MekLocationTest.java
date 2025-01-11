@@ -21,9 +21,9 @@ package mekhq.campaign.parts;
 import megamek.Version;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -1999,7 +1999,7 @@ class MekLocationTest {
         Campaign mockCampaign = mock(Campaign.class);
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        
+
         MekLocation mekLocation = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
 
         assertNotNull(mekLocation.getDetails());

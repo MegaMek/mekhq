@@ -7,7 +7,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.rating.UnitRatingMethod;

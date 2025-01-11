@@ -1,7 +1,7 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.CampaignOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.dialog.campaignOptions.AbilitiesTab.AbilityCategory;
 
