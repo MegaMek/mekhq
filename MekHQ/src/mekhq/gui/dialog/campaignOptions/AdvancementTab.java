@@ -13,6 +13,7 @@ import java.util.List;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class AdvancementTab {
+    private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final RandomSkillPreferences randomSkillPreferences;
     private final JFrame frame;
@@ -114,6 +115,7 @@ public class AdvancementTab {
     //end Skill Randomization Tab
 
     AdvancementTab(Campaign campaign, JFrame frame, String name) {
+        this.campaign = campaign;
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
         this.campaignOptions = campaign.getCampaignOptions();
         this.frame = frame;
@@ -121,7 +123,6 @@ public class AdvancementTab {
 
         initialize();
         loadValuesFromCampaignOptions();
-
     }
 
     private void initialize() {
@@ -800,7 +801,7 @@ public class AdvancementTab {
         spnSecondBonus.setValue(randomSkillPreferences.getSecondSkillBonus());
     }
 
-    void applyCampaignOptionsToCampaign(Campaign campaign) {
+    void applyCampaignOptionsToCampaign() {
         //start XP Awards Tab
         campaignOptions.setXpCostMultiplier((Double) spnXpCostMultiplier.getValue());
         campaignOptions.setTaskXP((Integer) spnTaskXP.getValue());

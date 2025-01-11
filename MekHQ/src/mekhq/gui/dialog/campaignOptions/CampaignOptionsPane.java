@@ -304,7 +304,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // appear in the dialog; however, this shouldn't make any major difference.
         generalTab.applyCampaignOptionsToCampaign();
         abilitiesTab.applyCampaignOptionsToCampaign();
-        advancementTab.applyCampaignOptionsToCampaign(campaign);
+        advancementTab.applyCampaignOptionsToCampaign();
         biographyTab.applyCampaignOptionsToCampaign();
         equipmentAndSuppliesTab.applyCampaignOptionsToCampaign();
         financesTab.applyCampaignOptionsToCampaign();
@@ -313,6 +313,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         repairAndMaintenanceTab.applyCampaignOptionsToCampaign();
         rulesetsTab.applyCampaignOptionsToCampaign();
         skillsTab.applyCampaignOptionsToCampaign();
+        turnoverAndRetentionTab.applyCampaignOptionsToCampaign();
     }
 
     public void updateOptions() {

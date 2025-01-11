@@ -851,4 +851,49 @@ public class TurnoverAndRetentionTab {
         chkFieldKitchenIgnoreNonCombatants.setSelected(campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
         spnFatigueLeaveThreshold.setValue(campaignOptions.getFatigueLeaveThreshold());
     }
+
+    void applyCampaignOptionsToCampaign() {
+        // Turnover
+        campaignOptions.setUseRandomRetirement(chkUseRandomRetirement.isSelected());
+        campaignOptions.setTurnoverFixedTargetNumber((int) spnTurnoverFixedTargetNumber.getValue());
+        campaignOptions.setTurnoverFrequency(comboTurnoverFrequency.getSelectedItem());
+        campaignOptions.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
+        campaignOptions.setUseRandomFounderTurnover(chkUseRandomFounderTurnover.isSelected());
+        campaignOptions.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
+        campaignOptions.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
+        campaignOptions.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
+        campaignOptions.setServiceContractDuration((int) spnServiceContractDuration.getValue());
+        campaignOptions.setServiceContractModifier((int) spnServiceContractModifier.getValue());
+        campaignOptions.setPayBonusDefault(chkPayBonusDefault.isSelected());
+        campaignOptions.setPayBonusDefaultThreshold((int) spnPayBonusDefaultThreshold.getValue());
+        campaignOptions.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
+        campaignOptions.setUseFatigueModifiers(chkUseFatigueModifiers.isSelected());
+        campaignOptions.setUseSkillModifiers(chkUseSkillModifiers.isSelected());
+        campaignOptions.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
+        campaignOptions.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
+        campaignOptions.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
+        campaignOptions.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
+        campaignOptions.setUseHostileTerritoryModifiers(chkUseHostileTerritoryModifiers.isSelected());
+        campaignOptions.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
+        campaignOptions.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
+        campaignOptions.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
+        campaignOptions.setPayoutRateOfficer((int) spnPayoutRateOfficer.getValue());
+        campaignOptions.setPayoutRateEnlisted((int) spnPayoutRateEnlisted.getValue());
+        campaignOptions.setPayoutRetirementMultiplier((int) spnPayoutRetirementMultiplier.getValue());
+        campaignOptions.setUsePayoutServiceBonus(chkUsePayoutServiceBonus.isSelected());
+        campaignOptions.setPayoutServiceBonusRate((int) spnPayoutServiceBonusRate.getValue());
+        campaignOptions.setUseAdministrativeStrain(chkUseAdministrativeStrain.isSelected());
+        campaignOptions.setAdministrativeCapacity((int) spnAdministrativeCapacity.getValue());
+        campaignOptions.setMultiCrewStrainDivider((int) spnMultiCrewStrainDivider.getValue());
+        campaignOptions.setUseManagementSkill(chkUseManagementSkill.isSelected());
+        campaignOptions.setUseCommanderLeadershipOnly(chkUseCommanderLeadershipOnly.isSelected());
+        campaignOptions.setManagementSkillPenalty((int) spnManagementSkillPenalty.getValue());
+
+        // Fatigue
+        campaignOptions.setUseFatigue(chkUseFatigue.isSelected());
+        campaignOptions.setFatigueRate((int) spnFatigueRate.getValue());
+        campaignOptions.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
+        campaignOptions.setFieldKitchenCapacity((int) spnFieldKitchenCapacity.getValue());
+        campaignOptions.setFatigueLeaveThreshold((int) spnFatigueLeaveThreshold.getValue());
+    }
 }
