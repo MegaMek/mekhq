@@ -329,10 +329,32 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             return;
         }
 
+        // TODO override these with current campaign settings in the event we're not calling this via start up
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
         LocalDate presetDate = campaignPreset.getDate();
         Faction presetFaction = campaignPreset.getFaction();
 
         generalTab.loadValuesFromCampaignOptions(presetCampaignOptions, presetDate, presetFaction);
+
+        // Human Resources
+        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
+            presetCampaignOptions.getRandomOriginOptions());
+        relationshipsTab.loadValuesFromCampaignOptions();
+        turnoverAndRetentionTab.loadValuesFromCampaignOptions();
+
+        // Advancement
+        advancementTab.loadValuesFromCampaignOptions();
+        skillsTab.loadValuesFromCampaignOptions();
+//        abilitiesTab.loa();
+
+        // Logistics
+        equipmentAndSuppliesTab.loadValuesFromCampaignOptions();
+        repairAndMaintenanceTab.loadValuesFromCampaignOptions();
+
+        // Operations
+        financesTab.loadValuesFromCampaignOptions();
+        marketsTab.loadValuesFromCampaignOptions();
+        rulesetsTab.loadValuesFromCampaignOptions();
     }
 }

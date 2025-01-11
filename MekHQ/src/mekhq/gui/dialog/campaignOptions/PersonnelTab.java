@@ -2,6 +2,7 @@ package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Skills;
@@ -1305,92 +1306,101 @@ public class PersonnelTab {
     }
 
     void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // General
-        chkUseTactics.setSelected(campaignOptions.isUseTaxes());
-        chkUseInitiativeBonus.setSelected(campaignOptions.isUseInitiativeBonus());
-        chkUseToughness.setSelected(campaignOptions.isUseToughness());
-        chkUseRandomToughness.setSelected(campaignOptions.isUseRandomToughness());
-        chkUseArtillery.setSelected(campaignOptions.isUseArtillery());
-        chkUseAbilities.setSelected(campaignOptions.isUseAbilities());
-        chkUseEdge.setSelected(campaignOptions.isUseEdge());
-        chkUseSupportEdge.setSelected(campaignOptions.isUseSupportEdge());
-        chkUseImplants.setSelected(campaignOptions.isUseImplants());
-        chkUseAlternativeQualityAveraging.setSelected(campaignOptions.isAlternativeQualityAveraging());
-        chkUsePersonnelRemoval.setSelected(campaignOptions.isUsePersonnelRemoval());
-        chkUseRemovalExemptCemetery.setSelected(campaignOptions.isUseRemovalExemptCemetery());
-        chkUseRemovalExemptRetirees.setSelected(campaignOptions.isUseRemovalExemptRetirees());
-        chkAdminsHaveNegotiation.setSelected(campaignOptions.isAdminsHaveNegotiation());
-        chkAdminExperienceLevelIncludeNegotiation.setSelected(campaignOptions.isAdminExperienceLevelIncludeNegotiation());
-        chkAdminsHaveScrounge.setSelected(campaignOptions.isAdminsHaveScrounge());
-        chkAdminExperienceLevelIncludeScrounge.setSelected(campaignOptions.isAdminExperienceLevelIncludeScrounge());
+        chkUseTactics.setSelected(options.isUseTaxes());
+        chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
+        chkUseToughness.setSelected(options.isUseToughness());
+        chkUseRandomToughness.setSelected(options.isUseRandomToughness());
+        chkUseArtillery.setSelected(options.isUseArtillery());
+        chkUseAbilities.setSelected(options.isUseAbilities());
+        chkUseEdge.setSelected(options.isUseEdge());
+        chkUseSupportEdge.setSelected(options.isUseSupportEdge());
+        chkUseImplants.setSelected(options.isUseImplants());
+        chkUseAlternativeQualityAveraging.setSelected(options.isAlternativeQualityAveraging());
+        chkUsePersonnelRemoval.setSelected(options.isUsePersonnelRemoval());
+        chkUseRemovalExemptCemetery.setSelected(options.isUseRemovalExemptCemetery());
+        chkUseRemovalExemptRetirees.setSelected(options.isUseRemovalExemptRetirees());
+        chkAdminsHaveNegotiation.setSelected(options.isAdminsHaveNegotiation());
+        chkAdminExperienceLevelIncludeNegotiation.setSelected(options.isAdminExperienceLevelIncludeNegotiation());
+        chkAdminsHaveScrounge.setSelected(options.isAdminsHaveScrounge());
+        chkAdminExperienceLevelIncludeScrounge.setSelected(options.isAdminExperienceLevelIncludeScrounge());
 
         // Personnel Log
-        chkUseTransfers.setSelected(campaignOptions.isUseTransfers());
-        chkUseExtendedTOEForceName.setSelected(campaignOptions.isUseExtendedTOEForceName());
-        chkPersonnelLogSkillGain.setSelected(campaignOptions.isPersonnelLogSkillGain());
-        chkPersonnelLogAbilityGain.setSelected(campaignOptions.isPersonnelLogAbilityGain());
-        chkPersonnelLogEdgeGain.setSelected(campaignOptions.isPersonnelLogEdgeGain());
-        chkDisplayPersonnelLog.setSelected(campaignOptions.isDisplayPersonnelLog());
-        chkDisplayScenarioLog.setSelected(campaignOptions.isDisplayScenarioLog());
-        chkDisplayKillRecord.setSelected(campaignOptions.isDisplayKillRecord());
+        chkUseTransfers.setSelected(options.isUseTransfers());
+        chkUseExtendedTOEForceName.setSelected(options.isUseExtendedTOEForceName());
+        chkPersonnelLogSkillGain.setSelected(options.isPersonnelLogSkillGain());
+        chkPersonnelLogAbilityGain.setSelected(options.isPersonnelLogAbilityGain());
+        chkPersonnelLogEdgeGain.setSelected(options.isPersonnelLogEdgeGain());
+        chkDisplayPersonnelLog.setSelected(options.isDisplayPersonnelLog());
+        chkDisplayScenarioLog.setSelected(options.isDisplayScenarioLog());
+        chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
 
         // Personnel Information
-        chkUseTimeInService.setSelected(campaignOptions.isUseTimeInService());
-        comboTimeInServiceDisplayFormat.setSelectedItem(campaignOptions.getTimeInServiceDisplayFormat());
-        chkUseTimeInRank.setSelected(campaignOptions.isUseTimeInRank());
-        comboTimeInRankDisplayFormat.setSelectedItem(campaignOptions.getTimeInRankDisplayFormat());
-        chkTrackTotalEarnings.setSelected(campaignOptions.isTrackTotalEarnings());
-        chkTrackTotalXPEarnings.setSelected(campaignOptions.isTrackTotalXPEarnings());
-        chkShowOriginFaction.setSelected(campaignOptions.isShowOriginFaction());
+        chkUseTimeInService.setSelected(options.isUseTimeInService());
+        comboTimeInServiceDisplayFormat.setSelectedItem(options.getTimeInServiceDisplayFormat());
+        chkUseTimeInRank.setSelected(options.isUseTimeInRank());
+        comboTimeInRankDisplayFormat.setSelectedItem(options.getTimeInRankDisplayFormat());
+        chkTrackTotalEarnings.setSelected(options.isTrackTotalEarnings());
+        chkTrackTotalXPEarnings.setSelected(options.isTrackTotalXPEarnings());
+        chkShowOriginFaction.setSelected(options.isShowOriginFaction());
 
         // Awards
-        comboAwardBonusStyle.setSelectedItem(campaignOptions.getAwardBonusStyle());
-        spnAwardTierSize.setValue(campaignOptions.getAwardTierSize());
-        chkEnableAutoAwards.setSelected(campaignOptions.isEnableAutoAwards());
-        chkIssuePosthumousAwards.setSelected(campaignOptions.isIssuePosthumousAwards());
-        chkIssueBestAwardOnly.setSelected(campaignOptions.isIssueBestAwardOnly());
-        chkIgnoreStandardSet.setSelected(campaignOptions.isIgnoreStandardSet());
-        chkEnableContractAwards.setSelected(campaignOptions.isEnableContractAwards());
-        chkEnableFactionHunterAwards.setSelected(campaignOptions.isEnableFactionHunterAwards());
-        chkEnableInjuryAwards.setSelected(campaignOptions.isEnableInjuryAwards());
-        chkEnableIndividualKillAwards.setSelected(campaignOptions.isEnableIndividualKillAwards());
-        chkEnableFormationKillAwards.setSelected(campaignOptions.isEnableFormationKillAwards());
-        chkEnableRankAwards.setSelected(campaignOptions.isEnableRankAwards());
-        chkEnableScenarioAwards.setSelected(campaignOptions.isEnableScenarioAwards());
-        chkEnableSkillAwards.setSelected(campaignOptions.isEnableSkillAwards());
-        chkEnableTheatreOfWarAwards.setSelected(campaignOptions.isEnableTheatreOfWarAwards());
-        chkEnableTimeAwards.setSelected(campaignOptions.isEnableTimeAwards());
-        chkEnableTrainingAwards.setSelected(campaignOptions.isEnableTrainingAwards());
-        chkEnableMiscAwards.setSelected(campaignOptions.isEnableMiscAwards());
-        txtAwardSetFilterList.setText(campaignOptions.getAwardSetFilterList());
+        comboAwardBonusStyle.setSelectedItem(options.getAwardBonusStyle());
+        spnAwardTierSize.setValue(options.getAwardTierSize());
+        chkEnableAutoAwards.setSelected(options.isEnableAutoAwards());
+        chkIssuePosthumousAwards.setSelected(options.isIssuePosthumousAwards());
+        chkIssueBestAwardOnly.setSelected(options.isIssueBestAwardOnly());
+        chkIgnoreStandardSet.setSelected(options.isIgnoreStandardSet());
+        chkEnableContractAwards.setSelected(options.isEnableContractAwards());
+        chkEnableFactionHunterAwards.setSelected(options.isEnableFactionHunterAwards());
+        chkEnableInjuryAwards.setSelected(options.isEnableInjuryAwards());
+        chkEnableIndividualKillAwards.setSelected(options.isEnableIndividualKillAwards());
+        chkEnableFormationKillAwards.setSelected(options.isEnableFormationKillAwards());
+        chkEnableRankAwards.setSelected(options.isEnableRankAwards());
+        chkEnableScenarioAwards.setSelected(options.isEnableScenarioAwards());
+        chkEnableSkillAwards.setSelected(options.isEnableSkillAwards());
+        chkEnableTheatreOfWarAwards.setSelected(options.isEnableTheatreOfWarAwards());
+        chkEnableTimeAwards.setSelected(options.isEnableTimeAwards());
+        chkEnableTrainingAwards.setSelected(options.isEnableTrainingAwards());
+        chkEnableMiscAwards.setSelected(options.isEnableMiscAwards());
+        txtAwardSetFilterList.setText(options.getAwardSetFilterList());
 
         // Medical
-        chkUseAdvancedMedical.setSelected(campaignOptions.isUseAdvancedMedical());
-        spnHealWaitingPeriod.setValue(campaignOptions.getHealingWaitingPeriod());
-        spnNaturalHealWaitingPeriod.setValue(campaignOptions.getNaturalHealingWaitingPeriod());
-        spnMinimumHitsForVehicles.setValue(campaignOptions.getMinimumHitsForVehicles());
-        chkUseRandomHitsForVehicles.setSelected(campaignOptions.isUseRandomHitsForVehicles());
-        chkUseTougherHealing.setSelected(campaignOptions.isTougherHealing());
-        spnMaximumPatients.setValue(campaignOptions.getMaximumPatients());
+        chkUseAdvancedMedical.setSelected(options.isUseAdvancedMedical());
+        spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
+        spnNaturalHealWaitingPeriod.setValue(options.getNaturalHealingWaitingPeriod());
+        spnMinimumHitsForVehicles.setValue(options.getMinimumHitsForVehicles());
+        chkUseRandomHitsForVehicles.setSelected(options.isUseRandomHitsForVehicles());
+        chkUseTougherHealing.setSelected(options.isTougherHealing());
+        spnMaximumPatients.setValue(options.getMaximumPatients());
 
         // Prisoners and Dependents
-        comboPrisonerCaptureStyle.setSelectedItem(campaignOptions.getPrisonerCaptureStyle());
-        comboPrisonerStatus.setSelectedItem(campaignOptions.getDefaultPrisonerStatus());
-        chkPrisonerBabyStatus.setSelected(campaignOptions.isPrisonerBabyStatus());
-        chkAtBPrisonerDefection.setSelected(campaignOptions.isUseAtBPrisonerDefection());
-        chkAtBPrisonerRansom.setSelected(campaignOptions.isUseAtBPrisonerRansom());
-        chkUseRandomDependentAddition.setSelected(campaignOptions.isUseRandomDependentAddition());
-        chkUseRandomDependentRemoval.setSelected(campaignOptions.isUseRandomDependentRemoval());
+        comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
+        comboPrisonerStatus.setSelectedItem(options.getDefaultPrisonerStatus());
+        chkPrisonerBabyStatus.setSelected(options.isPrisonerBabyStatus());
+        chkAtBPrisonerDefection.setSelected(options.isUseAtBPrisonerDefection());
+        chkAtBPrisonerRansom.setSelected(options.isUseAtBPrisonerRansom());
+        chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
+        chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
         // Salaries
-        chkDisableSecondaryRoleSalary.setSelected(campaignOptions.isDisableSecondaryRoleSalary());
-        spnAntiMekSalary.setValue(campaignOptions.getSalaryAntiMekMultiplier());
-        spnSpecialistInfantrySalary.setValue(campaignOptions.getSalarySpecialistInfantryMultiplier());
+        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
+        spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
+        spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
         for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
-            entry.getValue().setValue(campaignOptions.getSalaryXPMultipliers().get(entry.getKey()));
+            entry.getValue().setValue(options.getSalaryXPMultipliers().get(entry.getKey()));
         }
         for (int i = 0; i < spnBaseSalary.length; i++) {
-            spnBaseSalary[i].setValue(campaignOptions.getRoleBaseSalaries()[i].getAmount().doubleValue());
+            spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
     }
 

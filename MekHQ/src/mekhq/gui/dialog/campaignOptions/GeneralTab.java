@@ -426,8 +426,6 @@ public class GeneralTab {
 
         camouflage = campaign.getCamouflage();
         unitIcon = campaign.getUnitIcon();
-
-        refreshAllComponents(generalPanel);
     }
 
     void applyCampaignOptionsToCampaign() {

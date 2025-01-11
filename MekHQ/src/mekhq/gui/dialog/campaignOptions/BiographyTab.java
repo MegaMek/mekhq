@@ -1235,67 +1235,84 @@ public class BiographyTab {
     }
 
     void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null, null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                       @Nullable RandomOriginOptions presetRandomOriginOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (options == null) {
+            options = this.campaignOptions;
+        }
+
+        RandomOriginOptions originOptions = presetRandomOriginOptions;
+        if (originOptions == null) {
+            originOptions = this.randomOriginOptions;
+        }
+
+
         // General
-        chkUseDylansRandomXP.setSelected(campaignOptions.isUseDylansRandomXP());
-        sldGender.setValue(getPercentFemale());
-        spnNonBinaryDiceSize.setValue(campaignOptions.getNonBinaryDiceSize());
-        comboFamilyDisplayLevel.setSelectedItem(campaignOptions.getFamilyDisplayLevel());
-        chkAnnounceOfficersOnly.setSelected(campaignOptions.isAnnounceOfficersOnly());
-        chkAnnounceBirthdays.setSelected(campaignOptions.isAnnounceBirthdays());
-        chkAnnounceChildBirthdays.setSelected(campaignOptions.isAnnounceChildBirthdays());
-        chkAnnounceRecruitmentAnniversaries.setSelected(campaignOptions.isAnnounceRecruitmentAnniversaries());
+        chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
+        sldGender.setValue(getPercentFemale()); // 'getPercentFemale' is not stored in a Preset
+        spnNonBinaryDiceSize.setValue(options.getNonBinaryDiceSize());
+        comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
+        chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
+        chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
+        chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
+        chkAnnounceRecruitmentAnniversaries.setSelected(options.isAnnounceRecruitmentAnniversaries());
 
         // Backgrounds
-        chkUseRandomPersonalities.setSelected(campaignOptions.isUseRandomPersonalities());
-        chkUseRandomPersonalityReputation.setSelected(campaignOptions.isUseRandomPersonalityReputation());
-        chkUseIntelligenceXpMultiplier.setSelected(campaignOptions.isUseIntelligenceXpMultiplier());
-        chkUseSimulatedRelationships.setSelected(campaignOptions.isUseSimulatedRelationships());
-        chkRandomizeOrigin.setSelected(randomOriginOptions.isRandomizeOrigin());
-        chkRandomizeDependentsOrigin.setSelected(randomOriginOptions.isRandomizeDependentOrigin());
-        chkRandomizeAroundSpecifiedPlanet.setSelected(randomOriginOptions.isRandomizeAroundSpecifiedPlanet());
-        comboSpecifiedPlanet.setSelectedItem(randomOriginOptions.getSpecifiedPlanet());
-        spnOriginSearchRadius.setValue(randomOriginOptions.getOriginSearchRadius());
-        spnOriginDistanceScale.setValue(randomOriginOptions.getOriginDistanceScale());
-        chkAllowClanOrigins.setSelected(randomOriginOptions.isAllowClanOrigins());
-        chkExtraRandomOrigin.setSelected(randomOriginOptions.isExtraRandomOrigin());
+        chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
+        chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
+        chkUseIntelligenceXpMultiplier.setSelected(options.isUseIntelligenceXpMultiplier());
+        chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
+        chkRandomizeOrigin.setSelected(originOptions.isRandomizeOrigin());
+        chkRandomizeDependentsOrigin.setSelected(originOptions.isRandomizeDependentOrigin());
+        chkRandomizeAroundSpecifiedPlanet.setSelected(originOptions.isRandomizeAroundSpecifiedPlanet());
+        comboSpecifiedPlanet.setSelectedItem(originOptions.getSpecifiedPlanet());
+        spnOriginSearchRadius.setValue(originOptions.getOriginSearchRadius());
+        spnOriginDistanceScale.setValue(originOptions.getOriginDistanceScale());
+        chkAllowClanOrigins.setSelected(originOptions.isAllowClanOrigins());
+        chkExtraRandomOrigin.setSelected(originOptions.isExtraRandomOrigin());
 
         // Death
-        chkKeepMarriedNameUponSpouseDeath.setSelected(campaignOptions.isKeepMarriedNameUponSpouseDeath());
-        comboRandomDeathMethod.setSelectedItem(campaignOptions.getRandomDeathMethod());
-        chkUseRandomClanPersonnelDeath.setSelected(campaignOptions.isUseRandomClanPersonnelDeath());
-        chkUseRandomPrisonerDeath.setSelected(campaignOptions.isUseRandomPrisonerDeath());
-        chkUseRandomDeathSuicideCause.setSelected(campaignOptions.isUseRandomDeathSuicideCause());
-        spnPercentageRandomDeathChance.setValue(campaignOptions.getPercentageRandomDeathChance());
+        chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
+        comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
+        chkUseRandomClanPersonnelDeath.setSelected(options.isUseRandomClanPersonnelDeath());
+        chkUseRandomPrisonerDeath.setSelected(options.isUseRandomPrisonerDeath());
+        chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
+        spnPercentageRandomDeathChance.setValue(options.getPercentageRandomDeathChance());
 
-        Map<AgeGroup, Boolean> deathAgeGroups = campaignOptions.getEnabledRandomDeathAgeGroups();
+        Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             chkEnabledRandomDeathAgeGroups.get(ageGroup).setSelected(deathAgeGroups.get(ageGroup));
         }
 
         // Education
-        chkUseEducationModule.setSelected(campaignOptions.isUseEducationModule());
-        spnCurriculumXpRate.setValue(campaignOptions.getCurriculumXpRate());
-        spnMaximumJumpCount.setValue(campaignOptions.getMaximumJumpCount());
-        chkUseReeducationCamps.setSelected(campaignOptions.isUseReeducationCamps());
-        chkEnableOverrideRequirements.setSelected(campaignOptions.isEnableOverrideRequirements());
-        chkShowIneligibleAcademies.setSelected(campaignOptions.isEnableShowIneligibleAcademies());
-        spnEntranceExamBaseTargetNumber.setValue(campaignOptions.getEntranceExamBaseTargetNumber());
-        chkEnableLocalAcademies.setSelected(campaignOptions.isEnableLocalAcademies());
-        chkEnablePrestigiousAcademies.setSelected(campaignOptions.isEnablePrestigiousAcademies());
-        chkEnableUnitEducation.setSelected(campaignOptions.isEnableUnitEducation());
-        chkEnableBonuses.setSelected(campaignOptions.isEnableBonuses());
-        spnFacultyXpMultiplier.setValue(campaignOptions.getFacultyXpRate());
-        spnAdultDropoutChance.setValue(campaignOptions.getAdultDropoutChance());
-        spnChildrenDropoutChance.setValue(campaignOptions.getChildrenDropoutChance());
-        chkAllAges.setSelected(campaignOptions.isAllAges());
-        spnMilitaryAcademyAccidents.setValue(campaignOptions.getMilitaryAcademyAccidents());
+        chkUseEducationModule.setSelected(options.isUseEducationModule());
+        spnCurriculumXpRate.setValue(options.getCurriculumXpRate());
+        spnMaximumJumpCount.setValue(options.getMaximumJumpCount());
+        chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
+        chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
+        chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
+        spnEntranceExamBaseTargetNumber.setValue(options.getEntranceExamBaseTargetNumber());
+        chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
+        chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
+        chkEnableUnitEducation.setSelected(options.isEnableUnitEducation());
+        chkEnableBonuses.setSelected(options.isEnableBonuses());
+        spnFacultyXpMultiplier.setValue(options.getFacultyXpRate());
+        spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
+        spnChildrenDropoutChance.setValue(options.getChildrenDropoutChance());
+        chkAllAges.setSelected(options.isAllAges());
+        spnMilitaryAcademyAccidents.setValue(options.getMilitaryAcademyAccidents());
 
         // Name and Portraits
-        chkUseOriginFactionForNames.setSelected(campaignOptions.isUseOriginFactionForNames());
+        chkUseOriginFactionForNames.setSelected(options.isUseOriginFactionForNames());
+        // 'RandomNameGenerator' is not stored in a Preset
         comboFactionNames.setSelectedItem(RandomNameGenerator.getInstance().getChosenFaction());
-        chkAssignPortraitOnRoleChange.setSelected(campaignOptions.isAssignPortraitOnRoleChange());
+        chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
 
-        final boolean[] usePortraitForRole = campaignOptions.isUsePortraitForRoles();
+        final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
         boolean allSelected = allPortraitsBox.isSelected();
         boolean noneSelected = noPortraitsBox.isSelected();
         for (int i = 0; i < chkUsePortrait.length; i++) {

@@ -610,22 +610,4 @@ public class CampaignOptionsUtilities {
     static int processWrapSize(@Nullable Integer customWrapSize) {
         return customWrapSize == null ? 100 : customWrapSize;
     }
-
-    /**
-     * Refreshes all components in a container by revalidating and repainting it.
-     * <p>
-     * This method is useful to ensure that any updates made to the container's child
-     * components, such as layout changes or UI updates, are fully reflected in the UI.
-     * It recursively propagates the validation and repaint operations throughout
-     * the entire component hierarchy of the provided container.
-     * </p>
-     *
-     * @param rootContainer the root container whose components need to be refreshed;
-     *                      typically, a {@link JPanel}, {@link JFrame}, or other
-     *                      {@link Container} element. Must not be null.
-     */
-    static public void refreshAllComponents(Container rootContainer) {
-        rootContainer.revalidate();
-        rootContainer.repaint();
-    }
 }
