@@ -65,12 +65,7 @@ public class CampaignOptionsDialog_new extends JDialog {
         // Load Preset
         JButton btnLoadPreset = new CampaignOptionsButton("LoadPreset");
         btnLoadPreset.addActionListener(evt -> {
-            final SelectPresetDialog presetSelectionDialog =
-                new SelectPresetDialog(null, true, false);
-            if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
-                campaignOptionsPane.applyPreset(presetSelectionDialog.getSelectedPreset());
-            }
-            dispose();
+            btnLoadActionPerformed();
         });
         pnlButtons.add(btnLoadPreset);
 
@@ -102,5 +97,13 @@ public class CampaignOptionsDialog_new extends JDialog {
         preset.writeToFile(null,
             FileDialogs.saveCampaignPreset(null, preset).orElse(null));
         setVisible(false);
+    }
+
+    private void btnLoadActionPerformed() {
+        final SelectPresetDialog presetSelectionDialog =
+            new SelectPresetDialog(null, true, false);
+        if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
+            campaignOptionsPane.applyPreset(presetSelectionDialog.getSelectedPreset());
+        }
     }
 }

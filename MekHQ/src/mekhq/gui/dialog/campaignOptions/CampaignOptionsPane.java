@@ -1,12 +1,15 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.dialog.campaignOptions.AbilitiesTab.AbilityCategory;
 
 import javax.swing.*;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -91,7 +94,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @return a {@link JScrollPane} containing the General tab
      */
     private JScrollPane createGeneralTab() {
-        generalTab = new GeneralTab(campaign, getFrame());
+        generalTab = new GeneralTab(campaign, getFrame(), this);
         JPanel createdGeneralTab = generalTab.createGeneralTab();
         generalTab.loadValuesFromCampaignOptions();
 
@@ -321,6 +324,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         rulesetsTab.applyCampaignOptionsToCampaign();
     }
 
-    public void applyPreset(CampaignPreset campaignPreset) {
+    public void applyPreset(@Nullable CampaignPreset campaignPreset) {
+        if (campaignPreset == null) {
+            return;
+        }
+
+        CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
+        LocalDate presetDate = campaignPreset.getDate();
+        Faction presetFaction = campaignPreset.getFaction();
+
+        generalTab.loadValuesFromCampaignOptions(presetCampaignOptions, presetDate, presetFaction);
     }
 }

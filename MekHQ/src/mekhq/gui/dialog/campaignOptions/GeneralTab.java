@@ -11,6 +11,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
@@ -34,9 +35,12 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
  */
 public class GeneralTab {
     // region Variable Declarations
+    private final CampaignOptionsPane owner;
+    private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
-    private final JFrame frame;
+
+    private AbstractMHQScrollablePanel generalPanel;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -61,14 +65,16 @@ public class GeneralTab {
     /**
      * Constructs a new {@link GeneralTab} object.
      *
-     * @param campaign the campaign object associated with the tab
-     * @param frame the {@link JFrame} object that contains the tab
-     * @param name the name of the tab
+     * @param name                the name of the tab
+     * @param campaign            the campaign object associated with the tab
+     * @param frame               the {@link JFrame} object that contains the tab
+     * @param campaignOptionsPane
      */
-    public GeneralTab(Campaign campaign, JFrame frame) {
+    public GeneralTab(Campaign campaign, JFrame frame, CampaignOptionsPane owner) {
+        this.owner = owner;
+        this.frame = frame;
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
-        this.frame = frame;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
         this.unitIcon = campaign.getUnitIcon();
@@ -110,6 +116,7 @@ public class GeneralTab {
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage
@@ -123,8 +130,7 @@ public class GeneralTab {
         btnIcon.addActionListener(this::btnIconActionPerformed);
 
         // Initialize the parent panel
-        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
-            "generalPanel", new GridBagLayout());
+        generalPanel = new DefaultMHQScrollablePanel(frame, "generalPanel", new GridBagLayout());
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -312,6 +318,8 @@ public class GeneralTab {
 
         this.date = date;
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+        btnDate.revalidate();
+        btnDate.repaint();
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
         comboFaction.removeAllItems();
@@ -388,14 +396,38 @@ public class GeneralTab {
     }
 
     void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null, null, null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                       @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         chkGMMode.setSelected(campaign.isGM());
         txtName.setText(campaign.getName());
+
         comboFaction.setSelectedItem(campaign.getFaction());
-        unitRatingMethodCombo.setSelectedItem(campaignOptions.getUnitRatingMethod());
-        manualUnitRatingModifier.setValue(campaignOptions.getManualUnitRatingModifier());
+        if (presetFaction != null) {
+            comboFaction.setSelectedItem(new FactionDisplay(presetFaction, date));
+        }
+
+        unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
+        manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
+
         date = campaign.getLocalDate();
+        if (presetDate != null) {
+            date = presetDate;
+        }
+        // Button labels are not updated when we repaint, so we have to specifically call it here
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+
         camouflage = campaign.getCamouflage();
         unitIcon = campaign.getUnitIcon();
+
+        refreshAllComponents(generalPanel);
     }
 
     void applyCampaignOptionsToCampaign() {
