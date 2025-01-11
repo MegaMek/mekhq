@@ -29,6 +29,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
@@ -73,6 +74,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.*;
 
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.*;
 import java.time.LocalDate;
@@ -580,6 +582,38 @@ public class CampaignXmlParser {
                                     person.getFullTitle());
                         }
                     });
+
+        if (MHQConstants.VERSION.isHigherThan(version)) {
+            List<AtBContract> contracts = retVal.getAtBContracts();
+            boolean hasActiveContract = !contracts.isEmpty();
+
+            if (!hasActiveContract) {
+                LocalDate today = retVal.getLocalDate();
+
+                for (AtBContract contract : retVal.getAtBContracts()) {
+                    // This catches any contracts that have been accepted, but haven't yet started
+                    if (contract.getStartDate().isAfter(today)) {
+                        hasActiveContract = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasActiveContract) {
+                String message = String.format(
+                    "This campaign has an active contract." +
+                        "\n\nPlease complete the contract before updating to version %s.",
+                    MHQConstants.VERSION);
+
+                // Ensure dialog displays on the Event Dispatch Thread (EDT)
+                JOptionPane.showMessageDialog(
+                    null,
+                    message,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
 
         logger.info("Load of campaign file complete!");
 
