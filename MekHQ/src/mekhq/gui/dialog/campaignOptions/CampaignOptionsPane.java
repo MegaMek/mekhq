@@ -344,7 +344,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         turnoverAndRetentionTab.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
-        advancementTab.loadValuesFromCampaignOptions();
+        advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions,
+            campaignPreset.getRandomSkillPreferences());
         skillsTab.loadValuesFromCampaignOptions();
 //        abilitiesTab.loa();
 
