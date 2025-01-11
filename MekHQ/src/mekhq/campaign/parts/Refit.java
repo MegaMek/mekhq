@@ -1542,8 +1542,7 @@ public class Refit extends Part implements IAcquisitionWork {
         // ----------------- from here on oldUnit refers to the new entity -------------------------
         oldUnit.setEntity(newEntity);
         // Bay capacities might have changed - reset them
-        oldUnit.getShipTransportedUnitsSummary().initializeTransportCapacity(oldUnit.getEntity().getTransports());
-        oldUnit.getTacticalTransportedUnitsSummary().initializeTransportCapacity(oldUnit.getEntity().getTransports());
+        oldUnit.initializeAllTransportSpace();
 
         // set up new parts
         ArrayList<Part> newParts = new ArrayList<>();

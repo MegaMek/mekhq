@@ -156,7 +156,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
             }
         });
 
-        initializeTransportCapacity(transport.getEntity().getTransports());
+        recalculateTransportCapacity(transport.getEntity().getTransports());
     }
 
     /**

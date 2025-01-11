@@ -4,7 +4,6 @@ import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.Transporter;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 
 import java.util.Set;
@@ -81,7 +80,7 @@ public interface ITransportedUnitsSummary {
      * Recalculates transport capacity
      * @param transporters What transporters are we tracking the details of?
      */
-    void initializeTransportCapacity(Vector<Transporter> transporters);
+    void recalculateTransportCapacity(Vector<Transporter> transporters);
 
     /**
      * When fixing references we need to replace the transported units

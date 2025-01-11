@@ -1319,34 +1319,31 @@ public class Campaign implements ITechManager {
     /**
      * Imports a {@link Unit} into a campaign.
      *
-     * @param u A {@link Unit} to import into the campaign.
+     * @param unit A {@link Unit} to import into the campaign.
      */
-    public void importUnit(Unit u) {
-        Objects.requireNonNull(u);
+    public void importUnit(Unit unit) {
+        Objects.requireNonNull(unit);
 
-        logger.debug("Importing unit: ({}): {}", u.getId(), u.getName());
+        logger.debug("Importing unit: ({}): {}", unit.getId(), unit.getName());
 
-        getHangar().addUnit(u);
+        getHangar().addUnit(unit);
 
-        checkDuplicateNamesDuringAdd(u.getEntity());
+        checkDuplicateNamesDuringAdd(unit.getEntity());
 
-        u.initializeShipTransportSpace();
-        u.initializeTacticalTransportSpace();
+        unit.initializeAllTransportSpace();
 
-        if(!u.getShipTransportCapabilities().isEmpty()) {
-            addShipTransporter(u);
-        }
-
-        if (!u.getTacticalTransportCapabilities().isEmpty()) {
-            addTacticalTransporter(u);
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                addCampaignTransport(campaignTransportType, unit);
+            }
         }
 
         // Assign an entity ID to our new unit
-        if (Entity.NONE == u.getEntity().getId()) {
-            u.getEntity().setId(game.getNextEntityId());
+        if (Entity.NONE == unit.getEntity().getId()) {
+            unit.getEntity().setId(game.getNextEntityId());
         }
 
-        game.addEntity(u.getEntity());
+        game.addEntity(unit.getEntity());
     }
 
 
@@ -1520,18 +1517,14 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            unit.initializeTransportSpace(campaignTransportType);
-        }
+        unit.initializeAllTransportSpace();
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 
-        if (!unit.getShipTransportCapabilities().isEmpty()) {
-            addShipTransporter(unit);
-        }
-
-        if (!unit.getTacticalTransportCapabilities().isEmpty()) {
-            addTacticalTransporter(unit);
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                addCampaignTransport(campaignTransportType, unit);
+            }
         }
 
         unit.initializeParts(true);

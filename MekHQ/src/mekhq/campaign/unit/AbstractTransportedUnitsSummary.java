@@ -18,7 +18,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     AbstractTransportedUnitsSummary(Unit transport) {
         this.transport = transport;
         if (transport.getEntity() != null) {
-            initializeTransportCapacity(transport.getEntity().getTransports());
+            recalculateTransportCapacity(transport.getEntity().getTransports());
         }
     }
 
@@ -43,11 +43,10 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
 
     /**
      * Recalculates transport capacity
-     * @param transporters What transporters are we tracking the details of?
+     * @param transporters What transporters are we recalculating?
      */
     @Override
-    public void initializeTransportCapacity(@Nullable Vector<Transporter> transporters) {
-        transportCapacity.clear();
+    public void recalculateTransportCapacity(@Nullable Vector<Transporter> transporters) {
         clearTransportedEntities();
         loadTransportedEntities();
         if (transporters != null && !transporters.isEmpty()) {

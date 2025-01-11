@@ -69,7 +69,12 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
                 oldTransports.add(oldTransport);
             }
         }
-        transport.initializeShipTransportSpace();
+
+        //Let's get matching transporters and then recalculate our transport capacity for this transporter type
+        Vector<Transporter> transporters = new Vector<>(transport.getEntity().getTransports().stream()
+            .filter(transporter -> transporter.getClass() == transporterType).toList());
+        recalculateTransportCapacity(transporters);
+
         return oldTransports;
     }
 
@@ -133,7 +138,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
             }
         });
 
-        initializeTransportCapacity(transport.getEntity().getTransports());
+        recalculateTransportCapacity(transport.getEntity().getTransports());
     }
 
     /**
