@@ -5,7 +5,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-import megamek.common.internationalization.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -60,7 +60,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         }
 
         //Assign Unit to {campaignTransportTypeName}
-        setText(Internationalization.getTextAt("AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
+        setText(MHQInternationalization.getTextAt("AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
         }
@@ -98,7 +98,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
                 }
 
                 // {name of the bay}
-                transporterTypeMenu.setText(Internationalization.getTextAt("AssignForceToTransport",
+                transporterTypeMenu.setText(MHQInternationalization.getTextAt("AssignForceToTransport",
                     "AssignForceToTransportMenu." + transporterType.getSimpleName() + ".text"));
 
                 transporterTypeMenus.add(transporterTypeMenu);
@@ -114,7 +114,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
 
             // {Transport Name} | Space Remaining: {Current Transport Capacity}
-            transportMenu.setText(Internationalization.getFormattedTextAt("AssignForceToTransport",
+            transportMenu.setText(MHQInternationalization.getFormattedTextAt("AssignForceToTransport",
                 "AssignForceToTransportMenu.transportSpaceRemaining.text",
                 transport.getName(), transport.getCurrentTransportCapacity(campaignTransportType, transporterType)));
 

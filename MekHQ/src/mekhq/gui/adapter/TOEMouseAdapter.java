@@ -51,7 +51,7 @@ import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
-import megamek.common.internationalization.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -1487,7 +1487,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private void unassignShipTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
         if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-            JMenuItem menuItem = new JMenuItem(Internationalization.getTextAt("AssignForceToTransport", "TOEMouseAdapter.unassign.SHIP_TRANSPORT.text"));
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("AssignForceToTransport", "TOEMouseAdapter.unassign.SHIP_TRANSPORT.text"));
             menuItem.addActionListener(evt -> {
                 unassignTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0]));});
             menuItem.setEnabled(true);
@@ -1497,7 +1497,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private void unassignTacticalTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
         if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-            JMenuItem menuItem = new JMenuItem(Internationalization.getTextAt("AssignForceToTransport", "TOEMouseAdapter.unassign.TACTICAL_TRANSPORT.text"));
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("AssignForceToTransport", "TOEMouseAdapter.unassign.TACTICAL_TRANSPORT.text"));
             menuItem.addActionListener(evt -> {
                 unassignTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
             });

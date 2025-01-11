@@ -1,7 +1,7 @@
 package mekhq.gui.menus;
 
 import megamek.common.Transporter;
-import megamek.common.internationalization.Internationalization;
+import mekhq.utilities.MHQInternationalization;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -69,7 +69,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
     protected void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
-                JOptionPane.showMessageDialog(null, Internationalization.getFormattedTextAt(
+                JOptionPane.showMessageDialog(null,MHQInternationalization.getFormattedTextAt(
                     "AssignForceToTransport", "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
                     unit.getName(), transport.getName()), "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
