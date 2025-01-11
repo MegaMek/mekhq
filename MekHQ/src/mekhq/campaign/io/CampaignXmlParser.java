@@ -606,13 +606,13 @@ public class CampaignXmlParser {
      *               which contains information about the contracts and local date.
      */
     private static void triggerActiveContractWarning(Campaign campaign) {
-        List<AtBContract> contracts = campaign.getAtBContracts();
-        boolean hasActiveContract = !contracts.isEmpty();
+        boolean hasActiveContract = !campaign.getActiveAtBContracts().isEmpty();
 
         if (!hasActiveContract) {
+            List<AtBContract> contracts = campaign.getAtBContracts();
             LocalDate today = campaign.getLocalDate();
 
-            for (AtBContract contract : campaign.getAtBContracts()) {
+            for (AtBContract contract : contracts) {
                 // This catches any contracts that have been accepted, but haven't yet started
                 if (contract.getStartDate().isAfter(today)) {
                     hasActiveContract = true;
