@@ -583,41 +583,57 @@ public class CampaignXmlParser {
                         }
                     });
 
+
+
         if (MHQConstants.VERSION.isHigherThan(version)) {
-            List<AtBContract> contracts = retVal.getAtBContracts();
-            boolean hasActiveContract = !contracts.isEmpty();
-
-            if (!hasActiveContract) {
-                LocalDate today = retVal.getLocalDate();
-
-                for (AtBContract contract : retVal.getAtBContracts()) {
-                    // This catches any contracts that have been accepted, but haven't yet started
-                    if (contract.getStartDate().isAfter(today)) {
-                        hasActiveContract = true;
-                        break;
-                    }
-                }
-            }
-
-            if (hasActiveContract) {
-                String message = String.format(
-                    "This campaign has an active contract." +
-                        "\n\nPlease complete the contract before updating to version %s.",
-                    MHQConstants.VERSION);
-
-                // Ensure dialog displays on the Event Dispatch Thread (EDT)
-                JOptionPane.showMessageDialog(
-                    null,
-                    message,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
+            triggerActiveContractWarning(retVal);
         }
 
         logger.info("Load of campaign file complete!");
 
         return retVal;
+    }
+
+    /**
+     * Displays a warning dialog if the given {@code Campaign} has an active or future contract.
+     * <p>
+     * This method checks the campaign's list of contracts to determine if there are any currently active
+     * or accepted contracts with a start date in the future. If such a contract exists, it shows an error
+     * dialog informing the user that the campaign cannot proceed until the contract is completed.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign,
+     *               which contains information about the contracts and local date.
+     */
+    private static void triggerActiveContractWarning(Campaign campaign) {
+        List<AtBContract> contracts = campaign.getAtBContracts();
+        boolean hasActiveContract = !contracts.isEmpty();
+
+        if (!hasActiveContract) {
+            LocalDate today = campaign.getLocalDate();
+
+            for (AtBContract contract : campaign.getAtBContracts()) {
+                // This catches any contracts that have been accepted, but haven't yet started
+                if (contract.getStartDate().isAfter(today)) {
+                    hasActiveContract = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasActiveContract) {
+            String message = String.format(
+                "This campaign has an active contract." +
+                    "\n\nPlease complete the contract before updating to version %s.",
+                MHQConstants.VERSION);
+
+            JOptionPane.showMessageDialog(
+                null,
+                message,
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     /**
