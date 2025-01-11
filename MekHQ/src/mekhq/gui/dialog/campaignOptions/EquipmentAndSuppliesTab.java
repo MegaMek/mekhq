@@ -818,25 +818,25 @@ public class EquipmentAndSuppliesTab {
 
     void applyCampaignOptionsToCampaign() {
         // Acquisitions
-        campaignOptions.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
+        campaignOptions.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
         campaignOptions.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
-        campaignOptions.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getValue());
-        campaignOptions.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getValue());
-        campaignOptions.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getValue());
-        campaignOptions.setMaxAcquisitions((Integer) spnMaxAcquisitions.getValue());
+        campaignOptions.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
+        campaignOptions.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
+        campaignOptions.setWaitingPeriod((int) spnAcquireWaitingPeriod.getValue());
+        campaignOptions.setMaxAcquisitions((int) spnMaxAcquisitions.getValue());
 
         // Delivery
-        campaignOptions.setNDiceTransitTime((Integer) spnNDiceTransitTime.getValue());
-        campaignOptions.setConstantTransitTime((Integer) spnConstantTransitTime.getValue());
+        campaignOptions.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
+        campaignOptions.setConstantTransitTime((int) spnConstantTransitTime.getValue());
         campaignOptions.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
-        campaignOptions.setAcquireMosBonus((Integer) spnAcquireMosBonus.getValue());
+        campaignOptions.setAcquireMosBonus((int) spnAcquireMosBonus.getValue());
         campaignOptions.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
-        campaignOptions.setAcquireMinimumTime((Integer) spnAcquireMinimum.getValue());
+        campaignOptions.setAcquireMinimumTime((int) spnAcquireMinimum.getValue());
         campaignOptions.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
 
         // Planetary Acquisitions
         campaignOptions.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
-        campaignOptions.setMaxJumpsPlanetaryAcquisition((Integer) spnMaxJumpPlanetaryAcquisitions.getValue());
+        campaignOptions.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
         campaignOptions.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
         campaignOptions.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
         campaignOptions.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
