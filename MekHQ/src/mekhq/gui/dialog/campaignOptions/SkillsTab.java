@@ -1,6 +1,7 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.SkillType;
 
@@ -177,7 +178,7 @@ public class SkillsTab {
             skillLevels.add(label);
 
             JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + i,
-                null, 0, 0, 9999, 1, true);
+                null, 0, -1, 9999, 1, true);
             spinner.setVisible(false);
             spinners.add(spinner);
             skillCosts.add(spinner);
@@ -316,6 +317,8 @@ public class SkillsTab {
             if (allTargetNumbers.get(skill) == null) {
                 // This will happen if we're trying to load a skill that doesn't exist anymore
                 continue;
+            } else {
+                allTargetNumbers.get(skill).setValue(skill.getTarget());
             }
 
             // Costs
@@ -340,18 +343,82 @@ public class SkillsTab {
                     SkillLevel levelToSet;
 
                     if (i < greenIndex) {
-                        levelToSet = SkillLevel.ULTRA_GREEN;
+                        levelToSet = ULTRA_GREEN;
                     } else if (i < regularIndex) {
-                        levelToSet = SkillLevel.GREEN;
+                        levelToSet = GREEN;
                     } else if (i < veteranIndex) {
-                        levelToSet = SkillLevel.REGULAR;
+                        levelToSet = REGULAR;
                     } else if (i < eliteIndex) {
-                        levelToSet = SkillLevel.VETERAN;
+                        levelToSet = VETERAN;
                     } else {
-                        levelToSet = SkillLevel.ELITE;
+                        levelToSet = ELITE;
                     }
 
                     milestones.get(i).setSelectedItem(levelToSet); // Set selected milestone level
+                }
+            }
+        }
+    }
+
+
+    void applyCampaignOptionsToCampaign() {
+        for (final String skillName : SkillType.getSkillList()) {
+            SkillType type = SkillType.getType(skillName);
+
+            // Update Target Number
+            updateTargetNumber(type);
+
+            // Update Skill Costs
+            updateSkillCosts(type, skillName);
+
+            // Update Skill Milestones
+            updateSkillMilestones(type);
+        }
+    }
+
+    private void updateTargetNumber(SkillType type) {
+        MMLogger logger = MMLogger.create(SkillsTab.class);
+        logger.info(allTargetNumbers.get(type).getValue());
+        int targetNumber = (int) allTargetNumbers.get(type).getValue();
+        type.setTarget(targetNumber);
+    }
+
+    private void updateSkillCosts(SkillType type, String skillName) {
+        List<JSpinner> costs = allSkillCosts.get(type);
+
+        for (int level = 0; level < costs.size(); level++) {
+            int cost = (int) costs.get(level).getValue();
+            SkillType.setCost(skillName, cost, level);
+        }
+    }
+
+    private void updateSkillMilestones(SkillType type) {
+        List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type);
+
+        // These allow us to ensure the full array of milestones has been assigned
+        type.setGreenLevel(skillMilestones.size() -4);
+        type.setRegularLevel(skillMilestones.size() -3);
+        type.setVeteranLevel(skillMilestones.size() -2);
+        type.setEliteLevel(skillMilestones.size() -1);
+
+        // Then we overwrite those insurance values with the actual values
+        SkillLevel lastAssignment = ULTRA_GREEN;
+        for (int i = 0; i < skillMilestones.size(); i++) {
+
+            JComboBox<SkillLevel> milestoneCombo = skillMilestones.get(i);
+            SkillLevel selectedSkillLevel = (SkillLevel) milestoneCombo.getSelectedItem();
+
+            if (selectedSkillLevel != lastAssignment) {
+                lastAssignment = selectedSkillLevel;
+
+                if (selectedSkillLevel != null) {
+                    switch (selectedSkillLevel) {
+                        case GREEN -> type.setGreenLevel(i);
+                        case REGULAR -> type.setRegularLevel(i);
+                        case VETERAN -> type.setVeteranLevel(i);
+                        case ELITE -> type.setEliteLevel(i);
+                        default -> {}
+                    }
                 }
             }
         }

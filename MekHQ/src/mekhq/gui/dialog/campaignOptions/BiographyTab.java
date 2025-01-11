@@ -1347,7 +1347,7 @@ public class BiographyTab {
         campaignOptions.setUseRandomClanPersonnelDeath(chkUseRandomClanPersonnelDeath.isSelected());
         campaignOptions.setUseRandomPrisonerDeath(chkUseRandomPrisonerDeath.isSelected());
         campaignOptions.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        campaignOptions.setPercentageRandomDeathChance((int) spnPercentageRandomDeathChance.getValue());
+        campaignOptions.setPercentageRandomDeathChance((double) spnPercentageRandomDeathChance.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             campaignOptions.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());

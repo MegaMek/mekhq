@@ -778,18 +778,18 @@ public class FinancesTab {
         campaignOptions.setSharesForAll(chkSharesForAll.isSelected());
 
         // Price Multipliers
-        campaignOptions.setCommonPartPriceMultiplier((float) spnCommonPartPriceMultiplier.getValue());
-        campaignOptions.setInnerSphereUnitPriceMultiplier((float) spnInnerSphereUnitPriceMultiplier.getValue());
-        campaignOptions.setInnerSpherePartPriceMultiplier((float) spnInnerSpherePartPriceMultiplier.getValue());
-        campaignOptions.setClanUnitPriceMultiplier((float) spnClanUnitPriceMultiplier.getValue());
-        campaignOptions.setClanPartPriceMultiplier((float) spnClanPartPriceMultiplier.getValue());
-        campaignOptions.setMixedTechUnitPriceMultiplier((float) spnMixedTechUnitPriceMultiplier.getValue());
+        campaignOptions.setCommonPartPriceMultiplier((double) spnCommonPartPriceMultiplier.getValue());
+        campaignOptions.setInnerSphereUnitPriceMultiplier((double) spnInnerSphereUnitPriceMultiplier.getValue());
+        campaignOptions.setInnerSpherePartPriceMultiplier((double) spnInnerSpherePartPriceMultiplier.getValue());
+        campaignOptions.setClanUnitPriceMultiplier((double) spnClanUnitPriceMultiplier.getValue());
+        campaignOptions.setClanPartPriceMultiplier((double) spnClanPartPriceMultiplier.getValue());
+        campaignOptions.setMixedTechUnitPriceMultiplier((double) spnMixedTechUnitPriceMultiplier.getValue());
         for (int i = 0; i < spnUsedPartPriceMultipliers.length; i++) {
             campaignOptions.getUsedPartPriceMultipliers()[i] = (Double) spnUsedPartPriceMultipliers[i]
                 .getValue();
         }
-        campaignOptions.setDamagedPartsValueMultiplier((float) spnDamagedPartsValueMultiplier.getValue());
-        campaignOptions.setUnrepairablePartsValueMultiplier((float) spnUnrepairablePartsValueMultiplier.getValue());
-        campaignOptions.setCancelledOrderRefundMultiplier((float) spnCancelledOrderRefundMultiplier.getValue());
+        campaignOptions.setDamagedPartsValueMultiplier((double) spnDamagedPartsValueMultiplier.getValue());
+        campaignOptions.setUnrepairablePartsValueMultiplier((double) spnUnrepairablePartsValueMultiplier.getValue());
+        campaignOptions.setCancelledOrderRefundMultiplier((double) spnCancelledOrderRefundMultiplier.getValue());
     }
 }
