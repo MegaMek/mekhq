@@ -1,5 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
@@ -320,7 +321,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         rulesetsTab.applyCampaignOptionsToCampaign();
     }
 
-    public void updateOptions() {
-        // TODO this is where we update campaign values based on the dialog values
+    public void applyPreset(CampaignPreset campaignPreset) {
     }
 }

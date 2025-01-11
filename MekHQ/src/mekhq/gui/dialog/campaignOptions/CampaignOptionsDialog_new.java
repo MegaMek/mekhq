@@ -1,11 +1,16 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.gui.FileDialogs;
+import mekhq.gui.dialog.CreateCampaignPresetDialog;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 public class CampaignOptionsDialog_new extends JDialog {
     final JFrame frame;
@@ -52,6 +57,7 @@ public class CampaignOptionsDialog_new extends JDialog {
         // Save Preset
         JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
         btnSavePreset.addActionListener(evt -> {
+            btnSaveActionPerformed();
             dispose();
         });
         pnlButtons.add(btnSavePreset);
@@ -59,6 +65,11 @@ public class CampaignOptionsDialog_new extends JDialog {
         // Load Preset
         JButton btnLoadPreset = new CampaignOptionsButton("LoadPreset");
         btnLoadPreset.addActionListener(evt -> {
+            final SelectPresetDialog presetSelectionDialog =
+                new SelectPresetDialog(null, true, false);
+            if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
+                campaignOptionsPane.applyPreset(presetSelectionDialog.getSelectedPreset());
+            }
             dispose();
         });
         pnlButtons.add(btnLoadPreset);
@@ -72,5 +83,24 @@ public class CampaignOptionsDialog_new extends JDialog {
         pnlButtons.add(btnCancel);
 
         return pnlButtons;
+    }
+
+    private void btnSaveActionPerformed() {
+        campaignOptionsPane.applyCampaignOptionsToCampaign();
+
+        final CreateCampaignPresetDialog createCampaignPresetDialog
+            = new CreateCampaignPresetDialog(null, campaign, null);
+        if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+            dispose();
+            return;
+        }
+        final CampaignPreset preset = createCampaignPresetDialog.getPreset();
+        if (preset == null) {
+            dispose();
+            return;
+        }
+        preset.writeToFile(null,
+            FileDialogs.saveCampaignPreset(null, preset).orElse(null));
+        setVisible(false);
     }
 }
