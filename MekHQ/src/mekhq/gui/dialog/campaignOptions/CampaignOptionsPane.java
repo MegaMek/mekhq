@@ -6,7 +6,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.dialog.campaignOptions.AbilitiesTab.AbilityCategory;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -40,7 +40,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MarketsTab marketsTab;
     private RulesetsTab rulesetsTab;
     private JTabbedPane abilityContentTabs;
-    private JTabbedPane advancementParentTab;
 
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign) {
         super(frame, resources, "campaignOptionsDialog");
@@ -178,7 +177,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JTabbedPane createAdvancementParentTab() {
         // Parent Tab
-        advancementParentTab = new JTabbedPane();
+        JTabbedPane advancementParentTab = new JTabbedPane();
 
         // Advancement
         advancementTab = new AdvancementTab(campaign);
@@ -200,9 +199,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         abilitiesTab = new AbilitiesTab();
 
         abilityContentTabs = createSubTabs(Map.of(
-            "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITIES),
-            "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITIES),
-            "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITIES)));
+            "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITY),
+            "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITY),
+            "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITY)));
 
         // Add Tabs
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
@@ -352,7 +351,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             campaignPreset.getRandomSkillPreferences());
         skillsTab.loadValuesFromCampaignOptions(campaignPreset.getSkills());
         // The ability tab is a special case, so handled differently to other tabs
-        rebuildAbilityContentTabsContents(campaignPreset);
+        abilitiesTab.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
 
         // Logistics
         equipmentAndSuppliesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
@@ -362,32 +361,5 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-    }
-
-    void rebuildAbilityContentTabsContents(CampaignPreset campaignPreset) {
-        // Due to the complexity of the ability content tabs and how much can differ between
-        // presets and saves, we rebuild the entire batch of content tabs.
-        abilitiesTab.setAllAbilities(campaignPreset.getSpecialAbilities());
-        abilityContentTabs = createSubTabs(Map.of(
-                "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITIES),
-                "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITIES),
-                "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITIES)
-        ));
-
-        for (int i = 0; i < advancementParentTab.getTabCount(); i++) {
-            if (advancementParentTab.getTitleAt(i).contains(resources.getString("abilityContentTabs.title"))) {
-                advancementParentTab.remove(i);
-                break;
-            }
-        }
-
-        advancementParentTab.addTab(
-                String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-                        resources.getString("abilityContentTabs.title")),
-                abilityContentTabs
-        );
-
-        advancementParentTab.revalidate();
-        advancementParentTab.repaint();
     }
 }

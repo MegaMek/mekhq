@@ -4,6 +4,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsGridBagConstraints;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsHeaderPanel;
@@ -11,54 +12,155 @@ import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptions
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static mekhq.campaign.personnel.SpecialAbility.getDefaultSpecialAbilities;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.resources;
 
 public class AbilitiesTab {
-    private Map<String, SpecialAbility> allAbilities;
-    private HashMap<String, SpecialAbility> unusedAbilities;
-    private Map<SpecialAbility, Boolean> abilityUsageTable;
+    private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
     private JPanel combatTab;
     private JPanel maneuveringTab;
     private JPanel utilityTab;
 
     AbilitiesTab() {
-        allAbilities = new Hashtable<>();
-        abilityUsageTable = new HashMap<>();
-        unusedAbilities = new HashMap<>();
+        initialize();
+    }
+
+    private void initialize() {
+        allAbilityInfo = new HashMap<>();
         combatTab = new JPanel();
         maneuveringTab = new JPanel();
         utilityTab = new JPanel();
+        buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
     }
 
-    public enum AbilityCategory {
-        COMBAT_ABILITIES, MANEUVERING_ABILITIES, UTILITY_ABILITIES
+    /**
+     * Initializes all ability information, setting their active/inactive status based
+     * on the provided map of abilities and ensuring all abilities are covered.
+     *
+     * @param abilities A map of active abilities keyed by their names.
+     */
+    void buildAllAbilityInfo(Map<String, SpecialAbility> abilities) {
+        // Remove old data
+        allAbilityInfo.clear();
+
+        // Build abilities
+        buildAbilityInfo(abilities, true);
+
+        Map<String, SpecialAbility> allSpecialAbilities = SpecialAbility.getDefaultSpecialAbilities();
+        Map<String, SpecialAbility> missingAbilities = new HashMap<>();
+
+        for (SpecialAbility ability : allSpecialAbilities.values()) {
+            if (!allAbilityInfo.containsKey(ability.getName())) {
+                missingAbilities.put(ability.getName(), ability);
+            }
+        }
+
+        if (!missingAbilities.isEmpty()) {
+            buildAbilityInfo(missingAbilities, false);
+        }
+
+        // Clear and update tabs in-place
+        refreshAll();
     }
 
-    void setAllAbilities(Map<String, SpecialAbility> abilities) {
-        buildAbilityMaps(abilities);
+    private void refreshAll() {
+        refreshTabContents(combatTab, AbilityCategory.COMBAT_ABILITY);
+        refreshTabContents(maneuveringTab, AbilityCategory.MANEUVERING_ABILITY);
+        refreshTabContents(utilityTab, AbilityCategory.UTILITY_ABILITY);
+    }
+
+    private void refreshTabContents(JPanel tab, AbilityCategory category) {
+        tab.removeAll();
+        JPanel newContents = createAbilitiesTab(category);
+
+        // Add new content to the same panel
+        tab.setLayout(new BorderLayout());
+        tab.add(newContents, BorderLayout.CENTER);
+
+        tab.revalidate();
+        tab.repaint();
+    }
+
+    private void buildAbilityInfo(Map<String, SpecialAbility> abilities, boolean isEnabled) {
+        for (Entry<String, SpecialAbility> entry : abilities.entrySet()) {
+            SpecialAbility clonedAbility = entry.getValue().clone();
+            String abilityName = clonedAbility.getName();
+            AbilityCategory category = getCategory(clonedAbility);
+
+            // Mark the ability as active
+            allAbilityInfo.put(abilityName, new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
+        }
+    }
+
+    private AbilityCategory getCategory(SpecialAbility ability) {
+        for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
+            // Is the ability classified as a Combat Ability?
+            boolean isCombatAbility = Stream.of("Gunnery", "Artillery", "Small Arms")
+                .anyMatch(word -> Pattern.compile("\\b" + word)
+                    .matcher(skillPerquisite.toString())
+                    .find());
+
+            if (isCombatAbility) {
+                return COMBAT_ABILITY;
+            }
+
+            // Is the ability classified as a Maneuvering Ability?
+            boolean isManeuveringAbility = Stream.of("Piloting", "Anti-Mek")
+                .anyMatch(word -> Pattern.compile("\\b" + word)
+                    .matcher(skillPerquisite.toString())
+                    .find());
+
+            if (isManeuveringAbility) {
+                return MANEUVERING_ABILITY;
+            }
+        }
+
+        // If it isn't a Combat or Maneuvering ability, it's a utility ability
+        return UTILITY_ABILITY;
     }
 
     JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
         // Header
         JPanel headerPanel = switch (abilityCategory) {
-            case COMBAT_ABILITIES ->
-                new CampaignOptionsHeaderPanel("CombatAbilitiesTab", getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
-            case MANEUVERING_ABILITIES ->
-                new CampaignOptionsHeaderPanel("ManeuveringAbilitiesTab", getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
-            case UTILITY_ABILITIES ->
-                new CampaignOptionsHeaderPanel("UtilityAbilitiesTab", getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
+            case COMBAT_ABILITY ->
+                new CampaignOptionsHeaderPanel("CombatAbilitiesTab",
+                    getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
+            case MANEUVERING_ABILITY ->
+                new CampaignOptionsHeaderPanel("ManeuveringAbilitiesTab",
+                    getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
+            case UTILITY_ABILITY ->
+                new CampaignOptionsHeaderPanel("UtilityAbilitiesTab",
+                    getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
         };
 
         // Contents
-        List<SpecialAbility> eligibleAbilities = getEligibleAbilities(abilityCategory);
+        JButton btnEnableAll = new CampaignOptionsButton("AddAll");
+        btnEnableAll.addActionListener(e -> {
+            for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
+                abilityInfo.setEnabled(true);
+            }
+
+            refreshAll();
+        });
+
+        JButton btnRemoveAll = new CampaignOptionsButton("RemoveAll");
+        btnRemoveAll.addActionListener(e -> {
+            for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
+                abilityInfo.setEnabled(false);
+            }
+
+            refreshAll();
+        });
 
         // Layout the Panels
         final JPanel panel = new CampaignOptionsStandardPanel("AbilitiesGeneralTab", true);
@@ -69,16 +171,25 @@ public class AbilitiesTab {
         layout.gridy = 0;
         panel.add(headerPanel, layout);
 
-        int abilityCount = eligibleAbilities.size();
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(btnEnableAll, layout);
+        layout.gridx++;
+        panel.add(btnRemoveAll, layout);
 
-        for (int i = 0; i < abilityCount; i++) {
-            SpecialAbility ability = eligibleAbilities.get(i);
+        int abilityCounter = 0;
 
-            if (ability != null) {
-                JPanel abilityPanel = createSPAPanel(ability, unusedAbilities);
+        for (String abilityName : allAbilityInfo.keySet()) {
+            CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
 
-                layout.gridx = i % 4;
-                layout.gridy = 1 + (i / 4);
+            if (abilityInfo.getCategory() == abilityCategory) {
+                abilityCounter++;
+
+                JPanel abilityPanel = createSPAPanel(abilityInfo);
+
+                layout.gridx = (abilityCounter % 4) - 1;
+                layout.gridy = 2 + (abilityCounter / 4);
 
                 layout.gridwidth = 1;
                 panel.add(abilityPanel, layout);
@@ -86,108 +197,43 @@ public class AbilitiesTab {
         }
 
         // Create Parent Panel and return
+        JPanel parentPanel = createParentPanel(panel, "AbilitiesTab" + COMBAT_ABILITY.name());
+
         return switch (abilityCategory) {
-            case COMBAT_ABILITIES -> {
-                combatTab = panel;
-                yield createParentPanel(combatTab, "AbilitiesGeneralTab");
+            case COMBAT_ABILITY -> {
+                combatTab = parentPanel;
+                yield combatTab;
             }
-            case MANEUVERING_ABILITIES -> {
-                maneuveringTab = panel;
-                yield createParentPanel(maneuveringTab, "AbilitiesGeneralTab");
+            case MANEUVERING_ABILITY -> {
+                maneuveringTab = parentPanel;
+                yield maneuveringTab;
             }
-            case UTILITY_ABILITIES -> {
-                utilityTab = panel;
-                yield createParentPanel(utilityTab, "AbilitiesGeneralTab");
+            case UTILITY_ABILITY -> {
+                utilityTab = parentPanel;
+                yield utilityTab;
             }
         };
     }
 
-    private List<SpecialAbility> getEligibleAbilities(AbilityCategory abilityCategory) {
-        // This fetches all currently enabled special abilities
-        Map<String, SpecialAbility> specialAbilities = SpecialAbility.getSpecialAbilities();
+    private JPanel createSPAPanel(CampaignOptionsAbilityInfo abilityInfo) {
+        SpecialAbility ability = abilityInfo.getAbility();
 
-        if (allAbilities.isEmpty()) {
-            buildAbilityMaps(specialAbilities);
-        }
-
-        List<SpecialAbility> eligibleAbilities = new ArrayList<>();
-        for (SpecialAbility ability : allAbilities.values()) {
-            for (SkillPerquisite skillPerquisite : ability.getPrereqSkills()) {
-                // Is the ability classified as a Combat Ability?
-                boolean isCombatAbility = Stream.of("Gunnery", "Artillery", "Small Arms").anyMatch(word -> Pattern.compile("\\b" + word).matcher(skillPerquisite.toString()).find());
-
-                // Is the ability classified as a Maneuvering Ability?
-                boolean isManeuveringAbility = Stream.of("Piloting", "Anti-Mek").anyMatch(word -> Pattern.compile("\\b" + word).matcher(skillPerquisite.toString()).find());
-
-                switch (abilityCategory) {
-                    case COMBAT_ABILITIES -> {
-                        if (isCombatAbility) {
-                            eligibleAbilities.add(ability);
-                        }
-                    }
-                    case MANEUVERING_ABILITIES -> {
-                        if (!isCombatAbility && isManeuveringAbility) {
-                            eligibleAbilities.add(ability);
-                        }
-                    }
-                    case UTILITY_ABILITIES -> {
-                        if (!isCombatAbility && !isManeuveringAbility) {
-                            eligibleAbilities.add(ability);
-                        }
-                    }
-                }
-            }
-        }
-
-        eligibleAbilities.sort(Comparator.comparing(SpecialAbility::getDisplayName));
-
-        return eligibleAbilities;
-    }
-
-    void buildAbilityMaps(Map<String, SpecialAbility> specialAbilities) {
-        // We need to create a temporary hash of special abilities that we can modify
-        // without changing the underlying one in case the user cancels the changes
-        for (SpecialAbility ability : specialAbilities.values()) {
-            allAbilities.put(ability.getDisplayName(), ability.clone());
-        }
-
-        buildMapOfUnusedSPAs();
-
-        for (SpecialAbility ability : unusedAbilities.values()) {
-            allAbilities.put(ability.getName(), ability);
-        }
-    }
-
-    private void buildMapOfUnusedSPAs() {
-        final Map<String, SpecialAbility> defaultSpecialAbilities = getDefaultSpecialAbilities();
-
-        for (SpecialAbility ability : defaultSpecialAbilities.values()) {
-            String name = ability.getDisplayName();
-            // Check if the ability is unused
-            if (!allAbilities.containsKey(name)) {
-                SpecialAbility unusedAbility = ability.clone();
-                unusedAbilities.put(name, unusedAbility);
-            }
-        }
-    }
-
-    private JPanel createSPAPanel(SpecialAbility ability, HashMap<String, SpecialAbility> unusedAbilities) {
         // Initialization
         final JPanel panel = new AbilitiesTabStandardPanel(ability);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel,
+            GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL);
 
         // Contents
         JCheckBox chkAbility = new JCheckBox(resources.getString("abilityEnable.text"));
-        chkAbility.setSelected(!unusedAbilities.containsValue(ability));
-        // This sets the initial value, while the action listener ensures the SPAs presence in the
-        // table is kept up to date with player changes.
-        abilityUsageTable.put(ability, !unusedAbilities.containsValue(ability));
-        chkAbility.addActionListener(e -> abilityUsageTable.put(ability, chkAbility.isSelected()));
+        chkAbility.setSelected(abilityInfo.isEnabled());
+        chkAbility.addActionListener(e -> abilityInfo.setEnabled(chkAbility.isSelected()));
 
-        JLabel lblCost = getAbilityCost(ability);
+        JLabel lblCost = new JLabel(String.format(resources.getString("abilityCost.text"),
+            ability.getCost()));
 
         JLabel lblDescription = new JLabel();
-        lblDescription.setText(String.format("<html><div style='width: %s; text-align:justify;'><i>%s</i></div></html>", UIUtil.scaleForGUI(400), ability.getDescription()));
+        lblDescription.setText(String.format("<html><div style='width: %s; text-align:justify;'><i>%s</i></div></html>",
+            UIUtil.scaleForGUI(400), ability.getDescription()));
 
         JLabel lblPrerequisites = createAbilityLabel("prerequisites.text", ability.getAllPrereqDesc());
         JLabel lblIncompatible = createAbilityLabel("incompatible.text", ability.getInvalidDesc());
@@ -198,32 +244,26 @@ public class AbilitiesTab {
             if (editSPA(ability)) {
                 // This will run on the SWT thread
                 SwingUtilities.invokeLater(() -> {
-                    // Remove old panel
-                    panel.removeAll();
+                    // Update components with new values
+                    lblCost.setText(String.format(resources.getString("abilityCost.text"),
+                        ability.getCost()));
 
-                    // Compose replacement components
-                    final JLabel lblNewCost = getAbilityCost(ability);
-                    final JLabel lblNewPrerequisites = createAbilityLabel("prerequisites.text", ability.getAllPrereqDesc());
-                    final JLabel lblNewIncompatible = createAbilityLabel("incompatible.text", ability.getInvalidDesc());
-                    final JLabel lblNewRemoves = createAbilityLabel("removes.text", ability.getRemovedDesc());
+                    String prerequisitesDescription = resources.getString("prerequisites.text")
+                        + ability.getAllPrereqDesc();
+                    lblPrerequisites.setText(buildAbilityDescription(prerequisitesDescription));
 
-                    // Perform layout changes
-                    arrangeSPAPanelLayout(layout, panel, chkAbility, lblNewCost, lblDescription, lblNewPrerequisites, lblNewIncompatible, lblNewRemoves, btnCustomizeAbility);
+                    String incompatibleDescription = resources.getString("incompatible.text")
+                        + ability.getInvalidDesc();
+                    lblIncompatible.setText(buildAbilityDescription(incompatibleDescription));
 
-                    // Refresh display
-                    panel.revalidate();
-                    panel.repaint();
+                    String removesDescription = resources.getString("removes.text")
+                        + ability.getRemovedDesc();
+                    lblRemoves.setText(buildAbilityDescription(removesDescription));
                 });
             }
         });
 
         // Layout
-        arrangeSPAPanelLayout(layout, panel, chkAbility, lblCost, lblDescription, lblPrerequisites, lblIncompatible, lblRemoves, btnCustomizeAbility);
-
-        return panel;
-    }
-
-    private static void arrangeSPAPanelLayout(GridBagConstraints layout, JPanel panel, JCheckBox chkAbility, JLabel lblCost, JLabel lblDescription, JLabel lblPrerequisites, JLabel lblIncompatible, JLabel lblRemoves, JButton btnCustomizeAbility) {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
@@ -249,26 +289,16 @@ public class AbilitiesTab {
         layout.gridx = 0;
         layout.gridy++;
         panel.add(btnCustomizeAbility, layout);
-    }
 
-    private JLabel createAbilityLabel(String resourceKey, String descriptionFromAbility) {
-        String description = resources.getString(resourceKey) + descriptionFromAbility;
-        return new JLabel(buildAbilityDescription(description));
-    }
-
-    private static JLabel getAbilityCost(SpecialAbility ability) {
-        return new JLabel(String.format(resources.getString("abilityCost.text"), ability.getCost()));
+        return panel;
     }
 
     private boolean editSPA(SpecialAbility ability) {
-        EditSpecialAbilityDialog dialog = new EditSpecialAbilityDialog(null, ability, allAbilities);
+        EditSpecialAbilityDialog dialog = new EditSpecialAbilityDialog(null, ability,
+            Map.of(ability.getName(), ability.clone()));
         dialog.setVisible(true);
 
         return !dialog.wasCancelled();
-    }
-
-    private static String buildAbilityDescription(String description) {
-        return ("<html>" + description + "</html>").replaceAll("\\{", "").replaceAll("}", "");
     }
 
     static class AbilitiesTabStandardPanel extends JPanel {
@@ -283,32 +313,32 @@ public class AbilitiesTab {
                 }
             };
 
-            setBorder(BorderFactory.createTitledBorder(String.format("<html>%s</html>", name)));
-
+            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                String.format("<html>%s</html>", name)));
             setName("pnl" + name);
         }
     }
 
-    void applyCampaignOptionsToCampaign() {
-        Map<String, SpecialAbility> enabledAbilities = getEnabledAbilities();
-        SpecialAbility.replaceSpecialAbilities(enabledAbilities);
+    private JLabel createAbilityLabel(String resourceKey, String descriptionFromAbility) {
+        String description = resources.getString(resourceKey) + descriptionFromAbility;
+        return new JLabel(buildAbilityDescription(description));
     }
 
-    private Map<String, SpecialAbility> getEnabledAbilities() {
+    private static String buildAbilityDescription(String description) {
+        return ("<html>" + description + "</html>")
+            .replaceAll("\\{", "")
+            .replaceAll("}", "");
+    }
+
+    void applyCampaignOptionsToCampaign() {
         Map<String, SpecialAbility> enabledAbilities = new HashMap<>();
 
-        for (SpecialAbility ability : abilityUsageTable.keySet()) {
-            if (abilityUsageTable.get(ability)) {
-                enabledAbilities.put(ability.getName(), ability);
+        for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
+            if (abilityInfo.isEnabled()) {
+                enabledAbilities.put(abilityInfo.getAbility().getName(), abilityInfo.getAbility());
             }
         }
-        return enabledAbilities;
+        SpecialAbility.replaceSpecialAbilities(enabledAbilities);
     }
-
-//    private void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
-        // We don't use `loadValuesFromCampaignOptions` in this class, as the ability tab is
-        // reloaded differently to other tabs.
-        // This commented method is left in place so future developers know this was a deliberate
-        // design choice and not an oversight.
-//    }
 }
+
