@@ -62,11 +62,7 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
 
         // Save Preset
         JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
-        btnSavePreset.addActionListener(evt -> {
-            wasCanceled = false;
-            btnSaveActionPerformed();
-            dispose();
-        });
+        btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
         pnlButtons.add(btnSavePreset);
 
         // Load Preset
@@ -83,22 +79,17 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
     }
 
     private void btnSaveActionPerformed() {
-        campaignOptionsPane.applyCampaignOptionsToCampaign();
-
         final CreateCampaignPresetDialog createCampaignPresetDialog
             = new CreateCampaignPresetDialog(null, campaign, null);
         if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
-            dispose();
             return;
         }
         final CampaignPreset preset = createCampaignPresetDialog.getPreset();
         if (preset == null) {
-            dispose();
             return;
         }
         preset.writeToFile(null,
             FileDialogs.saveCampaignPreset(null, preset).orElse(null));
-        setVisible(false);
     }
 
     private void btnLoadActionPerformed() {
