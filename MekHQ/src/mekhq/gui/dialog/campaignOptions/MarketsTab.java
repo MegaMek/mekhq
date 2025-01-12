@@ -1,6 +1,7 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -559,43 +560,52 @@ public class MarketsTab {
     }
 
     void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // Personnel Market
-        comboPersonnelMarketType.setSelectedItem(campaignOptions.getPersonnelMarketName());
-        chkPersonnelMarketReportRefresh.setSelected(campaignOptions.isContractMarketReportRefresh());
-        chkUsePersonnelHireHiringHallOnly.setSelected(campaignOptions.isUsePersonnelHireHiringHallOnly());
-        spnPersonnelMarketDylansWeight.setValue(campaignOptions.getPersonnelMarketDylansWeight());
+        comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketName());
+        chkPersonnelMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        chkUsePersonnelHireHiringHallOnly.setSelected(options.isUsePersonnelHireHiringHallOnly());
+        spnPersonnelMarketDylansWeight.setValue(options.getPersonnelMarketDylansWeight());
         for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
-            entry.getValue().setValue(campaignOptions.getPersonnelMarketRandomRemovalTargets().get(entry.getKey()));
+            entry.getValue().setValue(options.getPersonnelMarketRandomRemovalTargets().get(entry.getKey()));
         }
 
         // Unit Market
-        comboUnitMarketMethod.setSelectedItem(campaignOptions.getUnitMarketMethod());
-        chkUnitMarketRegionalMekVariations.setSelected(campaignOptions.isRegionalMekVariations());
-        spnUnitMarketSpecialUnitChance.setValue(campaignOptions.getUnitMarketSpecialUnitChance());
-        spnUnitMarketRarityModifier.setValue(campaignOptions.getUnitMarketRarityModifier());
-        chkInstantUnitMarketDelivery.setSelected(campaignOptions.isInstantUnitMarketDelivery());
-        chkUnitMarketReportRefresh.setSelected(campaignOptions.isContractMarketReportRefresh());
+        comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
+        chkUnitMarketRegionalMekVariations.setSelected(options.isRegionalMekVariations());
+        spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
+        spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
+        chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
+        chkUnitMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
 
         // Contract Market
-        comboContractMarketMethod.setSelectedItem(campaignOptions.getContractMarketMethod());
-        spnContractSearchRadius.setValue(campaignOptions.getContractSearchRadius());
-        chkVariableContractLength.setSelected(campaignOptions.isVariableContractLength());
-        chkContractMarketReportRefresh.setSelected(campaignOptions.isContractMarketReportRefresh());
-        spnContractMaxSalvagePercentage.setValue(campaignOptions.getContractMaxSalvagePercentage());
-        spnDropShipBonusPercentage.setValue(campaignOptions.getDropShipBonusPercentage());
-        if (campaignOptions.isEquipmentContractBase()) {
+        comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
+        spnContractSearchRadius.setValue(options.getContractSearchRadius());
+        chkVariableContractLength.setSelected(options.isVariableContractLength());
+        chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
+        spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
+        if (options.isEquipmentContractBase()) {
             btnContractEquipment.setSelected(true);
         } else {
             btnContractPersonnel.setSelected(true);
         }
-        spnEquipPercent.setValue(campaignOptions.getEquipmentContractPercent());
-        chkEquipContractSaleValue.setSelected(campaignOptions.isEquipmentContractSaleValue());
-        spnDropShipPercent.setValue(campaignOptions.getDropShipContractPercent());
-        spnJumpShipPercent.setValue(campaignOptions.getJumpShipContractPercent());
-        spnWarShipPercent.setValue(campaignOptions.getWarShipContractPercent());
-        useInfantryDoseNotCountBox.setSelected(campaignOptions.isInfantryDontCount());
-        chkMercSizeLimited.setSelected(campaignOptions.isMercSizeLimited());
-        chkBLCSaleValue.setSelected(campaignOptions.isBLCSaleValue());
-        chkOverageRepaymentInFinalPayment.setSelected(campaignOptions.isOverageRepaymentInFinalPayment());
+        spnEquipPercent.setValue(options.getEquipmentContractPercent());
+        chkEquipContractSaleValue.setSelected(options.isEquipmentContractSaleValue());
+        spnDropShipPercent.setValue(options.getDropShipContractPercent());
+        spnJumpShipPercent.setValue(options.getJumpShipContractPercent());
+        spnWarShipPercent.setValue(options.getWarShipContractPercent());
+        useInfantryDoseNotCountBox.setSelected(options.isInfantryDontCount());
+        chkMercSizeLimited.setSelected(options.isMercSizeLimited());
+        chkBLCSaleValue.setSelected(options.isBLCSaleValue());
+        chkOverageRepaymentInFinalPayment.setSelected(options.isOverageRepaymentInFinalPayment());
     }
 }

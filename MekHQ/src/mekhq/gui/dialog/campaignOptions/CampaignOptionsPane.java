@@ -360,8 +360,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Operations
         financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        marketsTab.loadValuesFromCampaignOptions();
-        rulesetsTab.loadValuesFromCampaignOptions();
+        marketsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 
     private void rebuildAbilityContentTabsContents(CampaignPreset campaignPreset) {
