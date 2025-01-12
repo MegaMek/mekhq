@@ -356,7 +356,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Logistics
         equipmentAndSuppliesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        repairAndMaintenanceTab.loadValuesFromCampaignOptions();
+        repairAndMaintenanceTab.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Operations
         financesTab.loadValuesFromCampaignOptions();

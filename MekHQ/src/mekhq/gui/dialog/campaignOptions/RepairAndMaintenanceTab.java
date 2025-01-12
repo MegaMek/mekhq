@@ -1,5 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
 
 import javax.swing.*;
@@ -319,30 +320,6 @@ public class RepairAndMaintenanceTab {
         // TODO handle this
     }
 
-    void loadValuesFromCampaignOptions() {
-        // Repair
-        useEraModsCheckBox.setSelected(campaignOptions.isUseEraMods());
-        assignedTechFirstCheckBox.setSelected(campaignOptions.isAssignedTechFirst());
-        resetToFirstTechCheckBox.setSelected(campaignOptions.isResetToFirstTech());
-        useQuirksBox.setSelected(campaignOptions.isUseQuirks());
-        useAeroSystemHitsBox.setSelected(campaignOptions.isUseAeroSystemHits());
-        useDamageMargin.setSelected(campaignOptions.isDestroyByMargin());
-        spnDamageMargin.setValue(campaignOptions.getDestroyMargin());
-        spnDestroyPartTarget.setValue(campaignOptions.getDestroyPartTarget());
-
-        // Maintenance
-        checkMaintenance.setSelected(campaignOptions.isCheckMaintenance());
-        spnMaintenanceDays.setValue(campaignOptions.getMaintenanceCycleDays());
-        spnMaintenanceBonus.setValue(campaignOptions.getMaintenanceBonus());
-        spnDefaultMaintenanceTime.setValue(campaignOptions.getDefaultMaintenanceTime());
-        useQualityMaintenance.setSelected(campaignOptions.isUseQualityMaintenance());
-        reverseQualityNames.setSelected(campaignOptions.isReverseQualityNames());
-        chkUseRandomUnitQualities.setSelected(campaignOptions.isUseRandomUnitQualities());
-        chkUsePlanetaryModifiers.setSelected(campaignOptions.isUsePlanetaryModifiers());
-        useUnofficialMaintenance.setSelected(campaignOptions.isUseUnofficialMaintenance());
-        logMaintenance.setSelected(campaignOptions.isLogMaintenance());
-    }
-
     void applyCampaignOptionsToCampaign() {
         // Repair
         campaignOptions.setEraMods(useEraModsCheckBox.isSelected());
@@ -365,5 +342,38 @@ public class RepairAndMaintenanceTab {
         campaignOptions.setUsePlanetaryModifiers(chkUsePlanetaryModifiers.isSelected());
         campaignOptions.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
         campaignOptions.setLogMaintenance(logMaintenance.isSelected());
+    }
+
+    void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
+        // Repair
+        useEraModsCheckBox.setSelected(options.isUseEraMods());
+        assignedTechFirstCheckBox.setSelected(options.isAssignedTechFirst());
+        resetToFirstTechCheckBox.setSelected(options.isResetToFirstTech());
+        useQuirksBox.setSelected(options.isUseQuirks());
+        useAeroSystemHitsBox.setSelected(options.isUseAeroSystemHits());
+        useDamageMargin.setSelected(options.isDestroyByMargin());
+        spnDamageMargin.setValue(options.getDestroyMargin());
+        spnDestroyPartTarget.setValue(options.getDestroyPartTarget());
+
+        // Maintenance
+        checkMaintenance.setSelected(options.isCheckMaintenance());
+        spnMaintenanceDays.setValue(options.getMaintenanceCycleDays());
+        spnMaintenanceBonus.setValue(options.getMaintenanceBonus());
+        spnDefaultMaintenanceTime.setValue(options.getDefaultMaintenanceTime());
+        useQualityMaintenance.setSelected(options.isUseQualityMaintenance());
+        reverseQualityNames.setSelected(options.isReverseQualityNames());
+        chkUseRandomUnitQualities.setSelected(options.isUseRandomUnitQualities());
+        chkUsePlanetaryModifiers.setSelected(options.isUsePlanetaryModifiers());
+        useUnofficialMaintenance.setSelected(options.isUseUnofficialMaintenance());
+        logMaintenance.setSelected(options.isLogMaintenance());
     }
 }
