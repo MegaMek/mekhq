@@ -1465,7 +1465,8 @@ public class CampaignGUI extends JPanel {
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
 
-        new CampaignOptionsDialog(getFrame(), getCampaign(), null);
+        CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), getCampaign(), null);
+        optionsDialog.setVisible(true);
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 

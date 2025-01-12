@@ -34,7 +34,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         setLocationRelativeTo(frame);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setVisible(true);
     }
 
     public boolean wasCanceled() {

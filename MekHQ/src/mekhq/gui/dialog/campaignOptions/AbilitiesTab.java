@@ -1,6 +1,9 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
@@ -12,8 +15,7 @@ import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptions
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -26,7 +28,8 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.getImage
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.resources;
 
 public class AbilitiesTab {
-    private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo = new HashMap<>();
+    private ArrayList<String> level3Abilities;
+    private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private JPanel combatTab;
     private JPanel maneuveringTab;
     private JPanel utilityTab;
@@ -37,6 +40,7 @@ public class AbilitiesTab {
 
     private void initialize() {
         allAbilityInfo = new HashMap<>();
+        level3Abilities = new ArrayList<>();
         combatTab = new JPanel();
         maneuveringTab = new JPanel();
         utilityTab = new JPanel();
@@ -52,6 +56,22 @@ public class AbilitiesTab {
     void buildAllAbilityInfo(Map<String, SpecialAbility> abilities) {
         // Remove old data
         allAbilityInfo.clear();
+        level3Abilities.clear();
+
+        // Build list of Level 3 abilities
+        PersonnelOptions personnelOptions = new PersonnelOptions();
+        for (final Enumeration<IOptionGroup> i = personnelOptions.getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+
+            if (!group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)) {
+                continue;
+            }
+
+            for (final Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                IOption option = j.nextElement();
+                level3Abilities.add(option.getName());
+            }
+        }
 
         // Build abilities
         buildAbilityInfo(abilities, true);
@@ -97,8 +117,13 @@ public class AbilitiesTab {
             String abilityName = clonedAbility.getName();
             AbilityCategory category = getCategory(clonedAbility);
 
+            if (!level3Abilities.contains(abilityName)) {
+                continue;
+            }
+
             // Mark the ability as active
-            allAbilityInfo.put(abilityName, new CampaignOptionsAbilityInfo(abilityName, clonedAbility, isEnabled, category));
+            allAbilityInfo.put(abilityName, new CampaignOptionsAbilityInfo(abilityName,
+                clonedAbility, isEnabled, category));
         }
     }
 
@@ -180,16 +205,19 @@ public class AbilitiesTab {
 
         int abilityCounter = 0;
 
-        for (String abilityName : allAbilityInfo.keySet()) {
+        // Retrieve keySet and sort alphabetically
+        ArrayList<String> sortedAbilityNames = new ArrayList<>(allAbilityInfo.keySet());
+        Collections.sort(sortedAbilityNames);
+
+        for (String abilityName : sortedAbilityNames) {
             CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(abilityName);
 
             if (abilityInfo.getCategory() == abilityCategory) {
-                abilityCounter++;
-
                 JPanel abilityPanel = createSPAPanel(abilityInfo);
 
-                layout.gridx = (abilityCounter % 4) - 1;
-                layout.gridy = 2 + (abilityCounter / 4);
+                layout.gridx = abilityCounter % 3;
+                layout.gridy = 2 + (abilityCounter / 3);
+                abilityCounter++;
 
                 layout.gridwidth = 1;
                 panel.add(abilityPanel, layout);

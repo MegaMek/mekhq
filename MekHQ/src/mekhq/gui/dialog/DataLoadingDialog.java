@@ -338,9 +338,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    setVisible(false); // cede visibility to `optionsDialog`
                     CampaignOptionsDialog optionsDialog =
                         new CampaignOptionsDialog(getFrame(), campaign, preset);
+                    setVisible(false); // cede visibility to `optionsDialog`
+                    optionsDialog.setVisible(true);
                     if (optionsDialog.wasCanceled()) {
                         return null;
                     } else {
