@@ -1289,11 +1289,14 @@ public class Utilities {
      * @param toLoad         - Map of entity ids and transport assignments for the units we want to load
      * @param client         - the player's Client instance
      * @param loadTactical  - Should "tactical"-ly transported units be loaded?
+     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
      * @see mekhq.campaign.enums.CampaignTransportType#TACTICAL_TRANSPORT
      * @see ITransportAssignment
      */
     public static void loadPlayerTransports(int trnId, Map<Integer, ? extends ITransportAssignment> toLoad, Client client,
-                                            boolean loadTactical) {
+                                            boolean loadTactical, boolean isAlreadyReset) {
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
+
         if (!loadTactical) {
             // Nothing to do. Get outta here!
             return;
@@ -1302,7 +1305,14 @@ public class Utilities {
         // Reset transporter status, as currentSpace might still retain updates from
         // when the Unit
         // was assigned to the Transport on the TO&E tab
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(transport.getLoadedUnits());
+        }
+
         transport.resetTransporter();
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            transport.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
         for (int id : toLoad.keySet()) {
             Entity cargo = client.getEntity(id);
             if (cargo == null) {
@@ -1327,6 +1337,9 @@ public class Utilities {
 
         // Reset transporter status again so that sendLoadEntity can process correctly
         transport.resetTransporter();
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            transport.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
         for (int id : toLoad.keySet()) {
             Entity cargo = client.getEntity(id);
             if (!transport.canLoad(cargo, false)) {
