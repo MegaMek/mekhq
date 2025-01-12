@@ -1,6 +1,5 @@
 package mekhq.gui.dialog.campaignOptions;
 
-import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
@@ -21,8 +20,6 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
 
-    private static MMLogger logger = MMLogger.create(CampaignOptionsDialog_new.class);
-
     private boolean wasCanceled = true;
 
     public CampaignOptionsDialog_new(final JFrame frame, final Campaign campaign) {
@@ -32,6 +29,7 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
         initialize();
         setLocationRelativeTo(frame);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
     }
 
     public boolean wasCanceled() {

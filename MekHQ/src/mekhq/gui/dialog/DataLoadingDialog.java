@@ -351,7 +351,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                     CampaignOptionsDialog_new optionsDialog =
                         new CampaignOptionsDialog_new(getFrame(), campaign);
-                    optionsDialog.setVisible(true);
 //                    optionsDialog.setLocationRelativeTo(null);
 //                    optionsDialog.applyPreset(preset);
                     if (optionsDialog.wasCanceled()) {

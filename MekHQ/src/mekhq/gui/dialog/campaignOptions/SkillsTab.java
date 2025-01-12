@@ -377,7 +377,7 @@ public class SkillsTab {
             updateTargetNumber(type);
 
             // Update Skill Costs
-            updateSkillCosts(type, skillName);
+            updateSkillCosts(skillName);
 
             // Update Skill Milestones
             updateSkillMilestones(type);
@@ -385,14 +385,12 @@ public class SkillsTab {
     }
 
     private void updateTargetNumber(SkillType type) {
-        MMLogger logger = MMLogger.create(SkillsTab.class);
-        logger.info(allTargetNumbers.get(type).getValue());
-        int targetNumber = (int) allTargetNumbers.get(type).getValue();
+        int targetNumber = (int) allTargetNumbers.get(type.getName()).getValue();
         type.setTarget(targetNumber);
     }
 
-    private void updateSkillCosts(SkillType type, String skillName) {
-        List<JSpinner> costs = allSkillCosts.get(type);
+    private void updateSkillCosts(String skillName) {
+        List<JSpinner> costs = allSkillCosts.get(skillName);
 
         for (int level = 0; level < costs.size(); level++) {
             int cost = (int) costs.get(level).getValue();
@@ -401,7 +399,7 @@ public class SkillsTab {
     }
 
     private void updateSkillMilestones(SkillType type) {
-        List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type);
+        List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type.getName());
 
         // These allow us to ensure the full array of milestones has been assigned
         type.setGreenLevel(skillMilestones.size() -4);
