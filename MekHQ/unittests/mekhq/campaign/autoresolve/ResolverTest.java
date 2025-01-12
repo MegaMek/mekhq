@@ -23,6 +23,8 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulationOptions;
+import megamek.common.autoresolve.acar.order.Orders;
+import megamek.common.autoresolve.converter.SingleElementConsolidateForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -195,12 +197,9 @@ public class ResolverTest {
         var reputationController = mock(ReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
-
         campaign.setReputation(reputationController);
-
         var force = new Force("Heroes");
         campaign.addForce(force, campaign.getForce(0));
-
         return campaign;
     }
 
@@ -354,7 +353,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new SingleElementConsolidateForces()), SimulationOptions.empty(), new Board(30, 30));
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 
