@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -68,13 +68,13 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
+import mekhq.gui.dialog.ActiveContractWarning;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.*;
 
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.*;
 import java.time.LocalDate;
@@ -583,57 +583,15 @@ public class CampaignXmlParser {
                         }
                     });
 
-
-
         if (MHQConstants.VERSION.isHigherThan(version)) {
-            triggerActiveContractWarning(retVal);
+            if (retVal.hasActiveAtBContract(true)) {
+                new ActiveContractWarning();
+            }
         }
 
         logger.info("Load of campaign file complete!");
 
         return retVal;
-    }
-
-    /**
-     * Displays a warning dialog if the given {@code Campaign} has an active or future contract.
-     * <p>
-     * This method checks the campaign's list of contracts to determine if there are any currently active
-     * or accepted contracts with a start date in the future. If such a contract exists, it shows an error
-     * dialog informing the user that the campaign cannot proceed until the contract is completed.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} object representing the current campaign,
-     *               which contains information about the contracts and local date.
-     */
-    private static void triggerActiveContractWarning(Campaign campaign) {
-        boolean hasActiveContract = !campaign.getActiveAtBContracts().isEmpty();
-
-        if (!hasActiveContract) {
-            List<AtBContract> contracts = campaign.getAtBContracts();
-            LocalDate today = campaign.getLocalDate();
-
-            for (AtBContract contract : contracts) {
-                // This catches any contracts that have been accepted, but haven't yet started
-                if (contract.getStartDate().isAfter(today)) {
-                    hasActiveContract = true;
-                    break;
-                }
-            }
-        }
-
-        if (hasActiveContract) {
-            String message = String.format(
-                "This campaign has an active contract." +
-                    "\n\nPlease complete the contract before updating to version %s.",
-                MHQConstants.VERSION);
-
-            JOptionPane.showMessageDialog(
-                null,
-                message,
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
-        }
     }
 
     /**
