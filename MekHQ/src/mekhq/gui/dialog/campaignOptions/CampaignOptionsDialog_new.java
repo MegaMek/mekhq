@@ -1,5 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
@@ -16,6 +17,8 @@ public class CampaignOptionsDialog_new extends JDialog {
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
 
+    private static MMLogger logger = MMLogger.create(CampaignOptionsDialog_new.class);
+
     private boolean wasCanceled = false;
 
     public CampaignOptionsDialog_new(final JFrame frame, final Campaign campaign) {
@@ -26,13 +29,35 @@ public class CampaignOptionsDialog_new extends JDialog {
     }
 
     private void initialize() {
+        logger.info("Initializing Campaign Options Dialog");
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = screenSize.width;
+        int screenHeight = screenSize.height;
+
+        logger.info("Screen Width: " + screenWidth);
+        logger.info("Screen Height: " + screenHeight);
+
+        int adjustedScreenWidth = (int) (screenWidth * 0.9);
+        int adjustedScreenHeight = (int) (screenHeight * 0.9);
+
         setLayout(new BorderLayout());
         add(campaignOptionsPane, BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.PAGE_END);
 
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(frame);
         setModal(true);
+
+        // This accounts for unusual user setups
+        if (getWidth() > screenWidth) {
+            setSize(adjustedScreenWidth, getHeight());
+        } else if (getHeight() > screenHeight) {
+            setSize(getWidth(), adjustedScreenHeight);
+        } else if (getWidth() > screenWidth && getHeight() > screenHeight) {
+            setSize(adjustedScreenWidth, adjustedScreenHeight);
+        }
+
         setVisible(true);
     }
 
