@@ -1120,11 +1120,11 @@ public class PersonnelTab {
         // Contents
         lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
         spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary",
-            0, 0, 100, 0.05);
+            0, 0, 100, 0.01);
 
         lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
         spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary",
-            0, 0, 100, 0.05);
+            0, 0, 100, 0.01);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true,
@@ -1163,7 +1163,7 @@ public class PersonnelTab {
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
             final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel,
-                0, 0, 10, 0.05);
+                0, 0, 100, 0.1);
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
 
         }

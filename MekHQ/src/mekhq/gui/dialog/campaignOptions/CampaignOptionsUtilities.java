@@ -359,8 +359,13 @@ public class CampaignOptionsUtilities {
             };
 
             if (includeBorder) {
-                setBorder(BorderFactory.createTitledBorder(
-                    String.format("<html>%s</html>", borderTitle)));
+                if (borderTitle.isBlank()) {
+                    setBorder(BorderFactory.createEtchedBorder());
+                } else {
+                    setBorder(BorderFactory.createTitledBorder(
+                        BorderFactory.createEtchedBorder(),
+                        String.format("<html>%s</html>", borderTitle)));
+                }
             }
 
             setName("pnl" + name);

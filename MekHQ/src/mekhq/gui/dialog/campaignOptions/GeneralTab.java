@@ -34,13 +34,9 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
  * Extends the {@link AbstractMHQTabbedPane} class.
  */
 public class GeneralTab {
-    // region Variable Declarations
-    private final CampaignOptionsPane owner;
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
-
-    private AbstractMHQScrollablePanel generalPanel;
 
     private JLabel lblName;
     private JTextField txtName;
@@ -62,16 +58,8 @@ public class GeneralTab {
     private JButton btnIcon;
     private StandardForceIcon unitIcon;
 
-    /**
-     * Constructs a new {@link GeneralTab} object.
-     *
-     * @param name                the name of the tab
-     * @param campaign            the campaign object associated with the tab
-     * @param frame               the {@link JFrame} object that contains the tab
-     * @param campaignOptionsPane
-     */
-    public GeneralTab(Campaign campaign, JFrame frame, CampaignOptionsPane owner) {
-        this.owner = owner;
+    public GeneralTab(Campaign campaign, JFrame frame) {
+        // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
@@ -130,7 +118,8 @@ public class GeneralTab {
         btnIcon.addActionListener(this::btnIconActionPerformed);
 
         // Initialize the parent panel
-        generalPanel = new DefaultMHQScrollablePanel(frame, "generalPanel", new GridBagLayout());
+        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
+            "generalPanel", new GridBagLayout());
 
         // Layout the Panel
         JPanel panel = new JPanel();
@@ -182,7 +171,7 @@ public class GeneralTab {
         layout.gridx = GridBagConstraints.RELATIVE;
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        iconsPanel.setBorder(BorderFactory.createTitledBorder(""));
+        iconsPanel.setBorder(BorderFactory.createEtchedBorder());
 
         iconsPanel.add(lblIcon);
         iconsPanel.add(btnIcon);

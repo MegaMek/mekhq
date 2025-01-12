@@ -466,19 +466,19 @@ public class MarketsTab {
 
         lblEquipPercent = new CampaignOptionsLabel("EquipPercent");
         spnEquipPercent = new CampaignOptionsSpinner("EquipPercent",
-            0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
         spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
-            0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
         spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
-            0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
         spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
-            0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         btnContractPersonnel = new JRadioButton(resources.getString("lblContractPersonnel.text"));
         btnContractPersonnel.setToolTipText(resources.getString("lblContractPersonnel.tooltip"));
