@@ -156,7 +156,7 @@ public class SkillsTab {
         // Create the target number spinner
         JLabel lblTargetNumber = new CampaignOptionsLabel("SkillPanelTargetNumber");
         JSpinner spnTargetNumber = new CampaignOptionsSpinner("SkillPanelTargetNumber",
-            0, 0, 10, 1);
+            0, 0, 12, 1);
         allTargetNumbers.put(skill.getName(), spnTargetNumber);
 
         List<JLabel> labels = new ArrayList<>();
