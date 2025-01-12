@@ -214,8 +214,6 @@ public class GeneralTab {
         JLabel lblBody = new JLabel(String.format("<html>%s</html>",
             resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
-        Dimension size = lblBody.getPreferredSize();
-        lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
 
         final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel");
         final GroupLayout layout = createGroupLayout(panel);

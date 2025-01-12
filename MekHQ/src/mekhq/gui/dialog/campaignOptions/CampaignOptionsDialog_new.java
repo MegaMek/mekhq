@@ -1,7 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import mekhq.CampaignPreset;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.dialog.CreateCampaignPresetDialog;
@@ -15,7 +14,6 @@ import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTI
 public class CampaignOptionsDialog_new extends JDialog {
     final JFrame frame;
     private final Campaign campaign;
-    private final MekHQ application;
     private final CampaignOptionsPane campaignOptionsPane;
 
     private boolean wasCanceled = false;
@@ -24,7 +22,6 @@ public class CampaignOptionsDialog_new extends JDialog {
         this.frame = frame;
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
-        this.application = null;
         initialize();
     }
 
