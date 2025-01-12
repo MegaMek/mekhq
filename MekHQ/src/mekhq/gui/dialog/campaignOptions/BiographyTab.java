@@ -18,6 +18,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;
+import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -698,6 +699,9 @@ public class BiographyTab {
         lblPercentageRandomDeathChance = new CampaignOptionsLabel("PercentageRandomDeathChance");
         spnPercentageRandomDeathChance = new CampaignOptionsSpinner("PercentageRandomDeathChance",
             0, 0, 100, 0.000001);
+        NumberEditor editor = new NumberEditor(spnPercentageRandomDeathChance,
+            "0.000000");
+        spnPercentageRandomDeathChance.setEditor(editor);
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
