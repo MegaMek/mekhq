@@ -49,33 +49,30 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      */
     @Override
     public void recalculateTransportCapacity(@Nullable Vector<Transporter> transporters) {
-
-        // First let's clear the transport capacity for each transport type in transporters
-        for (Transporter transporter : transporters) {
-            if (hasTransportCapacity(transporter.getClass())) {
-                transportCapacity.remove(transporter.getClass());
-            }
-        }
-
-        // Then we make sure the transport entity is empty, and then let's load
-        // our transport entity so we can use the Transporter's getUnused method
-        clearTransportedEntities();
-        loadTransportedEntities();
-
-        // Now we can update our transport capacities using the unused space of each transporter
         if (transporters != null && !transporters.isEmpty()) {
+            // First let's clear the transport capacity for each transport type in transporters
+            for (Transporter transporter : transporters) {
+                if (hasTransportCapacity(transporter.getClass())) {
+                    transportCapacity.remove(transporter.getClass());
+                }
+            }
+            // Then we make sure the transport entity is empty, and then let's load
+            // our transport entity so we can use the Transporter's getUnused method
+            clearTransportedEntities();
+            loadTransportedEntities();
+
+            // Now we can update our transport capacities using the unused space of each transporter
+
             for (Transporter transporter : transporters) {
                 if (transportCapacity.containsKey(transporter.getClass())) {
                     transportCapacity.replace(transporter.getClass(), transportCapacity.get(transporter.getClass()) + transporter.getUnused());
-                }
-                else {
+                } else {
                     transportCapacity.put(transporter.getClass(), transporter.getUnused());
                 }
             }
-        }
-
         // Finally clear the transport entity again
         clearTransportedEntities();
+        }
     }
 
     /**
