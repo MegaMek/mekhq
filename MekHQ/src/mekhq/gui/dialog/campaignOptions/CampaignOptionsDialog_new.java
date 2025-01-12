@@ -4,73 +4,53 @@ import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.dialog.CreateCampaignPresetDialog;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 
 import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
-public class CampaignOptionsDialog_new extends JDialog {
-    final JFrame frame;
+public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
 
     private static MMLogger logger = MMLogger.create(CampaignOptionsDialog_new.class);
 
-    private boolean wasCanceled = false;
+    private boolean wasCanceled = true;
 
     public CampaignOptionsDialog_new(final JFrame frame, final Campaign campaign) {
-        this.frame = frame;
+        super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
         initialize();
-    }
-
-    private void initialize() {
-        logger.info("Initializing Campaign Options Dialog");
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int screenWidth = screenSize.width;
-        int screenHeight = screenSize.height;
-
-        logger.info("Screen Width: " + screenWidth);
-        logger.info("Screen Height: " + screenHeight);
-
-        int adjustedScreenWidth = (int) (screenWidth * 0.9);
-        int adjustedScreenHeight = (int) (screenHeight * 0.9);
-
-        setLayout(new BorderLayout());
-        add(campaignOptionsPane, BorderLayout.CENTER);
-        add(createButtonPanel(), BorderLayout.PAGE_END);
-
-        pack();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(frame);
-        setModal(true);
-
-        // This accounts for unusual user setups
-        if (getWidth() > screenWidth) {
-            setSize(adjustedScreenWidth, getHeight());
-        } else if (getHeight() > screenHeight) {
-            setSize(getWidth(), adjustedScreenHeight);
-        } else if (getWidth() > screenWidth && getHeight() > screenHeight) {
-            setSize(adjustedScreenWidth, adjustedScreenHeight);
-        }
-
-        setVisible(true);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     public boolean wasCanceled() {
         return wasCanceled;
     }
 
+    @Override
+    protected Container createCenterPane() {
+        return campaignOptionsPane;
+    }
+
+    @Override
     protected JPanel createButtonPanel() {
         final JPanel pnlButtons = new JPanel(new GridLayout(1, 0));
 
         // Apply Settings
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
         btnApplySettings.addActionListener(evt -> {
+            wasCanceled = false;
             campaignOptionsPane.applyCampaignOptionsToCampaign();
             dispose();
         });
@@ -79,6 +59,7 @@ public class CampaignOptionsDialog_new extends JDialog {
         // Save Preset
         JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
         btnSavePreset.addActionListener(evt -> {
+            wasCanceled = false;
             btnSaveActionPerformed();
             dispose();
         });
@@ -86,17 +67,12 @@ public class CampaignOptionsDialog_new extends JDialog {
 
         // Load Preset
         JButton btnLoadPreset = new CampaignOptionsButton("LoadPreset");
-        btnLoadPreset.addActionListener(evt -> {
-            btnLoadActionPerformed();
-        });
+        btnLoadPreset.addActionListener(evt -> btnLoadActionPerformed());
         pnlButtons.add(btnLoadPreset);
 
         // Cancel
         JButton btnCancel = new CampaignOptionsButton("Cancel");
-        btnCancel.addActionListener(evt -> {
-            wasCanceled = true;
-            dispose();
-        });
+        btnCancel.addActionListener(evt -> dispose());
         pnlButtons.add(btnCancel);
 
         return pnlButtons;
