@@ -1487,7 +1487,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private void unassignShipTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
         if (units.stream().allMatch(Unit::hasTransportShipAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("AssignForceToTransport", "TOEMouseAdapter.unassign.SHIP_TRANSPORT.text"));
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassign.SHIP_TRANSPORT.text"));
             menuItem.addActionListener(evt -> {
                 unassignTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0]));});
             menuItem.setEnabled(true);
@@ -1497,7 +1497,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private void unassignTacticalTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
         if (units.stream().allMatch(Unit::hasTacticalTransportAssignment) && !StaticChecks.areAnyUnitsDeployed(units)) {
-            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("AssignForceToTransport", "TOEMouseAdapter.unassign.TACTICAL_TRANSPORT.text"));
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassign.TACTICAL_TRANSPORT.text"));
             menuItem.addActionListener(evt -> {
                 unassignTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
             });

@@ -60,7 +60,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         }
 
         //Assign Unit to {campaignTransportTypeName}
-        setText(MHQInternationalization.getTextAt("AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
+        setText(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
         }
@@ -98,7 +98,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
                 }
 
                 // {name of the bay}
-                transporterTypeMenu.setText(MHQInternationalization.getTextAt("AssignForceToTransport",
+                transporterTypeMenu.setText(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport",
                     "AssignForceToTransportMenu." + transporterType.getSimpleName() + ".text"));
 
                 transporterTypeMenus.add(transporterTypeMenu);
@@ -114,7 +114,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
 
             // {Transport Name} | Space Remaining: {Current Transport Capacity}
-            transportMenu.setText(MHQInternationalization.getFormattedTextAt("AssignForceToTransport",
+            transportMenu.setText(MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport",
                 "AssignForceToTransportMenu.transportSpaceRemaining.text",
                 transport.getName(), transport.getCurrentTransportCapacity(campaignTransportType, transporterType)));
 

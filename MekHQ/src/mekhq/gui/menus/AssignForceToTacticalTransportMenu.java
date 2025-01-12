@@ -70,7 +70,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
                 JOptionPane.showMessageDialog(null,MHQInternationalization.getFormattedTextAt(
-                    "AssignForceToTransport", "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
+                    "mekhq.resources.AssignForceToTransport", "AssignForceToTransportMenu.warningCouldNotLoadUnit.text",
                     unit.getName(), transport.getName() ), "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }

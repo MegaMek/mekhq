@@ -42,13 +42,27 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     }
 
     /**
-     * Recalculates transport capacity
+     * Recalculates transport capacity - make sure you pass in all the transporters
+     * of a given type (class), or just all the transporters an entity has.
      * @param transporters What transporters are we recalculating?
+     * @see Entity#getTransports()
      */
     @Override
     public void recalculateTransportCapacity(@Nullable Vector<Transporter> transporters) {
+
+        // First let's clear the transport capacity for each transport type in transporters
+        for (Transporter transporter : transporters) {
+            if (hasTransportCapacity(transporter.getClass())) {
+                transportCapacity.remove(transporter.getClass());
+            }
+        }
+
+        // Then we make sure the transport entity is empty, and then let's load
+        // our transport entity so we can use the Transporter's getUnused method
         clearTransportedEntities();
         loadTransportedEntities();
+
+        // Now we can update our transport capacities using the unused space of each transporter
         if (transporters != null && !transporters.isEmpty()) {
             for (Transporter transporter : transporters) {
                 if (transportCapacity.containsKey(transporter.getClass())) {
@@ -59,6 +73,9 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
                 }
             }
         }
+
+        // Finally clear the transport entity again
+        clearTransportedEntities();
     }
 
     /**

@@ -487,8 +487,8 @@ public class AtBGameThread extends GameThread {
 
                         if (transport.hasTacticalTransportedUnits()) {
                             loadTactical = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                               MHQInternationalization.getFormattedTextAt("AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.text", transport.getName()),
-                               MHQInternationalization.getFormattedTextAt("AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.title"), JOptionPane.YES_NO_OPTION));
+                               MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.text", transport.getName()),
+                               MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.title"), JOptionPane.YES_NO_OPTION));
                         }
 
                         // Now, send the load commands
