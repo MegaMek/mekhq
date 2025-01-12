@@ -314,7 +314,7 @@ public class RelationshipsTab {
 
         lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange");
         spnRandomMarriageAgeRange = new CampaignOptionsSpinner("RandomMarriageAgeRange",
-            10, 0, 100, 1.0);
+            10, 0, 100, 1);
 
         lblRandomMarriageOppositeSexDiceSize = new CampaignOptionsLabel("RandomMarriageOppositeSexDiceSize");
         spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageOppositeSexDiceSize",
