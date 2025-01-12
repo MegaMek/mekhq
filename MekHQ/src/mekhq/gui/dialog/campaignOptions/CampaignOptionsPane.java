@@ -359,7 +359,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         repairAndMaintenanceTab.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Operations
-        financesTab.loadValuesFromCampaignOptions();
+        financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsTab.loadValuesFromCampaignOptions();
         rulesetsTab.loadValuesFromCampaignOptions();
     }
