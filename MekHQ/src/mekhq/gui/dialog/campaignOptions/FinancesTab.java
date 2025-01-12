@@ -14,20 +14,6 @@ import java.awt.*;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
-/**
- * This class represents the FinancesTab campaign options, configuring finance-related settings.
- * It provides panels including:
- * <ul>
- *   <li>{@code GeneralOptions}</li>
- *   <li>{@code Payments}</li>
- *   <li>{@code Sales}</li>
- *   <li>{@code OtherSystems}</li>
- *   <li>{@code PriceMultipliers}</li>
- * </ul>
- * Each panel has form components for user input.
- * <p>
- * Requires a valid {@link Campaign} and {@link JFrame} instances.
- */
 public class FinancesTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
@@ -98,13 +84,6 @@ public class FinancesTab {
     private JSpinner spnCancelledOrderRefundMultiplier;
     //end Price Multipliers
 
-    /**
-     * Constructs a new 'FinancesTab' instance, initializes its internal state, and sets up its user interface.
-     *
-     * @param campaign The {@link Campaign} instance associated with this tab.
-     * @param frame The parent {@link JFrame} in which this tab is displayed.
-     * @param name The name to be given to this tab.
-     */
     FinancesTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
@@ -112,21 +91,11 @@ public class FinancesTab {
         initialize();
     }
 
-    /**
-     * Initializes the user interface elements of the component.
-     * It calls other initialization methods such as {@link #initializeGeneralOptionsTab()} and {@link #initializePriceMultipliersTab()}
-     * for setting up specific parts of the interface.
-     */
     private void initialize() {
         initializeGeneralOptionsTab();
         initializePriceMultipliersTab();
     }
 
-    /**
-     * Initializes all components for the 'GeneralOptionsTab'.
-     * This includes setting up panels for General Options, Payments, Sales and Other Systems.
-     * Each panel contains various checkboxes and user interface elements for user interaction.
-     */
     private void initializeGeneralOptionsTab() {
         // General Options
         pnlGeneralOptions = new JPanel();

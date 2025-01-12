@@ -154,12 +154,6 @@ public class BiographyTab {
     private RankSystemsPane rankSystemsPane;
     //end Rank Tab
 
-    /**
-     * Initializes a new {@link BiographyTab} with the specified campaign, frame, and name.
-     *
-     * @param name     the name of the {@link BiographyTab}
-     * @param campaign the campaign associated with the {@link BiographyTab}
-     */
     BiographyTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();

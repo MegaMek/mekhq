@@ -1,7 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -20,8 +19,6 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createSu
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
-    private static final MMLogger logger = MMLogger.create(CampaignOptionsPane .class);
 
     private static final int SCROLL_SPEED = 16;
     private static final int HEADER_FONT_SIZE = 5;
