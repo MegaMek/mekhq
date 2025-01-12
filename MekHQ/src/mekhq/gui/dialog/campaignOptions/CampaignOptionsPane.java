@@ -351,11 +351,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions,
             campaignPreset.getRandomSkillPreferences());
         skillsTab.loadValuesFromCampaignOptions(campaignPreset.getSkills());
+        // The ability tab is a special case, so handled differently to other tabs
         rebuildAbilityContentTabsContents(campaignPreset);
 
-
         // Logistics
-        equipmentAndSuppliesTab.loadValuesFromCampaignOptions();
+        equipmentAndSuppliesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         repairAndMaintenanceTab.loadValuesFromCampaignOptions();
 
         // Operations

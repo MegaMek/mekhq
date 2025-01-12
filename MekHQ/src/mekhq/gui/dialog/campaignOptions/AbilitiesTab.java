@@ -304,4 +304,11 @@ public class AbilitiesTab {
         }
         return enabledAbilities;
     }
+
+//    private void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        // We don't use `loadValuesFromCampaignOptions` in this class, as the ability tab is
+        // reloaded differently to other tabs.
+        // This commented method is left in place so future developers know this was a deliberate
+        // design choice and not an oversight.
+//    }
 }

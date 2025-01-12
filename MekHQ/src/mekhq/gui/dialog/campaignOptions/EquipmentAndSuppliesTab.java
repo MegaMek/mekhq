@@ -4,6 +4,7 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -770,52 +771,6 @@ public class EquipmentAndSuppliesTab {
         return maximumTechLevelModel;
     }
 
-    void loadValuesFromCampaignOptions() {
-        // Acquisitions
-        choiceAcquireSkill.setSelectedItem(campaignOptions.getAcquisitionSkill());
-        chkSupportStaffOnly.setSelected(campaignOptions.isAcquisitionSupportStaffOnly());
-        spnAcquireClanPenalty.setValue(campaignOptions.getClanAcquisitionPenalty());
-        spnAcquireIsPenalty.setValue(campaignOptions.getIsAcquisitionPenalty());
-        spnAcquireWaitingPeriod.setValue(campaignOptions.getWaitingPeriod());
-        spnMaxAcquisitions.setValue(campaignOptions.getMaxAcquisitions());
-
-        // Delivery
-        spnNDiceTransitTime.setValue(campaignOptions.getNDiceTransitTime());
-        spnConstantTransitTime.setValue(campaignOptions.getConstantTransitTime());
-        choiceTransitTimeUnits.setSelectedIndex(campaignOptions.getUnitTransitTime());
-
-        spnAcquireMosBonus.setValue(campaignOptions.getAcquireMosBonus());
-        choiceAcquireMosUnits.setSelectedIndex(campaignOptions.getAcquireMosUnit());
-
-        spnAcquireMinimum.setValue(campaignOptions.getAcquireMinimumTime());
-        choiceAcquireMinimumUnit.setSelectedIndex(campaignOptions.getAcquireMinimumTimeUnit());
-
-        // Planetary Acquisitions
-        usePlanetaryAcquisitions.setSelected(campaignOptions.isUsePlanetaryAcquisition());
-        spnMaxJumpPlanetaryAcquisitions.setValue(campaignOptions.getMaxJumpsPlanetaryAcquisition());
-        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(campaignOptions.getPlanetAcquisitionFactionLimit());
-        disallowPlanetaryAcquisitionClanCrossover.setSelected(campaignOptions.isPlanetAcquisitionNoClanCrossover());
-        disallowClanPartsFromIS.setSelected(campaignOptions.isNoClanPartsFromIS());
-        spnPenaltyClanPartsFromIS.setValue(campaignOptions.getPenaltyClanPartsFromIS());
-        usePlanetaryAcquisitionsVerbose.setSelected(campaignOptions.isPlanetAcquisitionVerbose());
-        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
-            spnPlanetAcquireTechBonus[i].setValue(campaignOptions.getPlanetTechAcquisitionBonus(i));
-            spnPlanetAcquireIndustryBonus[i].setValue(campaignOptions.getPlanetIndustryAcquisitionBonus(i));
-            spnPlanetAcquireOutputBonus[i].setValue(campaignOptions.getPlanetOutputAcquisitionBonus(i));
-        }
-
-        // Tech Limits
-        limitByYearBox.setSelected(campaignOptions.isLimitByYear());
-        disallowExtinctStuffBox.setSelected(campaignOptions.isDisallowExtinctStuff());
-        allowClanPurchasesBox.setSelected(campaignOptions.isAllowClanPurchases());
-        allowISPurchasesBox.setSelected(campaignOptions.isAllowISPurchases());
-        allowCanonOnlyBox.setSelected(campaignOptions.isAllowCanonOnly());
-        allowCanonRefitOnlyBox.setSelected(campaignOptions.isAllowCanonRefitOnly());
-        choiceTechLevel.setSelectedIndex(campaignOptions.getTechLevel());
-        variableTechLevelBox.setSelected(campaignOptions.isVariableTechLevel());
-        useAmmoByTypeBox.setSelected(campaignOptions.isUseAmmoByType());
-    }
-
     void applyCampaignOptionsToCampaign() {
         // Acquisitions
         campaignOptions.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
@@ -860,5 +815,60 @@ public class EquipmentAndSuppliesTab {
         campaignOptions.setTechLevel(choiceTechLevel.getSelectedIndex());
         campaignOptions.setVariableTechLevel(variableTechLevelBox.isSelected());
         campaignOptions.setUseAmmoByType(useAmmoByTypeBox.isSelected());
+    }
+
+    void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null);
+    }
+
+    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
+        // Acquisitions
+        choiceAcquireSkill.setSelectedItem(options.getAcquisitionSkill());
+        chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
+        spnAcquireClanPenalty.setValue(options.getClanAcquisitionPenalty());
+        spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
+        spnAcquireWaitingPeriod.setValue(options.getWaitingPeriod());
+        spnMaxAcquisitions.setValue(options.getMaxAcquisitions());
+
+        // Delivery
+        spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
+        spnConstantTransitTime.setValue(options.getConstantTransitTime());
+        choiceTransitTimeUnits.setSelectedIndex(options.getUnitTransitTime());
+
+        spnAcquireMosBonus.setValue(options.getAcquireMosBonus());
+        choiceAcquireMosUnits.setSelectedIndex(options.getAcquireMosUnit());
+
+        spnAcquireMinimum.setValue(options.getAcquireMinimumTime());
+        choiceAcquireMinimumUnit.setSelectedIndex(options.getAcquireMinimumTimeUnit());
+
+        // Planetary Acquisitions
+        usePlanetaryAcquisitions.setSelected(options.isUsePlanetaryAcquisition());
+        spnMaxJumpPlanetaryAcquisitions.setValue(options.getMaxJumpsPlanetaryAcquisition());
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedItem(options.getPlanetAcquisitionFactionLimit());
+        disallowPlanetaryAcquisitionClanCrossover.setSelected(options.isPlanetAcquisitionNoClanCrossover());
+        disallowClanPartsFromIS.setSelected(options.isNoClanPartsFromIS());
+        spnPenaltyClanPartsFromIS.setValue(options.getPenaltyClanPartsFromIS());
+        usePlanetaryAcquisitionsVerbose.setSelected(options.isPlanetAcquisitionVerbose());
+        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
+            spnPlanetAcquireTechBonus[i].setValue(options.getPlanetTechAcquisitionBonus(i));
+            spnPlanetAcquireIndustryBonus[i].setValue(options.getPlanetIndustryAcquisitionBonus(i));
+            spnPlanetAcquireOutputBonus[i].setValue(options.getPlanetOutputAcquisitionBonus(i));
+        }
+
+        // Tech Limits
+        limitByYearBox.setSelected(options.isLimitByYear());
+        disallowExtinctStuffBox.setSelected(options.isDisallowExtinctStuff());
+        allowClanPurchasesBox.setSelected(options.isAllowClanPurchases());
+        allowISPurchasesBox.setSelected(options.isAllowISPurchases());
+        allowCanonOnlyBox.setSelected(options.isAllowCanonOnly());
+        allowCanonRefitOnlyBox.setSelected(options.isAllowCanonRefitOnly());
+        choiceTechLevel.setSelectedIndex(options.getTechLevel());
+        variableTechLevelBox.setSelected(options.isVariableTechLevel());
+        useAmmoByTypeBox.setSelected(options.isUseAmmoByType());
     }
 }
