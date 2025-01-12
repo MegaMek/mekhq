@@ -83,6 +83,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private StoryArcStub storyArcStub;
     private boolean isInAppNewCampaign;
 
+    private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
+
     // endregion Variable Declarations
 
     // region Constructors
@@ -317,42 +319,32 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                         + presetSelectionDialog.getReturnState());
                 }
 
-                // Date
-                final LocalDate date = ((preset == null) || (preset.getDate() == null))
-                        ? campaign.getLocalDate()
-                        : preset.getDate();
-                final DateChooser dc = new DateChooser(dialog, date);
-                dc.setLocationRelativeTo(getFrame());
-                // user can either choose a date or cancel by closing
-                if (dc.showDateChooser() != DateChooser.OK_OPTION) {
-                    return null;
-                }
-
+                // MegaMek Options
                 if ((preset != null) && (preset.getGameOptions() != null)) {
                     campaign.setGameOptions(preset.getGameOptions());
                 }
-
-                // This must be after the date chooser to enable correct functionality.
-                setVisible(false);
 
                 // Campaign Options
                 if (isSelect && preset != null) {
                     preset.applyContinuousToCampaign(campaign);
 
                     // This needs to be after we've applied the preset
-                    campaign.setLocalDate(dc.getDate());
+                    campaign.setLocalDate(DEFAULT_START_DATE);
                     campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                     campaign.setStartingSystem(preset.getPlanet());
                 } else {
                     // This needs to be before we trigger the customize preset dialog
-                    campaign.setLocalDate(dc.getDate());
+                    campaign.setLocalDate(DEFAULT_START_DATE);
                     campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
+                    setVisible(false); // cede visibility to `optionsDialog`
                     CampaignOptionsDialog_new optionsDialog =
                         new CampaignOptionsDialog_new(getFrame(), campaign, preset);
                     if (optionsDialog.wasCanceled()) {
                         return null;
+                    } else {
+                        setVisible(true); // restore loader visibility
                     }
                 }
 
