@@ -86,6 +86,9 @@ public class OrderFactory {
     private void createForceWithdrawOrder(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.ATTACK_TARGET_NOT_WITHDRAWING)
             .withCondition(Condition.alwaysTrue());
+        if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None) {
+            orderBuilder.withCondition(context -> context.getCurrentRound() <= objective.getTimeLimit());
+        }
         addOrder(orderBuilder.build());
     }
 
@@ -106,6 +109,9 @@ public class OrderFactory {
     private void createPreventReachMapEdgeOrder(int ownerId, ScenarioObjective objective) {
         var orderBuilder = Order.OrderBuilder.anOrder(ownerId, OrderType.ATTACK_TARGET_WITHDRAWING)
             .withCondition(Condition.alwaysTrue());
+        if (objective.getTimeLimitType() != ScenarioObjective.TimeLimitType.None) {
+            orderBuilder.withCondition(context -> context.getCurrentRound() <= objective.getTimeLimit());
+        }
         addOrder(orderBuilder.build());
     }
 
