@@ -72,7 +72,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog_new;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
@@ -1465,7 +1464,7 @@ public class CampaignGUI extends JPanel {
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
 
-        new CampaignOptionsDialog_new(getFrame(), getCampaign());
+        new CampaignOptionsDialog(getFrame(), getCampaign(), true);
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 

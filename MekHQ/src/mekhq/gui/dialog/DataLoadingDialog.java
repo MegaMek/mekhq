@@ -52,7 +52,6 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog_new;
 import mekhq.gui.dialog.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
@@ -349,13 +348,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    CampaignOptionsDialog_new optionsDialog =
-                        new CampaignOptionsDialog_new(getFrame(), campaign);
+                    CampaignOptionsDialog optionsDialog =
+                        new CampaignOptionsDialog(getFrame(), campaign, true);
+                    optionsDialog.setVisible(true);
 //                    optionsDialog.setLocationRelativeTo(null);
 //                    optionsDialog.applyPreset(preset);
-                    if (optionsDialog.wasCanceled()) {
-                        return null;
-                    }
+//                    if (optionsDialog.wasCanceled()) {
+//                        return null;
+//                    }
                 }
 
                 // initialize reputation
