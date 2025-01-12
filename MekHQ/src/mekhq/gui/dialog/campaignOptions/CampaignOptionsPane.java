@@ -42,6 +42,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private FinancesTab financesTab;
     private MarketsTab marketsTab;
     private RulesetsTab rulesetsTab;
+    private JTabbedPane abilityContentTabs;
+    private JTabbedPane advancementParentTab;
 
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign) {
         super(frame, resources, "campaignOptionsDialog");
@@ -65,6 +67,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         createTab("advancementParentTab", createAdvancementParentTab());
         createTab("logisticsAndMaintenanceParentTab", createEquipmentAndSuppliesParentTab());
         createTab("strategicOperationsParentTab", createStrategicOperationsParentTab());
+
+        abilityContentTabs = new JTabbedPane();
     }
 
     /**
@@ -177,7 +181,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JTabbedPane createAdvancementParentTab() {
         // Parent Tab
-        JTabbedPane advancementParentTab = new JTabbedPane();
+        advancementParentTab = new JTabbedPane();
 
         // Advancement
         advancementTab = new AdvancementTab(campaign);
@@ -198,7 +202,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // SPAs
         abilitiesTab = new AbilitiesTab();
 
-        JTabbedPane abilityContentTabs = createSubTabs(Map.of(
+        abilityContentTabs = createSubTabs(Map.of(
             "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITIES),
             "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITIES),
             "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITIES)));
@@ -350,8 +354,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions,
             campaignPreset.getRandomSkillPreferences());
         skillsTab.loadValuesFromCampaignOptions(campaignPreset.getSkills());
+        rebuildAbilityContentTabsContents(campaignPreset);
 
-//        abilitiesTab.loa();
 
         // Logistics
         equipmentAndSuppliesTab.loadValuesFromCampaignOptions();
@@ -361,5 +365,32 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions();
         marketsTab.loadValuesFromCampaignOptions();
         rulesetsTab.loadValuesFromCampaignOptions();
+    }
+
+    private void rebuildAbilityContentTabsContents(CampaignPreset campaignPreset) {
+        // Due to the complexity of the ability content tabs and how much can differ between
+        // presets and saves, we rebuild the entire batch of content tabs.
+        abilitiesTab.setAllAbilities(campaignPreset.getSpecialAbilities());
+        abilityContentTabs = createSubTabs(Map.of(
+                "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITIES),
+                "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITIES),
+                "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITIES)
+        ));
+
+        for (int i = 0; i < advancementParentTab.getTabCount(); i++) {
+            if (advancementParentTab.getTitleAt(i).contains(resources.getString("abilityContentTabs.title"))) {
+                advancementParentTab.remove(i);
+                break;
+            }
+        }
+
+        advancementParentTab.addTab(
+                String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+                        resources.getString("abilityContentTabs.title")),
+                abilityContentTabs
+        );
+
+        advancementParentTab.revalidate();
+        advancementParentTab.repaint();
     }
 }
