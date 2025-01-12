@@ -364,7 +364,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 
-    private void rebuildAbilityContentTabsContents(CampaignPreset campaignPreset) {
+    void rebuildAbilityContentTabsContents(CampaignPreset campaignPreset) {
         // Due to the complexity of the ability content tabs and how much can differ between
         // presets and saves, we rebuild the entire batch of content tabs.
         abilitiesTab.setAllAbilities(campaignPreset.getSpecialAbilities());

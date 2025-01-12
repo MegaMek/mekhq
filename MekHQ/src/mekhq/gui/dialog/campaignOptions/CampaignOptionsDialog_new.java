@@ -1,5 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
@@ -22,11 +23,16 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
 
     private boolean wasCanceled = true;
 
-    public CampaignOptionsDialog_new(final JFrame frame, final Campaign campaign) {
+    public CampaignOptionsDialog_new(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset) {
         super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
         initialize();
+
+        if (preset != null) {
+            applyPreset(preset);
+        }
+
         setLocationRelativeTo(frame);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
@@ -101,5 +107,9 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
         if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
             campaignOptionsPane.applyPreset(presetSelectionDialog.getSelectedPreset());
         }
+    }
+
+    public void applyPreset(CampaignPreset preset) {
+        campaignOptionsPane.applyPreset(preset);
     }
 }

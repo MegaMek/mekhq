@@ -350,9 +350,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
                     CampaignOptionsDialog_new optionsDialog =
-                        new CampaignOptionsDialog_new(getFrame(), campaign);
-//                    optionsDialog.setLocationRelativeTo(null);
-//                    optionsDialog.applyPreset(preset);
+                        new CampaignOptionsDialog_new(getFrame(), campaign, preset);
                     if (optionsDialog.wasCanceled()) {
                         return null;
                     }
