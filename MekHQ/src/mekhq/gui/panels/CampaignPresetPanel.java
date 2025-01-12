@@ -23,7 +23,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
-import mekhq.gui.dialog.CreateCampaignPresetDialog;
+import mekhq.gui.dialog.campaignOptions.CreateCampaignPreset;
 
 import javax.swing.*;
 import java.awt.*;
@@ -109,7 +109,7 @@ public class CampaignPresetPanel extends AbstractMHQPanel {
         if (editPreset) { // TODO : Add a way to access this
             final JButton btnEditPreset = new MMButton("btnEditPreset", resources.getString("Edit.text"),
                     resources.getString("btnEditPreset.toolTipText"), evt -> {
-                final CreateCampaignPresetDialog dialog = new CreateCampaignPresetDialog(
+                final CreateCampaignPreset dialog = new CreateCampaignPreset(
                         getFrame(), getCampaign(), getPreset());
                 if (dialog.showDialog().isConfirmed()) {
                     updateFromPreset(getPreset());

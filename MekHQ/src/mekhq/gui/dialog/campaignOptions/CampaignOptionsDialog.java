@@ -5,7 +5,6 @@ import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.dialog.CreateCampaignPresetDialog;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
 
 import javax.swing.*;
@@ -14,7 +13,7 @@ import java.util.ResourceBundle;
 
 import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
-public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
+public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
@@ -23,7 +22,7 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
 
     private boolean wasCanceled = true;
 
-    public CampaignOptionsDialog_new(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset) {
+    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset) {
         super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
@@ -79,8 +78,8 @@ public class CampaignOptionsDialog_new extends AbstractMHQButtonDialog {
     }
 
     private void btnSaveActionPerformed() {
-        final CreateCampaignPresetDialog createCampaignPresetDialog
-            = new CreateCampaignPresetDialog(null, campaign, null);
+        final CreateCampaignPreset createCampaignPresetDialog
+            = new CreateCampaignPreset(null, campaign, null);
         if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
             return;
         }

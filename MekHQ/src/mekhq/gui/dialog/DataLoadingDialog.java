@@ -52,7 +52,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog_new;
+import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
@@ -339,8 +339,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
                     setVisible(false); // cede visibility to `optionsDialog`
-                    CampaignOptionsDialog_new optionsDialog =
-                        new CampaignOptionsDialog_new(getFrame(), campaign, preset);
+                    CampaignOptionsDialog optionsDialog =
+                        new CampaignOptionsDialog(getFrame(), campaign, preset);
                     if (optionsDialog.wasCanceled()) {
                         return null;
                     } else {

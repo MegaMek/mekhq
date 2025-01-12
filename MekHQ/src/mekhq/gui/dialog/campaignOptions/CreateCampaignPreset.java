@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -44,6 +44,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
+import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
@@ -60,7 +62,7 @@ import java.util.stream.Collectors;
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialog {
+public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
     private CampaignPreset preset;
@@ -97,8 +99,8 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     //endregion Variable Declarations
 
     //region Constructors
-    public CreateCampaignPresetDialog(final JFrame frame, final Campaign campaign,
-                                      final @Nullable CampaignPreset preset) {
+    public CreateCampaignPreset(final JFrame frame, final Campaign campaign,
+                                final @Nullable CampaignPreset preset) {
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
         setPreset(preset);
