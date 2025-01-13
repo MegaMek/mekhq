@@ -608,4 +608,50 @@ public class MarketsTab {
         chkBLCSaleValue.setSelected(options.isBLCSaleValue());
         chkOverageRepaymentInFinalPayment.setSelected(options.isOverageRepaymentInFinalPayment());
     }
+
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
+        // Personnel Market
+        comboPersonnelMarketType.setSelectedItem(options.getPersonnelMarketName());
+        chkPersonnelMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        chkUsePersonnelHireHiringHallOnly.setSelected(options.isUsePersonnelHireHiringHallOnly());
+        spnPersonnelMarketDylansWeight.setValue(options.getPersonnelMarketDylansWeight());
+        for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
+            entry.getValue().setValue(options.getPersonnelMarketRandomRemovalTargets().get(entry.getKey()));
+        }
+
+        // Unit Market
+        comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
+        chkUnitMarketRegionalMekVariations.setSelected(options.isRegionalMekVariations());
+        spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
+        spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
+        chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
+        chkUnitMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+
+        // Contract Market
+        comboContractMarketMethod.setSelectedItem(options.getContractMarketMethod());
+        spnContractSearchRadius.setValue(options.getContractSearchRadius());
+        chkVariableContractLength.setSelected(options.isVariableContractLength());
+        chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
+        spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
+        if (options.isEquipmentContractBase()) {
+            btnContractEquipment.setSelected(true);
+        } else {
+            btnContractPersonnel.setSelected(true);
+        }
+        spnEquipPercent.setValue(options.getEquipmentContractPercent());
+        chkEquipContractSaleValue.setSelected(options.isEquipmentContractSaleValue());
+        spnDropShipPercent.setValue(options.getDropShipContractPercent());
+        spnJumpShipPercent.setValue(options.getJumpShipContractPercent());
+        spnWarShipPercent.setValue(options.getWarShipContractPercent());
+        useInfantryDoseNotCountBox.setSelected(options.isInfantryDontCount());
+        chkMercSizeLimited.setSelected(options.isMercSizeLimited());
+        chkBLCSaleValue.setSelected(options.isBLCSaleValue());
+        chkOverageRepaymentInFinalPayment.setSelected(options.isOverageRepaymentInFinalPayment());
+    }
 }

@@ -735,52 +735,57 @@ public class RulesetsTab {
         }
     }
 
-    void applyCampaignOptionsToCampaign() {
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // Universal
-        campaignOptions.setSkillLevel(comboSkillLevel.getSelectedItem());
-        campaignOptions.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
-        campaignOptions.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
-        campaignOptions.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
-        campaignOptions.setUseDropShips(chkUseDropShips.isSelected());
-        campaignOptions.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
-        campaignOptions.setClanVehicles(chkClanVehicles.isSelected());
-        campaignOptions.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
-        campaignOptions.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
-        campaignOptions.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
-        campaignOptions.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
-        campaignOptions.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
-        campaignOptions.setScenarioModMax((int) spnScenarioModMax.getValue());
-        campaignOptions.setScenarioModChance((int) spnScenarioModChance.getValue());
-        campaignOptions.setScenarioModBV((int) spnScenarioModBV.getValue());
-        campaignOptions.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
-        campaignOptions.setUseLightConditions(chkUseLightConditions.isSelected());
-        campaignOptions.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-        campaignOptions.setFixedMapChance((int) spnFixedMapChance.getValue());
-        campaignOptions.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
-        campaignOptions.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
-        campaignOptions.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-        campaignOptions.setUseStrategy(chkUseStrategy.isSelected());
-        campaignOptions.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
-        campaignOptions.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
-        campaignOptions.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
+        options.setSkillLevel(comboSkillLevel.getSelectedItem());
+        options.setOpForLanceTypeMeks((int) spnOpForLanceTypeMeks.getValue());
+        options.setOpForLanceTypeMixed((int) spnOpForLanceTypeMixed.getValue());
+        options.setOpForLanceTypeVehicles((int) spnOpForLanceTypeVehicles.getValue());
+        options.setUseDropShips(chkUseDropShips.isSelected());
+        options.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
+        options.setClanVehicles(chkClanVehicles.isSelected());
+        options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
+        options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
+        options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
+        options.setSpaUpgradeIntensity((int) spnSPAUpgradeIntensity.getValue());
+        options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
+        options.setScenarioModMax((int) spnScenarioModMax.getValue());
+        options.setScenarioModChance((int) spnScenarioModChance.getValue());
+        options.setScenarioModBV((int) spnScenarioModBV.getValue());
+        options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
+        options.setUseLightConditions(chkUseLightConditions.isSelected());
+        options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+        options.setFixedMapChance((int) spnFixedMapChance.getValue());
+        options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+        options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
+        options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
+        options.setUseStrategy(chkUseStrategy.isSelected());
+        options.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
+        options.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
+        options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
 
         // StratCon
-        campaignOptions.setUseStratCon(chkUseStratCon.isSelected());
-        campaignOptions.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
-        campaignOptions.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
+        options.setUseStratCon(chkUseStratCon.isSelected());
+        options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
+        options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
 
         // Legacy
-        campaignOptions.setUseAtB(chkUseAtB.isSelected());
-        campaignOptions.setUseVehicles(chkUseVehicles.isSelected());
-        campaignOptions.setDoubleVehicles(chkDoubleVehicles.isSelected());
-        campaignOptions.setUseAero(chkOpForUsesAero.isSelected());
-        campaignOptions.setOpForAeroChance((int) spnOpForAeroChance.getValue());
-        campaignOptions.setAllowOpForLocalUnits(chkOpForUsesLocalForces.isSelected());
-        campaignOptions.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
-        campaignOptions.setGenerateChases(chkGenerateChases.isSelected());
+        options.setUseAtB(chkUseAtB.isSelected());
+        options.setUseVehicles(chkUseVehicles.isSelected());
+        options.setDoubleVehicles(chkDoubleVehicles.isSelected());
+        options.setUseAero(chkOpForUsesAero.isSelected());
+        options.setOpForAeroChance((int) spnOpForAeroChance.getValue());
+        options.setAllowOpForLocalUnits(chkOpForUsesLocalForces.isSelected());
+        options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
+        options.setGenerateChases(chkGenerateChases.isSelected());
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            campaignOptions.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
+            options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
         }
     }
 

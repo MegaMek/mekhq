@@ -813,48 +813,61 @@ public class AdvancementTab {
         spnSecondBonus.setValue(skillPreferences.getSecondSkillBonus());
     }
 
-    void applyCampaignOptionsToCampaign() {
-        //start XP Awards Tab
-        campaignOptions.setXpCostMultiplier((Double) spnXpCostMultiplier.getValue());
-        campaignOptions.setTaskXP((Integer) spnTaskXP.getValue());
-        campaignOptions.setNTasksXP((Integer) spnNTasksXP.getValue());
-        campaignOptions.setSuccessXP((Integer) spnSuccessXP.getValue());
-        campaignOptions.setMistakeXP((Integer) spnMistakeXP.getValue());
-        campaignOptions.setScenarioXP((Integer) spnScenarioXP.getValue());
-        campaignOptions.setKillXPAward((Integer) spnKillXP.getValue());
-        campaignOptions.setKillsForXP((Integer) spnKills.getValue());
-        campaignOptions.setIdleXP((Integer) spnIdleXP.getValue());
-        campaignOptions.setMonthsIdleXP((Integer) spnMonthsIdleXP.getValue());
-        campaignOptions.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
-        campaignOptions.setMissionXpFail((Integer) spnMissionXpFail.getValue());
-        campaignOptions.setMissionXpSuccess((Integer) spnMissionXpSuccess.getValue());
-        campaignOptions.setMissionXpOutstandingSuccess((Integer) spnMissionXpOutstandingSuccess.getValue());
-        campaignOptions.setContractNegotiationXP((Integer) spnContractNegotiationXP.getValue());
-        campaignOptions.setAdminXP((Integer) spnAdminWeeklyXP.getValue());
-        campaignOptions.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
-
-        //start Skill Randomization Tab
-        chkExtraRandomness.setSelected(randomSkillPreferences.randomizeSkill());
-        for (int i = 0; i < phenotypeSpinners.length; i++) {
-            campaignOptions.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+                                        @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
         }
 
-        randomSkillPreferences.setAntiMekProb((Integer) spnAntiMekSkill.getValue());
-        randomSkillPreferences.setArtilleryProb((Integer) spnArtyProb.getValue());
-        randomSkillPreferences.setArtilleryBonus((Integer) spnArtyBonus.getValue());
-        randomSkillPreferences.setSecondSkillProb((Integer) spnSecondProb.getValue());
-        randomSkillPreferences.setSecondSkillBonus((Integer) spnSecondBonus.getValue());
-        randomSkillPreferences.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getValue());
-        randomSkillPreferences.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getValue());
-        randomSkillPreferences.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getValue());
-        randomSkillPreferences.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getValue());
-        randomSkillPreferences.setCombatSmallArmsBonus((Integer) spnCombatSA.getValue());
-        randomSkillPreferences.setSupportSmallArmsBonus((Integer) spnSupportSA.getValue());
-        randomSkillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (Integer) spnAbilityGreen.getValue());
-        randomSkillPreferences.setSpecialAbilityBonus(SkillType.EXP_REGULAR, (Integer) spnAbilityReg.getValue());
-        randomSkillPreferences.setSpecialAbilityBonus(SkillType.EXP_VETERAN, (Integer) spnAbilityVet.getValue());
-        randomSkillPreferences.setSpecialAbilityBonus(SkillType.EXP_ELITE, (Integer) spnAbilityElite.getValue());
+        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences;
+        if (skillPreferences == null) {
+            skillPreferences = this.randomSkillPreferences;
+        }
 
-        campaign.setRandomSkillPreferences(randomSkillPreferences);
+        //start XP Awards Tab
+        options.setXpCostMultiplier((Double) spnXpCostMultiplier.getValue());
+        options.setTaskXP((Integer) spnTaskXP.getValue());
+        options.setNTasksXP((Integer) spnNTasksXP.getValue());
+        options.setSuccessXP((Integer) spnSuccessXP.getValue());
+        options.setMistakeXP((Integer) spnMistakeXP.getValue());
+        options.setScenarioXP((Integer) spnScenarioXP.getValue());
+        options.setKillXPAward((Integer) spnKillXP.getValue());
+        options.setKillsForXP((Integer) spnKills.getValue());
+        options.setIdleXP((Integer) spnIdleXP.getValue());
+        options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getValue());
+        options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
+        options.setMissionXpFail((Integer) spnMissionXpFail.getValue());
+        options.setMissionXpSuccess((Integer) spnMissionXpSuccess.getValue());
+        options.setMissionXpOutstandingSuccess((Integer) spnMissionXpOutstandingSuccess.getValue());
+        options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getValue());
+        options.setAdminXP((Integer) spnAdminWeeklyXP.getValue());
+        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
+
+        //start Skill Randomization Tab
+        skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
+        for (int i = 0; i < phenotypeSpinners.length; i++) {
+            options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
+        }
+
+        skillPreferences.setAntiMekProb((Integer) spnAntiMekSkill.getValue());
+        skillPreferences.setArtilleryProb((Integer) spnArtyProb.getValue());
+        skillPreferences.setArtilleryBonus((Integer) spnArtyBonus.getValue());
+        skillPreferences.setSecondSkillProb((Integer) spnSecondProb.getValue());
+        skillPreferences.setSecondSkillBonus((Integer) spnSecondBonus.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getValue());
+        skillPreferences.setCombatSmallArmsBonus((Integer) spnCombatSA.getValue());
+        skillPreferences.setSupportSmallArmsBonus((Integer) spnSupportSA.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (Integer) spnAbilityGreen.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_REGULAR, (Integer) spnAbilityReg.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_VETERAN, (Integer) spnAbilityVet.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ELITE, (Integer) spnAbilityElite.getValue());
+
+        if (presetRandomSkillPreferences == null) {
+            campaign.setRandomSkillPreferences(randomSkillPreferences);
+        }
     }
 }

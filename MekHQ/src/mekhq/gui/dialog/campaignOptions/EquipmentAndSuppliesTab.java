@@ -771,50 +771,55 @@ public class EquipmentAndSuppliesTab {
         return maximumTechLevelModel;
     }
 
-    void applyCampaignOptionsToCampaign() {
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // Acquisitions
-        campaignOptions.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
-        campaignOptions.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
-        campaignOptions.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
-        campaignOptions.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
-        campaignOptions.setWaitingPeriod((int) spnAcquireWaitingPeriod.getValue());
-        campaignOptions.setMaxAcquisitions((int) spnMaxAcquisitions.getValue());
+        options.setAcquisitionSkill(choiceAcquireSkill.getSelectedItem());
+        options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
+        options.setClanAcquisitionPenalty((int) spnAcquireClanPenalty.getValue());
+        options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
+        options.setWaitingPeriod((int) spnAcquireWaitingPeriod.getValue());
+        options.setMaxAcquisitions((int) spnMaxAcquisitions.getValue());
 
         // Delivery
-        campaignOptions.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
-        campaignOptions.setConstantTransitTime((int) spnConstantTransitTime.getValue());
-        campaignOptions.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
-        campaignOptions.setAcquireMosBonus((int) spnAcquireMosBonus.getValue());
-        campaignOptions.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
-        campaignOptions.setAcquireMinimumTime((int) spnAcquireMinimum.getValue());
-        campaignOptions.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
+        options.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
+        options.setConstantTransitTime((int) spnConstantTransitTime.getValue());
+        options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
+        options.setAcquireMosBonus((int) spnAcquireMosBonus.getValue());
+        options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
+        options.setAcquireMinimumTime((int) spnAcquireMinimum.getValue());
+        options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
 
         // Planetary Acquisitions
-        campaignOptions.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
-        campaignOptions.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
-        campaignOptions.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
-        campaignOptions.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        campaignOptions.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        campaignOptions.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
-        campaignOptions.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
+        options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
+        options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
+        options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
+        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
+        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
+        options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
+        options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
-            campaignOptions.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
-            campaignOptions.setPlanetIndustryAcquisitionBonus(
+            options.setPlanetTechAcquisitionBonus((int) spnPlanetAcquireTechBonus[i].getValue(), i);
+            options.setPlanetIndustryAcquisitionBonus(
                 (int) spnPlanetAcquireIndustryBonus[i].getValue(), i);
-            campaignOptions.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(),
+            options.setPlanetOutputAcquisitionBonus((int) spnPlanetAcquireOutputBonus[i].getValue(),
                 i);
         }
 
         // Tech Limits
-        campaignOptions.setLimitByYear(limitByYearBox.isSelected());
-        campaignOptions.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
-        campaignOptions.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
-        campaignOptions.setAllowISPurchases(allowISPurchasesBox.isSelected());
-        campaignOptions.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
-        campaignOptions.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
-        campaignOptions.setTechLevel(choiceTechLevel.getSelectedIndex());
-        campaignOptions.setVariableTechLevel(variableTechLevelBox.isSelected());
-        campaignOptions.setUseAmmoByType(useAmmoByTypeBox.isSelected());
+        options.setLimitByYear(limitByYearBox.isSelected());
+        options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
+        options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
+        options.setAllowISPurchases(allowISPurchasesBox.isSelected());
+        options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
+        options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
+        options.setTechLevel(choiceTechLevel.getSelectedIndex());
+        options.setVariableTechLevel(variableTechLevelBox.isSelected());
+        options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
     }
 
     void loadValuesFromCampaignOptions() {

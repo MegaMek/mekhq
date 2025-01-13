@@ -4,6 +4,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
@@ -299,7 +300,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign() {
+        applyCampaignOptionsToCampaign(null, null);
+    }
+
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+                                               @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -312,24 +318,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         generalTab.applyCampaignOptionsToCampaign(options);
 
         // Human Resources
-        personnelTab.applyCampaignOptionsToCampaign();
-        biographyTab.applyCampaignOptionsToCampaign();
-        relationshipsTab.applyCampaignOptionsToCampaign();
-        turnoverAndRetentionTab.applyCampaignOptionsToCampaign();
+        personnelTab.applyCampaignOptionsToCampaign(options);
+        biographyTab.applyCampaignOptionsToCampaign(options);
+        relationshipsTab.applyCampaignOptionsToCampaign(options);
+        turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
 
         // Advancement
-        advancementTab.applyCampaignOptionsToCampaign();
-        skillsTab.applyCampaignOptionsToCampaign();
-        abilitiesTab.applyCampaignOptionsToCampaign();
+        advancementTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+        skillsTab.applyCampaignOptionsToCampaign(); // TODO
+        abilitiesTab.applyCampaignOptionsToCampaign(); // TODO
 
         // Logistics
-        equipmentAndSuppliesTab.applyCampaignOptionsToCampaign();
-        repairAndMaintenanceTab.applyCampaignOptionsToCampaign();
+        equipmentAndSuppliesTab.applyCampaignOptionsToCampaign(options);
+        repairAndMaintenanceTab.applyCampaignOptionsToCampaign(options);
 
         // Operations
-        financesTab.applyCampaignOptionsToCampaign();
-        marketsTab.loadValuesFromCampaignOptions();
-        rulesetsTab.applyCampaignOptionsToCampaign();
+        financesTab.applyCampaignOptionsToCampaign(options);
+        marketsTab.applyCampaignOptionsToCampaign(options); // TODO
+        rulesetsTab.applyCampaignOptionsToCampaign(options);
     }
 
     public void applyPreset(@Nullable CampaignPreset campaignPreset) {

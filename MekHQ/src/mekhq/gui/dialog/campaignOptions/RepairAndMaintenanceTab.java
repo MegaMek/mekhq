@@ -320,28 +320,33 @@ public class RepairAndMaintenanceTab {
         // TODO handle this
     }
 
-    void applyCampaignOptionsToCampaign() {
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // Repair
-        campaignOptions.setEraMods(useEraModsCheckBox.isSelected());
-        campaignOptions.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
-        campaignOptions.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
-        campaignOptions.setQuirks(useQuirksBox.isSelected());
-        campaignOptions.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
-        campaignOptions.setDestroyByMargin(useDamageMargin.isSelected());
-        campaignOptions.setDestroyMargin((int) spnDamageMargin.getValue());
-        campaignOptions.setDestroyPartTarget((int) spnDestroyPartTarget.getValue());
+        options.setEraMods(useEraModsCheckBox.isSelected());
+        options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
+        options.setResetToFirstTech(resetToFirstTechCheckBox.isSelected());
+        options.setQuirks(useQuirksBox.isSelected());
+        options.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
+        options.setDestroyByMargin(useDamageMargin.isSelected());
+        options.setDestroyMargin((int) spnDamageMargin.getValue());
+        options.setDestroyPartTarget((int) spnDestroyPartTarget.getValue());
 
         // Maintenance
-        campaignOptions.setCheckMaintenance(checkMaintenance.isSelected());
-        campaignOptions.setMaintenanceCycleDays((int) spnMaintenanceDays.getValue());
-        campaignOptions.setMaintenanceBonus((int) spnMaintenanceBonus.getValue());
-        campaignOptions.setDefaultMaintenanceTime((int) spnDefaultMaintenanceTime.getValue());
-        campaignOptions.setUseQualityMaintenance(useQualityMaintenance.isSelected());
-        campaignOptions.setReverseQualityNames(reverseQualityNames.isSelected());
-        campaignOptions.setUseRandomUnitQualities(chkUseRandomUnitQualities.isSelected());
-        campaignOptions.setUsePlanetaryModifiers(chkUsePlanetaryModifiers.isSelected());
-        campaignOptions.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
-        campaignOptions.setLogMaintenance(logMaintenance.isSelected());
+        options.setCheckMaintenance(checkMaintenance.isSelected());
+        options.setMaintenanceCycleDays((int) spnMaintenanceDays.getValue());
+        options.setMaintenanceBonus((int) spnMaintenanceBonus.getValue());
+        options.setDefaultMaintenanceTime((int) spnDefaultMaintenanceTime.getValue());
+        options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
+        options.setReverseQualityNames(reverseQualityNames.isSelected());
+        options.setUseRandomUnitQualities(chkUseRandomUnitQualities.isSelected());
+        options.setUsePlanetaryModifiers(chkUsePlanetaryModifiers.isSelected());
+        options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
+        options.setLogMaintenance(logMaintenance.isSelected());
     }
 
     void loadValuesFromCampaignOptions() {
