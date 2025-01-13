@@ -628,6 +628,12 @@ public class RulesetsTab {
         }
 
         btnIntensityUpdate = new CampaignOptionsButton("IntensityUpdate");
+        AtBBattleIntensityChangeListener atBBattleIntensityChangeListener = new AtBBattleIntensityChangeListener();
+        btnIntensityUpdate.addChangeListener(evt -> {
+            spnAtBBattleIntensity.removeChangeListener(atBBattleIntensityChangeListener);
+            spnAtBBattleIntensity.setValue(determineAtBBattleIntensity());
+            spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
+        });
 
         // Layout the Panel
         final JPanel panelBattleChance = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel");
@@ -688,16 +694,16 @@ public class RulesetsTab {
     private double determineAtBBattleIntensity() {
         double intensity = 0.0;
 
-        int x = (Integer) spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].getValue();
+        int x = (int) spnAtBBattleChance[CombatRole.MANEUVER.ordinal()].getValue();
         intensity += ((-3.0 / 2.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
+        x = (int) spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()].getValue();
         intensity += ((-4.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[CombatRole.PATROL.ordinal()].getValue();
+        x = (int) spnAtBBattleChance[CombatRole.PATROL.ordinal()].getValue();
         intensity += ((-2.0 / 3.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
-        x = (Integer) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
+        x = (int) spnAtBBattleChance[CombatRole.TRAINING.ordinal()].getValue();
         intensity += ((-9.0) * (2.0 * x - 1.0)) / (2.0 * x - 201.0);
 
         intensity = intensity / 4.0;
@@ -712,7 +718,7 @@ public class RulesetsTab {
     private class AtBBattleIntensityChangeListener implements ChangeListener {
         @Override
         public void stateChanged(ChangeEvent e) {
-            double intensity = (Double) spnAtBBattleIntensity.getValue();
+            double intensity = (double) spnAtBBattleIntensity.getValue();
 
             if (intensity >= AtBContract.MINIMUM_INTENSITY) {
                 int value = (int) Math.min(
@@ -785,7 +791,7 @@ public class RulesetsTab {
         options.setGenerateChases(chkGenerateChases.isSelected());
 
         for (int i = 0; i < spnAtBBattleChance.length; i++) {
-            options.setAtBBattleChance(i, (Integer) spnAtBBattleChance[i].getValue());
+            options.setAtBBattleChance(i, (int) spnAtBBattleChance[i].getValue());
         }
     }
 

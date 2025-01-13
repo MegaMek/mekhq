@@ -4479,25 +4479,37 @@ public class CampaignOptions {
     /**
      * Retrieves the chance of having a battle for the specified {@link CombatRole}.
      * <p>
-     * This method calculates the battle chance percentage for the provided combat role based on
-     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled, the
-     * method immediately returns {@code 0}.
-     * Roles marked as {@link CombatRole#RESERVE} or as {@link CombatRole#AUXILIARY} are not
-     * eligible for battles and also return {@code 0}.
+     * This is a convenience method that calls {@link #getAtBBattleChance(CombatRole, boolean)}
+     * with {@code useStratConBypass} set to {@code false}. As a result, if StratCon is enabled,
+     * the method will return {@code 0} regardless of other conditions.
      * </p>
      *
      * @param role the {@link CombatRole} to evaluate the battle chance for.
-     * @return the chance of having a battle for the specified role. Returns:
-     *         <ul>
-     *           <li>{@code 0} if StratCon is enabled.</li>
-     *           <li>{@code 0} if the role is {@link CombatRole#RESERVE} or
-     *           {@link CombatRole#AUXILIARY}.</li>
-     *           <li>A non-zero value from the {@code atbBattleChance} array corresponding to the
-     *           role otherwise.</li>
-     *         </ul>
+     * @return the chance of having a battle for the specified role.
+     *
+     * @see #getAtBBattleChance(CombatRole, boolean)
      */
     public int getAtBBattleChance(CombatRole role) {
-        if (useStratCon) {
+        return getAtBBattleChance(role, false);
+    }
+
+    /**
+     * Retrieves the chance of having a battle for the specified {@link CombatRole}.
+     * <p>
+     * This method calculates the battle chance percentage for the provided combat role based on
+     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled and the
+     * {@code useStratConBypass} parameter is set to {@code true}, the method immediately
+     * returns {@code 0}.
+     * <p>
+     * Combat roles marked as {@link CombatRole#RESERVE} or {@link CombatRole#AUXILIARY} are not
+     * eligible for battles and also return {@code 0}.
+     *
+     * @param role               the {@link CombatRole} to evaluate the battle chance for.
+     * @param useStratConBypass  a {@code boolean} indicating whether to bypass the StratCon-check logic.
+     *                           If {@code false}, this allows the method to ignore StratCon-enabled status.
+     */
+    public int getAtBBattleChance(CombatRole role, boolean useStratConBypass) {
+        if (useStratCon && useStratConBypass) {
             return 0;
         }
 

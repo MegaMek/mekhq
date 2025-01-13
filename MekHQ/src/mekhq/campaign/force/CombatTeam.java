@@ -388,8 +388,8 @@ public class CombatTeam {
 
     public AtBScenario checkForBattle(Campaign campaign) {
         // Make sure there is a battle first
-        if ((campaign.getCampaignOptions().getAtBBattleChance(role) == 0)
-                || (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role))) {
+        if ((campaign.getCampaignOptions().getAtBBattleChance(role, true) == 0)
+                || (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role, true))) {
             // No battle
             return null;
         }
