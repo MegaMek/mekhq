@@ -226,19 +226,19 @@ public class AdvancementTab {
         // Contents
         lblTaskXP = new CampaignOptionsLabel("TaskXP");
         spnTaskXP = new CampaignOptionsSpinner("TaskXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         lblNTasksXP = new CampaignOptionsLabel("NTasksXP");
         spnNTasksXP = new CampaignOptionsSpinner("NTasksXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         lblSuccessXP = new CampaignOptionsLabel("SuccessXP");
         spnSuccessXP = new CampaignOptionsSpinner("SuccessXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         lblMistakeXP = new CampaignOptionsLabel("MistakeXP");
         spnMistakeXP = new CampaignOptionsSpinner("MistakeXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TasksPanel", true,
@@ -277,14 +277,14 @@ public class AdvancementTab {
         // Contents
         lblScenarioXP = new CampaignOptionsLabel("ScenarioXP");
         spnScenarioXP = new CampaignOptionsSpinner("ScenarioXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
         lblKillXP = new CampaignOptionsLabel("KillXP");
         spnKillXP = new CampaignOptionsSpinner("KillXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         lblKills = new CampaignOptionsLabel("Kills");
         spnKills = new CampaignOptionsSpinner("Kills",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ScenariosPanel", true,
@@ -316,25 +316,25 @@ public class AdvancementTab {
         // Contents
         lblIdleXP = new CampaignOptionsLabel("IdleXP");
         spnIdleXP = new CampaignOptionsSpinner("IdleXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
         lblMonthsIdleXP = new CampaignOptionsLabel("MonthsIdleXP");
         spnMonthsIdleXP = new CampaignOptionsSpinner("MonthsIdleXP",
-            0, 0, 36, 1);
+            0, 0, 12, 1);
         lblTargetIdleXP = new CampaignOptionsLabel("TargetIdleXP");
         spnTargetIdleXP = new CampaignOptionsSpinner("TargetIdleXP",
-            2, 2, 13, 1);
+            2, 0, 12, 1);
 
         lblMissionXpFail = new CampaignOptionsLabel("MissionXpFail");
         spnMissionXpFail = new CampaignOptionsSpinner("MissionXpFail",
-            1, 0, 10, 1);
+            1, 0, 20, 1);
 
         lblMissionXpSuccess = new CampaignOptionsLabel("MissionXpSuccess");
         spnMissionXpSuccess = new CampaignOptionsSpinner("MissionXpSuccess",
-            1, 0, 10, 1);
+            1, 0, 20, 1);
 
         lblMissionXpOutstandingSuccess = new CampaignOptionsLabel("MissionXpOutstandingSuccess");
         spnMissionXpOutstandingSuccess = new CampaignOptionsSpinner("MissionXpOutstandingSuccess",
-            1, 0, 10, 1);
+            1, 0, 20, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MissionsPanel", true,
@@ -385,14 +385,14 @@ public class AdvancementTab {
         // Contents
         lblAdminWeeklyXP = new CampaignOptionsLabel("AdminWeeklyXP");
         spnAdminWeeklyXP = new CampaignOptionsSpinner("AdminWeeklyXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
         lblAdminWeeklyXPPeriod = new CampaignOptionsLabel("AdminWeeklyXPPeriod");
         spnAdminWeeklyXPPeriod = new CampaignOptionsSpinner("AdminWeeklyXPPeriod",
-            1, 1, 100, 1);
+            1, 1, 20, 1);
 
         lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP");
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP",
-            0, 0, 10000, 1);
+            0, 0, 20, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsXpPanel", true,
