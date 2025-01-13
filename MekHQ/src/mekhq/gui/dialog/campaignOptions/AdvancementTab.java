@@ -230,7 +230,7 @@ public class AdvancementTab {
 
         lblNTasksXP = new CampaignOptionsLabel("NTasksXP");
         spnNTasksXP = new CampaignOptionsSpinner("NTasksXP",
-            0, 0, 20, 1);
+            0, 0, 100, 1);
 
         lblSuccessXP = new CampaignOptionsLabel("SuccessXP");
         spnSuccessXP = new CampaignOptionsSpinner("SuccessXP",
@@ -284,7 +284,7 @@ public class AdvancementTab {
 
         lblKills = new CampaignOptionsLabel("Kills");
         spnKills = new CampaignOptionsSpinner("Kills",
-            0, 0, 20, 1);
+            0, 0, 100, 1);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ScenariosPanel", true,
@@ -388,7 +388,7 @@ public class AdvancementTab {
             0, 0, 20, 1);
         lblAdminWeeklyXPPeriod = new CampaignOptionsLabel("AdminWeeklyXPPeriod");
         spnAdminWeeklyXPPeriod = new CampaignOptionsSpinner("AdminWeeklyXPPeriod",
-            1, 1, 20, 1);
+            1, 1, 52, 1);
 
         lblContractNegotiationXP = new CampaignOptionsLabel("ContractNegotiationXP");
         spnContractNegotiationXP = new CampaignOptionsSpinner("ContractNegotiationXP",
