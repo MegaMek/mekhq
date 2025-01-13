@@ -1,7 +1,7 @@
 /*
- * TransportShipAssignment.java
+ * ITransportAssignment.java
  *
- * Copyright (c) 2020 The Megamek Team. All rights reserved.
+ * Copyright (c) 2020-2025 The Megamek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
