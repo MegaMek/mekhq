@@ -578,14 +578,22 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             || newDate.isBefore(MINIMUM_VIABLE_DATE)
             || newDate.isAfter(MAXIMUM_VIABLE_DATE)) {
             setVisible(false);
-            JOptionPane.showMessageDialog(null,
+
+            // Creating JOptionPane as a message box
+            JOptionPane optionPane = new JOptionPane(
                 message,
-                resources.getString("invalidDate.title"),
-                JOptionPane.WARNING_MESSAGE);
+                JOptionPane.WARNING_MESSAGE,
+                JOptionPane.DEFAULT_OPTION
+            );
+
+            // Creating a JDialog from the optionPane and setting it always on top
+            JDialog dialog = optionPane.createDialog(resources.getString("invalidDate.title"));
+            dialog.setAlwaysOnTop(true);
+            dialog.setVisible(true);
+
             setVisible(true);
             return false;
         }
-
         setDate(newDate);
         return true;
     }
@@ -634,7 +642,11 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         JButton button = new JButton(label);
         button.setToolTipText(wordWrap(resources.getString(reference + ".tooltip")));
         button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.addActionListener(e -> turningPointsDialog(era, reference));
+        button.addActionListener(e -> {
+            setVisible(false);
+            turningPointsDialog(era, reference);
+            setVisible(true);
+        });
 
         return button;
     }
