@@ -5,6 +5,7 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -405,25 +406,37 @@ public class GeneralTab {
         unitIcon = campaign.getUnitIcon();
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
         }
 
+        campaign.setName(txtName.getText());
+
+        if (isStartUp) {
+            campaign.getForces().setName(campaign.getName());
+        }
+        campaign.setLocalDate(date);
+
+        if ((campaign.getCampaignStartDate() == null)
+                || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
+            campaign.setCampaignStartDate(date);
+        }
+        // Ensure that the MegaMek year GameOption matches the campaign year
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
+                .setValue(campaign.getGameYear());
+
+        // Null state handled during validation
+        FactionDisplay newFaction = comboFaction.getSelectedItem();
+        if (newFaction != null) {
+            campaign.setFaction(comboFaction.getSelectedItem().getFaction());
+        }
+
+        campaign.setCamouflage(camouflage);
+        campaign.setUnitIcon(unitIcon);
+
         options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
-
-        if (presetCampaignOptions == null) {
-            campaign.setName(txtName.getText());
-
-            FactionDisplay newFaction = comboFaction.getSelectedItem();
-            if (newFaction != null) {
-                campaign.setFaction(comboFaction.getSelectedItem().getFaction());
-            }
-            campaign.setLocalDate(date);
-            campaign.setCamouflage(camouflage);
-            campaign.setUnitIcon(unitIcon);
-        }
     }
 }

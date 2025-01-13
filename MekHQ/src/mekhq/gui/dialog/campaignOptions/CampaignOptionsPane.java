@@ -2,9 +2,11 @@ package mekhq.gui.dialog.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
@@ -16,6 +18,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import static java.lang.Math.round;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
@@ -301,7 +304,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp) {
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;
@@ -316,7 +319,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // While this shouldn't break anything, it's not worth moving around.
         // For all other tabs, it makes sense to apply them in the order they
         // appear in the dialog; however, this shouldn't make any major difference.
-        generalTab.applyCampaignOptionsToCampaign(options);
+        generalTab.applyCampaignOptionsToCampaign(options, isStartUp);
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(options);
@@ -337,6 +340,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.applyCampaignOptionsToCampaign(options);
         marketsTab.applyCampaignOptionsToCampaign(options);
         rulesetsTab.applyCampaignOptionsToCampaign(options);
+
+        // Tidy up
+        if (preset == null) {
+            recalculateCombatTeams(campaign);
+            MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
+        }
     }
 
     public void applyPreset(@Nullable CampaignPreset campaignPreset) {
