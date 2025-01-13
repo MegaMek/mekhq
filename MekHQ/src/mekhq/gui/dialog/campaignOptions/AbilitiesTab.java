@@ -1,8 +1,10 @@
 package mekhq.gui.dialog.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import mekhq.CampaignPreset;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -358,7 +360,7 @@ public class AbilitiesTab {
             .replaceAll("}", "");
     }
 
-    void applyCampaignOptionsToCampaign() {
+    void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
         Map<String, SpecialAbility> enabledAbilities = new HashMap<>();
 
         for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
@@ -366,7 +368,13 @@ public class AbilitiesTab {
                 enabledAbilities.put(abilityInfo.getAbility().getName(), abilityInfo.getAbility());
             }
         }
-        SpecialAbility.replaceSpecialAbilities(enabledAbilities);
+
+        if (preset != null) {
+            preset.getSpecialAbilities().clear();
+            preset.getSpecialAbilities().putAll(enabledAbilities);
+        } else {
+            SpecialAbility.replaceSpecialAbilities(enabledAbilities);
+        }
     }
 }
 

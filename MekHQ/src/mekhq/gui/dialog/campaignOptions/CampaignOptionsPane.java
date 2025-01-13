@@ -5,6 +5,7 @@ import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
@@ -270,7 +271,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         financesTab.loadValuesFromCampaignOptions();
 
         // Markets
-        marketsTab = new MarketsTab(campaignOptions);
+        marketsTab = new MarketsTab(campaign);
 
         JTabbedPane marketsContentTabs = createSubTabs(Map.of(
             "personnelMarketTab", marketsTab.createPersonnelMarketTab(),
@@ -300,15 +301,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
-    public void applyCampaignOptionsToCampaign() {
-        applyCampaignOptionsToCampaign(null, null);
-    }
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
+        CampaignOptions options = this.campaignOptions;
+        RandomSkillPreferences presetRandomSkillPreferences = null;
+        Map<String, SkillType> presetSkills = null;
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-                                               @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
-        CampaignOptions options = presetCampaignOptions;
-        if (presetCampaignOptions == null) {
-            options = this.campaignOptions;
+        if (preset != null) {
+            options = preset.getCampaignOptions();
+            presetRandomSkillPreferences = preset.getRandomSkillPreferences();
+            presetSkills = preset.getSkills();
         }
 
         // Everything assumes general tab will be the first applied.
@@ -325,8 +326,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Advancement
         advancementTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
-        skillsTab.applyCampaignOptionsToCampaign(); // TODO
-        abilitiesTab.applyCampaignOptionsToCampaign(); // TODO
+        skillsTab.applyCampaignOptionsToCampaign(presetSkills);
+        abilitiesTab.applyCampaignOptionsToCampaign(preset);
 
         // Logistics
         equipmentAndSuppliesTab.applyCampaignOptionsToCampaign(options);
@@ -334,7 +335,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Operations
         financesTab.applyCampaignOptionsToCampaign(options);
-        marketsTab.applyCampaignOptionsToCampaign(options); // TODO
+        marketsTab.applyCampaignOptionsToCampaign(options);
         rulesetsTab.applyCampaignOptionsToCampaign(options);
     }
 

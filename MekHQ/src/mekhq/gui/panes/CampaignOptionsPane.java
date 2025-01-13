@@ -9526,9 +9526,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 options.getPersonnelMarketRandomRemovalTargets().put(entry.getKey(),
                         (int) entry.getValue().getValue());
             }
-            options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
-            options.setUsePersonnelHireHiringHallOnly(chkUsePersonnelHireHiringHallOnly.isSelected());
-
             // Unit Market
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
             options.setUnitMarketRegionalMekVariations(chkUnitMarketRegionalMekVariations.isSelected());

@@ -53,7 +53,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
         btnApplySettings.addActionListener(evt -> {
             wasCanceled = false;
-            campaignOptionsPane.applyCampaignOptionsToCampaign();
+            campaignOptionsPane.applyCampaignOptionsToCampaign(null);
             dispose();
         });
         pnlButtons.add(btnApplySettings);
@@ -87,7 +87,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             return;
         }
 
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset.getCampaignOptions(), preset.getRandomSkillPreferences());
+        campaignOptionsPane.applyCampaignOptionsToCampaign(preset);
 
         preset.writeToFile(null,
             FileDialogs.saveCampaignPreset(null, preset).orElse(null));

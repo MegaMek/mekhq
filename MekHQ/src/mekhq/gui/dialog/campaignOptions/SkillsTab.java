@@ -1,5 +1,6 @@
 package mekhq.gui.dialog.campaignOptions;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
@@ -369,9 +370,17 @@ public class SkillsTab {
         return ELITE;
     }
 
-    void applyCampaignOptionsToCampaign() {
+    void applyCampaignOptionsToCampaign(@Nullable Map<String, SkillType> presetSkills) {
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
+            if (presetSkills != null) {
+                type = presetSkills.get(skillName);
+            }
+
+            if (type == null) {
+                logger.info(String.format("Skipping outdated or missing skill: %s", skillName));
+                continue;
+            }
 
             // Update Target Number
             updateTargetNumber(type);
