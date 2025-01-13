@@ -467,26 +467,32 @@ public class MarketsTab {
         btnContractEquipment = new JRadioButton(resources.getString("lblContractEquipment.text"));
         btnContractEquipment.setToolTipText(resources.getString("lblContractEquipment.tooltip"));
 
+        btnContractPersonnel = new JRadioButton(resources.getString("lblContractPersonnel.text"));
+        btnContractPersonnel.setToolTipText(resources.getString("lblContractPersonnel.tooltip"));
+
+        // Create a ButtonGroup to link the buttons
+        ButtonGroup contractGroup = new ButtonGroup();
+        contractGroup.add(btnContractEquipment);
+        contractGroup.add(btnContractPersonnel);
+
+        // Add other components here...
         chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
 
         lblEquipPercent = new CampaignOptionsLabel("EquipPercent");
         spnEquipPercent = new CampaignOptionsSpinner("EquipPercent",
-            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
         spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
-            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
         spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
-            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
+                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
         spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
-            0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
-
-        btnContractPersonnel = new JRadioButton(resources.getString("lblContractPersonnel.text"));
-        btnContractPersonnel.setToolTipText(resources.getString("lblContractPersonnel.tooltip"));
+                0.1, 0, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
 
