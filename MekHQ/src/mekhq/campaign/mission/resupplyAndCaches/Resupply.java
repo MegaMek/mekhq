@@ -537,6 +537,7 @@ public class Resupply {
                 }
 
                 if (isProhibitedUnitType(entity, false)) {
+                    logger.info("skipping " + unit.getName() + " as it is prohibited.");
                     continue;
                 }
 
@@ -711,8 +712,12 @@ public class Resupply {
                 continue;
             }
 
-            PartDetails partDetails = new PartDetails(part, weight);
+            // This prevents us accidentally adding new items to the pool
+            if (!partsList.containsKey(getPartKey(part))) {
+                continue;
+            }
 
+            PartDetails partDetails = new PartDetails(part, weight);
             partsList.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
                 oldValue.setWeight(oldValue.getWeight() - newValue.getWeight());
                 return oldValue;
