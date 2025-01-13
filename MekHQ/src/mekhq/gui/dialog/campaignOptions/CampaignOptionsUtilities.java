@@ -425,7 +425,7 @@ public class CampaignOptionsUtilities {
 
             JLabel lblBody = new JLabel();
             if (includeBodyText) {
-                lblBody = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'><i>%s</i></div></html>",
+                lblBody = new JLabel(String.format("<html><div style='width: %s; text-align:justify;'>%s</div></html>",
                     UIUtil.scaleForGUI(750),
                     resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
                 lblBody.setName("lbl" + name + "Body");
