@@ -58,6 +58,10 @@ public class OutstandingScenariosNagLogic {
                     continue;
                 }
 
+                if (scenario.getDate() == null) {
+                    continue;
+                }
+
                 if (scenario.getHasTrack()) {
                     StratconScenario stratconScenario = getStratconScenarioFromAtBScenario(campaign, scenario);
 
