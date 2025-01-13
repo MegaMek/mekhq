@@ -411,16 +411,19 @@ public class GeneralTab {
             options = this.campaignOptions;
         }
 
-        campaign.setName(txtName.getText());
-
-        FactionDisplay newFaction = comboFaction.getSelectedItem();
-        if (newFaction != null) {
-            campaign.setFaction(comboFaction.getSelectedItem().getFaction());
-        }
         options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
-        campaign.setLocalDate(date);
-        campaign.setCamouflage(camouflage);
-        campaign.setUnitIcon(unitIcon);
+
+        if (presetCampaignOptions == null) {
+            campaign.setName(txtName.getText());
+
+            FactionDisplay newFaction = comboFaction.getSelectedItem();
+            if (newFaction != null) {
+                campaign.setFaction(comboFaction.getSelectedItem().getFaction());
+            }
+            campaign.setLocalDate(date);
+            campaign.setCamouflage(camouflage);
+            campaign.setUnitIcon(unitIcon);
+        }
     }
 }
