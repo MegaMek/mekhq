@@ -353,7 +353,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             return;
         }
 
-        // TODO override these with current campaign settings in the event we're not calling this via start up
         CampaignOptions presetCampaignOptions = campaignPreset.getCampaignOptions();
         LocalDate presetDate = campaignPreset.getDate();
         Faction presetFaction = campaignPreset.getFaction();
