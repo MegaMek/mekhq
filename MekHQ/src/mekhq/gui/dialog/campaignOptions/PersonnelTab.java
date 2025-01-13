@@ -1159,18 +1159,21 @@ public class PersonnelTab {
     private JPanel createExperienceMultipliersPanel() {
         // Contents
         for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
-            final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString());
+            final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(),
+                null, true);
+            label.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
             final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel,
-                0, 0, 100, 0.1);
+                null, 0, 0, 100, 0.1, true);
+            spinner.setToolTipText(resources.getString("lblSkillLevelMultiplier.tooltip"));
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
 
         }
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel", true,
-            "ExperienceMultipliersPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel",
+            true, "ExperienceMultipliersPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

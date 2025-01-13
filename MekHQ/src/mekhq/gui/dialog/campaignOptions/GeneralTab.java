@@ -91,9 +91,13 @@ public class GeneralTab {
         // Campaign faction
         lblFaction = new CampaignOptionsLabel("Faction");
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
+        comboFaction.setToolTipText(String.format("<html>%s</html>",
+            resources.getString("lblFaction.tooltip")));
 
         // Reputation
         lblReputation = new CampaignOptionsLabel("Reputation");
+        unitRatingMethodCombo.setToolTipText(String.format("<html>%s</html>",
+            resources.getString("lblReputation.tooltip")));
         lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
             0, -200, 200, 1);

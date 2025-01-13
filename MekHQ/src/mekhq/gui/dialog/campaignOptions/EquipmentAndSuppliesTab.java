@@ -705,6 +705,8 @@ public class EquipmentAndSuppliesTab {
         // Maximum Tech Level
         lblChoiceTechLevel = new CampaignOptionsLabel("ChoiceTechLevel");
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
+        choiceTechLevel.setToolTipText(String.format("<html>%s</html>",
+                resources.getString("lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
         variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox");
