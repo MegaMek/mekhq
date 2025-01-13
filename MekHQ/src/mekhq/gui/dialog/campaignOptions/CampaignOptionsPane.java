@@ -299,12 +299,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
-    public void applyCampaignOptionsToCampaign() {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         // Everything assumes general tab will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
         // For all other tabs, it makes sense to apply them in the order they
         // appear in the dialog; however, this shouldn't make any major difference.
-        generalTab.applyCampaignOptionsToCampaign();
+        generalTab.applyCampaignOptionsToCampaign(options);
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign();

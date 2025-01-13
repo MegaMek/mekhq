@@ -405,15 +405,20 @@ public class GeneralTab {
         unitIcon = campaign.getUnitIcon();
     }
 
-    void applyCampaignOptionsToCampaign() {
+    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         campaign.setName(txtName.getText());
 
         FactionDisplay newFaction = comboFaction.getSelectedItem();
         if (newFaction != null) {
             campaign.setFaction(comboFaction.getSelectedItem().getFaction());
         }
-        campaignOptions.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
-        campaignOptions.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+        options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
+        options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
         campaign.setLocalDate(date);
         campaign.setCamouflage(camouflage);
         campaign.setUnitIcon(unitIcon);
