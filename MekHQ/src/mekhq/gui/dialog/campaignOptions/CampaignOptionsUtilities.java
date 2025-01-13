@@ -443,11 +443,11 @@ public class CampaignOptionsUtilities {
 
             layout.gridy++;
             layout.gridwidth = 1;
-            this.add(lblBody, layout);
+            this.add(lblImage, layout);
 
             layout.gridy++;
             layout.gridwidth = 1;
-            this.add(lblImage, layout);
+            this.add(lblBody, layout);
         }
     }
 
