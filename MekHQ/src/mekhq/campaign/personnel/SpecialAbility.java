@@ -20,6 +20,23 @@
  */
 package mekhq.campaign.personnel;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Vector;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
@@ -39,16 +56,6 @@ import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In

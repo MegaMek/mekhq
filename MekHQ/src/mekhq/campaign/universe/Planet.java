@@ -19,9 +19,16 @@
  */
 package mekhq.campaign.universe;
 
+import java.time.LocalDate;
+import java.util.*;
+
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
@@ -29,12 +36,17 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
-import mekhq.adapter.*;
+import mekhq.adapter.AtmosphereAdapter;
+import mekhq.adapter.BooleanValueAdapter;
+import mekhq.adapter.ClimateAdapter;
+import mekhq.adapter.DateAdapter;
+import mekhq.adapter.HPGRatingAdapter;
+import mekhq.adapter.LifeFormAdapter;
+import mekhq.adapter.PressureAdapter;
+import mekhq.adapter.SocioIndustrialDataAdapter;
+import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
-
-import java.time.LocalDate;
-import java.util.*;
 
 /**
  * This is the start of a planet object that will keep lots of information about

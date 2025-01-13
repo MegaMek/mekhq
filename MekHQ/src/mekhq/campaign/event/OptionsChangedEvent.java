@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.event;
 
+import java.util.Objects;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-
-import java.util.Objects;
 
 /**
  * An event thrown after the campaign options were changed. The event handlers aren't supposed

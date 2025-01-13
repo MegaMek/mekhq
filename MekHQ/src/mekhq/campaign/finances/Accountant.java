@@ -20,6 +20,8 @@
  */
 package mekhq.campaign.finances;
 
+import java.util.UUID;
+
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -28,8 +30,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
-
-import java.util.UUID;
 
 /**
  * Provides accounting for a Campaign.
