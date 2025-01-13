@@ -566,12 +566,23 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @return {@link true} if the update is successful, {@link false} otherwise.
      */
     private boolean updateDateFromDateField() {
+        final LocalDate MINIMUM_VIABLE_DATE = LocalDate.of(2200, 1, 1);
+        final LocalDate MAXIMUM_VIABLE_DATE = LocalDate.of(4500, 1, 1);
+
         LocalDate newDate = parseDate(dateField.getText());
 
-        if (newDate == null) {
+        String message = String.format(resources.getString("invalidDate.body"),
+            MINIMUM_VIABLE_DATE, MAXIMUM_VIABLE_DATE);
+
+        if (newDate == null
+            || newDate.isBefore(MINIMUM_VIABLE_DATE)
+            || newDate.isAfter(MAXIMUM_VIABLE_DATE)) {
+            setVisible(false);
             JOptionPane.showMessageDialog(null,
-                "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
+                message,
+                resources.getString("invalidDate.title"),
                 JOptionPane.WARNING_MESSAGE);
+            setVisible(true);
             return false;
         }
 
