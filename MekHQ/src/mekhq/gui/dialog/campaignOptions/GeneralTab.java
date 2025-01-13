@@ -45,7 +45,6 @@ public class GeneralTab {
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblReputation;
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
-    private JCheckBox chkGMMode;
     private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
     private JLabel lblDate;
@@ -98,9 +97,6 @@ public class GeneralTab {
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
             0, -200, 200, 1);
 
-        // GM Mode
-        chkGMMode = new CampaignOptionsCheckBox("GMMode");
-
         // Date
         lblDate = new CampaignOptionsLabel("Date");
         btnDate = new CampaignOptionsButton("Date");
@@ -131,7 +127,8 @@ public class GeneralTab {
 
         layout.gridwidth = 1;
         layout.gridy++;
-        panel.add(chkGMMode, layout);
+        panel.add(lblDate, layout);
+        panel.add(btnDate, layout);
 
         layout.gridy++;
         panel.add(lblName, layout);
@@ -161,10 +158,6 @@ public class GeneralTab {
         layout.gridy++;
         panel.add(lblManualUnitRatingModifier, layout);
         panel.add(manualUnitRatingModifier, layout);
-
-        layout.gridy++;
-        panel.add(lblDate, layout);
-        panel.add(btnDate, layout);
 
         layout.gridy++;
         layout.gridwidth = 5;
@@ -228,8 +221,6 @@ public class GeneralTab {
      * Initialize the components of the {@link GeneralTab} class.
      */
     private void initialize() {
-        chkGMMode = new JCheckBox();
-
         lblName = new JLabel();
         txtName = new JTextField();
 
@@ -393,7 +384,6 @@ public class GeneralTab {
             options = this.campaignOptions;
         }
 
-        chkGMMode.setSelected(campaign.isGM());
         txtName.setText(campaign.getName());
 
         comboFaction.setSelectedItem(campaign.getFaction());
@@ -416,7 +406,6 @@ public class GeneralTab {
     }
 
     void applyCampaignOptionsToCampaign() {
-        campaign.setGMMode(chkGMMode.isSelected());
         campaign.setName(txtName.getText());
 
         FactionDisplay newFaction = comboFaction.getSelectedItem();
