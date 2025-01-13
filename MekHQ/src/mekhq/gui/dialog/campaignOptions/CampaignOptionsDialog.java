@@ -19,13 +19,27 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
+    private final boolean isStartUp;
 
     private boolean wasCanceled = true;
 
-    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset) {
+    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
         this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
+        this.isStartUp = false;
+        initialize();
+
+        setLocationRelativeTo(frame);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+
+    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset,
+                                 boolean isStartUp) {
+        super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
+        this.campaign = campaign;
+        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
+        this.isStartUp = isStartUp;
         initialize();
 
         if (preset != null) {
@@ -53,7 +67,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
         btnApplySettings.addActionListener(evt -> {
             wasCanceled = false;
-            campaignOptionsPane.applyCampaignOptionsToCampaign(null);
+            campaignOptionsPane.applyCampaignOptionsToCampaign(null, isStartUp);
             dispose();
         });
         pnlButtons.add(btnApplySettings);
@@ -87,7 +101,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
             return;
         }
 
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset);
+        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, isStartUp);
 
         preset.writeToFile(null,
             FileDialogs.saveCampaignPreset(null, preset).orElse(null));

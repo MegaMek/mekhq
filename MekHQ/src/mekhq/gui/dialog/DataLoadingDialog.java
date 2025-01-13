@@ -339,7 +339,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
                     CampaignOptionsDialog optionsDialog =
-                        new CampaignOptionsDialog(getFrame(), campaign, preset);
+                        new CampaignOptionsDialog(getFrame(), campaign, preset, true);
                     setVisible(false); // cede visibility to `optionsDialog`
                     optionsDialog.setVisible(true);
                     if (optionsDialog.wasCanceled()) {
