@@ -1339,12 +1339,16 @@ public class Utilities {
             }
         }
 
+        // If we reset the transporters for the Ship transport, we'll need to save those units
+        // before we remove the fake capacity that was removed by selectBestBayFor
         if (isAlreadyReset) {
             alreadyTransportedEntities.addAll(transport.getLoadedUnits());
         }
 
         // Reset transporter status again so that sendLoadEntity can process correctly
         transport.resetTransporter();
+
+        //Restore the Ship transported entities
         for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
             transport.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
         }
