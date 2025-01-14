@@ -57,7 +57,7 @@ public enum TransporterType {
     }
     // endregion Constructor
 
-    public static <T extends Transporter, Optional> TransporterType getTransporterType(T transporter) {
+    public static <T extends Transporter> TransporterType getTransporterType(T transporter) {
         for (TransporterType transporterType : TransporterType.values()) {
             if (transporterType.getTransporterClass() == transporter.getClass()) {
                 return transporterType;

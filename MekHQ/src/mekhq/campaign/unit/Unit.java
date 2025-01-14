@@ -2153,7 +2153,7 @@ public class Unit implements ITechnology {
      * @param transporterType type (Class) of Transporter to transport the units in
      * @param units Vector of units that we wish to load into this transport
      */
-    public Set<Unit> loadShipTransport(TransporterType transporterType, Unit... units) {
+    public Set<Unit> loadShipTransport(TransporterType transporterType, Set<Unit> units) {
         Vector<Unit> unitsVector = new Vector<>();
         for (Unit unit : units) {
             unitsVector.add(unit);
@@ -2332,7 +2332,7 @@ public class Unit implements ITechnology {
      * @param units units being loaded
      * @return the old transports of the units, or an empty set if none
      */
-    public Set<Unit> loadTacticalTransport(TransporterType transporterType, Unit... units) {
+    public Set<Unit> loadTacticalTransport(TransporterType transporterType, Set<Unit> units) {
         return getTacticalTransportedUnitsSummary().loadTransport(units, null, transporterType);
     }
 

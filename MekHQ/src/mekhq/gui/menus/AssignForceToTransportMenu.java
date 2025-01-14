@@ -55,7 +55,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @param units selected units to try and assign
      * @see CampaignTransportType
      */
-    public AssignForceToTransportMenu(CampaignTransportType campaignTransportType, final Campaign campaign, final Unit... units) {
+    public AssignForceToTransportMenu(CampaignTransportType campaignTransportType, final Campaign campaign, final Set<Unit> units) {
         super(campaignTransportType.getName());
         this.campaign = campaign;
         this.campaignTransportType = campaignTransportType;
@@ -63,15 +63,15 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
     }
     // endregion Constructors
 
-    private void initialize(final Unit... units) {
+    private void initialize(final Set<Unit> units) {
         /*
          * Immediate Return for Illegal Assignments:
          * 1) No units to assign
          * 2) Any units are currently unavailable
          * 3) No transports available
          */
-        if ((units.length == 0) || (Stream.of(units).anyMatch(unit -> !unit.isAvailable()))
-            || (!campaign.hasTransports(campaignTransportType))) {
+        if ((units.isEmpty() || (units.stream().anyMatch(unit -> !unit.isAvailable()))
+            || (!campaign.hasTransports(campaignTransportType)))) {
             return;
         }
 
@@ -94,7 +94,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @param units units being assigned a transport
      * @return menu of transporter types
      */
-    protected Set<JScrollableMenu> createTransporterTypeMenus(final Unit... units) {
+    protected Set<JScrollableMenu> createTransporterTypeMenus(final Set<Unit> units) {
         Set<JScrollableMenu> transporterTypeMenus = new HashSet<>();
         /* Let's get the transport types our campaign has
          and remove the ones that can't be used by these units.
@@ -129,7 +129,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         return transporterTypeMenus;
     }
 
-    private Set<JMenuItem> createTransportMenus(TransporterType transporterType, Set<Unit> transports, Unit... units) {
+    private Set<JMenuItem> createTransportMenus(TransporterType transporterType, Set<Unit> transports, Set<Unit> units) {
         Set<JMenuItem> transportMenus = new HashSet<>();
         for (Unit transport : transports) {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
@@ -151,7 +151,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @return transporters that can be used by all these units
      * @see CampaignTransportType
      */
-    protected abstract Set<TransporterType> filterTransporterTypeMenus(final Unit... units);
+    protected abstract Set<TransporterType> filterTransporterTypeMenus(final Set<Unit> units);
 
     /**
      * Different transporter type menus do different things when selected
@@ -160,6 +160,6 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @param transport transport (Unit) that will load these units
      * @param units units being assigned to the transport
      */
-    protected abstract void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Unit... units);
+    protected abstract void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Set<Unit> units);
 
 }

@@ -49,7 +49,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
      * @param units selected units to try and assign
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
-    public AssignForceToShipTransportMenu(Campaign campaign, Unit... units) {
+    public AssignForceToShipTransportMenu(Campaign campaign, Set<Unit> units) {
         super(SHIP_TRANSPORT, campaign, units);
     }
 
@@ -60,7 +60,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
      * @return Transporters suitable for long-term or space travel.
      */
     @Override
-    protected Set<TransporterType> filterTransporterTypeMenus(final Unit... units) {
+    protected Set<TransporterType> filterTransporterTypeMenus(final Set<Unit> units) {
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(campaignTransportType).keySet());
 
         for (Unit unit : units) {
@@ -86,7 +86,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
      * @param units           units being assigned to the transport
      */
     @Override
-    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Unit... units) {
+    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Set<Unit> units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
                 JOptionPane.showMessageDialog(null,MHQInternationalization.getFormattedTextAt(

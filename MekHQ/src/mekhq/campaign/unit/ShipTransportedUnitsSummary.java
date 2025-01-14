@@ -50,7 +50,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      * @param transportedUnits Units we wish to unload
      */
     @Override
-    public void unloadTransport(Unit... transportedUnits) {
+    public void unloadTransport(Set<Unit>  transportedUnits) {
         super.unloadTransport(transportedUnits);
 
     }

@@ -27,6 +27,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -70,7 +71,7 @@ public class TransportAssignment implements ITransportAssignment {
 
 
     /**
-     * The transport that is assigned, or null if none
+     * The transport that is assigned
      *
      * @return
      */
@@ -111,7 +112,7 @@ public class TransportAssignment implements ITransportAssignment {
     }
 
     @Override
-    public @Nullable Transporter getTransportedLocation() {
+    public Transporter getTransportedLocation() {
         return transportedLocation;
     }
 
@@ -141,8 +142,11 @@ public class TransportAssignment implements ITransportAssignment {
      * @return hash int, or null if none
      */
     @Override
-    public int hashTransportedLocation() {
-        return getTransportedLocation().hashCode();
+    public Optional<Integer> hashTransportedLocation() {
+        if (hasTransportedLocation()) {
+            return Optional.of(getTransportedLocation().hashCode());
+        }
+        return Optional.empty();
     }
 
     /**

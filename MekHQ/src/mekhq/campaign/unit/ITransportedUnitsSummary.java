@@ -127,25 +127,11 @@ public interface ITransportedUnitsSummary {
      * Main method to be used for unloading units from a transport
      * @param transportedUnits Units we wish to unload
      */
-    void unloadTransport(Unit... transportedUnits);
+    void unloadTransport(Set<Unit>  transportedUnits);
 
     /**
      * Fixes references after loading
      */
     void fixReferences(Campaign campaign, Unit unit);
 
-    /**
-     * Calculates transport bay space required by an infantry platoon,
-     * which is not the same as the flat weight of that platoon
-     *
-     * @param unit The Entity that we need the weight for
-     */
-    static double calcInfantryBayWeight(Entity unit) {
-        InfantryBay.PlatoonType type = InfantryBay.PlatoonType.getPlatoonType(unit);
-        if ((unit instanceof Infantry) && (type == InfantryBay.PlatoonType.MECHANIZED)) {
-            return type.getWeight() * ((Infantry) unit).getSquadCount();
-        } else {
-            return type.getWeight();
-        }
-    }
 }

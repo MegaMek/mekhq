@@ -26,6 +26,8 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
 
+import java.util.Optional;
+
 /**
  * Represents an assignment on a transport.
  * @see ITransportedUnitsSummary
@@ -34,10 +36,10 @@ import mekhq.campaign.unit.enums.TransporterType;
 public interface ITransportAssignment {
 
     /**
-     * The transport that is assigned, or null if none
+     * The transport that is assigned
      * @return
      */
-    @Nullable Unit getTransport();
+    Unit getTransport();
 
     boolean hasTransport();
 
@@ -49,7 +51,7 @@ public interface ITransportAssignment {
      * Where is this unit being transported?
      * @return The transporter this unit is in
      */
-    @Nullable Transporter getTransportedLocation();
+    Transporter getTransportedLocation();
 
     /**
      * Is this unit in a specific location?
@@ -61,7 +63,7 @@ public interface ITransportAssignment {
      * Convert location to hash to assist with saving/loading
      * @return hash int, or null if none
      */
-    @Nullable int hashTransportedLocation();
+    Optional<Integer> hashTransportedLocation();
 
     /**
      * After loading UnitRefs need converted to Units

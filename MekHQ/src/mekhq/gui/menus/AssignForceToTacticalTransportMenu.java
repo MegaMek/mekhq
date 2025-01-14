@@ -49,7 +49,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
      * @param units selected units to try and assign
      * @see CampaignTransportType#TACTICAL_TRANSPORT
      */
-    public AssignForceToTacticalTransportMenu(Campaign campaign, Unit... units) {
+    public AssignForceToTacticalTransportMenu(Campaign campaign, Set<Unit> units) {
         super(TACTICAL_TRANSPORT, campaign, units);
     }
 
@@ -60,7 +60,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
      * @return most Transporter types except cargo and hitches
      */
     @Override
-    protected Set<TransporterType> filterTransporterTypeMenus(final Unit... units) {
+    protected Set<TransporterType> filterTransporterTypeMenus(final Set<Unit> units) {
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(TACTICAL_TRANSPORT).keySet());
 
         for (Unit unit : units) {
@@ -86,7 +86,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
      * @param units           units being assigned to the transport
      */
     @Override
-    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Unit... units) {
+    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Set<Unit> units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
                 JOptionPane.showMessageDialog(null,MHQInternationalization.getFormattedTextAt(

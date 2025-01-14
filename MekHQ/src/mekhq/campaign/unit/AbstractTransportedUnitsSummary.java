@@ -48,7 +48,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @param transportedUnits Units we wish to unload
      */
     @Override
-    public void unloadTransport(Unit... transportedUnits) {
+    public void unloadTransport(Set<Unit> transportedUnits) {
         for (Unit transportedUnit : transportedUnits) {
             unloadTransport(transportedUnit);
         }

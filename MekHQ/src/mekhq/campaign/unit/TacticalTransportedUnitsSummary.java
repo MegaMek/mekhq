@@ -26,6 +26,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param transportedUnits Units we wish to unload
      */
     @Override
-    public void unloadTransport(Unit... transportedUnits) {
+    public void unloadTransport(Set<Unit>  transportedUnits) {
         super.unloadTransport(transportedUnits);
 
     }
@@ -76,7 +77,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param units units being loaded
      * @return old transports; what were  the units' previous transport, if they had one
      */
-    public Set<Unit> loadTransport(TransporterType transporterType, Unit... units) {
+    public Set<Unit> loadTransport(TransporterType transporterType, Set<Unit> units) {
         return loadTransport(units, null, transporterType);
     }
 
@@ -92,7 +93,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param transporterType type (Class) of bay or Transporter
      * @return old transports; what were  the units' previous transport, if they had one
      */
-    public Set<Unit> loadTransport(Unit[] units, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+    public Set<Unit> loadTransport(Set<Unit> units, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
         //Set<Entity> oldTransportedEntities = clearTransportedEntities();
         for (Unit transportedUnit : units) {
@@ -192,7 +193,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
                 Unit realUnit = campaign.getHangar().getUnit(tacticalTransportedUnit.getId());
                 if (realUnit != null) {
                     if (realUnit.hasTacticalTransportAssignment()) {
-                        loadTransport(realUnit.getTacticalTransportAssignment().getTransporterType(), realUnit);
+                        loadTransport(realUnit.getTacticalTransportAssignment().getTransporterType(), new HashSet<>(Collections.singleton(realUnit)));
                     } else {
                         logger.error(
                             String.format("Unit %s ('%s') references tactical transported unit %s which has no transport assignment",
@@ -204,7 +205,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
                             unit.getId(), unit.getName(), tacticalTransportedUnit.getId()));
                 }
             } else {
-                loadTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(), tacticalTransportedUnit);
+                loadTransport(tacticalTransportedUnit.getTacticalTransportAssignment().getTransporterType(), new HashSet<>(Collections.singleton(tacticalTransportedUnit)));
             }
         }
     }
