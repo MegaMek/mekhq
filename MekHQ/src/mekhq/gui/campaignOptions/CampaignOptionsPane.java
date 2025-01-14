@@ -40,9 +40,30 @@ import java.util.ResourceBundle;
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
-import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
+/**
+ * The {@code CampaignOptionsPane} class represents a tabbed pane used for displaying
+ * and managing various campaign options in MekHQ. It organizes these options
+ * into tabs and sub-tabs, enabling users to configure different aspects of a campaign.
+ * This component serves as the central UI for campaign settings management.
+ *
+ * <p>
+ * The pane is initialized with a {@link Campaign} instance, which provides the campaign's
+ * data and allows options to be applied directly to the active campaign.
+ * The dialog supports multiple modes, such as {@code NORMAL}, {@code ABRIDGED},
+ * and {@code STARTUP}, to determine the level of detail and features shown.
+ * </p>
+ *
+ * <h3>Key Features:</h3>
+ * <ul>
+ *   <li>Organizes options into logical groups, such as General, Human Resources,
+ *       Advancement, Logistics, and Operations.</li>
+ *   <li>Supports loading and applying campaign presets for streamlined configuration.</li>
+ *   <li>Dynamically handles UI scaling and scrolling speed based on environment properties.</li>
+ *   <li>Allows scalability for future addition of new campaign settings.</li>
+ * </ul>
+ */
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
@@ -68,6 +89,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MarketsTab marketsTab;
     private RulesetsTab rulesetsTab;
 
+    /**
+     * Constructs a {@code CampaignOptionsPane} for managing campaign settings.
+     * This initializes the tabbed pane and populates it with categories and sub-tabs
+     * based on the provided {@link Campaign} instance and dialog mode.
+     *
+     * @param frame    the parent {@link JFrame} for this pane
+     * @param campaign the {@link Campaign} object representing the current campaign
+     * @param mode     the {@link CampaignOptionsDialogMode} for configuring the pane's behavior
+     */
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign, CampaignOptionsDialogMode mode) {
         super(frame, resources, "campaignOptionsDialog");
         this.campaign = campaign;
@@ -77,6 +107,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         initialize();
     }
 
+    /**
+     * Initializes the campaign options pane by creating all parent tabs and adding
+     * sub-tabs for various campaign settings categories. Dynamically adjusts tab fonts
+     * and layout based on UI scaling settings.
+     */
     @Override
     protected void initialize() {
         double uiScale = 1;
@@ -101,10 +136,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Creates a tab and adds it to the TabbedPane.
+     * Adds a new tab to the pane. Wrapper method for adding a resource-labeled tab
+     * containing a {@link JScrollPane} to the campaign options pane. Dynamically adjusts font size
+     * for consistent scaling across all UI elements.
      *
-     * @param resourceName the name of the resource used to create the tab's title
-     * @param tab          the tab to be added
+     * @param resourceName the resource string key to locate the tab title
+     * @param tab          the {@link JTabbedPane} to add as content for the tab
      */
     private void createTab(String resourceName, JTabbedPane tab) {
         JScrollPane tabScrollPane = new JScrollPane(tab);
@@ -128,9 +165,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Creates the General tab.
+     * Creates the panel for general campaign options. Loads settings for general preferences
+     * and initializes it with current campaign options.
      *
-     * @return a {@link JScrollPane} containing the General tab
+     * @return a {@link JScrollPane} containing the general tab panel
      */
     private JScrollPane createGeneralTab() {
         generalTab = new GeneralTab(campaign, getFrame());
@@ -141,14 +179,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * The `createHumanResourcesParentTab` method creates and returns a `JTabbedPane` object,
-     * which represents the overarching "Human Resources" tab in the user interface.
-     * <p>
-     * Under the "Human Resources" tab, there are several sub-tabs for different categories, including
-     * Personnel, Biography, Relationships, and Turnover and Retention. Each sub-tab contains various
-     * settings related to its category.
+     * Creates the "Human Resources" parent tab. This tab organizes related sub-tabs concerning
+     * personnel management, relationships, turnover, and biography options.
      *
-     * @return JTabbedPane representing the "Human Resources" tab.
+     * @return a {@link JTabbedPane} containing sub-tabs for the human resources category
      */
     private JTabbedPane createHumanResourcesParentTab() {
         // Parent Tab
@@ -211,6 +245,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return humanResourcesParentTab;
     }
 
+    /**
+     * Creates the "Advancement" parent tab. This tab organizes related sub-tabs for awards,
+     * skill randomization, general skill management, and special pilot abilities (SPAs).
+     *
+     * @return a {@link JTabbedPane} containing sub-tabs for the advancement category
+     */
     private JTabbedPane createAdvancementParentTab() {
         // Parent Tab
         JTabbedPane advancementParentTab = new JTabbedPane();
@@ -255,10 +295,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * This `createEquipmentAndSuppliesParentTab` method creates and returns a `JTabbedPane` object.
-     * This represents the "Logistics and Maintenance" parent tab in the user interface.
+     * Creates the "Logistics and Maintenance" parent tab. This tab organizes related sub-tabs
+     * for equipment acquisition, repair, maintenance, and supply management options.
      *
-     * @return JTabbedPane representing the "Logistics and Maintenance" tab.
+     * @return a {@link JTabbedPane} containing sub-tabs for the logistics and maintenance category
      */
     private JTabbedPane createEquipmentAndSuppliesParentTab() {
         // Parent Tab
@@ -293,6 +333,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return equipmentAndSuppliesParentTab;
     }
 
+    /**
+     * Creates the "Strategic Operations" parent tab. This tab organizes related sub-tabs for
+     * finances, market management (personnel, units, and contracts), and ruleset configuration.
+     *
+     * @return a {@link JTabbedPane} containing sub-tabs for the strategic operations category
+     */
     private JTabbedPane createStrategicOperationsParentTab() {
         // Parent Tab
         JTabbedPane strategicOperationsParentTab = new JTabbedPane();
@@ -336,6 +382,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
+    /**
+     * Applies the currently configured campaign options to the active {@link Campaign}.
+     * This method processes all tabs in the dialog, applying the options to the campaign
+     * in logical order (e.g., "General" first, followed by other categories).
+     *
+     * @param preset      an optional {@link CampaignPreset} used to override campaign options
+     * @param isStartUp   specifies whether this is run as part of a startup initialization
+     * @param isSaveAction determines if this action is saving options to a preset
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
                                                boolean isSaveAction) {
         CampaignOptions options = this.campaignOptions;
@@ -381,6 +436,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
     }
 
+    /**
+     * Applies the values from a {@link CampaignPreset} to all tabs in the dialog. This propagates
+     * preset-specific configuration to all associated components and sub-tabs, including
+     * campaign-related properties such as dates, factions, and skills.
+     *
+     * @param campaignPreset the {@link CampaignPreset} containing the preset options to apply
+     */
     public void applyPreset(@Nullable CampaignPreset campaignPreset) {
         if (campaignPreset == null) {
             return;

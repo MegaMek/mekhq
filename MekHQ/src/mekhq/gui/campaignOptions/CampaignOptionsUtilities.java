@@ -25,28 +25,56 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.ResourceBundle;
 
+/**
+ * The {@code CampaignOptionsUtilities} class provides utility methods and constants
+ * for managing, creating, and organizing user interface components related to the
+ * campaign options dialog in the MekHQ application. This class focuses on assisting
+ * in the creation and layout of panels, tabs, and other related components.
+ *
+ * <p>
+ * This class is designed to be stateless and does not rely on any specific instance variables,
+ * making its methods accessible in a static fashion.
+ * </p>
+ *
+ * <h3>Key Features:</h3>
+ * <ul>
+ *   <li>Provides reusable methods to create and configure {@link JPanel} objects.</li>
+ *   <li>Handles creation of organized, alphabetized tab groups with specialized handling for
+ *       "general options" tabs.</li>
+ *   <li>Offers UI utility methods for processing resource names, image directories,
+ *       and dynamic content scaling.</li>
+ *   <li>Supports internationalization through the {@link ResourceBundle} for localized strings.</li>
+ * </ul>
+ */
 public class CampaignOptionsUtilities {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
 
     /**
-     * @return the image directory
+     * Retrieves the directory path for storing faction-related image resources.
+     *
+     * @return a {@link String} representing the path to the image directory.
      */
     public static String getImageDirectory() {
         return IMAGE_DIRECTORY;
     }
 
     /**
-     * Creates a {@link GroupLayout} object for the specified {@link JPanel}.
-     * <p>
-     * Written to be paired with {@code CampaignOptionsStandardPanel}.
+     * Creates a {@link GroupLayout} with default gap settings for the specified panel.
      *
-     * @param panel the {@link JPanel} for which the {@link GroupLayout} is created
-     * @return the created {@link GroupLayout} object
+     * <p>
+     * The created {@link GroupLayout} automatically enables gaps between components
+     * and containers for improved layout consistency and readability.
+     * </p>
+     *
+     * @param panel the {@link JPanel} to which the {@link GroupLayout} will be applied.
+     * @return the {@link GroupLayout} instance configured for the given panel.
      */
     public static GroupLayout createGroupLayout(JPanel panel) {
         final GroupLayout layout = new GroupLayout(panel);
@@ -57,11 +85,13 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Creates a parent panel for the provided {@link JPanel}.
+     * Creates a parent panel for the specified child panel and configures its layout.
+     * The child panel is encapsulated in the parent {@link JPanel}, ensuring consistent spacing
+     * and margins.
      *
-     * @param panel the panel to be added to the parent panel
-     * @param name the name of the parent panel
-     * @return the created {@link JPanel}
+     * @param panel the child {@link JPanel} that will be added to the parent panel.
+     * @param name  the identifier name for the parent panel, used for UI tracking and debugging purposes.
+     * @return a fully initialized {@link JPanel} configured as a parent container.
      */
     public static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
@@ -83,13 +113,23 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Creates a new instance of {@link JTabbedPane} with the supplied panels as tabs.
-     * <p>
-     * The resource bundle reference for the individual tabs will be {@code panel.getName() + ".title"}
+     * Dynamically creates a {@link JTabbedPane} from a map of tab names and panels.
      *
-     * @param panels a map containing the names of the panels as keys and the corresponding
-     *              {@link JPanel} objects as values
-     * @return a {@link JTabbedPane} with the supplied panels as tabs
+     * <p>
+     * This method organizes the tabs in alphabetic order except for tabs whose
+     * names contain "GeneralTab", which are moved to the front as a prioritized tab.
+     * Each panel is wrapped in a custom layout that includes additional components,
+     * such as quotes or additional spacing elements, for better visual formatting.
+     * </p>
+     *
+     * <p>
+     * Tabs are localized using the {@link ResourceBundle}, which maps tab names to
+     * their corresponding displayed titles.
+     * </p>
+     *
+     * @param panels a map where the key is the resource name of the tab, and the value
+     *               is the {@link JPanel} displayed as the content of the tab.
+     * @return a {@link JTabbedPane} containing the organized and formatted tabs.
      */
     static JTabbedPane createSubTabs(Map<String, JPanel> panels) {
         // We use a list here to ensure that the tabs always display in the same order,
@@ -158,12 +198,12 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * If a custom wrap size is provided, it is returned.
-     * Otherwise, the default wrap size of 100 is returned.
+     * Determines an appropriate wrap size for text rendering, using a default when
+     * no value is specified.
      *
-     * @param customWrapSize the maximum number of characters (including whitespaces) on each line
-     *                      of the tooltip, or {@code null} if no custom wrap size is specified
-     * @return the maximum number of characters on each line of a tooltip
+     * @param customWrapSize an optional {@link Integer} specifying the desired wrap size.
+     *                       If this parameter is {@code null}, a default value of 100 is used.
+     * @return the processed wrap size value; defaults to 100 if {@code customWrapSize} is null.
      */
     public static int processWrapSize(@Nullable Integer customWrapSize) {
         return customWrapSize == null ? 100 : customWrapSize;
