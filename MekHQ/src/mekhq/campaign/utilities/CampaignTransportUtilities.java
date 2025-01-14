@@ -20,6 +20,7 @@
 package mekhq.campaign.utilities;
 
 import megamek.common.*;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.HashSet;
@@ -30,13 +31,14 @@ import static mekhq.campaign.unit.enums.TransporterType.*;
 public class CampaignTransportUtilities {
     // region Static Helpers
     /**
-     * Helps the menus need to check less when generating
+     * Helps the menus need to check less when generating Ship Transports can't use short-term
+     * transport types like InfantryCompartments or BattleArmorHandles. Use a Bay! Or DockingCollar
      *
      * @see Transporter
      * @param unit unit we want to get the Transporter types that could potentially hold it
      * @return Transporter types that could potentially transport this entity
      */
-    public Set<TransporterType> mapEntityToTransporters(Entity unit) {
+    public static Set<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType, Entity unit) {
         Set<TransporterType> transporters = new HashSet<>();
 
         Class<? extends Entity> entityType = unit.getClass();
@@ -100,19 +102,23 @@ public class CampaignTransportUtilities {
         }
         else if (Infantry.class.isAssignableFrom(entityType)) {
             transporters.add(INFANTRY_BAY);
-            transporters.add(INFANTRY_COMPARTMENT);
 
-            if (BattleArmor.class.isAssignableFrom(entityType)) {
-                transporters.add(BATTLE_ARMOR_BAY);
-                BattleArmor baUnit = (BattleArmor) unit;
+            //Ship transports can't use some transport types
+            if (!(campaignTransportType.isShipTransport())) {
+                transporters.add(INFANTRY_COMPARTMENT);
 
-                if (baUnit.canDoMechanizedBA()) {
-                    transporters.add(BATTLE_ARMOR_HANDLES);
-                    transporters.add(BATTLE_ARMOR_HANDLES_TANK);
+                if (BattleArmor.class.isAssignableFrom(entityType)) {
+                    transporters.add(BATTLE_ARMOR_BAY);
+                    BattleArmor baUnit = (BattleArmor) unit;
 
-                    if (baUnit.hasMagneticClamps()) {
-                        transporters.add(CLAMP_MOUNT_MEK);
-                        transporters.add(CLAMP_MOUNT_TANK);
+                    if (baUnit.canDoMechanizedBA()) {
+                        transporters.add(BATTLE_ARMOR_HANDLES);
+                        transporters.add(BATTLE_ARMOR_HANDLES_TANK);
+
+                        if (baUnit.hasMagneticClamps()) {
+                            transporters.add(CLAMP_MOUNT_MEK);
+                            transporters.add(CLAMP_MOUNT_TANK);
+                        }
                     }
                 }
             }

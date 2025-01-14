@@ -86,7 +86,7 @@ public class PotentialTransportsMap {
     }
 
     /**
-     * Removes any transports that are empty
+     * Removes any transports that are empty from the map so they don't need referenced anymore
      */
     public void removeEmptyTransports() {
         if (hashMap.isEmpty()) {
@@ -96,8 +96,9 @@ public class PotentialTransportsMap {
             Set<UUID> emptyTransports = new HashSet<>();
             if (!(hashMap.get(campaignTransportType).isEmpty())) {
                 for (UUID transport : hashMap.get(campaignTransportType).keySet()) {
-                    if (hashMap.get(campaignTransportType).get(transport).isEmpty())
+                    if (hashMap.get(campaignTransportType).get(transport).isEmpty()) {
                         emptyTransports.add(transport);
+                    }
                 }
             }
             for (UUID emptyTransport : emptyTransports) {

@@ -19,8 +19,8 @@
 
 package mekhq.gui.menus;
 
-import megamek.common.Transporter;
 import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -64,7 +64,7 @@ public class AssignForceToTacticalTransportMenu extends AssignForceToTransportMe
         Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(TACTICAL_TRANSPORT).keySet());
 
         for (Unit unit : units) {
-            Set<TransporterType> unitTransporterTypes = TACTICAL_TRANSPORT.mapEntityToTransporters(unit.getEntity());
+            Set<TransporterType> unitTransporterTypes = CampaignTransportUtilities.mapEntityToTransporters(TACTICAL_TRANSPORT, unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {
