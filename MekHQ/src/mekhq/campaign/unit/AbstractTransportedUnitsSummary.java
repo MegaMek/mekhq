@@ -69,32 +69,35 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      */
     @Override
     public void recalculateTransportCapacity(@Nullable Vector<Transporter> transporters) {
-        if (transporters != null && !transporters.isEmpty()) {
-            // First let's clear the transport capacity for each transport type in transporters
-            for (Transporter transporter : transporters) {
-                TransporterType transporterType = TransporterType.getTransporterType(transporter);
-                if (hasTransportCapacity(transporterType)) {
-                    transportCapacity.remove(transporterType);
-                }
-            }
-            // Then we make sure the transport entity is empty, and then let's load
-            // our transport entity so we can use the Transporter's getUnused method
-            clearTransportedEntities();
-            loadTransportedEntities();
+        if (transporters == null || transporters.isEmpty()) {
+            return;
+        }
 
-            // Now we can update our transport capacities using the unused space of each transporter
-
-            for (Transporter transporter : transporters) {
-                TransporterType transporterType = TransporterType.getTransporterType(transporter);
-                if (transportCapacity.containsKey(transporterType)) {
-                    transportCapacity.replace(transporterType, transportCapacity.get(transporterType) + transporter.getUnused());
-                } else {
-                    transportCapacity.put(transporterType, transporter.getUnused());
-                }
+        // First let's clear the transport capacity for each transport type in transporters
+        for (Transporter transporter : transporters) {
+            TransporterType transporterType = TransporterType.getTransporterType(transporter);
+            if (hasTransportCapacity(transporterType)) {
+                transportCapacity.remove(transporterType);
             }
+        }
+
+        // Then we make sure the transport entity is empty, and then let's load
+        // our transport entity so we can use the Transporter's getUnused method
+        clearTransportedEntities();
+        loadTransportedEntities();
+
+        // Now we can update our transport capacities using the unused space of each transporter
+        for (Transporter transporter : transporters) {
+            TransporterType transporterType = TransporterType.getTransporterType(transporter);
+            if (transportCapacity.containsKey(transporterType)) {
+                transportCapacity.replace(transporterType, transportCapacity.get(transporterType) + transporter.getUnused());
+            } else {
+                transportCapacity.put(transporterType, transporter.getUnused());
+            }
+        }
+
         // Finally clear the transport entity again
         clearTransportedEntities();
-        }
     }
 
     /**
