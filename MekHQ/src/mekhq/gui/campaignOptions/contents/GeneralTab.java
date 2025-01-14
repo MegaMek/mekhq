@@ -135,11 +135,13 @@ public class GeneralTab {
         lblCamo = new CampaignOptionsLabel("Camo");
         btnCamo.setName("btnCamo");
         btnCamo.addActionListener(this::btnCamoActionPerformed);
+        btnCamo.setIcon(camouflage.getImageIcon(UIUtil.scaleForGUI(75)));
 
         // Unit icon
         lblIcon = new CampaignOptionsLabel("Icon");
         btnIcon.setName("btnIcon");
         btnIcon.addActionListener(this::btnIconActionPerformed);
+        btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
 
         // Initialize the parent panel
         AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
