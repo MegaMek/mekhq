@@ -320,7 +320,7 @@ public class BiographyTab {
     JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
-            getImageDirectory() + "logo_federated_suns.png");
+            getImageDirectory() + "logo_clan_blood_spirit.png");
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -424,7 +424,7 @@ public class BiographyTab {
     JPanel createBackgroundsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("BackgroundsTab",
-            getImageDirectory() + "logo_clan_goliath_scorpion.png");
+            getImageDirectory() + "logo_nueva_castile.png");
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
@@ -671,7 +671,7 @@ public class BiographyTab {
     JPanel createDeathTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("DeathTab",
-            getImageDirectory() + "logo_filtvelt_coalition.png");
+            getImageDirectory() + "logo_clan_fire_mandrills.png");
 
         // Contents
         chkKeepMarriedNameUponSpouseDeath = new CampaignOptionsCheckBox("KeepMarriedNameUponSpouseDeath");
@@ -796,7 +796,7 @@ public class BiographyTab {
     JPanel createEducationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("EducationTab",
-            getImageDirectory() + "logo_free_worlds_league.png");
+            getImageDirectory() + "logo_taurian_concordat.png");
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
@@ -1067,7 +1067,7 @@ public class BiographyTab {
     JPanel createNameAndPortraitGenerationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
-            getImageDirectory() + "logo_clan_mongoose.png");
+            getImageDirectory() + "logo_clan_nova_cat.png");
 
         // Contents
         chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
@@ -1204,7 +1204,7 @@ public class BiographyTab {
     JPanel createRankTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
-            getImageDirectory() + "logo_hanseatic_league.png", true);
+            getImageDirectory() + "logo_umayyad_caliphate.png", true);
 
         // Contents
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();

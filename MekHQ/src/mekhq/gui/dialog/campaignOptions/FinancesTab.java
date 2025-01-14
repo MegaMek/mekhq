@@ -152,7 +152,7 @@ public class FinancesTab {
     JPanel createFinancesGeneralOptionsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-            getImageDirectory() + "logo_clan_nova_cat.png");
+            getImageDirectory() + "logo_star_league.png");
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -463,7 +463,7 @@ public class FinancesTab {
     JPanel createPriceMultipliersTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-            getImageDirectory() + "logo_illyrian_palatinate.png", true);
+            getImageDirectory() + "logo_clan_stone_lion.png", true);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();

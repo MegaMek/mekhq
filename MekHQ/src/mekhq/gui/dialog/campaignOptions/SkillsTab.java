@@ -51,10 +51,10 @@ public class SkillsTab {
         JPanel headerPanel;
         if (isCombatTab) {
             headerPanel = new CampaignOptionsHeaderPanel("CombatSkillsTab",
-                getImageDirectory() + "logo_clan_ghost_bear.png");
+                getImageDirectory() + "logo_clan_diamond_sharks.png");
         } else {
             headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsTab",
-                getImageDirectory() + "logo_clan_ghost_bear.png");
+                getImageDirectory() + "logo_free_worlds_league.png");
         }
 
         // Contents

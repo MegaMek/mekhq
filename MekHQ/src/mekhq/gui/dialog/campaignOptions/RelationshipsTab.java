@@ -204,7 +204,7 @@ public class RelationshipsTab {
     JPanel createMarriageTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MarriageTab",
-            getImageDirectory() + "logo_federated_commonwealth.png");
+            getImageDirectory() + "logo_morgrains_valkyrate.png");
 
         // Contents
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
@@ -385,7 +385,7 @@ public class RelationshipsTab {
     JPanel createDivorceTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("DivorceTab",
-            getImageDirectory() + "logo_clan_hells_horses.png");
+            getImageDirectory() + "logo_escorpion_imperio.png");
 
         // Contents
         chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
@@ -504,7 +504,7 @@ public class RelationshipsTab {
     JPanel createProcreationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("ProcreationTab",
-            getImageDirectory() + "logo_clan_ice_hellion.png");
+            getImageDirectory() + "logo_hanseatic_league.png");
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();

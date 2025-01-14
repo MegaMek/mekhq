@@ -356,7 +356,7 @@ public class PersonnelTab {
     JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
-            getImageDirectory() + "logo_circinus_federation.png");
+            getImageDirectory() + "logo_clan_wolverine.png");
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
@@ -534,7 +534,7 @@ public class PersonnelTab {
     JPanel createAwardsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
-            getImageDirectory() + "logo_draconis_combine.png");
+            getImageDirectory() + "logo_outworld_alliance.png");
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -825,7 +825,7 @@ public class PersonnelTab {
     JPanel createPersonnelInformationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelInformation",
-            getImageDirectory() + "logo_comstar.png");
+            getImageDirectory() + "logo_rasalhague_dominion.png");
 
         // Contents
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
@@ -949,7 +949,7 @@ public class PersonnelTab {
     JPanel createPrisonersAndDependentsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
-            getImageDirectory() + "logo_clan_fire_mandrills.png");
+            getImageDirectory() + "logo_illyrian_palatinate.png");
 
         // Contents
         prisonerPanel = createPrisonersPanel();
@@ -1070,7 +1070,7 @@ public class PersonnelTab {
     JPanel createSalariesTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("SalariesTab",
-            getImageDirectory() + "logo_clan_ghost_bear.png");
+            getImageDirectory() + "logo_clan_coyote.png");
 
         // Contents
         chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");

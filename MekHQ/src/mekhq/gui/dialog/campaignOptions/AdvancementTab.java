@@ -175,7 +175,7 @@ public class AdvancementTab {
     JPanel xpAwardsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("XpAwardsTab",
-            getImageDirectory() + "logo_federated_suns.png");
+            getImageDirectory() + "logo_clan_steel_viper.png");
 
         // Contents
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier");
@@ -471,7 +471,7 @@ public class AdvancementTab {
     JPanel skillRandomizationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
-            getImageDirectory() + "logo_federated_suns.png");
+            getImageDirectory() + "logo_republic_of_the_sphere.png");
 
         // Contents
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness");

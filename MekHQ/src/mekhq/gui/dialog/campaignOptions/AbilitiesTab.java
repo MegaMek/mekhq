@@ -161,13 +161,13 @@ public class AbilitiesTab {
         JPanel headerPanel = switch (abilityCategory) {
             case COMBAT_ABILITY ->
                 new CampaignOptionsHeaderPanel("CombatAbilitiesTab",
-                    getImageDirectory() + "logo_clan_goliath_scorpion.png");
+                    getImageDirectory() + "logo_aurigan_coalition.png");
             case MANEUVERING_ABILITY ->
                 new CampaignOptionsHeaderPanel("ManeuveringAbilitiesTab",
-                    getImageDirectory() + "logo_clan_goliath_scorpion.png");
+                    getImageDirectory() + "logo_clan_hells_horses.png");
             case UTILITY_ABILITY ->
                 new CampaignOptionsHeaderPanel("UtilityAbilitiesTab",
-                    getImageDirectory() + "logo_clan_goliath_scorpion.png");
+                    getImageDirectory() + "logo_circinus_federation.png");
         };
 
         // Contents

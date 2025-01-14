@@ -442,7 +442,6 @@ public class CampaignOptionsUtilities {
             this.add(lblHeader, layout);
 
             layout.gridy++;
-            layout.gridwidth = 1;
             this.add(lblImage, layout);
 
             layout.gridy++;
