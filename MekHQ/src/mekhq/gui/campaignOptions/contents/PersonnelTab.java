@@ -52,7 +52,8 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  * logs, information, awards, medical options, salaries, and prisoners and dependents.
  * <p>
  * The class is organized into multiple tabs that encapsulate settings under specific categories:
- * <p>
+ * </p>
+ * <ul>
  *   <li><b>General Tab:</b> General settings for personnel management such as tactics,
  *   initiative bonus, toughness, and edge settings.</li>
  *   <li><b>Personnel Logs Tab:</b> Settings for logging activities like skill or ability
@@ -67,7 +68,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *   and dependent-related rules.</li>
  *   <li><b>Salaries Tab:</b> Configuration of salaries based on roles, experience
  *   multipliers, and base salary rates.</li>
- * </p>
+ * </ul>
  *
  * <p>
  * This class serves as the main controller for the UI components of the Personnel Tab,

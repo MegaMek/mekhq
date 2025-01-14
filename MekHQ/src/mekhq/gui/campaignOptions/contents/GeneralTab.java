@@ -53,13 +53,13 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayo
 /**
  * Represents a tab within the campaign options UI that allows the user to configure
  * general campaign settings. This includes options for:
- * <p>
+ * <ul>
  *     <li>Configuring the campaign name</li>
  *     <li>Setting the faction and faction-related options</li>
  *     <li>Adjusting reputation and manual unit rating modifiers</li>
  *     <li>Specifying the campaign start date</li>
  *     <li>Choosing a camouflage pattern and unit icon</li>
- * </p>
+ * </ul>
  *
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */

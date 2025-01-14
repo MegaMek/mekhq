@@ -48,14 +48,14 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 /**
  * The `BiographyTab` class is responsible for managing the biography-related settings in the campaign options tab
  * within the MekHQ application. It provides an interface for configuring various campaign settings, such as:
- * <p>
+ * <ul>
  *     <li>General campaign settings like gender distribution and familial relationships.</li>
  *     <li>Background options, including randomized personality traits and origin determination.</li>
  *     <li>Death-related settings such as probability of random deaths, age-group-specific deaths, etc.</li>
  *     <li>Education module settings for academic progression, dropout chances, and related configurations.</li>
  *     <li>Random name generation and portrait assignment based on roles and factions.</li>
  *     <li>Rank and hierarchy management for campaign personnel.</li>
- * </p>
+ * </ul>
  *
  * The class includes methods to initialize, load, and configure settings while providing GUI tools to enable user
  * interaction. It also integrates with the current `Campaign` and `CampaignOptions` objects to synchronize settings.

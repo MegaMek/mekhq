@@ -35,19 +35,21 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  * configuration tab in the campaign options for managing unit turnover, retention, and fatigue settings.
  * <p>
  * This class provides functionality to define and customize gameplay-related options such as:
- * <p>
+ * </p>
+ * <ul>
  *   <li>Unit turnover settings, including retirement, contract durations, payouts, and modifiers.</li>
  *   <li>Administrative strain and management skills impacting unit cohesion.</li>
  *   <li>Fatigue mechanics such as fatigue rates, leave thresholds, and injury fatigue.</li>
- * </p>
- * </p>
+ * </ul>
+ * <p>
  * The class interacts with a {@link CampaignOptions} object, allowing the user to load and save
  * configurations. It consists of two main panels:
- * <p>
+ * </p>
+ * <ul>
  *   <li><strong>Turnover Tab:</strong> Controls unit turnover, payouts, and related modifiers.</li>
  *   <li><strong>Fatigue Tab:</strong> Manages fatigue-related options like kitchen capacity
  *   and fatigue rates.</li>
- * </p>
+ * </ul>
  */
 public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;

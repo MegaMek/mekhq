@@ -45,12 +45,12 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 /**
  * The {@code MarketsTab} class represents the campaign options tab related to market settings.
  * This tab provides configurations for three key market areas:
- * <p>
+ * <ul>
  *     <li><b>Personnel Market</b>: Settings for managing personnel hiring, removal targets, and market types.</li>
  *     <li><b>Unit Market</b>: Configurations for purchasing units, special unit chances, rarity modifiers, etc.</li>
  *     <li><b>Contract Market</b>: Options for contract acquisition, such as market methods, search radius,
  *         and payment settings.</li>
- * </p>
+ * </ul>
  * <p>
  * The class initializes the UI components for these three market types and provides methods to
  * load data into the UI or apply changes from the UI to the campaign settings.

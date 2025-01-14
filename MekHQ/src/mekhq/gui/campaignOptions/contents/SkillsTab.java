@@ -40,12 +40,14 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  * to configure the rules and costs associated with skills in their campaign.
  * <p>
  * This tab can be configured for either combat or support skills. It allows users to:
- * <p>
+ * </p>
+ * <ul>
  *   <li>Set skill target numbers.</li>
  *   <li>Specify skill costs at different levels.</li>
  *   <li>Define milestones for the progression of skills by skill levels.</li>
  *   <li>Copy and paste configurations for skill settings.</li>
- * </p>
+ * </ul>
+ * <p>
  * The interface is dynamically created to display all relevant skill options for the
  * selected tab (combat or support).
  * </p>

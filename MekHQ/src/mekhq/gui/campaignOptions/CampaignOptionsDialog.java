@@ -45,13 +45,13 @@ import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANC
  * It facilitates user interaction for fine-tuning the game campaign experience.
  * </p>
  *
- * <h3>Key Features:</h3>
- * <p>
+ * <strong>Key Features:</strong>
+ * <ul>
  *   <li>Initialization in multiple modes, such as NORMAL, STARTUP, and ABRIDGED.</li>
  *   <li>Ability to load and save presets for recurring configurations.</li>
  *   <li>Application of campaign settings directly to the active {@link Campaign} instance.</li>
  *   <li>Visual notifications, such as a notice about StratCon activation during the campaign.</li>
- * </p>
+ * </ul>
  */
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
