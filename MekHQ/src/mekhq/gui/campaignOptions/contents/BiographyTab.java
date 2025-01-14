@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -39,10 +39,7 @@ import mekhq.gui.panes.RankSystemsPane;
 import javax.swing.*;
 import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
@@ -68,6 +65,9 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
  * And many more settings are controlled within this class.
  */
 public class BiographyTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private Campaign campaign;
     private CampaignOptions campaignOptions;
     private RandomOriginOptions randomOriginOptions;
@@ -174,7 +174,7 @@ public class BiographyTab {
     private RankSystemsPane rankSystemsPane;
     //end Rank Tab
 
-    BiographyTab(Campaign campaign) {
+    public BiographyTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomOriginOptions = campaignOptions.getRandomOriginOptions();
@@ -336,7 +336,7 @@ public class BiographyTab {
      *
      * @return a {@link JPanel} representing the general tab with multiple input components and panels
      */
-    JPanel createGeneralTab() {
+    public JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
             getImageDirectory() + "logo_clan_blood_spirit.png");
@@ -440,7 +440,7 @@ public class BiographyTab {
      * @return a JPanel representing the Backgrounds tab with specific components like checkboxes and
      * options panel
      */
-    JPanel createBackgroundsTab() {
+    public JPanel createBackgroundsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("BackgroundsTab",
             getImageDirectory() + "logo_nueva_castile.png");
@@ -687,7 +687,7 @@ public class BiographyTab {
      *
      * @return {@link JPanel} representing the Death Tab with all its components
      */
-    JPanel createDeathTab() {
+    public JPanel createDeathTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("DeathTab",
             getImageDirectory() + "logo_clan_fire_mandrills.png");
@@ -812,7 +812,7 @@ public class BiographyTab {
      * @return {@link JPanel} The newly created and configured parent JPanel for
      * the Education tab, containing all the educational settings controls.
      */
-    JPanel createEducationTab() {
+    public JPanel createEducationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("EducationTab",
             getImageDirectory() + "logo_taurian_concordat.png");
@@ -1083,7 +1083,7 @@ public class BiographyTab {
      * @return {@link JPanel} The newly created and configured parent JPanel for the Name and Portrait
      * Generation tab, containing all relevant name and portrait generation controls.
      */
-    JPanel createNameAndPortraitGenerationTab() {
+    public JPanel createNameAndPortraitGenerationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
             getImageDirectory() + "logo_clan_nova_cat.png");
@@ -1220,7 +1220,7 @@ public class BiographyTab {
      *
      * @return JPanel The parent panel with all the layout components added.
      */
-    JPanel createRankTab() {
+    public JPanel createRankTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
             getImageDirectory() + "logo_umayyad_caliphate.png", true);
@@ -1246,12 +1246,11 @@ public class BiographyTab {
         return createParentPanel(panel, "RankTab");
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                       @Nullable RandomOriginOptions presetRandomOriginOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomOriginOptions presetRandomOriginOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (options == null) {
             options = this.campaignOptions;
@@ -1338,7 +1337,7 @@ public class BiographyTab {
         }
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         RandomOriginOptions originOptions;
         if (presetCampaignOptions == null) {

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -37,6 +37,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
@@ -45,6 +46,9 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
  * Handles the Personnel tab of campaign options
  */
 public class PersonnelTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private final CampaignOptions campaignOptions;
 
     //start General Tab
@@ -172,7 +176,7 @@ public class PersonnelTab {
     /**
      * Represents a tab for repair and maintenance in an application.
      */
-    PersonnelTab(CampaignOptions campaignOptions) {
+    public PersonnelTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -372,7 +376,7 @@ public class PersonnelTab {
         return prisonerStatusModel;
     }
 
-    JPanel createGeneralTab() {
+    public JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
             getImageDirectory() + "logo_clan_wolverine.png");
@@ -550,7 +554,7 @@ public class PersonnelTab {
      *
      * @return the {@link JPanel} representing the Awards Tab panel
      */
-    JPanel createAwardsTab() {
+    public JPanel createAwardsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
             getImageDirectory() + "logo_outworld_alliance.png");
@@ -744,7 +748,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the Medical Tab containing settings for medical options.
      */
-    JPanel createMedicalTab() {
+    public JPanel createMedicalTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MedicalTab",
             getImageDirectory() + "logo_duchy_of_tamarind_abbey.png");
@@ -841,7 +845,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the Personnel Information Tab panel
      */
-    JPanel createPersonnelInformationTab() {
+    public JPanel createPersonnelInformationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelInformation",
             getImageDirectory() + "logo_rasalhague_dominion.png");
@@ -965,7 +969,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the prisoners and dependents configuration settings
      */
-    JPanel createPrisonersAndDependentsTab() {
+    public JPanel createPrisonersAndDependentsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
             getImageDirectory() + "logo_illyrian_palatinate.png");
@@ -1086,7 +1090,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the salary tab
      */
-    JPanel createSalariesTab() {
+    public JPanel createSalariesTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("SalariesTab",
             getImageDirectory() + "logo_clan_coyote.png");
@@ -1321,11 +1325,11 @@ public class PersonnelTab {
         return panel;
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -1420,7 +1424,7 @@ public class PersonnelTab {
         }
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

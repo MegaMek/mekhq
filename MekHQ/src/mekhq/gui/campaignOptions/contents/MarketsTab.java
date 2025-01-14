@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -37,10 +37,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class MarketsTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
 
@@ -101,7 +105,7 @@ public class MarketsTab {
     private JCheckBox chkOverageRepaymentInFinalPayment;
     //end Contract Market
 
-    MarketsTab(Campaign campaign) {
+    public MarketsTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 
@@ -138,7 +142,7 @@ public class MarketsTab {
         return personnelMarketTypeModel;
     }
 
-    JPanel createPersonnelMarketTab() {
+    public JPanel createPersonnelMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
             getImageDirectory() + "logo_st_ives_compact.png");
@@ -287,7 +291,7 @@ public class MarketsTab {
         chkUnitMarketReportRefresh = new JCheckBox();
     }
 
-    JPanel createUnitMarketTab() {
+    public JPanel createUnitMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
             getImageDirectory() + "logo_clan_ice_hellion.png");
@@ -387,7 +391,7 @@ public class MarketsTab {
         chkOverageRepaymentInFinalPayment = new JCheckBox();
     }
 
-    JPanel createContractMarketTab() {
+    public JPanel createContractMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
             getImageDirectory() + "logo_federated_suns.png");
@@ -585,11 +589,11 @@ public class MarketsTab {
         return panel;
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -635,7 +639,7 @@ public class MarketsTab {
         chkOverageRepaymentInFinalPayment.setSelected(options.isOverageRepaymentInFinalPayment());
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

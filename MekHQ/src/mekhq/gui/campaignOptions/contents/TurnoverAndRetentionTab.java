@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -135,7 +135,7 @@ public class TurnoverAndRetentionTab {
      * @param frame           the {@link JFrame} to be assigned to this tab's frame
      * @param name            the name to be assigned to this tab's name
      */
-    TurnoverAndRetentionTab(CampaignOptions campaignOptions) {
+    public TurnoverAndRetentionTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -246,7 +246,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} for the Fatigue tab
      */
-    JPanel createFatigueTab() {
+    public JPanel createFatigueTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("FatigueTab",
             getImageDirectory() + "logo_clan_mongoose.png", true);
@@ -335,7 +335,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} for the Turnover tab
      */
-    JPanel createTurnoverTab() {
+    public JPanel createTurnoverTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("TurnoverTab",
             getImageDirectory() + "logo_duchy_of_andurien.png", true);
@@ -820,11 +820,11 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -875,7 +875,7 @@ public class TurnoverAndRetentionTab {
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

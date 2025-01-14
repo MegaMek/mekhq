@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -104,7 +104,7 @@ public class FinancesTab {
     private JSpinner spnCancelledOrderRefundMultiplier;
     //end Price Multipliers
 
-    FinancesTab(Campaign campaign) {
+    public FinancesTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
 
@@ -168,7 +168,7 @@ public class FinancesTab {
      *
      * @return {@link JPanel} representing the 'Finances General' tab.
      */
-    JPanel createFinancesGeneralOptionsTab() {
+    public JPanel createFinancesGeneralOptionsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
             getImageDirectory() + "logo_star_league.png");
@@ -479,7 +479,7 @@ public class FinancesTab {
      *
      * @return {@link JPanel} that constitutes the 'Price Multipliers' tab.
      */
-    JPanel createPriceMultipliersTab() {
+    public JPanel createPriceMultipliersTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
             getImageDirectory() + "logo_clan_stone_lion.png", true);
@@ -696,7 +696,7 @@ public class FinancesTab {
         return panel;
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -741,11 +741,11 @@ public class FinancesTab {
         options.setCancelledOrderRefundMultiplier((double) spnCancelledOrderRefundMultiplier.getValue());
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

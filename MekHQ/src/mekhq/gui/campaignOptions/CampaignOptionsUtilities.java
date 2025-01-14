@@ -36,7 +36,7 @@ public class CampaignOptionsUtilities {
     /**
      * @return the image directory
      */
-    static String getImageDirectory() {
+    public static String getImageDirectory() {
         return IMAGE_DIRECTORY;
     }
 
@@ -48,7 +48,7 @@ public class CampaignOptionsUtilities {
      * @param panel the {@link JPanel} for which the {@link GroupLayout} is created
      * @return the created {@link GroupLayout} object
      */
-    static GroupLayout createGroupLayout(JPanel panel) {
+    public static GroupLayout createGroupLayout(JPanel panel) {
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -63,7 +63,7 @@ public class CampaignOptionsUtilities {
      * @param name the name of the parent panel
      * @return the created {@link JPanel}
      */
-    static JPanel createParentPanel(JPanel panel, String name) {
+    public static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
         final JPanel parentPanel = new CampaignOptionsStandardPanel(name);
         final GroupLayout parentLayout = createGroupLayout(parentPanel);

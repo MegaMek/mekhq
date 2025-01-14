@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -31,10 +31,14 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RulesetsTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private final CampaignOptions campaignOptions;
 
     //start Universal Options
@@ -122,7 +126,7 @@ public class RulesetsTab {
     private JCheckBox chkUseVerboseBidding;
     //end StratCon
 
-    RulesetsTab(CampaignOptions campaignOptions) {
+    public RulesetsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -480,7 +484,7 @@ public class RulesetsTab {
         chkUseVerboseBidding = new JCheckBox();
     }
 
-    JPanel createStratConTab() {
+    public JPanel createStratConTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("StratConTab",
             getImageDirectory() + "logo_clan_wolf.png");
@@ -550,7 +554,7 @@ public class RulesetsTab {
         btnIntensityUpdate = new JButton();
     }
 
-    JPanel createLegacyTab() {
+    public JPanel createLegacyTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("LegacyTab",
             getImageDirectory() + "logo_free_rasalhague_republic.png", true);
@@ -758,7 +762,7 @@ public class RulesetsTab {
         }
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -812,11 +816,11 @@ public class RulesetsTab {
         }
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -132,7 +132,7 @@ public class AdvancementTab {
     private JSpinner spnSecondBonus;
     //end Skill Randomization Tab
 
-    AdvancementTab(Campaign campaign) {
+    public AdvancementTab(Campaign campaign) {
         this.campaign = campaign;
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
         this.campaignOptions = campaign.getCampaignOptions();
@@ -191,7 +191,7 @@ public class AdvancementTab {
         spnAdminWeeklyXPPeriod = new JSpinner();
     }
 
-    JPanel xpAwardsTab() {
+    public JPanel xpAwardsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("XpAwardsTab",
             getImageDirectory() + "logo_clan_steel_viper.png");
@@ -487,7 +487,7 @@ public class AdvancementTab {
         spnAbilityElite = new JSpinner();
     }
 
-    JPanel skillRandomizationTab() {
+    public JPanel skillRandomizationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
             getImageDirectory() + "logo_republic_of_the_sphere.png");
@@ -772,12 +772,11 @@ public class AdvancementTab {
         return panel;
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                       @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -830,8 +829,7 @@ public class AdvancementTab {
         spnSecondBonus.setValue(skillPreferences.getSecondSkillBonus());
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-                                        @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

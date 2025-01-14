@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -236,7 +236,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return the created tab panel as a {@link JPanel}
      */
-    JPanel createAcquisitionTab() {
+    public JPanel createAcquisitionTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("AcquisitionTab",
             getImageDirectory() + "logo_clan_cloud_cobra.png");
@@ -411,7 +411,7 @@ public class EquipmentAndSuppliesTab {
         return panelParent;
     }
 
-    JPanel createPlanetaryAcquisitionTab() {
+    public JPanel createPlanetaryAcquisitionTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
             getImageDirectory() + "logo_rim_worlds_republic.png");
@@ -705,7 +705,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return a {@link JPanel} containing the technical limits tab with all its configured components
      */
-    JPanel createTechLimitsTab() {
+    public JPanel createTechLimitsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("TechLimitsTab",
             getImageDirectory() + "logo_clan_ghost_bear.png");
@@ -792,7 +792,7 @@ public class EquipmentAndSuppliesTab {
         return maximumTechLevelModel;
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -843,11 +843,11 @@ public class EquipmentAndSuppliesTab {
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

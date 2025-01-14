@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -107,7 +107,7 @@ public class RelationshipsTab {
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
     //end Procreation Tab
 
-    RelationshipsTab(CampaignOptions campaignOptions) {
+    public RelationshipsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -220,7 +220,7 @@ public class RelationshipsTab {
      * prisoner marriages, options for marriage characteristics, logging marriage name changes, surname
      * weight settings, and random marriage generation.
      */
-    JPanel createMarriageTab() {
+    public JPanel createMarriageTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MarriageTab",
             getImageDirectory() + "logo_morgrains_valkyrate.png");
@@ -401,7 +401,7 @@ public class RelationshipsTab {
      * @return a {@link JPanel} representing the Divorce tab with checkboxes for manual divorce,
      * clan personnel divorce, prisoner divorce, and a panel for configuring random divorce settings.
      */
-    JPanel createDivorceTab() {
+    public JPanel createDivorceTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("DivorceTab",
             getImageDirectory() + "logo_escorpion_imperio.png");
@@ -520,7 +520,7 @@ public class RelationshipsTab {
      * @return a {@link JPanel} representing the Procreation tab with header, general options panel,
      * and random procreation panel
      */
-    JPanel createProcreationTab() {
+    public JPanel createProcreationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("ProcreationTab",
             getImageDirectory() + "logo_hanseatic_league.png");
@@ -714,11 +714,11 @@ public class RelationshipsTab {
         return panel;
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -771,7 +771,7 @@ public class RelationshipsTab {
         spnRandomProcreationRelationshiplessDiceSize.setValue(options.getRandomProcreationRelationshiplessDiceSize());
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
@@ -45,6 +45,7 @@ import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
@@ -54,6 +55,9 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
  * Extends the {@link AbstractMHQTabbedPane} class.
  */
 public class GeneralTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
@@ -397,12 +401,11 @@ public class GeneralTab {
         return panel;
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null, null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                       @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -429,7 +432,7 @@ public class GeneralTab {
         unitIcon = campaign.getUnitIcon();
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

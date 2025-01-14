@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
@@ -26,6 +26,7 @@ import mekhq.CampaignPreset;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -45,16 +46,18 @@ import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCatego
 import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.resources;
 
 public class AbilitiesTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private ArrayList<String> level3Abilities;
     private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private JPanel combatTab;
     private JPanel maneuveringTab;
     private JPanel utilityTab;
 
-    AbilitiesTab() {
+    public AbilitiesTab() {
         initialize();
     }
 
@@ -73,7 +76,7 @@ public class AbilitiesTab {
      *
      * @param abilities A map of active abilities keyed by their names.
      */
-    void buildAllAbilityInfo(Map<String, SpecialAbility> abilities) {
+    public void buildAllAbilityInfo(Map<String, SpecialAbility> abilities) {
         // Remove old data
         allAbilityInfo.clear();
         level3Abilities.clear();
@@ -174,7 +177,7 @@ public class AbilitiesTab {
         return UTILITY_ABILITY;
     }
 
-    JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
+    public JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
         // Header
         JPanel headerPanel = switch (abilityCategory) {
             case COMBAT_ABILITY ->
@@ -378,7 +381,7 @@ public class AbilitiesTab {
             .replaceAll("}", "");
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset) {
         Map<String, SpecialAbility> enabledAbilities = new HashMap<>();
 
         for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {

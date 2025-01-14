@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
+import mekhq.gui.campaignOptions.contents.*;
 
 import javax.swing.*;
 import java.time.LocalDate;

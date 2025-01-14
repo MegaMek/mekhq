@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
@@ -134,7 +134,7 @@ public class RepairAndMaintenanceTab {
      *
      * @return the created repair tab panel as a {@link JPanel}
      */
-    JPanel createRepairTab() {
+    public JPanel createRepairTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
             getImageDirectory() + "logo_clan_burrock.png");
@@ -231,7 +231,7 @@ public class RepairAndMaintenanceTab {
      *
      * @return The created maintenance tab panel as a {@link JPanel}.
      */
-    JPanel createMaintenanceTab() {
+    public JPanel createMaintenanceTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
             getImageDirectory() + "logo_magistracy_of_canopus.png");
@@ -335,7 +335,7 @@ public class RepairAndMaintenanceTab {
         return createParentPanel(panelParent, "maintenanceTab");
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -364,11 +364,11 @@ public class RepairAndMaintenanceTab {
         options.setLogMaintenance(logMaintenance.isSelected());
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
-    void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

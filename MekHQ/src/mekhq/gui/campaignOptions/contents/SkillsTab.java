@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.campaignOptions;
+package mekhq.gui.campaignOptions.contents;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -26,10 +26,8 @@ import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Arrays.sort;
 import static megamek.common.enums.SkillLevel.*;
@@ -37,6 +35,9 @@ import static mekhq.campaign.personnel.SkillType.isCombatSkill;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+
     private Map<String, JSpinner> allTargetNumbers;
     private Map<String, List<JLabel>> allSkillLevels;
     private Map<String, List<JSpinner>> allSkillCosts;
@@ -47,7 +48,7 @@ public class SkillsTab {
 
     private static final MMLogger logger = MMLogger.create(SkillsTab.class);
 
-    SkillsTab() {
+    public SkillsTab() {
         initialize();
     }
 
@@ -65,7 +66,7 @@ public class SkillsTab {
         storedValuesComboBoxes = new ArrayList<>();
     }
 
-    JPanel createSkillsTab(boolean isCombatTab) {
+    public JPanel createSkillsTab(boolean isCombatTab) {
         // Header
         JPanel headerPanel;
         if (isCombatTab) {
@@ -320,11 +321,11 @@ public class SkillsTab {
         }
     }
 
-    void loadValuesFromCampaignOptions() {
+    public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(new HashMap<>());
     }
 
-    void loadValuesFromCampaignOptions(Map<String, SkillType> presetSkillValues) {
+    public void loadValuesFromCampaignOptions(Map<String, SkillType> presetSkillValues) {
         String[] skills = SkillType.getSkillList(); // default skills
 
         for (String skillName : skills) {
@@ -387,7 +388,7 @@ public class SkillsTab {
         return ELITE;
     }
 
-    void applyCampaignOptionsToCampaign(@Nullable Map<String, SkillType> presetSkills) {
+    public void applyCampaignOptionsToCampaign(@Nullable Map<String, SkillType> presetSkills) {
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
             if (presetSkills != null) {
