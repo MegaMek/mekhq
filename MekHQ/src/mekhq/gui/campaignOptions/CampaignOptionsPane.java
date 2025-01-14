@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.contents.*;
 
 import javax.swing.*;
@@ -38,6 +39,8 @@ import java.util.ResourceBundle;
 
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
@@ -49,6 +52,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
+    private final CampaignOptionsDialogMode mode;
 
     private GeneralTab generalTab;
     private PersonnelTab personnelTab;
@@ -63,12 +67,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private FinancesTab financesTab;
     private MarketsTab marketsTab;
     private RulesetsTab rulesetsTab;
-    private JTabbedPane abilityContentTabs;
 
-    public CampaignOptionsPane(final JFrame frame, final Campaign campaign) {
+    public CampaignOptionsPane(final JFrame frame, final Campaign campaign, CampaignOptionsDialogMode mode) {
         super(frame, resources, "campaignOptionsDialog");
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
+        this.mode = mode;
 
         initialize();
     }
@@ -83,12 +87,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(HEADER_FONT_SIZE * uiScale),
             resources.getString("generalPanel.title")), createGeneralTab());
 
-        createTab("humanResourcesParentTab", createHumanResourcesParentTab());
-        createTab("advancementParentTab", createAdvancementParentTab());
-        createTab("logisticsAndMaintenanceParentTab", createEquipmentAndSuppliesParentTab());
-        createTab("strategicOperationsParentTab", createStrategicOperationsParentTab());
+        JTabbedPane humanResourcesParentTab = createHumanResourcesParentTab();
+        createTab("humanResourcesParentTab", humanResourcesParentTab);
 
-        abilityContentTabs = new JTabbedPane();
+        JTabbedPane advancementParentTab = createAdvancementParentTab();
+        createTab("advancementParentTab", advancementParentTab);
+
+        JTabbedPane equipmentAndSuppliesParentTab = createEquipmentAndSuppliesParentTab();
+        createTab("logisticsAndMaintenanceParentTab", equipmentAndSuppliesParentTab);
+
+        JTabbedPane strategicOperationsParentTab = createStrategicOperationsParentTab();
+        createTab("strategicOperationsParentTab", strategicOperationsParentTab);
     }
 
     /**
@@ -110,9 +119,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
         } catch (Exception ignored) {}
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
-            round(HEADER_FONT_SIZE * uiScale),
-            resources.getString(resourceName + ".title")), tabScrollPane);
+        if (mode != ABRIDGED) {
+            addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+                round(HEADER_FONT_SIZE * uiScale),
+                resources.getString(resourceName + ".title")),
+                tabScrollPane);
+        }
     }
 
     /**
@@ -222,10 +234,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // SPAs
         abilitiesTab = new AbilitiesTab();
 
-        abilityContentTabs = createSubTabs(Map.of(
+        JTabbedPane abilityContentTabs = createSubTabs(Map.of(
             "combatAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.COMBAT_ABILITY),
             "maneuveringAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.MANEUVERING_ABILITY),
             "utilityAbilitiesTab", abilitiesTab.createAbilitiesTab(AbilityCategory.UTILITY_ABILITY)));
+        // the loading of values from the campaign is built into the AbilitiesTab class so not called here.
 
         // Add Tabs
         advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
@@ -323,7 +336,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return strategicOperationsParentTab;
     }
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignPreset preset, boolean isStartUp,
+                                               boolean isSaveAction) {
         CampaignOptions options = this.campaignOptions;
         RandomSkillPreferences presetRandomSkillPreferences = null;
         Map<String, SkillType> presetSkills = null;
@@ -338,7 +352,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // While this shouldn't break anything, it's not worth moving around.
         // For all other tabs, it makes sense to apply them in the order they
         // appear in the dialog; however, this shouldn't make any major difference.
-        generalTab.applyCampaignOptionsToCampaign(options, isStartUp);
+        generalTab.applyCampaignOptionsToCampaign(options, isStartUp, isSaveAction);
 
         // Human Resources
         personnelTab.applyCampaignOptionsToCampaign(options);

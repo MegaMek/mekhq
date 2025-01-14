@@ -193,6 +193,7 @@ public class GeneralTab {
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         iconsPanel.setBorder(BorderFactory.createEtchedBorder());
+        iconsPanel.setMinimumSize(UIUtil.scaleForGUI(0, 120));
 
         iconsPanel.add(lblIcon);
         iconsPanel.add(btnIcon);
@@ -432,35 +433,39 @@ public class GeneralTab {
         unitIcon = campaign.getUnitIcon();
     }
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, boolean isStartUp) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+                                               boolean isStartUp, boolean isSaveAction) {
+        // First we apply any updates to the campaign
+        if (!isSaveAction) {
+            campaign.setName(txtName.getText());
+
+            if (isStartUp) {
+                campaign.getForces().setName(campaign.getName());
+            }
+            campaign.setLocalDate(date);
+
+            if ((campaign.getCampaignStartDate() == null)
+                || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
+                campaign.setCampaignStartDate(date);
+            }
+            // Ensure that the MegaMek year GameOption matches the campaign year
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+
+            // Null state handled during validation
+            FactionDisplay newFaction = comboFaction.getSelectedItem();
+            if (newFaction != null) {
+                campaign.setFaction(comboFaction.getSelectedItem().getFaction());
+            }
+
+            campaign.setCamouflage(camouflage);
+            campaign.setUnitIcon(unitIcon);
+        }
+
+        // Then updates to Campaign Options
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
         }
-
-        campaign.setName(txtName.getText());
-
-        if (isStartUp) {
-            campaign.getForces().setName(campaign.getName());
-        }
-        campaign.setLocalDate(date);
-
-        if ((campaign.getCampaignStartDate() == null)
-                || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
-            campaign.setCampaignStartDate(date);
-        }
-        // Ensure that the MegaMek year GameOption matches the campaign year
-        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR)
-                .setValue(campaign.getGameYear());
-
-        // Null state handled during validation
-        FactionDisplay newFaction = comboFaction.getSelectedItem();
-        if (newFaction != null) {
-            campaign.setFaction(comboFaction.getSelectedItem().getFaction());
-        }
-
-        campaign.setCamouflage(camouflage);
-        campaign.setUnitIcon(unitIcon);
 
         options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());

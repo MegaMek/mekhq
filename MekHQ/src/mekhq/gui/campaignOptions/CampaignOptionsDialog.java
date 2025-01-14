@@ -29,6 +29,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.NORMAL;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
@@ -37,15 +40,21 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
-    private final boolean isStartUp;
+    private final CampaignOptionsDialogMode mode;
 
     private boolean wasCanceled = true;
+
+    public enum CampaignOptionsDialogMode {
+        NORMAL,
+        STARTUP,
+        ABRIDGED
+    }
 
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign) {
         super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
-        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
-        this.isStartUp = false;
+        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, NORMAL);
+        this.mode = NORMAL;
         initialize();
 
         setLocationRelativeTo(frame);
@@ -53,11 +62,11 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset,
-                                 boolean isStartUp) {
+                                 CampaignOptionsDialogMode mode) {
         super(frame, true, resources, "CampaignOptionsDialog", "campaignOptions.title");
         this.campaign = campaign;
-        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign);
-        this.isStartUp = isStartUp;
+        this.campaignOptionsPane = new CampaignOptionsPane(frame, campaign, mode);
+        this.mode = mode;
         initialize();
 
         if (preset != null) {
@@ -85,16 +94,19 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
         btnApplySettings.addActionListener(evt -> {
             wasCanceled = false;
-            campaignOptionsPane.applyCampaignOptionsToCampaign(null, isStartUp);
+            campaignOptionsPane.applyCampaignOptionsToCampaign(null, mode == STARTUP,
+                false);
             dispose();
             showStratConNotice();
         });
         pnlButtons.add(btnApplySettings);
 
         // Save Preset
-        JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
-        btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
-        pnlButtons.add(btnSavePreset);
+        if (mode != ABRIDGED) {
+            JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
+            btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
+            pnlButtons.add(btnSavePreset);
+        }
 
         // Load Preset
         JButton btnLoadPreset = new CampaignOptionsButton("LoadPreset");
@@ -112,15 +124,17 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private void btnSaveActionPerformed() {
         final CreateCampaignPreset createCampaignPresetDialog
             = new CreateCampaignPreset(null, campaign, null);
+
         if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
             return;
         }
+
         final CampaignPreset preset = createCampaignPresetDialog.getPreset();
         if (preset == null) {
             return;
         }
 
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, isStartUp);
+        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode == STARTUP, true);
 
         preset.writeToFile(null,
             FileDialogs.saveCampaignPreset(null, preset).orElse(null));

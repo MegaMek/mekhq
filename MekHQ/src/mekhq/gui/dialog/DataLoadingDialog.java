@@ -53,6 +53,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
@@ -67,6 +68,8 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
 import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
@@ -299,7 +302,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Campaign Preset
                 final SelectPresetDialog presetSelectionDialog =
-                    new SelectPresetDialog(getFrame(), false, true);
+                    new SelectPresetDialog(getFrame(), true, true);
                 CampaignPreset preset;
                 boolean isSelect = false;
 
@@ -325,28 +328,20 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 }
 
                 // Campaign Options
-                if (isSelect && preset != null) {
-                    preset.applyContinuousToCampaign(campaign);
+                // This needs to be before we trigger the customize preset dialog
+                campaign.setLocalDate(DEFAULT_START_DATE);
+                campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+                campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    // This needs to be after we've applied the preset
-                    campaign.setLocalDate(DEFAULT_START_DATE);
-                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                    campaign.setStartingSystem(preset.getPlanet());
+                CampaignOptionsDialogMode mode = isSelect ? ABRIDGED : STARTUP;
+                CampaignOptionsDialog optionsDialog =
+                    new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+                setVisible(false); // cede visibility to `optionsDialog`
+                optionsDialog.setVisible(true);
+                if (optionsDialog.wasCanceled()) {
+                    return null;
                 } else {
-                    // This needs to be before we trigger the customize preset dialog
-                    campaign.setLocalDate(DEFAULT_START_DATE);
-                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                    campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
-
-                    CampaignOptionsDialog optionsDialog =
-                        new CampaignOptionsDialog(getFrame(), campaign, preset, true);
-                    setVisible(false); // cede visibility to `optionsDialog`
-                    optionsDialog.setVisible(true);
-                    if (optionsDialog.wasCanceled()) {
-                        return null;
-                    } else {
-                        setVisible(true); // restore loader visibility
-                    }
+                    setVisible(true); // restore loader visibility
                 }
 
                 // initialize reputation
