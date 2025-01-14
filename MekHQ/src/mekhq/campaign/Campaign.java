@@ -1349,26 +1349,6 @@ public class Campaign implements ITechManager {
 
 
     /**
-     * Adds an entry to the list of ship transporters . We'll use this
-     * to assign units later
-     * @see CampaignTransporterMap
-     * @param unit - The unit we want to add to this Map
-     */
-    public void addShipTransporter(Unit unit) {
-        shipTransporters.addTransporter(unit);
-    }
-
-    /**
-     * Adds an entry to the list of tactical transporters . We'll use this
-     * to assign units later
-     * @see CampaignTransporterMap
-     * @param unit - The unit we want to add to this Map
-     */
-    public void addTacticalTransporter(Unit unit) {
-        tacticalTransporters.addTransporter(unit);
-    }
-
-    /**
      * Adds a transport (Unit) to the list specified transporters map.
      * This transporters map is used to store transports, the kinds of
      * transporters they have, and their remaining capacity. The
@@ -1383,14 +1363,6 @@ public class Campaign implements ITechManager {
         } else if (campaignTransportType.isTacticalTransport()) {
             tacticalTransporters.addTransporter(unit);
         }
-    }
-
-    /**
-     * This will update the transport in the transports list with new capacities
-     * @param transport
-     */
-    public void updateTransportInTacticalTransports(Unit transport) {
-        updateTransportInTransports(TACTICAL_TRANSPORT, transport);
     }
 
     /**
@@ -1416,32 +1388,10 @@ public class Campaign implements ITechManager {
      */
     public void removeCampaignTransporter(CampaignTransportType campaignTransportType, Unit unit) {
         if (campaignTransportType.isShipTransport()) {
-            removeShipTransporter(unit);
+            shipTransporters.removeTransport(unit);
         } else if (campaignTransportType.isTacticalTransport()) {
-            removeTacticalTransporter(unit);
+            tacticalTransporters.removeTransport(unit);
         }
-    }
-
-    /**
-     * Deletes an entry from the list of transit-capable transport ships. This gets
-     * updated when
-     * the ship is removed from the campaign for one reason or another
-     *
-     * @param unit - The ship we want to remove from this Set
-     */
-    public void removeShipTransporter(Unit unit) {
-        shipTransporters.removeTransport(unit);
-    }
-
-    /**
-     * Deletes an entry from the list of transit-capable transport units. This gets
-     * updated when
-     * the unit is removed from the campaign for one reason or another
-     *
-     * @param unit - The ship we want to remove from this Set
-     */
-    public void removeTacticalTransporter(Unit unit) {
-        tacticalTransporters.removeTransport(unit);
     }
 
     /**
@@ -5115,12 +5065,11 @@ public class Campaign implements ITechManager {
         // remove unit from any forces
         removeUnitFromForce(unit);
 
-        // If this is a ship, remove it from the list of potential transports
-        if (getCampaignTransporterMap(SHIP_TRANSPORT).hasTransport(unit)) {
-            removeShipTransporter(unit);
-        }
-        if (getCampaignTransporterMap(TACTICAL_TRANSPORT).hasTransport(unit)) {
-            removeTacticalTransporter(unit);
+        // If this is a transport, remove it from the list of potential transports
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (hasTransports(campaignTransportType)) {
+                removeCampaignTransporter(campaignTransportType, unit);
+            }
         }
 
         // If this unit was assigned to a transport ship, remove it from the transport
@@ -8159,15 +8108,6 @@ public class Campaign implements ITechManager {
         return null;
     }
 
-    /**
-     * Returns a Map that maps Transporter types to another
-     * Map that maps capacity (Double) to UUID of transports
-     *
-     * @return units that have space for that transport type
-     */
-    public Map<TransporterType, Map<Double, Set<UUID>>> getTacticalTransports() {
-        return tacticalTransporters.getTransporters();
-    }
 
     /**
      * Returns a Map that maps Transporter types to another
@@ -8175,16 +8115,18 @@ public class Campaign implements ITechManager {
      * for the specific TransportedUnitSummary type
      *
      * @param campaignTransportType type (Enum) of TransportedUnitSummary
-     * @return units that have space for that transport type
+     * @return the full map for that campaign transport type
      */
     public Map<TransporterType, Map<Double, Set<UUID>>> getTransports(CampaignTransportType campaignTransportType) {
         return getCampaignTransporterMap(campaignTransportType).getTransporters();
     }
 
     /**
-     * Returns list of transports
+     * Returns list of transports that have the provided
+     * TransporterType and CampaignTransportType
      *
-     * @param transporterType class of Transporter
+     * @param campaignTransportType type of campaign transport
+     * @param transporterType type of Transporter
      * @return units that have that transport type
      */
     public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType) {
@@ -8197,6 +8139,9 @@ public class Campaign implements ITechManager {
      * AbstractTransportedUnitSummary class/subclass
      * that has transport capacity for the
      * Transporter class/subclass
+     * For example, getTransportsByType(SHIP_TRANSPORT, MEK_BAY, 3.0)
+     * would return all transports that have 3 or more Mek Bay slots
+     * open for the SHIP_TRANSPORT type of assignment.
      *
      * @param campaignTransportType type (Enum) of TransportedUnitSummary
      * @param transporterType type (Enum) of Transporter

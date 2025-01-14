@@ -28,8 +28,8 @@ import mekhq.campaign.unit.enums.TransporterType;
 import java.util.*;
 
 /**
- * It is time consuming to determine what transporter types we can load a unit into when
- * in a popup menu. This class is for keeping just enough information in memory that we
+ * It is time-consuming to determine what transporter types we can load a unit into when
+ * in a popup menu. This class is for keeping just enough information that we
  * can quickly determine which transporters can fit a unit.
  *
  * @see CampaignTransportType
@@ -104,7 +104,7 @@ public class CampaignTransporterMap {
     }
 
     /**
-     * true if this transport map contians the unit, false if not
+     * true if this transport map contains the unit, false if not
      * @param unit is in this transport map as a UUID?
      * @return true if the unit is, false if not
      */
@@ -130,7 +130,9 @@ public class CampaignTransporterMap {
     }
 
     /**
-     * Returns list of transports that can transport a unit of given size
+     * Returns a list of transports that can transport a unit of given size.
+     * For example, getTransportsByType(MEK_BAY, 3.0) would return all
+     * transports that have 3 or more Mek Bay slots open.
      *
      * @param transporterType class of Transporter
      * @param unitSize the size of the unit (usually 1)
