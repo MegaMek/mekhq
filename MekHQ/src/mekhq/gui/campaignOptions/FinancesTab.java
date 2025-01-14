@@ -24,7 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;

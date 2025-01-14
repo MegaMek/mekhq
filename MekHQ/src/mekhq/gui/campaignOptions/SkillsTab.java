@@ -22,7 +22,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;

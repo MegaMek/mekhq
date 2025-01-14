@@ -22,7 +22,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;

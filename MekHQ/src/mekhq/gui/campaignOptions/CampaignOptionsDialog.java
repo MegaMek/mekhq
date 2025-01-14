@@ -23,7 +23,7 @@ import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 import javax.swing.*;
 import java.awt.*;

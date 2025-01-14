@@ -24,7 +24,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;

@@ -20,7 +20,7 @@ package mekhq.gui.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;

@@ -20,7 +20,7 @@ package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;

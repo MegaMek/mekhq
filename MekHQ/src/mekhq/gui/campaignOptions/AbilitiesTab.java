@@ -26,10 +26,10 @@ import mekhq.CampaignPreset;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsButton;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 

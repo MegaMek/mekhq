@@ -25,7 +25,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;

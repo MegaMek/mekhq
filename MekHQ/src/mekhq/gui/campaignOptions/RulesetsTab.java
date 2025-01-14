@@ -25,7 +25,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Skills;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

@@ -25,7 +25,7 @@ import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;

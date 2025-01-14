@@ -35,7 +35,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;

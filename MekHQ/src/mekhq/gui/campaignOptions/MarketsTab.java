@@ -26,7 +26,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.personnel.Skills;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 

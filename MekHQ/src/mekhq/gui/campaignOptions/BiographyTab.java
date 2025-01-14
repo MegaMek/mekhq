@@ -33,7 +33,7 @@ import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;

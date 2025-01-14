@@ -27,7 +27,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.campaignOptions.factoryClasses.*;
+import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;
