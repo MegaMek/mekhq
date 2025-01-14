@@ -23,107 +23,190 @@ import megamek.common.*;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static mekhq.campaign.unit.enums.TransporterType.*;
+import static mekhq.campaign.utilities.CampaignTransportUtilities.Visitor.visitors;
 
 public class CampaignTransportUtilities {
     // region Static Helpers
-    /**
-     * Helps the menus need to check less when generating Ship Transports can't use short-term
-     * transport types like InfantryCompartments or BattleArmorHandles. Use a Bay! Or DockingCollar
-     *
-     * @see Transporter
-     * @param unit unit we want to get the Transporter types that could potentially hold it
-     * @return Transporter types that could potentially transport this entity
-     */
-    public static Set<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType, Entity unit) {
-        Set<TransporterType> transporters = new HashSet<>();
 
-        Class<? extends Entity> entityType = unit.getClass();
-        if (ProtoMek.class.isAssignableFrom(entityType)) {
-            transporters.add(PROTO_MEK_BAY);
-            transporters.add(PROTO_MEK_CLAMP_MOUNT);
-        }
-        else if (Aero.class.isAssignableFrom(entityType)) {
-            if ((unit.isFighter())) {
-                transporters.add(ASF_BAY);
-            }
-            if ((unit.isFighter()) || unit.isSmallCraft()) {
-                transporters.add(SMALL_CRAFT_BAY);
-            }
-            if (unit.hasETypeFlag(Entity.ETYPE_DROPSHIP) && (unit.getWeight() <= 5000)) {
-                transporters.add(DROPSHUTTLE_BAY);
-            }
-            if (unit.hasETypeFlag(Entity.ETYPE_DROPSHIP) || unit.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                transporters.add(NAVAL_REPAIR_FACILITY);
-                transporters.add(REINFORCED_REPAIR_FACILITY);
-            }
-            if (unit instanceof Dropship && !((Dropship) unit).isDockCollarDamaged()) {
-                transporters.add(DOCKING_COLLAR);
-            }
-        }
-        else if (Tank.class.isAssignableFrom(entityType)) {
-            if (unit.getWeight() <= 50) {
-                transporters.add(LIGHT_VEHICLE_BAY);
-            }
+    interface Visitor<T extends Entity> {
+        boolean isInterestedIn(Entity entity);
 
-            if (unit.getWeight() <= 100) {
-                transporters.add(HEAVY_VEHICLE_BAY);
-            }
+        EnumSet<TransporterType> getTransporterTypes(T entity, CampaignTransportType campaignTransportType);
 
-            if (unit.getWeight() <= 150) {
-                transporters.add(SUPER_HEAVY_VEHICLE_BAY);
-            }
-        }
-        else if (Mek.class.isAssignableFrom(entityType)) {
-            boolean loadableQuadVee = (unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_MEK);
-            boolean loadableLAM = (unit instanceof LandAirMek) && (unit.getConversionMode() != LandAirMek.CONV_MODE_FIGHTER);
-            boolean loadableOtherMek = (unit instanceof Mek) && !(unit instanceof QuadVee) && !(unit instanceof LandAirMek);
-            if (loadableQuadVee || loadableLAM || loadableOtherMek) {
-                transporters.add(MEK_BAY);
 
-            } else {
-                if ((unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_VEHICLE)) {
-                    if (unit.getWeight() <= 50) {
+        List<Visitor> visitors = List.of(
+
+            new Visitor<ProtoMek>() {
+                @Override
+                public boolean isInterestedIn(Entity entity) {
+                    return entity instanceof ProtoMek;
+                }
+
+                @Override
+                public EnumSet<TransporterType> getTransporterTypes(ProtoMek entity, CampaignTransportType campaignTransportType) {
+                    Set<TransporterType> transporters = new HashSet<>();
+                    transporters.add(PROTO_MEK_BAY);
+
+                    //Ship transports can't use some transport types
+                    if (!(campaignTransportType.isShipTransport())) {
+                        transporters.add(PROTO_MEK_CLAMP_MOUNT);
+                    }
+
+                    return EnumSet.copyOf(transporters);
+                }
+            },
+            new Visitor<Aero>() {
+
+                @Override
+                public boolean isInterestedIn(Entity entity) {
+                    return entity instanceof Aero;
+                }
+
+                @Override
+                public EnumSet<TransporterType> getTransporterTypes(Aero entity, CampaignTransportType campaignTransportType) {
+                    Set<TransporterType> transporters = new HashSet<>();
+                     if (entity.isFighter()) {
+                         transporters.add(ASF_BAY);
+                     }
+                    if ((entity.isFighter()) || entity.isSmallCraft()) {
+                        transporters.add(SMALL_CRAFT_BAY);
+                    }
+                    if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) && (entity.getWeight() <= 5000)) {
+                        transporters.add(DROPSHUTTLE_BAY);
+                    }
+                    if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                        transporters.add(NAVAL_REPAIR_FACILITY);
+                        transporters.add(REINFORCED_REPAIR_FACILITY);
+                    }
+                    if (entity instanceof Dropship && !((Dropship) entity).isDockCollarDamaged()) {
+                        transporters.add(DOCKING_COLLAR);
+                    }
+
+                    return EnumSet.copyOf(transporters);
+                }
+            },
+            new Visitor<Tank>() {
+
+                @Override
+                public boolean isInterestedIn(Entity entity) {
+                    return entity instanceof Tank;
+                }
+
+                @Override
+                public EnumSet<TransporterType> getTransporterTypes(Tank entity, CampaignTransportType campaignTransportType) {
+
+                    Set<TransporterType> transporters = new HashSet<>();
+
+                    if (entity.getWeight() <= 50) {
                         transporters.add(LIGHT_VEHICLE_BAY);
                     }
 
-                    if (unit.getWeight() <= 100) {
+                    if (entity.getWeight() <= 100) {
                         transporters.add(HEAVY_VEHICLE_BAY);
                     }
 
-                    if (unit.getWeight() <= 100) {
+                    if (entity.getWeight() <= 150) {
                         transporters.add(SUPER_HEAVY_VEHICLE_BAY);
                     }
+                    return EnumSet.copyOf(transporters);
                 }
-            }
-        }
-        else if (Infantry.class.isAssignableFrom(entityType)) {
-            transporters.add(INFANTRY_BAY);
+            },
+            new Visitor<Mek>() {
 
-            //Ship transports can't use some transport types
-            if (!(campaignTransportType.isShipTransport())) {
-                transporters.add(INFANTRY_COMPARTMENT);
+                @Override
+                public boolean isInterestedIn(Entity entity) {
+                    return entity instanceof Mek;
+                }
 
-                if (BattleArmor.class.isAssignableFrom(entityType)) {
-                    transporters.add(BATTLE_ARMOR_BAY);
-                    BattleArmor baUnit = (BattleArmor) unit;
+                @Override
+                public EnumSet<TransporterType> getTransporterTypes(Mek entity, CampaignTransportType campaignTransportType) {
+                    Set<TransporterType> transporters = new HashSet<>();
+                    boolean loadableQuadVee = (entity instanceof QuadVee) && (entity.getConversionMode() == QuadVee.CONV_MODE_MEK);
+                    boolean loadableLAM = (entity instanceof LandAirMek) && (entity.getConversionMode() != LandAirMek.CONV_MODE_FIGHTER);
+                    boolean loadableOtherMek = (entity != null) && !(entity instanceof QuadVee) && !(entity instanceof LandAirMek);
+                    if (loadableQuadVee || loadableLAM || loadableOtherMek) {
+                        transporters.add(MEK_BAY);
 
-                    if (baUnit.canDoMechanizedBA()) {
-                        transporters.add(BATTLE_ARMOR_HANDLES);
-                        transporters.add(BATTLE_ARMOR_HANDLES_TANK);
+                    } else {
+                        if ((entity instanceof QuadVee) && (entity.getConversionMode() == QuadVee.CONV_MODE_VEHICLE)) {
+                            if (entity.getWeight() <= 50) {
+                                transporters.add(LIGHT_VEHICLE_BAY);
+                            }
 
-                        if (baUnit.hasMagneticClamps()) {
-                            transporters.add(CLAMP_MOUNT_MEK);
-                            transporters.add(CLAMP_MOUNT_TANK);
+                            if (entity.getWeight() <= 100) {
+                                transporters.add(HEAVY_VEHICLE_BAY);
+                            }
+
+                            if (entity.getWeight() <= 100) {
+                                transporters.add(SUPER_HEAVY_VEHICLE_BAY);
+                            }
                         }
                     }
+                    return EnumSet.copyOf(transporters);
                 }
-            }
-        }
-        return transporters;
+            },
+            new Visitor<Infantry>() {
+
+                @Override
+                public boolean isInterestedIn(Entity entity) {
+                    return entity instanceof Infantry;
+                }
+
+                @Override
+                public EnumSet<TransporterType> getTransporterTypes(Infantry entity, CampaignTransportType campaignTransportType) {
+                    Set<TransporterType> transporters = new HashSet<>();
+
+                    //Ship transports can't use some transport types
+                    if (!(campaignTransportType.isShipTransport())) {
+                        transporters.add(INFANTRY_COMPARTMENT);
+                    }
+
+                    if (entity instanceof BattleArmor baEntity) {
+                        transporters.add(BATTLE_ARMOR_BAY);
+
+                        //Ship transports can't use some transport types
+                        if (baEntity.canDoMechanizedBA() && !campaignTransportType.isShipTransport()) {
+                            transporters.add(BATTLE_ARMOR_HANDLES);
+                            transporters.add(BATTLE_ARMOR_HANDLES_TANK);
+
+                            if (baEntity.hasMagneticClamps()) {
+                                transporters.add(CLAMP_MOUNT_MEK);
+                                transporters.add(CLAMP_MOUNT_TANK);
+                            }
+
+                        }
+
+                    } else {
+                        transporters.add(INFANTRY_BAY);
+                    }
+
+                    return EnumSet.copyOf(transporters);
+                }
+            });
+    }
+
+    private static Optional<Visitor> getTransportTypeClassifier(Entity entity) {
+        return visitors.stream().filter(v -> v.isInterestedIn(entity)).findFirst();
+    }
+
+    /**
+     * Helps the menus need to check less when generating Transports. Let's get a list of
+     * TransporterTypes that this Entity could potentially be transported in. This will make
+     * it much easier to determine what Transporters we should even look at.
+     * In addition, CampaignTransportTypes that can't use certain TransporterTypes is handled,
+     * like Ship Transports not being able to use InfantryCompartments or BattleArmorHandles.
+     * Use a Bay! Or DockingCollar.
+     *
+     * @see TransporterType
+     * @param campaignTransportType type (enum) of campaign transport - some transport types can't use certain transporters
+     * @param unit unit we want to get the Transporter types that could potentially hold it
+     * @return Transporter types that could potentially transport this entity
+     */
+    public static EnumSet<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType, Entity unit) {
+        return getTransportTypeClassifier(unit).map(v -> v.getTransporterTypes(unit, campaignTransportType)).orElse(EnumSet.noneOf(TransporterType.class));
     }
 
 

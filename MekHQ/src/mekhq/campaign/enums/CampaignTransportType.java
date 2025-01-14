@@ -35,7 +35,7 @@ import static mekhq.campaign.unit.enums.TransporterType.*;
  * The different transport types primarily differ
  * in the Transporters they allow.
  * @see Unit
- * @see Transporter
+ * @see TransporterType
  */
 public enum CampaignTransportType
 {
