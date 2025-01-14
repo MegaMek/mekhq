@@ -1328,8 +1328,7 @@ public class Utilities {
 
             // Find a bay with space in it and update that space so the next unit can
             // process, unless the unit isn't being loaded into a bay
-            if (transportAssignment.hasTransportedLocation()
-                    && (transportAssignment.getTransportedLocation() instanceof Bay)) {
+            if (transportAssignment.getTransportedLocation() instanceof Bay) {
                 Bay bay = (Bay) transportAssignment.getTransportedLocation();
                 cargo.setTargetBay(bay.getBayNumber());
             } else {
