@@ -35,7 +35,7 @@ import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
  */
 public class PotentialTransportsMap {
 
-    private final HashMap<CampaignTransportType, Map<UUID, List<UUID>>> hashMap = new HashMap<CampaignTransportType, Map<UUID, List<UUID>>>();
+    private final HashMap<CampaignTransportType, Map<UUID, List<UUID>>> hashMap = new HashMap<>();
 
     public PotentialTransportsMap(CampaignTransportType[] campaignTransportTypes) {
         for (CampaignTransportType campaignTransportType : campaignTransportTypes) {
@@ -98,7 +98,7 @@ public class PotentialTransportsMap {
      * Look through the transport map for this unit's assigned transports
      * in priority order (Ship then Tactical Transports). If the transport
      * is in the map, add it to the Map for loading later.
-     * @param unit
+     * @param unit the Unit we want to transport on its assigned transport, if it has one
      */
     public void tryToAddTransportedUnit(Unit unit) {
         if (unit.hasTransportShipAssignment()) {
