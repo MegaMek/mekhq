@@ -2150,7 +2150,7 @@ public class Unit implements ITechnology {
      * this data
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param transporterType type (Class) of Transporter to transport the units in
+     * @param transporterType type (Enum) of Transporter to transport the units in
      * @param units Vector of units that we wish to load into this transport
      */
     public Set<Unit> loadShipTransport(TransporterType transporterType, Set<Unit> units) {
@@ -2246,7 +2246,7 @@ public class Unit implements ITechnology {
 
     /**
      * Set the transport capacity for the specified transporter type to a specific capacity
-     * @param transporterType type (class) of transporter we want to set the capacity
+     * @param transporterType type (Enum) of transporter we want to set the capacity
      * @param capacity how much this transporter should be able to transport
      */
     public void setCurrentShipTransportCapacity(TransporterType transporterType, double capacity) {
@@ -2255,7 +2255,7 @@ public class Unit implements ITechnology {
 
     /**
      * Set the transport capacity for the specified transporter type to a specific capacity
-     * @param transporterType type (class) of transporter we want to set the capacity
+     * @param transporterType type (Enum) of transporter we want to set the capacity
      * @param capacity how much this transporter should be able to transport
      */
     public void setCurrentTacticalTransportCapacity(TransporterType transporterType, double capacity) {
@@ -2328,7 +2328,7 @@ public class Unit implements ITechnology {
      * or the type of Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param transporterType type (Class) of bay or Transporter
+     * @param transporterType type (Enum) of bay or Transporter
      * @param units units being loaded
      * @return the old transports of the units, or an empty set if none
      */
@@ -2344,7 +2344,7 @@ public class Unit implements ITechnology {
      *
      * @param transportedUnit Unit we wish to load
      * @param transportedLocation specific bay (Transporter), or null
-     * @param transporterType type (Class) of bay or Transporter
+     * @param transporterType type (Enum) of bay or Transporter
      * @return the old transport of the unit, or an empty set if none
      */
     public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {

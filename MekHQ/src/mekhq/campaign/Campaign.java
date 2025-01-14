@@ -1369,10 +1369,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Adds an entry to the list specified transporters list. We'll use this
-     * to assign units later
+     * Adds a transport (Unit) to the list specified transporters map.
+     * This transporters map is used to store transports, the kinds of
+     * transporters they have, and their remaining capacity. The
+     * transporters map is meant to be utilized by the GUI.
      * @see CampaignTransporterMap
-     * @param campaignTransportType Transport Type (enum) we're checking
+     * @param campaignTransportType Transport Type (enum) we're adding to
      * @param unit unit with transport capabilities
      */
     public void addCampaignTransport(CampaignTransportType campaignTransportType, Unit unit) {
@@ -1392,8 +1394,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This will update the transport in the transports list with new capacities
-     * @param campaignTransportType type (Class) of TransportedUnitsSummary we're interested in
+     * This will update the transport in the transports list with current capacities.
+     * When a unit is added or removed from a transport, that information needs updated
+     * in the campaign transport map. This method takes the CampaignTransportType and
+     * transport as inputs and updates the map with the current capacities of the
+     * transport.
+     * @param campaignTransportType type (Enum) of TransportedUnitsSummary we're interested in
      * @param transport Unit
      */
     public void updateTransportInTransports(CampaignTransportType campaignTransportType, Unit transport) {
@@ -8176,7 +8182,7 @@ public class Campaign implements ITechManager {
      * Map that maps capacity (Double) to UUID of transports
      * for the specific TransportedUnitSummary type
      *
-     * @param campaignTransportType type (Class) of TransportedUnitSummary
+     * @param campaignTransportType type (Enum) of TransportedUnitSummary
      * @return units that have space for that transport type
      */
     public Map<TransporterType, Map<Double, Set<UUID>>> getTransports(CampaignTransportType campaignTransportType) {
@@ -8200,8 +8206,8 @@ public class Campaign implements ITechManager {
      * that has transport capacity for the
      * Transporter class/subclass
      *
-     * @param campaignTransportType type (Class) of TransportedUnitSummary
-     * @param transporterType type (Class) of Transporter
+     * @param campaignTransportType type (Enum) of TransportedUnitSummary
+     * @param transporterType type (Enum) of Transporter
      * @param unitSize capacity that the transport must be capable of
      * @return units that have that transport type
      */

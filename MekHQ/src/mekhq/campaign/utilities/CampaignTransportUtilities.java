@@ -213,7 +213,7 @@ public class CampaignTransportUtilities {
     /**
      * Most slots are 1:1, infantry use their tonnage in some cases
      *
-     * @param transporterType type (Class) of Transporter
+     * @param transporterType type (Enum) of Transporter
      * @param transportedUnit Entity we want the capacity usage of
      * @return how much capacity this unit uses when being transported in this kind of transporter
      */

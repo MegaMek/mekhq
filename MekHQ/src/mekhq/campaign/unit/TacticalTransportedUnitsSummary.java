@@ -73,7 +73,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * Transporter if one isn't provided. Once in the MM lobby,
      * will be used to actually load the unit into a bay on the transport.
      *
-     * @param transporterType type (Class) of bay or Transporter
+     * @param transporterType type (Enum) of bay or Transporter
      * @param units units being loaded
      * @return old transports; what were  the units' previous transport, if they had one
      */
@@ -90,7 +90,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      *
      * @param units units being loaded
      * @param transportedLocation specific bay (Transporter), or null
-     * @param transporterType type (Class) of bay or Transporter
+     * @param transporterType type (Enum) of bay or Transporter
      * @return old transports; what were  the units' previous transport, if they had one
      */
     public Set<Unit> loadTransport(Set<Unit> units, @Nullable Transporter transportedLocation, TransporterType transporterType) {
@@ -114,7 +114,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * will be used to actually load the unit into a bay on the transport.
      *
      * @param transportedLocation specific bay, or null
-     * @param transporterType type (Class) of bay or Transporter
+     * @param transporterType type (Enum) of bay or Transporter
      * @param transportedUnit unit being loaded
      * @return old transport; what was the unit's previous transport, if it had one
      */

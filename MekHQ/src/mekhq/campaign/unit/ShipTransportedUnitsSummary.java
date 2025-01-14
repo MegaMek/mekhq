@@ -79,7 +79,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      * will be used to actually load the unit into a bay on the transport.
      *
      * @param transportedUnits units being loaded
-     * @param transporterType type (Class) of bay or Transporter
+     * @param transporterType type (Enum) of bay or Transporter
      * @return old transports; what were  the units' previous transport, if they had one?
      */
     public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, TransporterType transporterType) {
