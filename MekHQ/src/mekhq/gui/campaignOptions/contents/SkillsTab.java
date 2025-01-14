@@ -26,14 +26,30 @@ import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.sort;
 import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+/**
+ * SkillsTab is a component of the campaign options user interface that allows players
+ * to configure the rules and costs associated with skills in their campaign.
+ * <p>
+ * This tab can be configured for either combat or support skills. It allows users to:
+ * <ul>
+ *   <li>Set skill target numbers.</li>
+ *   <li>Specify skill costs at different levels.</li>
+ *   <li>Define milestones for the progression of skills by skill levels.</li>
+ *   <li>Copy and paste configurations for skill settings.</li>
+ * </ul>
+ * The interface is dynamically created to display all relevant skill options for the
+ * selected tab (combat or support).
+ * </p>
+ */
 public class SkillsTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
@@ -48,14 +64,27 @@ public class SkillsTab {
 
     private static final MMLogger logger = MMLogger.create(SkillsTab.class);
 
+    /**
+     * Constructs a new `SkillsTab` instance and initializes the necessary data
+     * structures for managing skill configurations.
+     */
     public SkillsTab() {
         initialize();
     }
 
+    /**
+     * Initializes the SkillsTab by setting up the necessary data structures and
+     * default values for skill configuration.
+     */
     private void initialize() {
         initializeGeneral();
     }
 
+    /**
+     * Sets up the general data structures needed for skill configuration in the
+     * SkillsTab. This includes collections for tracking target numbers, costs,
+     * and milestones for every skill.
+     */
     private void initializeGeneral() {
         allTargetNumbers = new HashMap<>();
         allSkillLevels = new HashMap<>();
@@ -66,6 +95,19 @@ public class SkillsTab {
         storedValuesComboBoxes = new ArrayList<>();
     }
 
+    /**
+     * Creates the main panel for the SkillsTab UI.
+     * <p>
+     * Depending on the `isCombatTab` argument, it creates a tab for either combat
+     * or support skills. The tab displays skill panels associated with the selected
+     * category, allowing users to configure their target numbers, costs, and milestones.
+     * </p>
+     *
+     * @param isCombatTab a boolean indicating whether this is a combat tab
+     *                    (true for combat skills, false for support skills).
+     * @return a {@link JPanel} containing the dynamically generated skill options
+     *         for the selected tab.
+     */
     public JPanel createSkillsTab(boolean isCombatTab) {
         // Header
         JPanel headerPanel;
@@ -151,12 +193,33 @@ public class SkillsTab {
         return createParentPanel(panel, "CombatSkillsTab");
     }
 
+    /**
+     * Toggles the visibility of all components related to skills in the SkillsTab UI.
+     * <p>
+     * This can be used to either hide or display all components for easier navigation
+     * or cleaner representation of the tab.
+     * </p>
+     *
+     * @param visible a boolean indicating whether to show or hide all components.
+     */
     private void setVisibleForAll(boolean visible) {
         setVisibleForAll(allSkillLevels, visible);
         setVisibleForAll(allSkillCosts, visible);
         setVisibleForAll(allSkillMilestones, visible);
     }
 
+    /**
+     * Toggles the visibility of a specific category of components in the SkillsTab UI.
+     * <p>
+     * This method allows visibility control over target numbers, costs, and skill
+     * level milestones based on the provided component map.
+     * </p>
+     *
+     * @param componentsMap a map containing the components to show or hide.
+     * @param visible        a boolean indicating whether to show or hide the components.
+     * @param <T>            the type of the component to toggle visibility for
+     *                       (e.g., {@link JSpinner}, {@link JComboBox}).
+     */
     private <T extends JComponent> void setVisibleForAll(Map<String, List<T>> componentsMap,
                                                          boolean visible) {
         for (String SkillName : componentsMap.keySet()) {
@@ -169,6 +232,21 @@ public class SkillsTab {
         }
     }
 
+    /**
+     * Creates a dynamic panel for configuring the specified skill.
+     * <p>
+     * Each skill panel includes controls for:
+     * <ul>
+     *   <li>Setting the target number for the skill.</li>
+     *   <li>Configuring costs of the skill at different levels.</li>
+     *   <li>Defining milestones for skill progression (e.g., from Green to Veteran).</li>
+     * </ul>
+     * Copy and paste buttons are available for transferring configurations between skills.
+     * </p>
+     *
+     * @param skill the {@link SkillType} object representing the skill to be configured.
+     * @return a {@link JPanel} containing the UI components for the given skill.
+     */
     private JPanel createSkillPanel(SkillType skill) {
         String panelName = "SkillPanel" + skill.getName().replace(" ", "");
 
@@ -288,6 +366,17 @@ public class SkillsTab {
         return panel;
     }
 
+    /**
+     * Action listener for milestone combo boxes to synchronize their values sequentially.
+     * <p>
+     * When the user changes the value of a milestone, subsequent milestones are
+     * automatically adjusted to ensure logical skill progression (e.g., later
+     * milestones cannot precede earlier ones). This method enforces such constraints.
+     * </p>
+     *
+     * @param comboBoxes the list of combo boxes representing milestones for a single skill.
+     * @param comboBox   the combo box that triggered the action.
+     */
     private static void milestoneActionListener(List<JComboBox<SkillLevel>> comboBoxes, JComboBox<SkillLevel> comboBox) {
         int originIndex = comboBoxes.indexOf(comboBox);
 
@@ -321,10 +410,28 @@ public class SkillsTab {
         }
     }
 
+    /**
+     * Loads skill values from the default campaign options.
+     * <p>
+     * A version of this method without parameters that uses default skill values
+     * defined in the campaign.
+     * </p>
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(new HashMap<>());
     }
 
+    /**
+     * Loads skill values into the UI components from the campaign options.
+     * <p>
+     * The method populates the spinners, labels, and comboboxes for all skills
+     * with their corresponding properties (e.g., target numbers, costs, and milestones)
+     * retrieved from the campaign's configuration.
+     * </p>
+     *
+     * @param presetSkillValues an optional map of preset skill values. If null
+     *                          or empty, default skill values are used instead.
+     */
     public void loadValuesFromCampaignOptions(Map<String, SkillType> presetSkillValues) {
         String[] skills = SkillType.getSkillList(); // default skills
 
@@ -371,6 +478,20 @@ public class SkillsTab {
         }
     }
 
+    /**
+     * Determines the skill level milestone based on progress indices.
+     * <p>
+     * It evaluates whether the milestone falls under Green, Regular, Veteran, or Elite
+     * levels, ensuring proper assignments for milestone thresholds.
+     * </p>
+     *
+     * @param index        the position in the milestone sequence.
+     * @param greenIndex   the index where Green begins.
+     * @param regularIndex the index where Regular begins.
+     * @param veteranIndex the index where Veteran begins.
+     * @param eliteIndex   the index where Elite begins.
+     * @return the corresponding {@link SkillLevel} for the given milestone.
+     */
     private SkillLevel determineMilestoneLevel(int index, int greenIndex, int regularIndex,
                                                int veteranIndex, int eliteIndex) {
         if (index < greenIndex) {
@@ -388,6 +509,18 @@ public class SkillsTab {
         return ELITE;
     }
 
+    /**
+     * Transfers the configured skill values from the SkillsTab UI into the campaign's
+     * underlying data model.
+     * <p>
+     * The method iterates through all configurable skills, updating the campaign
+     * with the configured target numbers, costs, and milestones for each skill.
+     * </p>
+     *
+     * @param presetSkills an optional map of preset skill values. Overrides default
+     *                     values if provided. Null values will use the campaign's
+     *                     default values.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable Map<String, SkillType> presetSkills) {
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
@@ -411,11 +544,35 @@ public class SkillsTab {
         }
     }
 
+    /**
+     * Updates the target number for a given skill in the campaign based on the
+     * corresponding user input from the SkillsTab UI.
+     * <p>
+     * The target number determines the difficulty level for the specified skill
+     * in the campaign. This value is fetched from the associated spinner component
+     * in the UI and is applied to the given {@link SkillType}.
+     * </p>
+     *
+     * @param type the {@link SkillType} object representing the skill whose target
+     *             number needs to be updated.
+     */
     private void updateTargetNumber(SkillType type) {
         int targetNumber = (int) allTargetNumbers.get(type.getName()).getValue();
         type.setTarget(targetNumber);
     }
 
+    /**
+     * Updates the costs associated with a given skill based on the user input
+     * from the SkillsTab UI.
+     * <p>
+     * For each level of the specified skill, the cost values are retrieved from
+     * the corresponding spinner components in the UI and stored in the campaign's
+     * configuration. The costs represent the resource requirements for acquiring
+     * the skill at various levels.
+     * </p>
+     *
+     * @param skillName the name of the skill whose cost values are to be updated.
+     */
     private void updateSkillCosts(String skillName) {
         List<JSpinner> costs = allSkillCosts.get(skillName);
 
@@ -425,6 +582,22 @@ public class SkillsTab {
         }
     }
 
+    /**
+     * Updates the skill milestones for a given skill in the campaign
+     * based on user input from the SkillsTab UI.
+     * <p>
+     * Milestones represent the thresholds required to reach
+     * certain skill levels (e.g., Green, Regular, Veteran, Elite).
+     * The method processes these values from the associated combo boxes
+     * in the UI and applies them to the provided {@link SkillType}.
+     * <p>
+     * The method ensures logical milestone progression and assigns
+     * default values if necessary.
+     * </p>
+     *
+     * @param type the {@link SkillType} object representing the skill whose
+     *             milestones are to be updated.
+     */
     private void updateSkillMilestones(SkillType type) {
         List<JComboBox<SkillLevel>> skillMilestones = allSkillMilestones.get(type.getName());
 

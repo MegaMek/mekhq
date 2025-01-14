@@ -40,10 +40,40 @@ import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 /**
- * Handles the Personnel tab of campaign options
+ * The {@code PersonnelTab} class represents the user interface components
+ * for configuring personnel-related options in the MekHQ Campaign Options dialog.
+ * This class handles the initialization, layout, and logic for various personnel
+ * settings spanning multiple tabs, such as general personnel options, personnel
+ * logs, information, awards, medical options, salaries, and prisoners & dependents.
+ * <p>
+ * The class is organized into multiple tabs that encapsulate settings under specific categories:
+ * <ul>
+ *   <li><b>General Tab:</b> General settings for personnel management such as tactics,
+ *   initiative bonus, toughness, and edge settings.</li>
+ *   <li><b>Personnel Logs Tab:</b> Settings for logging activities like skill or ability
+ *   gains, personnel transfers, and kill records.</li>
+ *   <li><b>Personnel Information Tab:</b> Configuration of options for displaying
+ *   personnel details like time in service, time in rank, and earnings tracking.</li>
+ *   <li><b>Awards Tab:</b> Options for managing awards given during play, including
+ *   auto-awards, tier size configurations, and specific award filters.</li>
+ *   <li><b>Medical Tab:</b> Medical-related settings such as healing time,
+ *   advanced medical usage, and tougher healing options.</li>
+ *   <li><b>Prisoners & Dependents Tab:</b> Configuration of prisoner handling
+ *   and dependent-related rules.</li>
+ *   <li><b>Salaries Tab:</b> Configuration of salaries based on roles, experience
+ *   multipliers, and base salary rates.</li>
+ * </ul>
+ *
+ * <p>
+ * This class serves as the main controller for the UI components of the Personnel Tab,
+ * bridging the user interface with the {@link CampaignOptions} and ensuring the appropriate
+ * application of configuration settings.
+ * </p>
  */
 public class PersonnelTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -174,7 +204,9 @@ public class PersonnelTab {
     //end Salaries Tab
 
     /**
-     * Represents a tab for repair and maintenance in an application.
+     * Constructs the {@code PersonnelTab} object with the given campaign options.
+     *
+     * @param campaignOptions the {@link CampaignOptions} instance to be used for initializing and managing personnel options.
      */
     public PersonnelTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -183,7 +215,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of all tabs within the frame.
+     * Initializes all tabs and their components within the PersonnelTab.
      */
     private void initialize() {
         initializeGeneralTab();
@@ -196,8 +228,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the SalariesTab.
-     * The panel contains settings related to personnel salaries.
+     * Initializes the components of the Salaries Tab. This includes settings for
+     * personnel salaries, such as multipliers and base salary rates.
      */
     private void initializeSalariesTab() {
         chkDisableSecondaryRoleSalary = new JCheckBox();
@@ -220,8 +252,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the PrisonersAndDependentsTab.
-     * The panel contains settings related to prisoners and dependents.
+     * Initializes the components of the Prisoners & Dependents Tab. This includes
+     * settings related to prisoners and handling of dependents.
      */
     private void initializePrisonersAndDependentsTab() {
         prisonerPanel = new JPanel();
@@ -243,8 +275,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the MedicalTab.
-     * The panel contains settings related to medical recovery and checks.
+     * Initializes the components of the Medical Tab. This includes medical-related options
+     * such as recovery time, random hits for vehicles, and limits on patients.
      */
     private void initializeMedicalTab() {
         chkUseAdvancedMedical = new JCheckBox();
@@ -266,8 +298,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the AwardsTab.
-     * The panel contains settings related to award allocation.
+     * Initializes the components of the Awards Tab. This includes settings for managing
+     * awards, such as automatic awards issuance, tier configurations, and award filters.
      */
     private void initializeAwardsTab() {
         pnlAwardsGeneralOptions = new JPanel();
@@ -298,8 +330,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the PersonnelInformationTab.
-     * The panel contains settings related to personnel information display.
+     * Initializes the components of the Personnel Information Tab. This includes
+     * settings for tracking and displaying information like service time, rank time, and earnings.
      */
     private void initializePersonnelInformationTab() {
         chkUseTimeInService = new JCheckBox();
@@ -320,8 +352,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes components of the PersonnelLogsTab.
-     * Panel consists of settings related to personnel log keeping.
+     * Initializes the components of the Personnel Logs Tab. This includes options
+     * for personnel log-keeping, such as tracking skill and ability gains, as well as transfers.
      */
     private void initializePersonnelLogsTab() {
         chkUseTransfers = new JCheckBox();
@@ -335,8 +367,8 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes components of the GeneralTab.
-     * The panel contains general settings.
+     * Initializes the components of the General Tab. This includes general personnel-related
+     * options, such as tactics, edge, initiative bonuses, and personnel cleanup settings.
      */
     private void initializeGeneralTab() {
         pnlPersonnelGeneralOptions = new JPanel();
@@ -364,8 +396,10 @@ public class PersonnelTab {
     }
 
     /**
-     * @return a {@link DefaultComboBoxModel} containing all {@link PrisonerStatus} options except
-     * {@code PrisonerStatus.FREE}
+     * Retrieves a {@link DefaultComboBoxModel} containing all valid {@link PrisonerStatus} options,
+     * except for the {@code PrisonerStatus.FREE} enumeration.
+     *
+     * @return a {@link DefaultComboBoxModel} containing the prisoner status options.
      */
     private DefaultComboBoxModel<PrisonerStatus> getPrisonerStatusOptions() {
         final DefaultComboBoxModel<PrisonerStatus> prisonerStatusModel = new DefaultComboBoxModel<>(
@@ -376,6 +410,12 @@ public class PersonnelTab {
         return prisonerStatusModel;
     }
 
+    /**
+     * Creates the components and layout for the General Tab,
+     * organizing personnel management settings into specific groups.
+     *
+     * @return a {@link JPanel} representing the General Tab.
+     */
     public JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
@@ -417,6 +457,11 @@ public class PersonnelTab {
         return createParentPanel(panelParent, "PersonnelGeneralTab");
     }
 
+    /**
+     * Creates the panel for general personnel options in the General Tab.
+     *
+     * @return a {@link JPanel} containing checkboxes for various personnel management settings.
+     */
     private JPanel createGeneralOptionsPanel() {
         // Contents
         chkUseTactics = new CampaignOptionsCheckBox("UseTactics");
@@ -473,12 +518,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for personnel cleanup settings.
-     * <p>
-     * This method creates checkboxes for personnel cleanup options such as personnel removal, exempt
-     * cemetery personnel, and exempt retirees.
+     * Creates the panel for personnel cleanup options in the General Tab.
      *
-     * @return a {@link JPanel} containing the personnel cleanup checkboxes
+     * @return a {@link JPanel} containing options for personnel cleanup, such as removal exemptions.
      */
     private JPanel createPersonnelCleanUpPanel() {
         // Contents
@@ -514,12 +556,10 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for the Administrators Tab in the application.
-     * <p>
-     * This method constructs the header panel and checkbox components for administrator settings
-     * including negotiation and scrounging options.
+     * Creates the panel for administrative settings in the General Tab.
      *
-     * @return a {@link JPanel} representing the Administrators Tab panel
+     * @return a {@link JPanel} containing settings related to administrators, such as
+     * negotiation and scrounge options.
      */
     private JPanel createAdministratorsPanel() {
         // Contents
@@ -550,9 +590,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the Awards Tab panel with various components like labels, checkboxes, and filter options.
+     * Creates the panels and layout for the Awards Tab, including its general and filter components.
      *
-     * @return the {@link JPanel} representing the Awards Tab panel
+     * @return a {@link JPanel} representing the Awards Tab.
      */
     public JPanel createAwardsTab() {
         // Header
@@ -618,6 +658,11 @@ public class PersonnelTab {
         return createParentPanel(panelParent, "AwardsTab");
     }
 
+    /**
+     * Creates the panel for general award configuration settings in the Awards Tab.
+     *
+     * @return a {@link JPanel} containing settings for awards, such as bonus style and auto awards.
+     */
     JPanel createAwardsGeneralOptionsPanel() {
         // Contents
         lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
@@ -680,13 +725,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel with checkboxes for various types of autoAwards award filter options.
-     * <p>
-     * This method creates checkboxes for different types of awards filters such as contract awards,
-     * faction hunter awards, injury awards, individual kill awards, etc.
+     * Creates the panel for filtering auto-awards settings in the Awards Tab.
      *
-     * @return a {@link JPanel} containing checkboxes for various types of autoAwards award filter
-     * options
+     * @return a {@link JPanel} containing checkboxes for various award filters.
      */
     private JPanel createAutoAwardsFilterPanel() {
         // Contents
@@ -744,9 +785,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for the Medical Tab in the application.
+     * Creates the layout for the Medical Tab, combining components related to medical settings.
      *
-     * @return a {@link JPanel} representing the Medical Tab containing settings for medical options.
+     * @return a {@link JPanel} containing medical-related settings.
      */
     public JPanel createMedicalTab() {
         // Header
@@ -841,9 +882,10 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for the Personnel Information Tab in the application.
+     * Creates the layout for the Personnel Information Tab,
+     * including its components for displaying personnel information and logs.
      *
-     * @return a {@link JPanel} representing the Personnel Information Tab panel
+     * @return a {@link JPanel} representing the Personnel Information Tab.
      */
     public JPanel createPersonnelInformationTab() {
         // Header
@@ -914,6 +956,11 @@ public class PersonnelTab {
         return createParentPanel(panelParent, "PersonnelInformation");
     }
 
+    /**
+     * Creates a sub-panel for managing personnel log settings within the Personnel Information Tab.
+     *
+     * @return a {@link JPanel} containing log settings for personnel activities.
+     */
     JPanel createPersonnelLogsPanel() {
         // Contents
         chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers");
@@ -960,14 +1007,10 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for configuring settings related to prisoners and dependents.
-     * <p>
-     * This method constructs a panel with different components such as header, prisoners panel, and
-     * dependents panel.
-     * The layout is set up with the header on top followed by the prisoners and dependents panels
-     * side by side.
+     * Creates the layout for the Prisoners & Dependents Tab,
+     * organizing settings for prisoner handling and dependent management.
      *
-     * @return a {@link JPanel} representing the prisoners and dependents configuration settings
+     * @return a {@link JPanel} containing the Prisoners & Dependents Tab components.
      */
     public JPanel createPrisonersAndDependentsTab() {
         // Header
@@ -1000,11 +1043,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for configuring settings related to prisoners in the application.
-     * <p>
-     * This method sets up various components such as prisoner capture style, status, and related checkboxes.
+     * Creates the panel for configuring prisoner settings in the Prisoners & Dependents Tab.
      *
-     * @return a {@link JPanel} containing the prisoner configuration settings
+     * @return a {@link JPanel} containing prisoner-related options such as capture style and status.
      */
     private JPanel createPrisonersPanel() {
         // Contents
@@ -1061,9 +1102,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel with checkboxes for setting dependent options.
+     * Creates the panel for configuring dependent settings in the Prisoners & Dependents Tab.
      *
-     * @return a {@link JPanel} containing checkboxes for setting dependent options
+     * @return a {@link JPanel} containing dependent management options.
      */
     private JPanel createDependentsPanel() {
         // Contents
@@ -1086,9 +1127,10 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a salary configuration tab for managing salary settings such as multipliers and base salaries.
+     * Creates the layout for the Salaries Tab, including components for salary multipliers
+     * and base salary settings.
      *
-     * @return a {@link JPanel} representing the salary tab
+     * @return a {@link JPanel} representing the Salaries Tab.
      */
     public JPanel createSalariesTab() {
         // Header
@@ -1129,9 +1171,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for configuring salary multipliers for different personnel roles.
+     * Creates the panel for configuring salary multipliers for specific roles in the Salaries Tab.
      *
-     * @return a {@link JPanel} containing the salary multiplier configuration panel
+     * @return a {@link JPanel} containing salary multiplier options.
      */
     private JPanel createSalaryMultipliersPanel() {
         // Contents
@@ -1165,13 +1207,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for configuring experience multipliers for different skill levels.
-     * <p>
-     * This method dynamically generates labels and spinners for each skill level based on the values
-     * in the {@link SkillLevel} enum.
-     * </p>
+     * Creates the panel for configuring experience multipliers based on skill levels in the Salaries Tab.
      *
-     * @return a {@link JPanel} containing the experience multipliers configuration panel
+     * @return a {@link JPanel} containing settings for skill-based experience multipliers.
      */
     private JPanel createExperienceMultipliersPanel() {
         // Contents
@@ -1237,12 +1275,9 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a panel for configuring base salaries for different personnel roles.
-     * <p>
-     * This method dynamically generates labels and spinners for each personnel role
-     * based on the values in the PersonnelRole enum.
+     * Creates the panel for configuring base salaries for various personnel roles in the Salaries Tab.
      *
-     * @return a {@link JPanel} containing the base salaries configuration panel
+     * @return a {@link JPanel} containing settings for base salaries.
      */
     private JPanel createBaseSalariesPanel() {
         // Contents
@@ -1325,10 +1360,19 @@ public class PersonnelTab {
         return panel;
     }
 
+    /**
+     * Shortcut method to load default {@link CampaignOptions} values into the tab components.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads the values from the provided {@link CampaignOptions} into the Personnel Tab components.
+     * If no preset options are provided, the current {@link CampaignOptions} instance is used.
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} to load into the tab.
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
@@ -1424,6 +1468,12 @@ public class PersonnelTab {
         }
     }
 
+    /**
+     * Applies the modified personnel tab settings to the repository's campaign options.
+     * If no preset {@link CampaignOptions} is provided, the changes are applied to the current options.
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply changes to.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {

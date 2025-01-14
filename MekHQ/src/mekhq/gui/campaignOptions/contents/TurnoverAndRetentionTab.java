@@ -27,23 +27,27 @@ import mekhq.gui.campaignOptions.components.*;
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 /**
- * This class represents a GUI configuration form with two main tabs: 'Turnover' and 'Fatigue'.
+ * The {@code TurnoverAndRetentionTab} class represents a graphical user interface (GUI)
+ * configuration tab in the campaign options for managing unit turnover, retention, and fatigue settings.
  * <p>
- * These tabs contain various controls for user input and selection including checkboxes, spinners
- * and combo boxes. These configurations cover a wide range of settings, categorized into panels that
- * include settings, modifiers, payouts, unit cohesion, administrative strain, and management skill
- * panels for the 'Turnover' tab, and fatigue configurations for the 'Fatigue' tab.
- * <p>
- * The class uses Swing, a Java GUI toolkit, to create these controls. A {@link JFrame} object is used
- * to contain the tab structure, which itself contains various {@link JPanel} instances to group related
- * settings.
- * <p>
- * Use of this class involves calling the constructor with a {@link JFrame} parent and the name of the
- * tab, and then adding the resulting object to a Swing container. The various public methods in the
- * class are then called in response to user interactions with the GUI.
+ * This class provides functionality to define and customize gameplay-related options such as:
+ * <ul>
+ *   <li>Unit turnover settings, including retirement, contract durations, payouts, and modifiers.</li>
+ *   <li>Administrative strain and management skills impacting unit cohesion.</li>
+ *   <li>Fatigue mechanics such as fatigue rates, leave thresholds, and injury fatigue.</li>
+ * </ul>
+ * </p>
+ * The class interacts with a {@link CampaignOptions} object, allowing the user to load and save
+ * configurations. It consists of two main panels:
+ * <ul>
+ *   <li><strong>Turnover Tab:</strong> Controls unit turnover, payouts, and related modifiers.</li>
+ *   <li><strong>Fatigue Tab:</strong> Manages fatigue-related options like kitchen capacity
+ *   and fatigue rates.</li>
+ * </ul>
  */
 public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;
@@ -126,14 +130,12 @@ public class TurnoverAndRetentionTab {
     //end Fatigue Tab
 
     /**
-     * Constructs and configures a {@link TurnoverAndRetentionTab} instance.
-     * This constructor receives a {@link JFrame} and a name string, assigns them to the instance
-     * variables 'frame' and 'name', and then calls the initilize method to initialize the components
-     * of the tabs.
+     * Constructs a {@code TurnoverAndRetentionTab} and initializes the tab with the given
+     * {@link CampaignOptions}. This sets up necessary UI components and their default
+     * configurations.
      *
-     * @param campaignOptions
-     * @param frame           the {@link JFrame} to be assigned to this tab's frame
-     * @param name            the name to be assigned to this tab's name
+     * @param campaignOptions the {@code CampaignOptions} instance that holds the settings
+     *                        to be modified or displayed in this tab.
      */
     public TurnoverAndRetentionTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -142,7 +144,8 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes all tab components.
+     * Initializes the content and configuration of the turnover and fatigue tabs.
+     * This method sets up their respective panels and components.
      */
     private void initialize() {
         initializeTurnoverTab();
@@ -150,8 +153,9 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the components for the FatigueTab panel.
-     * This panel contains settings related to fatigue mechanics in the game.
+     * Initializes the content of the fatigue configuration tab.
+     * Includes settings such as fatigue rate, injury fatigue, field kitchen capacity,
+     * and fatigue leave thresholds.
      */
     private void initializeFatigueTab() {
         chkUseFatigue = new JCheckBox();
@@ -166,8 +170,9 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the components for the TurnoverTab panel.
-     * This panel contains various settings influencing unit turnover in the game.
+     * Initializes the content of the turnover configuration tab.
+     * Includes settings such as turnover frequencies, service contract details,
+     * and retirement/payout modifiers.
      */
     private void initializeTurnoverTab() {
         chkUseRandomRetirement = new JCheckBox();
@@ -235,16 +240,11 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures a panel for the Fatigue tab.
-     * This tab contains a header panel, a checkbox for activating fatigue,
-     * a spinner for adjusting the fatigue rate, a checkbox for toggling fatigue from injury,
-     * a spinner for adjusting field kitchen capacity, a checkbox for making field kitchens ignore
-     * non-combatants and a spinner for adjusting the fatigue leave threshold.
-     * <p>
-     * The layout of the tab panel is organized with a {@link GroupLayout}, ensuring organized vertical
-     * and horizontal alignment.
+     * Creates and configures the "Fatigue" tab with its relevant components.
+     * These include options related to enabling fatigue, fatigue rates, injury fatigue,
+     * kitchen capacities, and leave thresholds.
      *
-     * @return panel the configured {@link JPanel} for the Fatigue tab
+     * @return the {@link JPanel} representing the constructed Fatigue tab.
      */
     public JPanel createFatigueTab() {
         // Header
@@ -326,14 +326,11 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures a panel for the Turnover tab.
-     * This tab contains a header panel, a checkbox for activating random retirement, settings,
-     * modifiers, payout, and unit cohesion panels.
-     * <p>
-     * The layout of the tab panel is organized with a {@link GroupLayout} for clean vertical and
-     * horizontal alignment.
+     * Creates and configures the "Turnover" tab with its relevant components.
+     * These include options for turnover control, random retirement, payout settings,
+     * and modifiers for administrative strain and cohesion.
      *
-     * @return panel the configured {@link JPanel} for the Turnover tab
+     * @return the {@link JPanel} representing the constructed Turnover tab.
      */
     public JPanel createTurnoverTab() {
         // Header
@@ -385,18 +382,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures a settings panel for controlling various turnover settings.
-     * This panel allows for configuration of turnover fixed target number, turnover frequency,
-     * contract completion, random retirement, random founder turnover, tracking of original unit,
-     * aero recruits having units, subcontracted soldiers, service contract duration and modifier,
-     * default payment bonus and payment bonus threshold.
-     * <p>
-     * Each of these settings is either controlled by a checkbox or a spinner with a specific range.
-     * The turnover frequency selection is handled by a combo box.
-     * The layout of the panel is organized with a {@link GroupLayout}, ensuring organized vertical
-     * and horizontal alignment.
+     * Creates the settings panel for the "Turnover" tab, which organizes various
+     * settings like random retirement, contract durations, and bonuses into a layout.
      *
-     * @return panel the configured {@link JPanel} with various turnover settings
+     * @return the {@link JPanel} representing the turnover settings.
      */
     private JPanel createSettingsPanel() {
         // Contents
@@ -507,16 +496,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures a settings panel for controlling various status modifiers.
-     * This panel offers checkboxes for toggling the use of custom retirement modifiers, fatigue modifiers,
-     * skill modifiers, age modifiers, unit rating modifiers, faction modifiers, mission status modifiers,
-     * hostile territory modifiers, family modifiers, loyalty modifiers, and the hiding of loyalty.
-     * <p>
-     * Each of these settings is represented by a checkbox, allowing for them to be easily toggled
-     * on or off. The layout of the panel is organized with a {@link GroupLayout} for clean vertical
-     * and horizontal alignment.
+     * Creates the modifiers panel for the "Turnover" tab, which contains gameplay
+     * modifiers such as age, skill, faction, and loyalty.
      *
-     * @return panel the configured {@link JPanel} with modifier settings
+     * @return the {@link JPanel} representing the turnover modifiers.
      */
     private JPanel createModifiersPanel() {
         // Contents
@@ -576,15 +559,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures a settings panel for controlling payouts.
-     * This panel allows for configuration of officer and enlisted payout rates, as well as retirement
-     * multipliers and service bonus (if enabled).
-     * <p>
-     * Each configurable setting is controlled by a spinner with a different acceptable range.
-     * The layout of the panel is organized with a {@link GroupLayout}, ensuring organized vertical
-     * and horizontal alignment.
+     * Creates the payouts panel for the "Turnover" tab. This panel holds settings related to
+     * payout rates for officers and enlisted personnel, service bonuses, and retirement multipliers.
      *
-     * @return panel the configured {@link JPanel} with payout settings
+     * @return the {@link JPanel} representing the payout settings.
      */
     private JPanel createPayoutsPanel() {
         // Contents
@@ -646,14 +624,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures a settings panel for controlling unit cohesion.
-     * This panel contains check boxes which toggle usage of administrative strain and management skill,
-     * along with their associated settings panels.
-     * <p>
-     * The layout of the panel is organized with a {@link GroupLayout}, placing the components in a
-     * sequential order for vertical alignment and in a parallel formation for horizontal alignment.
+     * Creates the unit cohesion panel for the "Turnover" tab, which includes settings like
+     * administrative strain and management skills.
      *
-     * @return panel the configured {@link JPanel} with unit cohesion settings
+     * @return the {@link JPanel} containing unit cohesion settings.
      */
     private JPanel createUnitCohesionPanel() {
         // Contents
@@ -676,14 +650,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Constructs and configures an administrative strain wrapper {@link JPanel} with a checkbox and
-     * associated settings panel.
-     * <p>
-     * The layout of the panel is organized in a {@link GroupLayout}, placing the checkbox and the
-     * settings panel sequentially for vertical alignment and in parallel for horizontal alignment.
+     * Creates the administrative strain wrapper panel. Includes a checkbox to enable
+     * administrative strain and settings for related capacities and behaviors.
      *
-     * @return {@link JPanel} The newly created and configured JPanel containing administrative strain
-     * settings
+     * @return the {@link JPanel} for managing administrative strain settings.
      */
     private JPanel createAdministrativeStrainWrapperPanel() {
         // Contents
@@ -706,16 +676,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates a settings panel for controlling administrative strain parameters.
-     * This panel includes settings for administrative capacity and multi-crew strain divider.
-     * <p>
-     * The administrative capacity is a customizable setting, allowing selection between 1 and 30.
-     * The multi-crew strain divider is also a customizable setting, allowing selection between 1 and 25.
-     * <p>
-     * The panel uses a {@link GroupLayout} for layout management, organizing the components in sequential
-     * and parallel groups for vertical and horizontal alignment respectively.
+     * Creates the panel for administrative strain settings, which contains
+     * spinners to adjust administrative capacity and multi-crew strain dividers.
      *
-     * @return panel the configured {@link JPanel} with administrative strain settings
+     * @return the {@link JPanel} for administrative strain adjustment.
      */
     private JPanel createAdministrativeStrainPanel() {
         // Contents
@@ -749,15 +713,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates and configures a settings panel for controlling management skills.
-     * <p>
-     * This panel contains a checkbox for toggling management skill usage, along with an associated
-     * settings panel.
-     * <p>
-     * The layout of the panel is organized with a {@link GroupLayout}, placing the components in a
-     * sequential order for vertical alignment and in a parallel formation for horizontal alignment.
+     * Creates the management skill wrapper panel, which contains settings such as enabling
+     * management skill checks and adjusting penalties.
      *
-     * @return {@link JPanel} The constructed and configured jPanel containing the management skill settings
+     * @return the {@link JPanel} for managing skill configurations.
      */
     private JPanel createManagementSkillWrapperPanel() {
         // Contents
@@ -781,17 +740,10 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates a panel for management skill settings.
-     * This panel consists of a checkbox to enable/disable use of commander leadership only and
-     * a spinner to control the management skill penalty.
-     * <p>
-     * The panel uses a {@link GroupLayout} for layout management, organizing its components
-     * in a sequential group for vertical alignment and a parallel group for horizontal alignment.
-     * <p>
-     * The management skill penalty is a customizable setting, with the possibility
-     * to choose a value between -10 and 10.
+     * Creates the panel for management skill settings, including options for leadership adjustments
+     * and penalties.
      *
-     * @return panel the configured {@link JPanel} with management skill settings
+     * @return the {@link JPanel} for setting management and leadership skill penalties.
      */
     private JPanel createManagementSkillPanel() {
         // Contents
@@ -820,10 +772,22 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
+    /**
+     * Overload of {@code loadValuesFromCampaignOptions} method.
+     * Loads values from the current {@link CampaignOptions} instance.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads the current configuration values from the provided {@link CampaignOptions}
+     * object and updates the associated UI components in both the Turnover and Fatigue tabs.
+     * If no options are provided, the existing campaign options are used.
+     *
+     * @param presetCampaignOptions the {@link CampaignOptions} instance to load settings from,
+     *                              or {@code null} to use the current campaign options.
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
@@ -875,6 +839,14 @@ public class TurnoverAndRetentionTab {
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
     }
 
+    /**
+     * Applies the current campaign options based on the configurations in the UI
+     * to the given {@link CampaignOptions}. If no options are provided, the current
+     * campaign options are updated.
+     *
+     * @param presetCampaignOptions the {@link CampaignOptions} instance to save settings to,
+     *                              or {@code null} to update the current campaign options.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {

@@ -42,27 +42,24 @@ import java.awt.*;
 import java.util.*;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 /**
- * The `BiographyTab` class represents the biography settings tab in campaign options.
- * It is responsible for maintaining and allowing updates to the settings related to biographies
- * in a campaign. This includes general settings, name and portrait settings, rank settings,
- * background settings, death settings, and education settings.
- * <p>
- * Each area of settings is initialized and managed in its own tab, which allows for organization
- * and easy navigation settings related to biographic information.
- * <p>
- * The class also has a set of fields that dictate the state of the individual settings.
- * <p>
- * Some of the key settings managed by this tab include:
- * - Random XP: a setting that controls the use of Dylan's random XP.
- * - Gender settings: a set of settings that controls the gender ratio and non-binary dice size.
- * - Name and portrait settings: a set of settings to control the use of origin factions for names,
- *   and the behavior of random portraits.
- * - Education settings: a set of settings to control the usage and specifics of the educational module.
- * <p>
- * And many more settings are controlled within this class.
+ * The `BiographyTab` class is responsible for managing the biography-related settings in the campaign options tab
+ * within the MekHQ application. It provides an interface for configuring various campaign settings, such as:
+ * <ul>
+ *     <li>General campaign settings like gender distribution and familial relationships.</li>
+ *     <li>Background options, including randomized personality traits and origin determination.</li>
+ *     <li>Death-related settings such as probability of random deaths, age-group-specific deaths, etc.</li>
+ *     <li>Education module settings for academic progression, dropout chances, and related configurations.</li>
+ *     <li>Random name generation and portrait assignment based on roles and factions.</li>
+ *     <li>Rank and hierarchy management for campaign personnel.</li>
+ * </ul>
+ *
+ * The class includes methods to initialize, load, and configure settings while providing GUI tools to enable user
+ * interaction. It also integrates with the current `Campaign` and `CampaignOptions` objects to synchronize settings.
+ * This class serves as the backbone for displaying and managing the "Biography" tab in the campaign options dialog.
  */
 public class BiographyTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -174,6 +171,12 @@ public class BiographyTab {
     private RankSystemsPane rankSystemsPane;
     //end Rank Tab
 
+    /**
+     * Constructs the `BiographyTab` and initializes the campaign and its dependent options.
+     *
+     * @param campaign The current `Campaign` object to which the BiographyTab is linked.
+     *                 The campaign options and origin options are derived from this object.
+     */
     public BiographyTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
@@ -183,8 +186,17 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the components for the NameAndPortraitTab panel.
-     * The panel contains various settings related to names and portraits.
+     * Initializes the various sections and settings tabs within the BiographyTab.
+     * This method organizes the following tabs:
+     * <ul>
+     *     <li>General Tab: Handles general campaign settings such as gender distribution and
+     *     relationship displays.</li>
+     *     <li>Background Tab: Configures randomized backgrounds for campaign characters.</li>
+     *     <li>Death Tab: Sets up random death rules and options.</li>
+     *     <li>Education Tab: Defines education-related gameplay settings.</li>
+     *     <li>Name and Portrait Tab: Configures rules for name and portrait generation.</li>
+     *     <li>Rank Tab: Manages the rank systems for campaign personnel.</li>
+     * </ul>
      */
     private void initialize() {
         initializeGeneralTab();
@@ -197,8 +209,12 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the components for the EducationTab panel.
-     * The panel contains various settings related to the educational module.
+     * Initializes the Name and Portrait tab. The tab allows users to:
+     * <ul>
+     *     <li>Enable or disable the use of origin factions for name generation.</li>
+     *     <li>Assign portraits to personnel upon role changes.</li>
+     *     <li>Customize which portraits should be used randomly based on roles.</li>
+     * </ul>
      */
     private void initializeNameAndPortraitTab() {
         chkUseOriginFactionForNames = new JCheckBox();
@@ -213,8 +229,13 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the components for the DeathTab panel.
-     * The panel deals with various settings related to in-game character death.
+     * Initializes the Education tab, providing settings such as:
+     * <ul>
+     *     <li>Setting curriculum XP rates.</li>
+     *     <li>Enabling re-education camps or specific academy requirements.</li>
+     *     <li>Managing academy dropout chances for adults and children.</li>
+     *     <li>Supporting the configuration of education-related accidents and events.</li>
+     * </ul>
      */
     private void initializeEducationTab() {
         chkUseEducationModule = new JCheckBox();
@@ -251,8 +272,12 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the components for the BackgroundsTab panel.
-     * The panel contains various settings related to backgrounds and origins.
+     * Initializes the Death tab, focusing on:
+     * <ul>
+     *     <li>Allowing configuration of random death probabilities for personnel.</li>
+     *     <li>Customizing age-group-specific death settings.</li>
+     *     <li>Selecting methods for random deaths (e.g., natural causes or accidents).</li>
+     * </ul>
      */
     private void initializeDeathTab() {
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
@@ -269,8 +294,12 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the components for the GeneralTab panel.
-     * The panel contains various general settings.
+     * Initializes the Backgrounds tab, which handles:
+     * <ul>
+     *     <li>Randomized background settings for characters.</li>
+     *     <li>Options for specifying origins (e.g., faction-specific planetary systems).</li>
+     *     <li>Custom search radius and distance scaling for randomized origins.</li>
+     * </ul>
      */
     private void initializeBackgroundsTab() {
         pnlRandomBackgrounds = new JPanel();
@@ -297,8 +326,12 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes components of the GeneralTab.
-     * The panel contains general settings.
+     * Initializes the General tab, which provides options for:
+     * <ul>
+     *     <li>General gameplay settings such as gender distribution sliders.</li>
+     *     <li>Configuration of familial display levels and other general campaign settings.</li>
+     *     <li>Annunciation of anniversaries, recruitment dates, and officer-related milestones.</li>
+     * </ul>
      */
     private void initializeGeneralTab() {
         chkUseDylansRandomXP = new JCheckBox();
@@ -318,10 +351,9 @@ public class BiographyTab {
     }
 
     /**
-     * Retrieves a {@link DefaultComboBoxModel} containing faction names generated by the
-     * {@link RandomNameGenerator} instance.
+     * Builds and returns a `DefaultComboBoxModel` containing the names of all available factions.
      *
-     * @return DefaultComboBoxModel<String> containing faction names
+     * @return A `DefaultComboBoxModel` populated with faction names for random name generation rules.
      */
     private static DefaultComboBoxModel<String> getFactionNamesModel() {
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
@@ -332,9 +364,14 @@ public class BiographyTab {
     }
 
     /**
-     * Creates a general tab for the Biography category containing various components
+     * Creates and lays out the General tab, including its components like:
+     * <ul>
+     *     <li>Checkboxes for random XP distribution.</li>
+     *     <li>Sliders for gender representation customization.</li>
+     *     <li>Combo boxes for family display level settings within the GUI.</li>
+     * </ul>
      *
-     * @return a {@link JPanel} representing the general tab with multiple input components and panels
+     * @return A `JPanel` representing the General tab in the campaign options dialog.
      */
     public JPanel createGeneralTab() {
         // Header
@@ -403,8 +440,13 @@ public class BiographyTab {
     }
 
     /**
-     * @return a {@link JPanel} representing the Anniversaries panel with checkboxes for different
-     * anniversary options
+     * Creates the Anniversaries panel within the General tab for managing announcement-related settings:
+     * <ul>
+     *     <li>Enabling birthday and recruitment anniversary announcements.</li>
+     *     <li>Specifying whether such announcements should be limited to officers.</li>
+     * </ul>
+     *
+     * @return A `JPanel` containing the UI components for defining anniversary-related settings.
      */
     private JPanel createAnniversariesPanel() {
         // Contents
@@ -437,8 +479,13 @@ public class BiographyTab {
     }
 
     /**
-     * @return a JPanel representing the Backgrounds tab with specific components like checkboxes and
-     * options panel
+     * Creates and lays out the Backgrounds tab, which includes:
+     * <ul>
+     *     <li>Settings for enabling randomized personalities and relationships.</li>
+     *     <li>Random origin configurations such as faction specificity and distance scaling.</li>
+     * </ul>
+     *
+     * @return A `JPanel` representing the Backgrounds tab in the campaign options dialog.
      */
     public JPanel createBackgroundsTab() {
         // Header
@@ -469,6 +516,19 @@ public class BiographyTab {
         return createParentPanel(panel, "BackgroundsTab");
     }
 
+    /**
+     * Creates the panel for configuring random background options in the campaign.
+     * <p>
+     * This includes controls to enable or disable features such as:
+     * <ul>
+     *     <li>Random personalities for characters.</li>
+     *     <li>Random personality reputation.</li>
+     *     <li>Intelligence XP multipliers.</li>
+     *     <li>Simulated relationships.</li>
+     * </ul>
+     *
+     * @return A {@code JPanel} representing the random background configuration UI.
+     */
     JPanel createRandomBackgroundsPanel() {
         // Contents
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities");
@@ -499,9 +559,14 @@ public class BiographyTab {
     }
 
     /**
-     * Creates a panel containing options for randomizing personnel origins.
+     * Creates and returns a panel for random origin options. This includes:
+     * <ul>
+     *     <li>Controls to enable or disable randomization of origins.</li>
+     *     <li>Options for selecting specific planetary systems or factions for origin determination.</li>
+     *     <li>Search radius and distance scaling fields to tweak origin calculations.</li>
+     * </ul>
      *
-     * @return a {@link JPanel} containing the random origin options, configured with the necessary components
+     * @return A `JPanel` for managing random origin settings.
      */
     private JPanel createRandomOriginOptionsPanel() {
         // Contents
@@ -624,10 +689,7 @@ public class BiographyTab {
     }
 
     /**
-     * Restores the list of planets in the combo box based on the selected planetary system.
-     * If no planetary system is selected, clear the combo box.
-     * If a planetary system is selected, populates the combo box with the planets from that system,
-     * and selects the primary planet of the system.
+     * Resets the planet combo box to show only the planets matching the currently selected planetary system.
      */
     private void restoreComboSpecifiedPlanet() {
         final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
@@ -642,9 +704,7 @@ public class BiographyTab {
     }
 
     /**
-     * Removes all items from the combo box, then populates it with planetary systems
-     * based on the selected faction filter.
-     * Restores the combo box for specified planets after updating the specified system combo box.
+     * Resets the system combo box to show only the planetary systems that match the current faction, if applicable.
      */
     private void restoreComboSpecifiedSystem() {
         comboSpecifiedSystem.removeAllItems();
@@ -656,12 +716,10 @@ public class BiographyTab {
     }
 
     /**
-     * Retrieves an array of {@link PlanetarySystem} objects based on the provided {@link Faction}.
+     * Filters planetary systems based on a given faction (if specified) and returns a sorted array of matches.
      *
-     * @param faction The {@link Faction} to filter the {@link PlanetarySystem} by. Specify null for
-     *               no filtering.
-     * @return An array of {@link PlanetarySystem} objects that match the filtering criteria, sorted
-     * by system name.
+     * @param faction The faction to filter planetary systems by (nullable). If `null`, all systems are included.
+     * @return An array of `PlanetarySystem` objects meeting the filter criteria.
      */
     private PlanetarySystem[] getPlanetarySystems(final @Nullable Faction faction) {
         ArrayList<PlanetarySystem> systems = campaign.getSystems();
@@ -682,10 +740,14 @@ public class BiographyTab {
     }
 
     /**
-     * Creates and returns a {@link JPanel} for the Death Tab.
-     * The panel includes header, various checkboxes, labels, spinners, and a custom combo box.
+     * Configures and creates the Death tab. This includes options like:
+     * <ul>
+     *     <li>Methods for random death.</li>
+     *     <li>Percentage-based chances for random death events.</li>
+     *     <li>Check boxes to enable or disable age-specific death events.</li>
+     * </ul>
      *
-     * @return {@link JPanel} representing the Death Tab with all its components
+     * @return A `JPanel` representing the Death tab.
      */
     public JPanel createDeathTab() {
         // Header
@@ -772,9 +834,9 @@ public class BiographyTab {
     }
 
     /**
-     * Creates a panel for the Death Age Groups tab with checkboxes for different age groups
+     * Configures and creates a panel where users can enable or disable random death probabilities for specific age groups.
      *
-     * @return a {@link JPanel} representing the Death Age Groups tab with checkboxes for each age group
+     * @return A `JPanel` containing the random death age group options.
      */
     private JPanel createDeathAgeGroupsPanel() {
         final AgeGroup[] ageGroups = AgeGroup.values();
@@ -798,19 +860,17 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures an "Education" {@link JPanel}.
-     * The panel includes various controls related to education settings,
-     * including checkboxes for enabling specific modules and settings,
-     * spinners for configuring values such as XP rate and jump count,
-     * and separate panels for managing standard sets, XP and skill bonuses,
-     * dropout chances, accidents, and events.
+     * Creates the Education tab, which allows managing educational settings within the campaign.
      * <p>
-     * The JPanel configuration is done using a {@link GroupLayout}, setting up
-     * the components in a structured layout with optimized vertical and
-     * horizontal alignments.
+     * This includes:
+     * <ul>
+     *     <li>Setting curriculum XP rates.</li>
+     *     <li>Configuring academy requirements and override options.</li>
+     *     <li>Managing dropout chances for adults and children.</li>
+     *     <li>Enabling or disabling the use of reeducation camps, accidents, and events.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The newly created and configured parent JPanel for
-     * the Education tab, containing all the educational settings controls.
+     * @return A {@code JPanel} representing the Education tab in the campaign UI.
      */
     public JPanel createEducationTab() {
         // Header
@@ -924,16 +984,16 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures an "Enable Standard Sets" {@link JPanel}.
-     * The panel consists of three checkboxes: to enable local academies,
-     * prestigious academies, and unit education.
+     * Creates a panel for enabling different education-related academy sets.
      * <p>
-     * A {@link GroupLayout} is used to arrange these components in an
-     * optimal manner, ensuring good readability and usability in both
-     * vertical and horizontal alignments.
+     * This includes options to toggle various academy types:
+     * <ul>
+     *     <li>Local academies.</li>
+     *     <li>Prestigious academies.</li>
+     *     <li>Unit-based education academies.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The newly constructed and configured JPanel for
-     * Enable Standard Sets settings.
+     * @return A {@code JPanel} containing the Enable Standard Sets UI components.
      */
     private JPanel createEnableStandardSetsPanel() {
         chkEnableLocalAcademies = new CampaignOptionsCheckBox("EnableLocalAcademies");
@@ -960,15 +1020,15 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures an "XP and Skill Bonuses" {@link JPanel}.
-     * The panel includes a checkbox to enable or disable bonuses, a label
-     * for faculty XP multiplier, and a spinner to adjust the faculty XP multiplier value.
+     * Creates a panel for configuring experience gain and skill bonuses.
      * <p>
-     * The layout of the panel is set up with a {@link GroupLayout}, arranging
-     * the checkbox, label, and spinner for optimal vertical and horizontal alignment.
+     * This includes:
+     * <ul>
+     *     <li>Option to enable or disable bonuses.</li>
+     *     <li>Setting the faculty XP multiplier.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The newly created and configured JPanel
-     * containing the XP and Skill Bonuses settings.
+     * @return A {@code JPanel} for managing XP rates and skill bonuses.
      */
     private JPanel createXpAndSkillBonusesPanel() {
         // Contents
@@ -997,14 +1057,15 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures a "Dropout Chance" {@link JPanel}.
-     * The created panel includes two labels and spinners: one set for adult dropout chances,
-     * and the other for child dropout chances.
+     * Creates a panel for configuring dropout chances for academies.
      * <p>
-     * The JPanel layout is arranged using a {@link GroupLayout}, positioning the labels and spinners
-     * in a way that optimizes horizontal and vertical alignments.
+     * This includes:
+     * <ul>
+     *     <li>Setting the dropout chance for adults.</li>
+     *     <li>Setting the dropout chance for children.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The newly constructed and configured JPanel that contains the Dropout Chance settings.
+     * @return A {@code JPanel} for managing dropout chance settings.
      */
     private JPanel createDropoutChancePanel() {
         // Contents
@@ -1037,15 +1098,15 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures an "Accidents and Events" {@link JPanel}. The panel includes a checkbox
-     * indicating whether to include all ages, a label for military academy accidents, and also a spinner
-     * for adjusting the count of military academy accidents.
+     * Creates a panel for configuring accidents and events related to military academies.
      * <p>
-     * The layout of the panel is configured with a {@link GroupLayout}, organizing the checkbox and
-     * other components for optimized alignments in vertical and horizontal layouts.
+     * This includes:
+     * <ul>
+     *     <li>Toggling settings for all-age accidents.</li>
+     *     <li>Configuring the frequency of military academy accidents.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The constructed, configured JPanel containing "Accidents and Events"
-     * settings
+     * @return A {@code JPanel} containing the accidents and events configuration UI.
      */
     private JPanel createAccidentsAndEventsPanel() {
         // Contents
@@ -1072,16 +1133,16 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures a "Name and Portrait Generation" {@link JPanel}. This panel contains
-     * various components for managing how names and portraits are generated. It includes a checkbox
-     * for using the origin faction for names, a label and combo box for faction names, a panel for
-     * random portrait selection, and a checkbox for assigning a portrait on role change.
+     * Creates the Name and Portrait Generation tab for the campaign options.
      * <p>
-     * A {@link GroupLayout} is used to optimally arrange these components for effective vertical
-     * and horizontal alignment.
+     * This tab allows users to:
+     * <ul>
+     *     <li>Enable or disable the use of origin factions for name generation.</li>
+     *     <li>Assign portraits to personnel upon role changes.</li>
+     *     <li>Customize which portraits are randomly used for specific roles.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The newly created and configured parent JPanel for the Name and Portrait
-     * Generation tab, containing all relevant name and portrait generation controls.
+     * @return A {@code JPanel} representing the Name and Portrait Generation tab.
      */
     public JPanel createNameAndPortraitGenerationTab() {
         // Header
@@ -1136,18 +1197,15 @@ public class BiographyTab {
     }
 
     /**
-     * Constructs and configures a {@link JPanel} for managing random portrait settings.
-     * The panel contains individual checkboxes for each personnel role defined in {@link PersonnelRole},
-     * as well as two special checkboxes: one for selecting all portraits, and one for selecting none.
-     * Selecting either of these special checkboxes will override the individual role selections and
-     * disable them.
+     * Creates a panel for customizing random portrait generation for personnel roles.
      * <p>
-     * The panel uses a grid layout, arranging the checkboxes in a grid that extends up to 4 columns,
-     * with each checkbox
-     * representing a particular role. It also has a border around it, titled with the panel's name.
+     * This includes:
+     * <ul>
+     *     <li>Options to enable or disable the use of role-specific portraits.</li>
+     *     <li>Buttons to toggle all or no portrait options collectively.</li>
+     * </ul>
      *
-     * @return {@link JPanel} The newly constructed and configured JPanel for managing random portrait
-     * settings.
+     * @return A {@code JPanel} containing the random portrait generation configuration UI.
      */
     private JPanel createRandomPortraitPanel() {
         // Contents
@@ -1205,20 +1263,15 @@ public class BiographyTab {
     }
 
     /**
-     * This method is responsible for creating and setting up the RankTab
-     * and its components.
+     * Creates the Rank tab for configuring rank systems within the campaign.
+     * <p>
+     * This tab provides options for:
+     * <ul>
+     *     <li>Managing rank systems for personnel in the campaign.</li>
+     *     <li>Displaying rank-related UI components for user configuration.</li>
+     * </ul>
      *
-     * <p>The method creates a header panel with a specified logo and then initializes
-     * {@code rankSystemsPane} with a {@code RankSystemsPane} object. The preferred size of the
-     * {@code rankSystemsPane} is set as its minimum and maximum size.
-     *
-     * <p>The layout is created with a vertical and horizontal group,
-     * to which the components are added sequentially. The {@code headerPanel} and
-     * the view-port component of {@code rankSystemsPane} are added to both layout groups.
-     *
-     * <p>Finally, the layout components are added to a parent panel which is then returned.
-     *
-     * @return JPanel The parent panel with all the layout components added.
+     * @return A {@code JPanel} representing the Rank tab in the campaign configuration.
      */
     public JPanel createRankTab() {
         // Header
@@ -1250,7 +1303,14 @@ public class BiographyTab {
         loadValuesFromCampaignOptions(null, null);
     }
 
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomOriginOptions presetRandomOriginOptions) {
+    /**
+     * Loads values from campaign options, optionally integrating with presets for default settings.
+     *
+     * @param presetCampaignOptions Optional preset campaign options, or `null` to use the campaign's active settings.
+     * @param presetRandomOriginOptions Optional random origin options, or `null` to use the default origin settings.
+     */
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                              @Nullable RandomOriginOptions presetRandomOriginOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (options == null) {
             options = this.campaignOptions;
@@ -1337,6 +1397,17 @@ public class BiographyTab {
         }
     }
 
+    /**
+     * Applies the current settings from the market UI components back into
+     * the {@link CampaignOptions} of the associated campaign.
+     * <p>
+     * If a preset options object is provided, the changes are applied there.
+     * Otherwise, they are applied to the current campaign's options.
+     *
+     * @param presetCampaignOptions A {@link CampaignOptions} object to update
+     *                              with the current UI settings, or {@code null}
+     *                              to apply changes to the campaign's options directly.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         RandomOriginOptions originOptions;

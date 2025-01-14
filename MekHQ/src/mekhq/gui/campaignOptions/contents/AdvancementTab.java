@@ -30,8 +30,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+/**
+ * The {@code AdvancementTab} class is responsible for rendering and managing two primary tabs
+ * in the campaign options interface: the Experience Awards (XP Awards) tab and the Skill
+ * Randomization tab. These tabs allow for customization of experience point distribution,
+ * randomization preferences, and skill probabilities in the campaign.
+ *
+ * <p>This class provides methods to initialize the UI components, load current settings
+ * from the campaign options, and update the options based on user input.</p>
+ */
 public class AdvancementTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
@@ -132,6 +142,13 @@ public class AdvancementTab {
     private JSpinner spnSecondBonus;
     //end Skill Randomization Tab
 
+    /**
+     * Constructs an {@code AdvancementTab} object for rendering and managing campaign advancement
+     * configurations.
+     *
+     * @param campaign The {@code Campaign} instance from which the campaign options and random
+     *                skill preferences are retrieved.
+     */
     public AdvancementTab(Campaign campaign) {
         this.campaign = campaign;
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
@@ -141,11 +158,19 @@ public class AdvancementTab {
         loadValuesFromCampaignOptions();
     }
 
+    /**
+     * Initializes the UI components for the XP Awards and Skill Randomization tabs. This includes
+     * setting up the labels, panels, and spinners for each of the categories within the respective tabs.
+     */
     private void initialize() {
         initializeXPAwardsTab();
         initializeSkillRandomizationTab();
     }
 
+    /**
+     * Initializes the XP Awards tab by setting up the UI components, such as labels,
+     * panels, and spinners, for various experience-related options within the campaign.
+     */
     private void initializeXPAwardsTab() {
         lblXpCostMultiplier = new JLabel();
         spnXpCostMultiplier = new JSpinner();
@@ -191,6 +216,13 @@ public class AdvancementTab {
         spnAdminWeeklyXPPeriod = new JSpinner();
     }
 
+    /**
+     * Creates and returns the Experience Awards (XP Awards) tab panel. This tab allows users to
+     * configure experience awards for tasks, scenarios, missions, and administrators, as well
+     * as set the overall XP cost multiplier.
+     *
+     * @return A {@code JPanel} containing the configuration options for XP Awards in the campaign.
+     */
     public JPanel xpAwardsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("XpAwardsTab",
@@ -240,6 +272,12 @@ public class AdvancementTab {
         return createParentPanel(panel, "XpAwardsTab");
     }
 
+    /**
+     * Creates and returns the Tasks panel, which allows users to configure settings
+     * for task-related experience awards, such as successful task completions or mistakes.
+     *
+     * @return A {@code JPanel} containing configuration options for task-related experience awards.
+     */
     private JPanel createTasksPanel() {
         // Contents
         lblTaskXP = new CampaignOptionsLabel("TaskXP");
@@ -291,6 +329,12 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Scenarios panel, which allows users to configure settings
+     * for experience awards related to scenarios, kills, and kill thresholds.
+     *
+     * @return A {@code JPanel} containing configuration options for scenario-related experience awards.
+     */
     private JPanel createScenariosPanel() {
         // Contents
         lblScenarioXP = new CampaignOptionsLabel("ScenarioXP");
@@ -330,6 +374,12 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Missions panel, which allows users to configure settings
+     * related to mission performance and idle time experience bonuses in the campaign.
+     *
+     * @return A {@code JPanel} containing configuration options for mission-related experience settings.
+     */
     private JPanel createMissionsPanel() {
         // Contents
         lblIdleXP = new CampaignOptionsLabel("IdleXP");
@@ -399,6 +449,12 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Administrators panel, which allows users to configure settings
+     * for contract negotiation experience points and weekly experience points for administrators.
+     *
+     * @return A {@code JPanel} containing configuration options for administrator experience settings.
+     */
     private JPanel createAdministratorsPanel() {
         // Contents
         lblAdminWeeklyXP = new CampaignOptionsLabel("AdminWeeklyXP");
@@ -437,6 +493,11 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Initializes the Skill Randomization tab by setting up the UI components,
+     * including phenotype configurations, random abilities, skill groups, and other
+     * randomization settings.
+     */
     private void initializeSkillRandomizationTab() {
         chkExtraRandomness = new JCheckBox();
 
@@ -487,6 +548,13 @@ public class AdvancementTab {
         spnAbilityElite = new JSpinner();
     }
 
+    /**
+     * Creates and returns the Skill Randomization tab panel. This tab allows users to configure
+     * settings related to skill randomization, including phenotype probabilities and skill bonuses
+     * for different experience levels and skill groups.
+     *
+     * @return A {@code JPanel} containing the configuration options for skill randomization.
+     */
     public JPanel skillRandomizationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("SkillRandomizationTab",
@@ -526,6 +594,13 @@ public class AdvancementTab {
         return createParentPanel(panel, "XpAwardsTab");
     }
 
+    /**
+     * Creates and returns the Phenotype panel, which allows users to configure settings
+     * for phenotype probabilities in the campaign. Each phenotype is assigned a spinner
+     * to adjust its probability.
+     *
+     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
+     */
     private JPanel createPhenotypePanel() {
         // Contents
         List<Phenotype> phenotypes = Phenotype.getExternalPhenotypes();
@@ -558,6 +633,13 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Ability panel, which allows users to configure settings
+     * for bonuses to special abilities at different experience levels, such as green,
+     * regular, veteran, and elite.
+     *
+     * @return A {@code JPanel} containing configuration options for special ability bonuses.
+     */
     private JPanel createAbilityPanel() {
         // Contents
         lblAbilityGreen = new CampaignOptionsLabel("AbilityGreen");
@@ -603,6 +685,13 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Skill Groups panel, which groups together related panels
+     * for configuring various skill-related options, including tactics, small arms,
+     * secondary skills, and artillery.
+     *
+     * @return A {@code JPanel} containing grouped configuration options for skills.
+     */
     private JPanel createSkillGroupPanel() {
         // Contents
         pnlArtillery = createArtilleryPanel();
@@ -632,6 +721,12 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Tactics panel, which allows users to configure settings
+     * for Tactics modifiers for different skill levels, such as green, regular, veteran, and elite.
+     *
+     * @return A {@code JPanel} containing configuration options for Tactics modifiers.
+     */
     private JPanel createTacticsPanel() {
         // Contents
         lblTacticsGreen = new CampaignOptionsLabel("TacticsGreen");
@@ -678,6 +773,12 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Small Arms panel, which allows users to configure settings
+     * for combat and non-combat small arms bonuses.
+     *
+     * @return A {@code JPanel} containing configuration options for small arms skill bonuses.
+     */
     private JPanel createSmallArmsPanel() {
         // Contents
         lblCombatSA = new CampaignOptionsLabel("CombatSmallArms");
@@ -706,6 +807,13 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Artillery panel, which allows users to configure settings
+     * for artillery-specific skills, including the chance for an artillery skill and
+     * the bonus associated with it.
+     *
+     * @return A {@code JPanel} containing configuration options for artillery-related skills.
+     */
     private JPanel createArtilleryPanel() {
         // Contents
         lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
@@ -734,6 +842,13 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Creates and returns the Secondary Skill panel, which allows users to configure settings
+     * related to special secondary skills such as Anti-Mek, secondary skill probability,
+     * and secondary skill bonuses.
+     *
+     * @return A {@code JPanel} containing configuration options for secondary skills.
+     */
     private JPanel createSecondarySkillPanel() {
         // Contents
         lblAntiMekSkill = new CampaignOptionsLabel("AntiMekChance");
@@ -772,11 +887,25 @@ public class AdvancementTab {
         return panel;
     }
 
+    /**
+     * Loads the current values for XP Awards and Skill Randomization settings into the UI components
+     * from the campaign options and random skill preferences.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null);
     }
 
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    /**
+     * Loads the current values for XP Awards and Skill Randomization settings into the UI components
+     * from the given {@code CampaignOptions} and {@code RandomSkillPreferences} objects.
+     *
+     * @param presetCampaignOptions    Optional {@code CampaignOptions} object to load values from;
+     *                                 if {@code null}, values are loaded from the current campaign options.
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values
+     *                                 from; if {@code null}, values are loaded from the current skill preferences.
+     */
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                              @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -829,7 +958,17 @@ public class AdvancementTab {
         spnSecondBonus.setValue(skillPreferences.getSecondSkillBonus());
     }
 
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions, @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    /**
+     * Applies the current values from the XP Awards and Skill Randomization tabs
+     * to the specified {@code CampaignOptions} and {@code RandomSkillPreferences}.
+     *
+     * @param presetCampaignOptions    Optional {@code CampaignOptions} object to set values to;
+     *                                 if {@code null}, values are applied to the current campaign options.
+     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values
+     *                                 to; if {@code null}, values are applied to the current skill preferences.
+     */
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+                                               @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

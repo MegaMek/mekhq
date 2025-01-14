@@ -39,8 +39,27 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+/**
+ * The {@code MarketsTab} class represents the campaign options tab related to market settings.
+ * This tab provides configurations for three key market areas:
+ * <p>
+ *     <li><b>Personnel Market</b>: Settings for managing personnel hiring, removal targets, and market types.</li>
+ *     <li><b>Unit Market</b>: Configurations for purchasing units, special unit chances, rarity modifiers, etc.</li>
+ *     <li><b>Contract Market</b>: Options for contract acquisition, such as market methods, search radius,
+ *         and payment settings.</li>
+ * </p>
+ * <p>
+ * The class initializes the UI components for these three market types and provides methods to
+ * load data into the UI or apply changes from the UI to the campaign settings.
+ * </p>
+ * <p>
+ * This class interacts with {@link CampaignOptions} to retrieve or update the persistent campaign settings.
+ * It also utilizes Swing components for building the UI.
+ * </p>
+ */
 public class MarketsTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
@@ -105,6 +124,13 @@ public class MarketsTab {
     private JCheckBox chkOverageRepaymentInFinalPayment;
     //end Contract Market
 
+    /**
+     * Constructs a {@code MarketsTab} with the provided campaign. Initializes the market
+     * configuration options based on the settings of the given {@link Campaign}.
+     *
+     * @param campaign The {@link Campaign} associated with this market tab. This campaign
+     *                 is used to retrieve and modify {@link CampaignOptions}.
+     */
     public MarketsTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
@@ -112,12 +138,25 @@ public class MarketsTab {
         initialize();
     }
 
+    /**
+     * Initializes the market-related options tabs by setting up configurations
+     * for the Personnel Market, Unit Market, and Contract Market.
+     * <p>
+     * This method is invoked internally within the constructor to prepare the
+     * various market configurations for use in the UI.
+     */
     private void initialize() {
         initializePersonnelMarket();
         initializeUnitMarket();
         initializeContractMarket();
     }
 
+    /**
+     * Initializes the settings and UI components related to the Personnel Market.
+     * <p>
+     * This includes setting up labels, combo boxes for selecting the personnel market type,
+     * checkboxes for additional options, and spinners for configuring removal targets.
+     */
     private void initializePersonnelMarket() {
         pnlPersonnelMarketGeneralOptions = new JPanel();
         lblPersonnelMarketType = new JLabel();
@@ -133,6 +172,14 @@ public class MarketsTab {
         spnPersonnelMarketRandomRemovalTargets = new HashMap<>();
     }
 
+    /**
+     * Retrieves the available personnel market type options for display in a combo box.
+     * <p>
+     * These types are fetched from the {@link PersonnelMarketServiceManager} and represent
+     * the available personnel market methods configured for the campaign.
+     *
+     * @return A {@link DefaultComboBoxModel} containing the personnel market type options.
+     */
     private static DefaultComboBoxModel<String> getPersonnelMarketTypeOptions() {
         final DefaultComboBoxModel<String> personnelMarketTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance()
@@ -142,6 +189,14 @@ public class MarketsTab {
         return personnelMarketTypeModel;
     }
 
+    /**
+     * Creates and returns the JPanel representing the Personnel Market configuration tab.
+     * <p>
+     * This tab includes general personnel market settings, as well as removal target
+     * configuration options for various skill levels.
+     *
+     * @return A {@link JPanel} for the Personnel Market configuration tab.
+     */
     public JPanel createPersonnelMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
@@ -172,6 +227,14 @@ public class MarketsTab {
 
     }
 
+    /**
+     * Builds the general options panel for the Personnel Market tab, which includes settings
+     * such as the personnel market type, Dylan's weight, and options like report refresh toggles.
+     * <p>
+     * These components are laid out into a panel and returned for use in the UI.
+     *
+     * @return A {@link JPanel} representing the general options within the Personnel Market tab.
+     */
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
         lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
@@ -215,6 +278,15 @@ public class MarketsTab {
         return panel;
     }
 
+    /**
+     * Creates and configures the removal options panel for the Personnel Market tab.
+     * <p>
+     * This panel includes settings for removal targets, which are based on various
+     * {@link SkillLevel} entries. Each skill level configuration includes both a label
+     * and an associated spinner for setting values.
+     *
+     * @return A {@link JPanel} containing removal options for the Personnel Market.
+     */
     private JPanel createPersonnelMarketRemovalOptionsPanel() {
         // Contents
         for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
@@ -279,6 +351,12 @@ public class MarketsTab {
         return panel;
     }
 
+    /**
+     * Initializes the settings and UI components related to the Unit Market tab.
+     * <p>
+     * This includes various elements such as labels, combo boxes, checkboxes, and
+     * spinners for settings like unit market methods, rarity modifiers, and delivery options.
+     */
     private void initializeUnitMarket() {
         lblUnitMarketMethod = new JLabel();
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
@@ -291,6 +369,14 @@ public class MarketsTab {
         chkUnitMarketReportRefresh = new JCheckBox();
     }
 
+    /**
+     * Creates and returns the JPanel representing the Unit Market configuration tab.
+     * <p>
+     * This tab includes options such as unit market methods, rarity modifiers,
+     * special unit chance settings, and more.
+     *
+     * @return A {@link JPanel} for the Unit Market configuration tab.
+     */
     public JPanel createUnitMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
@@ -359,6 +445,12 @@ public class MarketsTab {
         return createParentPanel(panel, "UnitMarketTab");
     }
 
+    /**
+     * Initializes the settings and UI components related to the Contract Market.
+     * <p>
+     * This includes options for contract market methods, payment settings, salvage percentages,
+     * and other contract-specific configurations.
+     */
     private void initializeContractMarket() {
         pnlContractMarketGeneralOptions = new JPanel();
         lblContractMarketMethod = new JLabel();
@@ -391,6 +483,14 @@ public class MarketsTab {
         chkOverageRepaymentInFinalPayment = new JCheckBox();
     }
 
+    /**
+     * Creates and returns the JPanel representing the Contract Market configuration tab.
+     * <p>
+     * This tab includes settings for configuring various aspects of contract acquisition,
+     * such as methods, search radius, payment options, and variable contract length.
+     *
+     * @return A {@link JPanel} for the Contract Market configuration tab.
+     */
     public JPanel createContractMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
@@ -420,6 +520,13 @@ public class MarketsTab {
         return createParentPanel(panel, "ContractMarketTab");
     }
 
+    /**
+     * Builds the general settings panel for the Contract Market tab, which includes
+     * options for the contract market method, search radius, salvage percentages, and
+     * other general configurations.
+     *
+     * @return A {@link JPanel} representing general options within the Contract Market tab.
+     */
     private JPanel createContractMarketGeneralOptionsPanel() {
         // Contents
         lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
@@ -482,6 +589,14 @@ public class MarketsTab {
         return panel;
     }
 
+    /**
+     * Creates the panel for configuring payment settings in the Contract Market tab.
+     * <p>
+     * This panel contains options for configuring equipment-based payment percentages,
+     * override repayment rules, and toggles for contract payment methods.
+     *
+     * @return A {@link JPanel} containing payment configuration settings for the Contract Market.
+     */
     private JPanel createContractPayPanel() {
         // Contents
         btnContractEquipment = new JRadioButton(resources.getString("lblContractEquipment.text"));
@@ -589,10 +704,22 @@ public class MarketsTab {
         return panel;
     }
 
+
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads the campaign options from the associated {@link Campaign} into
+     * the UI components of the market tabs. This includes personnel, unit,
+     * and contract market settings.
+     * <p>
+     * If no preset options are provided, the current campaign options are loaded.
+     *
+     * @param presetCampaignOptions A {@link CampaignOptions} object with previously
+     *                              configured settings, or {@code null} to use the
+     *                              current campaign's options.
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {

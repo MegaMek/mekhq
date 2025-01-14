@@ -32,8 +32,18 @@ import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+/**
+ * The FinancesTab class represents a UI tab within a larger financial management system
+ * for a campaign. It provides panels, checkboxes, spinners, combo boxes, and other controls
+ * to manage and configure various financial options, payments, sales, taxes, shares,
+ * and price multipliers for the campaign.
+ * <p>
+ * It is primarily composed of multiple `JPanel` sections organized using
+ * `GroupLayout` for modularity and clarity.
+ */
 public class FinancesTab {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
@@ -104,6 +114,13 @@ public class FinancesTab {
     private JSpinner spnCancelledOrderRefundMultiplier;
     //end Price Multipliers
 
+    /**
+     * Constructs a `FinancesTab` instance which manages the financial settings
+     * and configurations for a specific campaign.
+     *
+     * @param campaign The `Campaign` object that this `FinancesTab` will be associated with.
+     *                 Provides access to campaign-related options and data.
+     */
     public FinancesTab(Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
@@ -111,11 +128,30 @@ public class FinancesTab {
         initialize();
     }
 
+    /**
+     * Initializes the primary components and subcomponents of the `FinancesTab`.
+     * Specifically, sets up the 'General Options' and 'Price Multipliers' tabs
+     * through their respective initialization methods.
+     * This method ensures that the tabs are prepared prior to being displayed or used.
+     */
     private void initialize() {
         initializeGeneralOptionsTab();
         initializePriceMultipliersTab();
     }
 
+    /**
+     * Initializes the General Options tab within the application's UI.
+     * <p>
+     * This method sets up various UI components and panels that
+     * provide configurable options for general settings, payments,
+     * sales, other systems, taxes, and shares. Components include
+     * checkboxes, labels, spinners, and combo boxes that allow
+     * the user to interact with and configure these settings.
+     * <p>
+     * All UI components are initialized, but additional configuration
+     * such as layout placements, listeners, or actual visibility might
+     * need to be completed separately.
+     */
     private void initializeGeneralOptionsTab() {
         // General Options
         pnlGeneralOptions = new JPanel();
@@ -162,11 +198,12 @@ public class FinancesTab {
     }
 
     /**
-     * Constructs and returns a {@link JPanel} for the 'FinancesGeneralTab'.
-     * This tab includes 'GeneralOptions', 'Payments', 'Sales', and 'OtherSystems' panels that are
-     * organized using {@link GroupLayout}. A header is also included in the layout.
+     * Creates and configures the Finances General Options tab, assembling its components,
+     * layout, and panels which include general options, other systems, payments, and sales.
+     * This method initializes required sub-panels and arranges them within the overall
+     * structure to create a fully constructed tab for financial general options.
      *
-     * @return {@link JPanel} representing the 'Finances General' tab.
+     * @return A fully configured JPanel representing the Finances General Options tab.
      */
     public JPanel createFinancesGeneralOptionsTab() {
         // Header
@@ -215,11 +252,11 @@ public class FinancesTab {
     }
 
     /**
-     * Constructs and returns a {@link JPanel} for the 'PaymentsPanel'.
-     * This panel contains checkboxes for different payment categories, organized into two rows
-     * within a {@link GroupLayout}.
+     * Creates and configures a payments panel with various checkbox options for payment categories such as
+     * parts, repairs, units, salaries, overhead, maintenance, transport, and recruitment. The layout of
+     * the panel organizes the checkboxes in a grid-based format.
      *
-     * @return {@link JPanel} representing the 'Payments' panel.
+     * @return a JPanel instance containing the configured payment options checkboxes.
      */
     private JPanel createPaymentsPanel() {
         // Contents
@@ -266,10 +303,13 @@ public class FinancesTab {
     }
 
     /**
-     * Constructs and returns a {@link JPanel} for the 'OtherSystemsPanel'.
-     * This panel includes 'Taxes' and 'Shares' panels, arranged vertically within a {@link GroupLayout}.
+     * Constructs and returns a {@link JPanel} for the 'Other Systems Panel'.
+     * This panel combines two sub-panels: 'Taxes Panel' and 'Shares Panel'.
+     * Each sub-panel is added sequentially to the main panel using a grid-bag layout.
+     * These panels are organized vertically in the resulting panel.
      *
-     * @return {@link JPanel} representing the 'Other Systems' panel.
+     * @return {@link JPanel} representing the 'Other Systems Panel', containing the
+     *         'Taxes Panel' and 'Shares Panel'.
      */
     private JPanel createOtherSystemsPanel() {
         // Contents
@@ -292,12 +332,13 @@ public class FinancesTab {
     }
 
     /**
-     * Constructs and returns a {@link JPanel} for the 'GeneralOptionsPanel'. This panel contains
-     * checkboxes for various options, a label displaying financial year duration,
-     * and a combo box to select the financial year duration.
-     * The components are arranged vertically within a {@link GroupLayout}.
+     * Creates and initializes the General Options Panel with various configurable
+     * options related to loan limits, maintenance, parts modifiers, peacetime costs,
+     * and financial year settings. The panel includes checkboxes and labels for easy
+     * user interaction and configuration of these parameters.
      *
-     * @return {@link JPanel} representing the 'General Options' panel.
+     * @return A JPanel containing the general options components laid out in a
+     *         structured format.
      */
     private JPanel createGeneralOptionsPanel() {
         // Contents
@@ -347,11 +388,12 @@ public class FinancesTab {
     }
 
     /**
-     * Constructs and returns a {@link JPanel} for the 'SalesPanel'.
-     * This panel contains two checkboxes - 'SellUnitsBox' and 'SellPartsBox',
-     * organized in a horizontal arrangement within a {@link GroupLayout}.
+     * Creates and configures the sales panel within the finance tab.
+     * The panel contains checkboxes for options related to sales, including
+     * "Sell Units" and "Sell Parts". These checkboxes are added to a layout
+     * that organizes the components vertically.
      *
-     * @return {@link JPanel} representing the 'Sales' panel.
+     * @return A JPanel instance containing the configured sales options.
      */
     private JPanel createSalesPanel() {
         // Contents
@@ -375,12 +417,11 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and returns a {@link JPanel} for the 'TaxesPanel'.
-     * This panel includes a checkbox for activating/deactivating taxes and
-     * a label and spinner for adjusting the tax percentage. These components are organized
-     * vertically in a {@link GroupLayout}.
+     * Creates and returns a JPanel representing the taxes panel in the campaign options.
+     * This panel includes a checkbox to enable or disable taxes and a spinner
+     * to set the percentage of taxes, along with corresponding labels.
      *
-     * @return {@link JPanel} representing the 'Taxes' panel.
+     * @return the configured JPanel containing the components for the taxes panel.
      */
     private JPanel createTaxesPanel() {
         // Contents
@@ -410,11 +451,12 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and returns a {@link JPanel} for the 'SharesPanel'.
-     * This panel includes two check boxes - 'UseShareSystem', and 'SharesForAll' arranged vertically
-     * in a {@link GroupLayout}.
+     * Creates and returns a JPanel representing the 'Shares Panel' within the finance tab.
+     * <p>
+     * The panel is laid out using grid-based constraints to position the components
+     * in a structured vertical arrangement.
      *
-     * @return {@link JPanel} representing the 'Shares' panel.
+     * @return A JPanel containing the configured components for the 'Shares Panel'.
      */
     private JPanel createSharesPanel() {
         // Contents
@@ -438,10 +480,15 @@ public class FinancesTab {
     }
 
     /**
-     * Initializes the components of the 'PriceMultipliersTab'.
-     * This method assigns new instances of {@link JPanel}, {@link JLabel}, and {@link JSpinner}
-     * to the panel and its accompanying components for 'General Multipliers',
-     * 'Used Parts Multipliers', and 'Other Multipliers'.
+     * Initializes the components and layout for the price multipliers tab.
+     * This tab includes controls for setting various price multipliers such as
+     * - General multipliers for unit and part prices.
+     * - Multipliers for used parts.
+     * - Miscellaneous multipliers for damaged, unrepairable parts, and order refunds.
+     * <p>
+     * The method creates and assigns UI components including panels, labels, and spinners
+     * to their respective class fields. Each field corresponds to a specific category
+     * of price multiplier.
      */
     private void initializePriceMultipliersTab() {
         pnlGeneralMultipliers = new JPanel();
@@ -472,12 +519,12 @@ public class FinancesTab {
     }
 
     /**
-     * Constructs and returns a {@link JPanel} for the 'PriceMultipliersTab'.
-     * This tab comprises a header panel and three individual sections - 'General Multipliers',
-     * 'Used Parts Multipliers', and 'Other Multipliers'. These sections are vertically aligned
-     * using a {@link GroupLayout}.
+     * Creates and returns a JPanel representing the "Price Multipliers" tab in the user interface.
+     * The method includes a header section, general multipliers panel, used parts multipliers panel,
+     * and other multipliers panel. These components are arranged using a specific layout and added
+     * to a parent panel.
      *
-     * @return {@link JPanel} that constitutes the 'Price Multipliers' tab.
+     * @return a JPanel representing the "Price Multipliers" tab with all its components and layout configured
      */
     public JPanel createPriceMultipliersTab() {
         // Header
@@ -511,12 +558,12 @@ public class FinancesTab {
     }
 
     /**
-     * Creates a {@link JPanel} for entering general multipliers with labeled spinners.
-     * The panel groups together spinners for entering multipliers for multiple categories like 'CommonPart',
-     * 'InnerSphereUnit', 'InnerSpherePart', 'ClanUnit', 'ClanPart', and 'MixedTechUnit'.
-     * Each category has its own row with the respective label and spinner.
+     * Creates and configures the general multipliers panel, which includes labels
+     * and spinners for various pricing multipliers such as common parts, Inner Sphere
+     * units, Inner Sphere parts, Clan units, Clan parts, and mixed tech units.
+     * The panel is structured using a grid layout for organized placement of components.
      *
-     * @return {@link JPanel} representing the 'General Multipliers' panel.
+     * @return a JPanel containing the components for setting general multipliers.
      */
     private JPanel createGeneralMultipliersPanel() {
         // Contents
@@ -584,22 +631,18 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and returns a {@link JPanel} representing the 'Used Parts Multiplier' panel.
+     * Creates and returns a JPanel for configuring used parts price multipliers
+     * based on part quality. Each part quality level is represented with a label
+     * and a spinner for adjusting the multiplier value.
      * <p>
-     * The {@link JPanel} includes numerous pairs of {@link JLabel} and {@link JSpinner} components,
-     * each associated with a particular 'quality' level of the used parts.
-     * Each {@link JLabel} is named according to the quality level.
-     * Each {@link JSpinner} is initialized with a {@link SpinnerNumberModel} for inputting numbers with
-     * a range of 0.00 to 1.00, and a step increment of 0.05.
+     * The spinners are initialized with a range of values from 0.00 to 1.00,
+     * incrementing by 0.05, and include formatting for two decimal places.
+     * Additionally, the alignment of the spinner text fields is set to left.
      * <p>
-     * The 'quality' levels range from 'QUALITY_A' to 'QUALITY_F', as defined in the Part class.
-     * These different quality levels represent different conditions of used parts.
-     * <p>
-     * The {@link JPanel} uses a {@link GroupLayout} to arrange its components.
-     * Vertically, each {@link JLabel} is paired alongside its corresponding {@link JSpinner}.
-     * Horizontally, each {@link JLabel}-{@link JSpinner} pair is in a row of its own.
+     * The panel is arranged using GridBagLayout to ensure proper alignment
+     * between labels and spinners for each quality level.
      *
-     * @return {@link JPanel} representing the 'Used Parts Multiplier' panel.
+     * @return A JPanel containing labels and spinners for used parts price multipliers.
      */
     private JPanel createUsedPartsMultiplierPanel() {
         boolean reverseQualities = campaign.getCampaignOptions().isReverseQualityNames();
@@ -644,16 +687,12 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and returns a {@link JPanel} that includes various spinners associated with different multipliers.
-     * These multipliers include "Damaged Parts Value Multiplier", "Unrepairable Parts Value Multiplier",
-     * and "Cancelled Order Refund Multiplier". Each of these multipliers has their own label and
-     * corresponding spinner for input.
-     * <p>
-     * The layout of the panel is organized so that each label is directly paired with its corresponding
-     * spinner horizontally. Vertically, the pairs are stacked on top of each other in the order that they
-     * were added to the panel.
+     * Creates and returns a JPanel configured with components for adjusting
+     * multipliers related to damaged parts value, unrepairable parts value,
+     * and cancelled order refunds. Each multiplier is represented with a label
+     * and an associated configurable spinner control.
      *
-     * @return {@link JPanel} representing the 'Other Multipliers' panel.
+     * @return a JPanel instance containing the components for configuring the multipliers.
      */
     private JPanel createOtherMultipliersPanel() {
         // Contents
@@ -696,6 +735,14 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Applies the specified campaign options to the corresponding campaign settings.
+     * If no campaign options are provided, default options are used instead.
+     *
+     * @param presetCampaignOptions
+     *        The campaign options to be applied. If null, default campaign options
+     *        are applied.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
@@ -741,10 +788,26 @@ public class FinancesTab {
         options.setCancelledOrderRefundMultiplier((double) spnCancelledOrderRefundMultiplier.getValue());
     }
 
+    /**
+     * Loads configuration values from the current campaign options to populate
+     * the financial settings and related UI components in the `FinancesTab`.
+     * <p>
+     * This method is a convenience overload that invokes the overloaded
+     * {@link #loadValuesFromCampaignOptions(CampaignOptions)} method with a
+     * `null` parameter, ensuring that default campaign options will be loaded.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads and applies the values from the provided campaign options or the default campaign options
+     * if the provided options are null. Updates various UI components and internal variables based
+     * on the configuration of the campaign options.
+     *
+     * @param presetCampaignOptions the campaign options to load values from; if null, the default
+     *                              campaign options will be used
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {

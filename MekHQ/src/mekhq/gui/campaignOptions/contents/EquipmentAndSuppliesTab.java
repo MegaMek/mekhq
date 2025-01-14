@@ -36,6 +36,22 @@ import java.util.ResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+/**
+ * The {@code EquipmentAndSuppliesTab} class represents a graphical user interface (GUI)
+ * tab containing various options and settings related to equipment and supplies in a campaign simulation.
+ * This class is responsible for building and managing multiple sub-tabs and panels for customization purposes,
+ * including acquisition settings, delivery settings, planetary acquisition settings, and more.
+ * It also provides methods to initialize, create, and manage these different components.
+ * <p>
+ * Fields in this class include labels, spinners, combo boxes, checkboxes, and panels used for displaying
+ * and managing options in the tab. They allow the user to configure various parameters like transit times,
+ * penalties, acquisition limits, faction-specific settings, and modifiers to influence game mechanics.
+ * Multiple constants are defined for units of time, representing days, weeks, and months, among others.
+ * <p>
+ * The class includes initialization methods for different sections of the tab, as well as methods
+ * to create panels for specific functionality. Utility methods are also provided for configuring spinners
+ * and combo boxes or formatting options and labels.
+ */
 public class EquipmentAndSuppliesTab {
     // region Variable Declarations
     private static String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -118,6 +134,12 @@ public class EquipmentAndSuppliesTab {
     private JCheckBox useAmmoByTypeBox;
     //end Tech Limits Tab
 
+    /**
+     * Constructs the EquipmentAndSuppliesTab with the given campaign options.
+     *
+     * @param campaignOptions the {@link CampaignOptions} object containing
+     *                        configuration settings for the campaign
+     */
     public EquipmentAndSuppliesTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
@@ -125,7 +147,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Calls the initialization methods for all the tab panels.
+     * Initializes the EquipmentAndSuppliesTab by configuring its various components and panels.
+     * This includes setting up the acquisitions tab, delivery tab, planetary acquisitions tab,
+     * and tech limits tab.
      */
     void initialize() {
         initializeAcquisitionTab();
@@ -135,8 +159,15 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components of the ProcreationTab.
-     * The panel contains settings related to character procreation in the simulation.
+     * Initializes the components and configurations for the Planetary Acquisitions tab in the
+     * EquipmentAndSuppliesTab. This includes setting up options, labels, spinners, combo boxes,
+     * checkboxes, and panels related to planetary acquisitions.
+     * <p>
+     * The method sets up the following:
+     * <li> Configuration options for planetary acquisitions such as enabling/disabling planetary acquisitions,
+     *   setting faction limits, and managing clan/Inner Sphere specific rules.</li>
+     * <li> Panels and components for modifiers, including technology bonuses, industry bonuses,
+     *   and output bonuses.</li>
      */
     private void initializePlanetaryAcquisitionsTab() {
         // Options
@@ -173,8 +204,15 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components of the DivorceTab.
-     * The panel contains settings related to divorce mechanics within the simulation.
+     * Initializes the components and configurations for the delivery tab within the
+     * EquipmentAndSuppliesTab. This method sets up panels, labels, spinners, and combo boxes required
+     * for managing delivery-related settings and options.
+     * <p>
+     * The setup includes:
+     * <li> The main delivery panel.</li>
+     * <li> Spinners for numeric inputs such as transit time settings and acquisition modifiers.</li>
+     * <li> Labels for providing descriptions for components.</li>
+     * <li> Combo boxes for selecting unit options related to transit times and acquisitions.</li>
      */
     private void initializeDelivery() {
         pnlDeliveries = new JPanel();
@@ -194,8 +232,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components of the MarriageTab.
-     * The panel contains various settings related to marriage mechanics within the simulation.
+     * Initializes the components and settings for the acquisitions tab in the EquipmentAndSuppliesTab.
+     * This method sets up the GUI components required for configuring acquisition-related options,
+     * including panels, labels, spinners, combo boxes, and checkboxes.
      */
     private void initializeAcquisitionTab() {
         pnlAcquisitions = new JPanel();
@@ -220,8 +259,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components of the TechLimitsTab.
-     * This panel contains various controls for setting technological limits.
+     * Initializes the components and settings for the Tech Limits tab in the EquipmentAndSuppliesTab.
+     * This method sets up a series of checkboxes, labels, and combo boxes to configure technology-related
+     * limits and options.
      */
     private void initializeTechLimitsTab() {
         limitByYearBox = new JCheckBox();
@@ -237,9 +277,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates the acquisition tab panel.
+     * Creates and configures the acquisition tab panel for the user interface.
+     * This method initializes and organizes the components such as the header,
+     * acquisition panel, and delivery panel, and then returns the fully constructed
+     * acquisition tab panel.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return A {@code JPanel} instance representing the complete acquisition tab.
      */
     public JPanel createAcquisitionTab() {
         // Header
@@ -271,9 +314,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates the acquisition tab panel.
+     * Creates and returns a {@code JPanel} for configuring acquisition-related options.
+     * This panel includes various components such as labels, checkboxes, and
+     * spinners to allow users to set values for acquisition settings, including
+     * penalties, waiting periods, maximum acquisitions, and stock percentages.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return A {@code JPanel} populated with acquisition configuration components and their layout.
      */
     private JPanel createAcquisitionPanel() {
         // Content
@@ -353,9 +399,10 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates the delivery tab panel.
+     * Creates and configures a delivery panel composed of multiple sub-panels for managing transit time and delivery-related settings.
+     * The panel includes components such as labels, spinners, and choice units, and ensures proper layout and structure.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return a {@code JPanel} instance representing the delivery panel with all configured sub-panels and components.
      */
     private JPanel createDeliveryPanel() {
         lblNDiceTransitTime = new CampaignOptionsLabel("NDiceTransitTime");
@@ -426,6 +473,13 @@ public class EquipmentAndSuppliesTab {
         return panelParent;
     }
 
+    /**
+     * Creates and configures the planetary acquisition tab panel in a campaign options interface.
+     * The panel includes a header, options, and modifiers section, arranged using
+     * layout constraints. Once configured, it is wrapped within a parent panel and returned.
+     *
+     * @return a {@code JPanel} object representing the planetary acquisition tab with its configured components and layout.
+     */
     public JPanel createPlanetaryAcquisitionTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
@@ -457,9 +511,12 @@ public class EquipmentAndSuppliesTab {
 
 
     /**
-     * Creates the planetary acquisition options panel.
+     * Creates and returns a {@code JPanel} containing the components necessary
+     * for configuring campaign options related to planetary acquisitions.
+     * This panel includes various labels, checkboxes, and spinners
+     * for setting and adjusting relevant options.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return a {@code JPanel} containing the campaign options panel for planetary acquisitions.
      */
     private JPanel createOptionsPanel() {
         usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions");
@@ -521,9 +578,16 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates the planetary acquisition modifiers panel.
+     * Creates and returns a panel that organizes and displays the planetary acquisition
+     * modifiers for technology, industry, and output. This method sets up spinners and
+     * labels for each equipment type rating (A through F) to adjust acquisition bonuses.
+     * <p>
+     * The method initializes modifier spinners for technology, industry, and output
+     * acquisition bonuses, creates separate panels for each category, and combines them
+     * into a single panel using a grid layout.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return a {@code JPanel} representing the planetary acquisition modifiers panel, including
+     *         elements for adjusting technology, industry, and output modifiers.
      */
     private JPanel createModifiersPanel() {
         // Modifier Spinners
@@ -571,9 +635,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates the planetary acquisition modifiers panel.
+     * Creates and returns a {@code JPanel} layout containing components for configuring
+     * technology-related modifiers in a campaign setting. The panel includes
+     * labels and corresponding input components (spinners) arranged in a
+     * grid layout.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return a {@code JPanel} containing the layout for technology modifiers configuration
      */
     private JPanel createTechModifiersPanel() {
         JLabel techLabel = new CampaignOptionsLabel("TechLabel");
@@ -595,9 +662,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates the planetary acquisition modifiers panel.
+     * Creates and configures a {@code JPanel} that serves as the Industry Modifiers Panel.
+     * The panel contains labels and spinners arranged in a grid layout to display
+     * and allow modification of industry bonuses.
      *
-     * @return the created tab panel as a {@link JPanel}
+     * @return a {@code JPanel} component configured as the Industry Modifiers Panel with
+     *         labels and spinners for industry adjustment.
      */
     private JPanel createIndustryModifiersPanel() {
         JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
@@ -618,6 +688,13 @@ public class EquipmentAndSuppliesTab {
         return panel;
     }
 
+    /**
+     * Creates and configures a {@code JPanel} for displaying and adjusting output modifiers.
+     * The panel includes labels and corresponding spinner components to modify
+     * planet acquisition output bonuses.
+     *
+     * @return a {@code JPanel} configured with labels and spinners for planet output modifiers
+     */
     private JPanel createOutputModifiersPanel() {
         JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
         outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
@@ -638,10 +715,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Sets the width of a {@link JSpinner} component based on the width of the text that would be
-     * displayed in it.
+     * Sets the minimum width of the specified JSpinner component by scaling its preferred size.
      *
-     * @param spinner the {@link JSpinner} to set the width for
+     * @param spinner the JSpinner component whose minimum width is to be set
      */
     private void setSpinnerWidth(JSpinner spinner) {
         Dimension size = spinner.getPreferredSize();
@@ -649,10 +725,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Retrieves the label for a given quality modifier.
+     * Determines the modifier label based on the provided quality rating.
      *
-     * @param quality The quality modifier represented by an integer value.
-     * @return The label corresponding to the quality modifier.
+     * @param quality the integer representing the quality rating, corresponding to predefined
+     *               constants in EquipmentType.
+     * @return the string label associated with the provided quality rating. Returns "A" for RATING_A,
+     * "B" for RATING_B, etc., or "ERROR" if the quality does not match any predefined ratings.
      */
     private String getModifierLabel(int quality) {
         return switch (quality) {
@@ -667,10 +745,9 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Retrieves the transit unit options as a {@link DefaultComboBoxModel}.
+     * Creates and returns a DefaultComboBoxModel containing the transit unit options.
      *
-     * @return The {@link DefaultComboBoxModel} containing the transit unit options with labels fetched
-     * from {@code getTransitUnitName()}.
+     * @return a DefaultComboBoxModel<String> populated with transit unit names based on TRANSIT_UNIT_NUM.
      */
     private static DefaultComboBoxModel<String> getTransitUnitOptions() {
         DefaultComboBoxModel<String> transitUnitModel = new DefaultComboBoxModel<>();
@@ -682,10 +759,10 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Returns the name of the transit unit based on the given unit value.
+     * Retrieves the name of the transit unit based on the provided unit value.
      *
-     * @param unit the unit value representing the transit unit
-     * @return the name of the transit unit as a {@link String}
+     * @param unit the integer value representing the transit unit (e.g., day, week, month)
+     * @return the name of the transit unit as a string, or "ERROR" if the unit is not recognized
      */
     private static String getTransitUnitName(final int unit) {
         return switch (unit) {
@@ -697,9 +774,11 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Builds the options for the acquisition skill combo box.
+     * Builds a DefaultComboBoxModel containing a predefined set of skill options
+     * that can be acquired. The options include technical, administrative,
+     * scrounge, negotiation, and auto skills.
      *
-     * @return the default combo box model containing the acquisition skill options
+     * @return a DefaultComboBoxModel containing the skill options as string elements.
      */
     private static DefaultComboBoxModel<String> buildAcquireSkillComboOptions() {
         DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<>();
@@ -714,11 +793,13 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates a {@link JPanel} representing the tech limits tab.
-     * This method constructs various components including checkboxes, labels, and combo boxes
-     * to customize the tech limit settings.
+     * Creates and initializes the "Tech Limits" tab panel within a user interface.
+     * The tab includes various settings and options related to technical limitations,
+     * such as limiting by year, disallowing extinct technologies, allowing faction-specific purchases,
+     * enabling canon-only restrictions, setting maximum tech levels, and more.
+     * The method arranges the components in a structured layout and constructs the required parent panel.
      *
-     * @return a {@link JPanel} containing the technical limits tab with all its configured components
+     * @return the {@code JPanel} representing the "Tech Limits" tab, fully configured with its components and layout.
      */
     public JPanel createTechLimitsTab() {
         // Header
@@ -793,7 +874,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * @return a {@link DefaultComboBoxModel} containing options for maximum technology levels.
+     * Creates and returns a DefaultComboBoxModel containing the available
+     * options for maximum technology levels.
+     *
+     * @return A DefaultComboBoxModel<String> populated with the list of
+     *         technology level names corresponding to the defined constants
+     *         in CampaignOptions (e.g., TECH_INTRO, TECH_STANDARD, etc.).
      */
     private static DefaultComboBoxModel<String> getMaximumTechLevelOptions() {
         DefaultComboBoxModel<String> maximumTechLevelModel = new DefaultComboBoxModel<>();
@@ -807,6 +893,14 @@ public class EquipmentAndSuppliesTab {
         return maximumTechLevelModel;
     }
 
+    /**
+     * Applies the given campaign options to the campaign or uses default options if none are provided.
+     * This method updates the campaign settings for acquisitions, deliveries, planetary acquisitions,
+     * and technological limits to customize campaign behavior.
+     *
+     * @param presetCampaignOptions the campaign options to apply; if null, default campaign options
+     *                              are used instead
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
@@ -859,10 +953,25 @@ public class EquipmentAndSuppliesTab {
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
     }
 
+    /**
+     * Loads values from the campaign options. This method serves as a convenience
+     * method that calls the overloaded version of {@code loadValuesFromCampaignOptions}
+     * with a {@code null} parameter.
+     * <p>
+     * This method is typically used to initialize or update certain settings or
+     * configurations based on the campaign options when no specific options are provided.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads values from the provided CampaignOptions instance into the UI components.
+     * If the provided CampaignOptions instance is null, it defaults to using the internal campaignOptions instance.
+     *
+     * @param presetCampaignOptions the CampaignOptions instance containing the preset values to load,
+     *                               or null to use the default internal campaignOptions.
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {

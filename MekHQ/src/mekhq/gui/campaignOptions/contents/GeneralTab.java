@@ -48,11 +48,20 @@ import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 
 /**
- * Represents a tab that allows the user to configure general settings for a campaign.
- * Extends the {@link AbstractMHQTabbedPane} class.
+ * Represents a tab within the campaign options UI that allows the user to configure
+ * general campaign settings. This includes options for:
+ * <ul>
+ *     <li>Configuring the campaign name</li>
+ *     <li>Setting the faction and faction-related options</li>
+ *     <li>Adjusting reputation and manual unit rating modifiers</li>
+ *     <li>Specifying the campaign start date</li>
+ *     <li>Choosing a camouflage pattern and unit icon</li>
+ * </ul>
+ *
+ * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
 public class GeneralTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -81,6 +90,12 @@ public class GeneralTab {
     private JButton btnIcon;
     private StandardForceIcon unitIcon;
 
+    /**
+     * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
+     *
+     * @param campaign The {@link Campaign} associated with this tab, which contains the core game data.
+     * @param frame    The parent {@link JFrame} used to display this tab.
+     */
     public GeneralTab(Campaign campaign, JFrame frame) {
         // region Variable Declarations
         this.frame = frame;
@@ -94,9 +109,18 @@ public class GeneralTab {
     }
 
     /**
-     * Creates the general tab for a campaign.
+     * Creates the UI components displayed in the general tab.
+     * <p>
+     * The general tab includes various configurable fields and panels:
+     * <ul>
+     *     <li>An editable text field for setting the campaign name</li>
+     *     <li>A dropdown for selecting the campaign's faction</li>
+     *     <li>Controls for managing reputation and manual rating modifiers</li>
+     *     <li>Date selection associated with the campaign</li>
+     *     <li>Buttons for choosing camouflage and unit icons</li>
+     * </ul>
      *
-     * @return the created general tab as an AbstractMHQScrollablePanel
+     * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
      */
     public AbstractMHQScrollablePanel createGeneralTab() {
         // Header
@@ -212,9 +236,14 @@ public class GeneralTab {
     }
 
     /**
-     * Creates a {@link JPanel} with a header containing an image, title, and body text.
+     * Creates a header panel for the general tab, which includes:
+     * <ul>
+     *     <li>An image representing the campaign options</li>
+     *     <li>A title for the general tab</li>
+     *     <li>A description of the general tab functionalities</li>
+     * </ul>
      *
-     * @return the created {@link JPanel} with the header
+     * @return A {@link JPanel} containing the general tab header.
      */
     private static JPanel createGeneralHeader() {
         ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
@@ -249,7 +278,13 @@ public class GeneralTab {
     }
 
     /**
-     * Initialize the components of the {@link GeneralTab} class.
+     * Initializes the UI components used throughout the general tab.
+     * <p>
+     * This method sets up the components for all editable campaign settings, including:
+     * <ul>
+     *     <li>Labels, text fields, dropdowns, and buttons for campaign settings</li>
+     *     <li>Default values fetched from the campaign instance</li>
+     * </ul>
      */
     private void initialize() {
         lblName = new JLabel();
@@ -287,7 +322,10 @@ public class GeneralTab {
     }
 
     /**
-     * Builds a {@link DefaultComboBoxModel} of {@link FactionDisplay} options.
+     * Builds a {@link DefaultComboBoxModel} containing faction options based on the current campaign data.
+     * These options allow users to choose valid factions appropriate to the campaign's start date.
+     *
+     * @return A {@link DefaultComboBoxModel} populated with available {@link FactionDisplay} options.
      */
     private DefaultComboBoxModel<FactionDisplay> buildFactionDisplayOptions() {
         DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
@@ -299,10 +337,10 @@ public class GeneralTab {
     }
 
     /**
-     * This method is called when the "btnDate" button is clicked.
-     * It shows a date chooser dialog and sets the selected date if the user chooses a date.
+     * Handles the "Date" button action, which triggers a date selection via a {@link DateChooser} dialog.
+     * If the user confirms their date choice, it updates the campaign's start date accordingly.
      *
-     * @param actionEvent The action event that triggered the method.
+     * @param actionEvent The {@link ActionEvent} triggered by the "Date" button.
      */
     private void btnDateActionPerformed(ActionEvent actionEvent) {
         // show the date chooser
@@ -314,11 +352,9 @@ public class GeneralTab {
     }
 
     /**
-     * Sets the date for the {@link RepairAndMaintenanceTab}.
-     * This method is called when the "btnDate" button is clicked.
-     * It shows a date chooser dialog and sets the selected date if the user chooses a date.
+     * Updates the campaign start date and refreshes the dependent UI components based on the changes.
      *
-     * @param date The selected date. This parameter may contain a null value.
+     * @param date The selected {@link LocalDate} to set as the campaign start date. Can be null.
      */
     private void setDate(final @Nullable LocalDate date) {
         if (date == null) {
@@ -338,11 +374,11 @@ public class GeneralTab {
     }
 
     /**
-     * This method is called when the "btnCamo" button is clicked.
-     * It opens a {@link CamoChooserDialog} and sets the selected camouflage if the user confirms the
-     * dialog.
+     * Handles the "Camouflage" button action, which opens a {@link CamoChooserDialog}.
+     * If the user confirms their camouflage selection, it updates the button icon to display the
+     * chosen camouflage.
      *
-     * @param actionEvent The action event that triggered this method.
+     * @param actionEvent The {@link ActionEvent} triggered by the "Camouflage" button.
      */
     private void btnCamoActionPerformed(ActionEvent actionEvent) {
         CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame, camouflage);
@@ -353,11 +389,11 @@ public class GeneralTab {
     }
 
     /**
-     * Event handler for the button action of btnIcon.
-     * Opens a {@link UnitIconDialog} for the user to select a unit icon.
-     * If selection is confirmed, the button's icon is updated to the selected one.
+     * Handles the "Unit Icon" button action, which opens a {@link UnitIconDialog}.
+     * If the user selects a new unit icon and confirms, this method updates the button icon to
+     * reflect the selection.
      *
-     * @param actionEvent The {@link ActionEvent} object generated when button btnIcon is clicked.
+     * @param actionEvent The {@link ActionEvent} triggered by the "Unit Icon" button.
      */
     private void btnIconActionPerformed(ActionEvent actionEvent) {
         final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
@@ -368,12 +404,17 @@ public class GeneralTab {
     }
 
     /**
-     * Creates a {@link JPanel} named FurtherReadingPanel.
-     * The panel contains other panels: headerPanelBMM, headerPanelTotalWarfare, and
-     * headerPanelCampaignOperations, each defining a specific campaign option.
-     * The panels are added to FurtherReadingPanel in top-to-bottom order.
+     * Creates a "Further Reading" panel that provides links or additional details to guide users
+     * in understanding the campaign options.
+     * <p>
+     * The panel may include references to:
+     * <ul>
+     *     <li>BattleMech Manual (BMM)</li>
+     *     <li>Total Warfare rules</li>
+     *     <li>Campaign Operations documentation</li>
+     * </ul>
      *
-     * @return the constructed {@link JPanel}.
+     * @return A {@link JPanel} containing additional informational components.
      */
     private JPanel createFurtherReadingPanel() {
         // Contents
@@ -404,11 +445,44 @@ public class GeneralTab {
         return panel;
     }
 
+    /**
+     * Loads the values from the current campaign's {@link CampaignOptions} and updates the user interface components.
+     * <p>
+     * This is a convenience method that uses the default campaign options, default date, and default faction
+     * to populate the relevant data fields in the user interface. It essentially delegates the work to the overloaded
+     * method {@link #loadValuesFromCampaignOptions(CampaignOptions, LocalDate, Faction)} with all parameters set to {@code null}.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null, null, null);
     }
 
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions, @Nullable LocalDate presetDate, @Nullable Faction presetFaction) {
+    /**
+     * Loads values from the specified {@link CampaignOptions}, date, and faction into the user interface components.
+     * <p>
+     * This method updates the UI fields (e.g., text fields, combo boxes, and buttons) with the corresponding values
+     * from the provided options or defaults to the current campaign's settings if no presets are provided.
+     * <p>
+     * Specific actions include:
+     * <ul>
+     *     <li>Setting the campaign name and faction in the respective fields.</li>
+     *     <li>Updating the unit rating method and manual unit rating modifier based on the campaign
+     *     options.</li>
+     *     <li>Synchronizing the date to the UI, accounting for a preset date if provided.</li>
+     *     <li>Setting the camouflage pattern and unit icon to align with the campaign's default or
+     *     custom configuration.</li>
+     *     <li>Performing required UI updates (e.g., repainting date labels).</li>
+     * </ul>
+     *
+     * @param presetCampaignOptions Optional {@link CampaignOptions} used to populate values.
+     *                              If {@code null}, the current campaign options are used.
+     * @param presetDate Optional {@link LocalDate} to be used as the active date.
+     *                   If {@code null}, the campaign's current date is used.
+     * @param presetFaction Optional {@link Faction} to be used in the faction selection field.
+     *                      If {@code null}, the campaign's default faction is used.
+     */
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                              @Nullable LocalDate presetDate,
+                                              @Nullable Faction presetFaction) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
@@ -435,9 +509,17 @@ public class GeneralTab {
         unitIcon = campaign.getUnitIcon();
     }
 
+    /**
+     * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}.
+     * This method ensures that any changes made in the UI are reflected in the campaign's settings.
+     *
+     * @param presetCampaignOptions An optional {@link CampaignOptions} to apply instead of the campaign's current options.
+     * @param isStartUp             A boolean indicating if the campaign is in a startup state.
+     * @param isSaveAction          A boolean indicating if this is a save action.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
                                                boolean isStartUp, boolean isSaveAction) {
-        // First we apply any updates to the campaign
+        // First, we apply any updates to the campaign
         if (!isSaveAction) {
             campaign.setName(txtName.getText());
 

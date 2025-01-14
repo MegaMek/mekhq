@@ -25,10 +25,25 @@ import mekhq.gui.campaignOptions.components.*;
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 /**
- * This class represents the tab for repair and maintenance settings.
+ * Represents a tab in the campaign options UI used to configure settings related to
+ * repair and maintenance in a campaign.
+ * <p>
+ * This tab is divided into two sections:
+ * </p>
+ * <ul>
+ *     <li><b>Repair Tab:</b> Manages options for era modifications, tech assignments,
+ *         equipment quirks handling, destruction margins, and more.</li>
+ *     <li><b>Maintenance Tab:</b> Handles maintenance settings such as cycle frequency, quality standards,
+ *         planetary modifiers, and unofficial maintenance rules.</li>
+ * </ul>
+ * <p>
+ * The class interacts with {@link CampaignOptions}, enabling the retrieval, storage,
+ * and application of repair and maintenance configuration settings.
+ * </p>
  */
 public class RepairAndMaintenanceTab {
     private final CampaignOptions campaignOptions;
@@ -63,7 +78,11 @@ public class RepairAndMaintenanceTab {
     //end Maintenance Tab
 
     /**
-     * Represents a tab for repair and maintenance in an application.
+     * Constructs a {@code RepairAndMaintenanceTab} instance for configuring
+     * repair and maintenance-related settings.
+     *
+     * @param campaignOptions the {@link CampaignOptions} object to be used
+     *        for managing repair and maintenance options.
      */
     public RepairAndMaintenanceTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
@@ -72,7 +91,7 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Initializes the repair and maintenance tab by creating and initializing various UI components.
+     * Initializes the components of the tab, including both the Repair and Maintenance sections.
      */
     void initialize() {
         initializeRepairTab();
@@ -80,7 +99,11 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Initializes the repair tab by creating and initializing various UI components.
+     * Initializes the components for the Repair Tab.
+     * <p>
+     * The Repair Tab includes settings for era-based modifications, technician assignment,
+     * equipment quirks, damage margins, and destruction thresholds.
+     * </p>
      */
     private void initializeRepairTab() {
         useEraModsCheckBox = new JCheckBox();
@@ -102,7 +125,11 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Initializes the maintenance tab by creating and initializing various UI components.
+     * Initializes the components for the Maintenance Tab.
+     * <p>
+     * The Maintenance Tab includes settings for maintenance scheduling, quality rules,
+     * randomization factors, and logging options.
+     * </p>
      */
     private void initializeMaintenanceTab() {
         checkMaintenance = new JCheckBox();
@@ -130,9 +157,13 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Creates the repair tab panel.
+     * Creates the panel for the Repair Tab.
+     * <p>
+     * This tab provides configurable options for managing repair rules, handling quirks,
+     * setting margins for equipment survival, and incorporating era modifications.
+     * </p>
      *
-     * @return the created repair tab panel as a {@link JPanel}
+     * @return a {@link JPanel} representing the Repair Tab.
      */
     public JPanel createRepairTab() {
         // Header
@@ -227,9 +258,13 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Creates the maintenance tab panel.
+     * Creates the panel for the Maintenance Tab.
+     * <p>
+     * This tab provides configurable options for managing maintenance cycles,
+     * quality standards, planetary effects, and custom rules for units' upkeep.
+     * </p>
      *
-     * @return The created maintenance tab panel as a {@link JPanel}.
+     * @return a {@link JPanel} representing the Maintenance Tab.
      */
     public JPanel createMaintenanceTab() {
         // Header
@@ -335,6 +370,17 @@ public class RepairAndMaintenanceTab {
         return createParentPanel(panelParent, "maintenanceTab");
     }
 
+    /**
+     * Applies the current tab's repair and maintenance settings from the UI components
+     * to the provided {@link CampaignOptions}.
+     * <p>
+     * If no custom {@link CampaignOptions} are provided, uses the default
+     * {@link CampaignOptions} associated with this tab.
+     * </p>
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to
+     *                              apply the current settings to. If {@code null}, the default options are modified.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
@@ -364,10 +410,25 @@ public class RepairAndMaintenanceTab {
         options.setLogMaintenance(logMaintenance.isSelected());
     }
 
+    /**
+     * Loads the repair and maintenance settings from the default {@link CampaignOptions}
+     * into the tab's UI components.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads the repair and maintenance settings from the {@link CampaignOptions} object
+     * into the tab's UI components.
+     * <p>
+     * If no custom {@link CampaignOptions} are provided, the default
+     * {@link CampaignOptions} associated with this tab is used.
+     * </p>
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} object to load settings from.
+     *                              If {@code null}, the default options are used.
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {

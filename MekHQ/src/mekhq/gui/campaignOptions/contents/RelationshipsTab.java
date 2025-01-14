@@ -30,8 +30,27 @@ import mekhq.gui.campaignOptions.components.*;
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
+/**
+ * Represents a tab in the campaign options UI for configuring relationship-related options,
+ * such as marriage, divorce, and procreation settings.
+ * <p>
+ * This tab allows users to manage manual and random settings for the relationships
+ * between personnel in a campaign, applying user-defined rules and configurations.
+ * The class generates UI components for the respective configurations and interacts
+ * with {@link CampaignOptions} to store and apply these settings.
+ * </p>
+ * <p>
+ * The tab is divided into three main sections:
+ * </p>
+ * <ul>
+ *     <li>Marriage Tab: Manages configurations for manual and random marriage settings.</li>
+ *     <li>Divorce Tab: Manages configurations for manual and random divorce settings.</li>
+ *     <li>Procreation Tab: Manages configurations for manual and random procreation settings.</li>
+ * </ul>
+ */
 public class RelationshipsTab {
     private final CampaignOptions campaignOptions;
 
@@ -107,6 +126,11 @@ public class RelationshipsTab {
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
     //end Procreation Tab
 
+    /**
+     * Constructs a {@code RelationshipsTab} instance for configuring relationships-related campaign options.
+     *
+     * @param campaignOptions the {@link CampaignOptions} instance to be used for managing relationship settings.
+     */
     public RelationshipsTab(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
@@ -114,7 +138,7 @@ public class RelationshipsTab {
     }
 
     /**
-     * Calls the initialization methods for all the tab panels.
+     * Initializes the various tabs within the RelationshipsTab, including Marriage, Divorce, and Procreation Tabs.
      */
     private void initialize() {
         initializeMarriageTab();
@@ -123,8 +147,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the components of the ProcreationTab.
-     * The panel contains settings related to character procreation in the simulation.
+     * Initializes the Procreation Tab and its components.
+     * This tab controls general procreation settings and allows configuring random procreation options.
      */
     private void initializeProcreationTab() {
         pnlProcreationGeneralOptionsPanel = new JPanel();
@@ -158,8 +182,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the components of the DivorceTab.
-     * The panel contains settings related to divorce mechanics within the simulation.
+     * Initializes the Divorce Tab and its components.
+     * This tab controls general divorce settings and allows configuring random divorce options.
      */
     private void initializeDivorceTab() {
         chkUseManualDivorce = new JCheckBox();
@@ -178,8 +202,8 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the components of the MarriageTab.
-     * The panel contains various settings related to marriage mechanics within the simulation.
+     * Initializes the Marriage Tab and its components.
+     * This tab controls general marriage settings and allows configuring random marriage options.
      */
     private void initializeMarriageTab() {
         pnlMarriageGeneralOptions = new JPanel();
@@ -214,11 +238,9 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates a panel for the Marriage tab with various input components and panels related to marriage settings.
+     * Creates the UI for the Marriage Tab, including components for managing manual and random marriage options.
      *
-     * @return a {@link} representing the Marriage tab with checkboxes for manual, clan personnel,
-     * prisoner marriages, options for marriage characteristics, logging marriage name changes, surname
-     * weight settings, and random marriage generation.
+     * @return a {@link JPanel} representing the Marriage Tab.
      */
     public JPanel createMarriageTab() {
         // Header
@@ -250,9 +272,10 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates a panel for general marriage options with checkboxes and input components.
+     * Creates the panel for general marriage settings.
+     * This panel includes controls like manual marriage toggles and ancestor checks.
      *
-     * @return a {@link JPanel} representing the general marriage options panel
+     * @return a {@link JPanel} containing general marriage options.
      */
     private JPanel createMarriageGeneralOptionsPanel() {
         // Contents
@@ -304,12 +327,10 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates a panel for random marriage settings, including options for different marriage methods,
-     * using random clan personnel and prisoner marriages, setting age range for marriages, and
-     * percentage settings.
+     * Creates the panel for configuring random marriage settings.
+     * Options include random clan marriages, prisoner marriages, and other random marriage rules.
      *
-     * @return a {@link JPanel} representing the random marriage panel with various input components
-     * and panels for configuring random marriage settings
+     * @return a {@link JPanel} containing random marriage settings.
      */
     private JPanel createRandomMarriagePanel() {
         // Contents
@@ -395,11 +416,9 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates a tab for divorce settings with various checkboxes and panels for manual, clan personnel,
-     * and prisoner divorces.
+     * Creates the UI for the Divorce Tab, including components for managing manual and random divorce options.
      *
-     * @return a {@link JPanel} representing the Divorce tab with checkboxes for manual divorce,
-     * clan personnel divorce, prisoner divorce, and a panel for configuring random divorce settings.
+     * @return a {@link JPanel} representing the Divorce Tab.
      */
     public JPanel createDivorceTab() {
         // Header
@@ -448,10 +467,10 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates a panel for the Divorce tab with checkboxes for manual divorce, clan personnel divorce,
-     * prisoner divorce, and a panel for configuring random divorce settings.
+     * Creates the panel for configuring random divorce settings.
+     * Options include toggles for random same-sex and opposite-sex divorces.
      *
-     * @return a {@link JPanel} representing the Divorce tab with various components for configuring divorce settings
+     * @return a {@link JPanel} containing random divorce settings.
      */
     private JPanel createRandomDivorcePanel() {
         // Contents
@@ -515,10 +534,9 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates a panel for the Procreation tab with header, general options panel, and random procreation panel.
+     * Creates the UI for the Procreation Tab, including components for managing manual and random procreation options.
      *
-     * @return a {@link JPanel} representing the Procreation tab with header, general options panel,
-     * and random procreation panel
+     * @return a {@link JPanel} representing the Procreation Tab.
      */
     public JPanel createProcreationTab() {
         // Header
@@ -550,7 +568,10 @@ public class RelationshipsTab {
     }
 
     /**
-     * @return the {@link JPanel} containing the procreation settings components
+     * Creates the panel for general procreation settings.
+     * This panel includes controls for determining maternity leave, surname styles, and logging options.
+     *
+     * @return a {@link JPanel} containing general procreation options.
      */
     private JPanel createProcreationGeneralOptionsPanel() {
         // Contents
@@ -645,7 +666,10 @@ public class RelationshipsTab {
     }
 
     /**
-     * @return a {@link JPanel} containing the configured components for random procreation settings
+     * Creates the panel for configuring random procreation options.
+     * Options include toggles for relationshipless procreation and dice settings.
+     *
+     * @return a {@link JPanel} containing random procreation settings.
      */
     private JPanel createRandomProcreationPanel() {
         // Contents
@@ -714,10 +738,20 @@ public class RelationshipsTab {
         return panel;
     }
 
+    /**
+     * Loads the default {@link CampaignOptions} values into the RelationshipsTab components.
+     * This is a shortcut for calling {@link #loadValuesFromCampaignOptions(CampaignOptions)} with {@code null}.
+     */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
     }
 
+    /**
+     * Loads values from the specified {@link CampaignOptions} instance into the RelationshipsTab components.
+     * If no custom options are provided, the current {@link CampaignOptions} instance is used.
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} to load. If {@code null}, default options are used.
+     */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
@@ -771,6 +805,12 @@ public class RelationshipsTab {
         spnRandomProcreationRelationshiplessDiceSize.setValue(options.getRandomProcreationRelationshiplessDiceSize());
     }
 
+    /**
+     * Applies the current settings from the RelationshipsTab components to the specified {@link CampaignOptions}.
+     * If no custom options are provided, changes are applied to the current {@link CampaignOptions} instance.
+     *
+     * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply changes to. If {@code null}, default options are used.
+     */
     public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
