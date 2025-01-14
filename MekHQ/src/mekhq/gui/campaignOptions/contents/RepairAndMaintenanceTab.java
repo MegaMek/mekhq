@@ -39,7 +39,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *         equipment quirks handling, destruction margins, and more.</li>
  *     <li><b>Maintenance Tab:</b> Handles maintenance settings such as cycle frequency, quality standards,
  *         planetary modifiers, and unofficial maintenance rules.</li>
- *
+ * </p>
  * <p>
  * The class interacts with {@link CampaignOptions}, enabling the retrieval, storage,
  * and application of repair and maintenance configuration settings.

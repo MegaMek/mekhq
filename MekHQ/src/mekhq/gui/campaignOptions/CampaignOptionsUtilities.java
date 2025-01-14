@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
  *   <li>Offers UI utility methods for processing resource names, image directories,
  *       and dynamic content scaling.</li>
  *   <li>Supports internationalization through the {@link ResourceBundle} for localized strings.</li>
- *
+ * </p>
  */
 public class CampaignOptionsUtilities {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";

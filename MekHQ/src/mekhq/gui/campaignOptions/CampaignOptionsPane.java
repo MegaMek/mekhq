@@ -62,7 +62,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
  *   <li>Supports loading and applying campaign presets for streamlined configuration.</li>
  *   <li>Dynamically handles UI scaling and scrolling speed based on environment properties.</li>
  *   <li>Allows scalability for future addition of new campaign settings.</li>
- *
+ * </p>
  */
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
