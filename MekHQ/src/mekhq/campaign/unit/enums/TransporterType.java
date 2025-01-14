@@ -20,7 +20,19 @@
 package mekhq.campaign.unit.enums;
 
 import megamek.common.*;
+import mekhq.campaign.enums.CampaignTransportType;
 
+/**
+ * Entities are equipped with different Transporters.
+ * TransporterTypes are the different kinds of
+ * transporters from MegaMek that are implemented
+ * to be used with CampaignTransportTypes, like
+ * Mek Bays, Docking Collars, Battle Armor Handles,
+ * or Infantry Compartments.
+ *
+ * @see Transporter
+ * @see CampaignTransportType
+ */
 public enum TransporterType {
 
     // region Enum declarations
@@ -57,6 +69,17 @@ public enum TransporterType {
     }
     // endregion Constructor
 
+    /**
+     * An Entity's Transporters need to be mapped to their
+     * TransporterTypes. For the provided Transporter,
+     * this returns its corresponding TransporterType,
+     * or null if it's not found.
+     *
+     * @see Transporter
+     * @param transporter specific transporter to return the type of
+     * @return TransporterType (enum) of the provided transporter, or null
+     * @param <T> extends Transporter
+     */
     public static <T extends Transporter> TransporterType getTransporterType(T transporter) {
         for (TransporterType transporterType : TransporterType.values()) {
             if (transporterType.getTransporterClass() == transporter.getClass()) {
@@ -66,5 +89,9 @@ public enum TransporterType {
         return null;
     }
 
+    /**
+     * The specific Class of Transporter that corresponds to this TransporterType
+     * @return Class that extends Transporter
+     */
     public Class<? extends Transporter> getTransporterClass() { return transporterClass; }
 }
