@@ -59,6 +59,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
+import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
@@ -84,6 +85,7 @@ import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.*;
+import static mekhq.campaign.unit.enums.TransporterType.*;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -1764,12 +1766,12 @@ public class Unit implements ITechnology {
      * @deprecated this only checks ship transport type, use
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public int getCurrentDocks() {
-        return (int) Math.floor(getShipTransportedUnitsSummary().getCurrentTransportCapacity(DockingCollar.class));
+        return (int) Math.floor(getShipTransportedUnitsSummary().getCurrentTransportCapacity(DOCKING_COLLAR));
     }
 
     /** Used to assign a Dropship to a collar on a specific Jumpship in the TOE
@@ -1780,12 +1782,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param docks
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setDocks(int docks) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(DockingCollar.class, docks);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(DOCKING_COLLAR, docks);
     }
 
     public double getLightVehicleCapacity() {
@@ -1803,12 +1805,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentLightVehicleCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(LightVehicleBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(LIGHT_VEHICLE_BAY);
     }
 
     /** Used to assign a tank to a bay on a specific transport ship in the TOE
@@ -1819,12 +1821,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setLightVehicleCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(LightVehicleBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(LIGHT_VEHICLE_BAY, bays);
     }
 
     public double getHeavyVehicleCapacity() {
@@ -1842,12 +1844,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentHeavyVehicleCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(HeavyVehicleBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(HEAVY_VEHICLE_BAY);
     }
 
     /** Used to assign a tank to a bay on a specific transport ship in the TOE
@@ -1858,12 +1860,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setHeavyVehicleCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(HeavyVehicleBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(HEAVY_VEHICLE_BAY, bays);
     }
 
     public double getSuperHeavyVehicleCapacity() {
@@ -1880,12 +1882,12 @@ public class Unit implements ITechnology {
      * @deprecated this only checks ship transport type, use
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentSuperHeavyVehicleCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(SuperHeavyVehicleBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(SUPER_HEAVY_VEHICLE_BAY);
     }
 
     /** Used to assign a tank to a bay on a specific transport ship in the TOE
@@ -1896,12 +1898,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setSuperHeavyVehicleCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(SuperHeavyVehicleBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(SUPER_HEAVY_VEHICLE_BAY, bays);
     }
 
     public double getBattleArmorCapacity() {
@@ -1919,12 +1921,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentBattleArmorCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(BattleArmorBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(BATTLE_ARMOR_BAY);
     }
 
     /** Used to assign a ba squad to a bay on a specific transport ship in the TOE
@@ -1935,12 +1937,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setBattleArmorCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(BattleArmorBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(BATTLE_ARMOR_BAY, bays);
     }
 
     public double getInfantryCapacity() {
@@ -1958,12 +1960,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentInfantryCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(InfantryBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(INFANTRY_BAY);
     }
 
     /** Used to assign an infantry unit to a bay on a specific transport ship in the
@@ -1975,12 +1977,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param tonnage
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setInfantryCapacity(double tonnage) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(InfantryBay.class, tonnage);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(INFANTRY_BAY, tonnage);
     }
 
     public double getASFCapacity() {
@@ -1998,12 +2000,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentASFCapacity() {
-        return getCurrentShipTransportCapacity(ASFBay.class);
+        return getCurrentShipTransportCapacity(ASF_BAY);
     }
 
     /** Used to assign a fighter to a bay on a specific transport ship in the TOE
@@ -2014,12 +2016,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setASFCapacity(double bays) {
-        setCurrentShipTransportCapacity(ASFBay.class, bays);
+        setCurrentShipTransportCapacity(ASF_BAY, bays);
     }
 
     public double getSmallCraftCapacity() {
@@ -2037,12 +2039,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentSmallCraftCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(SmallCraftBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(SMALL_CRAFT_BAY);
     }
 
     /** Used to assign a small craft to a bay on a specific transport ship in the
@@ -2054,12 +2056,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setSmallCraftCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(SmallCraftBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(SMALL_CRAFT_BAY, bays);
     }
 
     public double getMekCapacity() {
@@ -2077,12 +2079,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentMekCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(MekBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(MEK_BAY);
     }
 
     /** Used to assign a mek or LAM to a bay on a specific transport ship in the TOE
@@ -2093,12 +2095,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setMekCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(MekBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(MEK_BAY, bays);
     }
 
     public double getProtoMekCapacity() {
@@ -2116,12 +2118,12 @@ public class Unit implements ITechnology {
      * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
-     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, Class)
+     * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public double getCurrentProtoMekCapacity() {
-        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(ProtoMekBay.class);
+        return getShipTransportedUnitsSummary().getCurrentTransportCapacity(PROTO_MEK_BAY);
     }
 
     /** Used to assign a Protomek to a bay on a specific transport ship in the TOE
@@ -2132,12 +2134,12 @@ public class Unit implements ITechnology {
      * - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
-     * @see Unit#setCurrentShipTransportCapacity(Class, double)
+     * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
     @Deprecated
     public void setProtoCapacity(double bays) {
-        getShipTransportedUnitsSummary().setCurrentTransportCapacity(ProtoMekBay.class, bays);
+        getShipTransportedUnitsSummary().setCurrentTransportCapacity(PROTO_MEK_BAY, bays);
     }
 
     /**
@@ -2151,7 +2153,7 @@ public class Unit implements ITechnology {
      * @param transporterType type (Class) of Transporter to transport the units in
      * @param units Vector of units that we wish to load into this transport
      */
-    public Set<Unit> loadShipTransport(Class<? extends Transporter> transporterType, Unit... units) {
+    public Set<Unit> loadShipTransport(TransporterType transporterType, Unit... units) {
         Vector<Unit> unitsVector = new Vector<>();
         for (Unit unit : units) {
             unitsVector.add(unit);
@@ -2188,7 +2190,7 @@ public class Unit implements ITechnology {
      * @param transporterType class of Transporter
      * @return capacity
      */
-    public double getCurrentShipTransportCapacity(Class<? extends Transporter> transporterType ){
+    public double getCurrentShipTransportCapacity(TransporterType transporterType ){
         return getShipTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
     }
 
@@ -2226,7 +2228,7 @@ public class Unit implements ITechnology {
      * @param transporterType class of Transporter
      * @return capacity
      */
-    public double getCurrentTacticalTransportCapacity(Class<? extends Transporter> transporterType ){
+    public double getCurrentTacticalTransportCapacity(TransporterType transporterType ){
         return getTacticalTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
     }
 
@@ -2238,7 +2240,7 @@ public class Unit implements ITechnology {
      * @return remaining capacity
      * @see CampaignTransportType
      */
-    public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType, Class<? extends Transporter> transporterType ){
+    public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType, TransporterType transporterType ){
         return getTransportedUnitsSummary(campaignTransportType).getCurrentTransportCapacity(transporterType);
     }
 
@@ -2247,7 +2249,7 @@ public class Unit implements ITechnology {
      * @param transporterType type (class) of transporter we want to set the capacity
      * @param capacity how much this transporter should be able to transport
      */
-    public void setCurrentShipTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
+    public void setCurrentShipTransportCapacity(TransporterType transporterType, double capacity) {
         getShipTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
 
@@ -2256,7 +2258,7 @@ public class Unit implements ITechnology {
      * @param transporterType type (class) of transporter we want to set the capacity
      * @param capacity how much this transporter should be able to transport
      */
-    public void setCurrentTacticalTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
+    public void setCurrentTacticalTransportCapacity(TransporterType transporterType, double capacity) {
         getTacticalTransportedUnitsSummary().setCurrentTransportCapacity(transporterType, capacity);
     }
 
@@ -2266,7 +2268,7 @@ public class Unit implements ITechnology {
      * @param campaignTransportType type (enum) of campaign transport
      * @return set of Transporter types (class)
      */
-    public Set<Class<? extends Transporter>> getTransportCapabilities(CampaignTransportType campaignTransportType) {
+    public Set<TransporterType> getTransportCapabilities(CampaignTransportType campaignTransportType) {
         return getTransportedUnitsSummary(campaignTransportType).getTransportCapabilities();
     }
 
@@ -2330,7 +2332,7 @@ public class Unit implements ITechnology {
      * @param units units being loaded
      * @return the old transports of the units, or an empty set if none
      */
-    public Set<Unit> loadTacticalTransport(Class<? extends Transporter> transporterType, Unit... units) {
+    public Set<Unit> loadTacticalTransport(TransporterType transporterType, Unit... units) {
         return getTacticalTransportedUnitsSummary().loadTransport(units, null, transporterType);
     }
 
@@ -2345,7 +2347,7 @@ public class Unit implements ITechnology {
      * @param transporterType type (Class) of bay or Transporter
      * @return the old transport of the unit, or an empty set if none
      */
-    public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
+    public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation, transporterType, transportedUnit);
     }
 
@@ -2473,7 +2475,7 @@ public class Unit implements ITechnology {
             if (getTacticalTransportAssignment().hasTransportedLocation()) {
                 transportedLocation += " transportedLocation=\"" + getTacticalTransportAssignment().getTransportedLocation() + "\"";
             } else if (getTacticalTransportAssignment().hasTransporterType()) {
-                transportedLocation += " transporterType=\"" + getTacticalTransportAssignment().getTransporterType().getName() + "\"";
+                transportedLocation += " transporterType=\"" + getTacticalTransportAssignment().getTransporterType() + "\"";
             }
             pw.println(MHQXMLUtility.indentStr(indent) + "<transportAssignment id=\""
                 + getTacticalTransportAssignment().getTransport().getId()
@@ -2649,11 +2651,12 @@ public class Unit implements ITechnology {
                         int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation").getTextContent());
                         retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id), transportedLocationHash));
                     } else if (attributes.getNamedItem("transporterType") != null) {
-                        Class<?> transporterType = Class.forName((attributes.getNamedItem("transporterType").getTextContent()));
-                        if (Transporter.class.isAssignableFrom(transporterType)) {
-                            retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id), (Class<? extends Transporter>) transporterType));
+                        try {
+                            TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem("transporterType").getTextContent()));
+                            retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id), transporterType));
                         }
-                        else {
+                        catch (IllegalArgumentException e) {
+                            logger.error(e, "Could not find transporter type.");
                             retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id)));
                         }
                     } else {

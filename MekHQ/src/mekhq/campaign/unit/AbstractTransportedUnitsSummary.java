@@ -22,6 +22,7 @@ package mekhq.campaign.unit;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.*;
 
@@ -32,7 +33,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
     protected final MMLogger logger = MMLogger.create(this.getClass());
     protected Unit transport;
     private Set<Unit> transportedUnits = new HashSet<>();
-    private Map<Class<? extends Transporter>, Double> transportCapacity = new HashMap<>();
+    private Map<TransporterType, Double> transportCapacity = new HashMap<>();
 
     AbstractTransportedUnitsSummary(Unit transport) {
         this.transport = transport;
@@ -71,8 +72,9 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
         if (transporters != null && !transporters.isEmpty()) {
             // First let's clear the transport capacity for each transport type in transporters
             for (Transporter transporter : transporters) {
-                if (hasTransportCapacity(transporter.getClass())) {
-                    transportCapacity.remove(transporter.getClass());
+                TransporterType transporterType = TransporterType.getTransporterType(transporter);
+                if (hasTransportCapacity(transporterType)) {
+                    transportCapacity.remove(transporterType);
                 }
             }
             // Then we make sure the transport entity is empty, and then let's load
@@ -83,10 +85,11 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
             // Now we can update our transport capacities using the unused space of each transporter
 
             for (Transporter transporter : transporters) {
-                if (transportCapacity.containsKey(transporter.getClass())) {
-                    transportCapacity.replace(transporter.getClass(), transportCapacity.get(transporter.getClass()) + transporter.getUnused());
+                TransporterType transporterType = TransporterType.getTransporterType(transporter);
+                if (transportCapacity.containsKey(transporterType)) {
+                    transportCapacity.replace(transporterType, transportCapacity.get(transporterType) + transporter.getUnused());
                 } else {
-                    transportCapacity.put(transporter.getClass(), transporter.getUnused());
+                    transportCapacity.put(transporterType, transporter.getUnused());
                 }
             }
         // Finally clear the transport entity again
@@ -110,7 +113,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @return Set of Transporter classes
      */
     @Override
-    public Set<Class<? extends Transporter>> getTransportCapabilities() {
+    public Set<TransporterType> getTransportCapabilities() {
         return transportCapacity.keySet();
     }
 
@@ -121,7 +124,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @return True if the unit has capacity, false if not
      */
     @Override
-    public boolean hasTransportCapacity(Class<? extends Transporter> transporterType) {
+    public boolean hasTransportCapacity(TransporterType transporterType) {
         return transportCapacity.containsKey(transporterType);
     }
 
@@ -132,7 +135,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @return The current capacity of the transporter, or 0
      */
     @Override
-    public double getCurrentTransportCapacity(Class<? extends Transporter> transporterType) {
+    public double getCurrentTransportCapacity(TransporterType transporterType) {
         return transportCapacity.getOrDefault(transporterType, 0.0);
     }
 
@@ -143,7 +146,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      * @param capacity        What is the new capacity?
      */
     @Override
-    public void setCurrentTransportCapacity(Class<? extends Transporter> transporterType, double capacity) {
+    public void setCurrentTransportCapacity(TransporterType transporterType, double capacity) {
         transportCapacity.replace(transporterType, capacity);
     }
 

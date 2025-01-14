@@ -1329,7 +1329,7 @@ public class Utilities {
                 cargo.setTargetBay(bay.getBayNumber());
             } else {
                 if (transportAssignment.hasTransporterType()
-                        && Bay.class.isAssignableFrom(transportAssignment.getTransporterType())) {
+                        && Bay.class.isAssignableFrom(transportAssignment.getTransporterType().getTransporterClass())) {
                     cargo.setTargetBay(selectBestBayFor(cargo, transport));
                 }
             }

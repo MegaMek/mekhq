@@ -23,6 +23,8 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -74,7 +76,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param units units being loaded
      * @return old transports; what were  the units' previous transport, if they had one
      */
-    public Set<Unit> loadTransport(Class<? extends Transporter> transporterType, Unit... units) {
+    public Set<Unit> loadTransport(TransporterType transporterType, Unit... units) {
         return loadTransport(units, null, transporterType);
     }
 
@@ -90,7 +92,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param transporterType type (Class) of bay or Transporter
      * @return old transports; what were  the units' previous transport, if they had one
      */
-    public Set<Unit> loadTransport(Unit[] units, @Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType) {
+    public Set<Unit> loadTransport(Unit[] units, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
         //Set<Entity> oldTransportedEntities = clearTransportedEntities();
         for (Unit transportedUnit : units) {
@@ -115,9 +117,9 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param transportedUnit unit being loaded
      * @return old transport; what was the unit's previous transport, if it had one
      */
-    public Unit loadTransport(@Nullable Transporter transportedLocation, Class<? extends Transporter> transporterType, Unit transportedUnit) {
+    public Unit loadTransport(@Nullable Transporter transportedLocation, TransporterType transporterType, Unit transportedUnit) {
         Unit oldTransport = null;
-        Class<? extends Transporter> oldTransporterType = null;
+        TransporterType oldTransporterType = null;
 
         if (transportedUnit.hasTacticalTransportAssignment()) {
             oldTransport = transportedUnit.getTacticalTransportAssignment().getTransport();
@@ -141,7 +143,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         if (!Objects.equals(oldTransport, transport)
             && (transportedUnit.getTacticalTransportAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - CampaignTransportType.transportCapacityUsage(transporterType,transportedUnit.getEntity()));
+                getCurrentTransportCapacity(transporterType) - CampaignTransportUtilities.transportCapacityUsage(transporterType,transportedUnit.getEntity()));
         }
         return oldTransport;
     }

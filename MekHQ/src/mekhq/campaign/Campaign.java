@@ -110,6 +110,7 @@ import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -8166,7 +8167,7 @@ public class Campaign implements ITechManager {
      *
      * @return units that have space for that transport type
      */
-    public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTacticalTransports() {
+    public Map<TransporterType, Map<Double, Set<UUID>>> getTacticalTransports() {
         return tacticalTransporters.getTransporters();
     }
 
@@ -8178,7 +8179,7 @@ public class Campaign implements ITechManager {
      * @param campaignTransportType type (Class) of TransportedUnitSummary
      * @return units that have space for that transport type
      */
-    public Map<Class<? extends Transporter>, Map<Double, Set<UUID>>> getTransports(CampaignTransportType campaignTransportType) {
+    public Map<TransporterType, Map<Double, Set<UUID>>> getTransports(CampaignTransportType campaignTransportType) {
         return getCampaignTransporterMap(campaignTransportType).getTransporters();
     }
 
@@ -8188,7 +8189,7 @@ public class Campaign implements ITechManager {
      * @param transporterType class of Transporter
      * @return units that have that transport type
      */
-    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, Class<? extends Transporter> transporterType) {
+    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType) {
         return getCampaignTransporterMap(campaignTransportType).getTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
     }
 
@@ -8204,7 +8205,7 @@ public class Campaign implements ITechManager {
      * @param unitSize capacity that the transport must be capable of
      * @return units that have that transport type
      */
-    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, Class<? extends Transporter> transporterType, double unitSize) {
+    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType, double unitSize) {
         return getCampaignTransporterMap(campaignTransportType).getTransportsByType(transporterType, unitSize);
     }
 

@@ -19,6 +19,7 @@
 package mekhq.campaign;
 
 
+import static mekhq.campaign.unit.enums.TransporterType.ASF_BAY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -172,7 +173,7 @@ public class CampaignTest {
 
         // Create mock transport capacity info for transport
         AbstractTransportedUnitsSummary mockTransportedUnitsSummary = mock(campaignTransportType.getTransportedUnitsSummaryType());
-        when(mockTransportedUnitsSummary.getTransportCapabilities()).thenReturn(new HashSet<>(List.of(Bay.class)));
+        when(mockTransportedUnitsSummary.getTransportCapabilities()).thenReturn(new HashSet<>(List.of(ASF_BAY)));
 
         when(mockUnit.getTransportedUnitsSummary(campaignTransportType)).thenReturn(mockTransportedUnitsSummary);
 
@@ -182,14 +183,14 @@ public class CampaignTest {
 
         // Ensure our mock transport exists
         assertEquals(1, campaign.getTransports(campaignTransportType).size());
-        assertTrue(campaign.getTransportsByType(campaignTransportType, Bay.class).contains(mockUnit));
+        assertTrue(campaign.getTransportsByType(campaignTransportType, ASF_BAY).contains(mockUnit));
 
         // Add our mock transport a second time
         campaign.addCampaignTransport(campaignTransportType, mockUnit);
 
         // Ensure our mock transport exists only once
         assertEquals(1, campaign.getTransports(campaignTransportType).size());
-        assertTrue(campaign.getTransportsByType(campaignTransportType, Bay.class).contains(mockUnit));
+        assertTrue(campaign.getTransportsByType(campaignTransportType, ASF_BAY).contains(mockUnit));
 
         // Remove the mock transport
         campaign.removeCampaignTransporter(campaignTransportType, mockUnit);

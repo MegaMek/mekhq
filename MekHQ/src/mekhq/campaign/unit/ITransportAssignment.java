@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.enums.TransporterType;
 
 /**
  * Represents an assignment on a transport.
@@ -40,7 +41,7 @@ public interface ITransportAssignment {
 
     boolean hasTransport();
 
-    Class<? extends Transporter> getTransporterType();
+    TransporterType getTransporterType();
 
     boolean hasTransporterType();
 

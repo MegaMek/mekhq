@@ -23,6 +23,8 @@ import megamek.common.*;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 
 import java.util.*;
 
@@ -80,7 +82,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
      * @param transporterType type (Class) of bay or Transporter
      * @return old transports; what were  the units' previous transport, if they had one?
      */
-    public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, Class<? extends Transporter> transporterType) {
+    public Set<Unit> loadTransportShip(Vector<Unit> transportedUnits, TransporterType transporterType) {
         Set<Unit> oldTransports = new HashSet<>();
         for (Unit transportedUnit : transportedUnits) {
             Unit oldTransport = loadTransport(transporterType, transportedUnit);
@@ -91,17 +93,17 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
         //Let's get matching transporters and then recalculate our transport capacity for this transporter type
         Vector<Transporter> transporters = new Vector<>(transport.getEntity().getTransports().stream()
-            .filter(transporter -> transporter.getClass() == transporterType).toList());
+            .filter(transporter -> TransporterType.getTransporterType(transporter) == transporterType).toList());
         recalculateTransportCapacity(transporters);
 
         return oldTransports;
     }
 
-    private Unit loadTransport(Class<? extends Transporter> transporterType, Unit transportedUnit) {
+    private Unit loadTransport(TransporterType transporterType, Unit transportedUnit) {
         Unit oldTransport = null;
         int bayNumber = Utilities.selectBestBayFor(transportedUnit.getEntity(), transport.getEntity());
 
-        Class<? extends Transporter> oldTransporterType = null;
+        TransporterType oldTransporterType = null;
         if(transportedUnit.hasTransportShipAssignment()) {
             oldTransport = transportedUnit.getTransportShipAssignment().getTransportShip();
             oldTransporterType = transportedUnit.getTransportShipAssignment().getTransporterType();
@@ -114,7 +116,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
 
         if ((transportedUnit.getEntity() != null)) {
             // This shouldn't happen, but it'd be really annoying to debug if it did
-            if ((transportedUnit.getEntity().getBayById(bayNumber) != null && transportedUnit.getEntity().getBayById(bayNumber).getClass() != transporterType)) {
+            if ((transportedUnit.getEntity().getBayById(bayNumber) != null && TransporterType.getTransporterType(transportedUnit.getEntity().getBayById(bayNumber)) != transporterType)) {
                 logger.warn(String.format("Unit was assigned a bay number for a different transport type than the unit is assigned! " +
                     "Transport: %s Unit: %s Assigned Transporter: %s Assigned Bay ID: %s",
                     transport.getName(), transportedUnit.getName(), transporterType, bayNumber));
@@ -125,7 +127,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         if (!Objects.equals(oldTransport, transport)
             && (transportedUnit.getTransportShipAssignment().getTransporterType() != oldTransporterType)) {
             setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - CampaignTransportType.transportCapacityUsage(transporterType, transportedUnit.getEntity()));
+                getCurrentTransportCapacity(transporterType) - CampaignTransportUtilities.transportCapacityUsage(transporterType, transportedUnit.getEntity()));
         }
         return oldTransport;
     }

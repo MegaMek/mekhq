@@ -497,7 +497,7 @@ public class AtBGameThread extends GameThread {
                                         scenario.addPlayerTransportRelationship(transportId, transportedUnit.getId());
                                     }
                                     if (transportedUnit.getTech() != null && transportedUnit.getTacticalTransportAssignment().hasTransporterType()
-                                            && Bay.class.isAssignableFrom(transportedUnit.getTacticalTransportAssignment().getTransporterType())) {
+                                            && Bay.class.isAssignableFrom(transportedUnit.getTacticalTransportAssignment().getTransporterType().getTransporterClass())) {
                                         cargoTechs.add(transportedUnit.getTech());
                                     }
                                 }

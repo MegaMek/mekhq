@@ -17,10 +17,9 @@
  *  along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.enums;
+package mekhq.campaign.utilities;
 
 import megamek.common.*;
-import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.HashSet;
@@ -28,105 +27,7 @@ import java.util.Set;
 
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
-/**
- * Enum for the different transport types used in MekHQ.
- * Campaign Transports allow a unit to be
- * assigned a transport (another unit).
- * The different transport types primarily differ
- * in the Transporters they allow.
- * @see Unit
- * @see Transporter
- */
-public enum CampaignTransportType
-{
-    //region Enum declarations
-    /**
-     * Units assigned a ship transport, if both units are in the battle
-     * the unit will attempt to load onto the transport when deployed into battle.
-     * Ship transports are intended to be used for long-term travel or space combat
-     * and only allow units to be transported in long-term Transporters like Bays or
-     * Docking Collars.
-     * @see Bay
-     * @see DockingCollar
-     */
-    SHIP_TRANSPORT(TransportShipAssignment.class, ShipTransportedUnitsSummary.class) {
-
-        /**
-         * Helps the menus need to check less when generating. Ship Transports can't use short-term
-         * transport types like InfantryCompartments or BattleArmorHandles. Use a Bay! Or DockingCollar
-         * @param unit the unit we want to get the Transporter types that could potentially hold it
-         * @return Transporter types that could potentially transport this entity
-         */
-        @Override
-        public Set<TransporterType> mapEntityToTransporters(Entity unit) {
-            Set<TransporterType> transporters = super.mapEntityToTransporters(unit);
-            transporters.remove(INFANTRY_COMPARTMENT);
-            transporters.remove(BATTLE_ARMOR_HANDLES);
-            transporters.remove(BATTLE_ARMOR_HANDLES_TANK);
-            transporters.remove(CLAMP_MOUNT_MEK);
-            transporters.remove(CLAMP_MOUNT_TANK);
-
-            return transporters;
-        }
-
-    },
-    /**
-     * Units assigned a tactical transport, if both units are in the battle
-     * the unit will attempt to load onto the transport when deployed into battle.
-     * Tactical Transporters are meant to represent short-term transport - Infantry in
-     * an Infantry compartment, or Battle Armor on Battle Armor Handles. It still allows
-     * units to be loaded into bays though for tactical Dropship assaults.
-     * @see InfantryCompartment
-     * @see BattleArmorHandles
-     */
-    TACTICAL_TRANSPORT(TransportAssignment.class, TacticalTransportedUnitsSummary.class);
-    // endregion Enum declarations
-
-
-    // region Variable declarations
-    private final Class<? extends ITransportAssignment> transportAssignmentType;
-    private final Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType;
-    // endregion Variable declarations
-
-    // region Constructors
-    CampaignTransportType(Class<? extends ITransportAssignment> transportAssignmentType, Class<? extends AbstractTransportedUnitsSummary> transportedUnitsSummaryType) {
-        this.transportAssignmentType = transportAssignmentType;
-        this.transportedUnitsSummaryType = transportedUnitsSummaryType;
-    }
-    // endregion Constructors
-
-
-    // region Boolean Comparison Methods
-
-    /**
-     * Is this a Ship Transport?
-     * @return true if this is a SHIP_TRANSPORT
-     */
-    public boolean isShipTransport() { return this == SHIP_TRANSPORT; }
-
-    /**
-     * Is this a Tactical Transport?
-     * @return true if this is a TACTICAL_TRANSPORT
-     */
-    public boolean isTacticalTransport() { return this == TACTICAL_TRANSPORT; }
-    // endregion Boolean Comparison Methods
-
-    // region Getters
-
-    /**
-     * Different Transport Types use different transport assignments.
-     * @return Transport Assignment class used by this transport type
-     */
-    public Class<? extends ITransportAssignment> getTransportAssignmentType() { return transportAssignmentType; }
-
-    /**
-     * Different Transport Types use different transported units summaries.
-     * @return Transported Unit Summary used by this transport type
-     */
-    public Class<? extends AbstractTransportedUnitsSummary> getTransportedUnitsSummaryType() { return transportedUnitsSummaryType; }
-    // endregion Getters
-
-
+public class CampaignTransportUtilities {
     // region Static Helpers
     /**
      * Helps the menus need to check less when generating
@@ -142,7 +43,8 @@ public enum CampaignTransportType
         if (ProtoMek.class.isAssignableFrom(entityType)) {
             transporters.add(PROTO_MEK_BAY);
             transporters.add(PROTO_MEK_CLAMP_MOUNT);
-        } else if (Aero.class.isAssignableFrom(entityType)) {
+        }
+        else if (Aero.class.isAssignableFrom(entityType)) {
             if ((unit.isFighter())) {
                 transporters.add(ASF_BAY);
             }
@@ -159,7 +61,8 @@ public enum CampaignTransportType
             if (unit instanceof Dropship && !((Dropship) unit).isDockCollarDamaged()) {
                 transporters.add(DOCKING_COLLAR);
             }
-        } else if (Tank.class.isAssignableFrom(entityType)) {
+        }
+        else if (Tank.class.isAssignableFrom(entityType)) {
             if (unit.getWeight() <= 50) {
                 transporters.add(LIGHT_VEHICLE_BAY);
             }
@@ -171,7 +74,8 @@ public enum CampaignTransportType
             if (unit.getWeight() <= 150) {
                 transporters.add(SUPER_HEAVY_VEHICLE_BAY);
             }
-        } else if (Mek.class.isAssignableFrom(entityType)) {
+        }
+        else if (Mek.class.isAssignableFrom(entityType)) {
             boolean loadableQuadVee = (unit instanceof QuadVee) && (unit.getConversionMode() == QuadVee.CONV_MODE_MEK);
             boolean loadableLAM = (unit instanceof LandAirMek) && (unit.getConversionMode() != LandAirMek.CONV_MODE_FIGHTER);
             boolean loadableOtherMek = (unit instanceof Mek) && !(unit instanceof QuadVee) && !(unit instanceof LandAirMek);
@@ -193,7 +97,8 @@ public enum CampaignTransportType
                     }
                 }
             }
-        } else if (Infantry.class.isAssignableFrom(entityType)) {
+        }
+        else if (Infantry.class.isAssignableFrom(entityType)) {
             transporters.add(INFANTRY_BAY);
             transporters.add(INFANTRY_COMPARTMENT);
 
@@ -214,9 +119,37 @@ public enum CampaignTransportType
         }
         return transporters;
     }
-    // endregion Static Helpers
 
-    public String getName() {
-        return this.toString();
+
+    /**
+     * Most slots are 1:1, infantry use their tonnage in some cases
+     *
+     * @param transporterType type (Class) of Transporter
+     * @param transportedUnit Entity we want the capacity usage of
+     * @return how much capacity this unit uses when being transported in this kind of transporter
+     */
+    public static double transportCapacityUsage(TransporterType transporterType, Entity transportedUnit) {
+        if (transporterType == INFANTRY_BAY || transporterType == INFANTRY_COMPARTMENT) {
+            if (Infantry.class.isAssignableFrom(transportedUnit.getClass())) {
+                return calcInfantryBayWeight(transportedUnit);
+            }
+        }
+        return 1.0;
     }
+
+    /**
+     * Calculates transport bay space required by an infantry platoon,
+     * which is not the same as the flat weight of that platoon
+     *
+     * @param unit The Entity that we need the weight for
+     */
+    public static double calcInfantryBayWeight(Entity unit) {
+        InfantryBay.PlatoonType type = InfantryBay.PlatoonType.getPlatoonType(unit);
+        if ((unit instanceof Infantry) && (type == InfantryBay.PlatoonType.MECHANIZED)) {
+            return type.getWeight() * ((Infantry) unit).getSquadCount();
+        } else {
+            return type.getWeight();
+        }
+    }
+    // endregion Static Helpers
 }

@@ -23,6 +23,8 @@ import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.utilities.MHQInternationalization;
 
@@ -101,16 +103,16 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
          calculation methods (an infantry and tank were both selected)
          then they shouldn't have any compatible transport types
          */
-        for (Class<? extends Transporter> transporterType : filterTransporterTypeMenus(units)) {
+        for (TransporterType transporterType : filterTransporterTypeMenus(units)) {
             double requiredTransportCapacity = 0.0;
             for (Unit unit : units) {
-                requiredTransportCapacity += CampaignTransportType.transportCapacityUsage(transporterType, unit.getEntity());
+                requiredTransportCapacity += CampaignTransportUtilities.transportCapacityUsage(transporterType, unit.getEntity());
             }
 
             Set<Unit> transports = campaign.getTransportsByType(campaignTransportType, transporterType, requiredTransportCapacity);
 
             if (!transports.isEmpty()) {
-                JScrollableMenu transporterTypeMenu = new JScrollableMenu(transporterType.getName(), transporterType.getName());
+                JScrollableMenu transporterTypeMenu = new JScrollableMenu(transporterType.toString(), transporterType.toString());
                 Set<JMenuItem> transportMenus = createTransportMenus(transporterType, transports, units);
                 for (JMenuItem transportMenu : transportMenus) {
                     transporterTypeMenu.add(transportMenu);
@@ -118,7 +120,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
 
                 // {name of the bay}
                 transporterTypeMenu.setText(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport",
-                    "AssignForceToTransportMenu." + transporterType.getSimpleName() + ".text"));
+                    "AssignForceToTransportMenu." + transporterType + ".text"));
 
                 transporterTypeMenus.add(transporterTypeMenu);
             }
@@ -127,7 +129,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         return transporterTypeMenus;
     }
 
-    private Set<JMenuItem> createTransportMenus(Class<? extends Transporter> transporterType, Set<Unit> transports, Unit... units) {
+    private Set<JMenuItem> createTransportMenus(TransporterType transporterType, Set<Unit> transports, Unit... units) {
         Set<JMenuItem> transportMenus = new HashSet<>();
         for (Unit transport : transports) {
             JMenuItem transportMenu = new JMenuItem(transport.getId().toString());
@@ -149,7 +151,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @return transporters that can be used by all these units
      * @see CampaignTransportType
      */
-    protected abstract Set<Class<? extends Transporter>> filterTransporterTypeMenus(final Unit... units);
+    protected abstract Set<TransporterType> filterTransporterTypeMenus(final Unit... units);
 
     /**
      * Different transporter type menus do different things when selected
@@ -158,6 +160,6 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @param transport transport (Unit) that will load these units
      * @param units units being assigned to the transport
      */
-    protected abstract void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units);
+    protected abstract void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Unit... units);
 
 }

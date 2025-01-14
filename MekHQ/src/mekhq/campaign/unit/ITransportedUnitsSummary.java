@@ -24,6 +24,7 @@ import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.Transporter;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.Set;
 import java.util.Vector;
@@ -70,30 +71,30 @@ public interface ITransportedUnitsSummary {
 
     /**
      * Gets the different kinds of transporters the transport has
-     * @return Set of Transporter classes
+     * @return Set of Transporter types
      */
-    Set<Class<? extends Transporter>> getTransportCapabilities();
+    Set<TransporterType> getTransportCapabilities();
 
     /**
      * Returns true if the unit has capacity left for a transporter type
      * @param transporterType Does the unit have free capacity in this type?
      * @return True if the unit has capacity, false if not
      */
-    boolean hasTransportCapacity(Class<? extends Transporter> transporterType);
+    boolean hasTransportCapacity(TransporterType transporterType);
 
     /**
      * Returns the current capacity of a transporter type
      * @param transporterType What kind of transporter types are we checking?
      * @return The current capacity of the transporter
      */
-    double getCurrentTransportCapacity(Class<? extends Transporter> transporterType);
+    double getCurrentTransportCapacity(TransporterType transporterType);
 
     /**
      * Sets the current transport capacity for the provided transport type
      * @param transporterType What kind of transporter are we changing the capacity of?
      * @param capacity What is the new capacity?
      */
-    void setCurrentTransportCapacity(Class<? extends Transporter> transporterType, double capacity);
+    void setCurrentTransportCapacity(TransporterType transporterType, double capacity);
 
     /**
      * Recalculates transport capacity

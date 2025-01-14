@@ -20,6 +20,7 @@
 package mekhq.gui.menus;
 
 import megamek.common.Transporter;
+import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -59,11 +60,11 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
      * @return Transporters suitable for long-term or space travel.
      */
     @Override
-    protected Set<Class<? extends Transporter>> filterTransporterTypeMenus(final Unit... units) {
-        Set<Class<? extends Transporter>> transporterTypes = new HashSet<>(campaign.getTransports(campaignTransportType).keySet());
+    protected Set<TransporterType> filterTransporterTypeMenus(final Unit... units) {
+        Set<TransporterType> transporterTypes = new HashSet<>(campaign.getTransports(campaignTransportType).keySet());
 
         for (Unit unit : units) {
-            Set<Class<? extends Transporter>> unitTransporterTypes = SHIP_TRANSPORT.mapEntityToTransporters(unit.getEntity());
+            Set<TransporterType> unitTransporterTypes = SHIP_TRANSPORT.mapEntityToTransporters(unit.getEntity());
             if (!unitTransporterTypes.isEmpty()) {
                 transporterTypes.retainAll(unitTransporterTypes);
             } else {
@@ -85,7 +86,7 @@ public class AssignForceToShipTransportMenu extends AssignForceToTransportMenu {
      * @param units           units being assigned to the transport
      */
     @Override
-    protected void transportMenuAction(ActionEvent evt, Class<? extends Transporter> transporterType, Unit transport, Unit... units) {
+    protected void transportMenuAction(ActionEvent evt, TransporterType transporterType, Unit transport, Unit... units) {
         for (Unit unit : units) {
             if (!transport.getEntity().canLoad(unit.getEntity(), false)) {
                 JOptionPane.showMessageDialog(null,MHQInternationalization.getFormattedTextAt(

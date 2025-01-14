@@ -24,6 +24,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,13 +40,13 @@ public class TransportAssignment implements ITransportAssignment {
 
     Unit transport;
     Transporter transportedLocation;
-    Class<? extends Transporter> transporterType;
+    TransporterType transporterType;
 
     public TransportAssignment(Unit transport) {
-        this(transport, (Class<? extends Transporter>) null);
+        this(transport, (TransporterType) null);
     }
 
-    public TransportAssignment(Unit transport, Class<? extends Transporter> transporterType) {
+    public TransportAssignment(Unit transport, TransporterType transporterType) {
         setTransport(transport);
         setTransporterType(transporterType);
     }
@@ -53,7 +54,7 @@ public class TransportAssignment implements ITransportAssignment {
     public TransportAssignment(Unit transport, @Nullable Transporter transportedLocation) {
         setTransport(transport);
         setTransportedLocation(transportedLocation);
-        setTransporterType(hasTransportedLocation() ? getTransportedLocation().getClass() : null);
+        setTransporterType(hasTransportedLocation() ? TransporterType.getTransporterType(getTransportedLocation()) : null);
     }
 
     public TransportAssignment(Unit transport, int hashedTransportedLocation) {
@@ -95,7 +96,7 @@ public class TransportAssignment implements ITransportAssignment {
     }
 
     @Override
-    public Class<? extends Transporter> getTransporterType() {
+    public TransporterType getTransporterType() {
         return transporterType;
     }
 
@@ -104,7 +105,7 @@ public class TransportAssignment implements ITransportAssignment {
         return transporterType != null;
     }
 
-    protected boolean setTransporterType(Class<? extends Transporter> transporterType) {
+    protected boolean setTransporterType(TransporterType transporterType) {
         this.transporterType = transporterType;
         return hasTransporterType();
     }
