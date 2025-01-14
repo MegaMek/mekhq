@@ -1302,17 +1302,18 @@ public class Utilities {
             return;
         }
         Entity transport = client.getEntity(trnId);
+
+        if (transport == null) {
+            return;
+        }
+
         // Reset transporter status, as currentSpace might still retain updates from
         // when the Unit
         // was assigned to the Transport on the TO&E tab
-        if (isAlreadyReset) {
-            alreadyTransportedEntities.addAll(transport.getLoadedUnits());
+        if (!isAlreadyReset) {
+            transport.resetTransporter();
         }
 
-        transport.resetTransporter();
-        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
-            transport.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
-        }
         for (int id : toLoad.keySet()) {
             Entity cargo = client.getEntity(id);
             if (cargo == null) {
@@ -1321,10 +1322,14 @@ public class Utilities {
 
             ITransportAssignment transportAssignment = toLoad.get(id);
 
+            if (transportAssignment == null) {
+                continue;
+            }
+
             // Find a bay with space in it and update that space so the next unit can
             // process, unless the unit isn't being loaded into a bay
             if (transportAssignment.hasTransportedLocation()
-                    && Bay.class.isAssignableFrom(transportAssignment.getTransportedLocation().getClass())) {
+                    && (transportAssignment.getTransportedLocation() instanceof Bay)) {
                 Bay bay = (Bay) transportAssignment.getTransportedLocation();
                 cargo.setTargetBay(bay.getBayNumber());
             } else {
@@ -1333,6 +1338,10 @@ public class Utilities {
                     cargo.setTargetBay(selectBestBayFor(cargo, transport));
                 }
             }
+        }
+
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(transport.getLoadedUnits());
         }
 
         // Reset transporter status again so that sendLoadEntity can process correctly

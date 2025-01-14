@@ -399,7 +399,7 @@ public class AtBGameThread extends GameThread {
                     loadTransports(botClient, scenario, bf);
                 }
 
-                boolean alreadyResetTransport = false;
+                Set<UUID> alreadyResetTransport = new HashSet<>();
 
                 // All player and bot units have been added to the lobby
                 // Prompt the player to autoload units into transport ships
@@ -465,7 +465,7 @@ public class AtBGameThread extends GameThread {
                             // And now load the units. Unit crews load as passengers here.
                             Utilities.loadPlayerTransports(transportShip.getEntity().getId(), toLoad,
                                     client, loadDropShips, loadSmallCraft, loadFighters, loadGround);
-                            alreadyResetTransport = true;
+                            alreadyResetTransport.add(transportId);
                         }
                     }
                 }
@@ -508,8 +508,8 @@ public class AtBGameThread extends GameThread {
                             client.sendUpdateEntity(transport.getEntity());
                             // And now load the units.
                             Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad,
-                                client, loadTactical, alreadyResetTransport);
-                            alreadyResetTransport = true;
+                                client, loadTactical, alreadyResetTransport.contains(transportId));
+                            alreadyResetTransport.add(transportId);
                         }
                     }
                 }
