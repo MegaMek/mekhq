@@ -1136,11 +1136,12 @@ public class BiographyTab {
      * Creates the Name and Portrait Generation tab for the campaign options.
      * <p>
      * This tab allows users to:
-     * <p>
+     * </p>
+     * <ul>
      *     <li>Enable or disable the use of origin factions for name generation.</li>
      *     <li>Assign portraits to personnel upon role changes.</li>
      *     <li>Customize which portraits are randomly used for specific roles.</li>
-     * </p>
+     * </ul>
      *
      * @return A {@code JPanel} representing the Name and Portrait Generation tab.
      */

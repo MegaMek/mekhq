@@ -44,9 +44,9 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * Default constraints include:
      * </p>
      * <ul>
-     *   <li>{@code anchor} set to {@link GridBagConstraints#NORTHWEST}</li>
-     *   <li>{@code fill} set to {@link GridBagConstraints#BOTH}</li>
-     *   <li>{@code insets} set to {@code new Insets(5, 5, 5, 5)}</li>
+     *   <li> {@code anchor} set to {@link GridBagConstraints#NORTHWEST} </li>
+     *   <li> {@code fill} set to {@link GridBagConstraints#BOTH} </li>
+     *   <li> {@code insets} set to {@code new Insets(5, 5, 5, 5)} </li>
      * </ul>
      *
      * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created

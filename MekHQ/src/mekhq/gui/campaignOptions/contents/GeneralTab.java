@@ -112,13 +112,14 @@ public class GeneralTab {
      * Creates the UI components displayed in the general tab.
      * <p>
      * The general tab includes various configurable fields and panels:
-     * <p>
+     * </p>
+     * <ul>
      *     <li>An editable text field for setting the campaign name</li>
      *     <li>A dropdown for selecting the campaign's faction</li>
      *     <li>Controls for managing reputation and manual rating modifiers</li>
      *     <li>Date selection associated with the campaign</li>
      *     <li>Buttons for choosing camouflage and unit icons</li>
-     * </p>
+     * </ul>
      *
      * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
      */
@@ -463,7 +464,7 @@ public class GeneralTab {
      * from the provided options or defaults to the current campaign's settings if no presets are provided.
      * <p>
      * Specific actions include:
-     * <p>
+     * <ul>
      *     <li>Setting the campaign name and faction in the respective fields.</li>
      *     <li>Updating the unit rating method and manual unit rating modifier based on the campaign
      *     options.</li>
@@ -471,7 +472,7 @@ public class GeneralTab {
      *     <li>Setting the camouflage pattern and unit icon to align with the campaign's default or
      *     custom configuration.</li>
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
-     * </p>
+     * </ul>
      *
      * @param presetCampaignOptions Optional {@link CampaignOptions} used to populate values.
      *                              If {@code null}, the current campaign options are used.
