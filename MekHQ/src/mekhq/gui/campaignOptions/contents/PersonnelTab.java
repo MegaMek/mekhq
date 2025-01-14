@@ -63,7 +63,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *   auto-awards, tier size configurations, and specific award filters.</li>
  *   <li><b>Medical Tab:</b> Medical-related settings such as healing time,
  *   advanced medical usage, and tougher healing options.</li>
- *   <li><b>Prisoners & Dependents Tab:</b> Configuration of prisoner handling
+ *   <li><b>Prisoners and Dependents Tab:</b> Configuration of prisoner handling
  *   and dependent-related rules.</li>
  *   <li><b>Salaries Tab:</b> Configuration of salaries based on roles, experience
  *   multipliers, and base salary rates.</li>
@@ -170,7 +170,7 @@ public class PersonnelTab {
     private JSpinner spnMaximumPatients;
     //end Medical Tab
 
-    //start Prisoners & Dependents Tab
+    //start Prisoners and Dependents Tab
     private JPanel prisonerPanel;
     private JLabel lblPrisonerCaptureStyle;
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
@@ -183,7 +183,7 @@ public class PersonnelTab {
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
-    //end Prisoners & Dependents Tab
+    //end Prisoners and Dependents Tab
 
     //start Salaries Tab
     private JCheckBox chkDisableSecondaryRoleSalary;
@@ -252,7 +252,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the Prisoners & Dependents Tab. This includes
+     * Initializes the components of the Prisoners and Dependents Tab. This includes
      * settings related to prisoners and handling of dependents.
      */
     private void initializePrisonersAndDependentsTab() {
@@ -1007,10 +1007,10 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the layout for the Prisoners & Dependents Tab,
+     * Creates the layout for the Prisoners and Dependents Tab,
      * organizing settings for prisoner handling and dependent management.
      *
-     * @return a {@link JPanel} containing the Prisoners & Dependents Tab components.
+     * @return a {@link JPanel} containing the Prisoners and Dependents Tab components.
      */
     public JPanel createPrisonersAndDependentsTab() {
         // Header
@@ -1043,7 +1043,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for configuring prisoner settings in the Prisoners & Dependents Tab.
+     * Creates the panel for configuring prisoner settings in the Prisoners and Dependents Tab.
      *
      * @return a {@link JPanel} containing prisoner-related options such as capture style and status.
      */
@@ -1102,7 +1102,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for configuring dependent settings in the Prisoners & Dependents Tab.
+     * Creates the panel for configuring dependent settings in the Prisoners and Dependents Tab.
      *
      * @return a {@link JPanel} containing dependent management options.
      */
