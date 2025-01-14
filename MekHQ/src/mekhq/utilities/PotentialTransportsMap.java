@@ -20,11 +20,17 @@
 package mekhq.utilities;
 
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+
 /**
- * Map to help hold what transports are transporting what units for a given campaign transport type
+ * We need to determine what units in game are transports, and what units they're transporting.
+ * This map does most of the work and helps hold what transports are transporting what units
+ * for a given campaign transport type.
  * @see CampaignTransportType
  */
 public class PotentialTransportsMap {
@@ -38,7 +44,19 @@ public class PotentialTransportsMap {
     }
 
     /**
+     * For the provided campaign transport type, are there any
+     * transports in the map?
+     * @see CampaignTransportType
+     * @param campaignTransportType type (enum) of campaign transport
+     * @return true if there are any transports in the map for the corresponding CampaignTransportType
+     */
+    public boolean hasTransports(CampaignTransportType campaignTransportType) {
+        return hashMap.containsKey(campaignTransportType) && !(hashMap.get(campaignTransportType).isEmpty());
+    }
+
+    /**
      * For the provided campaign transport type, get the transports
+     * @see CampaignTransportType
      * @param campaignTransportType type (enum) of campaign transport
      * @return transports for the given campaign transport type
      */
@@ -51,6 +69,7 @@ public class PotentialTransportsMap {
      * @param campaignTransportType type (enum) of campaign transport
      * @param uuid transport id
      * @return list of uuids of units on that transport
+     * @see CampaignTransportType
      */
     public List<UUID> getTransportedUnits(CampaignTransportType campaignTransportType, UUID uuid) {
         return hashMap.get(campaignTransportType).get(uuid);
@@ -73,6 +92,31 @@ public class PotentialTransportsMap {
      */
     public void putNewTransport(CampaignTransportType campaignTransportType, UUID key) {
         hashMap.get(campaignTransportType).put(key, new ArrayList<>());
+    }
+
+    /**
+     * Look through the transport map for this unit's assigned transports
+     * in priority order (Ship then Tactical Transports). If the transport
+     * is in the map, add it to the Map for loading later.
+     * @param unit
+     */
+    public void tryToAddTransportedUnit(Unit unit) {
+        if (unit.hasTransportShipAssignment()) {
+            Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
+
+            if (containsTransportKey(SHIP_TRANSPORT, transportShip.getId())) {
+                addTransportedUnit(SHIP_TRANSPORT, transportShip.getId(), unit.getId());
+                return;
+            }
+        }
+        if ( unit.hasTacticalTransportAssignment()) {
+            Unit transport = unit.getTacticalTransportAssignment().getTransport();
+
+            if (containsTransportKey(TACTICAL_TRANSPORT, transport.getId())) {
+                addTransportedUnit(TACTICAL_TRANSPORT, transport.getId(), unit.getId());
+                return;
+            }
+        }
     }
 
     /**

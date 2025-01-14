@@ -310,23 +310,7 @@ public class AtBGameThread extends GameThread {
                 // but only if the transport itself is in the game too.
                 // Try to load into transportShips first, then tacticalTransports
                 for (Unit unit : units) {
-                    boolean isTransported = false;
-                    if (unit.hasTransportShipAssignment()) {
-                        Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
-
-                        if (potentialTransports.containsTransportKey(SHIP_TRANSPORT, transportShip.getId())) {
-                            potentialTransports.addTransportedUnit(SHIP_TRANSPORT, transportShip.getId(), unit.getId());
-                            isTransported = true;
-                        }
-                    }
-                    if (!(isTransported) && unit.hasTacticalTransportAssignment()) {
-                        Unit transport = unit.getTacticalTransportAssignment().getTransport();
-
-                        if (potentialTransports.containsTransportKey(TACTICAL_TRANSPORT, transport.getId())) {
-                            potentialTransports.addTransportedUnit(TACTICAL_TRANSPORT, transport.getId(), unit.getId());
-                            isTransported = true;
-                        }
-                    }
+                    potentialTransports.tryToAddTransportedUnit(unit);
                 }
                 // Now, clean the list of any transports that don't have deployed units in the
                 // game
@@ -403,7 +387,7 @@ public class AtBGameThread extends GameThread {
 
                 // All player and bot units have been added to the lobby
                 // Prompt the player to autoload units into transport ships
-                if (!potentialTransports.getTransports(SHIP_TRANSPORT).isEmpty()) {
+                if (potentialTransports.hasTransports(SHIP_TRANSPORT)) {
                     for (UUID transportId : potentialTransports.getTransports(SHIP_TRANSPORT)) {
                         boolean loadDropShips = false;
                         boolean loadSmallCraft = false;
@@ -413,7 +397,6 @@ public class AtBGameThread extends GameThread {
                         Set<Integer> toLoad = new HashSet<>();
                         // Let the player choose to load DropShips, Small Craft, fighters, and/or
                         // ground units on each transport
-                        //TODO add new stuff
                         if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.DROPSHIP)) {
                             loadDropShips = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
@@ -471,7 +454,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 // Prompt the player to autoload units into tactical transports (lower priority)
-                if (!potentialTransports.getTransports(TACTICAL_TRANSPORT).isEmpty()) {
+                if (potentialTransports.hasTransports(TACTICAL_TRANSPORT)) {
                     for (UUID transportId : potentialTransports.getTransports(TACTICAL_TRANSPORT)) {
                         boolean loadTactical = false;
                         Unit transport = campaign.getUnit(transportId);

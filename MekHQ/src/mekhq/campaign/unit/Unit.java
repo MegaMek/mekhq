@@ -2190,7 +2190,7 @@ public class Unit implements ITechnology {
      * @param transporterType class of Transporter
      * @return capacity
      */
-    public double getCurrentShipTransportCapacity(TransporterType transporterType ){
+    public double getCurrentShipTransportCapacity(TransporterType transporterType) {
         return getShipTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
     }
 
@@ -2228,7 +2228,7 @@ public class Unit implements ITechnology {
      * @param transporterType class of Transporter
      * @return capacity
      */
-    public double getCurrentTacticalTransportCapacity(TransporterType transporterType ){
+    public double getCurrentTacticalTransportCapacity(TransporterType transporterType) {
         return getTacticalTransportedUnitsSummary().getCurrentTransportCapacity(transporterType);
     }
 
@@ -2240,7 +2240,7 @@ public class Unit implements ITechnology {
      * @return remaining capacity
      * @see CampaignTransportType
      */
-    public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType, TransporterType transporterType ){
+    public double getCurrentTransportCapacity(CampaignTransportType campaignTransportType, TransporterType transporterType) {
         return getTransportedUnitsSummary(campaignTransportType).getCurrentTransportCapacity(transporterType);
     }
 
