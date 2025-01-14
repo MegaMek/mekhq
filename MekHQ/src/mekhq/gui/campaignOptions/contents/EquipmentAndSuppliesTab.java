@@ -33,7 +33,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 public class EquipmentAndSuppliesTab {
     // region Variable Declarations
@@ -56,6 +57,8 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnAcquireWaitingPeriod;
     private JLabel lblMaxAcquisitions;
     private JSpinner spnMaxAcquisitions;
+    private JLabel lblDefaultStockPercent;
+    private JSpinner spnDefaultStockPercent;
     //end Acquisition Tab
 
     //start Delivery Tab
@@ -212,6 +215,8 @@ public class EquipmentAndSuppliesTab {
 
         lblMaxAcquisitions = new JLabel();
         spnMaxAcquisitions = new JSpinner();
+        lblDefaultStockPercent = new JLabel();
+        spnDefaultStockPercent = new JSpinner();
     }
 
     /**
@@ -292,6 +297,10 @@ public class EquipmentAndSuppliesTab {
         spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions",
             0,0, 100, 1);
 
+        lblDefaultStockPercent = new CampaignOptionsLabel("DefaultStockPercent");
+        spnDefaultStockPercent = new CampaignOptionsSpinner("DefaultStockPercent",
+                10.0, 0.0, 10000, 0.5);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true,
             "AcquisitionPanel");
@@ -333,6 +342,12 @@ public class EquipmentAndSuppliesTab {
         panel.add(lblMaxAcquisitions, layout);
         layout.gridx++;
         panel.add(spnMaxAcquisitions, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblDefaultStockPercent, layout);
+        layout.gridx++;
+        panel.add(spnDefaultStockPercent, layout);
 
         return panel;
     }
@@ -805,6 +820,7 @@ public class EquipmentAndSuppliesTab {
         options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
         options.setWaitingPeriod((int) spnAcquireWaitingPeriod.getValue());
         options.setMaxAcquisitions((int) spnMaxAcquisitions.getValue());
+        options.setDefaultStockPercent((double) spnDefaultStockPercent.getValue());
 
         // Delivery
         options.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
@@ -860,6 +876,7 @@ public class EquipmentAndSuppliesTab {
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
         spnAcquireWaitingPeriod.setValue(options.getWaitingPeriod());
         spnMaxAcquisitions.setValue(options.getMaxAcquisitions());
+        spnDefaultStockPercent.setValue(options.getDefaultStockPercent());
 
         // Delivery
         spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
