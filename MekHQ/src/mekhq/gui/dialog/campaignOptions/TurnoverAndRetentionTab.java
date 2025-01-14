@@ -230,8 +230,7 @@ public class TurnoverAndRetentionTab {
     JPanel createFatigueTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("FatigueTab",
-            getImageDirectory() + "logo_free_rasalhague_republic.png",
-            true);
+            getImageDirectory() + "logo_free_rasalhague_republic.png", true);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
@@ -320,8 +319,7 @@ public class TurnoverAndRetentionTab {
     JPanel createTurnoverTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("TurnoverTab",
-            getImageDirectory() + "logo_clan_jade_falcon.png",
-            true);
+            getImageDirectory() + "logo_clan_jade_falcon.png", true);
 
         // Contents
         chkUseRandomRetirement = new CampaignOptionsCheckBox("UseRandomRetirement");

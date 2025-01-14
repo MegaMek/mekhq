@@ -51,12 +51,10 @@ public class SkillsTab {
         JPanel headerPanel;
         if (isCombatTab) {
             headerPanel = new CampaignOptionsHeaderPanel("CombatSkillsTab",
-                getImageDirectory() + "logo_clan_ghost_bear.png",
-                true);
+                getImageDirectory() + "logo_clan_ghost_bear.png");
         } else {
             headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsTab",
-                getImageDirectory() + "logo_clan_ghost_bear.png",
-                true);
+                getImageDirectory() + "logo_clan_ghost_bear.png");
         }
 
         // Contents

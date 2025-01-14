@@ -122,8 +122,7 @@ public class MarketsTab {
     JPanel createPersonnelMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
-            getImageDirectory() + "logo_clan_sea_fox.png",
-            true);
+            getImageDirectory() + "logo_clan_sea_fox.png");
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -272,8 +271,7 @@ public class MarketsTab {
     JPanel createUnitMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
-            getImageDirectory() + "logo_loathian_league.png",
-            true);
+            getImageDirectory() + "logo_loathian_league.png");
 
         // Contents
         lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
@@ -373,8 +371,7 @@ public class MarketsTab {
     JPanel createContractMarketTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
-            getImageDirectory() + "logo_clan_smoke_jaguar.png",
-            true);
+            getImageDirectory() + "logo_clan_smoke_jaguar.png");
 
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();

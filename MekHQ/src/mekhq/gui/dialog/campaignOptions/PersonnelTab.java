@@ -356,8 +356,7 @@ public class PersonnelTab {
     JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
-            getImageDirectory() + "logo_circinus_federation.png",
-            true);
+            getImageDirectory() + "logo_circinus_federation.png");
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
@@ -535,8 +534,7 @@ public class PersonnelTab {
     JPanel createAwardsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
-            getImageDirectory() + "logo_draconis_combine.png",
-            true);
+            getImageDirectory() + "logo_draconis_combine.png");
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -730,8 +728,7 @@ public class PersonnelTab {
     JPanel createMedicalTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MedicalTab",
-            getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-            true);
+            getImageDirectory() + "logo_duchy_of_tamarind_abbey.png");
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
@@ -828,8 +825,7 @@ public class PersonnelTab {
     JPanel createPersonnelInformationTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelInformation",
-            getImageDirectory() + "logo_comstar.png",
-            true);
+            getImageDirectory() + "logo_comstar.png");
 
         // Contents
         chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
@@ -953,8 +949,7 @@ public class PersonnelTab {
     JPanel createPrisonersAndDependentsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
-            getImageDirectory() + "logo_clan_fire_mandrills.png",
-            true);
+            getImageDirectory() + "logo_clan_fire_mandrills.png");
 
         // Contents
         prisonerPanel = createPrisonersPanel();
@@ -1075,8 +1070,7 @@ public class PersonnelTab {
     JPanel createSalariesTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("SalariesTab",
-            getImageDirectory() + "logo_clan_ghost_bear.png",
-            true);
+            getImageDirectory() + "logo_clan_ghost_bear.png");
 
         // Contents
         chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");

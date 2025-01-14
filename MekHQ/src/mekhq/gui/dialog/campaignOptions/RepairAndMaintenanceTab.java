@@ -118,7 +118,7 @@ public class RepairAndMaintenanceTab {
     JPanel createRepairTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
-            getImageDirectory() + "logo_aurigan_coalition.png", true);
+            getImageDirectory() + "logo_aurigan_coalition.png");
 
         // Era Mods
             useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
@@ -215,7 +215,7 @@ public class RepairAndMaintenanceTab {
     JPanel createMaintenanceTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
-            getImageDirectory() + "logo_clan_blood_spirit.png", true);
+            getImageDirectory() + "logo_clan_blood_spirit.png");
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");

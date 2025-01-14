@@ -220,7 +220,7 @@ public class EquipmentAndSuppliesTab {
     JPanel createAcquisitionTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("AcquisitionTab",
-            getImageDirectory() + "logo_calderon_protectorate.png", true);
+            getImageDirectory() + "logo_calderon_protectorate.png");
 
         pnlAcquisitions = createAcquisitionPanel();
         pnlDeliveries = createDeliveryPanel();
@@ -395,7 +395,7 @@ public class EquipmentAndSuppliesTab {
     JPanel createPlanetaryAcquisitionTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
-            getImageDirectory() + "logo_capellan_confederation.png", true);
+            getImageDirectory() + "logo_capellan_confederation.png");
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -689,7 +689,7 @@ public class EquipmentAndSuppliesTab {
     JPanel createTechLimitsTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("TechLimitsTab",
-            getImageDirectory() + "logo_clan_cloud_cobra.png", true);
+            getImageDirectory() + "logo_clan_cloud_cobra.png");
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
 

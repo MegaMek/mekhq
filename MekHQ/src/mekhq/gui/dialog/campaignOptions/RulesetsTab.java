@@ -464,8 +464,7 @@ public class RulesetsTab {
     JPanel createStratConTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("StratConTab",
-            getImageDirectory() + "logo_lyran_alliance.png",
-            true);
+            getImageDirectory() + "logo_lyran_alliance.png", false);
 
         // Content
         chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
@@ -535,8 +534,7 @@ public class RulesetsTab {
     JPanel createLegacyTab() {
         // Header
         JPanel headerPanel = new CampaignOptionsHeaderPanel("LegacyTab",
-            getImageDirectory() + "logo_clan_snow_raven.png",
-            true);
+            getImageDirectory() + "logo_clan_snow_raven.png", true);
 
         chkUseAtB = new CampaignOptionsCheckBox("UseAtB");
         pnlLegacyOpForGenerationPanel = createLegacyOpForGenerationPanel();
