@@ -99,7 +99,7 @@ public class AtBSetupForces extends SetupForces {
     private void convertForcesIntoFormations(SimulationContext game) {
         for(var force : game.getForces().getTopLevelForces()) {
             try {
-                var formation = new LanceToFormationConverter(force, game).convert();
+                var formation = new EntityAsUnit(force, game).convert();
                 formation.setTargetFormationId(Entity.NONE);
                 formation.setOwnerId(force.getOwnerId());
                 game.addUnit(formation);

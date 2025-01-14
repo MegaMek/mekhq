@@ -23,7 +23,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulationOptions;
-import megamek.common.autoresolve.converter.UseLancesAsFormations;
+import megamek.common.autoresolve.converter.FlattenForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -352,7 +352,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new UseLancesAsFormations()), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()), SimulationOptions.empty(), new Board(30, 30));
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 

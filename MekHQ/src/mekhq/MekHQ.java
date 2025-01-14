@@ -39,8 +39,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Board;
 import megamek.common.annotations.Nullable;
 import megamek.common.autoresolve.acar.SimulatedClient;
-import megamek.common.autoresolve.acar.order.Orders;
-import megamek.common.autoresolve.converter.SingleElementConsolidateForces;
+import megamek.common.autoresolve.converter.SingletonForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
@@ -655,7 +654,7 @@ public class MekHQ implements GameListener {
                     getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
                     Runtime.getRuntime().availableProcessors(),
                     1,
-                    new AtBSetupForces(getCampaign(), units, scenario, new SingleElementConsolidateForces()),
+                    new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
                     new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
@@ -664,7 +663,7 @@ public class MekHQ implements GameListener {
 
         var event = AutoResolveProgressDialog.showDialog(
             campaignGUI.getFrame(),
-            new AtBSetupForces(getCampaign(), units, scenario, new SingleElementConsolidateForces()),
+            new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
             new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
 
         var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
