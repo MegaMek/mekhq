@@ -476,9 +476,10 @@ public class BiographyTab {
 
     /**
      * Creates and lays out the Backgrounds tab, which includes:
+     * <ul>
      *     <li>Settings for enabling randomized personalities and relationships.</li>
      *     <li>Random origin configurations such as faction specificity and distance scaling.</li>
-     *
+     * </ul>
      *
      * @return A `JPanel` representing the Backgrounds tab in the campaign options dialog.
      */
