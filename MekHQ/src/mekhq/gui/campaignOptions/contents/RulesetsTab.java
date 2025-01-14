@@ -22,6 +22,7 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.Skills;
@@ -33,7 +34,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 public class RulesetsTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -94,6 +96,13 @@ public class RulesetsTab {
     private JLabel lblAdditionalStrategyDeployment;
     private JSpinner spnAdditionalStrategyDeployment;
     private JCheckBox chkAdjustPaymentForStrategy;
+
+    private JPanel pnlAutoResolve;
+    private JLabel lblAutoResolveMethod;
+    private MMComboBox<AutoResolveMethod> comboAutoResolveMethod;
+    private JCheckBox chkAutoResolveVictoryChanceEnabled;
+    private JLabel lblAutoResolveNumberOfScenarios;
+    private JSpinner spnAutoResolveNumberOfScenarios;
     //end Universal Options
 
     //start Legacy AtB
@@ -196,6 +205,16 @@ public class RulesetsTab {
         spnAdditionalStrategyDeployment = new JSpinner();
         chkAdjustPaymentForStrategy = new JCheckBox();
 
+        // Auto Resolve
+        pnlAutoResolve = new JPanel();
+        lblAutoResolveMethod = new JLabel();
+        final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
+                AutoResolveMethod.values());
+        comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
+        chkAutoResolveVictoryChanceEnabled = new JCheckBox();
+        lblAutoResolveNumberOfScenarios = new JLabel();
+        spnAutoResolveNumberOfScenarios = new JSpinner();
+
         // Here we set up the options, so they can be used across both the AtB and StratCon tabs
         substantializeUniversalOptions();
     }
@@ -228,6 +247,7 @@ public class RulesetsTab {
 
         pnlScenarioGenerationPanel = createUniversalScenarioGenerationPanel();
         pnlCampaignOptions = createUniversalCampaignOptionsPanel();
+        pnlAutoResolve = createAutoResolvePanel();
     }
 
     private static DefaultComboBoxModel<SkillLevel> getSkillLevelOptions() {
@@ -282,6 +302,38 @@ public class RulesetsTab {
         layout.gridy++;
         layout.gridwidth = 3;
         panel.add(pnlScenarioModifiers, layout);
+
+        return panel;
+    }
+
+    private JPanel createAutoResolvePanel() {
+        // Content
+        lblAutoResolveMethod = new CampaignOptionsLabel("AutoResolveMethod");
+        lblAutoResolveNumberOfScenarios = new CampaignOptionsLabel("AutoResolveNumberOfScenarios");
+        spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
+                250, 10, 1000, 10);
+        chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled");
+
+        // Layout the panel
+        final JPanel panel = new CampaignOptionsStandardPanel("AutoResolvePanel", true,
+            "AutoResolvePanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblAutoResolveMethod, layout);
+        layout.gridx++;
+        panel.add(comboAutoResolveMethod, layout);
+        layout.gridx++;
+        layout.gridwidth = 2;
+        panel.add(chkAutoResolveVictoryChanceEnabled, layout);
+
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(lblAutoResolveNumberOfScenarios, layout);
+        layout.gridx++;
+        panel.add(spnAutoResolveNumberOfScenarios, layout);
 
         return panel;
     }
@@ -515,6 +567,11 @@ public class RulesetsTab {
         panel.add(chkUseGenericBattleValue, layout);
         layout.gridx++;
         panel.add(chkUseVerboseBidding, layout);
+
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlAutoResolve, layout);
 
         layout.gridwidth = 2;
         layout.gridx = 0;
@@ -795,6 +852,9 @@ public class RulesetsTab {
         options.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
         options.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
         options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
+        options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
+        options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
+        options.setAutoResolveNumberOfScenarios((int) spnAutoResolveNumberOfScenarios.getValue());
 
         // StratCon
         options.setUseStratCon(chkUseStratCon.isSelected());
@@ -853,6 +913,9 @@ public class RulesetsTab {
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         chkAdjustPaymentForStrategy.setSelected(options.isAdjustPaymentForStrategy());
+        comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
+        chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
+        spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
 
         // StratCon
         chkUseStratCon.setSelected(options.isUseStratCon());
