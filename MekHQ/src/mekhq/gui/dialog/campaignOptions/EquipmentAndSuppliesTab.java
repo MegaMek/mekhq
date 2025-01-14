@@ -18,7 +18,7 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
 
 public class EquipmentAndSuppliesTab {
     // region Variable Declarations
-    private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
+    private static String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
 

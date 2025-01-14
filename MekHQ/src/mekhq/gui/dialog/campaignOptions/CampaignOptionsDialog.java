@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private final Campaign campaign;

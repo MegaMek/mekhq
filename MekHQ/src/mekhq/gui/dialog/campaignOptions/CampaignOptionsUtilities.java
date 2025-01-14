@@ -14,7 +14,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 
 public class CampaignOptionsUtilities {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
 

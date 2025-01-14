@@ -39,7 +39,7 @@ import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createGr
  * Provides options to select a preset, customize a preset, or cancel the operation.
  */
 public class SelectPresetDialog extends JDialog {
-    private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
+    private static String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
 

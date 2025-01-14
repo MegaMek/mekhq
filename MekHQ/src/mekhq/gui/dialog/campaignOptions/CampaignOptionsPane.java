@@ -22,7 +22,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
-    private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
+    private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private static final int SCROLL_SPEED = 16;
