@@ -42,14 +42,14 @@ import java.util.ResourceBundle;
  * </p>
  *
  * <h3>Key Features:</h3>
- * <ul>
+ * <p>
  *   <li>Provides reusable methods to create and configure {@link JPanel} objects.</li>
  *   <li>Handles creation of organized, alphabetized tab groups with specialized handling for
  *       "general options" tabs.</li>
  *   <li>Offers UI utility methods for processing resource names, image directories,
  *       and dynamic content scaling.</li>
  *   <li>Supports internationalization through the {@link ResourceBundle} for localized strings.</li>
- * </ul>
+ * </p>
  */
 public class CampaignOptionsUtilities {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";

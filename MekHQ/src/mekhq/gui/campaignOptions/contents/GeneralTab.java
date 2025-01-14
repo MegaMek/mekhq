@@ -53,13 +53,13 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayo
 /**
  * Represents a tab within the campaign options UI that allows the user to configure
  * general campaign settings. This includes options for:
- * <ul>
+ * <p>
  *     <li>Configuring the campaign name</li>
  *     <li>Setting the faction and faction-related options</li>
  *     <li>Adjusting reputation and manual unit rating modifiers</li>
  *     <li>Specifying the campaign start date</li>
  *     <li>Choosing a camouflage pattern and unit icon</li>
- * </ul>
+ * </p>
  *
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
@@ -112,13 +112,13 @@ public class GeneralTab {
      * Creates the UI components displayed in the general tab.
      * <p>
      * The general tab includes various configurable fields and panels:
-     * <ul>
+     * <p>
      *     <li>An editable text field for setting the campaign name</li>
      *     <li>A dropdown for selecting the campaign's faction</li>
      *     <li>Controls for managing reputation and manual rating modifiers</li>
      *     <li>Date selection associated with the campaign</li>
      *     <li>Buttons for choosing camouflage and unit icons</li>
-     * </ul>
+     * </p>
      *
      * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
      */
@@ -237,11 +237,11 @@ public class GeneralTab {
 
     /**
      * Creates a header panel for the general tab, which includes:
-     * <ul>
+     * <p>
      *     <li>An image representing the campaign options</li>
      *     <li>A title for the general tab</li>
      *     <li>A description of the general tab functionalities</li>
-     * </ul>
+     * </p>
      *
      * @return A {@link JPanel} containing the general tab header.
      */
@@ -281,10 +281,10 @@ public class GeneralTab {
      * Initializes the UI components used throughout the general tab.
      * <p>
      * This method sets up the components for all editable campaign settings, including:
-     * <ul>
+     * <p>
      *     <li>Labels, text fields, dropdowns, and buttons for campaign settings</li>
      *     <li>Default values fetched from the campaign instance</li>
-     * </ul>
+     * </p>
      */
     private void initialize() {
         lblName = new JLabel();
@@ -408,11 +408,11 @@ public class GeneralTab {
      * in understanding the campaign options.
      * <p>
      * The panel may include references to:
-     * <ul>
+     * <p>
      *     <li>BattleMech Manual (BMM)</li>
      *     <li>Total Warfare rules</li>
      *     <li>Campaign Operations documentation</li>
-     * </ul>
+     * </p>
      *
      * @return A {@link JPanel} containing additional informational components.
      */
@@ -463,7 +463,7 @@ public class GeneralTab {
      * from the provided options or defaults to the current campaign's settings if no presets are provided.
      * <p>
      * Specific actions include:
-     * <ul>
+     * <p>
      *     <li>Setting the campaign name and faction in the respective fields.</li>
      *     <li>Updating the unit rating method and manual unit rating modifier based on the campaign
      *     options.</li>
@@ -471,7 +471,7 @@ public class GeneralTab {
      *     <li>Setting the camouflage pattern and unit icon to align with the campaign's default or
      *     custom configuration.</li>
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
-     * </ul>
+     * </p>
      *
      * @param presetCampaignOptions Optional {@link CampaignOptions} used to populate values.
      *                              If {@code null}, the current campaign options are used.

@@ -56,13 +56,13 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
  * </p>
  *
  * <h3>Key Features:</h3>
- * <ul>
+ * <p>
  *   <li>Organizes options into logical groups, such as General, Human Resources,
  *       Advancement, Logistics, and Operations.</li>
  *   <li>Supports loading and applying campaign presets for streamlined configuration.</li>
  *   <li>Dynamically handles UI scaling and scrolling speed based on environment properties.</li>
  *   <li>Allows scalability for future addition of new campaign settings.</li>
- * </ul>
+ * </p>
  */
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";

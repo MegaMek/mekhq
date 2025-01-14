@@ -34,12 +34,12 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  * <p>
  * This tab is divided into two sections:
  * </p>
- * <ul>
+ * <p>
  *     <li><b>Repair Tab:</b> Manages options for era modifications, tech assignments,
  *         equipment quirks handling, destruction margins, and more.</li>
  *     <li><b>Maintenance Tab:</b> Handles maintenance settings such as cycle frequency, quality standards,
  *         planetary modifiers, and unofficial maintenance rules.</li>
- * </ul>
+ * </p>
  * <p>
  * The class interacts with {@link CampaignOptions}, enabling the retrieval, storage,
  * and application of repair and maintenance configuration settings.

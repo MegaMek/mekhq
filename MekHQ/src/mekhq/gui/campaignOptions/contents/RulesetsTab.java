@@ -46,14 +46,14 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  * </p>
  *
  * <h3>Tab Sections:</h3>
- * <ul>
+ * <p>
  *     <li><b>Universal Options:</b> Handles features applicable to all campaigns,
  *         such as skill levels, unit ratios, map conditions, and auto-resolve settings.</li>
  *     <li><b>Legacy AtB:</b> Legacy-specific rules for opponent force generation,
  *         scenario generation probabilities, and battle intensity configurations.</li>
  *     <li><b>StratCon:</b> Settings for Strategic Context campaigns, including BV usage
  *         (Battle Values) and verbose bidding options.</li>
- * </ul>
+ * </p>
  */
 public class RulesetsTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -166,11 +166,11 @@ public class RulesetsTab {
 
     /**
      * Initializes the tab by setting up all three sections:
-     * <ul>
+     * <p>
      *     <li>Universal Options</li>
      *     <li>StratCon Tab</li>
      *     <li>Legacy Tab</li>
-     * </ul>
+     * </p>
      */
     private void initialize() {
         initializeUniversalOptions();

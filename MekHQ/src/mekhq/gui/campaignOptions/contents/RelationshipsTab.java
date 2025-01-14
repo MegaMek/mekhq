@@ -45,11 +45,11 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  * <p>
  * The tab is divided into three main sections:
  * </p>
- * <ul>
+ * <p>
  *     <li>Marriage Tab: Manages configurations for manual and random marriage settings.</li>
  *     <li>Divorce Tab: Manages configurations for manual and random divorce settings.</li>
  *     <li>Procreation Tab: Manages configurations for manual and random procreation settings.</li>
- * </ul>
+ * </p>
  */
 public class RelationshipsTab {
     private final CampaignOptions campaignOptions;
