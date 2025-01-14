@@ -61,11 +61,12 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * <p>
      * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}.
      * If {@code anchor} or {@code fill} values are not provided, the following default
+     * </p>
      * values are used:
-     * <p>
+     * <ul>
      *   <li>Default {@code anchor}: {@link GridBagConstraints#NORTHWEST}</li>
      *   <li>Default {@code fill}: {@link GridBagConstraints#BOTH}</li>
-     * </p>
+     * </ul>
      * Default {@code insets} are set to {@code new Insets(5, 5, 5, 5)}.
      *
      * @param panel  the {@link JPanel} for which the {@link GridBagConstraints} is created
