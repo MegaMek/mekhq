@@ -38,7 +38,7 @@ public class CampaignOptionsAbilityInfo {
      *     <li>{@code COMBAT_ABILITIES}: Abilities related to combat actions</li>
      *     <li>{@code MANEUVERING_ABILITIES}: Abilities related to movement and maneuvering</li>
      *     <li>{@code UTILITY_ABILITIES}: Abilities providing utility or non-combat benefits</li>
-     * </p>
+     *
      */
     public enum AbilityCategory {
         COMBAT_ABILITY, MANEUVERING_ABILITY, UTILITY_ABILITY

@@ -39,7 +39,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *   <li>Unit turnover settings, including retirement, contract durations, payouts, and modifiers.</li>
  *   <li>Administrative strain and management skills impacting unit cohesion.</li>
  *   <li>Fatigue mechanics such as fatigue rates, leave thresholds, and injury fatigue.</li>
- * </p>
+ *
  * </p>
  * The class interacts with a {@link CampaignOptions} object, allowing the user to load and save
  * configurations. It consists of two main panels:
@@ -47,7 +47,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *   <li><strong>Turnover Tab:</strong> Controls unit turnover, payouts, and related modifiers.</li>
  *   <li><strong>Fatigue Tab:</strong> Manages fatigue-related options like kitchen capacity
  *   and fatigue rates.</li>
- * </p>
+ *
  */
 public class TurnoverAndRetentionTab {
     private final CampaignOptions campaignOptions;

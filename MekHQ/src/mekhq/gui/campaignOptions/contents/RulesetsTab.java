@@ -53,7 +53,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *         scenario generation probabilities, and battle intensity configurations.</li>
  *     <li><b>StratCon:</b> Settings for Strategic Context campaigns, including BV usage
  *         (Battle Values) and verbose bidding options.</li>
- * </p>
+ *
  */
 public class RulesetsTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
@@ -170,7 +170,7 @@ public class RulesetsTab {
      *     <li>Universal Options</li>
      *     <li>StratCon Tab</li>
      *     <li>Legacy Tab</li>
-     * </p>
+     *
      */
     private void initialize() {
         initializeUniversalOptions();

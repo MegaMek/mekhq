@@ -59,7 +59,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayo
  *     <li>Adjusting reputation and manual unit rating modifiers</li>
  *     <li>Specifying the campaign start date</li>
  *     <li>Choosing a camouflage pattern and unit icon</li>
- * </p>
+ *
  *
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
@@ -118,7 +118,7 @@ public class GeneralTab {
      *     <li>Controls for managing reputation and manual rating modifiers</li>
      *     <li>Date selection associated with the campaign</li>
      *     <li>Buttons for choosing camouflage and unit icons</li>
-     * </p>
+     *
      *
      * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
      */
@@ -241,7 +241,7 @@ public class GeneralTab {
      *     <li>An image representing the campaign options</li>
      *     <li>A title for the general tab</li>
      *     <li>A description of the general tab functionalities</li>
-     * </p>
+     *
      *
      * @return A {@link JPanel} containing the general tab header.
      */
@@ -284,7 +284,7 @@ public class GeneralTab {
      * <p>
      *     <li>Labels, text fields, dropdowns, and buttons for campaign settings</li>
      *     <li>Default values fetched from the campaign instance</li>
-     * </p>
+     *
      */
     private void initialize() {
         lblName = new JLabel();
@@ -412,7 +412,7 @@ public class GeneralTab {
      *     <li>BattleMech Manual (BMM)</li>
      *     <li>Total Warfare rules</li>
      *     <li>Campaign Operations documentation</li>
-     * </p>
+     *
      *
      * @return A {@link JPanel} containing additional informational components.
      */
@@ -471,7 +471,7 @@ public class GeneralTab {
      *     <li>Setting the camouflage pattern and unit icon to align with the campaign's default or
      *     custom configuration.</li>
      *     <li>Performing required UI updates (e.g., repainting date labels).</li>
-     * </p>
+     *
      *
      * @param presetCampaignOptions Optional {@link CampaignOptions} used to populate values.
      *                              If {@code null}, the current campaign options are used.

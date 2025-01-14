@@ -67,7 +67,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
  *   and dependent-related rules.</li>
  *   <li><b>Salaries Tab:</b> Configuration of salaries based on roles, experience
  *   multipliers, and base salary rates.</li>
- * </p>
+ *
  *
  * <p>
  * This class serves as the main controller for the UI components of the Personnel Tab,
