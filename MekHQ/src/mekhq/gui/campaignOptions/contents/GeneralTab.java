@@ -112,7 +112,7 @@ public class GeneralTab {
      * Creates the UI components displayed in the general tab.
      * <p>
      * The general tab includes various configurable fields and panels:
-     * <p>
+     * </p>
      *     <li>An editable text field for setting the campaign name</li>
      *     <li>A dropdown for selecting the campaign's faction</li>
      *     <li>Controls for managing reputation and manual rating modifiers</li>
@@ -463,7 +463,7 @@ public class GeneralTab {
      * from the provided options or defaults to the current campaign's settings if no presets are provided.
      * <p>
      * Specific actions include:
-     * <p>
+     * </p>
      *     <li>Setting the campaign name and faction in the respective fields.</li>
      *     <li>Updating the unit rating method and manual unit rating modifier based on the campaign
      *     options.</li>

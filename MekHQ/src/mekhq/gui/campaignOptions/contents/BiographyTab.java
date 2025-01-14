@@ -210,7 +210,6 @@ public class BiographyTab {
 
     /**
      * Initializes the Name and Portrait tab. The tab allows users to:
-     * <p>
      *     <li>Enable or disable the use of origin factions for name generation.</li>
      *     <li>Assign portraits to personnel upon role changes.</li>
      *     <li>Customize which portraits should be used randomly based on roles.</li>
@@ -230,7 +229,6 @@ public class BiographyTab {
 
     /**
      * Initializes the Education tab, providing settings such as:
-     * <p>
      *     <li>Setting curriculum XP rates.</li>
      *     <li>Enabling re-education camps or specific academy requirements.</li>
      *     <li>Managing academy dropout chances for adults and children.</li>
@@ -273,7 +271,6 @@ public class BiographyTab {
 
     /**
      * Initializes the Death tab, focusing on:
-     * <p>
      *     <li>Allowing configuration of random death probabilities for personnel.</li>
      *     <li>Customizing age-group-specific death settings.</li>
      *     <li>Selecting methods for random deaths (e.g., natural causes or accidents).</li>
@@ -365,7 +362,6 @@ public class BiographyTab {
 
     /**
      * Creates and lays out the General tab, including its components like:
-     * <p>
      *     <li>Checkboxes for random XP distribution.</li>
      *     <li>Sliders for gender representation customization.</li>
      *     <li>Combo boxes for family display level settings within the GUI.</li>
@@ -480,7 +476,6 @@ public class BiographyTab {
 
     /**
      * Creates and lays out the Backgrounds tab, which includes:
-     * <p>
      *     <li>Settings for enabling randomized personalities and relationships.</li>
      *     <li>Random origin configurations such as faction specificity and distance scaling.</li>
      *
@@ -741,7 +736,6 @@ public class BiographyTab {
 
     /**
      * Configures and creates the Death tab. This includes options like:
-     * <p>
      *     <li>Methods for random death.</li>
      *     <li>Percentage-based chances for random death events.</li>
      *     <li>Check boxes to enable or disable age-specific death events.</li>
@@ -863,7 +857,7 @@ public class BiographyTab {
      * Creates the Education tab, which allows managing educational settings within the campaign.
      * <p>
      * This includes:
-     * <p>
+     * </p>
      *     <li>Setting curriculum XP rates.</li>
      *     <li>Configuring academy requirements and override options.</li>
      *     <li>Managing dropout chances for adults and children.</li>
@@ -1266,7 +1260,7 @@ public class BiographyTab {
      * Creates the Rank tab for configuring rank systems within the campaign.
      * <p>
      * This tab provides options for:
-     * <p>
+     * </p>
      *     <li>Managing rank systems for personnel in the campaign.</li>
      *     <li>Displaying rank-related UI components for user configuration.</li>
      *
