@@ -210,11 +210,11 @@ public class BiographyTab {
 
     /**
      * Initializes the Name and Portrait tab. The tab allows users to:
-     * <p>
+     * <ul>
      *     <li>Enable or disable the use of origin factions for name generation.</li>
      *     <li>Assign portraits to personnel upon role changes.</li>
      *     <li>Customize which portraits should be used randomly based on roles.</li>
-     * </p>
+     * </ul>
      */
     private void initializeNameAndPortraitTab() {
         chkUseOriginFactionForNames = new JCheckBox();
@@ -230,12 +230,12 @@ public class BiographyTab {
 
     /**
      * Initializes the Education tab, providing settings such as:
-     * <p>
+     * <ul>
      *     <li>Setting curriculum XP rates.</li>
      *     <li>Enabling re-education camps or specific academy requirements.</li>
      *     <li>Managing academy dropout chances for adults and children.</li>
      *     <li>Supporting the configuration of education-related accidents and events.</li>
-     * </p>
+     * </ul>
      */
     private void initializeEducationTab() {
         chkUseEducationModule = new JCheckBox();
@@ -273,11 +273,11 @@ public class BiographyTab {
 
     /**
      * Initializes the Death tab, focusing on:
-     * <p>
+     * <ul>
      *     <li>Allowing configuration of random death probabilities for personnel.</li>
      *     <li>Customizing age-group-specific death settings.</li>
      *     <li>Selecting methods for random deaths (e.g., natural causes or accidents).</li>
-     * </p>
+     * </ul>
      */
     private void initializeDeathTab() {
         chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
@@ -365,11 +365,11 @@ public class BiographyTab {
 
     /**
      * Creates and lays out the General tab, including its components like:
-     * <p>
+     * <ul>
      *     <li>Checkboxes for random XP distribution.</li>
      *     <li>Sliders for gender representation customization.</li>
      *     <li>Combo boxes for family display level settings within the GUI.</li>
-     * </p>
+     * </ul>
      *
      * @return A `JPanel` representing the General tab in the campaign options dialog.
      */
@@ -480,10 +480,10 @@ public class BiographyTab {
 
     /**
      * Creates and lays out the Backgrounds tab, which includes:
-     * <p>
+     * <ul>
      *     <li>Settings for enabling randomized personalities and relationships.</li>
      *     <li>Random origin configurations such as faction specificity and distance scaling.</li>
-     * </p>
+     * </ul>
      *
      * @return A `JPanel` representing the Backgrounds tab in the campaign options dialog.
      */
@@ -741,11 +741,11 @@ public class BiographyTab {
 
     /**
      * Configures and creates the Death tab. This includes options like:
-     * <p>
+     * <ul>
      *     <li>Methods for random death.</li>
      *     <li>Percentage-based chances for random death events.</li>
      *     <li>Check boxes to enable or disable age-specific death events.</li>
-     * </p>
+     * </ul>
      *
      * @return A `JPanel` representing the Death tab.
      */
@@ -863,12 +863,12 @@ public class BiographyTab {
      * Creates the Education tab, which allows managing educational settings within the campaign.
      * <p>
      * This includes:
-     * <p>
+     * <ul>
      *     <li>Setting curriculum XP rates.</li>
      *     <li>Configuring academy requirements and override options.</li>
      *     <li>Managing dropout chances for adults and children.</li>
      *     <li>Enabling or disabling the use of reeducation camps, accidents, and events.</li>
-     * </p>
+     * </ul>
      *
      * @return A {@code JPanel} representing the Education tab in the campaign UI.
      */
@@ -1266,10 +1266,10 @@ public class BiographyTab {
      * Creates the Rank tab for configuring rank systems within the campaign.
      * <p>
      * This tab provides options for:
-     * <p>
+     * <ul>
      *     <li>Managing rank systems for personnel in the campaign.</li>
      *     <li>Displaying rank-related UI components for user configuration.</li>
-     * </p>
+     * </ul>
      *
      * @return A {@code JPanel} representing the Rank tab in the campaign configuration.
      */
