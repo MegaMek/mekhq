@@ -120,8 +120,6 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         campaignOptionsPane.applyPreset(preset);
     }
 
-
-
     /**
      * Displays a promo introducing users to StratCon.
      * This method shows the promo only when the Campaign Options pane is closed
