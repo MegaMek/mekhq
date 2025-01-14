@@ -24,11 +24,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
+/**
+ * A custom implementation of {@link GridBagConstraints} designed for use with
+ * panels in the campaign options dialog.
+ * <p>
+ * This class allows for simplified initialization of {@link GridBagConstraints}
+ * with configurable anchor and fill properties, as well as preset insets.
+ * <p>
+ * It is intended to be paired with {@code CampaignOptionsStandardPanel} or similar components
+ * using the {@link GridBagLayout}.
+ */
 public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
+
     /**
-     * Creates a {@link GridBagConstraints} object for the specified {@link JPanel}.
+     * Constructs an instance of {@link GridBagConstraints} with default settings
+     * for the specified {@link JPanel}.
      * <p>
-     * Written to be paired with {@code CampaignOptionsStandardPanel}.
+     * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}.
+     * Default constraints include:
+     * <ul>
+     *   <li>{@code anchor} set to {@link GridBagConstraints#NORTHWEST}</li>
+     *   <li>{@code fill} set to {@link GridBagConstraints#BOTH}</li>
+     *   <li>{@code insets} set to {@code new Insets(5, 5, 5, 5)}</li>
+     * </ul>
      *
      * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
      */
@@ -37,24 +55,35 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
     }
 
     /**
-     * Creates a {@link GridBagConstraints} object for the specified {@link JPanel} according to the
-     * provided settings.
+     * Constructs an instance of {@link GridBagConstraints} with configurable
+     * anchor and fill properties for the specified {@link JPanel}.
      * <p>
-     * Written to be paired with {@code CampaignOptionsStandardPanel}.
+     * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}.
+     * If {@code anchor} or {@code fill} values are not provided, the following default
+     * values are used:
+     * <ul>
+     *   <li>Default {@code anchor}: {@link GridBagConstraints#NORTHWEST}</li>
+     *   <li>Default {@code fill}: {@link GridBagConstraints#BOTH}</li>
+     * </ul>
+     * Default {@code insets} are set to {@code new Insets(5, 5, 5, 5)}.
      *
-     * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
+     * @param panel  the {@link JPanel} for which the {@link GridBagConstraints} is created
      * @param anchor the anchor setting for the {@link GridBagConstraints}, or {@code null} to use
-     *              the default value {@link GridBagConstraints#NORTHWEST}
-     * @param fill the fill setting for the {@link GridBagConstraints}, or {@code null} to use the
-     *            default value {@link GridBagConstraints#NORTHWEST}
+     *               the default value {@link GridBagConstraints#NORTHWEST}
+     * @param fill   the fill setting for the {@link GridBagConstraints}, or {@code null} to use the
+     *               default value {@link GridBagConstraints#BOTH}
      */
     public CampaignOptionsGridBagConstraints(JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
         super();
+
+        // Set up GridBagLayout on the panel
         panel.setLayout(new GridBagLayout());
 
+        // Assign anchor and fill, using defaults if not provided
         this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
         this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.BOTH);
 
+        // Set default insets
         this.insets = new Insets(5, 5, 5, 5);
     }
 }

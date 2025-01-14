@@ -25,71 +25,87 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 /**
- * This class provides a custom {@link JPanel} for campaign options.
- * Offers an optional untitled border, and the panel name is set to "pnl" + name.
+ * A specialized {@link JPanel} tailored for use in campaign options dialogs.
+ * <p>
+ * This panel offers configurable borders (titled or untitled) and applies a standardized
+ * layout and styling for consistency across the UI. The panel's name can also be dynamically
+ * assigned based on the provided {@code name} parameter.
  */
 public class CampaignOptionsStandardPanel extends JPanel {
+
+    /**
+     * The path to the resource bundle containing localized strings for border titles.
+     */
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+
+    /**
+     * The {@link ResourceBundle} used to fetch localized strings for titles and labels.
+     */
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     /**
-     * Creates a standardized {@link JPanel} without a border.
+     * Constructs a {@link CampaignOptionsStandardPanel} without a border.
      * <p>
-     * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
-     * assigned to the panel via {@code setLayout}.
+     * The name of the panel is set to {@code "pnl" + name}. The layout should
+     * be configured using {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
      *
-     * @param name         the name of the panel.
+     * @param name the name of the panel, used to set its internal name
      */
     public CampaignOptionsStandardPanel(String name) {
         this(name, false, "");
     }
 
     /**
-     * Creates a standardized {@link JPanel} with an untitled border.
+     * Constructs a {@link CampaignOptionsStandardPanel} with an optional untitled border.
      * <p>
-     * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
-     * assigned to the panel via {@code setLayout}.
+     * If {@code includeBorder} is {@code true}, an etched border is applied to the panel. The name of
+     * the panel is set to {@code "pnl" + name}. The layout should be configured using
+     * {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
      *
-     * @param name         the name of the panel.
-     * @param includeBorder whether the panel should have a border.
+     * @param name           the name of the panel, used to set its internal name
+     * @param includeBorder  {@code true} if the panel should include an untitled border
      */
     public CampaignOptionsStandardPanel(String name, boolean includeBorder) {
         this(name, includeBorder, "");
     }
 
     /**
-     * Creates a standardized {@link JPanel} with a titled border.
+     * Constructs a {@link CampaignOptionsStandardPanel} with an optional titled border.
      * <p>
-     * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
-     * assigned to the panel via {@code setLayout}.
-     * <p>
-     * If {@code borderTitle} isn't empty the resource bundle reference, used to fetch the border's
-     * title, will be {@code "lbl" + borderTitle + ".text"}
+     * If {@code includeBorder} is {@code true}, a border is applied to the panel. If {@code borderTitle}
+     * is provided, it is used to fetch the localized string for the border's title from the resource bundle.
+     * The name of the panel is set to {@code "pnl" + name}. The layout should be configured using
+     * {@code createGroupLayout} and assigned to the panel using {@code setLayout}.
      *
-     * @param name         the name of the panel.
-     * @param includeBorder whether the panel should have a border.
+     * @param name          the name of the panel, used to set its internal name
+     * @param includeBorder {@code true} if the panel should include a border
+     * @param borderTitle   the resource bundle key for the border's title; an empty string indicates no title
      */
     public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle) {
         borderTitle = borderTitle.isBlank() ? "" : resources.getString("lbl" + borderTitle + ".text");
 
+        // Set a standardized panel behavior and preferred size scaling
         new JPanel() {
             @Override
             public Dimension getPreferredSize() {
                 Dimension standardSize = super.getPreferredSize();
-                return UIUtil.scaleForGUI((Math.max(standardSize.width, 500)), standardSize.height);
+                return UIUtil.scaleForGUI(Math.max(standardSize.width, 500), standardSize.height);
             }
         };
 
         if (includeBorder) {
             if (borderTitle.isBlank()) {
+                // Add an untitled etched border
                 setBorder(BorderFactory.createEtchedBorder());
             } else {
+                // Add a titled border with localized title
                 setBorder(BorderFactory.createTitledBorder(
-                    BorderFactory.createEtchedBorder(),
-                    String.format("<html>%s</html>", borderTitle)));
+                        BorderFactory.createEtchedBorder(),
+                        String.format("<html>%s</html>", borderTitle)));
             }
         }
 
+        // Set the name of the panel dynamically
         setName("pnl" + name);
     }
 }

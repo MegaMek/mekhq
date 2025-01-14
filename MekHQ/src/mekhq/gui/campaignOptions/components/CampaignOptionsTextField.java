@@ -21,7 +21,6 @@ package mekhq.gui.campaignOptions.components;
 import megamek.common.annotations.Nullable;
 
 import javax.swing.*;
-
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
@@ -29,42 +28,61 @@ import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 
 /**
- * This class provides a custom {@link JTextField} for campaign options.
- * The text field name and tooltips are fetched from a resource bundle based on the provided name.
+ * A specialized {@link JTextField} component designed for use in campaign options dialogs.
+ * <p>
+ * This text field fetches its tooltip text dynamically from a resource bundle
+ * based on the provided name. It also supports a customizable tooltip wrap size while
+ * maintaining consistent UI scaling.
  */
 public class CampaignOptionsTextField extends JTextField {
+
+    /**
+     * The path to the resource bundle that contains tooltip text for the text field.
+     */
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+
+    /**
+     * The {@link ResourceBundle} used to fetch localized tooltip and other properties.
+     */
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     /**
-     * Creates a {@link JTextField} object.
+     * Constructs a {@link CampaignOptionsTextField} with a default tooltip wrap size.
      * <p>
-     * The name of the {@link JTextField} will be {@code}, and it will use the following resource
-     * bundle reference: {@code "lbl" + name + ".tooltip"}.
+     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched
+     * using the key {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are
+     * word-wrapped to a default width of 100 characters.
      *
-     * @param name                the name of the object.
+     * @param name the base name used to generate the text field's name and tooltip text.
      */
     public CampaignOptionsTextField(String name) {
         this(name, null);
     }
 
     /**
-     * Creates a {@link JTextField} object with a custom word wrap width.
+     * Constructs a {@link CampaignOptionsTextField} with a customizable tooltip wrap size.
      * <p>
-     * The name of the {@link JTextField} will be {@code}, and it will use the following resource
-     * bundle reference: {@code "lbl" + name + ".tooltip"}.
+     * The name of the text field is set to {@code "lbl" + name}, and its tooltip text is fetched
+     * using the key {@code "lbl" + name + ".tooltip"} from the resource bundle. Tooltips are
+     * word-wrapped to the specified width in {@code customWrapSize}.
      *
-     * @param name                the name of the object.
-     * @param customWrapSize      the maximum number of characters (including whitespaces) on each
-     *                            line of the tooltip.
-     *                            If {@code null}, the default wrap size of 100 is used.
+     * @param name           the base name used to generate the text field's name and tooltip text.
+     * @param customWrapSize the maximum number of characters (including spaces) per line in the tooltip text.
+     *                       If {@code null}, a default wrap size of 100 characters is used.
      */
     public CampaignOptionsTextField(String name, @Nullable Integer customWrapSize) {
         super();
-        setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
-            processWrapSize(customWrapSize)));
+
+        // Set the tooltip text with word wrapping
+        setToolTipText(wordWrap(
+            resources.getString("lbl" + name + ".tooltip"),
+            processWrapSize(customWrapSize)
+        ));
+
+        // Set the component name
         setName("lbl" + name);
 
+        // Apply UI font scaling
         setFontScaling(this, false, 1);
     }
 }

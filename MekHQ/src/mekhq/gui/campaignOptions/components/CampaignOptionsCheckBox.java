@@ -19,9 +19,9 @@
 package mekhq.gui.campaignOptions.components;
 
 import megamek.common.annotations.Nullable;
+import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 
 import javax.swing.*;
-
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
@@ -29,33 +29,72 @@ import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 
 /**
- * This class provides a custom {@link JCheckBox} for campaign options.
- * The checkbox name and tooltips are fetched from a resource bundle based on the provided name.
+ * A specialized {@link JCheckBox} used in the campaign options dialog.
+ * <p>
+ * This check box's text and tooltip are dynamically loaded from a resource bundle
+ * based on a given name. The tooltip can optionally include word wrapping
+ * with a configurable wrap size.
+ * <p>
+ * The checkbox also supports font scaling adjustments.
  */
 public class CampaignOptionsCheckBox extends JCheckBox {
+    /**
+     * The path to the resource bundle containing text and tooltip information
+     * for this component.
+     */
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
+
+    /**
+     * The {@link ResourceBundle} used to load localized strings for checkbox text and tooltips.
+     */
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
+    /**
+     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified name.
+     * <p>
+     * The name is used to determine the checkbox's visible text and tooltip, as well
+     * as to generate its unique internal name.
+     * <p>
+     * The text is located in the resource bundle key {@code "lbl" + name + ".text"}.
+     * The tooltip is located in the resource bundle key {@code "lbl" + name + ".tooltip"}.
+     * <p>
+     * A default wrap size is used for the tooltip text if {@link CampaignOptionsUtilities#processWrapSize}
+     * is not overridden.
+     *
+     * @param name the name used to fetch the checkbox's text and tooltip, and to set its name
+     */
     public CampaignOptionsCheckBox(String name) {
         this(name, null);
     }
 
     /**
-     * Returns a new {@link JCheckBox} object with a custom wrap size.
+     * Constructs a new instance of {@link CampaignOptionsCheckBox} with the specified
+     * name and a custom tooltip wrap size.
      * <p>
-     * The {@link JCheckBox} will be named {@code "chk" + name}, and use the following resource
-     * bundle references: {@code "lbl" + name + ".text"} and {@code "lbl" + name + ".tooltip"}.
+     * The name is used to determine the checkbox's visible text and tooltip, as well
+     * as to generate its unique internal name. The text and tooltip are fetched
+     * from the resource bundle, located at keys {@code "lbl" + name + ".text"}
+     * and {@code "lbl" + name + ".tooltip"} respectively.
+     * <p>
+     * If a custom wrap size is provided, the tooltip text will be word-wrapped
+     * accordingly. If {@code customWrapSize} is {@code null}, a default wrap size is used.
      *
-     * @param name    the name of the checkbox
-     * @param customWrapSize    the maximum number of characters (including whitespaces) on each
-     *                         line of the tooltip (or 100, if {@code null}).
+     * @param name           the name used to fetch the checkbox's text and tooltip, and to set its name
+     * @param customWrapSize the maximum number of characters per tooltip line,
+     *                       or {@code null} for the default wrap size
      */
     public CampaignOptionsCheckBox(String name, @Nullable Integer customWrapSize) {
+        // Sets the checkbox's text from the resource bundle, wrapped in HTML tags
         super(String.format("<html>%s</html>", resources.getString("lbl" + name + ".text")));
-        setName("chk" + name);
-        setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
-            processWrapSize(customWrapSize)));
 
+        // Sets the checkbox's internal name
+        setName("chk" + name);
+
+        // Sets the checkbox's tooltip, applying word wrapping based on customWrapSize
+        setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"),
+                processWrapSize(customWrapSize)));
+
+        // Applies font scaling with default scaling disabled
         setFontScaling(this, false, 1);
     }
 }
