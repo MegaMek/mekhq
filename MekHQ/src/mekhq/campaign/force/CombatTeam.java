@@ -2,7 +2,7 @@
  * Lance.java
  *
  * Copyright (c) 2011 - Carl Spain. All rights reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
