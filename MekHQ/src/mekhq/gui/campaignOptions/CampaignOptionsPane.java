@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
@@ -28,7 +28,7 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
+import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -37,7 +37,7 @@ import java.util.ResourceBundle;
 
 import static java.lang.Math.round;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";

@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * This class represents the tab for repair and maintenance settings.
@@ -332,10 +333,6 @@ public class RepairAndMaintenanceTab {
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "maintenanceTab");
-    }
-
-    private void recreateFinancesPanel(boolean isReversingQualityNames) {
-        // TODO handle this
     }
 
     void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {

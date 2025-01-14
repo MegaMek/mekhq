@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -27,12 +27,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class EquipmentAndSuppliesTab {
     // region Variable Declarations

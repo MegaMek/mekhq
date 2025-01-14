@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
@@ -26,6 +26,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.personnel.Skills;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
@@ -37,7 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class MarketsTab {
     private final Campaign campaign;

@@ -72,7 +72,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;

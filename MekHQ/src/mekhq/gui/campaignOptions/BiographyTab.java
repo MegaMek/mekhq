@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -33,6 +33,7 @@ import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;
@@ -44,7 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * The `BiographyTab` class represents the biography settings tab in campaign options.

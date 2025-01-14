@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -24,12 +24,13 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class AdvancementTab {
     private final Campaign campaign;

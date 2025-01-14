@@ -16,12 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,7 +34,7 @@ import java.util.Map;
 import static java.util.Arrays.sort;
 import static megamek.common.enums.SkillLevel.*;
 import static mekhq.campaign.personnel.SkillType.isCombatSkill;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 public class SkillsTab {
     private Map<String, JSpinner> allTargetNumbers;

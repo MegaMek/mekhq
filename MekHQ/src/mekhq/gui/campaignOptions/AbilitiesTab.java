@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
@@ -26,12 +26,12 @@ import mekhq.CampaignPreset;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsGridBagConstraints;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsHeaderPanel;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsStandardPanel;
+import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,12 +40,12 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.resources;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.COMBAT_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.MANEUVERING_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory.UTILITY_ABILITY;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.resources;
 
 public class AbilitiesTab {
     private ArrayList<String> level3Abilities;

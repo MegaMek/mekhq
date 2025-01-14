@@ -52,8 +52,8 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsDialog;
-import mekhq.gui.dialog.campaignOptions.SelectPresetDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,9 +67,9 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
-import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
-import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);

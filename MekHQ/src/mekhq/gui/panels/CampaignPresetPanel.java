@@ -23,7 +23,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
-import mekhq.gui.dialog.campaignOptions.CreateCampaignPreset;
+import mekhq.gui.campaignOptions.CreateCampaignPreset;
 
 import javax.swing.*;
 import java.awt.*;

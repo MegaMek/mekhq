@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsButton;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}.

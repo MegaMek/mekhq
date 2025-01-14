@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
@@ -35,6 +35,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -46,7 +47,7 @@ import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * Represents a tab that allows the user to configure general settings for a campaign.

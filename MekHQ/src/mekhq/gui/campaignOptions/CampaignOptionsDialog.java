@@ -16,20 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
-import mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.factoryClasses.CampaignOptionsButton;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.dialog.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";

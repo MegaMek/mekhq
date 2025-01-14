@@ -16,17 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 
 import javax.swing.*;
 import java.awt.*;
 
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * This class represents a GUI configuration form with two main tabs: 'Turnover' and 'Fatigue'.

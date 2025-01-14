@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog.campaignOptions;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -25,6 +25,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.gui.campaignOptions.factoryClasses.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.dialog.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * Handles the Personnel tab of campaign options
