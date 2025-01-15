@@ -65,7 +65,7 @@ public abstract class AbstractSkillGenerator {
      * @param expLvl   The experience level of the person (e.g.
      *                 {@link SkillType#EXP_GREEN}).
      */
-    public abstract void generateSkills(final Campaign campaign, final Person person, final int expLvl);
+    public abstract void generateSkills(Campaign campaign, Person person, int expLvl);
 
     /**
      * Generates the default skills for a {@link Person} based on their primary

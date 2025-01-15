@@ -31,6 +31,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 import mekhq.utilities.ReportingUtilities;
 
@@ -247,11 +248,29 @@ public class EducationController {
                 person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
                 person.setEduAcademySystem(campus);
             }
+        }
 
-            for (Person child : person.getGenealogy().getChildren()) {
-                if ((child.getStatus().isActive()) && (child.isChild(campaign.getLocalDate()))) {
-                    person.addEduTagAlong(child.getId());
-                    child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+        Genealogy genealogy = person.getGenealogy();
+        Person spouse = genealogy.getSpouse();
+        List<Person> children = genealogy.getChildren();
+
+        boolean hasActiveParent = false;
+        if (spouse != null) {
+            if (spouse.getStatus().isActive() && spouse.isDependent()) {
+                person.addEduTagAlong(spouse.getId());
+                spouse.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+            }
+
+            hasActiveParent = spouse.getStatus().isActive();
+        }
+
+        if (!hasActiveParent) {
+            for (Person child : children) {
+                if (child.getStatus().isActive()) {
+                    if (child.isChild(campaign.getLocalDate())) {
+                        person.addEduTagAlong(child.getId());
+                        child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                    }
                 }
             }
         }

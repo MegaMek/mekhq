@@ -46,5 +46,5 @@ public abstract class AbstractBattleMekQualityGenerator {
      * @param roll the modified roll to use
      * @return the generated IUnitRating magic int for Dragoon Quality
      */
-    public abstract int generate(final int roll);
+    public abstract int generate(int roll);
 }

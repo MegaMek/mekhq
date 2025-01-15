@@ -46,6 +46,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -676,13 +677,27 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void clearAssignedUnits() {
-        if (0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove all units from this scenario?",
+        if (0 == JOptionPane.showConfirmDialog(null,
+            "Do you really want to remove all units from this scenario?",
                 "Clear Units?", JOptionPane.YES_NO_OPTION)) {
             int row = scenarioTable.getSelectedRow();
             Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-            if (null == scenario) {
+
+            if (scenario == null) {
                 return;
             }
+
+            // This handles StratCon undeployment
+            if (scenario instanceof AtBScenario) {
+                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(getCampaign());
+
+                if (stratConScenario != null) {
+                    stratConScenario.resetScenario(getCampaign());
+                    return;
+                }
+            }
+
+            // This handles Legacy AtB undeployment
             scenario.clearAllForcesAndPersonnel(getCampaign());
         }
     }
@@ -1282,11 +1297,19 @@ public final class BriefingTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
         final boolean canStartGame = scenario.canStartScenario(getCampaign());
+
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
         btnLoadGame.setEnabled(canStartGame);
         btnGetMul.setEnabled(canStartGame);
-        btnClearAssignedUnits.setEnabled(canStartGame);
+
+        final boolean hasTrack = scenario.getHasTrack();
+        if (hasTrack) {
+            btnClearAssignedUnits.setEnabled(canStartGame && getCampaign().isGM());
+        } else {
+            btnClearAssignedUnits.setEnabled(canStartGame);
+        }
+
         btnResolveScenario.setEnabled(canStartGame);
         if (scenario instanceof AtBScenario) {
             btnAutoResolveScenario.setEnabled(canStartGame);

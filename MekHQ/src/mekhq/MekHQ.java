@@ -27,6 +27,8 @@ import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.ui.dialogs.AutoResolveChanceDialog;
+import megamek.client.ui.dialogs.AutoResolveProgressDialog;
 import megamek.client.ui.dialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
@@ -37,6 +39,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Board;
 import megamek.common.annotations.Nullable;
 import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.converter.SingletonForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
@@ -645,25 +648,25 @@ public class MekHQ implements GameListener {
         this.autosaveService.requestBeforeMissionAutosave(getCampaign());
 
         if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
-            var proceed = megamek.client.ui.dialogs.AutoResolveChanceDialog
+            var proceed = AutoResolveChanceDialog
                 .showDialog(
-                    getCampaigngui().getFrame(),
+                    campaignGUI.getFrame(),
                     getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
                     Runtime.getRuntime().availableProcessors(),
-                    getCampaign().getPlayer().getTeam(),
-                    new AtBSetupForces(getCampaign(), units, scenario),
+                    1,
+                    new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
                     new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
             if (!proceed) {
                 return;
             }
         }
 
-        var event = megamek.client.ui.dialogs.AutoResolveProgressDialog.showDialog(
-            getCampaigngui().getFrame(),
-            new AtBSetupForces(getCampaign(), units, scenario),
+        var event = AutoResolveProgressDialog.showDialog(
+            campaignGUI.getFrame(),
+            new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
             new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
 
-        var autoResolveBattleReport = new AutoResolveSimulationLogDialog(getCampaigngui().getFrame(), event.getLogFile());
+        var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
         autoResolveBattleReport.setModal(true);
         autoResolveBattleReport.setVisible(true);
 

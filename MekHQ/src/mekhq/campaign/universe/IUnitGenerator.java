@@ -86,7 +86,7 @@ public interface IUnitGenerator {
      * @param unitType UnitType constant
      * @return true if the generator supports the unit type
      */
-    boolean isSupportedUnitType(final int unitType);
+    boolean isSupportedUnitType(int unitType);
 
     /**
      * Generate a single unit.
@@ -170,9 +170,9 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A unit that matches the criteria
      */
-    @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass, final int year,
-                                   final int quality, final Collection<EntityMovementMode> movementModes,
-                                   final Collection<MissionRole> missionRoles, @Nullable Predicate<MekSummary> filter);
+    @Nullable MekSummary generate(String faction, int unitType, int weightClass, int year,
+                                   int quality, Collection<EntityMovementMode> movementModes,
+                                   Collection<MissionRole> missionRoles, @Nullable Predicate<MekSummary> filter);
 
     /**
      * Generates a list of units.
@@ -261,10 +261,10 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A list of units matching the criteria.
      */
-    @Nullable List<MekSummary> generate(final int count, final String faction, final int unitType,
-                                         final int weightClass, final int year, final int quality,
-                                         final Collection<EntityMovementMode> movementModes,
-                                         final Collection<MissionRole> missionRoles,
+    @Nullable List<MekSummary> generate(int count, String faction, int unitType,
+                                         int weightClass, int year, int quality,
+                                         Collection<EntityMovementMode> movementModes,
+                                         Collection<MissionRole> missionRoles,
                                          @Nullable Predicate<MekSummary> filter);
 
     /**
@@ -274,7 +274,7 @@ public interface IUnitGenerator {
      * @param parameters data structure containing unit generation parameters
      * @return The generated unit, or null if none are generated.
      */
-    @Nullable MekSummary generate(final UnitGeneratorParameters parameters);
+    @Nullable MekSummary generate(UnitGeneratorParameters parameters);
 
     /**
      * Generates the given count of units to be used in an OpFor using the given set of parameters.
@@ -284,7 +284,7 @@ public interface IUnitGenerator {
      * @param parameters data structure containing unit generation parameters
      * @return List of generated units. Empty if none are generated.
      */
-    List<MekSummary> generate(final int count, final UnitGeneratorParameters parameters);
+    List<MekSummary> generate(int count, UnitGeneratorParameters parameters);
 
     /**
      * Generates a list of turrets given a skill level, quality and year
@@ -294,5 +294,5 @@ public interface IUnitGenerator {
      * @param currentYear The current year
      * @return List of turrets
      */
-    List<MekSummary> generateTurrets(final int num, final SkillLevel skill, final int quality, final int currentYear);
+    List<MekSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear);
 }

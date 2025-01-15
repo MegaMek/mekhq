@@ -873,6 +873,11 @@ public class CampaignXmlParser {
             }
         }
 
+        // This removes the risk of having forces with invalid leadership getting locked in
+        for (Force force : retVal.getAllForces()) {
+            force.updateCommander(retVal);
+        }
+
         recalculateCombatTeams(retVal);
         logger.info("Load of Force Organization complete!");
     }

@@ -53,6 +53,10 @@ public class OutstandingScenariosNagLogic {
             for (AtBScenario scenario : contract.getCurrentAtBScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();
 
+                if (scenario.getDate() == null) {
+                    continue;
+                }
+
                 // Skip scenarios not matching today's date
                 if (!scenarioDate.equals(today)) {
                     continue;

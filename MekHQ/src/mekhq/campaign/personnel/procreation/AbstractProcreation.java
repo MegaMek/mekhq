@@ -33,7 +33,6 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
@@ -371,9 +370,7 @@ public abstract class AbstractProcreation {
             campaign.recruitPerson(baby, prisonerStatus, true, true);
 
             // if the mother is at school, add the baby to the list of tag alongs
-            if ((mother.getEduAcademyName() != null)
-                    && (!EducationController.getAcademy(mother.getEduAcademySet(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
-
+            if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
             }
@@ -393,6 +390,11 @@ public abstract class AbstractProcreation {
 
         // Cleanup Data
         removePregnancy(mother);
+
+        // Return from Maternity leave
+        if (mother.getStatus().isOnMaternityLeave()) {
+            mother.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
+        }
     }
 
     /**
@@ -556,7 +558,17 @@ public abstract class AbstractProcreation {
             // They give birth if the due date has passed
             if ((today.isAfter(person.getDueDate())) || (today.isEqual(person.getDueDate()))) {
                 birth(campaign, today, person);
+
+                return;
             }
+
+            if (campaign.getCampaignOptions().isUseMaternityLeave()) {
+                if (person.getStatus().isActive()
+                    && (person.getDueDate().minusWeeks(20).isAfter(today.minusDays(1)))) {
+                    person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
+                }
+            }
+
             return;
         }
 
@@ -600,5 +612,5 @@ public abstract class AbstractProcreation {
      * @param person the person to determine for
      * @return true if they do, otherwise false
      */
-    protected abstract boolean procreation(final Person person);
+    protected abstract boolean procreation(Person person);
 }
