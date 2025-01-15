@@ -29,7 +29,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
@@ -62,8 +61,6 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
-import mekhq.campaign.unit.ShipTransportedUnitsSummary;
-import mekhq.campaign.unit.TacticalTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
@@ -71,7 +68,6 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
-import mekhq.gui.dialog.ActiveContractWarning;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
@@ -84,8 +80,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
@@ -146,6 +140,7 @@ public class CampaignXmlParser {
             throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
                     campaignEle.getAttribute("version")));
         }
+        retVal.setVersion(version);
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -243,6 +238,8 @@ public class CampaignXmlParser {
                 // level.
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
+
+
 
                 if (xn.equalsIgnoreCase("campaignOptions")) {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
@@ -595,12 +592,6 @@ public class CampaignXmlParser {
                                     person.getFullTitle());
                         }
                     });
-
-        if (MHQConstants.VERSION.isHigherThan(version)) {
-            if (retVal.hasActiveAtBContract(true)) {
-                new ActiveContractWarning();
-            }
-        }
 
         logger.info("Load of campaign file complete!");
 

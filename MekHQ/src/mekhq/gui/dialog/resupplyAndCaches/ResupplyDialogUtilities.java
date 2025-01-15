@@ -18,7 +18,6 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
@@ -27,10 +26,8 @@ import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -55,22 +52,6 @@ import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
  * presentation and interaction contexts tied to resupply scenarios.</p>
  */
 public class ResupplyDialogUtilities {
-    /**
-     * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon
-     * for the campaign is returned instead.
-     *
-     * @param campaign the {@link Campaign} instance containing the faction icon.
-     * @param speaker  the {@link Person} serving as the speaker for the dialog; can be {@code null}.
-     * @return an {@link ImageIcon} for the speaker's portrait, or the faction icon if the speaker is {@code null}.
-     */
-    public static @Nullable ImageIcon getSpeakerIcon(Campaign campaign, @Nullable Person speaker) {
-        if (speaker == null) {
-            return campaign.getCampaignFactionIcon();
-        }
-
-        return speaker.getPortrait().getImageIcon();
-    }
-
     /**
      * Generates a detailed report of the parts available in the convoy contents of the given resupply mission.
      *

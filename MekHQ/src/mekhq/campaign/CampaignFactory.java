@@ -18,15 +18,21 @@
  */
 package mekhq.campaign;
 
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
+import mekhq.gui.dialog.CampaignHasProblemOnLoad;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
+
+import static mekhq.campaign.CampaignFactory.CampaignProblemType.NONE;
 
 /**
  * Defines a factory API that enables {@link Campaign} instances to be created
@@ -34,6 +40,13 @@ import java.util.zip.GZIPInputStream;
  */
 public class CampaignFactory {
     private MekHQ app;
+
+    public enum CampaignProblemType {
+        NONE,
+        CANT_LOAD_FROM_NEWER_VERSION,
+        CANT_LOAD_FROM_OLDER_VERSION,
+        ACTIVE_OR_FUTURE_CONTRACT
+    }
 
     /**
      * Protected constructor to prevent instantiation.
@@ -64,7 +77,7 @@ public class CampaignFactory {
      *                                   the input stream.
      * @throws NullEntityException       if the campaign contains a null entity
      */
-    public Campaign createCampaign(InputStream is)
+    public @Nullable Campaign createCampaign(InputStream is)
         throws CampaignXmlParseException, IOException, NullEntityException {
         if (!is.markSupported()) {
             is = new BufferedInputStream(is);
@@ -79,7 +92,62 @@ public class CampaignFactory {
         // ...otherwise, assume we're an XML file.
 
         CampaignXmlParser parser = new CampaignXmlParser(is, this.app);
-        return parser.parse();
+        Campaign campaign = parser.parse();
+
+        if (campaign == null) {
+            return null;
+        }
+
+        return checkForLoadProblems(campaign);
+    }
+
+    /**
+     * Validates a given campaign for potential loading problems and handles user choices based on
+     * detected issues.
+     *
+     * <p>This method performs the following checks:</p>
+     * <ul>
+     *   <li>Ensures the campaign version is compatible with the current application version.</li>
+     *   <li>Checks whether the campaign version is supported compared to the last milestone version.</li>
+     *   <li>Checks whether the campaign has active or future AtB (Against the Bot) contracts.</li>
+     * </ul>
+     *
+     * <p>If any issues are found, a dialog prompts the user to decide whether to proceed or not.
+     * If the user chooses to abort, the method returns {@code null}; otherwise, it returns the
+     * original campaign object.</p>
+     *
+     * @param campaign the {@link Campaign} object to validate for loading issues
+     * @return the given {@link Campaign} if no critical issues are detected or the user chooses to proceed;
+     *         {@code null} if the user opts to abort loading due to critical issues
+     */
+    private static Campaign checkForLoadProblems(Campaign campaign) {
+        CampaignProblemType problemType = CampaignProblemType.NONE;
+
+        final Version mhqVersion = MHQConstants.VERSION;
+        final Version lastMilestone = MHQConstants.LAST_MILESTONE;
+        final Version campaignVersion = campaign.getVersion();
+
+        if (campaignVersion.isHigherThan(mhqVersion)) {
+            problemType = CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
+        }
+
+        if (campaignVersion.isLowerThan(lastMilestone)) {
+            problemType = CampaignProblemType.CANT_LOAD_FROM_OLDER_VERSION;
+        }
+
+        if (!campaign.hasActiveAtBContract(true)) {
+            problemType = CampaignProblemType.ACTIVE_OR_FUTURE_CONTRACT;
+        }
+
+        if (problemType != NONE) {
+            CampaignHasProblemOnLoad problemDialog = new CampaignHasProblemOnLoad(campaign, problemType);
+
+            if (problemDialog.getDialogChoice() == 0) {
+                return null;
+            }
+        }
+
+        return campaign;
     }
 
     private byte[] readHeader(InputStream is) throws IOException {
