@@ -1489,14 +1489,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         final PersonnelRole[] roles = PersonnelRole.values();
-        menu = new JMenu(resources.getString("changePrimaryRole.text"));
 
+        menu = new JMenu(resources.getString("changePrimaryRole.text"));
         for (final PersonnelRole role : roles) {
-            if (person.canPerformRole(gui.getCampaign().getLocalDate(), person, role, true)) {
-                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanPersonnel()));
+            boolean allCanPerform = true;
+
+            for (Person selectedPerson : getSelectedPeople()) {
+                if (!selectedPerson.canPerformRole(gui.getCampaign().getLocalDate(), role, true)) {
+                    allCanPerform = false;
+                    break;
+                }
+            }
+
+            if (allCanPerform) {
+                cbMenuItem = new JCheckBoxMenuItem(role.toString());
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
-                cbMenuItem.setSelected(person.getPrimaryRole() == role);
                 cbMenuItem.addActionListener(this);
+                if (oneSelected && role == person.getPrimaryRole()) {
+                    cbMenuItem.setSelected(true);
+                }
                 menu.add(cbMenuItem);
             }
         }
@@ -1504,11 +1515,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         menu = new JMenu(resources.getString("changeSecondaryRole.text"));
         for (final PersonnelRole role : roles) {
-            if (person.canPerformRole(gui.getCampaign().getLocalDate(), person, role, false)) {
-                cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanPersonnel()));
+            boolean allCanPerform = true;
+
+            for (Person selectedPerson : getSelectedPeople()) {
+                if (!selectedPerson.canPerformRole(gui.getCampaign().getLocalDate(), role, false)) {
+                    allCanPerform = false;
+                    break;
+                }
+            }
+
+            if (allCanPerform) {
+                cbMenuItem = new JCheckBoxMenuItem(role.toString());
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
-                cbMenuItem.setSelected(person.getSecondaryRole() == role);
                 cbMenuItem.addActionListener(this);
+                if (oneSelected && role == person.getSecondaryRole()) {
+                    cbMenuItem.setSelected(true);
+                }
                 menu.add(cbMenuItem);
             }
         }
