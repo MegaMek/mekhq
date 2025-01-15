@@ -50,6 +50,9 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.utilities.MHQXMLUtility;
@@ -2115,5 +2118,52 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     public boolean canStartScenario(Campaign c) {
         return c.getLocalDate().equals(getDate()) && super.canStartScenario(c);
+    }
+
+    /**
+     * Retrieves the {@link StratconScenario} associated with the current mission ID.
+     *
+     * <p>The method first retrieves the {@link AtBContract} from the given campaign.
+     * If the contract, its {@link StratconCampaignState}, or any required track data
+     * is unavailable, the method returns {@code null}. It iterates through all
+     * {@link StratconTrackState} objects in the campaign state and their associated scenarios.
+     * If a {@link StratconScenario} contains a non-null {@link AtBDynamicScenario} whose
+     * mission ID matches the current mission ID, it is returned.
+     *
+     * @param campaign the {@link Campaign} instance being queried for the scenario
+     * @return the matching {@link StratconScenario} if found, or {@code null} if no match
+     *         is found or any required data is missing
+     * @throws NullPointerException if {@code campaign} is {@code null}
+     */
+    public @Nullable StratconScenario getStratconScenario(Campaign campaign) {
+        // Get contract
+        AtBContract contract = getContract(campaign);
+        if (contract == null) {
+            return null;
+        }
+
+        // Fetch campaign state
+        StratconCampaignState campaignState = contract.getStratconCampaignState();
+        if (campaignState == null) {
+            return null;
+        }
+
+        // Find associated StratCon Scenario, if any
+        for (StratconTrackState track : campaignState.getTracks()) {
+            Collection<StratconScenario> trackScenarios = track.getScenarios().values();
+
+            for (StratconScenario scenario : trackScenarios) {
+                AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+                if (backingScenario == null) {
+                    continue;
+                }
+
+                if (backingScenario.getMissionId() == getMissionId()) {
+                    return scenario;
+                }
+            }
+        }
+
+        return null;
     }
 }
