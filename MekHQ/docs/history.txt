@@ -60,7 +60,30 @@ MEKHQ VERSION HISTORY:
 + PR #5709: Added MHQDialogImmersive for Immersive Dialog Functionality that Immersively Improves Immersion
 + Fix #3752: Added Handling for Unsupported Unit Types
 + Fix #5717: Removed End of Contract and Manual Resupplies; Fixed Smuggler Prices; Added Remove SP Button
-+ PR #5735: Fix: compilation error due to a function being set as static but acessing instance data 
++ PR #5735: Fix: compilation error due to a function being set as static but acessing instance data
++ PR #5781: Feat/ACAR formations reintroduced
++ Fix #5739: Updated 'Clear Units' Button to Correctly Handle StratCon Scenarios
++ Fix #5740,#5580: Fixed Role Eligibility Checks and Ensured Proper Role Assignment
++ Fix #5746: Added Clan and Inner Sphere Resupply Restrictions
++ Fix #5766, #5769: Refactored Education Tag-Along Logic
++ PR #5771: Removed EnemyDropShip and GroundedEnemyDropShip Modifiers
++ Fix #5770: Added null Protection to OutstandingScenariosNagLogic for Outstanding Scenario Nags
++ Fix #5765: Log Prohibited Unit Skips in Resupplies & Prevent Invalid Part Additions
++ Fix #5760: Fixed Combat Team Status Logic for Convoy and Support Force
++ PR #5783: Update Sector Display in Briefing Room to Show Full Grid Reference
++ Fix #5779: Adjust Bounds Calculation in getUnoccupiedAdjacentCoords
++ Fix #5714: Fixed Maternity Leave... yet again
++ Fix #5716: Fixed Force Commander Handling and Improve XML Persistence
++ Fix #5727: Fixed Routed Contracts Resulting in Truncated Payouts
++ Fix #5726: Fix Support Point Acquisition Visual Bug
++ Fix #5736: Preventing Negative Personnel Income
++ PR #5754: Corrected Birthday Generation for Personnel
++ Fix #5753: Added 'null' Protection to AtBDynamicScenarioFactory
++ Fix #5751: Added Exception Handling for Out-of_Bounds Tab Index Selection
++ PR #5731: Remove all the damage applier classes because they currently reside on MegaMek
++ Fix #5713, #5737 Updated & Fixed Required Combat Team Calculations;
+             Reworked Combat Team Requirement Contract Pay Modifiers; Added Contract Difficulty Modifier
++ PR #4963: Implemented Campaign Options IIC - Full rework of all MekHQ options
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
