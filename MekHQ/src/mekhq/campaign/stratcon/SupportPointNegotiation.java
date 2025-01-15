@@ -137,7 +137,7 @@ public class SupportPointNegotiation {
                 contract.getName(),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
                 CLOSING_SPAN_TAG,
-                negotiatedSupportPoints,
+                maxSupportPoints,
                 pluralizer));
 
             return;
