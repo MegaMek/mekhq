@@ -113,7 +113,6 @@ public class RulesetsTab {
     private JSpinner spnBaseStrategyDeployment;
     private JLabel lblAdditionalStrategyDeployment;
     private JSpinner spnAdditionalStrategyDeployment;
-    private JCheckBox chkAdjustPaymentForStrategy;
 
     private JPanel pnlAutoResolve;
     private JLabel lblAutoResolveMethod;
@@ -241,7 +240,6 @@ public class RulesetsTab {
         spnBaseStrategyDeployment = new JSpinner();
         lblAdditionalStrategyDeployment = new JLabel();
         spnAdditionalStrategyDeployment = new JSpinner();
-        chkAdjustPaymentForStrategy = new JCheckBox();
 
         // Auto Resolve
         pnlAutoResolve = new JPanel();
@@ -619,7 +617,6 @@ public class RulesetsTab {
         lblAdditionalStrategyDeployment = new CampaignOptionsLabel("AdditionalStrategyDeployment");
         spnAdditionalStrategyDeployment = new CampaignOptionsSpinner("AdditionalStrategyDeployment",
             0, 0, 10, 1);
-        chkAdjustPaymentForStrategy = new CampaignOptionsCheckBox("AdjustPaymentForStrategy");
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalLancePanel", true,
@@ -649,11 +646,6 @@ public class RulesetsTab {
         panel.add(lblAdditionalStrategyDeployment, layout);
         layout.gridx++;
         panel.add(spnAdditionalStrategyDeployment, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        layout.gridwidth = 2;
-        panel.add(chkAdjustPaymentForStrategy, layout);
 
         return panel;
     }
@@ -1061,7 +1053,6 @@ public class RulesetsTab {
         options.setUseStrategy(chkUseStrategy.isSelected());
         options.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
         options.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
-        options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
         options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
         options.setAutoResolveNumberOfScenarios((int) spnAutoResolveNumberOfScenarios.getValue());
@@ -1135,7 +1126,6 @@ public class RulesetsTab {
         chkUseStrategy.setSelected(options.isUseStrategy());
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
-        chkAdjustPaymentForStrategy.setSelected(options.isAdjustPaymentForStrategy());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
         spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
