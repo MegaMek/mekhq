@@ -37,5 +37,5 @@ public interface MekHQModule {
     void initPlugin(Campaign c);
 
     void loadFieldsFromXml(Node node);
-    void writeToXML(final PrintWriter pw, int indent);
+    void writeToXML(PrintWriter pw, int indent);
 }

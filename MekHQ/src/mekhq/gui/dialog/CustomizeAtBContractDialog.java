@@ -190,7 +190,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblEnemyRating = new JLabel();
         JLabel lblRequiredLances = new JLabel();
 
-        int requiredLances = contract.getRequiredLances() > 0 ? contract.getRequiredLances() : 1;
+        int requiredLances = contract.getRequiredCombatTeams() > 0 ? contract.getRequiredCombatTeams() : 1;
 
         spnRequiredLances = new JSpinner(new SpinnerNumberModel(requiredLances, 1, null, 1));
         JLabel lblEnemyMorale = new JLabel();
@@ -574,7 +574,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-        contract.setRequiredLances((Integer) spnRequiredLances.getValue());
+        contract.setRequiredCombatTeams((Integer) spnRequiredLances.getValue());
         contract.setMoraleLevel(comboEnemyMorale.getSelectedItem());
         contract.setContractScoreArbitraryModifier((Integer) spnContractScoreArbitraryModifier.getValue());
         contract.setBaseAmount(txtBasePay.getMoney());

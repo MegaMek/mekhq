@@ -48,5 +48,5 @@ public abstract class AbstractBattleMekWeightClassGenerator {
      * signify no generation and EntityWeightClass.WEIGHT_SUPER_HEAVY to signify Star League-era
      * generation.
     */
-    public abstract int generate(final int roll);
+    public abstract int generate(int roll);
 }

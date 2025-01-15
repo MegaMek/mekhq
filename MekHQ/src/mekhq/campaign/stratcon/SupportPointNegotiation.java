@@ -120,8 +120,8 @@ public class SupportPointNegotiation {
                                                      List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
         int maxSupportPoints = isInitialNegotiation
-            ? contract.getRequiredLances() * 3
-            : contract.getRequiredLances();
+            ? contract.getRequiredCombatTeams() * 3
+            : contract.getRequiredCombatTeams();
 
         StratconCampaignState campaignState = contract.getStratconCampaignState();
 
@@ -137,7 +137,7 @@ public class SupportPointNegotiation {
                 contract.getName(),
                 spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
                 CLOSING_SPAN_TAG,
-                negotiatedSupportPoints,
+                maxSupportPoints,
                 pluralizer));
 
             return;

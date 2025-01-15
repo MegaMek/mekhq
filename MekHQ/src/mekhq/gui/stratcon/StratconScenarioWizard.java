@@ -33,7 +33,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
-import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
@@ -51,9 +50,8 @@ import static mekhq.campaign.personnel.SkillType.S_LEADER;
 import static mekhq.campaign.stratcon.StratconRulesManager.*;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
-import static mekhq.campaign.stratcon.StratconRulesManager.calculateReinforcementTargetNumber;
-import static mekhq.campaign.stratcon.StratconRulesManager.getEligibleLeadershipUnits;
-import static mekhq.campaign.stratcon.StratconRulesManager.processReinforcementDeployment;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
@@ -851,7 +849,7 @@ public class StratconScenarioWizard extends JDialog {
         // go through all the force lists and add the selected forces to the scenario
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
-                if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
+                if (currentScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
                     ReinforcementEligibilityType reinforcementType = getReinforcementType(
                         force.getId(), currentTrackState, campaign, currentCampaignState);
 
@@ -904,8 +902,10 @@ public class StratconScenarioWizard extends JDialog {
 
         currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
 
-        translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
-        scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
+        if (currentScenario.getCurrentState().ordinal() < REINFORCEMENTS_COMMITTED.ordinal()) {
+            translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
+            scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
+        }
 
         this.getParent().repaint();
 

@@ -298,7 +298,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract, false));
+        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -392,7 +392,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract, false));
+        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
@@ -434,7 +434,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
-        contract.setRequiredLances(calculateRequiredLances(campaign, contract, false));
+        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
@@ -484,15 +484,26 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        int baseRequiredLances = calculateRequiredLances(campaign, contract, true);
-        int requiredLances = contract.getRequiredLances();
+        // Adjust pay based on the percentage of the players' forces required by the contract
+        int requiredCombatTeams = contract.getRequiredCombatTeams();
+        double totalCombatTeams = campaign.getAllCombatTeams().size();
+        totalCombatTeams /= COMBAT_FORCE_DIVIDER;
 
-        multiplier *= (double) requiredLances / baseRequiredLances;
-
-        int maxDeployedLances = calculateMaxDeployedLances(campaign);
-        if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
-            multiplier *= (double) maxDeployedLances / (double) requiredLances;
+        if (totalCombatTeams > 0) {
+            multiplier *= (double) requiredCombatTeams / totalCombatTeams;
         }
+
+        // Adjust pay based on difficulty if FG3 is enabled
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            double skulls = contract.calculateContractDifficulty(campaign);
+            skulls -= 5; // 5 skulls (or 2.5) is equivalent to the player force, so no modifier.
+
+            if (skulls != 0) {
+                skulls *= 0.05; // each half-skull is a 5% pay change
+                multiplier *= (1 + skulls);
+            }
+        }
+
 
         return multiplier;
     }
