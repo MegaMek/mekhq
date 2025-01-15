@@ -894,7 +894,7 @@ public class Person {
         return getSecondaryRole().getName(isClanPersonnel());
     }
 
-    public boolean canPerformRole(LocalDate today, Person person, final PersonnelRole role, final boolean primary) {
+    public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
             // We only do a few here, as it is better on the UX-side to correct the issues
@@ -930,7 +930,7 @@ public class Person {
             }
         }
 
-        if (person.isChild(today)) {
+        if (isChild(today)) {
             return false;
         }
 
@@ -943,8 +943,7 @@ public class Person {
             case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
             case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
             case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC)
-                    && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW ->
                 Stream.of(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
                     SkillType.S_TECH_BA, SkillType.S_DOCTOR, SkillType.S_MEDTECH, SkillType.S_ASTECH)
@@ -958,18 +957,11 @@ public class Person {
             case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
             case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
             case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAV);
-            case MEK_TECH ->
-                hasSkill(SkillType.S_TECH_MEK)
-                        && (getSkill(SkillType.S_TECH_MEK).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case AERO_TEK ->
-                hasSkill(SkillType.S_TECH_AERO)
-                        && (getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case BA_TECH ->
-                hasSkill(SkillType.S_TECH_BA)
-                        && (getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
+            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
+            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
             case ASTECH -> hasSkill(SkillType.S_ASTECH);
-            case DOCTOR -> hasSkill(SkillType.S_DOCTOR)
-                    && (getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                 hasSkill(SkillType.S_ADMIN);
@@ -2715,6 +2707,22 @@ public class Person {
             if (retVal.getRecruitment() == null) {
                 retVal.setRecruitment(c.getLocalDate());
             }
+
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
+            // potentially as far back as 2014. The next two handlers should never be removed.
+            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getPrimaryRole(), true)) {
+                retVal.setPrimaryRole(c, PersonnelRole.NONE);
+                logger.info(String.format("%s was found to be ineligible for their" +
+                    " primary role. That role has been removed and they were assigned the" +
+                    " NONE role.", retVal.getFullTitle()));
+            }
+
+            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getSecondaryRole(), false)) {
+                retVal.setSecondaryRole(PersonnelRole.NONE);
+                logger.info(String.format("%s was found to be ineligible for their" +
+                    " secondary role. That role has been removed and they were assigned the" +
+                    " NONE role.", retVal.getFullTitle()));
+            }
         } catch (Exception e) {
             logger.error("Failed to read person {} from file", retVal.getFullName(), e);
             retVal = null;
@@ -2871,22 +2879,17 @@ public class Person {
     }
 
     /**
-     * This is used to pay a person
+     * This is used to pay a person. Preventing negative payments
+     * is intentional to ensure we don't accidentally
+     * change someone when trying to give them money.
+     * To charge a person, implement a new method.
+     * (And then add a @see here)
      *
      * @param money the amount of money to add to their total earnings
      */
     public void payPerson(final Money money) {
-        totalEarnings = getTotalEarnings().plus(money);
-    }
-
-    /**
-     * This is used to pay a person their salary
-     *
-     * @param campaign the campaign the person is a part of
-     */
-    public void payPersonSalary(final Campaign campaign) {
-        if (getStatus().isActive()) {
-            payPerson(getSalary(campaign));
+        if (money.isPositiveOrZero()) {
+            totalEarnings = getTotalEarnings().plus((money));
         }
     }
 

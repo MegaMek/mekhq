@@ -2,7 +2,7 @@
  * Lance.java
  *
  * Copyright (c) 2011 - Carl Spain. All rights reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,6 +25,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.Infantry;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -371,6 +372,15 @@ public class CombatTeam {
                 force.setCombatTeamStatus(false);
                 return false;
             }
+
+            if (parentForce.isConvoyForce()) {
+                force.setCombatTeamStatus(false);
+                return false;
+            }
+
+            if (!parentForce.isCombatForce()) {
+                return false;
+            }
         }
 
         force.setCombatTeamStatus(true);
@@ -388,8 +398,8 @@ public class CombatTeam {
 
     public AtBScenario checkForBattle(Campaign campaign) {
         // Make sure there is a battle first
-        if ((campaign.getCampaignOptions().getAtBBattleChance(role) == 0)
-                || (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role))) {
+        if ((campaign.getCampaignOptions().getAtBBattleChance(role, true) == 0)
+                || (Compute.randomInt(100) > campaign.getCampaignOptions().getAtBBattleChance(role, true))) {
             // No battle
             return null;
         }
@@ -735,5 +745,21 @@ public class CombatTeam {
             MekHQ.triggerEvent(new OrganizationChangedEvent(force));
             recalculateSubForceStrategicStatus(campaign, campaign.getCombatTeamsTable(), force);
         }
+    }
+
+    /**
+     * Retrieves the force associated with the given campaign using the stored force ID.
+     *
+     * <p>
+     * This method returns a {@link Force} object corresponding to the stored {@code forceId},
+     * if it exists within the specified campaign. If no matching force is found, {@code null}
+     * is returned.
+     * </p>
+     *
+     * @param campaign the campaign containing the forces to search for the specified {@code forceId}
+     * @return the {@link Force} object associated with the {@code forceId}, or {@code null} if not found
+     */
+    public @Nullable Force getForce(Campaign campaign) {
+        return campaign.getForce(forceId);
     }
 }

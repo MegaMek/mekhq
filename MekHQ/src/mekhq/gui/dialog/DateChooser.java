@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -273,6 +273,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         // center this dialog over the owner
         setLocationRelativeTo(owner);
         setUserPreferences();
+        setAlwaysOnTop(true);
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
@@ -565,15 +566,34 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @return {@link true} if the update is successful, {@link false} otherwise.
      */
     private boolean updateDateFromDateField() {
+        final LocalDate MINIMUM_VIABLE_DATE = LocalDate.of(2200, 1, 1);
+        final LocalDate MAXIMUM_VIABLE_DATE = LocalDate.of(4500, 1, 1);
+
         LocalDate newDate = parseDate(dateField.getText());
 
-        if (newDate == null) {
-            JOptionPane.showMessageDialog(null,
-                "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
-                JOptionPane.WARNING_MESSAGE);
+        String message = String.format(resources.getString("invalidDate.body"),
+            MINIMUM_VIABLE_DATE, MAXIMUM_VIABLE_DATE);
+
+        if (newDate == null
+            || newDate.isBefore(MINIMUM_VIABLE_DATE)
+            || newDate.isAfter(MAXIMUM_VIABLE_DATE)) {
+            setVisible(false);
+
+            // Creating JOptionPane as a message box
+            JOptionPane optionPane = new JOptionPane(
+                message,
+                JOptionPane.WARNING_MESSAGE,
+                JOptionPane.DEFAULT_OPTION
+            );
+
+            // Creating a JDialog from the optionPane and setting it always on top
+            JDialog dialog = optionPane.createDialog(resources.getString("invalidDate.title"));
+            dialog.setAlwaysOnTop(true);
+            dialog.setVisible(true);
+
+            setVisible(true);
             return false;
         }
-
         setDate(newDate);
         return true;
     }
@@ -622,7 +642,11 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         JButton button = new JButton(label);
         button.setToolTipText(wordWrap(resources.getString(reference + ".tooltip")));
         button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.addActionListener(e -> turningPointsDialog(era, reference));
+        button.addActionListener(e -> {
+            setVisible(false);
+            turningPointsDialog(era, reference);
+            setVisible(true);
+        });
 
         return button;
     }
@@ -677,7 +701,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         turningPointsDialog.getContentPane().add(descriptionAndButtonsPanel, BorderLayout.CENTER);
 
         // set turningPointsDialog size and location, and make it visible
-        setResizable(false);
+        turningPointsDialog.setResizable(false);
+        turningPointsDialog.setAlwaysOnTop(true);
         turningPointsDialog.pack();
         turningPointsDialog.setMinimumSize(turningPointsDialog.getSize());
         turningPointsDialog.setLocationRelativeTo(null);

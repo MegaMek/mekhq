@@ -3833,8 +3833,8 @@ public class Campaign implements ITechManager {
             return 0;
         }
 
-        int total = -contract.getRequiredLances();
-        int role = -max(1, contract.getRequiredLances() / 2);
+        int total = -contract.getRequiredCombatTeams();
+        int role = -max(1, contract.getRequiredCombatTeams() / 2);
         int minimumUnitCount = (int) ((double) getStandardForceSize(faction) / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
@@ -4291,27 +4291,6 @@ public class Campaign implements ITechManager {
             getDivorce().processNewWeek(this, getLocalDate(), person, false);
             getMarriage().processNewWeek(this, getLocalDate(), person, false);
             getProcreation().processNewWeek(this, getLocalDate(), person);
-
-            if (person.getGender().isFemale()) {
-                if (campaignOptions.isUseMaternityLeave()) {
-                    if ((person.isPregnant())
-                            && (person.getStatus().isActive())
-                            && (person.getDueDate().minusWeeks(20).isAfter(currentDay.minusDays(1)))) {
-
-                        person.changeStatus(this, currentDay, PersonnelStatus.ON_MATERNITY_LEAVE);
-                    }
-
-                    List<Person> children = person.getGenealogy().getChildren();
-
-                    if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
-                        LocalDate lastChildBirthDate = getYoungestChildDateOfBirth(children);
-
-                        if (currentDay.isAfter(lastChildBirthDate)) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -5603,6 +5582,24 @@ public class Campaign implements ITechManager {
         finances.debit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
         addReport("Funds removed : " + quantityString + " (" + description + ')');
+    }
+
+
+    /**
+     * Generic method for paying Personnel (Person) in the company.
+     * Debits money from the campaign and if the campaign tracks
+     * total earnings it will account for that.
+     * @param type TransactionType being debited
+     * @param quantity total money - it's usually displayed outside of this method
+     * @param description String displayed in the ledger and report
+     * @param individualPayouts Map of Person to the Money they're owed
+     */
+    public void payPersonnel(TransactionType type, Money quantity, String description, Map<Person, Money> individualPayouts) {
+        getFinances().debit(type, getLocalDate(), quantity, description,
+            individualPayouts, getCampaignOptions().isTrackTotalEarnings());
+        String quantityString = quantity.toAmountAndSymbolString();
+        addReport("Funds removed : " + quantityString + " (" + description + ')');
+
     }
 
     public CampaignOptions getCampaignOptions() {
@@ -7802,10 +7799,15 @@ public class Campaign implements ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems foolish
-            if ((contract.getStatus().isSuccess())
-                    && (contract.getMonthsLeft(getLocalDate()) > 0)) {
+            if (contract.getStatus().isSuccess()) {
                 remainingMoney = contract.getMonthlyPayOut()
-                        .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+                    .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+
+                if (contract instanceof AtBContract) {
+                    Money routedPayout = ((AtBContract) contract).getRoutedPayout();
+
+                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+                }
             }
 
             // If overage repayment is enabled, we first need to check if the salvage
@@ -7828,27 +7830,17 @@ public class Campaign implements ITechManager {
 
             if (getCampaignOptions().isUseShareSystem()) {
                 ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                        MekHQ.getMHQOptions().getLocale());
+                    MekHQ.getMHQOptions().getLocale());
 
-                Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
-                remainingMoney = remainingMoney.minus(shares);
+                if (remainingMoney.isGreaterThan(Money.zero())) {
+                    Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+                    remainingMoney = remainingMoney.minus(shares);
 
-                if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
+                    if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
                         String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
-                    addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
+                        addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
 
-                    if (getCampaignOptions().isTrackTotalEarnings()) {
-                        boolean sharesForAll = getCampaignOptions().isSharesForAll();
-
-                        int numberOfShares = getActivePersonnel().stream()
-                                .mapToInt(person -> person.getNumShares(this, sharesForAll))
-                                .sum();
-
-                        Money singleShare = shares.dividedBy(numberOfShares);
-
-                        for (Person person : getActivePersonnel()) {
-                            person.payPersonShares(this, singleShare, sharesForAll);
-                        }
+                        getFinances().payOutSharesToPersonnel(this, shares);
                     }
                 }
             }

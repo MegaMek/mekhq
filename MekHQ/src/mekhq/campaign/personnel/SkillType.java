@@ -2,6 +2,7 @@
  * SkillType.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,18 +22,18 @@
 package mekhq.campaign.personnel;
 
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import megamek.common.enums.*;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
-
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,9 +64,8 @@ public class SkillType {
     public static final String S_ARTILLERY = "Artillery";
     public static final String S_SMALL_ARMS = "Small Arms";
     public static final String S_ANTI_MEK = "Anti-Mek";
-    public static final String S_TACTICS = "Tactics";
 
-    // non-combat skills
+    // support skills
     public static final String S_TECH_MEK = "Tech/Mek";
     public static final String S_TECH_MECHANIC = "Tech/Mechanic";
     public static final String S_TECH_AERO = "Tech/Aero";
@@ -80,6 +80,7 @@ public class SkillType {
     public static final String S_LEADER = "Leadership";
     public static final String S_SCROUNGE = "Scrounge";
     public static final String S_STRATEGY = "Strategy";
+    public static final String S_TACTICS = "Tactics";
 
     public static final int NUM_LEVELS = 11;
 
@@ -188,6 +189,20 @@ public class SkillType {
     }
 
     /**
+     * Checks if a given skill is a combat skill.
+     *
+     * @param skill The skill to check if it is a combat skill.
+     * @return {@code true} if the skill is a combat skill, {@code false} otherwise.
+     */
+    public static boolean isCombatSkill(SkillType skill) {
+        List<String> combatSkills = List.of(S_PILOT_MEK, S_PILOT_AERO, S_PILOT_JET, S_PILOT_GVEE, S_PILOT_VTOL,
+            S_PILOT_NVEE, S_PILOT_SPACE, S_GUN_MEK, S_GUN_AERO, S_GUN_JET, S_GUN_VEE, S_GUN_SPACE,
+            S_GUN_BA, S_GUN_PROTO, S_ARTILLERY, S_SMALL_ARMS, S_ANTI_MEK);
+
+        return combatSkills.contains(skill.getName());
+    }
+
+    /**
      * @param level - skill level integer to get tagged name for
      * @return "Skillname" wrapped by coloring span or bare if no color exists
      */
@@ -195,7 +210,7 @@ public class SkillType {
         if (getExperienceLevelColor(level).isEmpty()) {
             return getExperienceLevelName(level);
         }
-        
+
         return ReportingUtilities.messageSurroundedBySpanWithColor(
             getExperienceLevelColor(level), getExperienceLevelName(level));
     }
@@ -317,6 +332,15 @@ public class SkillType {
         } else {
             return costs[lvl];
         }
+    }
+
+    /**
+     * Retrieves the cost values associated with this skill type for different levels.
+     *
+     * @return an array of Integer representing the costs for each level of the skill.
+     */
+    public Integer[] getCosts() {
+        return costs;
     }
 
     /** get the cost to acquire this skill at the given level from scratch **/

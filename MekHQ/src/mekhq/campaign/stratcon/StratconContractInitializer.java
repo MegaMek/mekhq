@@ -75,7 +75,7 @@ public class StratconContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int maximumTrackIndex = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = Math.max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < maximumTrackIndex; x++) {
@@ -93,7 +93,7 @@ public class StratconContractInitializer {
         // a campaign will have X tracks going at a time, where
         // X = # required lances / 3, rounded up. The last track will have fewer
         // required lances.
-        int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
+        int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
         if (oddLanceCount > 0) {
             int scenarioOdds = contractDefinition.getScenarioOdds()
                     .get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
@@ -109,7 +109,7 @@ public class StratconContractInitializer {
         // now seed the tracks with objectives and facilities
         for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
             int objectiveCount = objectiveParams.objectiveCount > 0 ? (int) objectiveParams.objectiveCount
-                    : (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredLances());
+                    : (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
 
             List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size());
 
@@ -166,7 +166,7 @@ public class StratconContractInitializer {
         // non-objective allied facilities
         int facilityCount = contractDefinition.getAlliedFacilityCount() > 0
                 ? (int) contractDefinition.getAlliedFacilityCount()
-                : (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredLances());
+                : (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredCombatTeams());
 
         List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size());
 
@@ -180,7 +180,7 @@ public class StratconContractInitializer {
         // non-objective hostile facilities
         facilityCount = contractDefinition.getHostileFacilityCount() > 0
                 ? (int) contractDefinition.getHostileFacilityCount()
-                : (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredLances());
+                : (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredCombatTeams());
 
         trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size());
 

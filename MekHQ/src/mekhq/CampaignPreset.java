@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -24,8 +24,9 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -64,6 +65,8 @@ import java.util.stream.Collectors;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
+    static final private Version LAST_COMPATIBLE_VERSION = new Version("0.50.03-SNAPSHOT");
+
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
     // region Variable Declarations
@@ -435,6 +438,14 @@ public class CampaignPreset {
             String message = String.format(
                     "Cannot parse Campaign Preset from %s in older version %s.",
                     version.toString(), MHQConstants.VERSION);
+            logger.error(message);
+            return null;
+        }
+
+        if (LAST_COMPATIBLE_VERSION.isLowerThan(version)) {
+            String message = String.format(
+                "Cannot parse Campaign Preset from %s in newer version %s.",
+                version.toString(), MHQConstants.VERSION);
             logger.error(message);
             return null;
         }

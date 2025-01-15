@@ -81,7 +81,7 @@ public abstract class AbstractUnitMarket {
      *
      * @param campaign the campaign to process the Unit Market new day using
      */
-    public abstract void processNewDay(final Campaign campaign);
+    public abstract void processNewDay(Campaign campaign);
 
     // region Generate Offers
     /**
@@ -91,7 +91,7 @@ public abstract class AbstractUnitMarket {
      *
      * @param campaign the campaign to generate the unit offers for
      */
-    public abstract void generateUnitOffers(final Campaign campaign);
+    public abstract void generateUnitOffers(Campaign campaign);
 
     /**
      * This adds a number of unit offers
@@ -107,8 +107,8 @@ public abstract class AbstractUnitMarket {
      * @param quality     the quality of the unit to generate
      * @param priceTarget the target number used to determine the percent
      */
-    public abstract void addOffers(final Campaign campaign, final int number, UnitMarketType market, final int unitType,
-            @Nullable Faction faction, final int quality, final int priceTarget);
+    public abstract void addOffers(Campaign campaign, int number, UnitMarketType market, int unitType,
+            @Nullable Faction faction, int quality, int priceTarget);
 
     /**
      * @param campaign the campaign to use to generate the unit
@@ -214,8 +214,8 @@ public abstract class AbstractUnitMarket {
      * @param faction  the faction to generate the weight for
      * @return the generated weight
      */
-    protected abstract int generateWeight(final Campaign campaign, final int unitType,
-            final Faction faction);
+    protected abstract int generateWeight(Campaign campaign, int unitType,
+            Faction faction);
 
     /**
      * @param campaign the campaign to use to generate the transit duration
@@ -244,7 +244,7 @@ public abstract class AbstractUnitMarket {
      *
      * @param campaign the campaign to use in determining the offers to remove
      */
-    protected abstract void removeUnitOffers(final Campaign campaign);
+    protected abstract void removeUnitOffers(Campaign campaign);
     // endregion Offer Removal
     // endregion Process New Day
 

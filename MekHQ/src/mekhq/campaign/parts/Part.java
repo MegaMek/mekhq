@@ -568,7 +568,7 @@ public abstract class Part implements IPartWork, ITechnology {
         return getTechBase() == TECH_BASE_CLAN;
     }
 
-    public abstract void writeToXML(final PrintWriter pw, int indent);
+    public abstract void writeToXML(PrintWriter pw, int indent);
 
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());

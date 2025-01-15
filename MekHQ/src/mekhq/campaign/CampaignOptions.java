@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -570,7 +570,6 @@ public class CampaignOptions {
     private boolean useStrategy;
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
-    private boolean adjustPaymentForStrategy;
     private final int[] atbBattleChance;
     private boolean generateChases;
 
@@ -1207,7 +1206,6 @@ public class CampaignOptions {
         useStrategy = true;
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
-        adjustPaymentForStrategy = false;
         atbBattleChance = new int[CombatRole.values().length - 1];
         atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
@@ -4475,25 +4473,37 @@ public class CampaignOptions {
     /**
      * Retrieves the chance of having a battle for the specified {@link CombatRole}.
      * <p>
-     * This method calculates the battle chance percentage for the provided combat role based on
-     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled, the
-     * method immediately returns {@code 0}.
-     * Roles marked as {@link CombatRole#RESERVE} or as {@link CombatRole#AUXILIARY} are not
-     * eligible for battles and also return {@code 0}.
+     * This is a convenience method that calls {@link #getAtBBattleChance(CombatRole, boolean)}
+     * with {@code useStratConBypass} set to {@code false}. As a result, if StratCon is enabled,
+     * the method will return {@code 0} regardless of other conditions.
      * </p>
      *
      * @param role the {@link CombatRole} to evaluate the battle chance for.
-     * @return the chance of having a battle for the specified role. Returns:
-     *         <ul>
-     *           <li>{@code 0} if StratCon is enabled.</li>
-     *           <li>{@code 0} if the role is {@link CombatRole#RESERVE} or
-     *           {@link CombatRole#AUXILIARY}.</li>
-     *           <li>A non-zero value from the {@code atbBattleChance} array corresponding to the
-     *           role otherwise.</li>
-     *         </ul>
+     * @return the chance of having a battle for the specified role.
+     *
+     * @see #getAtBBattleChance(CombatRole, boolean)
      */
     public int getAtBBattleChance(CombatRole role) {
-        if (useStratCon) {
+        return getAtBBattleChance(role, false);
+    }
+
+    /**
+     * Retrieves the chance of having a battle for the specified {@link CombatRole}.
+     * <p>
+     * This method calculates the battle chance percentage for the provided combat role based on
+     * its ordinal position in the {@code atbBattleChance} array. If StratCon is enabled and the
+     * {@code useStratConBypass} parameter is set to {@code true}, the method immediately
+     * returns {@code 0}.
+     * <p>
+     * Combat roles marked as {@link CombatRole#RESERVE} or {@link CombatRole#AUXILIARY} are not
+     * eligible for battles and also return {@code 0}.
+     *
+     * @param role               the {@link CombatRole} to evaluate the battle chance for.
+     * @param useStratConBypass  a {@code boolean} indicating whether to bypass the StratCon-check logic.
+     *                           If {@code false}, this allows the method to ignore StratCon-enabled status.
+     */
+    public int getAtBBattleChance(CombatRole role, boolean useStratConBypass) {
+        if (useStratCon && useStratConBypass) {
             return 0;
         }
 
@@ -4567,14 +4577,6 @@ public class CampaignOptions {
 
     public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
         this.additionalStrategyDeployment = additionalStrategyDeployment;
-    }
-
-    public boolean isAdjustPaymentForStrategy() {
-        return adjustPaymentForStrategy;
-    }
-
-    public void setAdjustPaymentForStrategy(final boolean adjustPaymentForStrategy) {
-        this.adjustPaymentForStrategy = adjustPaymentForStrategy;
     }
 
     public boolean isRestrictPartsByMission() {
@@ -5207,7 +5209,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPaymentForStrategy", adjustPaymentForStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
@@ -6237,8 +6238,6 @@ public class CampaignOptions {
                     retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("additionalStrategyDeployment")) {
                     retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("adjustPaymentForStrategy")) {
-                    retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {

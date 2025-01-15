@@ -27,12 +27,12 @@ import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.CampaignPreset;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -52,7 +52,9 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
+import mekhq.gui.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,9 +68,11 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
@@ -81,6 +85,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
     private boolean isInAppNewCampaign;
+
+    private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
 
     // endregion Variable Declarations
 
@@ -296,7 +302,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Campaign Preset
                 final SelectPresetDialog presetSelectionDialog =
-                    new SelectPresetDialog(getFrame(), false, true);
+                    new SelectPresetDialog(getFrame(), true, true);
                 CampaignPreset preset;
                 boolean isSelect = false;
 
@@ -316,45 +322,26 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                         + presetSelectionDialog.getReturnState());
                 }
 
-                // Date
-                final LocalDate date = ((preset == null) || (preset.getDate() == null))
-                        ? campaign.getLocalDate()
-                        : preset.getDate();
-                final DateChooser dc = new DateChooser(dialog, date);
-                dc.setLocationRelativeTo(getFrame());
-                // user can either choose a date or cancel by closing
-                if (dc.showDateChooser() != DateChooser.OK_OPTION) {
-                    return null;
-                }
-
+                // MegaMek Options
                 if ((preset != null) && (preset.getGameOptions() != null)) {
                     campaign.setGameOptions(preset.getGameOptions());
                 }
 
-                // This must be after the date chooser to enable correct functionality.
-                setVisible(false);
-
                 // Campaign Options
-                if (isSelect && preset != null) {
-                    preset.applyContinuousToCampaign(campaign);
+                // This needs to be before we trigger the customize preset dialog
+                campaign.setLocalDate(DEFAULT_START_DATE);
+                campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+                campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    // This needs to be after we've applied the preset
-                    campaign.setLocalDate(dc.getDate());
-                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                    campaign.setStartingSystem(preset.getPlanet());
+                CampaignOptionsDialogMode mode = isSelect ? ABRIDGED : STARTUP;
+                CampaignOptionsDialog optionsDialog =
+                    new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+                setVisible(false); // cede visibility to `optionsDialog`
+                optionsDialog.setVisible(true);
+                if (optionsDialog.wasCanceled()) {
+                    return null;
                 } else {
-                    // This needs to be before we trigger the customize preset dialog
-                    campaign.setLocalDate(dc.getDate());
-                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                    campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
-
-                    CampaignOptionsDialog optionsDialog =
-                        new CampaignOptionsDialog(dialog, getFrame(), campaign, true, application);
-                    optionsDialog.setLocationRelativeTo(getFrame());
-                    optionsDialog.applyPreset(preset);
-                    if (optionsDialog.showDialog().isCancelled()) {
-                        return null;
-                    }
+                    setVisible(true); // restore loader visibility
                 }
 
                 // initialize reputation
