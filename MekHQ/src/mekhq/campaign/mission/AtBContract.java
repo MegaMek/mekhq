@@ -1632,7 +1632,7 @@ public class AtBContract extends Contract {
 
         requiredCombatTeams = calculateRequiredLances(campaign);
 
-        setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
+        setPartsAvailabilityLevel(getContractType().calculateContractPartsAvailability());
 
         int currentYear = campaign.getGameYear();
         allyBotName = getEmployerName(currentYear);

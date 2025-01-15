@@ -28,7 +28,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
-import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -39,10 +38,6 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
-import megamek.common.weapons.autocannons.ACWeapon;
-import megamek.common.weapons.flamers.FlamerWeapon;
-import megamek.common.weapons.gaussrifles.GaussWeapon;
-import megamek.common.weapons.lasers.EnergyWeapon;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -154,6 +149,7 @@ import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getTargetForAcquisition;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
@@ -3211,7 +3207,7 @@ public class Campaign implements ITechManager {
      */
     public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
             PlanetarySystem system) {
-        TargetRoll target = getTargetForAcquisition(acquisition, person);
+        TargetRoll target = getTargetForAcquisition(this, acquisition, person);
 
         String impossibleSentencePrefix = person == null ? "Can't search for "
                 : person.getFullName() + " can't search for ";
@@ -3303,7 +3299,7 @@ public class Campaign implements ITechManager {
             report += person.getHyperlinkedFullTitle() + ' ';
         }
 
-        TargetRoll target = getTargetForAcquisition(acquisition, person);
+        TargetRoll target = getTargetForAcquisition(this, acquisition, person);
 
         // check on funds
         if (!canPayFor(acquisition)) {
@@ -6739,205 +6735,6 @@ public class Campaign implements ITechManager {
         }
 
         return target;
-    }
-
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition) {
-        return getTargetForAcquisition(acquisition, getLogisticsPerson());
-    }
-
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
-            final @Nullable Person person) {
-        return getTargetForAcquisition(acquisition, person, false);
-    }
-
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
-            final @Nullable Person person,
-            final boolean checkDaysToWait) {
-        if (getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
-        }
-
-        if (null == person) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "No one on your force is capable of acquiring parts");
-        }
-        final Skill skill = person.getSkillForWorkingOn(getCampaignOptions().getAcquisitionSkill());
-        if (null != getShoppingList().getShoppingItem(
-                acquisition.getNewEquipment())
-                && checkDaysToWait) {
-            return new TargetRoll(
-                    TargetRoll.AUTOMATIC_FAIL,
-                    "You must wait until the new cycle to check for this part. Further attempts will be added to the shopping list.");
-        }
-        if (acquisition.getTechBase() == Part.T_CLAN
-                && !getCampaignOptions().isAllowClanPurchases()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "You cannot acquire clan parts");
-        }
-        if (acquisition.getTechBase() == Part.T_IS
-                && !getCampaignOptions().isAllowISPurchases()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "You cannot acquire inner sphere parts");
-        }
-        if (getCampaignOptions().getTechLevel() < Utilities
-                .getSimpleTechLevel(acquisition.getTechLevel())) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "You cannot acquire parts of this tech level");
-        }
-        if (getCampaignOptions().isLimitByYear()
-                && !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "It has not been invented yet!");
-        }
-        if (getCampaignOptions().isDisallowExtinctStuff() &&
-                (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction())
-                        || acquisition.getAvailability() == EquipmentType.RATING_X)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                    "It is extinct!");
-        }
-        if (getCampaignOptions().isUseAtB() &&
-                getCampaignOptions().isRestrictPartsByMission() && acquisition instanceof Part) {
-            int partAvailability = ((Part) acquisition).getAvailability();
-            EquipmentType et = null;
-            if (acquisition instanceof EquipmentPart) {
-                et = ((EquipmentPart) acquisition).getType();
-            } else if (acquisition instanceof MissingEquipmentPart) {
-                et = ((MissingEquipmentPart) acquisition).getType();
-            }
-
-            StringBuilder partAvailabilityLog = new StringBuilder("<html>");
-            partAvailabilityLog.append("Part Rating Level: ").append(partAvailability)
-                    .append(" (").append(EquipmentType.ratingNames[partAvailability]).append(')');
-
-            /*
-             * Even if we can acquire Clan parts, they have a minimum availability of F for
-             * non-Clan units
-             */
-            if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
-                partAvailability = max(partAvailability, EquipmentType.RATING_F);
-                partAvailabilityLog.append("<br>[clan part for non clan faction]");
-            } else if (et != null) {
-                /*
-                 * AtB rules do not simply affect the difficulty of getting parts, but whether
-                 * they can be obtained at all. Changing the system to use availability codes
-                 * can have a serious effect on game play, so we apply a few tweaks to keep some
-                 * of the more basic items from becoming completely unobtainable, while applying
-                 * a minimum for non-flamer energy weapons, which was the reason this rule was
-                 * included in AtB to begin with.
-                 */
-                if (et instanceof EnergyWeapon
-                        && !(et instanceof FlamerWeapon)
-                        && partAvailability < EquipmentType.RATING_C) {
-                    partAvailability = EquipmentType.RATING_C;
-                    partAvailabilityLog.append("<br>[Non-Flamer Lasers]");
-                }
-                if (et instanceof ACWeapon) {
-                    partAvailability -= 2;
-                    partAvailabilityLog.append("<br>Autocannon: -2");
-                }
-                if (et instanceof GaussWeapon
-                        || et instanceof FlamerWeapon) {
-                    partAvailability--;
-                    partAvailabilityLog.append("<br>Gauss Rifle or Flamer: -1");
-                }
-                if (et instanceof AmmoType) {
-                    switch (((AmmoType) et).getAmmoType()) {
-                        case AmmoType.T_AC:
-                            partAvailability -= 2;
-                            partAvailabilityLog.append("<br>Autocannon Ammo: -2");
-                            break;
-                        case AmmoType.T_GAUSS:
-                            partAvailability -= 1;
-                            partAvailabilityLog.append("<br>Gauss Ammo: -1");
-                            break;
-                    }
-                    if (EnumSet.of(Munitions.M_STANDARD).containsAll(
-                            ((AmmoType) et).getMunitionType())) {
-                        partAvailability--;
-                        partAvailabilityLog.append("<br>Standard Ammo: -1");
-                    }
-                }
-            }
-
-            if (((getGameYear() < 2950) || (getGameYear() > 3040))
-                    && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
-                            || acquisition instanceof MissingMekCockpit
-                            || acquisition instanceof MissingMekLifeSupport
-                            || acquisition instanceof MissingMekLocation
-                            || acquisition instanceof MissingMekSensor)) {
-                partAvailability--;
-                partAvailabilityLog.append("<br>Mek part prior to 2950 or after 3040: - 1");
-            }
-
-            int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
-            partAvailabilityLog.append("<br>Total part availability: ").append(partAvailability)
-                    .append("<br>Current campaign availability: ").append(AtBPartsAvailability)
-                    .append("</html>");
-            if (partAvailability > AtBPartsAvailability) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
-            }
-        }
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), skill.getSkillLevel().toString());
-        target.append(acquisition.getAllAcquisitionMods());
-        return target;
-    }
-
-    public @Nullable AtBContract getAttachedAtBContract(Unit unit) {
-        if (null != unit && null != combatTeams.get(unit.getForceId())) {
-            return combatTeams.get(unit.getForceId()).getContract(this);
-        }
-        return null;
-    }
-
-    public int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition, StringBuilder reportBuilder) {
-        AtBContract contract = (acquisition != null) ? getAttachedAtBContract(acquisition.getUnit()) : null;
-
-        /*
-         * If the unit is not assigned to a contract, use the least restrictive active
-         * contract. Don't restrict parts availability by contract if it has not
-         * started.
-         */
-        if (hasActiveContract()) {
-            for (final AtBContract c : getActiveAtBContracts()) {
-                if ((contract == null)
-                        || (c.getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel())) {
-                    contract = c;
-                }
-            }
-        }
-
-        // if we have a contract and it has started
-        if ((null != contract) && contract.isActiveOn(getLocalDate(), true)) {
-            if (reportBuilder != null) {
-                reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType())
-                        .append(')');
-            }
-            return contract.getPartsAvailabilityLevel();
-        }
-
-        /* If contract is still null, the unit is not in a contract. */
-        final Person person = getLogisticsPerson();
-        final int experienceLevel;
-        if (person == null) {
-            experienceLevel = SkillType.EXP_ULTRA_GREEN;
-        } else if (CampaignOptions.S_TECH.equals(getCampaignOptions().getAcquisitionSkill())) {
-            experienceLevel = person.getBestTechSkill().getExperienceLevel();
-        } else {
-            experienceLevel = person.getSkill(getCampaignOptions().getAcquisitionSkill()).getExperienceLevel();
-        }
-
-        final int modifier = experienceLevel - SkillType.EXP_REGULAR;
-
-        if (reportBuilder != null) {
-            reportBuilder.append(getAtBUnitRatingMod()).append("(unit rating)");
-            if (person != null) {
-                reportBuilder.append(modifier).append('(').append(person.getFullName()).append(", logistics admin)");
-            } else {
-                reportBuilder.append(modifier).append("(no logistics admin)");
-            }
-        }
-
-        return getAtBUnitRatingMod() + modifier;
     }
 
     public void resetAstechMinutes() {

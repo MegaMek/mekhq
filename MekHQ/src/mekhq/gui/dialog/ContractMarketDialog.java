@@ -231,7 +231,7 @@ public class ContractMarketDialog extends JDialog {
             if (c instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
                 campaign.getContractMarket().calculatePaymentMultiplier(campaign, atbContract);
-                atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
+                atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculateContractPartsAvailability());
                 atbContract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem()
                         ? (Integer) spnSharePct.getValue()
                         : 0);
@@ -403,7 +403,7 @@ public class ContractMarketDialog extends JDialog {
             }
 
             c.initContractDetails(campaign);
-            c.setPartsAvailabilityLevel(c.getContractType().calculatePartsAvailabilityLevel());
+            c.setPartsAvailabilityLevel(c.getContractType().calculateContractPartsAvailability());
             c.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem()
                     ? (Integer) spnSharePct.getValue()
                     : 0);

@@ -20,33 +20,10 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.MekView;
-import megamek.common.ViewFormatting;
+import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -55,6 +32,21 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getTargetForAcquisition;
 
 /**
  * @author Taharqa
@@ -381,7 +373,7 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();
             } else if (col == COL_TARGET) {
-                return campaign.getTargetForAcquisition(r).getValueAsString();
+                return getTargetForAcquisition(campaign, r).getValueAsString();
             } else {
                 return "?";
             }
@@ -433,7 +425,7 @@ public class ChooseRefitDialog extends JDialog {
             }
             switch (col) {
                 case COL_TARGET:
-                    return campaign.getTargetForAcquisition(r).getDesc();
+                    return getTargetForAcquisition(campaign, r).getDesc();
                 default:
                     return null;
             }
@@ -467,7 +459,7 @@ public class ChooseRefitDialog extends JDialog {
 
     /**
      * A comparator for numbers that have been formatted with DecimalFormat
-     * 
+     *
      * @author Jay Lawson
      */
     public static class FormattedNumberSorter implements Comparator<String> {
@@ -493,7 +485,7 @@ public class ChooseRefitDialog extends JDialog {
 
     /**
      * A comparator for refit classes
-     * 
+     *
      * @author Jay Lawson
      */
     public static class ClassSorter implements Comparator<String> {

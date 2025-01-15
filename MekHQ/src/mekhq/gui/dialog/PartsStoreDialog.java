@@ -54,6 +54,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getAcquisitionsCharacter;
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getTargetForAcquisition;
+
 /**
  * @author Taharqa
  */
@@ -514,7 +517,7 @@ public class PartsStoreDialog extends JDialog {
 
     private Person getLogisticsPerson() {
         if (null == logisticsPerson) {
-            logisticsPerson = campaign.getLogisticsPerson();
+            logisticsPerson = getAcquisitionsCharacter(campaign);
         }
         return logisticsPerson;
     }
@@ -795,7 +798,7 @@ public class PartsStoreDialog extends JDialog {
                         shoppingItem = (IAcquisitionWork) part;
                     }
                     if (null != shoppingItem) {
-                        TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true);
+                        TargetRoll target = getTargetForAcquisition(campaign, shoppingItem, getLogisticsPerson(), true);
                         targetProxy = new TargetProxy(target);
                     } else {
                         targetProxy = new TargetProxy(null);

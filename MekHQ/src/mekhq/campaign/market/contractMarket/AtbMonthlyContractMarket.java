@@ -301,7 +301,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
-        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        contract.setPartsAvailabilityLevel(contract.getContractType().calculateContractPartsAvailability());
 
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
@@ -394,7 +394,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
-        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        contract.setPartsAvailabilityLevel(contract.getContractType().calculateContractPartsAvailability());
         contract.calculateContract(campaign);
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
@@ -437,7 +437,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
-        followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
+        followup.setPartsAvailabilityLevel(followup.getContractType().calculateContractPartsAvailability());
 
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);

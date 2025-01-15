@@ -18,9 +18,7 @@
  */
 package mekhq.campaign.market.procurement;
 
-import megamek.common.Compute;
-import megamek.common.ITechnology;
-import megamek.common.SimpleTechLevel;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.parts.Part;
@@ -105,7 +103,7 @@ public class Procurement {
         List<Part> successfulParts = new ArrayList<>();
 
         for (Part part : parts) {
-            int targetNumber = getProcurementTargetNumber(part, useHardExtinction, isResupply);
+            int targetNumber = getProcurementTargetNumber(part, useHardExtinction, isResupply).getValue();
             int roll = Compute.d6(2);
             if (roll >= targetNumber) {
                 successfulParts.add(part);
@@ -123,33 +121,33 @@ public class Procurement {
      * @param isResupply Flag indicating if procurement is for resupplying parts
      * @return The calculated procurement target number
      */
-    private int getProcurementTargetNumber(Part part, boolean useHardExtinction, boolean isResupply) {
+    public TargetRoll getProcurementTargetNumber(Part part, boolean useHardExtinction, boolean isResupply) {
         // Get the base target number
-        int targetNumber;
+        TargetRoll targetNumber;
         if (part instanceof AmmoBin) {
             targetNumber = getConsumableBaseTargetNumber(part, useHardExtinction);
         } else {
             targetNumber = getBaseTargetNumber(part, useHardExtinction);
         }
 
-        if (targetNumber > 12) {
+        if (targetNumber.getValue() > 12) {
             return targetNumber;
         }
 
         // Get the modifiers
         if (part.isClan() && !originFaction.isClan()) {
             if (gameYear >= 3050 && gameYear <= 3070) {
-                targetNumber += 3;
+                targetNumber.addModifier(3, "Clan Part");
             }
         }
 
-        targetNumber += getNegotiatorModifier();
+        targetNumber.addModifier(getNegotiatorModifier());
 
         if (isResupply) {
-            targetNumber -= 2;
+            targetNumber.addModifier(-2, "Resupply");
         }
 
-        return Math.max(2, targetNumber);
+        return targetNumber;
     }
 
     /**
@@ -157,24 +155,27 @@ public class Procurement {
      *
      * @return Modifier for the procurement process based on negotiator's skill level
      */
-    private int getNegotiatorModifier() {
+    private TargetRollModifier getNegotiatorModifier() {
+        int modifier = 0;
+
         if (negotiatorSkillRating == SkillLevel.NONE.ordinal()) {
-            return 4;
+            modifier = 4;
         }
 
         if (negotiatorSkillRating == SkillLevel.ULTRA_GREEN.ordinal()) {
-            return 3;
+            modifier = 3;
         }
 
         if (negotiatorSkillRating == SkillLevel.VETERAN.ordinal()) {
-            return -2;
+            modifier = -2;
         }
 
         if (negotiatorSkillRating >= SkillLevel.ELITE.ordinal()) {
-            return -3;
+            modifier = -3;
         }
 
-        return 0;
+        return new TargetRollModifier(modifier, "Negotiator Skill: "
+            + SkillLevel.values()[negotiatorSkillRating].toString());
     }
 
     /**
@@ -184,31 +185,33 @@ public class Procurement {
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
      * @return The calculated base target number.
      */
-    private int getConsumableBaseTargetNumber(Part part, boolean useHardExtinction) {
+    private TargetRoll getConsumableBaseTargetNumber(Part part, boolean useHardExtinction) {
+        TargetRoll targetNumber = new TargetRoll();
+
         int availability = getAvailability(part, useHardExtinction);
 
-        int targetNumber =  switch (availability) {
-            case RATING_A -> 2;
-            case RATING_B -> 3;
-            case RATING_C -> 4;
-            case RATING_D -> 6;
-            case RATING_E -> 8;
-            case RATING_F -> 10;
+        switch (availability) {
+            case RATING_A -> targetNumber.addModifier(2, "Availability A");
+            case RATING_B -> targetNumber.addModifier(3, "Availability B");
+            case RATING_C -> targetNumber.addModifier(4, "Availability C");
+            case RATING_D -> targetNumber.addModifier(6, "Availability D");
+            case RATING_E -> targetNumber.addModifier(8, "Availability E");
+            case RATING_F -> targetNumber.addModifier(10, "Availability F");
             // This value is deliberately impossible on 2d6
-            default -> 13; // X or F*
-        };
+            default -> targetNumber.addModifier(13, "Availability X or F*");
+        }
 
         SimpleTechLevel techLevel = part.getStaticTechLevel();
 
         if (techLevel == INTRO || techLevel == STANDARD) {
-            targetNumber -= 2;
+            targetNumber.addModifier(-2, "Tech Level");
         }
 
         if (techLevel == SimpleTechLevel.ADVANCED) {
-            targetNumber--;
+            targetNumber.addModifier(-1, "Tech Level");
         }
 
-        return Math.max(2, targetNumber);
+        return targetNumber;
     }
 
     /**
@@ -218,19 +221,23 @@ public class Procurement {
      * @param useHardExtinction a boolean flag that indicates whether to enforce hard extinctions.
      * @return The calculated base target number.
      */
-    private int getBaseTargetNumber(Part part, boolean useHardExtinction) {
+    private TargetRoll getBaseTargetNumber(Part part, boolean useHardExtinction) {
+        TargetRoll targetNumber = new TargetRoll();
+
         int availability = getAvailability(part, useHardExtinction);
 
-        return switch (availability) {
-            case RATING_A -> 3;
-            case RATING_B -> 4;
-            case RATING_C -> 6;
-            case RATING_D -> 8;
-            case RATING_E -> 10;
-            case RATING_F -> 11;
+        switch (availability) {
+            case RATING_A -> targetNumber.addModifier(3, "Availability A");
+            case RATING_B -> targetNumber.addModifier(4, "Availability B");
+            case RATING_C -> targetNumber.addModifier(6, "Availability C");
+            case RATING_D -> targetNumber.addModifier(8, "Availability D");
+            case RATING_E -> targetNumber.addModifier(10, "Availability E");
+            case RATING_F -> targetNumber.addModifier(11, "Availability F");
             // This value is deliberately impossible on 2d6
-            default -> 13; // X or F*
-        };
+            default -> targetNumber.addModifier(13, "Availability X or F*");
+        }
+
+        return targetNumber;
     }
 
     /**
@@ -243,18 +250,14 @@ public class Procurement {
     private int getAvailability(Part part, boolean useHardExtinction) {
         int availability = part.calcYearAvailability(gameYear, originFaction.isClan(), factionTechCode);
 
-        if (part.getTechBase() == TECH_BASE_IS) {
-            availability = getInnerSphereTechBaseRating(part, availability);
-            return performTrulyExtinctCheck(part, availability, useHardExtinction);
-        }
+        // Apply tech base-specific rating adjustments
+        availability = switch (part.getTechBase()) {
+            case TECH_BASE_IS -> getInnerSphereTechBaseRating(part, availability);
+            case TECH_BASE_CLAN -> getClanTechBaseRating(part, availability);
+            default -> getCommonTechBaseRating(part, availability); // Tech Base: All
+        };
 
-        if (part.getTechBase() == TECH_BASE_CLAN) {
-            availability = getClanTechBaseRating(part, availability);
-            return performTrulyExtinctCheck(part, availability, useHardExtinction);
-        }
-
-        // Tech Base: All
-        availability = getCommonTechBaseRating(part, availability);
+        // Perform "truly extinct" check if necessary
         return performTrulyExtinctCheck(part, availability, useHardExtinction);
     }
 

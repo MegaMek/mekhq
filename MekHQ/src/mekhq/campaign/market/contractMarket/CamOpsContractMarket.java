@@ -209,7 +209,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability
         // TODO: Rewrite this to be CamOps-compliant
-        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        contract.setPartsAvailabilityLevel(contract.getContractType().calculateContractPartsAvailability());
         // Step 10: Finish up contract initialization
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);

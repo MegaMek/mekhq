@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getTargetForAcquisition;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -179,7 +180,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             selectedUnit = new UnitOrder(entity, campaign);
             if (addToCampaign) {
                 buttonSelect.setEnabled(true);
-                final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
+                final TargetRoll target = getTargetForAcquisition(campaign, selectedUnit);
                 buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy",
                         target.getValueAsString()));
                 buttonSelect.setToolTipText(target.getDesc());

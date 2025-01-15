@@ -18,11 +18,6 @@
  */
 package mekhq.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -31,6 +26,14 @@ import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getAcquisitionsCharacter;
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getTargetForAcquisition;
 
 public class PartsAcquisitionService {
     private static Map<String, List<IAcquisitionWork>> acquisitionMap = null;
@@ -141,12 +144,12 @@ public class PartsAcquisitionService {
     public static void generateSummaryCounts(Campaign campaign) {
         partCountInfoMap = new HashMap<>();
 
-        Person admin = campaign.getLogisticsPerson();
+        Person admin = getAcquisitionsCharacter(campaign);
 
         for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
             IAcquisitionWork awFirst = awList.get(0);
             Part part = awFirst.getAcquisitionPart();
-            TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin, true);
+            TargetRoll target = getTargetForAcquisition(campaign, awFirst, admin, true);
             PartCountInfo pci = new PartCountInfo();
 
             PartInventory inventories = campaign.getPartInventory(part);

@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
+import static mekhq.campaign.market.procurement.ProcurementUtilities.getTargetForAcquisition;
+
 /**
  * A table model for displaying acquisitions. Unlike the other table models here, this one
  * can apply to multiple tables and so we have to be more careful in its design
@@ -107,7 +109,7 @@ public class ProcurementTableModel extends DataTableModel {
             case COL_TOTAL_COST:
                 return shoppingItem.getBuyCost().multipliedBy(shoppingItem.getQuantity()).toAmountAndSymbolString();
             case COL_TARGET:
-                final TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem);
+                final TargetRoll target = getTargetForAcquisition(getCampaign(), shoppingItem);
                 String value = target.getValueAsString();
                 if (IntStream.of(TargetRoll.IMPOSSIBLE, TargetRoll.AUTOMATIC_SUCCESS, TargetRoll.AUTOMATIC_FAIL)
                         .allMatch(i -> (target.getValue() != i))) {
@@ -176,7 +178,7 @@ public class ProcurementTableModel extends DataTableModel {
     private String getTooltipFor(final IAcquisitionWork shoppingItem, final int column) {
         switch (column) {
             case COL_TARGET:
-                return getCampaign().getTargetForAcquisition(shoppingItem).getDesc();
+                return getTargetForAcquisition(getCampaign(), shoppingItem).getDesc();
             default:
                 return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
         }

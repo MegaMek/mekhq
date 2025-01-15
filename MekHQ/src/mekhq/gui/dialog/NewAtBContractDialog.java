@@ -553,7 +553,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
         contract.setAtBSharesPercent((Integer) spnShares.getValue());
 
-        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        contract.setPartsAvailabilityLevel(contract.getContractType().calculateContractPartsAvailability());
 
         campaign.getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
                 contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
