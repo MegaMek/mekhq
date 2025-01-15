@@ -367,13 +367,13 @@ public class Unit implements ITechnology {
                 Constructor<? extends AbstractTransportedUnitsSummary> constructor = campaignTransportType.getTransportedUnitsSummaryType().getConstructor(new Class[]{Unit.class});
                 addTransportedUnitType(constructor.newInstance(this));
             } catch (NoSuchMethodException e) {
-                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.getName(), e.toString(), e.getCause()));
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.name(), e.toString(), e.getCause()));
             } catch (InvocationTargetException e) {
-                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.getName(), e.toString(), e.getCause()));
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.name(), e.toString(), e.getCause()));
             } catch (InstantiationException e) {
-                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.getName(), e.toString(), e.getCause()));
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.name(), e.toString(), e.getCause()));
             } catch (IllegalAccessException e) {
-                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.getName(), e.toString(), e.getCause()));
+                logger.error(String.format("Could not find constructor to initialize transport space for %s Error: %s Cause: %s", campaignTransportType.name(), e.toString(), e.getCause()));
             }
         }
     }

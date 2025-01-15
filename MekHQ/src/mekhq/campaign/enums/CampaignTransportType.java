@@ -23,11 +23,6 @@ import megamek.common.*;
 import mekhq.campaign.unit.*;
 import mekhq.campaign.unit.enums.TransporterType;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static mekhq.campaign.unit.enums.TransporterType.*;
-
 /**
  * Enum for the different transport types used in MekHQ.
  * Campaign Transports allow a unit to be
@@ -105,9 +100,4 @@ public enum CampaignTransportType
      */
     public Class<? extends AbstractTransportedUnitsSummary> getTransportedUnitsSummaryType() { return transportedUnitsSummaryType; }
     // endregion Getters
-
-
-    public String getName() {
-        return this.toString();
-    }
 }

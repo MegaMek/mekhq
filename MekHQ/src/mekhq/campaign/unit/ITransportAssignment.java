@@ -22,7 +22,6 @@
 package mekhq.campaign.unit;
 
 import megamek.common.Transporter;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.enums.TransporterType;
 
@@ -72,5 +71,15 @@ public interface ITransportAssignment {
      * @param unit Unit we need to fix references for
      */
     void fixReferences(Campaign campaign, Unit unit);
+
+    /**
+     * Bays have some extra functionality other transporters don't have, like
+     * having a tech crew, which will matter for boarding actions against
+     * dropships and other Ship Transports. This method determines if this
+     * transport assignment is for a Bay.
+     * @return true if the unit is transported in a Bay or a subclass
+     * @see megamek.common.Bay
+     */
+    boolean isTransportedInBay();
 
 }

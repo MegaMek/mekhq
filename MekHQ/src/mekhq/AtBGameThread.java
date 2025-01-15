@@ -92,17 +92,6 @@ public class AtBGameThread extends GameThread {
         this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
     }
 
-    // String tokens for dialog boxes used for transport loading
-    // FIXME : I'm not localized!
-    private static final String LOAD_DROPSHIP_DIALOG_TITLE = "Load DropShips onto Transport?";
-    private static final String LOAD_DROPSHIP_DIALOG_TEXT = "Would you like the DropShip(s) assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_SMALL_CRAFT_DIALOG_TITLE = "Load Small Craft onto Transport?";
-    private static final String LOAD_SMALL_CRAFT_DIALOG_TEXT = "Would you like the small craft assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighter(s) assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters onto Transport?";
-    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground unit(s) assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units onto Transport?";
-
     @Override
     public void run() {
         client.addCloseClientListener(this);
@@ -400,27 +389,27 @@ public class AtBGameThread extends GameThread {
                         if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.DROPSHIP)) {
                             loadDropShips = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_DROPSHIP_DIALOG_TEXT, transportShip.getName()),
-                                    AtBGameThread.LOAD_DROPSHIP_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_DROPSHIP_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_DROPSHIP_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION);
                         }
 
                         if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT)) {
                             loadSmallCraft = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TEXT, transportShip.getName()),
-                                    AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_SMALL_CRAFT_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_SMALL_CRAFT_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION);
                         }
 
                         if (transportShip.isCarryingSmallerAero()) {
                             loadFighters = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transportShip.getName()),
-                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_FTR_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_FTR_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION);
                         }
 
                         if (transportShip.isCarryingGround()) {
                             loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transportShip.getName()),
-                                    AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_GND_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_GND_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION));
                         }
 
                         // Now, send the load commands
@@ -479,8 +468,8 @@ public class AtBGameThread extends GameThread {
                                     if (scenario.getPlayerTransportLinkages().containsKey(transportId)) {
                                         scenario.addPlayerTransportRelationship(transportId, transportedUnit.getId());
                                     }
-                                    if (transportedUnit.getTech() != null && transportedUnit.getTacticalTransportAssignment().hasTransporterType()
-                                            && Bay.class.isAssignableFrom(transportedUnit.getTacticalTransportAssignment().getTransporterType().getTransporterClass())) {
+                                    if (transportedUnit.getTech() != null && transportedUnit.hasTransportAssignment(TACTICAL_TRANSPORT)
+                                            && transportedUnit.getTransportAssignment(TACTICAL_TRANSPORT).isTransportedInBay()){
                                         cargoTechs.add(transportedUnit.getTech());
                                     }
                                 }

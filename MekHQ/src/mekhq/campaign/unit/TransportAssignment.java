@@ -19,6 +19,7 @@
 
 package mekhq.campaign.unit;
 
+import megamek.common.Bay;
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -26,9 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Represents an assignment on a transport. Currently only used by TACTICAL_TRANSPORT
@@ -182,5 +181,19 @@ public class TransportAssignment implements ITransportAssignment {
                 unit.setTacticalTransportAssignment(null);
             }
         }
+    }
+
+    /**
+     * Bays have some extra functionality other transporters don't have, like
+     * having a tech crew, which will matter for boarding actions against
+     * dropships and other Ship Transports. This method determines if this
+     * transport assignment is for a Bay.
+     *
+     * @return true if the unit is transported in a Bay or a subclass
+     * @see Bay
+     */
+    @Override
+    public boolean isTransportedInBay() {
+        return (hasTransporterType() && Bay.class.isAssignableFrom(getTransporterType().getTransporterClass()));
     }
 }

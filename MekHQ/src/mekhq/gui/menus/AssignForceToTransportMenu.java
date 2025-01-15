@@ -19,7 +19,6 @@
 
 package mekhq.gui.menus;
 
-import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
@@ -32,7 +31,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Generic menu for displaying transports for the units in the force selected (or an individual unit).
@@ -56,7 +54,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      * @see CampaignTransportType
      */
     public AssignForceToTransportMenu(CampaignTransportType campaignTransportType, final Campaign campaign, final Set<Unit> units) {
-        super(campaignTransportType.getName());
+        super(campaignTransportType.name());
         this.campaign = campaign;
         this.campaignTransportType = campaignTransportType;
         initialize(units);
@@ -81,7 +79,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
         }
 
         //Assign Unit to {campaignTransportTypeName}
-        setText(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.getName() + ".text"));
+        setText(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AssignForceToTransportMenu." + campaignTransportType.name() + ".text"));
         for (JScrollableMenu transporterTypeMenu : transporterTypeMenus) {
             add(transporterTypeMenu);
         }
