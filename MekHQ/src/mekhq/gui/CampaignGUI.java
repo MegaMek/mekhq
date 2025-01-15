@@ -2,7 +2,7 @@
  * CampaignGUI.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,6 @@ import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -73,10 +72,10 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -98,7 +97,6 @@ import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * The application's main frame.
@@ -370,25 +368,6 @@ public class CampaignGUI extends JPanel {
         JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text"));
         menuImport.setMnemonic(KeyEvent.VK_I);
 
-        final JMenuItem miImportCampaignPreset = new JMenuItem(resourceMap.getString("miImportCampaignPreset.text"));
-        miImportCampaignPreset.setToolTipText(resourceMap.getString("miImportCampaignPreset.toolTipText"));
-        miImportCampaignPreset.setName("miImportCampaignPreset");
-        miImportCampaignPreset.setMnemonic(KeyEvent.VK_C);
-        miImportCampaignPreset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
-        miImportCampaignPreset.addActionListener(evt -> {
-            final SelectPresetDialog campaignPresetSelectionDialog =
-                new SelectPresetDialog(getFrame(), true, false);
-            if (campaignPresetSelectionDialog.getReturnState() == PRESET_SELECTION_CANCELLED) {
-                return;
-            }
-            final CampaignPreset preset = campaignPresetSelectionDialog.getSelectedPreset();
-            if (preset == null) {
-                return;
-            }
-            preset.applyContinuousToCampaign(getCampaign());
-        });
-        menuImport.add(miImportCampaignPreset);
-
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text"));
         miImportPerson.setMnemonic(KeyEvent.VK_P);
         miImportPerson.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
@@ -488,25 +467,6 @@ public class CampaignGUI extends JPanel {
         // C, I, P, R
         JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text"));
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
-
-        final JMenuItem miExportCampaignPreset = new JMenuItem(resourceMap.getString("miExportCampaignPreset.text"));
-        miExportCampaignPreset.setName("miExportCampaignPreset");
-        miExportCampaignPreset.setMnemonic(KeyEvent.VK_C);
-        miExportCampaignPreset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
-        miExportCampaignPreset.addActionListener(evt -> {
-            final CreateCampaignPresetDialog createCampaignPresetDialog = new CreateCampaignPresetDialog(getFrame(),
-                    getCampaign(), null);
-            if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
-                return;
-            }
-            final CampaignPreset preset = createCampaignPresetDialog.getPreset();
-            if (preset == null) {
-                return;
-            }
-            preset.writeToFile(getFrame(),
-                    FileDialogs.saveCampaignPreset(getFrame(), preset).orElse(null));
-        });
-        miExportXMLFile.add(miExportCampaignPreset);
 
         JMenuItem miExportRankSystems = new JMenuItem(resourceMap.getString("miExportRankSystems.text"));
         miExportRankSystems.setName("miExportRankSystems");
@@ -1504,8 +1464,9 @@ public class CampaignGUI extends JPanel {
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
-        final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
-        cod.setVisible(true);
+
+        CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), getCampaign());
+        optionsDialog.setVisible(true);
 
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 
