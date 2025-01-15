@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -28,10 +28,10 @@ import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -44,9 +44,12 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
+import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -59,7 +62,7 @@ import java.util.stream.Collectors;
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialog {
+public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
     private CampaignPreset preset;
@@ -96,8 +99,8 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
     //endregion Variable Declarations
 
     //region Constructors
-    public CreateCampaignPresetDialog(final JFrame frame, final Campaign campaign,
-                                      final @Nullable CampaignPreset preset) {
+    public CreateCampaignPreset(final JFrame frame, final Campaign campaign,
+                                final @Nullable CampaignPreset preset) {
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
         setPreset(preset);
@@ -538,32 +541,32 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyDate())
-                                .addComponent(btnDate, GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnDate, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyFaction())
-                                .addComponent(getComboFaction(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboFaction(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyPlanet())
-                                .addComponent(getChkStartingSystemFactionSpecific(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkStartingSystemFactionSpecific(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getComboStartingSystem())
-                                .addComponent(getComboStartingPlanet(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboStartingPlanet(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyRankSystem())
-                                .addComponent(getComboRankSystem(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboRankSystem(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblContractCount)
-                                .addComponent(getSpnContractCount(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnContractCount(), Alignment.LEADING))
                         .addComponent(getChkGM())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyCompanyGenerationOptions())
-                                .addComponent(btnCompanyGenerationOptions, GroupLayout.Alignment.LEADING))
+                                .addComponent(btnCompanyGenerationOptions, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkSpecifyDate())
                                 .addComponent(btnDate))
@@ -623,14 +626,14 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyGameOptions())
-                                .addComponent(btnGameOptions, GroupLayout.Alignment.LEADING))
+                                .addComponent(btnGameOptions, Alignment.LEADING))
                         .addComponent(getChkSpecifyCampaignOptions())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkSpecifyGameOptions())
                                 .addComponent(btnGameOptions))
