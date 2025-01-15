@@ -175,8 +175,12 @@ public final class TOETab extends CampaignGuiTab {
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
-            tabUnit.setSelectedIndex(tabUnitLastSelectedIndex);
-            tabUnit.addChangeListener(evt -> forceViewTabChange()); // added late so it won't overwrite
+            try {
+                tabUnit.setSelectedIndex(tabUnitLastSelectedIndex);
+                tabUnit.addChangeListener(evt -> forceViewTabChange()); // added late so it won't overwrite
+            } catch (Exception ignored) {}
+            // We can ignore here because if the selected index is out of bounds, we're just going
+            // to not select the unit in the TO&E.
         } else if (node instanceof Force) {
             final JScrollPane scrollForce = new JScrollPaneWithSpeed(new ForceViewPanel((Force) node, getCampaign()));
             panForceView.add(scrollForce, BorderLayout.CENTER);
