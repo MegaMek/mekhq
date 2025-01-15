@@ -79,7 +79,6 @@ public class CampaignFactory {
         // ...otherwise, assume we're an XML file.
 
         CampaignXmlParser parser = new CampaignXmlParser(is, this.app);
-
         return parser.parse();
     }
 
@@ -91,4 +90,5 @@ public class CampaignFactory {
 
         return header;
     }
+
 }

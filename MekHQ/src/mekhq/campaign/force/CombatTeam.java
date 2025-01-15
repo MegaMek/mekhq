@@ -371,6 +371,15 @@ public class CombatTeam {
                 force.setCombatTeamStatus(false);
                 return false;
             }
+
+            if (parentForce.isConvoyForce()) {
+                force.setCombatTeamStatus(false);
+                return false;
+            }
+
+            if (!parentForce.isCombatForce()) {
+                return false;
+            }
         }
 
         force.setCombatTeamStatus(true);

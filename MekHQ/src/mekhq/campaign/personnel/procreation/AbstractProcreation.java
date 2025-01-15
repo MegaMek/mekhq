@@ -33,7 +33,6 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
@@ -371,9 +370,7 @@ public abstract class AbstractProcreation {
             campaign.recruitPerson(baby, prisonerStatus, true, true);
 
             // if the mother is at school, add the baby to the list of tag alongs
-            if ((mother.getEduAcademyName() != null)
-                    && (!EducationController.getAcademy(mother.getEduAcademySet(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
-
+            if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
             }
