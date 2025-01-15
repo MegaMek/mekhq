@@ -570,7 +570,6 @@ public class CampaignOptions {
     private boolean useStrategy;
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
-    private boolean adjustPaymentForStrategy;
     private final int[] atbBattleChance;
     private boolean generateChases;
 
@@ -1207,7 +1206,6 @@ public class CampaignOptions {
         useStrategy = true;
         baseStrategyDeployment = 3;
         additionalStrategyDeployment = 1;
-        adjustPaymentForStrategy = false;
         atbBattleChance = new int[CombatRole.values().length - 1];
         atbBattleChance[CombatRole.MANEUVER.ordinal()] = 40;
         atbBattleChance[CombatRole.FRONTLINE.ordinal()] = 20;
@@ -4569,14 +4567,6 @@ public class CampaignOptions {
         this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
-    public boolean isAdjustPaymentForStrategy() {
-        return adjustPaymentForStrategy;
-    }
-
-    public void setAdjustPaymentForStrategy(final boolean adjustPaymentForStrategy) {
-        this.adjustPaymentForStrategy = adjustPaymentForStrategy;
-    }
-
     public boolean isRestrictPartsByMission() {
         return restrictPartsByMission;
     }
@@ -5207,7 +5197,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPaymentForStrategy", adjustPaymentForStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
@@ -6237,8 +6226,6 @@ public class CampaignOptions {
                     retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("additionalStrategyDeployment")) {
                     retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("adjustPaymentForStrategy")) {
-                    retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {

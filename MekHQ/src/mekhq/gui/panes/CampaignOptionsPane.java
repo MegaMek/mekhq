@@ -8963,7 +8963,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseStrategy.setSelected(options.isUseStrategy());
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
-        chkAdjustPaymentForStrategy.setSelected(options.isAdjustPaymentForStrategy());
         spnAtBBattleChance[CombatRole.MANEUVER.ordinal()]
                 .setValue(options.getAtBBattleChance(CombatRole.MANEUVER));
         spnAtBBattleChance[CombatRole.FRONTLINE.ordinal()]
@@ -9565,7 +9564,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseStrategy(chkUseStrategy.isSelected());
             options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
             options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());
-            options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
 
             options.setUseAero(chkUseAero.isSelected());
             options.setUseVehicles(chkUseVehicles.isSelected());

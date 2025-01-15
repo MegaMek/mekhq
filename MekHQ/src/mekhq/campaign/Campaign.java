@@ -3833,8 +3833,8 @@ public class Campaign implements ITechManager {
             return 0;
         }
 
-        int total = -contract.getRequiredLances();
-        int role = -max(1, contract.getRequiredLances() / 2);
+        int total = -contract.getRequiredCombatTeams();
+        int role = -max(1, contract.getRequiredCombatTeams() / 2);
         int minimumUnitCount = (int) ((double) getStandardForceSize(faction) / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
