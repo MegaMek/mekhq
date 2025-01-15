@@ -178,7 +178,7 @@ public final class TOETab extends CampaignGuiTab {
             try {
                 tabUnit.setSelectedIndex(tabUnitLastSelectedIndex);
                 tabUnit.addChangeListener(evt -> forceViewTabChange()); // added late so it won't overwrite
-            } catch (Exception ignored) {}
+            } catch (ArrayIndexOutOfBoundsException ignored) {}
             // We can ignore here because if the selected index is out of bounds, we're just going
             // to not select the unit in the TO&E.
         } else if (node instanceof Force) {
