@@ -390,6 +390,11 @@ public abstract class AbstractProcreation {
 
         // Cleanup Data
         removePregnancy(mother);
+
+        // Return from Maternity leave
+        if (mother.getStatus().isOnMaternityLeave()) {
+            mother.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
+        }
     }
 
     /**
@@ -553,7 +558,17 @@ public abstract class AbstractProcreation {
             // They give birth if the due date has passed
             if ((today.isAfter(person.getDueDate())) || (today.isEqual(person.getDueDate()))) {
                 birth(campaign, today, person);
+
+                return;
             }
+
+            if (campaign.getCampaignOptions().isUseMaternityLeave()) {
+                if (person.getStatus().isActive()
+                    && (person.getDueDate().minusWeeks(20).isAfter(today.minusDays(1)))) {
+                    person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
+                }
+            }
+
             return;
         }
 
