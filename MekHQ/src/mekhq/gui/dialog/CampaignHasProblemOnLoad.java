@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
 
 /**
  * Dialog to inform and handle campaign-loading problems within MekHQ.
@@ -41,29 +42,39 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      */
     public CampaignHasProblemOnLoad(Campaign campaign, CampaignProblemType problemType) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, problemType),
-            createButtons(), createOutOfCharacterMessage(problemType), 0,
+            createButtons(problemType), createOutOfCharacterMessage(problemType), 0,
             null, null, null);
     }
 
     /**
-     * Generates the list of buttons for the dialog.
+     * Generates the list of buttons for the dialog based on the specified problem type.
      *
      * <p>Buttons include:</p>
      * <ul>
-     *   <li>"Cancel" button to stop loading the campaign.</li>
-     *   <li>"Continue" button to proceed with loading the campaign despite the problems.</li>
+     *   <li>"Cancel" button: Stops loading the campaign in all scenarios.</li>
+     *   <li>"Continue" button: Allows proceeding with loading the campaign, provided the problem type permits it.</li>
      * </ul>
      *
+     * <p>If the problem type is {@code CANT_LOAD_FROM_NEWER_VERSION}, only the "Cancel" button is available
+     * because proceeding is not allowed for this issue. For other problem types, both "Cancel" and "Continue"
+     * buttons are included in the dialog.</p>
+     *
+     * @param problemType the {@link CampaignProblemType} specifying the nature of the issue, which determines
+     *                    the buttons to display
      * @return a {@link List} of {@link ButtonLabelTooltipPair} objects representing the dialog's buttons
      */
-    private static List<ButtonLabelTooltipPair> createButtons() {
+    private static List<ButtonLabelTooltipPair> createButtons(CampaignProblemType problemType) {
         ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(
             resources.getString("cancel.button"), null);
 
         ButtonLabelTooltipPair btnContinue = new ButtonLabelTooltipPair(
             resources.getString("continue.button"), null);
 
-        return List.of(btnCancel, btnContinue);
+        if (problemType == CANT_LOAD_FROM_NEWER_VERSION) {
+            return List.of(btnCancel);
+        } else {
+            return List.of(btnCancel, btnContinue);
+        }
     }
 
     /**
@@ -108,6 +119,6 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      */
     private static String createOutOfCharacterMessage(CampaignProblemType problemType) {
         String typeKey = problemType.toString();
-        return resources.getString(typeKey + ".message");
+        return resources.getString(typeKey + ".ooc");
     }
 }

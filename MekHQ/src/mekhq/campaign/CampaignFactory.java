@@ -32,8 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
-import static mekhq.campaign.CampaignFactory.CampaignProblemType.NONE;
-
 /**
  * Defines a factory API that enables {@link Campaign} instances to be created
  * from its detected format.
@@ -102,52 +100,72 @@ public class CampaignFactory {
     }
 
     /**
-     * Validates a given campaign for potential loading problems and handles user choices based on
-     * detected issues.
+     * Validates the campaign for loading issues and presents the user with dialogs for each problem encountered.
      *
-     * <p>This method performs the following checks:</p>
+     * <p>This method sequentially checks for three potential problems while loading the campaign:</p>
      * <ul>
-     *   <li>Ensures the campaign version is compatible with the current application version.</li>
-     *   <li>Checks whether the campaign version is supported compared to the last milestone version.</li>
-     *   <li>Checks whether the campaign has active or future AtB (Against the Bot) contracts.</li>
+     *   <li>If the campaign version is newer than the application's version.</li>
+     *   <li>If the campaign version is older than the last supported milestone version.</li>
+     *   <li>If the campaign has active or future AtB contracts.</li>
      * </ul>
      *
-     * <p>If any issues are found, a dialog prompts the user to decide whether to proceed or not.
-     * If the user chooses to abort, the method returns {@code null}; otherwise, it returns the
-     * original campaign object.</p>
+     * <p>For each issue encountered, a dialog is displayed to the user using {@link CampaignHasProblemOnLoad}.
+     * The user can either cancel or proceed with loading. If the user cancels at any point, the method
+     * returns {@code null}. Otherwise, if no problems remain or the user chooses to proceed for all
+     * issues, the method returns the given {@code Campaign} object.</p>
      *
-     * @param campaign the {@link Campaign} object to validate for loading issues
-     * @return the given {@link Campaign} if no critical issues are detected or the user chooses to proceed;
-     *         {@code null} if the user opts to abort loading due to critical issues
+     * @param campaign the {@link Campaign} object to validate and load
+     * @return the {@link Campaign} object if the user chooses to proceed with all problems or if no
+     *         problems are detected; {@code null} if the user chooses to cancel
      */
     private static Campaign checkForLoadProblems(Campaign campaign) {
-        CampaignProblemType problemType = CampaignProblemType.NONE;
-
         final Version mhqVersion = MHQConstants.VERSION;
         final Version lastMilestone = MHQConstants.LAST_MILESTONE;
         final Version campaignVersion = campaign.getVersion();
 
+        // Check if the campaign is from a newer version
         if (campaignVersion.isHigherThan(mhqVersion)) {
-            problemType = CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
-        }
-
-        if (campaignVersion.isLowerThan(lastMilestone)) {
-            problemType = CampaignProblemType.CANT_LOAD_FROM_OLDER_VERSION;
-        }
-
-        if (!campaign.hasActiveAtBContract(true)) {
-            problemType = CampaignProblemType.ACTIVE_OR_FUTURE_CONTRACT;
-        }
-
-        if (problemType != NONE) {
-            CampaignHasProblemOnLoad problemDialog = new CampaignHasProblemOnLoad(campaign, problemType);
-
-            if (problemDialog.getDialogChoice() == 0) {
+            if (triggerProblemDialog(campaign, CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION)) {
                 return null;
             }
         }
 
+        // Check if the campaign is from an older, unsupported version
+        if (campaignVersion.isLowerThan(lastMilestone)) {
+            if (triggerProblemDialog(campaign, CampaignProblemType.CANT_LOAD_FROM_OLDER_VERSION)) {
+                return null;
+            }
+        }
+
+        // Check if the campaign has active or future AtB contracts (only if the user is changing versions)
+        if (!campaignVersion.equals(mhqVersion) && campaign.hasActiveAtBContract(true)) {
+            if (triggerProblemDialog(campaign, CampaignProblemType.ACTIVE_OR_FUTURE_CONTRACT)) {
+                return null;
+            }
+        }
+
+        // All checks passed, return the campaign
         return campaign;
+    }
+
+    /**
+     * Displays the {@link CampaignHasProblemOnLoad} dialog for a given problem type and returns
+     * whether the user cancelled the loading process.
+     *
+     * <p>The dialog informs the user about the specific problem and allows them to either
+     * cancel the loading process or continue despite the problem. If the user selects
+     * "Cancel," the method returns {@code true}. Otherwise, it returns {@code false}.</p>
+     *
+     * @param campaign    the {@link Campaign} object associated with the problem
+     * @param problemType the {@link CampaignProblemType} specifying the current issue
+     * @return {@code true} if the user chose to cancel loading, {@code false} otherwise
+     */
+    private static boolean triggerProblemDialog(Campaign campaign, CampaignProblemType problemType) {
+        final int USER_SELECTED_CANCEL = 0;
+
+        CampaignHasProblemOnLoad problemDialog = new CampaignHasProblemOnLoad(campaign, problemType);
+
+        return problemDialog.getDialogChoice() == USER_SELECTED_CANCEL;
     }
 
     private byte[] readHeader(InputStream is) throws IOException {
