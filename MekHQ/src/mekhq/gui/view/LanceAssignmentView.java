@@ -366,11 +366,11 @@ class RequiredLancesTableModel extends DataTableModel {
                     return t + "/" + contract.getRequiredCombatTeams();
                 }
                 return Integer.toString(contract.getRequiredCombatTeams());
-            } else if (contract.getContractType().getRequiredLanceRole().ordinal() == column - 2) {
+            } else if (contract.getContractType().getRequiredCombatRole().ordinal() == column - 2) {
                 int t = 0;
                 for (CombatTeam combatTeam : campaign.getAllCombatTeams()) {
                     if (data.get(row).equals(combatTeam.getContract(campaign))
-                            && (combatTeam.getRole() == combatTeam.getContract(campaign).getContractType().getRequiredLanceRole())
+                            && (combatTeam.getRole() == combatTeam.getContract(campaign).getContractType().getRequiredCombatRole())
                             && combatTeam.isEligible(campaign)) {
                         t++;
                     }

@@ -194,27 +194,22 @@ public enum AtBContractType {
         }
     }
 
-    public CombatRole getRequiredLanceRole() {
-        switch (this) {
-            case CADRE_DUTY:
-                return CombatRole.TRAINING;
-            case GARRISON_DUTY:
-            case SECURITY_DUTY:
-            case RIOT_DUTY:
-                return CombatRole.FRONTLINE;
-            case GUERRILLA_WARFARE:
-            case PIRATE_HUNTING:
-            case PLANETARY_ASSAULT:
-            case RELIEF_DUTY:
-                return CombatRole.MANEUVER;
-            case DIVERSIONARY_RAID:
-            case EXTRACTION_RAID:
-            case OBJECTIVE_RAID:
-            case RECON_RAID:
-                return CombatRole.PATROL;
-            default:
-                return CombatRole.RESERVE;
-        }
+    /**
+     * Determines the required combat role for the current contract type.
+     *
+     * <p>Each contract type specifies a primary {@link CombatRole} that defines
+     * the focus of the contract. For example, some contracts may require a patrol role,
+     * while others require maneuver or frontline support.</p>
+     *
+     * @return the {@link CombatRole} required for the current contract type.
+     */
+    public CombatRole getRequiredCombatRole() {
+        return switch (this) {
+            case CADRE_DUTY -> CombatRole.TRAINING;
+            case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY -> CombatRole.MANEUVER;
+            case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY -> CombatRole.FRONTLINE;
+            case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID -> CombatRole.PATROL;
+        };
     }
 
     public int generateEventType() {

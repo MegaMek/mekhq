@@ -188,7 +188,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             // while completing this scenario on others just puts the morale to
             // Rout for a while
             ObjectiveEffect victoryEffect = new ObjectiveEffect();
-            final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
+            final CombatRole requiredLanceRole = contract.getContractType().getRequiredCombatRole();
             if (requiredLanceRole.isManeuver() || requiredLanceRole.isPatrol()) {
                 victoryEffect.effectType = ObjectiveEffectType.ContractVictory;
                 destroyHostiles.addDetail(getResourceBundle().getString("battleDetails.baseAttack.attacker.details.winnerFightScout"));
