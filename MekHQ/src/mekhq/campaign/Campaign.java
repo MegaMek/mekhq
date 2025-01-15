@@ -5584,6 +5584,24 @@ public class Campaign implements ITechManager {
         addReport("Funds removed : " + quantityString + " (" + description + ')');
     }
 
+
+    /**
+     * Generic method for paying Personnel (Person) in the company.
+     * Debits money from the campaign and if the campaign tracks
+     * total earnings it will account for that.
+     * @param type TransactionType being debited
+     * @param quantity total money - it's usually displayed outside of this method
+     * @param description String displayed in the ledger and report
+     * @param individualPayouts Map of Person to the Money they're owed
+     */
+    public void payPersonnel(TransactionType type, Money quantity, String description, Map<Person, Money> individualPayouts) {
+        getFinances().debit(type, getLocalDate(), quantity, description,
+            individualPayouts, getCampaignOptions().isTrackTotalEarnings());
+        String quantityString = quantity.toAmountAndSymbolString();
+        addReport("Funds removed : " + quantityString + " (" + description + ')');
+
+    }
+
     public CampaignOptions getCampaignOptions() {
         return campaignOptions;
     }
@@ -7812,27 +7830,17 @@ public class Campaign implements ITechManager {
 
             if (getCampaignOptions().isUseShareSystem()) {
                 ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                        MekHQ.getMHQOptions().getLocale());
+                    MekHQ.getMHQOptions().getLocale());
 
-                Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
-                remainingMoney = remainingMoney.minus(shares);
+                if (remainingMoney.isGreaterThan(Money.zero())) {
+                    Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+                    remainingMoney = remainingMoney.minus(shares);
 
-                if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
+                    if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
                         String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
-                    addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
+                        addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
 
-                    if (getCampaignOptions().isTrackTotalEarnings()) {
-                        boolean sharesForAll = getCampaignOptions().isSharesForAll();
-
-                        int numberOfShares = getActivePersonnel().stream()
-                                .mapToInt(person -> person.getNumShares(this, sharesForAll))
-                                .sum();
-
-                        Money singleShare = shares.dividedBy(numberOfShares);
-
-                        for (Person person : getActivePersonnel()) {
-                            person.payPersonShares(this, singleShare, sharesForAll);
-                        }
+                        getFinances().payOutSharesToPersonnel(this, shares);
                     }
                 }
             }

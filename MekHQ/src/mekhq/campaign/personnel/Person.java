@@ -2879,22 +2879,17 @@ public class Person {
     }
 
     /**
-     * This is used to pay a person
+     * This is used to pay a person. Preventing negative payments
+     * is intentional to ensure we don't accidentally
+     * change someone when trying to give them money.
+     * To charge a person, implement a new method.
+     * (And then add a @see here)
      *
      * @param money the amount of money to add to their total earnings
      */
     public void payPerson(final Money money) {
-        totalEarnings = getTotalEarnings().plus(money);
-    }
-
-    /**
-     * This is used to pay a person their salary
-     *
-     * @param campaign the campaign the person is a part of
-     */
-    public void payPersonSalary(final Campaign campaign) {
-        if (getStatus().isActive()) {
-            payPerson(getSalary(campaign));
+        if (money.isPositiveOrZero()) {
+            totalEarnings = getTotalEarnings().plus((money));
         }
     }
 
