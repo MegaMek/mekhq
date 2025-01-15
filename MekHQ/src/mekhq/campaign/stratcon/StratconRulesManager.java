@@ -18,15 +18,21 @@
  */
 package mekhq.campaign.stratcon;
 
+import megamek.common.Board;
 import megamek.common.Minefield;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.autoresolve.Resolver;
+import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.acar.SimulationOptions;
+import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.autoresolve.AtBSetupForces;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
@@ -40,6 +46,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
@@ -51,14 +58,15 @@ import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 import org.apache.commons.math3.util.Pair;
 
+import javax.swing.*;
+import java.awt.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.round;
+import static java.lang.Math.*;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -69,19 +77,11 @@ import static mekhq.campaign.icons.enums.OperationalStatus.determineLayeredForce
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.finalizeScenario;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Opposing;
-import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
-import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.LowAtmosphere;
-import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
-import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
-import static mekhq.campaign.personnel.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.SkillType.S_TACTICS;
-import static mekhq.campaign.personnel.SkillType.getSkillHash;
+import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.*;
+import static mekhq.campaign.personnel.SkillType.*;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementEligibilityType.AUXILIARY;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.DELAYED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.INTERCEPTED;
-import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.SUCCESS;
+import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.*;
 import static mekhq.campaign.stratcon.StratconScenarioFactory.convertSpecificUnitTypeToGeneral;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -2750,6 +2750,52 @@ public class StratconRulesManager {
     }
 
     /**
+     * Processes an ignored dynamic scenario - locates it on one of the tracks and
+     * checks if it should or should not run ACAR to resolve the scenario automatically.
+     * It will run the scenario if the team 1 is currently present in the scenario, as in
+     * attached allied forces.
+     */
+    public static void simulateTheResultsOfIgnoredScenario(Campaign campaign, AtBDynamicScenario atbScenario, StratconCampaignState campaignState) {
+        var setupForces = new AtBSetupForces(campaign, new ArrayList<>(), atbScenario);
+        if (setupForces.isTeamPresent(1)) {
+            var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, new ArrayList<>(), atbScenario),
+                SimulationOptions.empty(),
+                new Board(atbScenario.getMapX(), atbScenario.getMapY()));
+            var result = resolver.resolveSimulation();
+
+            var tracker = new ResolveScenarioTracker(atbScenario, campaign, false);
+            tracker.setClient(new SimulatedClient(result.getGame()));
+            tracker.setEvent(result);
+            tracker.processGame();
+
+            var objectiveProcessor = new ScenarioObjectiveProcessor();
+            var objectives = atbScenario.getScenarioObjectives();
+            objectiveProcessor.evaluateScenarioObjectives(tracker);
+
+            var objectiveUnits = objectiveProcessor.getQualifyingObjectiveUnits();
+            Map<ScenarioObjective, Integer> objectiveUnitCounts = new HashMap<>();
+            for (var entry : objectiveUnits.entrySet()) {
+                objectiveUnitCounts.put(entry.getKey(), entry.getValue().size());
+            }
+
+            ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(), new HashMap<>(), objectiveUnitCounts);
+            StringBuilder report = new StringBuilder();
+            for (var objective : objectives) {
+                report.append(objectiveProcessor.processObjective(campaign, objective, objectiveProcessor.getPotentialObjectiveUnits().get(objective).size(), null, tracker, false));
+            }
+            tracker.resolveScenario(scenarioStatus, report.toString());
+            processScenarioCompletion(tracker);
+        } else {
+            if (processIgnoredScenario(atbScenario, campaignState)) {
+                atbScenario.convertToStub(campaign, ScenarioStatus.REFUSED_ENGAGEMENT);
+            } else {
+                atbScenario.clearAllForcesAndPersonnel(campaign);
+            }
+        }
+
+    }
+
+    /**
      * Processes an ignored Stratcon scenario
      *
      * @return Whether or not we also need to get rid of the backing scenario from
@@ -2759,9 +2805,10 @@ public class StratconRulesManager {
         for (StratconTrackState track : campaignState.getTracks()) {
             if (track.getScenarios().containsKey(scenario.getCoords())) {
                 // subtract VP if scenario is 'required'
-                if (scenario.isTurningPoint()) {
-                    campaignState.updateVictoryPoints(-1);
-                }
+                // this is already processed in the simulateTheResultsOfIgnoredScenario
+//                if (scenario.isTurningPoint()) {
+//                    campaignState.updateVictoryPoints(-1);
+//                }
 
                 track.removeScenario(scenario);
 

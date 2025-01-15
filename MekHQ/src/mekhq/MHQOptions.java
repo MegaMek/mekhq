@@ -31,6 +31,12 @@ import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 public final class MHQOptions extends SuiteOptions {
+
+    // region Better Colors
+    private static final Color CRIMSON_RED = new Color(0xB22222);
+
+    // endregion Better Colors
+
     // region Display Tab
     public String getDisplayDateFormat() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).get(MHQConstants.DISPLAY_DATE_FORMAT, "yyyy-MM-dd");
@@ -242,7 +248,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getBelowContractMinimumForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
-                .getInt(MHQConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, Color.RED.getRGB()));
+                .getInt(MHQConstants.BELOW_CONTRACT_MINIMUM_FOREGROUND, CRIMSON_RED.getRGB()));
     }
 
     public void setBelowContractMinimumForeground(Color value) {
@@ -435,7 +441,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getLoanOverdueBackground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.LOAN_OVERDUE_BACKGROUND,
-                Color.RED.getRGB()));
+            CRIMSON_RED.getRGB()));
     }
 
     public void setLoanOverdueBackground(Color value) {
@@ -453,7 +459,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getInjuredBackground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.INJURED_BACKGROUND,
-                Color.RED.getRGB()));
+                CRIMSON_RED.getRGB()));
     }
 
     public void setInjuredBackground(Color value) {
@@ -562,7 +568,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getFontColorNegative() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_NEGATIVE,
-                Color.RED.getRGB()));
+                CRIMSON_RED.getRGB()));
     }
 
     /**

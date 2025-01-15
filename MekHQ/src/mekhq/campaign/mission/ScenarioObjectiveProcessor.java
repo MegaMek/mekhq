@@ -489,7 +489,9 @@ public class ScenarioObjectiveProcessor {
         }
 
         double potentialObjectiveUnitCount = getPotentialObjectiveUnits().get(objective).size();
-
+        if (potentialObjectiveUnitCount == 0.0) {
+            return false;
+        }
         return qualifyingUnitCount / potentialObjectiveUnitCount >= (double) objective.getPercentage() / 100;
     }
 

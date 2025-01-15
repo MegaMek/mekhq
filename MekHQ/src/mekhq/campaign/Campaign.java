@@ -104,6 +104,7 @@ import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -158,6 +159,8 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.stratcon.StratconRulesManager.processIgnoredScenario;
+import static mekhq.campaign.stratcon.StratconRulesManager.simulateTheResultsOfIgnoredScenario;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -3939,23 +3942,23 @@ public class Campaign implements ITechManager {
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(getLocalDate())) {
-                    if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
-                        final boolean stub = StratconRulesManager.processIgnoredScenario(
-                                (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
+                    var finalState = ScenarioStatus.REFUSED_ENGAGEMENT;
 
-                        if (stub) {
+                    if (getCampaignOptions().isUseStratCon() && (scenario instanceof AtBDynamicScenario atBDynamicScenario)) {
+
+//                        if (processIgnoredScenario(atBDynamicScenario, contract.getStratconCampaignState())) {
                             if (scenario.getStratConScenarioType().isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                                scenario.convertToStub(this, finalState);
+                            } else {
+                                simulateTheResultsOfIgnoredScenario(this, atBDynamicScenario, contract.getStratconCampaignState());
                             }
-
-                            scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
-                        } else {
-                            scenario.clearAllForcesAndPersonnel(this);
-                        }
+//                        } else {
+//                            scenario.clearAllForcesAndPersonnel(this);
+//                        }
                     } else {
-                        scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
+                        scenario.convertToStub(this, finalState);
                         contract.addPlayerMinorBreach();
-
                         addReport("Failure to deploy for " + scenario.getName()
                                 + " resulted in a minor contract breach.");
                     }
