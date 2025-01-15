@@ -180,7 +180,7 @@ public abstract class AbstractDeath {
      * @param gender the person's gender
      * @return true if the person is selected to randomly die, otherwise false
      */
-    public abstract boolean randomlyDies(final int age, final Gender gender);
+    public abstract boolean randomlyDies(int age, Gender gender);
     // endregion Random Death
     // endregion New Day
 

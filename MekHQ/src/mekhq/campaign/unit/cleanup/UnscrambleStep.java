@@ -22,7 +22,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 
 public abstract class UnscrambleStep {
-    public abstract void visit(final EquipmentProposal proposal, final EquipmentPart part);
+    public abstract void visit(EquipmentProposal proposal, EquipmentPart part);
 
     public void visit(final EquipmentProposal proposal, final MissingEquipmentPart part) {
 

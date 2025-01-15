@@ -612,5 +612,5 @@ public abstract class AbstractProcreation {
      * @param person the person to determine for
      * @return true if they do, otherwise false
      */
-    protected abstract boolean procreation(final Person person);
+    protected abstract boolean procreation(Person person);
 }
