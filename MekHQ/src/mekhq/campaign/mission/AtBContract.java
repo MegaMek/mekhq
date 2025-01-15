@@ -933,14 +933,18 @@ public class AtBContract extends Contract {
             }
 
             switch (getContractType().generateEventType()) {
-                case EVT_BONUSROLL:
-                    campaign.addReport("<b>Special Event:</b> ");
-                    doBonusRoll(campaign, false);
-                    break;
-                case EVT_SPECIAL_SCENARIO:
-                    campaign.addReport("<b>Special Event:</b> Special scenario this month");
-                    specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
-                    specialEventScenarioType = getContractType().generateSpecialScenarioType(campaign);
+                case EVT_BONUSROLL, EVT_SPECIAL_SCENARIO:
+                    int roll = randomInt(2);
+
+                    // StratCon doesn't support AtB's special scenarios
+                    if (campaign.getCampaignOptions().isUseStratCon() || roll == 0) {
+                        campaign.addReport("<b>Special Event:</b> ");
+                        doBonusRoll(campaign, false);
+                    } else {
+                        campaign.addReport("<b>Special Event:</b> Special scenario this month");
+                        specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
+                        specialEventScenarioType = getContractType().generateSpecialScenarioType(campaign);
+                    }
                     break;
                 case EVT_CIVILDISTURBANCE:
                     campaign.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
