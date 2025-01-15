@@ -26,9 +26,10 @@
 			Need ability to allow player to specifically deploy DropShips
 			HotDrop.xml
 		</modifier-->
-		<modifier>
+		<!--modifier>
+            Removed by popular demand
 			EnemyDropShip.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			GoodIntel.xml
 		</modifier>

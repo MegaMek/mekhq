@@ -25,6 +25,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -129,7 +130,13 @@ public class ScenarioTableModel extends DataTableModel {
                         for (StratconTrackState track : campaignState.getTracks()) {
                             for (StratconScenario stratconScenario : track.getScenarios().values()) {
                                 if (Objects.equals(stratconScenario.getBackingScenario(), scenario)) {
-                                    return track.getDisplayableName();
+                                    StratconCoords coords = stratconScenario.getCoords();
+
+                                    if (coords == null) {
+                                        return track.getDisplayableName();
+                                    } else {
+                                        return track.getDisplayableName() + '-' + coords.toBTString();
+                                    }
                                 }
                             }
                         }

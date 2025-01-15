@@ -19,10 +19,7 @@ import io.sentry.Sentry;
 import megamek.common.*;
 import megamek.common.alphaStrike.conversion.ASConverter;
 import megamek.common.autoresolve.acar.SimulationContext;
-import megamek.common.autoresolve.converter.ConsolidateForces;
-import megamek.common.autoresolve.converter.ForceToFormationConverter;
-import megamek.common.autoresolve.converter.SetupForces;
-import megamek.common.autoresolve.converter.SingleElementConsolidateForces;
+import megamek.common.autoresolve.converter.*;
 import megamek.common.copy.CrewRefBreak;
 import megamek.common.force.Forces;
 import megamek.common.options.OptionsConstants;
@@ -41,6 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static megamek.common.force.Force.NO_FORCE;
+
 /**
  * @author Luana Coppio
  */
@@ -50,11 +49,20 @@ public class AtBSetupForces extends SetupForces {
     private final Campaign campaign;
     private final List<Unit> units;
     private final AtBScenario scenario;
+    private final ForceConsolidation forceConsolidationMethod;
 
-    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
+    private final OrderFactory orderFactory;
+
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, ForceConsolidation forceConsolidationMethod) {
+        this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
+    }
+
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, ForceConsolidation forceConsolidationMethod, OrderFactory orderFactory) {
         this.campaign = campaign;
         this.units = units;
         this.scenario = scenario;
+        this.forceConsolidationMethod = forceConsolidationMethod;
+        this.orderFactory = orderFactory;
     }
 
     /**
@@ -64,8 +72,16 @@ public class AtBSetupForces extends SetupForces {
     public void createForcesOnSimulation(SimulationContext game) {
         setupPlayer(game);
         setupBots(game);
-        ConsolidateForces.consolidateForces(game, new SingleElementConsolidateForces());
+        forceConsolidationMethod.consolidateForces(game);
         convertForcesIntoFormations(game);
+    }
+
+    @Override
+    public void addOrdersToForces(SimulationContext context) {
+        var orders = orderFactory.getOrders();
+        context.getOrders().clear();
+        context.getOrders().addAll(orders);
+        context.getOrders().resetOrders();
     }
 
     private static class FailedToConvertForceToFormationException extends RuntimeException {
@@ -80,10 +96,10 @@ public class AtBSetupForces extends SetupForces {
      * and used in the auto resolve in place of the original entities
      * @param game The game object to convert the forces in
      */
-    private static void convertForcesIntoFormations(SimulationContext game) {
+    private void convertForcesIntoFormations(SimulationContext game) {
         for(var force : game.getForces().getTopLevelForces()) {
             try {
-                var formation = new ForceToFormationConverter(force, game).convert();
+                var formation = new EntityAsUnit(force, game).convert();
                 formation.setTargetFormationId(Entity.NONE);
                 formation.setOwnerId(force.getOwnerId());
                 game.addUnit(formation);
@@ -413,33 +429,14 @@ public class AtBSetupForces extends SetupForces {
     private void sendEntities(List<Entity> entities, SimulationContext game) {
         Map<Integer, Integer> forceMapping = new HashMap<>();
         for (final Entity entity : new ArrayList<>(entities)) {
-            if (entity instanceof ProtoMek) {
-                int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
-                    private final int ownerId = entity.getOwnerId();
-                    @Override
-                    public boolean accept(Entity entity) {
-                        return (entity instanceof ProtoMek) && (ownerId == entity.getOwnerId());
-                    }
-                });
-
-                entity.setUnitNumber((short) (numPlayerProtos / 5));
-            }
-
-            if (Entity.NONE == entity.getId()) {
-                entity.setId(game.getNextEntityId());
-            }
-
-            // Give the unit a spotlight, if it has the spotlight quirk
-            entity.setExternalSearchlight(entity.hasExternalSearchlight()
-                || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
-
+            lastTouchesBeforeSendingEntity(game, entity);
             game.getPlayer(entity.getOwnerId()).changeInitialEntityCount(1);
 
             // Restore forces from MULs or other external sources from the forceString, if
             // any
             if (!entity.getForceString().isBlank()) {
                 List<megamek.common.force.Force> forceList = Forces.parseForceString(entity);
-                int realId = megamek.common.force.Force.NO_FORCE;
+                int realId = NO_FORCE;
                 boolean topLevel = true;
 
                 for (megamek.common.force.Force force : forceList) {
@@ -462,5 +459,27 @@ public class AtBSetupForces extends SetupForces {
                 game.getForces().addEntity(entity, realId);
             }
         }
+    }
+
+    private static void lastTouchesBeforeSendingEntity(SimulationContext game, Entity entity) {
+        if (entity instanceof ProtoMek) {
+            int numPlayerProtos = game.getSelectedEntityCount(new EntitySelector() {
+                private final int ownerId = entity.getOwnerId();
+                @Override
+                public boolean accept(Entity entity) {
+                    return (entity instanceof ProtoMek) && (ownerId == entity.getOwnerId());
+                }
+            });
+
+            entity.setUnitNumber((short) (numPlayerProtos / 5));
+        }
+
+        if (Entity.NONE == entity.getId()) {
+            entity.setId(game.getNextEntityId());
+        }
+
+        // Give the unit a spotlight, if it has the spotlight quirk
+        entity.setExternalSearchlight(entity.hasExternalSearchlight()
+            || entity.hasQuirk(OptionsConstants.QUIRK_POS_SEARCHLIGHT));
     }
 }

@@ -19,6 +19,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 
 import static java.lang.Math.floor;
@@ -68,6 +69,7 @@ public class Resupply {
     public static final int CARGO_MULTIPLIER = 4;
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
+    final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
     private static final MMLogger logger = MMLogger.create(Resupply.class);
 
@@ -522,6 +524,10 @@ public class Resupply {
         final Collection<UUID> unitIds = campaign.getForce(0).getAllUnits(true);
         Map<String, PartDetails> processedParts = new HashMap<>();
 
+        boolean allowClan = (employerIsClan || campaign.getLocalDate().isAfter(BATTLE_OF_TUKAYYID))
+            && campaign.getCampaignOptions().isAllowClanPurchases();
+        boolean allowInnerSphere = campaign.getCampaignOptions().isAllowISPurchases();
+
         try {
             for (UUID unitId : unitIds) {
                 Unit unit = campaign.getUnit(unitId);
@@ -537,12 +543,23 @@ public class Resupply {
                 }
 
                 if (isProhibitedUnitType(entity, false)) {
+                    logger.info("skipping " + unit.getName() + " as it is prohibited.");
                     continue;
                 }
 
                 if (!unit.isSalvage() && (unit.isAvailable() || unit.isDeployed())) {
                     List<Part> parts = unit.getParts();
                     for (Part part : parts) {
+                        if (part.isClan()) {
+                            if (!allowClan) {
+                                continue;
+                            }
+                        } else {
+                            if (!allowInnerSphere) {
+                                continue;
+                            }
+                        }
+
                         if (isIneligiblePart(part, unit)) {
                             continue;
                         }
@@ -711,8 +728,12 @@ public class Resupply {
                 continue;
             }
 
-            PartDetails partDetails = new PartDetails(part, weight);
+            // This prevents us accidentally adding new items to the pool
+            if (!partsList.containsKey(getPartKey(part))) {
+                continue;
+            }
 
+            PartDetails partDetails = new PartDetails(part, weight);
             partsList.merge(getPartKey(part), partDetails, (oldValue, newValue) -> {
                 oldValue.setWeight(oldValue.getWeight() - newValue.getWeight());
                 return oldValue;

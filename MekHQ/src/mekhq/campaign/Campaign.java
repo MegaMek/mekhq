@@ -4291,27 +4291,6 @@ public class Campaign implements ITechManager {
             getDivorce().processNewWeek(this, getLocalDate(), person, false);
             getMarriage().processNewWeek(this, getLocalDate(), person, false);
             getProcreation().processNewWeek(this, getLocalDate(), person);
-
-            if (person.getGender().isFemale()) {
-                if (campaignOptions.isUseMaternityLeave()) {
-                    if ((person.isPregnant())
-                            && (person.getStatus().isActive())
-                            && (person.getDueDate().minusWeeks(20).isAfter(currentDay.minusDays(1)))) {
-
-                        person.changeStatus(this, currentDay, PersonnelStatus.ON_MATERNITY_LEAVE);
-                    }
-
-                    List<Person> children = person.getGenealogy().getChildren();
-
-                    if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
-                        LocalDate lastChildBirthDate = getYoungestChildDateOfBirth(children);
-
-                        if (currentDay.isAfter(lastChildBirthDate)) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -7802,10 +7781,15 @@ public class Campaign implements ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems foolish
-            if ((contract.getStatus().isSuccess())
-                    && (contract.getMonthsLeft(getLocalDate()) > 0)) {
+            if (contract.getStatus().isSuccess()) {
                 remainingMoney = contract.getMonthlyPayOut()
-                        .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+                    .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+
+                if (contract instanceof AtBContract) {
+                    Money routedPayout = ((AtBContract) contract).getRoutedPayout();
+
+                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+                }
             }
 
             // If overage repayment is enabled, we first need to check if the salvage
