@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -31,10 +31,14 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQInternationalization;
+import mekhq.utilities.PotentialTransportsMap;
 
 import javax.swing.*;
 import java.io.File;
@@ -44,6 +48,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
 /**
@@ -85,17 +91,6 @@ public class AtBGameThread extends GameThread {
         this.scenario = Objects.requireNonNull(scenario);
         this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
     }
-
-    // String tokens for dialog boxes used for transport loading
-    // FIXME : I'm not localized!
-    private static final String LOAD_DROPSHIP_DIALOG_TITLE = "Load DropShips onto Transport?";
-    private static final String LOAD_DROPSHIP_DIALOG_TEXT = "Would you like the DropShip(s) assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_SMALL_CRAFT_DIALOG_TITLE = "Load Small Craft onto Transport?";
-    private static final String LOAD_SMALL_CRAFT_DIALOG_TEXT = "Would you like the small craft assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighter(s) assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters onto Transport?";
-    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground unit(s) assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units onto Transport?";
 
     @Override
     public void run() {
@@ -235,6 +230,8 @@ public class AtBGameThread extends GameThread {
                     }
                 }
 
+                PotentialTransportsMap potentialTransports = new PotentialTransportsMap(CampaignTransportType.values());
+
                 var entities = new ArrayList<Entity>();
                 for (Unit unit : units) {
                     // Get the Entity
@@ -243,9 +240,12 @@ public class AtBGameThread extends GameThread {
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer());
-                    if (unit.hasTransportedUnits()) {
+                    if (unit.hasShipTransportedUnits()) {
                         // Store this unit as a potential transport to load
-                        scenario.getPlayerTransportLinkages().put(unit.getId(), new ArrayList<>());
+                        potentialTransports.putNewTransport(SHIP_TRANSPORT, unit.getId());
+                    }
+                    if (unit.hasTacticalTransportedUnits()) {
+                        potentialTransports.putNewTransport(TACTICAL_TRANSPORT, unit.getId());
                     }
                     // If this unit is a spacecraft, set the crew size and marine size values
                     if (entity.isLargeCraft() || (entity.getUnitType() == UnitType.SMALL_CRAFT)) {
@@ -294,28 +294,16 @@ public class AtBGameThread extends GameThread {
                 }
                 client.sendAddEntity(entities);
 
-                // Run through the units again. This time add transported units to the correct
-                // linkage,
+                // Run through the units again. This time add
+                // transported units to the correct linkage,
                 // but only if the transport itself is in the game too.
+                // Try to load into transportShips first, then tacticalTransports
                 for (Unit unit : units) {
-                    if (unit.hasTransportShipAssignment()) {
-                        Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
-                        if (scenario.getPlayerTransportLinkages().containsKey(transportShip.getId())) {
-                            scenario.addPlayerTransportRelationship(transportShip.getId(), unit.getId());
-                        }
-                    }
+                    potentialTransports.tryToAddTransportedUnit(unit);
                 }
                 // Now, clean the list of any transports that don't have deployed units in the
                 // game
-                Set<UUID> emptyTransports = new HashSet<>();
-                for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
-                    if (scenario.getPlayerTransportLinkages().get(id).isEmpty()) {
-                        emptyTransports.add(id);
-                    }
-                }
-                for (UUID id : emptyTransports) {
-                    scenario.getPlayerTransportLinkages().remove(id);
-                }
+                potentialTransports.removeEmptyTransports();
 
                 /* Add player-controlled ally units */
                 entities.clear();
@@ -384,42 +372,44 @@ public class AtBGameThread extends GameThread {
                     loadTransports(botClient, scenario, bf);
                 }
 
+                Set<UUID> alreadyResetTransport = new HashSet<>();
+
                 // All player and bot units have been added to the lobby
-                // Prompt the player to autoload units into transports
-                if (!scenario.getPlayerTransportLinkages().isEmpty()) {
-                    for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                // Prompt the player to autoload units into transport ships
+                if (potentialTransports.hasTransports(SHIP_TRANSPORT)) {
+                    for (UUID transportId : potentialTransports.getTransports(SHIP_TRANSPORT)) {
                         boolean loadDropShips = false;
                         boolean loadSmallCraft = false;
                         boolean loadFighters = false;
                         boolean loadGround = false;
-                        Unit transport = campaign.getUnit(id);
+                        Unit transportShip = campaign.getUnit(transportId);
                         Set<Integer> toLoad = new HashSet<>();
                         // Let the player choose to load DropShips, Small Craft, fighters, and/or
                         // ground units on each transport
-                        if (transport.getTransportedUnits().stream()
+                        if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.DROPSHIP)) {
                             loadDropShips = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_DROPSHIP_DIALOG_TEXT, transport.getName()),
-                                    AtBGameThread.LOAD_DROPSHIP_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_DROPSHIP_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_DROPSHIP_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION);
                         }
 
-                        if (transport.getTransportedUnits().stream()
+                        if (transportShip.getShipTransportedUnits().stream()
                                 .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT)) {
                             loadSmallCraft = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TEXT, transport.getName()),
-                                    AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_SMALL_CRAFT_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_SMALL_CRAFT_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION);
                         }
 
-                        if (transport.isCarryingSmallerAero()) {
+                        if (transportShip.isCarryingSmallerAero()) {
                             loadFighters = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
-                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_FTR_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_FTR_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION);
                         }
 
-                        if (transport.isCarryingGround()) {
+                        if (transportShip.isCarryingGround()) {
                             loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transport.getName()),
-                                    AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                                    MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_GND_DIALOG_TEXT.text", transportShip.getName()),
+                                    MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.LOAD_GND_DIALOG_TITLE.title"), JOptionPane.YES_NO_OPTION));
                         }
 
                         // Now, send the load commands
@@ -427,23 +417,71 @@ public class AtBGameThread extends GameThread {
                             // List of technicians assigned to transported units. Several units can share a
                             // tech.
                             Set<Person> cargoTechs = new HashSet<>();
-                            for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
-                                Unit unit = campaign.getUnit(cargoId);
-                                if (unit != null) {
+                            for (UUID cargoId : potentialTransports.getTransportedUnits(SHIP_TRANSPORT, transportId)) {
+                                Unit transportedUnit = campaign.getUnit(cargoId);
+                                if (transportedUnit != null) {
                                     // Convert the list of Unit UUIDs to MM EntityIds
-                                    toLoad.add(unit.getEntity().getId());
-                                    if (unit.getTech() != null) {
-                                        cargoTechs.add(unit.getTech());
+                                    toLoad.add(transportedUnit.getEntity().getId());
+                                    if (scenario.getPlayerTransportLinkages().containsKey(transportShip.getId())) {
+                                        scenario.addPlayerTransportRelationship(transportShip.getId(), transportedUnit.getId());
+                                    }
+                                    if (transportedUnit.getTech() != null) {
+                                        cargoTechs.add(transportedUnit.getTech());
+                                    }
+                                }
+                            }
+                            // Update the transport's passenger count with assigned techs
+                            transportShip.getEntity()
+                                    .setNPassenger(transportShip.getEntity().getNPassenger() + cargoTechs.size());
+                            client.sendUpdateEntity(transportShip.getEntity());
+                            // And now load the units. Unit crews load as passengers here.
+                            Utilities.loadPlayerTransports(transportShip.getEntity().getId(), toLoad,
+                                    client, loadDropShips, loadSmallCraft, loadFighters, loadGround);
+                            alreadyResetTransport.add(transportId);
+                        }
+                    }
+                }
+
+                // Prompt the player to autoload units into tactical transports (lower priority)
+                if (potentialTransports.hasTransports(TACTICAL_TRANSPORT)) {
+                    for (UUID transportId : potentialTransports.getTransports(TACTICAL_TRANSPORT)) {
+                        boolean loadTactical = false;
+                        Unit transport = campaign.getUnit(transportId);
+                        Map<Integer, ITransportAssignment> toLoad = new HashMap<>();
+
+                        if (transport.hasTacticalTransportedUnits()) {
+                            loadTactical = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                               MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.text", transport.getName()),
+                               MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.title"), JOptionPane.YES_NO_OPTION));
+                        }
+
+                        // Now, send the load commands
+                        if (loadTactical) {
+                            // List of technicians assigned to transported units. Several units can share a
+                            // tech.
+                            Set<Person> cargoTechs = new HashSet<>();
+                            for (UUID cargoId : potentialTransports.getTransportedUnits(TACTICAL_TRANSPORT, transportId)) {
+                                Unit transportedUnit = campaign.getUnit(cargoId);
+                                if (transportedUnit != null && transport.getEntity().canLoad(transportedUnit.getEntity())) { //transportedUnit.getTransportAssignment().getTransporterType()) {
+                                    // Convert the list of Unit UUIDs to MM EntityIds
+                                    toLoad.put(transportedUnit.getEntity().getId(), transportedUnit.getTacticalTransportAssignment());
+                                    if (scenario.getPlayerTransportLinkages().containsKey(transportId)) {
+                                        scenario.addPlayerTransportRelationship(transportId, transportedUnit.getId());
+                                    }
+                                    if (transportedUnit.getTech() != null && transportedUnit.hasTransportAssignment(TACTICAL_TRANSPORT)
+                                            && transportedUnit.getTransportAssignment(TACTICAL_TRANSPORT).isTransportedInBay()){
+                                        cargoTechs.add(transportedUnit.getTech());
                                     }
                                 }
                             }
                             // Update the transport's passenger count with assigned techs
                             transport.getEntity()
-                                    .setNPassenger(transport.getEntity().getNPassenger() + cargoTechs.size());
+                                .setNPassenger(transport.getEntity().getNPassenger() + cargoTechs.size());
                             client.sendUpdateEntity(transport.getEntity());
-                            // And now load the units. Unit crews load as passengers here.
+                            // And now load the units.
                             Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad,
-                                    client, loadDropShips, loadSmallCraft, loadFighters, loadGround);
+                                client, loadTactical, alreadyResetTransport.contains(transportId));
+                            alreadyResetTransport.add(transportId);
                         }
                     }
                 }

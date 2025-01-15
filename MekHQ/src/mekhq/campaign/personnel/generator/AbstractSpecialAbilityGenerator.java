@@ -57,5 +57,5 @@ public abstract class AbstractSpecialAbilityGenerator {
      * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
      * @return A value indicating whether or not a special ability was assigned.
      */
-    public abstract boolean generateSpecialAbilities(final Campaign campaign, final Person person, final int expLvl);
+    public abstract boolean generateSpecialAbilities(Campaign campaign, Person person, int expLvl);
 }

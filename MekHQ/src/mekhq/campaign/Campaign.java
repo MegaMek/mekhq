@@ -49,6 +49,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -109,6 +110,7 @@ import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -147,6 +149,8 @@ import java.util.stream.Collectors;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
@@ -183,7 +187,8 @@ public class Campaign implements ITechManager {
     // and more still - we're tracking DropShips and WarShips in a separate set so
     // that we can assign units to transports
     private final Hangar units = new Hangar();
-    private final Set<Unit> transportShips = new HashSet<>();
+    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, SHIP_TRANSPORT);
+    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, TACTICAL_TRANSPORT);
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
@@ -1362,56 +1367,77 @@ public class Campaign implements ITechManager {
     /**
      * Imports a {@link Unit} into a campaign.
      *
-     * @param u A {@link Unit} to import into the campaign.
+     * @param unit A {@link Unit} to import into the campaign.
      */
-    public void importUnit(Unit u) {
-        Objects.requireNonNull(u);
+    public void importUnit(Unit unit) {
+        Objects.requireNonNull(unit);
 
-        logger.debug("Importing unit: ({}): {}", u.getId(), u.getName());
+        logger.debug("Importing unit: ({}): {}", unit.getId(), unit.getName());
 
-        getHangar().addUnit(u);
+        getHangar().addUnit(unit);
 
-        checkDuplicateNamesDuringAdd(u.getEntity());
+        checkDuplicateNamesDuringAdd(unit.getEntity());
 
-        // If this is a ship, add it to the list of potential transports
-        if ((u.getEntity() instanceof Dropship) || (u.getEntity() instanceof Jumpship)) {
-            addTransportShip(u);
+        unit.initializeAllTransportSpace();
+
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                addCampaignTransport(campaignTransportType, unit);
+            }
         }
 
         // Assign an entity ID to our new unit
-        if (Entity.NONE == u.getEntity().getId()) {
-            u.getEntity().setId(game.getNextEntityId());
+        if (Entity.NONE == unit.getEntity().getId()) {
+            unit.getEntity().setId(game.getNextEntityId());
         }
 
-        game.addEntity(u.getEntity());
+        game.addEntity(unit.getEntity());
     }
 
+
     /**
-     * Adds an entry to the list of transit-capable transport ships. We'll use this
-     * to look for empty bays that ground units can be assigned to
-     *
-     * @param unit - The ship we want to add to this Set
+     * Adds a transport (Unit) to the list specified transporters map.
+     * This transporters map is used to store transports, the kinds of
+     * transporters they have, and their remaining capacity. The
+     * transporters map is meant to be utilized by the GUI.
+     * @see CampaignTransporterMap
+     * @param campaignTransportType Transport Type (enum) we're adding to
+     * @param unit unit with transport capabilities
      */
-    public void addTransportShip(Unit unit) {
-        logger.debug("Adding DropShip/WarShip: {}", unit.getId());
-        transportShips.add(Objects.requireNonNull(unit));
+    public void addCampaignTransport(CampaignTransportType campaignTransportType, Unit unit) {
+        if (campaignTransportType.isShipTransport()) {
+            shipTransporters.addTransporter(unit);
+        } else if (campaignTransportType.isTacticalTransport()) {
+            tacticalTransporters.addTransporter(unit);
+        }
     }
 
     /**
-     * Deletes an entry from the list of transit-capable transport ships. This gets
+     * This will update the transport in the transports list with current capacities.
+     * When a unit is added or removed from a transport, that information needs updated
+     * in the campaign transport map. This method takes the CampaignTransportType and
+     * transport as inputs and updates the map with the current capacities of the
+     * transport.
+     * @param campaignTransportType type (Enum) of TransportedUnitsSummary we're interested in
+     * @param transport Unit
+     */
+    public void updateTransportInTransports(CampaignTransportType campaignTransportType, Unit transport) {
+        getCampaignTransporterMap(campaignTransportType).updateTransportInTransporterMap(transport);
+    }
+
+    /**
+     * Deletes an entry from the list of specified list of transports. This gets
      * updated when
-     * the ship is removed from the campaign for one reason or another
-     *
+     * the transport is removed from the campaign for one reason or another
+     * @see CampaignTransporterMap
+     * @param campaignTransportType Transport Type (enum) we're checking
      * @param unit - The ship we want to remove from this Set
      */
-    public void removeTransportShip(Unit unit) {
-        // If we remove a transport ship from the campaign,
-        // we need to remove any transported units from it
-        if (transportShips.remove(unit) && unit.hasTransportedUnits()) {
-            List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnits());
-            for (Unit transportedUnit : transportedUnits) {
-                unit.removeTransportedUnit(transportedUnit);
-            }
+    public void removeCampaignTransporter(CampaignTransportType campaignTransportType, Unit unit) {
+        if (campaignTransportType.isShipTransport()) {
+            shipTransporters.removeTransport(unit);
+        } else if (campaignTransportType.isTacticalTransport()) {
+            tacticalTransporters.removeTransport(unit);
         }
     }
 
@@ -1495,13 +1521,14 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        unit.initializeBaySpace();
+        unit.initializeAllTransportSpace();
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 
-        // If this is a ship, add it to the list of potential transports
-        if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
-            addTransportShip(unit);
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                addCampaignTransport(campaignTransportType, unit);
+            }
         }
 
         unit.initializeParts(true);
@@ -3880,8 +3907,8 @@ public class Campaign implements ITechManager {
             return 0;
         }
 
-        int total = -contract.getRequiredLances();
-        int role = -max(1, contract.getRequiredLances() / 2);
+        int total = -contract.getRequiredCombatTeams();
+        int role = -max(1, contract.getRequiredCombatTeams() / 2);
         int minimumUnitCount = (int) ((double) getStandardForceSize(faction) / 2);
 
         final CombatRole requiredLanceRole = contract.getContractType().getRequiredLanceRole();
@@ -4338,27 +4365,6 @@ public class Campaign implements ITechManager {
             getDivorce().processNewWeek(this, getLocalDate(), person, false);
             getMarriage().processNewWeek(this, getLocalDate(), person, false);
             getProcreation().processNewWeek(this, getLocalDate(), person);
-
-            if (person.getGender().isFemale()) {
-                if (campaignOptions.isUseMaternityLeave()) {
-                    if ((person.isPregnant())
-                            && (person.getStatus().isActive())
-                            && (person.getDueDate().minusWeeks(20).isAfter(currentDay.minusDays(1)))) {
-
-                        person.changeStatus(this, currentDay, PersonnelStatus.ON_MATERNITY_LEAVE);
-                    }
-
-                    List<Person> children = person.getGenealogy().getChildren();
-
-                    if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
-                        LocalDate lastChildBirthDate = getYoungestChildDateOfBirth(children);
-
-                        if (currentDay.isAfter(lastChildBirthDate)) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -5106,8 +5112,12 @@ public class Campaign implements ITechManager {
         // remove unit from any forces
         removeUnitFromForce(unit);
 
-        // If this is a ship, remove it from the list of potential transports
-        removeTransportShip(unit);
+        // If this is a transport, remove it from the list of potential transports
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (hasTransports(campaignTransportType)) {
+                removeCampaignTransporter(campaignTransportType, unit);
+            }
+        }
 
         // If this unit was assigned to a transport ship, remove it from the transport
         if (unit.hasTransportShipAssignment()) {
@@ -5650,6 +5660,24 @@ public class Campaign implements ITechManager {
         finances.debit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
         addReport("Funds removed : " + quantityString + " (" + description + ')');
+    }
+
+
+    /**
+     * Generic method for paying Personnel (Person) in the company.
+     * Debits money from the campaign and if the campaign tracks
+     * total earnings it will account for that.
+     * @param type TransactionType being debited
+     * @param quantity total money - it's usually displayed outside of this method
+     * @param description String displayed in the ledger and report
+     * @param individualPayouts Map of Person to the Money they're owed
+     */
+    public void payPersonnel(TransactionType type, Money quantity, String description, Map<Person, Money> individualPayouts) {
+        getFinances().debit(type, getLocalDate(), quantity, description,
+            individualPayouts, getCampaignOptions().isTrackTotalEarnings());
+        String quantityString = quantity.toAmountAndSymbolString();
+        addReport("Funds removed : " + quantityString + " (" + description + ')');
+
     }
 
     public CampaignOptions getCampaignOptions() {
@@ -7849,10 +7877,15 @@ public class Campaign implements ITechManager {
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
             // further payment even though this seems foolish
-            if ((contract.getStatus().isSuccess())
-                    && (contract.getMonthsLeft(getLocalDate()) > 0)) {
+            if (contract.getStatus().isSuccess()) {
                 remainingMoney = contract.getMonthlyPayOut()
-                        .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+                    .multipliedBy(contract.getMonthsLeft(getLocalDate()));
+
+                if (contract instanceof AtBContract) {
+                    Money routedPayout = ((AtBContract) contract).getRoutedPayout();
+
+                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+                }
             }
 
             // If overage repayment is enabled, we first need to check if the salvage
@@ -7875,27 +7908,17 @@ public class Campaign implements ITechManager {
 
             if (getCampaignOptions().isUseShareSystem()) {
                 ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                        MekHQ.getMHQOptions().getLocale());
+                    MekHQ.getMHQOptions().getLocale());
 
-                Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
-                remainingMoney = remainingMoney.minus(shares);
+                if (remainingMoney.isGreaterThan(Money.zero())) {
+                    Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+                    remainingMoney = remainingMoney.minus(shares);
 
-                if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
+                    if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
                         String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
-                    addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
+                        addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
 
-                    if (getCampaignOptions().isTrackTotalEarnings()) {
-                        boolean sharesForAll = getCampaignOptions().isSharesForAll();
-
-                        int numberOfShares = getActivePersonnel().stream()
-                                .mapToInt(person -> person.getNumShares(this, sharesForAll))
-                                .sum();
-
-                        Money singleShare = shares.dividedBy(numberOfShares);
-
-                        for (Person person : getActivePersonnel()) {
-                            person.payPersonShares(this, singleShare, sharesForAll);
-                        }
+                        getFinances().payOutSharesToPersonnel(this, shares);
                     }
                 }
             }
@@ -8122,13 +8145,81 @@ public class Campaign implements ITechManager {
         }
     }
 
+    private CampaignTransporterMap getCampaignTransporterMap(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isTacticalTransport()) {
+            return tacticalTransporters;
+        }
+        else if (campaignTransportType.isShipTransport()) {
+            return shipTransporters;
+        }
+        return null;
+    }
+
+
     /**
-     * Returns our list of potential transport ships
+     * Returns a Map that maps Transporter types to another
+     * Map that maps capacity (Double) to UUID of transports
+     * for the specific TransportedUnitSummary type
      *
-     * @return
+     * @param campaignTransportType type (Enum) of TransportedUnitSummary
+     * @return the full map for that campaign transport type
      */
-    public Set<Unit> getTransportShips() {
-        return Collections.unmodifiableSet(transportShips);
+    public Map<TransporterType, Map<Double, Set<UUID>>> getTransports(CampaignTransportType campaignTransportType) {
+        return getCampaignTransporterMap(campaignTransportType).getTransporters();
+    }
+
+    /**
+     * Returns list of transports that have the provided
+     * TransporterType and CampaignTransportType
+     *
+     * @param campaignTransportType type of campaign transport
+     * @param transporterType type of Transporter
+     * @return units that have that transport type
+     */
+    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType) {
+        return getCampaignTransporterMap(campaignTransportType).getTransportsByType(transporterType, -1.0); //include transports with no remaining capacity
+    }
+
+
+    /**
+     * Returns list of transports for the specified
+     * AbstractTransportedUnitSummary class/subclass
+     * that has transport capacity for the
+     * Transporter class/subclass
+     * For example, getTransportsByType(SHIP_TRANSPORT, MEK_BAY, 3.0)
+     * would return all transports that have 3 or more Mek Bay slots
+     * open for the SHIP_TRANSPORT type of assignment.
+     *
+     * @param campaignTransportType type (Enum) of TransportedUnitSummary
+     * @param transporterType type (Enum) of Transporter
+     * @param unitSize capacity that the transport must be capable of
+     * @return units that have that transport type
+     */
+    public Set<Unit> getTransportsByType(CampaignTransportType campaignTransportType, TransporterType transporterType, double unitSize) {
+        return getCampaignTransporterMap(campaignTransportType).getTransportsByType(transporterType, unitSize);
+    }
+
+    private boolean hasTacticalTransports() {
+        return tacticalTransporters.hasTransporters();
+    }
+
+    private boolean hasShipTransports() {
+        return shipTransporters.hasTransporters();
+    }
+
+    /**
+     * Do we have transports for the kind of transport?
+     * @param campaignTransportType class of the TransportDetail
+     * @return true if it has transporters, false otherwise
+     */
+    public boolean hasTransports(CampaignTransportType campaignTransportType) {
+        if (campaignTransportType.isTacticalTransport()) {
+            return hasTacticalTransports();
+        }
+        else if (campaignTransportType.isShipTransport()) {
+            return hasShipTransports();
+        }
+        return false;
     }
 
     public void doMaintenance(Unit u) {

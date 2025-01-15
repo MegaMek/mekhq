@@ -127,7 +127,7 @@ public class StarLeagueCache {
     private void processUnits() {
         int intactUnitCount = 0;
 
-        for (int lance = 0; lance < contract.getRequiredLances(); lance++) {
+        for (int lance = 0; lance < contract.getRequiredCombatTeams(); lance++) {
             // This will generate a number between 1 and 4 with an average roll of 3
             intactUnitCount += Compute.randomInt(3) + Compute.randomInt(3);
         }

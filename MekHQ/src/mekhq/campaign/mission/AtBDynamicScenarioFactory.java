@@ -3695,6 +3695,12 @@ public class AtBDynamicScenarioFactory {
                 // it there would likely break things for non-StratCon users. -- Illiani
                 Collection<ScenarioForceTemplate> templates = scenario.getPlayerForceTemplates().values();
                 for (ScenarioForceTemplate template : templates) {
+                    if (template == null) {
+                        // I don't know why 'templates' sometimes contains 'null' templates, but it
+                        // does and this stops them from gumming up the works.
+                        continue;
+                    }
+
                     if (Objects.equals(template.getForceName(), ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID)) {
                         if (primaryForceIDs.contains(forceID)) {
                             deployRound = template.getArrivalTurn();

@@ -192,7 +192,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         currentScenario.addUnit(unit.getId(), templateList.getSelectedValue().getForceName());
         unit.setScenarioId(currentScenario.getId());
         MekHQ.triggerEvent(new DeploymentChangedEvent(unit, currentScenario));
-        if (unit.hasTransportedUnits()) {
+        if (unit.hasShipTransportedUnits()) {
             // Prompt the player to also deploy any units transported by this one
             deployTransportedUnitsDialog(unit);
         }
@@ -217,7 +217,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 u.setScenarioId(currentScenario.getId());
                 // If your force includes transports with units assigned,
                 // prompt the player to also deploy any units transported by this one
-                if (u.hasTransportedUnits()) {
+                if (u.hasShipTransportedUnits()) {
                     deployTransportedUnitsDialog(u);
                 }
             }
@@ -242,13 +242,13 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     }
 
     private void deployTransportedUnits(final Unit unit) {
-        for (final Unit cargo : unit.getTransportedUnits()) {
+        for (final Unit cargo : unit.getShipTransportedUnits()) {
             currentScenario.removeUnit(cargo.getId());
             currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
             cargo.setScenarioId(currentScenario.getId());
             MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
 
-            if (cargo.hasTransportedUnits()) {
+            if (cargo.hasShipTransportedUnits()) {
                 deployTransportedUnits(cargo);
             }
         }

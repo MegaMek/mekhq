@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,16 +19,16 @@
 package mekhq.campaign.unit;
 
 import megamek.common.*;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.UUID;
 import java.util.Vector;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UnitTransportTest {
@@ -36,76 +36,86 @@ public class UnitTransportTest {
     @BeforeAll
     static void before() {
         EquipmentType.initializeTypes();
+
+
     }
 
-    @Test
-    public void basicTransportedUnits() {
+    @ParameterizedTest
+    @EnumSource(value = CampaignTransportType.class)
+    public void basicTransportedUnits(CampaignTransportType campaignTransportType) {
+        Game mockGame = mock(Game.class);
+        Campaign mockCampaign = mock(Campaign.class);
+
+
         Unit transport = new Unit();
+        when(mockCampaign.getGame()).thenReturn(mockGame);
+        mockCampaign.importUnit(transport);
+
+
 
         // We start with empty transport bays
-        assertFalse(transport.hasTransportedUnits());
-        assertNotNull(transport.getTransportedUnits());
-        assertTrue(transport.getTransportedUnits().isEmpty());
+        assertFalse(transport.hasTransportedUnits(campaignTransportType));
+        assertNotNull(transport.getTransportedUnits(campaignTransportType));
+        assertTrue(transport.getTransportedUnits(campaignTransportType).isEmpty());
 
         // Create a fake unit to transport
         Unit mockUnit = mock(Unit.class);
         when(mockUnit.getId()).thenReturn(UUID.randomUUID());
 
         // Add a transported unit
-        transport.addTransportedUnit(mockUnit);
+        transport.addTransportedUnit(campaignTransportType, mockUnit);
 
         // Now we should have units
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(1, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockUnit));
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
+        assertEquals(1, transport.getTransportedUnits(campaignTransportType).size());
+        assertTrue(transport.getTransportedUnits(campaignTransportType).contains(mockUnit));
 
         // Adding the same unit again...
-        transport.addTransportedUnit(mockUnit);
+        transport.addTransportedUnit(campaignTransportType, mockUnit);
 
         // ... should leave everything the same.
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(1, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockUnit));
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
+        assertEquals(1, transport.getTransportedUnits(campaignTransportType).size());
+        assertTrue(transport.getTransportedUnits(campaignTransportType).contains(mockUnit));
 
         Unit mockOtherUnit = mock(Unit.class);
         when(mockOtherUnit.getId()).thenReturn(UUID.randomUUID());
 
         // We should not be able to remove an unknown unit
-        transport.removeTransportedUnit(mockOtherUnit);
+        transport.removeTransportedUnit(campaignTransportType, mockOtherUnit);
 
         // But we can add at least one more unit...
-        transport.addTransportedUnit(mockOtherUnit);
+        transport.addTransportedUnit(campaignTransportType, mockOtherUnit);
 
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(2, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockUnit));
-        assertTrue(transport.getTransportedUnits().contains(mockOtherUnit));
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
+        assertEquals(2, transport.getTransportedUnits(campaignTransportType).size());
+        assertTrue(transport.getTransportedUnits(campaignTransportType).contains(mockUnit));
+        assertTrue(transport.getTransportedUnits(campaignTransportType).contains(mockOtherUnit));
 
         // ... and removing the first...
-        assertTrue(transport.removeTransportedUnit(mockUnit));
+        assertTrue(transport.removeTransportedUnit(campaignTransportType, mockUnit));
 
         // ... should leave us with just that one other unit.
-        assertTrue(transport.hasTransportedUnits());
-        assertEquals(1, transport.getTransportedUnits().size());
-        assertTrue(transport.getTransportedUnits().contains(mockOtherUnit));
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
+        assertEquals(1, transport.getTransportedUnits(campaignTransportType).size());
+        assertTrue(transport.getTransportedUnits(campaignTransportType).contains(mockOtherUnit));
 
         // ... and clearing out our transport bays...
-        transport.clearTransportedUnits();
+        transport.clearTransportedUnits(campaignTransportType);
 
         // ... should leave us empty again.
-        assertFalse(transport.hasTransportedUnits());
-        assertNotNull(transport.getTransportedUnits());
-        assertTrue(transport.getTransportedUnits().isEmpty());
+        assertFalse(transport.hasTransportedUnits(campaignTransportType));
+        assertNotNull(transport.getTransportedUnits(campaignTransportType));
+        assertTrue(transport.getTransportedUnits(campaignTransportType).isEmpty());
     }
 
-    @Test
-    public void isCarryingAeroAndGround() {
+    @ParameterizedTest
+    @EnumSource(value = CampaignTransportType.class)
+    public void isCarryingAeroAndGround(CampaignTransportType campaignTransportType) {
         Unit transport = new Unit();
 
         // No units? No aeros.
-        assertFalse(transport.hasTransportedUnits());
-        assertFalse(transport.isCarryingSmallerAero());
-        assertFalse(transport.isCarryingGround());
+        assertFalse(transport.hasTransportedUnits(campaignTransportType));
 
         // Add a ground unit
         Entity mockGroundEntity = mock(Mek.class);
@@ -114,12 +124,10 @@ public class UnitTransportTest {
         when(mockGroundUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockGroundUnit.getEntity()).thenReturn(mockGroundEntity);
 
-        transport.addTransportedUnit(mockGroundUnit);
+        transport.addTransportedUnit(campaignTransportType, mockGroundUnit);
 
         // No aeros, just a ground unit
-        assertTrue(transport.hasTransportedUnits());
-        assertFalse(transport.isCarryingSmallerAero());
-        assertTrue(transport.isCarryingGround());
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
 
         // Add an aero unit
         Entity mockAeroEntity = mock(Aero.class);
@@ -128,35 +136,36 @@ public class UnitTransportTest {
         when(mockAeroUnit.getId()).thenReturn(UUID.randomUUID());
         when(mockAeroUnit.getEntity()).thenReturn(mockAeroEntity);
 
-        transport.addTransportedUnit(mockAeroUnit);
+        transport.addTransportedUnit(campaignTransportType, mockAeroUnit);
 
         // Now we have an areo
-        assertTrue(transport.hasTransportedUnits());
-        assertTrue(transport.isCarryingSmallerAero());
-        assertTrue(transport.isCarryingGround());
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
 
         // Removing the ground unit should not affect our aero calculation
-        transport.removeTransportedUnit(mockGroundUnit);
+        transport.removeTransportedUnit(campaignTransportType, mockGroundUnit);
 
-        assertTrue(transport.hasTransportedUnits());
-        assertTrue(transport.isCarryingSmallerAero());
-        assertFalse(transport.isCarryingGround());
+        assertTrue(transport.hasTransportedUnits(campaignTransportType));
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(value = CampaignTransportType.class)
     public void testUnitTypeForAerosMatchesAeroBayType() {
+        Campaign campaign = mock(Campaign.class);
+
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);
-        Unit transport = new Unit();
-        ASFBay mockASFBay = mock(ASFBay.class);
-        when(mockASFBay.getCapacity()).thenReturn(100.0);
-        transport.setEntity(mockVengeance);
+        Unit transport = new Unit(mockVengeance,campaign);
+        ASFBay mockASFBay = new ASFBay(100, 1 ,0);
 
         // Initialize bays
         Vector<Bay> bays = new Vector<>();
         bays.add(mockASFBay);
+        Vector<Transporter> transporters = new Vector<>();
+        transporters.add(mockASFBay);
         when(mockVengeance.getTransportBays()).thenReturn(bays);
-        transport.initializeBaySpace();
+        when(mockVengeance.getTransports()).thenReturn(transporters);
+        mockASFBay.setGame(mock(Game.class));
+        transport.initializeShipTransportSpace();
 
         // Add an aero unit
         Entity aero = new AeroSpaceFighter();
@@ -169,41 +178,43 @@ public class UnitTransportTest {
         assertEquals(100.0, remainingCap);
     }
 
-    @Test
-    public void unloadFromTransportShipDoesNothingIfNotLoaded() {
+    @ParameterizedTest
+    @EnumSource(value = CampaignTransportType.class)
+    public void unloadFromTransportDoesNothingIfNotLoaded(CampaignTransportType campaignTransportType) {
         Unit transport = spy(new Unit());
 
         Unit randomUnit = mock(Unit.class);
-        when(randomUnit.hasTransportShipAssignment()).thenReturn(false);
+        when(randomUnit.hasTransportAssignment(campaignTransportType)).thenReturn(false);
 
         // Try removing a ship that's not on our transport.
-        transport.removeTransportedUnit(randomUnit);
+        transport.removeTransportedUnit(campaignTransportType, randomUnit);
 
         // The unit should NOT have its assignment changed.
-        verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
+        verify(randomUnit, times(0)).setTransportAssignment(eq(campaignTransportType), eq(null));
 
         // And we should not have had our bay space recalculated.
-        verify(transport, times(0)).updateBayCapacity(anyInt(), anyDouble(),
-                anyBoolean(), anyInt());
+        verify(transport, times(0)).initializeTransportSpace(campaignTransportType);
     }
 
-    @Test
-    public void unloadFromTransportShipDoesNothingIfLoadedOnAnotherShip() {
+    @ParameterizedTest
+    @EnumSource(value = CampaignTransportType.class)
+    public void unloadFromTransportDoesNothingIfLoadedOnAnotherTransport(CampaignTransportType campaignTransportType) {
         Unit transport0 = spy(new Unit());
 
         Unit transport1 = mock(Unit.class);
         Unit randomUnit = mock(Unit.class);
-        when(randomUnit.hasTransportShipAssignment()).thenReturn(true);
-        when(randomUnit.getTransportShipAssignment()).thenReturn(new TransportShipAssignment(transport1, 0));
+        ITransportAssignment transportAssignment = mock(campaignTransportType.getTransportAssignmentType());
+        when(randomUnit.hasTransportAssignment(eq(campaignTransportType))).thenReturn(true);
+        when(randomUnit.getTransportAssignment(eq(campaignTransportType))).thenReturn(transportAssignment);
+        when(transportAssignment.getTransport()).thenReturn(transport1);
 
         // Try removing a ship that's on somebody else's transport
-        transport0.removeTransportedUnit(randomUnit);
+        transport0.removeTransportedUnit(campaignTransportType, randomUnit);
 
         // The unit should NOT have its assignment changed.
-        verify(randomUnit, times(0)).setTransportShipAssignment(eq(null));
+        verify(randomUnit, times(0)).setTransportAssignment(eq(campaignTransportType), eq(null));
 
         // And we should not have had our bay space recalculated.
-        verify(transport0, times(0)).updateBayCapacity(anyInt(), anyDouble(),
-                anyBoolean(), anyInt());
+        verify(transport0, times(0)).initializeTransportSpace(campaignTransportType);
     }
 }

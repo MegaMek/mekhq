@@ -5,6 +5,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -22,8 +23,6 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.util.*;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
 import static megamek.common.enums.SkillLevel.REGULAR;
@@ -41,6 +40,12 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_SUPPORT = 2;
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
+
+    /**
+     * The portion of combat teams we expect to be performing combat actions.
+     * This is one in 'x' where 'x' is the value set here.
+     */
+    static final double COMBAT_FORCE_DIVIDER = 2;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -182,64 +187,130 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Determines the number of required lances to be deployed for a contract. For Mercenary subcontracts
-     * this defaults to 1; otherwise, the number is based on the number of combat units in the
-     * campaign. Modified by a 2d6 roll if {@code bypassVariance} is {@code false}.
+     * Calculates the required number of combat teams for a contract based on campaign options,
+     * contract details, and variance factors.
      *
-     * @param campaign the current campaign
-     * @param contract the relevant contract
-     * @param bypassVariance if {@code true} requirements will not be semi-randomized.
-     * @return The number of lances required to be deployed.
+     * <p>
+     * This method determines the number of combat teams needed to deploy, taking into account factors such as:
+     * <ul>
+     *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
+     *   <li>The base formation sizes (lance-level and company-level) and the effective unit forces.</li>
+     *   <li>The maximum deployable combat teams, adjusted based on campaign strategy options.</li>
+     *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
+     *   <li>Variance adjustments applied through a dice roll, affecting the availability of forces.</li>
+     * </ul>
+     * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
+     * team while not exceeding the maximum deployable combat teams.
+     *
+     * @param campaign        the campaign containing relevant options and faction information
+     * @param contract        the contract that specifies details such as subcontract status
+     * @param bypassVariance  a flag indicating whether variance adjustments should be bypassed
+     * @return the calculated number of required combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredLances(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+    public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+        // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
         }
 
-        int formationSize = getStandardForceSize(campaign.getFaction());
-        int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
-        int maxDeployedLances = availableForces;
+        // Calculate base formation size and effective unit force
+        Faction faction = campaign.getFaction();
+        int lanceLevelFormationSize = getStandardForceSize(faction);
 
+        int effectiveForces = Math.max(getEffectiveNumUnits(campaign) / lanceLevelFormationSize, 1);
+
+        // Calculate maximum deployed forces based on strategy options
+        int maxDeployableCombatTeams = effectiveForces;
         if (campaign.getCampaignOptions().isUseStrategy()) {
-            maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
+            maxDeployableCombatTeams = Math.max(calculateMaxDeployableCombatTeams(campaign), 1);
         }
 
-        availableForces = min(availableForces, maxDeployedLances);
+        // Clamp available forces to the max deployable limit
+        int availableForces = Math.min(effectiveForces, maxDeployableCombatTeams);
 
-        // If we're bypassing variance, we can early exit here
+        // If bypassing variance, apply flat reduction (reduce force by 1/3)
         if (bypassVariance) {
-            availableForces -= (int) floor((double) availableForces / 3);
-
-            return max(availableForces, 1);
+            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
         }
 
-        // Otherwise, we roll to determine the amount we divide availableForces by
-        int roll = d6(2);
-        double varianceFactor = switch (roll) {
-            case 2 -> 4.5;
-            case 3 -> 4;
-            case 4 -> 3.5;
-            case 10 -> 2.5;
-            case 11 -> 2;
-            case 12 -> 1.5;
-            default -> 3;
-        };
+        // Apply variance based on a die roll
+        int varianceRoll = d6(2);
+        double varianceFactor = calculateVarianceFactor(varianceRoll);
 
-        availableForces -= (int) floor((double) availableForces / varianceFactor);
+        // Adjust available forces based on variance, ensuring minimum clamping
+        int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
 
-        return max(availableForces, 1);
+        if (adjustedForces < 1) {
+            adjustedForces = 1;
+        }
+
+        // Return the clamped value, ensuring it does not exceed max-deployable forces
+        return Math.min(adjustedForces, maxDeployableCombatTeams);
     }
 
     /**
-     * Determine the maximum number of lances the force can deploy. The result is based on the
-     * commander's Strategy skill and various campaign options.
-     * @param campaign
-     * @return the maximum number of lances that can be deployed on the contract.
+     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
+     *
+     * <p>
+     * The variance factor is determined by applying a multiplier to the fixed formation size divisor.
+     * The multiplier varies based on the roll value:
+     * <ul>
+     *   <li><b>Roll 2:</b> Multiplier is 0.75.</li>
+     *   <li><b>Roll 3:</b> Multiplier is 0.5.</li>
+     *   <li><b>Roll 4:</b> Multiplier is 0.25.</li>
+     *   <li><b>Rolls 10, 11, 12:</b> Multipliers are 1.25, 1.5, and 1.75 respectively.</li>
+     *   <li><b>Rolls 5-9:</b> Default multiplier is 1.0 (no change).</li>
+     * </ul>
+     *
+     * @param roll the roll value used to determine the multiplier
+     * @return the calculated variance factor as a double
      */
-    public int calculateMaxDeployedLances(Campaign campaign) {
-        return campaign.getCampaignOptions().getBaseStrategyDeployment() +
-            campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-                campaign.getCommanderStrategy();
+    private double calculateVarianceFactor(int roll) {
+        return switch (roll) {
+            case 2 -> COMBAT_FORCE_DIVIDER * 0.25;
+            case 3 -> COMBAT_FORCE_DIVIDER * 0.5;
+            case 4 -> COMBAT_FORCE_DIVIDER * 0.75;
+            case 10 -> COMBAT_FORCE_DIVIDER * 1.25;
+            case 11 -> COMBAT_FORCE_DIVIDER * 1.5;
+            case 12 -> COMBAT_FORCE_DIVIDER * 1.75;
+            default -> COMBAT_FORCE_DIVIDER; // 5-9
+        };
+    }
+
+    /**
+     * Calculates the bypass variance reduction based on the available forces.
+     *
+     * <p>
+     * The reduction is calculated by dividing the available forces by a fixed factor of 3
+     * and rounding down to the nearest whole number. This value is used in scenarios where
+     * variance adjustments are bypassed.
+     * </p>
+     *
+     * @param availableForces the total number of forces available
+     * @return the bypass variance reduction as an integer
+     */
+    private int calculateBypassVarianceReduction(int availableForces) {
+        return (int) Math.floor((double) availableForces / 3);
+    }
+
+    /**
+     * Calculates the maximum number of deployable combat teams based on the given campaign's options.
+     *
+     * <p>
+     * This method retrieves campaign options and calculates the total deployable combat teams using
+     * the base strategy deployment, additional strategy deployment, and the campaign's commander strategy.
+     * </p>
+     *
+     * @param campaign the campaign object containing the necessary data to perform the calculation
+     * @return the total number of deployable combat teams
+     */
+    public int calculateMaxDeployableCombatTeams(Campaign campaign) {
+        CampaignOptions options = campaign.getCampaignOptions();
+        int baseStrategyDeployment = options.getBaseStrategyDeployment();
+        int additionalStrategyDeployment = options.getAdditionalStrategyDeployment();
+        int commanderStrategy = campaign.getCommanderStrategy();
+
+        return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
     }
 
     protected SkillLevel getSkillRating(int roll) {

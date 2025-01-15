@@ -23,6 +23,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
 import megamek.common.autoresolve.Resolver;
 import megamek.common.autoresolve.acar.SimulationOptions;
+import megamek.common.autoresolve.converter.FlattenForces;
 import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -48,7 +49,6 @@ import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -191,16 +191,14 @@ public class ResolverTest {
 
     Campaign createCampaign() {
         var campaign = new Campaign();
-
+        campaign.setName("Test Player");
         var reputationController = mock(ReputationController.class);
         when(reputationController.getAverageSkillLevel()).thenReturn(SkillLevel.REGULAR);
 
-
         campaign.setReputation(reputationController);
-
         var force = new Force("Heroes");
-        campaign.addForce(force, campaign.getForce(0));
 
+        campaign.addForce(force, campaign.getForce(0));
         return campaign;
     }
 
@@ -354,7 +352,7 @@ public class ResolverTest {
         when(botForce.getTeam()).thenReturn(2);
         when(botForce.getFullEntityList(any())).thenReturn(entities);
 
-        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario), SimulationOptions.empty(), new Board(30, 30));
+        var resolver = Resolver.simulationRun(new AtBSetupForces(campaign, units, scenario, new FlattenForces()), SimulationOptions.empty(), new Board(30, 30));
         autoResolveConcludedEvent.accept(resolver.resolveSimulation());
     }
 

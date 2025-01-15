@@ -35,6 +35,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
@@ -61,6 +62,8 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.unit.ShipTransportedUnitsSummary;
+import mekhq.campaign.unit.TacticalTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
@@ -81,6 +84,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
@@ -432,6 +437,14 @@ public class CampaignXmlParser {
                 // force, so check to make sure they aren't already here
                 if (!s.isAssigned(unit, retVal)) {
                     s.addUnit(unit.getId());
+                }
+            }
+
+            //Update the campaign transport availability if this is a transport.
+            //If it's empty we should be able to just ignore it
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (unit.hasTransportedUnits(campaignTransportType)) {
+                    retVal.updateTransportInTransports(campaignTransportType, unit);
                 }
             }
         });
@@ -866,6 +879,11 @@ public class CampaignXmlParser {
             } else {
                 logger.error("More than one type-level force found");
             }
+        }
+
+        // This removes the risk of having forces with invalid leadership getting locked in
+        for (Force force : retVal.getAllForces()) {
+            force.updateCommander(retVal);
         }
 
         recalculateCombatTeams(retVal);
