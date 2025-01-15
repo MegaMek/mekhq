@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.apache.commons.csv.CSVFormat;
@@ -1276,6 +1277,89 @@ public class Utilities {
             } else if (loadGround) {
                 sendLoadEntity(client, id, trnId, cargo);
             }
+        }
+    }
+
+    /**
+     * Handles loading a player's transported units onto their transports once a
+     * megamek scenario has actually started.
+     *
+     *
+     * @param trnId          - The MM id of the transport entity we want to load
+     * @param toLoad         - Map of entity ids and transport assignments for the units we want to load
+     * @param client         - the player's Client instance
+     * @param loadTactical  - Should "tactical"-ly transported units be loaded?
+     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
+     * @see mekhq.campaign.enums.CampaignTransportType#TACTICAL_TRANSPORT
+     * @see ITransportAssignment
+     */
+    public static void loadPlayerTransports(int trnId, Map<Integer, ? extends ITransportAssignment> toLoad, Client client,
+                                            boolean loadTactical, boolean isAlreadyReset) {
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
+
+        if (!loadTactical) {
+            // Nothing to do. Get outta here!
+            return;
+        }
+        Entity transport = client.getEntity(trnId);
+
+        if (transport == null) {
+            return;
+        }
+
+        // Reset transporter status, as currentSpace might still retain updates from
+        // when the Unit
+        // was assigned to the Transport on the TO&E tab
+        if (!isAlreadyReset) {
+            transport.resetTransporter();
+        }
+
+        for (int id : toLoad.keySet()) {
+            Entity cargo = client.getEntity(id);
+            if (cargo == null) {
+                continue;
+            }
+
+            ITransportAssignment transportAssignment = toLoad.get(id);
+
+            if (transportAssignment == null) {
+                continue;
+            }
+
+            // Find a bay with space in it and update that space so the next unit can
+            // process, unless the unit isn't being loaded into a bay
+            if (transportAssignment.getTransportedLocation() instanceof Bay bay) {
+                cargo.setTargetBay(bay.getBayNumber());
+            } else {
+                if (transportAssignment.isTransportedInBay()) {
+                    cargo.setTargetBay(selectBestBayFor(cargo, transport));
+                }
+            }
+        }
+
+        // If we reset the transporters for the Ship transport, we'll need to save those units
+        // before we remove the fake capacity that was removed by selectBestBayFor
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(transport.getLoadedUnits());
+        }
+
+        // Reset transporter status again so that sendLoadEntity can process correctly
+        transport.resetTransporter();
+
+        //Restore the Ship transported entities
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            transport.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
+        for (int id : toLoad.keySet()) {
+            Entity cargo = client.getEntity(id);
+            if (!transport.canLoad(cargo, false)) {
+                continue;
+            }
+
+            //Transported units should deploy on their transport's turn
+            cargo.setDeployRound(transport.getDeployRound());
+
+            sendLoadEntity(client, id, trnId, cargo);
         }
     }
 

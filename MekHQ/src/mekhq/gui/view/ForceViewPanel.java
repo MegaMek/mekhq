@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -590,6 +590,12 @@ public class ForceViewPanel extends JScrollablePanel {
             if (unit.getCurrentInfantryCapacity() > 0) {
                 toReturn += "<br><i>" + "Infantry Bays: " + (int) unit.getCurrentInfantryCapacity() + " tons free.</i>";
             }
+        }
+        //Let's get preferred transport too
+        if (unit.hasTacticalTransportAssignment()) {
+            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
+            toReturn += "</i>";
         }
         toReturn += "</font></html>";
         return toReturn;

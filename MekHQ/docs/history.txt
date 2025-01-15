@@ -84,6 +84,7 @@ MEKHQ VERSION HISTORY:
 + Fix #5713, #5737 Updated & Fixed Required Combat Team Calculations;
              Reworked Combat Team Requirement Contract Pay Modifiers; Added Contract Difficulty Modifier
 + PR #4963: Implemented Campaign Options IIC - Full rework of all MekHQ options
++ Fix #3650, #4006, #4712, #5593: Added Ability to Link Units in MekHQ
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
