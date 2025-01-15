@@ -1061,8 +1061,9 @@ public class StratconRulesManager {
      */
     private static @Nullable StratconCoords getUnoccupiedAdjacentCoords(StratconCoords originCoords,
                                                                        StratconTrackState trackState) {
-        final int trackWidth = trackState.getWidth();
-        final int trackHeight = trackState.getHeight();
+        // We need to reduce width/height by one because coordinates index from 0, not 1
+        final int trackWidth = trackState.getWidth() - 1;
+        final int trackHeight = trackState.getHeight() - 1;
 
         List<StratconCoords> suitableCoords = new ArrayList<>();
         for (int direction : ALL_DIRECTIONS) {
