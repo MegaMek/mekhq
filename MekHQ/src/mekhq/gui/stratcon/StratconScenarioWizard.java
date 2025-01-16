@@ -53,7 +53,7 @@ import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**

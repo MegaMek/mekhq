@@ -21,6 +21,7 @@
  */
 package mekhq.campaign;
 
+import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.generator.RandomGenderGenerator;
@@ -179,6 +180,7 @@ public class Campaign implements ITechManager {
     public static final String REPORT_LINEBREAK = "<br/><br/>";
 
     private UUID id;
+    private Version version; // this is dynamically populated on load and doesn't need to be saved
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
@@ -435,6 +437,14 @@ public class Campaign implements ITechManager {
 
     public UUID getId() {
         return id;
+    }
+
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    public @Nullable Version getVersion() {
+        return version;
     }
 
     public String getName() {
@@ -1212,6 +1222,53 @@ public class Campaign implements ITechManager {
                 .filter(c -> c instanceof AtBContract)
                 .map(c -> (AtBContract) c)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Determines whether there is an active AtB (Against the Bot) contract.
+     * This method checks if there are contracts currently active. Optionally,
+     * it can also consider future contracts that have been accepted but have
+     * not yet started.
+     *
+     * @param includeFutureContracts a boolean indicating whether contracts that
+     *                               have been accepted but have not yet started
+     *                               should also be considered as active.
+     * @return {@code true} if there is any currently active AtB contract, or if
+     *         {@code includeFutureContracts} is {@code true} and there are future
+     *         contracts starting after the current date. Otherwise, {@code false}.
+     * @see #hasFutureAtBContract()
+     */
+    public boolean hasActiveAtBContract(boolean includeFutureContracts) {
+        if (!getActiveAtBContracts().isEmpty()) {
+            return true;
+        }
+
+        if (includeFutureContracts) {
+            return hasFutureAtBContract();
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether there are any future AtB (Against the Bot) contracts.
+     * A future contract is defined as a contract that has been accepted but
+     * has a start date later than the current day.
+     *
+     * @return true if there is at least one future AtB contract (accepted but
+     *         starting after the current date). Otherwise, false.
+     */
+    public boolean hasFutureAtBContract() {
+        List<AtBContract> contracts = getAtBContracts();
+
+        for (AtBContract contract : contracts) {
+            // This catches any contracts that have been accepted, but haven't yet started
+            if (contract.getStartDate().isAfter(currentDay)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public List<AtBContract> getActiveAtBContracts() {
