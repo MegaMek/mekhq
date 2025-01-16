@@ -334,6 +334,8 @@ public class Loot {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cash", getCash());
         for (Entity entity : units) {
+            // This null protection was implemented in 50.03 to guard against a bug in the
+            // depreciated Legacy AtB Digital GM.
             if (entity == null) {
                 continue;
             }
@@ -342,6 +344,8 @@ public class Loot {
         }
 
         for (Part part : parts) {
+            // This null protection was implemented in 50.03 to guard against a bug in the
+            // depreciated Legacy AtB Digital GM.
             if (part == null) {
                 continue;
             }
