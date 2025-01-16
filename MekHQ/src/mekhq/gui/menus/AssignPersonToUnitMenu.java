@@ -225,7 +225,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // Pilot Menu
                 if (unit.canTakeMoreDrivers()) {
                     // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
-                    if (singlePerson && (unit.usesSoloPilot() || (entity instanceof VTOL) || entity.isSuperHeavy() || entity.isTripodMek())) {
+                    if (singlePerson && (unit.usesSoloPilot() || (entity instanceof VTOL) || entity.isSuperHeavy() || entity.isTripodMek() || entity.isQuadMek())) {
                         final boolean valid;
                         if (entity instanceof Mek) {
                             valid = areAllBattleMekPilots;
@@ -320,7 +320,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     } else if ((entity instanceof SmallCraft)
                             || (entity instanceof Jumpship)) {
                         valid = areAllVesselGunners;
-                    } else if (entity.isTripodMek() || entity.isSuperHeavy()) {
+                    } else if (entity.isTripodMek() || entity.isSuperHeavy() || entity.isQuadMek()) {
                         valid = areAllBattleMekPilots;
                     } else {
                         valid = false;
