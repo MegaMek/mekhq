@@ -7507,6 +7507,7 @@ public class Campaign implements ITechManager {
         entity.resetCoolantFailureAmount();
         entity.setConversionMode(0);
         entity.setDoomed(false);
+        entity.setDestroyed(false);
         entity.setHidden(false);
         entity.clearNarcAndiNarcPods();
         entity.setShutDown(false);
