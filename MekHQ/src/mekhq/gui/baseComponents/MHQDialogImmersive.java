@@ -20,6 +20,7 @@ package mekhq.gui.baseComponents;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -45,6 +46,7 @@ public class MHQDialogImmersive extends JDialog {
     private final int INSERT_SIZE = UIUtil.scaleForGUI(10);
     private final int IMAGE_WIDTH = 100; // This is scaled to GUI by 'scaleImageIconToWidth'
 
+    private JPanel northPanel;
     private JPanel southPanel;
     private JPanel buttonPanel;
     private final Person leftSpeaker;
@@ -52,8 +54,7 @@ public class MHQDialogImmersive extends JDialog {
 
     private int dialogChoice;
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
+    private static final MMLogger logger = MMLogger.create(MHQDialogImmersive.class);
 
     /**
      * Retrieves the user's selected dialog choice.
@@ -113,6 +114,8 @@ public class MHQDialogImmersive extends JDialog {
 
         int gridx = 0;
 
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMHQOptions().getLocale());
         setTitle(resources.getString("incomingTransmission.title"));
 
         // Main Panel to hold all boxes
@@ -190,34 +193,17 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Creates and displays an instance of the {@link MHQDialogImmersive}.
+     * Handles hyperlink clicks from HTML content.
      * <p>
-     * This method acts as a factory for generating and displaying the dialog,
-     * allowing easy instantiation without requiring custom panel widths.
+     * This method provides a default implementation that does nothing. Subclasses should override
+     * this to provide specific behavior when hyperlinks are clicked.
+     * </p>
      *
-     * @param campaign              The {@link Campaign} tied to the dialog.
-     * @param leftSpeaker           The optional {@link Person} to display as the left speaker in
-     *                              the dialog. Can be {@code null}.
-     * @param rightSpeaker          The optional {@link Person} to display as the right speaker in
-     *                             the dialog. Can be {@code null}.
-     * @param centerMessage         The main message to display in the dialog.
-     * @param buttons               A list of {@link ButtonLabelTooltipPair} buttons with labels
-     *                             and optional tooltips.
-     * @param outOfCharacterMessage An optional custom OOC message displayed beneath the buttons.
-     *                             Can be {@code null}.
-     * @param defaultChoiceIndex    The default index selected if no user action is taken.
-     * @return A newly created and displayed instance of {@link MHQDialogImmersive}.
-     *
-     * @see #MHQDialogImmersive(Campaign, Person, Person, String, List, String, int, Integer,
-     * Integer, Integer)
+     * @param campaign The {@link Campaign} instance that contains relevant data.
+     * @param href The hyperlink reference (e.g., a URL or a specific identifier).
      */
-    public static MHQDialogImmersive createMHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
-                                                @Nullable Person rightSpeaker, String centerMessage,
-                                                List<ButtonLabelTooltipPair> buttons,
-                                                @Nullable String outOfCharacterMessage,
-                                                int defaultChoiceIndex) {
-        return new MHQDialogImmersive(campaign, leftSpeaker, rightSpeaker, centerMessage, buttons,
-            outOfCharacterMessage, defaultChoiceIndex, null, null, null);
+    protected void handleHyperlinkClick(Campaign campaign, String href) {
+        logger.error("handleHyperlinkClick() was not overridden in the subclass.");
     }
 
     /**

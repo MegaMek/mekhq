@@ -278,6 +278,7 @@ public class Campaign implements ITechManager {
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
+    private List<Person> personnelWhoAdvancedInXP;
 
     private RetirementDefectionTracker retirementDefectionTracker;
     private List<String> turnoverRetirementInformation;
@@ -379,6 +380,7 @@ public class Campaign implements ITechManager {
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
+        personnelWhoAdvancedInXP = new ArrayList<>();
         retirementDefectionTracker = new RetirementDefectionTracker();
         turnoverRetirementInformation = new ArrayList<>();
         atbConfig = null;
@@ -661,6 +663,14 @@ public class Campaign implements ITechManager {
 
     public RetirementDefectionTracker getRetirementDefectionTracker() {
         return retirementDefectionTracker;
+    }
+
+    public void setPersonnelWhoAdvancedInXP(List<Person> personnelWhoAdvancedInXP) {
+        this.personnelWhoAdvancedInXP = personnelWhoAdvancedInXP;
+    }
+
+    public List<Person> getPersonnelWhoAdvancedInXP() {
+        return personnelWhoAdvancedInXP;
     }
 
     public List<String> getTurnoverRetirementInformation() {
@@ -4276,11 +4286,17 @@ public class Campaign implements ITechManager {
             // apply for support personnel - combat troops reset with each new mm game
             processWeeklyEdgeResets(person);
 
-            processMonthlyVocationalXp(person);
+            if (processMonthlyVocationalXp(person)) {
+                personnelWhoAdvancedInXP.add(person);
+            }
 
             processAnniversaries(person);
 
             processMonthlyAutoAwards(person);
+        }
+
+        if (!personnelWhoAdvancedInXP.isEmpty()) {
+            addReport("personnel <a href='PERSONNEL_ADVANCEMENT|'>advanced</a> in vocational XP: ");
         }
     }
 
@@ -4347,31 +4363,33 @@ public class Campaign implements ITechManager {
      *
      * @param person the {@link Person} whose monthly vocational XP gain is being processed.
      */
-    private void processMonthlyVocationalXp(Person person) {
+    private boolean processMonthlyVocationalXp(Person person) {
         if (!person.getStatus().isActive()) {
-            return;
+            return false;
         }
 
         if (person.isChild(currentDay)) {
-            return;
+            return false;
         }
 
         if (person.isDependent()) {
-            return;
+            return false;
         }
 
         if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can
             person.setIdleMonths(person.getIdleMonths() + 1);
             if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                 if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
                     person.awardXP(this, getCampaignOptions().getIdleXP());
-                    addReport(person.getHyperlinkedFullTitle() + " has gained "
-                            + getCampaignOptions().getIdleXP() + " XP");
+                    person.setIdleMonths(0);
+                    return true;
                 }
                 person.setIdleMonths(0);
             }
         }
+
+        return false;
     }
 
     /**
@@ -4656,6 +4674,7 @@ public class Campaign implements ITechManager {
         currentReport.clear();
         currentReportHTML="";
         newReports.clear();
+        personnelWhoAdvancedInXP.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
@@ -5928,6 +5947,12 @@ public class Campaign implements ITechManager {
         }
 
         retirementDefectionTracker.writeToXML(pw, indent);
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelWhoAdvancedInXP");
+        for (Person person : personnelWhoAdvancedInXP) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personWhoAdvancedInXP", person.getId());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelWhoAdvancedInXP");
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
         for (Unit unit : automatedMothballUnits) {
