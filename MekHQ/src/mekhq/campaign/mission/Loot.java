@@ -333,12 +333,20 @@ public class Loot {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loot");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cash", getCash());
-        for (Entity e : units) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", e.getShortNameRaw());
+        for (Entity entity : units) {
+            if (entity == null) {
+                continue;
+            }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", entity.getShortNameRaw());
         }
 
-        for (Part p : parts) {
-            p.writeToXML(pw, indent);
+        for (Part part : parts) {
+            if (part == null) {
+                continue;
+            }
+
+            part.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loot");
     }
