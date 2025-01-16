@@ -78,10 +78,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
-import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
-import static java.lang.Math.max;
-import static java.lang.Math.round;
+import static java.lang.Math.*;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
@@ -97,6 +94,7 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -504,7 +502,7 @@ public class AtBContract extends Contract {
                     case 0,1 -> AtBMoraleLevel.STALEMATE;
                     case 2,3,4,5 -> AtBMoraleLevel.ADVANCING;
                     case 6,7 -> AtBMoraleLevel.DOMINATING;
-                    case 8 -> AtBMoraleLevel.OVERWHELMING;
+                    case 8 -> OVERWHELMING;
                     default -> AtBMoraleLevel.STALEMATE;
                 };
 
@@ -633,7 +631,7 @@ public class AtBContract extends Contract {
             moraleLevel = moraleLevels[max(getMoraleLevel().ordinal() - 1, 0)];
             logger.info("Result: Morale Level -1");
         } else if ((roll > 9)) {
-            moraleLevel = moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)];
+            moraleLevel = moraleLevels[min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)];
             logger.info("Result: Morale Level +1");
         } else {
             logger.info("Result: Morale Unchanged");
@@ -713,7 +711,7 @@ public class AtBContract extends Contract {
             repairLocation++;
         }
 
-        return Math.min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
+        return min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
     }
 
     public void addMoraleMod(int mod) {
@@ -1087,7 +1085,7 @@ public class AtBContract extends Contract {
         }
 
         final int extension;
-        final int roll = d6();
+        int roll = d6();
         if (roll == 1) {
             extension = max(1, getLength() / 2);
         } else if (roll == 2) {
@@ -1101,6 +1099,22 @@ public class AtBContract extends Contract {
                 warName, extension, ((extension == 1) ? " month" : " months")));
         setEndDate(getEndingDate().plusMonths(extension));
         extensionLength += extension;
+
+        // We spike morale to create a jump in contract difficulty
+        // - essentially the reason why the employer is using the emergency clause.
+        int moraleOrdinal = moraleLevel.ordinal();
+        roll = d6(2) / 2;
+
+        // we need to reset routEnd to null otherwise we'll attempt to rally
+        if (routEnd != null) {
+            routEnd = null;
+        }
+
+        moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
+        moraleLevel = AtBMoraleLevel.values()[moraleOrdinal];
+
+        campaign.addReport(moraleLevel.getToolTipText());
+
         MekHQ.triggerEvent(new MissionChangedEvent(this));
         return true;
     }
@@ -1976,7 +1990,7 @@ public class AtBContract extends Contract {
             mappedValue = 5 + mappedValue;
         }
 
-        return Math.min(max(mappedValue, 1), 10);
+        return min(max(mappedValue, 1), 10);
     }
 
     /**
