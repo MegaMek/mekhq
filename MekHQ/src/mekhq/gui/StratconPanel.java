@@ -945,7 +945,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         StratconScenario selectedScenario = getSelectedScenario();
         if ((selectedScenario != null) &&
-                ((selectedScenario.getDeploymentDate() != null) || currentTrack.isGmRevealed())) {
+                (coordsRevealed || currentTrack.isGmRevealed())) {
             infoBuilder.append(selectedScenario.getInfo(campaign));
         }
 
