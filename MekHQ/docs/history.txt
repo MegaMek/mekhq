@@ -84,6 +84,17 @@ MEKHQ VERSION HISTORY:
 + Fix #5713, #5737 Updated & Fixed Required Combat Team Calculations;
              Reworked Combat Team Requirement Contract Pay Modifiers; Added Contract Difficulty Modifier
 + PR #4963: Implemented Campaign Options IIC - Full rework of all MekHQ options
++ Fix #3650, #4006, #4712, #5593: Added Ability to Link Units in MekHQ
++ PR #5757: Warnings on Campaign Load
++ PR #5790: Removed Legacy AtB Scenarios from StratCon Campaigns
++ PR #5791: Updated Contract Role Requirements
++ Fix #5777: QuadMeks (and QuadVees) that use Gunner & Pilot can be crewed
++ PR #5795: Replaced a Number of Placeholder Flavor Text & Fixed Encoding Error
++ PR #5796: Fixed Incorrect Condition for VTOL Unit Check
++ PR #5797: Refactored Portrait Mass Assignment Controls to Use Buttons
++ Fix #5750: Added Contract Breach CVP Penalties to StratCon Contracts
++ Fix #6416: Ghostbusting - Reset isDestroyed for entities when returning to MekHQ
+
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

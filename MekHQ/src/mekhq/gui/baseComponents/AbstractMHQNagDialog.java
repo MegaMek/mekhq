@@ -29,7 +29,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 /**

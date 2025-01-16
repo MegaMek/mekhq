@@ -196,7 +196,7 @@ public class ResupplyUtilities {
                 continue;
             }
 
-            if (!entity.isAirborneVTOLorWIGE()) {
+            if (entity.isAirborneVTOLorWIGE()) {
                 vtolCount++;
             }
         }

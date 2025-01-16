@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,6 +34,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
@@ -139,6 +140,7 @@ public class CampaignXmlParser {
             throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
                     campaignEle.getAttribute("version")));
         }
+        retVal.setVersion(version);
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -236,6 +238,8 @@ public class CampaignXmlParser {
                 // level.
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
+
+
 
                 if (xn.equalsIgnoreCase("campaignOptions")) {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
@@ -430,6 +434,14 @@ public class CampaignXmlParser {
                 // force, so check to make sure they aren't already here
                 if (!s.isAssigned(unit, retVal)) {
                     s.addUnit(unit.getId());
+                }
+            }
+
+            //Update the campaign transport availability if this is a transport.
+            //If it's empty we should be able to just ignore it
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (unit.hasTransportedUnits(campaignTransportType)) {
+                    retVal.updateTransportInTransports(campaignTransportType, unit);
                 }
             }
         });

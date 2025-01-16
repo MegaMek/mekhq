@@ -20,13 +20,7 @@ package mekhq.campaign.unit.actions;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 
@@ -89,7 +83,7 @@ public class RestoreUnitActionTest {
 
         verify(unit, times(1)).setEntity(eq(mockNewEntity));
         verify(unit, times(1)).removeParts();
-        verify(unit, times(1)).initializeBaySpace();
+        verify(unit, times(1)).initializeAllTransportSpace();
         verify(unit, times(1)).initializeParts(eq(true));
         verify(unit, times(1)).runDiagnostic(eq(false));
         verify(unit, times(1)).setSalvage(eq(false));

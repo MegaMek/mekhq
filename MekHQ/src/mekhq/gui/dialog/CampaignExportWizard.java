@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,6 +46,7 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.Kill;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
@@ -516,10 +517,14 @@ public class CampaignExportWizard extends JDialog {
             // Reset any transport assignments, as the export may not contain all transports
             // and cargo units
             unit.setTransportShipAssignment(null);
+            unit.setTransportShipAssignment(null);
 
-            if (unit.hasTransportedUnits()) {
-                unit.unloadTransportShip();
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (unit.hasTransportedUnits(campaignTransportType)) {
+                    unit.unloadTransport(campaignTransportType);
+                }
             }
+
 
             // make an attempt to re-construct the force structure in the destination
             // campaign

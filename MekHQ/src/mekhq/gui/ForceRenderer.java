@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -127,7 +127,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 transport.append("<br>Transported by: ")
                         .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
-            String text = name + ", " + unitName + c3network + transport;
+            String tacticalTransport = "";
+            if (unit.hasTacticalTransportAssignment()) {
+                transport.append("<br>Transported by: ")
+                    .append(unit.getTacticalTransportAssignment().getTransport().getName());
+            }
+
+            String text = name + ", " + unitName + c3network + transport + tacticalTransport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
             if((null != person) && (null != force) && (person.getId() == force.getForceCommanderID())) {
