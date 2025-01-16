@@ -234,11 +234,15 @@ public class StratconScenario implements IStratconDisplayable {
                     .append("<br/>");
             }
 
+            int hostileBV = backingScenario.getTeamTotalBattleValue(campaign, false);
+            int alliedBV = backingScenario.getTeamTotalBattleValue(campaign, true);
+
             if (campaign != null) {
-                stateBuilder.append(String.format("<b>Hostile BV:</b> %d<br>",
-                    backingScenario.getTeamTotalBattleValue(campaign, false)));
-                stateBuilder.append(String.format("<b>Allied BV:</b> %d",
-                    backingScenario.getTeamTotalBattleValue(campaign, true)));
+                stateBuilder.append(String.format("<b>Hostile BV:</b> %s<br>",
+                    hostileBV == 0 && alliedBV == 0 ? "UNKNOWN" : hostileBV));
+                stateBuilder.append(String.format("<b>Allied BV:</b> %s",
+                    hostileBV == 0 && alliedBV == 0 ? "UNKNOWN" : alliedBV
+                    ));
             }
         }
 
