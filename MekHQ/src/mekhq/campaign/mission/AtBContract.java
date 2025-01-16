@@ -94,7 +94,10 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.rating.IUnitRating.*;
 import static mekhq.campaign.stratcon.StratconContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -232,7 +235,7 @@ public class AtBContract extends Contract {
 
         sharesPct = 0;
         batchallAccepted = true;
-        setMoraleLevel(AtBMoraleLevel.STALEMATE);
+        setMoraleLevel(STALEMATE);
         routEnd = null;
         priorLogisticsFailure = false;
         specialEventScenarioDate = null;
@@ -499,11 +502,11 @@ public class AtBContract extends Contract {
                 // This works with the regenerated Scenario Odds to crease very high intensity
                 // spikes in otherwise low-key Garrison-type contracts.
                 AtBMoraleLevel newMoraleLevel = switch (roll) {
-                    case 0,1 -> AtBMoraleLevel.STALEMATE;
-                    case 2,3,4,5 -> AtBMoraleLevel.ADVANCING;
-                    case 6,7 -> AtBMoraleLevel.DOMINATING;
+                    case 0,1 -> STALEMATE;
+                    case 2,3,4,5 -> ADVANCING;
+                    case 6,7 -> DOMINATING;
                     case 8 -> OVERWHELMING;
-                    default -> AtBMoraleLevel.STALEMATE;
+                    default -> STALEMATE;
                 };
 
                 // If we have a StratCon enabled contract, regenerate Scenario Odds
