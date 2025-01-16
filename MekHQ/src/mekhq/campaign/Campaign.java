@@ -4307,7 +4307,9 @@ public class Campaign implements ITechManager {
         }
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
-            addReport("personnel <a href='PERSONNEL_ADVANCEMENT|'>advanced</a> in vocational XP: ");
+            addReport(String.format(resources.getString("gainedExperience.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                personnelWhoAdvancedInXP.size(), CLOSING_SPAN_TAG));
         }
     }
 
