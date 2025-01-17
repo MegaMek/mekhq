@@ -19,7 +19,6 @@
 package mekhq;
 
 import io.sentry.Sentry;
-import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.BehaviorSettings;
@@ -27,6 +26,8 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
+import megamek.client.ui.swing.IDisconnectSilently;
+import megamek.client.ui.swing.ILocalBots;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -37,6 +38,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.AcarGUI;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.PotentialTransportsMap;
 
@@ -63,7 +65,7 @@ public class AtBGameThread extends GameThread {
 
     private final AtBScenario scenario;
     private final BehaviorSettings autoResolveBehaviorSettings;
-
+    private final boolean minimalGUI;
     /**
      * Constructor for AtBGameThread
      *
@@ -82,31 +84,35 @@ public class AtBGameThread extends GameThread {
      */
     public AtBGameThread(String name, String password, Client client, MekHQ app, List<Unit> units,
                          AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings) {
-        this(name, password, client, app, units, scenario, autoResolveBehaviorSettings, true);
+        this(name, password, client, app, units, scenario, autoResolveBehaviorSettings, false, true);
     }
 
     public AtBGameThread(String name, String password, Client client, MekHQ app, List<Unit> units,
-            AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings, boolean started) {
+            AtBScenario scenario, @Nullable BehaviorSettings autoResolveBehaviorSettings, boolean minimalGUI, boolean started) {
         super(name, password, client, app, units, scenario, started);
         this.scenario = Objects.requireNonNull(scenario);
         this.autoResolveBehaviorSettings = autoResolveBehaviorSettings;
+        this.minimalGUI = minimalGUI;
     }
 
     @Override
     public void run() {
         client.addCloseClientListener(this);
 
-        if (swingGui != null) {
-            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
-                client2.die();
-            }
-            swingGui.getLocalBots().clear();
-        }
         createController();
-        swingGui = new ClientGUI(client, controller);
+        if (minimalGUI)
+        {
+            var acarGui = new AcarGUI(client, controller);
+            localBots = acarGui;
+            swingGui = acarGui;
+        } else {
+            var clientGui = new ClientGUI(client, controller);
+            localBots = clientGui;
+            swingGui = clientGui;
+        }
+
         controller.clientgui = swingGui;
         swingGui.initialize();
-
         try {
             client.connect();
         } catch (Exception ex) {
@@ -337,20 +343,23 @@ public class AtBGameThread extends GameThread {
                 }
                 client.sendAddEntity(entities);
                 client.sendPlayerInfo();
-
+                var botClients = new ArrayList<BotClient>();
+                var botName = new HashSet<String>();
                 /* Add bots */
                 for (int i = 0; i < scenario.getNumBots(); i++) {
                     BotForce bf = scenario.getBotForce(i);
                     String name = bf.getName();
-                    if (swingGui.getLocalBots().containsKey(name)) {
+                    if (botName.contains(name)) {
                         int append = 2;
-                        while (swingGui.getLocalBots().containsKey(name + append)) {
+                        while (botName.contains(name + append)) {
                             append++;
                         }
                         name += append;
                     }
                     Princess botClient = new Princess(name, client.getHost(), client.getPort());
                     botClient.setBehaviorSettings(bf.getBehaviorSettings());
+                    botClients.add(botClient);
+                    botName.add(name);
 
                     try {
                         botClient.connect();
@@ -360,7 +369,7 @@ public class AtBGameThread extends GameThread {
                                 e);
                     }
 
-                    swingGui.getLocalBots().put(name, botClient);
+                    getLocalBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
@@ -491,7 +500,13 @@ public class AtBGameThread extends GameThread {
                 // set to the players team
                 // and then moves all the player forces under this new bot
                 if (Objects.nonNull(autoResolveBehaviorSettings)) {
-                    setupPlayerBotForAutoResolve(player);
+                    botClients.add(setupPlayerBotForAutoResolve(player));
+                    client.getLocalPlayer().setDone(true);
+                    client.sendDone(true);
+                    for (var botClient : botClients) {
+                        botClient.sendDone(true);
+                    }
+
                 }
             }
 
@@ -502,7 +517,7 @@ public class AtBGameThread extends GameThread {
             Sentry.captureException(ex);
             logger.error("", ex);
         } finally {
-            swingGui.setDisconnectQuietly(true);
+            disconnectGuiSilently();
             client.die();
             client = null;
             swingGui = null;
@@ -510,7 +525,8 @@ public class AtBGameThread extends GameThread {
         }
     }
 
-    private void setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
+
+    private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
         var botName = player.getName() + ":AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
@@ -524,7 +540,7 @@ public class AtBGameThread extends GameThread {
             logger.error(String.format("Could not connect with Bot name %s", botName),
                 e);
         }
-        swingGui.getLocalBots().put(botName, botClient);
+//        swingGui.getLocalBots().put(botName, botClient);
 
         var retryCount = MekHQ.getMHQOptions().getStartGameBotClientRetryCount();
         while (botClient.getLocalPlayer() == null) {
@@ -556,6 +572,7 @@ public class AtBGameThread extends GameThread {
             .collect(Collectors.toList());
         botClient.sendChangeOwner(playerEntities, botClient.getLocalPlayer().getId());
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+        return botClient;
     }
 
     private PlanetaryConditions getPlanetaryConditions() {
