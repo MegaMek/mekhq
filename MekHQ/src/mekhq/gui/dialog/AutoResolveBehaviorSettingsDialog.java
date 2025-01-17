@@ -37,7 +37,7 @@ public class AutoResolveBehaviorSettingsDialog
      * @param campaign The campaign to get the auto resolve behavior settings from.
      */
     public AutoResolveBehaviorSettingsDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, campaign.getName() + ":AI", campaign.getAutoResolveBehaviorSettings(), null);
+        super(frame, campaign.getName() + "@AI", campaign.getAutoResolveBehaviorSettings(), null);
         setAlwaysOnTop(true);
         setCampaign(campaign);
     }
@@ -77,7 +77,7 @@ public class AutoResolveBehaviorSettingsDialog
     private void updateBehaviorSettings() {
         var autoResolveBehaviorSettings = getBehaviorSettings();
         try {
-            autoResolveBehaviorSettings.setDescription(campaign.getName() + ":AI");
+            autoResolveBehaviorSettings.setDescription(campaign.getName() + "@AI");
         } catch (PrincessException e) {
             // This should never happen, but if it does, it is not a critical error.
             // We set the auto resolve behavior setting, ignore that its description

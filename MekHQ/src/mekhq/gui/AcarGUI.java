@@ -77,7 +77,7 @@ public class AcarGUI implements IClientGUI, ILocalBots {
         public static IFF getIFFStatus(Entity entity, Player player) {
             if (entity.getOwner().isEnemyOf(player)) {
                 return ENEMY;
-            } else if (entity.getOwner().equals(player) || entity.getOwner().getName().contains(":AI")) {
+            } else if (entity.getOwner().equals(player) || entity.getOwner().getName().contains("@AI")) {
                 return OWN_FORCES;
             } else {
                 return ALLIE;
@@ -485,7 +485,7 @@ public class AcarGUI implements IClientGUI, ILocalBots {
     }
     private JPopupMenu createPriorityTargetPopup() {
         JPopupMenu popup = new JPopupMenu("Priority Target Menu");
-        var aiName = getClient().getLocalPlayer().getName() + ":AI";
+        var aiName = getClient().getLocalPlayer().getName() + "@AI";
         for (var entity : client.getEntitiesVector().stream().filter(e -> e.getOwner().isEnemyOf(client.getLocalPlayer())).toList()) {
             JMenuItem targetItem = new JMenuItem(entity.getDisplayName());
             targetItem.addActionListener(evt -> {
@@ -497,12 +497,12 @@ public class AcarGUI implements IClientGUI, ILocalBots {
     }
     private JPopupMenu createIgnoreTargetPopup() {
         JPopupMenu popup = new JPopupMenu("Ignore Target Menu");
-        var aiName = getClient().getLocalPlayer().getName() + ":AI";
+        var aiName = getClient().getLocalPlayer().getName() + "@AI";
         return popup;
     }
     private JPopupMenu createEndGamePopup() {
         JPopupMenu popup = new JPopupMenu("End Game Menu");
-        var aiName = getClient().getLocalPlayer().getName() + ":AI";
+        var aiName = getClient().getLocalPlayer().getName() + "@AI";
         JMenuItem confirmItem = new JMenuItem("Confirm End");
         confirmItem.addActionListener(evt -> {
             client.sendChat("/victory");
@@ -513,7 +513,7 @@ public class AcarGUI implements IClientGUI, ILocalBots {
 
     private JPopupMenu createRetreatPopup() {
         JPopupMenu popup = new JPopupMenu("Retreat Menu");
-        var aiName = getClient().getLocalPlayer().getName() + ":AI";
+        var aiName = getClient().getLocalPlayer().getName() + "@AI";
         JMenuItem retreatNow = new JMenuItem("Retreat Nearest Edge");
         retreatNow.addActionListener(evt -> {
             client.sendChat(aiName + ": fl : 4");
