@@ -162,8 +162,8 @@ public class BiographyTab {
 
     private JPanel pnlRandomPortrait;
     private JCheckBox[] chkUsePortrait;
-    private JCheckBox allPortraitsBox;
-    private JCheckBox noPortraitsBox;
+    private JButton btnEnableAllPortraits;
+    private JButton btnDisableAllPortraits;
     private JCheckBox chkAssignPortraitOnRoleChange;
     //end Name and Portrait Tab
 
@@ -224,8 +224,8 @@ public class BiographyTab {
 
         pnlRandomPortrait = new JPanel();
         chkUsePortrait = new JCheckBox[1]; // We're going to properly initialize this later
-        allPortraitsBox = new JCheckBox();
-        noPortraitsBox = new JCheckBox();
+        btnEnableAllPortraits = new JButton();
+        btnDisableAllPortraits = new JButton();
     }
 
     /**
@@ -1214,31 +1214,17 @@ public class BiographyTab {
 
         chkUsePortrait = new JCheckBox[personnelRoles.length];
 
-        allPortraitsBox = new JCheckBox(resources.getString("lblAllPortraitsBox.text"));
-        allPortraitsBox.addActionListener(evt -> {
-            final boolean selected = allPortraitsBox.isSelected();
-            for (final JCheckBox box : chkUsePortrait) {
-                if (selected) {
-                    box.setSelected(true);
-                }
-                box.setEnabled(!selected);
-            }
-            if (selected) {
-                noPortraitsBox.setSelected(false);
+        btnEnableAllPortraits = new CampaignOptionsButton("EnableAllPortraits");
+        btnEnableAllPortraits.addActionListener(evt -> {
+            for (JCheckBox checkBox : chkUsePortrait) {
+                checkBox.setSelected(true);
             }
         });
 
-        noPortraitsBox = new JCheckBox(resources.getString("lblNoPortraitsBox.text"));
-        noPortraitsBox.addActionListener(evt -> {
-            final boolean selected = noPortraitsBox.isSelected();
-            for (final JCheckBox box : chkUsePortrait) {
-                if (selected) {
-                    box.setSelected(false);
-                }
-                box.setEnabled(!selected);
-            }
-            if (selected) {
-                allPortraitsBox.setSelected(false);
+        btnDisableAllPortraits = new CampaignOptionsButton("DisableAllPortraits");
+        btnDisableAllPortraits.addActionListener(evt -> {
+            for (JCheckBox checkBox : chkUsePortrait) {
+                checkBox.setSelected(false);
             }
         });
 
@@ -1249,8 +1235,8 @@ public class BiographyTab {
             String.format(String.format("<html>%s</html>",
                 resources.getString("lblRandomPortraitPanel.text")))));
 
-        panel.add(allPortraitsBox);
-        panel.add(noPortraitsBox);
+        panel.add(btnEnableAllPortraits);
+        panel.add(btnDisableAllPortraits);
 
         // Add remaining checkboxes
         JCheckBox jCheckBox;
@@ -1385,16 +1371,8 @@ public class BiographyTab {
         chkAssignPortraitOnRoleChange.setSelected(options.isAssignPortraitOnRoleChange());
 
         final boolean[] usePortraitForRole = options.isUsePortraitForRoles();
-        boolean allSelected = allPortraitsBox.isSelected();
-        boolean noneSelected = noPortraitsBox.isSelected();
         for (int i = 0; i < chkUsePortrait.length; i++) {
-            if (allSelected) {
-                chkUsePortrait[i].setSelected(true);
-            } else if (noneSelected) {
-                chkUsePortrait[i].setSelected(true);
-            } else {
-                chkUsePortrait[i].setSelected(usePortraitForRole[i]);
-            }
+            chkUsePortrait[i].setSelected(usePortraitForRole[i]);
         }
     }
 

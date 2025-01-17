@@ -50,8 +50,12 @@ public class AtBSetupForces extends SetupForces {
     private final List<Unit> units;
     private final AtBScenario scenario;
     private final ForceConsolidation forceConsolidationMethod;
-
+    private final Set<Integer> teamIds = new HashSet<>();
     private final OrderFactory orderFactory;
+
+    public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario) {
+        this(campaign, units, scenario, new SingletonForces(), new OrderFactory(campaign, scenario));
+    }
 
     public AtBSetupForces(Campaign campaign, List<Unit> units, AtBScenario scenario, ForceConsolidation forceConsolidationMethod) {
         this(campaign, units, scenario, forceConsolidationMethod, new OrderFactory(campaign, scenario));
@@ -63,6 +67,17 @@ public class AtBSetupForces extends SetupForces {
         this.scenario = scenario;
         this.forceConsolidationMethod = forceConsolidationMethod;
         this.orderFactory = orderFactory;
+        setupTeamIds();
+    }
+
+    private void setupTeamIds() {
+        if (!units.isEmpty()) {
+            teamIds.add(1);
+        }
+        for (int i = 0; i < scenario.getNumBots(); i++) {
+            BotForce bf = scenario.getBotForce(i);
+            teamIds.add(bf.getTeam());
+        }
     }
 
     /**
@@ -82,6 +97,11 @@ public class AtBSetupForces extends SetupForces {
         context.getOrders().clear();
         context.getOrders().addAll(orders);
         context.getOrders().resetOrders();
+    }
+
+    @Override
+    public boolean isTeamPresent(int teamId) {
+        return teamIds.contains(teamId);
     }
 
     private static class FailedToConvertForceToFormationException extends RuntimeException {

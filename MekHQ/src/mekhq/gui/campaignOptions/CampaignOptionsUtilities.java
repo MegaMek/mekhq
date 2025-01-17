@@ -159,7 +159,7 @@ public class CampaignOptionsUtilities {
             // Create a panel for the quote
             JPanel quotePanel = new JPanel(new GridBagLayout());
             JLabel quote = new JLabel(String.format(
-                "<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
+                "<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 UIUtil.scaleForGUI(mainPanel.getPreferredSize().width),
                 resources.getString(tabName + ".border")));
 
