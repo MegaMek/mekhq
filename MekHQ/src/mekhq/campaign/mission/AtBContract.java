@@ -2,7 +2,7 @@
  * AtBContract.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -932,7 +932,7 @@ public class AtBContract extends Contract {
                 priorLogisticsFailure = false;
             }
 
-            switch (getContractType().generateEventType()) {
+            switch (getContractType().generateEventType(campaign)) {
                 case EVT_BONUSROLL:
                     campaign.addReport("<b>Special Event:</b> ");
                     doBonusRoll(campaign, false);

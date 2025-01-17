@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
 public class MHQDialogImmersive extends JDialog {
@@ -370,6 +369,27 @@ public class MHQDialogImmersive extends JDialog {
             speakerDescription.append("<b>").append(campaign.getName()).append("</b>");
         }
         return speakerDescription;
+    }
+
+    /**
+     * Retrieves the speaker's icon for dialogs. If no speaker is supplied, the faction icon
+     * for the campaign is returned instead.
+     *
+     * @param campaign the {@link Campaign} instance containing the faction icon; can be
+     *                 {@code null} to use a default image.
+     * @param speaker  the {@link Person} serving as the speaker for the dialog; can be {@code null}.
+     * @return an {@link ImageIcon} for the speaker's portrait, or the faction icon if the speaker is {@code null}.
+     */
+    public static @Nullable ImageIcon getSpeakerIcon(@Nullable Campaign campaign, @Nullable Person speaker) {
+        if (campaign == null) {
+            return new ImageIcon("data/images/universe/factions/logo_mercenaries.png");
+        }
+
+        if (speaker == null) {
+            return campaign.getCampaignFactionIcon();
+        }
+
+        return speaker.getPortrait().getImageIcon();
     }
 
     /**
