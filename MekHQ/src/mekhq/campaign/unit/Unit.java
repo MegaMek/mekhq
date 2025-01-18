@@ -5910,6 +5910,10 @@ public class Unit implements ITechnology {
         return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
     }
 
+    public boolean isMaintained() {
+        return requiresMaintenance() && (getTech() != null);
+    }
+
     public boolean isUnmaintained() {
         return requiresMaintenance() && (getTech() == null);
     }
