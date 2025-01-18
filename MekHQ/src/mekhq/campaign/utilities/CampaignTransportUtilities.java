@@ -62,9 +62,12 @@ public class CampaignTransportUtilities {
      * @return how much capacity this unit uses when being transported in this kind of transporter
      */
     public static double transportCapacityUsage(TransporterType transporterType, Entity transportedUnit) {
-        if (transporterType == INFANTRY_BAY || transporterType == INFANTRY_COMPARTMENT) {
-            if (transportedUnit instanceof Infantry) {
+        if (transportedUnit instanceof Infantry) {
+            if (transporterType == INFANTRY_BAY) {
                 return calcInfantryBayWeight(transportedUnit);
+            }
+            else if (transporterType == INFANTRY_COMPARTMENT) {
+                return calcInfantryCompartmentWeight(transportedUnit);
             }
         }
         return 1.0;
@@ -74,15 +77,27 @@ public class CampaignTransportUtilities {
      * Calculates transport bay space required by an infantry platoon,
      * which is not the same as the flat weight of that platoon
      *
-     * @param unit The Entity that we need the weight for
+     * @param entity The Entity that we need the weight for
+     * @return Capacity in tons needed to transport this entity
      */
-    public static double calcInfantryBayWeight(Entity unit) {
-        InfantryBay.PlatoonType type = InfantryBay.PlatoonType.getPlatoonType(unit);
-        if ((unit instanceof Infantry) && (type == InfantryBay.PlatoonType.MECHANIZED)) {
-            return type.getWeight() * ((Infantry) unit).getSquadCount();
+    private static double calcInfantryBayWeight(Entity entity) {
+        InfantryBay.PlatoonType type = InfantryBay.PlatoonType.getPlatoonType(entity);
+
+        if ((entity instanceof Infantry) && (type == InfantryBay.PlatoonType.MECHANIZED)) {
+            return type.getWeight() * ((Infantry) entity).getSquadCount();
         } else {
             return type.getWeight();
         }
+    }
+
+    /**
+     * Calculates transport space required for an infantry compartment
+     *
+     * @param entity The Entity that we need the weight for
+     * @return Capacity in tons needed to transport this entity
+     */
+    private static double calcInfantryCompartmentWeight(Entity entity) {
+        return entity.getWeight();
     }
 
 
