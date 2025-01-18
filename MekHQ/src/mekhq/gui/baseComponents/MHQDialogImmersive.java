@@ -20,6 +20,7 @@ package mekhq.gui.baseComponents;
 
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -28,15 +29,28 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static java.lang.Math.round;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
+/**
+ * An immersive dialog used in MekHQ to display interactions between speakers,
+ * messages, and actions. The dialog supports entities such as speakers, campaign,
+ * buttons, and optional details for enhanced storytelling.
+ *
+ * <p>It allows displaying one or more speakers in a dialog alongside a central message,
+ * optional out-of-character notes, and UI buttons for user interaction.</p>
+ *
+ * <p>The dialog is flexible in terms of panel layout and width adjustments,
+ * allowing for dynamic configurations based on the input parameters.</p>
+ */
 public class MHQDialogImmersive extends JDialog {
-    private final Campaign campaign;
+    private Campaign campaign;
 
     private int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
@@ -45,15 +59,15 @@ public class MHQDialogImmersive extends JDialog {
     private final int INSERT_SIZE = UIUtil.scaleForGUI(10);
     private final int IMAGE_WIDTH = 100; // This is scaled to GUI by 'scaleImageIconToWidth'
 
+    private JPanel northPanel;
     private JPanel southPanel;
     private JPanel buttonPanel;
-    private final Person leftSpeaker;
-    private final Person rightSpeaker;
+    private Person leftSpeaker;
+    private Person rightSpeaker;
 
     private int dialogChoice;
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle(
-        "mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
+    private static final MMLogger logger = MMLogger.create(MHQDialogImmersive.class);
 
     /**
      * Retrieves the user's selected dialog choice.
@@ -73,27 +87,38 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Constructs an immersive dialog for displaying speakers, a message, and action buttons.
+     * Minimal constructor for initializing the immersive dialog with default width configurations.
      *
-     * @param campaign              The {@link Campaign} tied to the dialog.
-     * @param leftSpeaker           The optional {@link Person} to display as the left speaker in the dialog.
-     *                              Pass {@code null} for no left speaker.
-     * @param rightSpeaker          The optional {@link Person} to display as the right speaker in the dialog.
-     *                              Pass {@code null} for no right speaker.
-     * @param centerMessage         The main message displayed in the center of the dialog.
-     * @param buttons               A list of {@link ButtonLabelTooltipPair} controls to add below the message. Button
-     *                              labels and tooltips are defined in these pairs.
-     * @param outOfCharacterMessage An optional message displayed below the buttons (normally for
-     *                             OOC notes). Pass {@code null} for no message.
-     * @param leftWidth             Optional custom width for the left speaker panel. Pass {@code null}
-     *                             to use default width.
-     * @param defaultChoiceIndex   The index of the button included in {@code buttons} that is
-     *                            presumed to have been selected if the user cancels the dialog.
-     *                            Essentially, the default user choice if no other choice is made.
-     * @param centerWidth           Optional custom width for the center panel. Pass {@code null} to
-     *                             use default width.
-     * @param rightWidth            Optional custom width for the right speaker panel. Pass {@code null}
-     *                             to use default width.
+     * @param campaign The {@link Campaign} associated with the dialog.
+     * @param leftSpeaker The optional left-side speaker; {@code null} if none.
+     * @param rightSpeaker The optional right-side speaker; {@code null} if none.
+     * @param centerMessage The message displayed at the center of the dialog.
+     * @param buttons The list of buttons to display, each accompanied by a tooltip.
+     * @param outOfCharacterMessage Optional out-of-character notes; {@code null} if none.
+     * @param defaultChoiceIndex The default choice index if no button is explicitly selected.
+     */
+    public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
+                              @Nullable Person rightSpeaker, String centerMessage,
+                              List<ButtonLabelTooltipPair> buttons,
+                              @Nullable String outOfCharacterMessage, int defaultChoiceIndex) {
+        new MHQDialogImmersive(campaign, leftSpeaker, rightSpeaker, centerMessage, buttons,
+            outOfCharacterMessage, defaultChoiceIndex,
+            null, null, null);
+    }
+
+    /**
+     * Full constructor for initializing the immersive dialog with detailed layouts.
+     *
+     * @param campaign The {@link Campaign} tied to the dialog.
+     * @param leftSpeaker Optional left-side {@link Person}; {@code null} if none.
+     * @param rightSpeaker Optional right-side {@link Person}; {@code null} if none.
+     * @param centerMessage The main message displayed in the dialog's center.
+     * @param buttons The list of {@link ButtonLabelTooltipPair} actions for the dialog.
+     * @param outOfCharacterMessage Optional out-of-character message below the buttons.
+     * @param defaultChoiceIndex Default button index assumed when the user closes the dialog.
+     * @param leftWidth Optional width for the left panel; defaults to a pre-defined width if null.
+     * @param centerWidth Optional width for the center panel; defaults if null.
+     * @param rightWidth Optional width for the right panel; defaults if null.
      */
     public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
                               @Nullable Person rightSpeaker, String centerMessage,
@@ -101,18 +126,17 @@ public class MHQDialogImmersive extends JDialog {
                               @Nullable String outOfCharacterMessage, int defaultChoiceIndex,
                               @Nullable Integer leftWidth, @Nullable Integer centerWidth,
                               @Nullable Integer rightWidth) {
+        // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
 
-        dialogChoice = defaultChoiceIndex;
+        initialize(leftSpeaker, rightSpeaker, defaultChoiceIndex, leftWidth, centerWidth,
+            rightWidth);
 
-        LEFT_WIDTH = (leftWidth != null) ? leftWidth : LEFT_WIDTH;
-        CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
-        RIGHT_WIDTH = (rightWidth != null) ? rightWidth : RIGHT_WIDTH;
-
-        int gridx = 0;
-
+        // Title
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+            MekHQ.getMHQOptions().getLocale());
         setTitle(resources.getString("incomingTransmission.title"));
 
         // Main Panel to hold all boxes
@@ -122,6 +146,8 @@ public class MHQDialogImmersive extends JDialog {
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
+        int gridx = 0;
+
         // Left box for speaker details
         if (leftSpeaker != null) {
             JPanel pnlLeftSpeaker = buildSpeakerPanel(true);
@@ -129,27 +155,19 @@ public class MHQDialogImmersive extends JDialog {
             // Add pnlLeftSpeaker to mainPanel
             constraints.gridx = gridx;
             constraints.gridy = 0;
-            constraints.weightx = 0;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
             mainPanel.add(pnlLeftSpeaker, constraints);
-
             gridx++;
         }
 
-        // Center box: for message
-        JPanel pnlCenter = new JPanel(new BorderLayout());
-        pnlCenter.setBorder(BorderFactory.createEtchedBorder());
-        JLabel lblCenterMessage = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                CENTER_WIDTH, centerMessage)
-        );
-        pnlCenter.add(lblCenterMessage);
-
-        // Add mainPanel to dialog
+        // Center box for the message
+        JPanel pnlCenter = createCenterBox(centerMessage);
         constraints.gridx = gridx;
         constraints.gridy = 0;
-        constraints.weightx = 0;
+        constraints.weightx = 2;
+        constraints.weighty = 2;
         mainPanel.add(pnlCenter, constraints);
-
         gridx++;
 
         // Right box for speaker details
@@ -159,7 +177,8 @@ public class MHQDialogImmersive extends JDialog {
             // Add pnlRightSpeaker to mainPanel
             constraints.gridx = gridx;
             constraints.gridy = 0;
-            constraints.weightx = 0;
+            constraints.weightx = 1;
+            constraints.weighty = 1;
             mainPanel.add(pnlRightSpeaker, constraints);
         }
 
@@ -185,39 +204,92 @@ public class MHQDialogImmersive extends JDialog {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModal(true);
         setLocationRelativeTo(null);
+        int preferredWidth = (int) round(CENTER_WIDTH + LEFT_WIDTH + RIGHT_WIDTH * 1.1);
+        setPreferredSize(new Dimension(preferredWidth, UIUtil.scaleForGUI(400)));
         pack();
         setVisible(true);
     }
 
     /**
-     * Creates and displays an instance of the {@link MHQDialogImmersive}.
-     * <p>
-     * This method acts as a factory for generating and displaying the dialog,
-     * allowing easy instantiation without requiring custom panel widths.
+     * Performs initialization logic for setting default dialog settings and widths.
      *
-     * @param campaign              The {@link Campaign} tied to the dialog.
-     * @param leftSpeaker           The optional {@link Person} to display as the left speaker in
-     *                              the dialog. Can be {@code null}.
-     * @param rightSpeaker          The optional {@link Person} to display as the right speaker in
-     *                             the dialog. Can be {@code null}.
-     * @param centerMessage         The main message to display in the dialog.
-     * @param buttons               A list of {@link ButtonLabelTooltipPair} buttons with labels
-     *                             and optional tooltips.
-     * @param outOfCharacterMessage An optional custom OOC message displayed beneath the buttons.
-     *                             Can be {@code null}.
-     * @param defaultChoiceIndex    The default index selected if no user action is taken.
-     * @return A newly created and displayed instance of {@link MHQDialogImmersive}.
-     *
-     * @see #MHQDialogImmersive(Campaign, Person, Person, String, List, String, int, Integer,
-     * Integer, Integer)
+     * @param leftSpeaker The left speaker for the dialog.
+     * @param rightSpeaker The right speaker for the dialog.
+     * @param defaultChoiceIndex Default choice assigned when dialog is dismissed.
+     * @param leftWidth Optional custom width for the left panel.
+     * @param centerWidth Optional custom width for the center panel.
+     * @param rightWidth Optional custom width for the right panel.
      */
-    public static MHQDialogImmersive createMHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
-                                                @Nullable Person rightSpeaker, String centerMessage,
-                                                List<ButtonLabelTooltipPair> buttons,
-                                                @Nullable String outOfCharacterMessage,
-                                                int defaultChoiceIndex) {
-        return new MHQDialogImmersive(campaign, leftSpeaker, rightSpeaker, centerMessage, buttons,
-            outOfCharacterMessage, defaultChoiceIndex, null, null, null);
+    private void initialize(@Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+                            int defaultChoiceIndex, @Nullable Integer leftWidth,
+                            @Nullable Integer centerWidth, @Nullable Integer rightWidth) {
+        dialogChoice = defaultChoiceIndex;
+
+        if (leftSpeaker == null) {
+            LEFT_WIDTH = 0;
+        } else {
+            LEFT_WIDTH = (leftWidth != null) ? leftWidth : LEFT_WIDTH;
+        }
+
+        CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
+
+        if (rightSpeaker == null) {
+            RIGHT_WIDTH = 0;
+        } else {
+            RIGHT_WIDTH = (rightWidth != null) ? rightWidth : RIGHT_WIDTH;
+        }
+    }
+
+    /**
+     * Creates and returns the central panel that contains the main dialog message.
+     *
+     * @param centerMessage The main message as a string, typically in HTML format.
+     * @return A {@link JPanel} containing the message displayed at the center.
+     */
+    private JPanel createCenterBox(String centerMessage) {
+        northPanel = new JPanel(new BorderLayout());
+        northPanel.setBorder(BorderFactory.createEtchedBorder());
+
+        // Create a JEditorPane for the center message
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setText(
+            String.format("<div style='text-align:center;'>%s</div>", centerMessage)
+        );
+
+        // Add a HyperlinkListener to capture hyperlink clicks
+        editorPane.addHyperlinkListener(evt -> {
+            if (evt.getEventType() == EventType.ACTIVATED) {
+                handleHyperlinkClick(campaign, evt.getDescription());
+            }
+        });
+
+        // Wrap the JEditorPane in a JScrollPane
+        JScrollPane scrollPane = new JScrollPane(editorPane);
+        scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
+
+        northPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Ensure the scrollbars default to the top-left position
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+
+        return northPanel;
+    }
+
+    /**
+     * Handles hyperlink clicks from HTML content.
+     * <p>
+     *     <b>Usage</b><br>
+     *     This method provides a default implementation that does nothing. Subclasses should
+     *     override this to provide specific behavior when hyperlinks are clicked.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} instance that contains relevant data.
+     * @param href The hyperlink reference (e.g., a URL or a specific identifier).
+     */
+    protected void handleHyperlinkClick(Campaign campaign, String href) {
+        logger.error("handleHyperlinkClick() was not overridden in the subclass.");
     }
 
     /**
@@ -232,9 +304,7 @@ public class MHQDialogImmersive extends JDialog {
         JPanel pnlOutOfCharacter = new JPanel(new BorderLayout());
         pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
 
-        int bottomPanelWidth = CENTER_WIDTH;
-        bottomPanelWidth += leftSpeaker == null ? 0 : LEFT_WIDTH;
-        bottomPanelWidth += rightSpeaker == null ? 0 : RIGHT_WIDTH;
+        int bottomPanelWidth = CENTER_WIDTH + LEFT_WIDTH + RIGHT_WIDTH;
 
         JLabel lblOutOfCharacter = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
@@ -393,10 +463,8 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * A class to store and represent a button label and its associated tooltip.
-     * <p>
-     * This class is useful for scenarios where you want to pair a button's display label
-     * with an optional tooltip message.
+     * Represents a label-tooltip pair for constructing UI buttons.
+     * Each button displays a label and optionally provides a tooltip when hovered.
      */
     public record ButtonLabelTooltipPair(String btnLabel, String btnTooltip) {
         /**
