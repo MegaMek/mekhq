@@ -94,7 +94,6 @@ MEKHQ VERSION HISTORY:
 + PR #5797: Refactored Portrait Mass Assignment Controls to Use Buttons
 + Fix #5750: Added Contract Breach CVP Penalties to StratCon Contracts
 + Fix #6416: Ghostbusting - Reset isDestroyed for entities when returning to MekHQ
-
 + Fix #5591: Improved Vocational (Idle) Experience Gain; Expanded Immersive Dialog Functionality 
 + Fix #5745: Added null Protection to Loot Saving
 + Fix #5761: Fixed Incorrect Pass/Fail Logic in Initial Education Evaluation
