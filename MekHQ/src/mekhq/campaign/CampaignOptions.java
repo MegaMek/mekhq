@@ -602,6 +602,7 @@ public class CampaignOptions {
     private AutoResolveMethod autoResolveMethod;
     private boolean autoResolveVictoryChanceEnabled;
     private int autoResolveNumberOfScenarios;
+    private boolean autoResolveExperimentalPacarGuiEnabled;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1192,6 +1193,7 @@ public class CampaignOptions {
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
         autoResolveNumberOfScenarios = 100;
+        autoResolveExperimentalPacarGuiEnabled = false;
 
         // Unit Administration
         useAero = false;
@@ -5180,6 +5182,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", getAutoResolveMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveNumberOfScenarios", getAutoResolveNumberOfScenarios());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveUseExperimentalPacarGui", isAutoResolveExperimentalPacarGuiEnabled());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -6163,12 +6166,16 @@ public class CampaignOptions {
                     // region AtB Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                     retVal.setSkillLevel(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                    // region ACAR Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveMethod")) {
                     retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
                     retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveNumberOfScenarios")) {
                     retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveUseExperimentalPacarGui")) {
+                    retVal.setAutoResolveExperimentalPacarGuiEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    // endregion ACAR Tab
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6459,5 +6466,13 @@ public class CampaignOptions {
 
     public int getAutoResolveNumberOfScenarios() {
         return autoResolveNumberOfScenarios;
+    }
+
+    public boolean isAutoResolveExperimentalPacarGuiEnabled() {
+        return autoResolveExperimentalPacarGuiEnabled;
+    }
+
+    public void setAutoResolveExperimentalPacarGuiEnabled(boolean autoResolveExperimentalPacarGuiEnabled) {
+        this.autoResolveExperimentalPacarGuiEnabled = autoResolveExperimentalPacarGuiEnabled;
     }
 }

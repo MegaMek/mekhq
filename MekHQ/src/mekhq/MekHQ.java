@@ -453,18 +453,20 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         }
-
-        if (autoResolveBehaviorSettings != null) {
+        // Refactor this into a factory
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
             client = new HeadlessClient(playerName, LOCALHOST_IP, port);
         } else {
             client = new Client(playerName, LOCALHOST_IP, port);
         }
+
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        // Start the game thread
+        // Start the game thread - also refactor this into a factory
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings, true, true);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings, useExperimentalPacarGui, true);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }

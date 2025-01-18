@@ -26,8 +26,6 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
-import megamek.client.ui.swing.IDisconnectSilently;
-import megamek.client.ui.swing.ILocalBots;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -38,7 +36,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.AcarGUI;
+import mekhq.gui.acar.AcarGUI;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.PotentialTransportsMap;
 
@@ -105,14 +103,16 @@ public class AtBGameThread extends GameThread {
             var acarGui = new AcarGUI(client, controller);
             localBots = acarGui;
             swingGui = acarGui;
+            acarGui.start();
         } else {
             var clientGui = new ClientGUI(client, controller);
             localBots = clientGui;
             swingGui = clientGui;
+            swingGui.initialize();
         }
 
         controller.clientgui = swingGui;
-        swingGui.initialize();
+
         try {
             client.connect();
         } catch (Exception ex) {
@@ -500,13 +500,18 @@ public class AtBGameThread extends GameThread {
                 // set to the players team
                 // and then moves all the player forces under this new bot
                 if (Objects.nonNull(autoResolveBehaviorSettings)) {
-                    botClients.add(setupPlayerBotForAutoResolve(player));
-                    client.getLocalPlayer().setDone(true);
-                    client.sendDone(true);
+                    var bot = setupPlayerBotForAutoResolve(player);
+                    getLocalBots().put(bot.getName(), bot);
+                    botClients.add(bot);
                     for (var botClient : botClients) {
                         botClient.sendDone(true);
                     }
-
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+                    client.getLocalPlayer().setDone(true);
+                    client.sendDone(true);
+                    if (swingGui != null) {
+                        swingGui.setActive(true);
+                    }
                 }
             }
 
@@ -540,7 +545,6 @@ public class AtBGameThread extends GameThread {
             logger.error(String.format("Could not connect with Bot name %s", botName),
                 e);
         }
-//        swingGui.getLocalBots().put(botName, botClient);
 
         var retryCount = MekHQ.getMHQOptions().getStartGameBotClientRetryCount();
         while (botClient.getLocalPlayer() == null) {
