@@ -95,6 +95,15 @@ MEKHQ VERSION HISTORY:
 + Fix #5750: Added Contract Breach CVP Penalties to StratCon Contracts
 + Fix #6416: Ghostbusting - Reset isDestroyed for entities when returning to MekHQ
 
++ Fix #5591: Improved Vocational (Idle) Experience Gain; Expanded Immersive Dialog Functionality 
++ Fix #5745: Added null Protection to Loot Saving
++ Fix #5761: Fixed Incorrect Pass/Fail Logic in Initial Education Evaluation
++ Fix #5801: Added Enemy Morale Spike to Justify Contract Extension Clause
++ Fix #5800: Corrected Scenario info Visibility Logic in StratconPanel
++ PR #5806: Refactored BV Display Logic in StratconScenario.java
++ PR #5813: Replaced ':' with '@' in internal AI Bot Name
++ Fix #5724: Fix astech time calculations for units that do not require maintenance 
++ Fix #5818: Fixed assigning/unassigning transports from TOE at the Force level & infantry compartments use the correct weight for infantry squads 
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
