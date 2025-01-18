@@ -4005,7 +4005,7 @@ public class Person {
         }
     }
 
-    public Skill getBestTechSkill() {
+    public @Nullable Skill getBestTechSkill() {
         Skill skill = null;
         int lvl = SkillType.EXP_NONE;
         if (hasSkill(SkillType.S_TECH_MEK) && getSkill(SkillType.S_TECH_MEK).getExperienceLevel() > lvl) {

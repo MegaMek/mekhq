@@ -468,7 +468,7 @@ public class Resupply {
         }
 
         // Make procurement checks for each of the items in the individual pools
-        Procurement procurement = new Procurement(negotiatorSkill, currentYear, employerFaction);
+        Procurement procurement = new Procurement(campaign, negotiatorSkill, currentYear, employerFaction);
 
         partsPool = procurement.makeProcurementChecks(partsPool, true, true);
         Collections.shuffle(partsPool);

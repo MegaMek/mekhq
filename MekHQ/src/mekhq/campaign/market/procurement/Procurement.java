@@ -21,8 +21,10 @@ package mekhq.campaign.market.procurement;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import static megamek.common.SimpleTechLevel.STANDARD;
  * rarity and scarcity of parts in a given time frame.
  */
 public class Procurement {
+    private final Campaign campaign;
     private final int negotiatorSkillRating;
     private final int gameYear;
     private final int techEra;
@@ -50,11 +53,13 @@ public class Procurement {
      * Procurement constructor.
      * Initializes class instance with negotiator skill rating, game year, and originating faction.
      *
+     * @param campaign the current campaign.
      * @param negotiatorSkillRating the skill rating of the negotiator.
      * @param gameYear the current year of the game.
      * @param originFaction the faction from where procurement is initiated.
      */
-    public Procurement(int negotiatorSkillRating, int gameYear, Faction originFaction) {
+    public Procurement(Campaign campaign, int negotiatorSkillRating, int gameYear, Faction originFaction) {
+        this.campaign = campaign;
         this.negotiatorSkillRating = negotiatorSkillRating;
         this.gameYear = gameYear;
         this.originFaction = originFaction;
@@ -141,7 +146,7 @@ public class Procurement {
             }
         }
 
-        targetNumber.addModifier(getNegotiatorModifier());
+        targetNumber.addModifier(getNegotiatorModifier(isResupply));
 
         if (isResupply) {
             targetNumber.addModifier(-2, "Resupply");
@@ -155,27 +160,35 @@ public class Procurement {
      *
      * @return Modifier for the procurement process based on negotiator's skill level
      */
-    private TargetRollModifier getNegotiatorModifier() {
+    private TargetRollModifier getNegotiatorModifier(boolean isResupply) {
         int modifier = 0;
 
-        if (negotiatorSkillRating == SkillLevel.NONE.ordinal()) {
+        SkillType skillType = isResupply
+            ? SkillType.getType(SkillType.S_NEG)
+            : SkillType.getType(campaign.getCampaignOptions().getAcquisitionSkill());
+
+        int experienceLevel = skillType.getExperienceLevel(negotiatorSkillRating);
+
+        if (experienceLevel == SkillLevel.NONE.ordinal()) {
             modifier = 4;
         }
 
-        if (negotiatorSkillRating == SkillLevel.ULTRA_GREEN.ordinal()) {
+        if (experienceLevel == SkillLevel.ULTRA_GREEN.ordinal()) {
             modifier = 3;
         }
 
-        if (negotiatorSkillRating == SkillLevel.VETERAN.ordinal()) {
+        // Regular has no modifier
+
+        if (experienceLevel == SkillLevel.VETERAN.ordinal()) {
             modifier = -2;
         }
 
-        if (negotiatorSkillRating >= SkillLevel.ELITE.ordinal()) {
+        if (experienceLevel >= SkillLevel.ELITE.ordinal()) {
             modifier = -3;
         }
 
         return new TargetRollModifier(modifier, "Negotiator Skill: "
-            + SkillLevel.values()[negotiatorSkillRating].toString());
+            + SkillLevel.values()[experienceLevel].toString());
     }
 
     /**

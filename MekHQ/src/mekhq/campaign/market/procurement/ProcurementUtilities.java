@@ -3,6 +3,7 @@ package mekhq.campaign.market.procurement;
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -17,6 +18,8 @@ import mekhq.campaign.work.IAcquisitionWork;
 import java.util.List;
 
 public class ProcurementUtilities {
+    private final static MMLogger logger = MMLogger.create(ProcurementUtilities.class);
+
     /**
      * Finds the best-suited character to handle acquisitions in the current campaign.
      *
@@ -61,10 +64,22 @@ public class ProcurementUtilities {
             int skillLevel = 0;
             if (CampaignOptions.S_TECH.equals(acquisitionSkill)) {
                 if (person.getBestTechSkill() != null) {
-                    skillLevel = person.getBestTechSkill().getLevel();
+                    Skill bestTechSkill = person.getBestTechSkill();
+
+                    if (bestTechSkill == null) {
+                        continue;
+                    }
+
+                    skillLevel = bestTechSkill.getLevel();
                 }
-            } else if (person.hasSkill(acquisitionSkill)) {
-                skillLevel = person.getSkill(acquisitionSkill).getLevel();
+            } else {
+                Skill characterAcquisitionSkill = person.getSkill(acquisitionSkill);
+
+                if (characterAcquisitionSkill == null) {
+                    continue;
+                }
+
+                skillLevel = characterAcquisitionSkill.getLevel();
             }
 
             // Update if this person has the highest skill level seen so far
@@ -141,10 +156,10 @@ public class ProcurementUtilities {
         }
 
         int targetNumber = skill.getFinalSkillValue();
-        Procurement procurement = new Procurement(targetNumber, currentYear, faction);
-
         TargetRoll target = new TargetRoll(targetNumber, skill.getSkillLevel().toString());
+
         if (acquisition instanceof Part) {
+            Procurement procurement = new Procurement(campaign, targetNumber, currentYear, faction);
             target = procurement.getProcurementTargetNumber((Part) acquisition,
                 false, false);
         } else {
