@@ -5190,7 +5190,10 @@ public class Campaign implements ITechManager {
                     .unloadFromTransportShip(unit);
         }
 
-        // finally remove the unit
+        // remove from automatic mothballing
+        automatedMothballUnits.remove(unit);
+
+        // finally, remove the unit
         getHangar().removeUnit(unit.getId());
 
         checkDuplicateNamesDuringDelete(unit.getEntity());
@@ -5781,10 +5784,28 @@ public class Campaign implements ITechManager {
         return fameAndInfamy;
     }
 
+    /**
+     * Retrieves the list of units that are configured for automated mothballing.
+     *
+     * <p>Automated mothballing is a mechanism where certain units are automatically
+     * placed into a mothballed state, reducing their active maintenance costs
+     * and operational demands over time.</p>
+     *
+     * @return A {@link List} of {@link Unit} objects that are set for automated
+     *         mothballing. Returns an empty list if no units are configured.
+     */
     public List<Unit> getAutomatedMothballUnits() {
         return automatedMothballUnits;
     }
 
+    /**
+     * Sets the list of units that are configured for automated mothballing.
+     *
+     * <p>Replaces the current list of units that have undergone automated mothballing.</p>
+     *
+     * @param automatedMothballUnits A {@link List} of {@link Unit} objects
+     *                               to configure for automated mothballing.
+     */
     public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
         this.automatedMothballUnits = automatedMothballUnits;
     }
@@ -5981,6 +6002,11 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
         for (Unit unit : automatedMothballUnits) {
+            if (unit == null) {
+                // <50.03 compatibility handler
+                continue;
+            }
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
