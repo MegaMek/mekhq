@@ -1163,11 +1163,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             // This checks to see if the ship is in a basic state that can accept units.
             // Capacity gets checked once the action is submitted.
             if (!unitsInForces.isEmpty()) {
-                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), new HashSet<>(units)));
-                unassignShipTransportMenuClass(units, popup);
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
+                unassignShipTransportMenuClass(unitsInForces, popup);
 
-                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(units)));
-                unassignTacticalTransportMenuClass(units, popup);
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
+                unassignTacticalTransportMenuClass(unitsInForces, popup);
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);

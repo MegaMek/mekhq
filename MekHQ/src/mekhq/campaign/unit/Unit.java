@@ -5910,6 +5910,20 @@ public class Unit implements ITechnology {
         return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
     }
 
+    /**
+     * Not always opposite to isUnmaintained() - both are false for units that do not require maintenance.
+     * @return true if unit requires maintenance and has a tech assigned, false otherwise.
+     * @see #isUnmaintained()
+     */
+    public boolean isMaintained() {
+        return requiresMaintenance() && (getTech() != null);
+    }
+
+    /**
+     * Not always opposite to isMaintained() - both are false for units that do not require maintenance.
+     * @return true if unit requires maintenance and does not have a tech assigned, false otherwise.
+     * @see #isMaintained()
+     */
     public boolean isUnmaintained() {
         return requiresMaintenance() && (getTech() == null);
     }
