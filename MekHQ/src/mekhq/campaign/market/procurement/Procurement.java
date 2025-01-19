@@ -170,7 +170,7 @@ public class Procurement {
         int experienceLevel = skillType.getExperienceLevel(negotiatorSkillRating);
 
         if (experienceLevel == SkillLevel.NONE.ordinal()) {
-            modifier = 4;
+            modifier = 5;
         }
 
         if (experienceLevel == SkillLevel.ULTRA_GREEN.ordinal()) {
