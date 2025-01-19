@@ -177,6 +177,10 @@ public class Procurement {
             modifier = 3;
         }
 
+        if (experienceLevel == SkillLevel.GREEN.ordinal()) {
+            modifier = 2;
+        }
+
         // Regular has no modifier
 
         if (experienceLevel == SkillLevel.VETERAN.ordinal()) {
