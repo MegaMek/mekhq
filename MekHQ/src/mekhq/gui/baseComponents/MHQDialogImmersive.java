@@ -87,26 +87,6 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Minimal constructor for initializing the immersive dialog with default width configurations.
-     *
-     * @param campaign The {@link Campaign} associated with the dialog.
-     * @param leftSpeaker The optional left-side speaker; {@code null} if none.
-     * @param rightSpeaker The optional right-side speaker; {@code null} if none.
-     * @param centerMessage The message displayed at the center of the dialog.
-     * @param buttons The list of buttons to display, each accompanied by a tooltip.
-     * @param outOfCharacterMessage Optional out-of-character notes; {@code null} if none.
-     * @param defaultChoiceIndex The default choice index if no button is explicitly selected.
-     */
-    public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
-                              @Nullable Person rightSpeaker, String centerMessage,
-                              List<ButtonLabelTooltipPair> buttons,
-                              @Nullable String outOfCharacterMessage, int defaultChoiceIndex) {
-        new MHQDialogImmersive(campaign, leftSpeaker, rightSpeaker, centerMessage, buttons,
-            outOfCharacterMessage, defaultChoiceIndex,
-            null, null, null);
-    }
-
-    /**
      * Full constructor for initializing the immersive dialog with detailed layouts.
      *
      * @param campaign The {@link Campaign} tied to the dialog.
