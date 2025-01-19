@@ -211,7 +211,7 @@ public class Procurement {
             case RATING_E -> targetNumber.addModifier(8, "Availability E");
             case RATING_F -> targetNumber.addModifier(10, "Availability F");
             // This value is deliberately impossible on 2d6
-            default -> targetNumber.addModifier(13, "Availability X or F*");
+            default -> targetNumber.addModifier(99, "Availability X or F*");
         }
 
         SimpleTechLevel techLevel = part.getStaticTechLevel();
@@ -247,7 +247,7 @@ public class Procurement {
             case RATING_E -> targetNumber.addModifier(10, "Availability E");
             case RATING_F -> targetNumber.addModifier(11, "Availability F");
             // This value is deliberately impossible on 2d6
-            default -> targetNumber.addModifier(13, "Availability X or F*");
+            default -> targetNumber.addModifier(99, "Availability X or F*");
         }
 
         return targetNumber;
@@ -362,15 +362,18 @@ public class Procurement {
     private int getCommonTechBaseRating(Part part, int availability) {
         if (!originFaction.isClan()) {
             if (part.getBaseAvailability(techEra) >= RATING_E) {
-                if (availability == RATING_FSTAR || availability == RATING_X) {
-                    int extinctionYear = part.getExtinctionDate();
+                if (availability >= RATING_E) {
 
-                    if ((techEra == ERA_SW)
-                        && (gameYear >= extinctionYear)) {
-                        return Compute.d6() > 3 ? RATING_F : RATING_X;
-                    } else {
-                        return availability;
+                    if (techEra == ERA_SW) {
+                        availability++;
+
+                        int extinctionYear = part.getExtinctionDate();
+                        if (gameYear >= extinctionYear) {
+                            return Compute.d6() > 3 ? RATING_F : RATING_X;
+                        }
                     }
+
+                    return availability;
                 }
             }
         }

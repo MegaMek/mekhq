@@ -182,11 +182,11 @@ public enum AtBContractType {
      */
     public int calculateContractPartsAvailability() {
         return switch (this) {
-            case GUERRILLA_WARFARE -> -2;
-            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> -1;
+            case GUERRILLA_WARFARE -> 2;
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> 1;
             case PLANETARY_ASSAULT, RELIEF_DUTY -> 0;
-            case PIRATE_HUNTING -> 1;
-            default -> 2;
+            case PIRATE_HUNTING -> -1;
+            default -> -2;
         };
     }
 
