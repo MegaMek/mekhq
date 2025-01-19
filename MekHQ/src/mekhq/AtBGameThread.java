@@ -26,6 +26,7 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
+import megamek.client.ui.swing.CommanderGUI;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -36,7 +37,6 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.acar.AcarGUI;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.PotentialTransportsMap;
 
@@ -100,7 +100,7 @@ public class AtBGameThread extends GameThread {
         createController();
         if (minimalGUI)
         {
-            var acarGui = new AcarGUI(client, controller);
+            var acarGui = new CommanderGUI(client, controller);
             localBots = acarGui;
             swingGui = acarGui;
             acarGui.start();
@@ -509,9 +509,6 @@ public class AtBGameThread extends GameThread {
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
                     client.getLocalPlayer().setDone(true);
                     client.sendDone(true);
-                    if (swingGui != null) {
-                        swingGui.setActive(true);
-                    }
                 }
             }
 
