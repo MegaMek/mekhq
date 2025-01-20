@@ -754,10 +754,12 @@ public class InterstellarMapPanel extends JPanel {
                                     ++i;
                                 }
                             } else {
-                                // Just a dark grey circle then
-                                g2.setPaint(Color.DARK_GRAY);
-                                arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
-                                g2.fill(arc);
+                                if (optEmptySystems.isSelected()) {
+                                    // Just a dark grey circle then
+                                    g2.setPaint(Color.DARK_GRAY);
+                                    arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
+                                    g2.fill(arc);
+                                }
                             }
                         } else {
                             g2.setPaint(getSystemColor(system));
@@ -845,7 +847,7 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         optionPanel.add(createLabel("Options:"));
         optEmptySystems = createOptionCheckBox("Empty systems", checkboxIcon, checkboxSelectedIcon);
-        optEmptySystems.setSelected(true);
+        optEmptySystems.setSelected(false);
         optionPanel.add(optEmptySystems);
         optTerritory = createOptionCheckBox("Territory", checkboxIcon, checkboxSelectedIcon);
         optTerritory.setSelected(true);
