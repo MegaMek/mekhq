@@ -507,8 +507,6 @@ public class AtBGameThread extends GameThread {
                         botClient.sendDone(true);
                     }
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-                    client.getLocalPlayer().setDone(true);
-                    client.sendDone(true);
                 }
             }
 
@@ -526,7 +524,7 @@ public class AtBGameThread extends GameThread {
             controller = null;
         }
     }
-  
+
     private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
         var botName = player.getName() + "@AI";
 
