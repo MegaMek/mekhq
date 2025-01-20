@@ -533,7 +533,16 @@ public class Force {
         return forceCommanderID;
     }
 
-    public void setForceCommanderID(UUID commanderID) {
+    /**
+     * Sets the force commander ID to the provided UUID.
+     * You probably want to use
+     * setOverrideForceCommanderID(UUID) followed by
+     * updateCommander(campaign).
+     * @see #setOverrideForceCommanderID(UUID)
+     * @see #updateCommander(Campaign)
+     * @param commanderID UUID of the commander
+     */
+    private void setForceCommanderID(UUID commanderID) {
         forceCommanderID = commanderID;
     }
 
@@ -626,6 +635,16 @@ public class Force {
 
         if (getParentForce() != null) {
             getParentForce().updateCommander(campaign);
+        }
+
+        updateCombatTeamCommanderIfCombatTeam(campaign);
+    }
+
+    private void updateCombatTeamCommanderIfCombatTeam(Campaign campaign) {
+        if (isCombatTeam()) {
+            campaign.getCombatTeamsTable().values().stream().filter(
+                    combatTeam -> combatTeam.getForceId() == getId())
+                    .forEach(combatTeam -> combatTeam.setCommander((UUID) null));
         }
     }
 
