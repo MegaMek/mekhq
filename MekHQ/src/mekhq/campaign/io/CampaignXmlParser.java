@@ -294,6 +294,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
+                } else if (xn.equalsIgnoreCase("personnelWhoAdvancedInXP")) {
+                    retVal.setPersonnelWhoAdvancedInXP(processPersonnelWhoAdvancedInXP(wn, retVal));
                 } else if (xn.equalsIgnoreCase("automatedMothballUnits")) {
                     retVal.setAutomatedMothballUnits(processAutomatedMothballNodes(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
@@ -973,6 +975,53 @@ public class CampaignXmlParser {
     private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
         logger.info("Loading Fame and Infamy Nodes from XML...");
         FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
+    }
+
+    /**
+     * Processes a list of personnel who advanced in experience points (XP) from a given XML node.
+     * <p>
+     * This method reads the child nodes of the provided XML {@code workingNode} and extracts the personnel
+     * listed under the "personWhoAdvancedInXP" nodes. It retrieves the corresponding {@link Person} objects
+     * from the provided {@link Campaign} using their unique UUIDs. If a person cannot be found, an error
+     * is logged. The method returns a list of processed {@link Person} objects.
+     * </p>
+     *
+     * @param workingNode The XML node containing the "personWhoAdvancedInXP" elements to be processed.
+     * @param campaign    The {@link Campaign} instance used to fetch the {@link Person} objects based on UUIDs.
+     * @return A {@link List} of {@link Person} objects representing the personnel who advanced in XP.
+     *         If no valid personnel are found, an empty list is returned.
+     */
+    private static List<Person> processPersonnelWhoAdvancedInXP(Node workingNode, Campaign campaign) {
+        logger.info("Loading personnelWhoAdvancedInXP Nodes from XML...");
+
+        List<Person> personWhoAdvancedInXP = new ArrayList<>();
+
+        NodeList workingList = workingNode.getChildNodes();
+        for (int x = 0; x < workingList.getLength(); x++) {
+            Node childNode = workingList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!childNode.getNodeName().equalsIgnoreCase("personWhoAdvancedInXP")) {
+                logger.error("Unknown node type not loaded in personnelWhoAdvancedInXP nodes: "
+                    + childNode.getNodeName());
+                continue;
+            }
+
+            Person person = campaign.getPerson(UUID.fromString(childNode.getTextContent()));
+
+            if (person == null) {
+                logger.error("Unknown UUID: " + childNode.getTextContent());
+            }
+
+            personWhoAdvancedInXP.add(person);
+        }
+
+        logger.info("Load personWhoAdvancedInXP Nodes Complete!");
+        return personWhoAdvancedInXP;
     }
 
     private static List<Unit> processAutomatedMothballNodes(Node workingNode, Campaign campaign) {

@@ -333,12 +333,24 @@ public class Loot {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loot");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cash", getCash());
-        for (Entity e : units) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", e.getShortNameRaw());
+        for (Entity entity : units) {
+            // This null protection was implemented in 50.03 to guard against a bug in the
+            // depreciated Legacy AtB Digital GM.
+            if (entity == null) {
+                continue;
+            }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", entity.getShortNameRaw());
         }
 
-        for (Part p : parts) {
-            p.writeToXML(pw, indent);
+        for (Part part : parts) {
+            // This null protection was implemented in 50.03 to guard against a bug in the
+            // depreciated Legacy AtB Digital GM.
+            if (part == null) {
+                continue;
+            }
+
+            part.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loot");
     }

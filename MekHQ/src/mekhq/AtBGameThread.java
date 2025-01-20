@@ -526,8 +526,7 @@ public class AtBGameThread extends GameThread {
             controller = null;
         }
     }
-
-
+  
     private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
         var botName = player.getName() + "@AI";
 
