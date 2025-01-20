@@ -81,6 +81,7 @@ import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -2480,9 +2481,35 @@ public class Campaign implements ITechManager {
             part = ((MissingPart) part).getNewPart();
         }
         PartInUse result = new PartInUse(part);
-        result.setRequestedStock(getCampaignOptions().getDefaultStockPercent());
+        result.setRequestedStock(getDefaultStockPercent(part));
         return (null != result.getPartToBuy()) ? result : null;
     }
+
+    private int getDefaultStockPercent(Part part) {
+        if (part instanceof HeatSink) {
+            return campaignOptions.getAutoLogisticsHeatSink();
+        } else if (part instanceof MekLocation) {
+            if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
+                return campaignOptions.getAutoLogisticsMekHead();
+            }
+
+            if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
+                return campaignOptions.getAutoLogisticsNonRepairableLocation();
+            }
+
+            return campaignOptions.getAutoLogisticsMekLocation();
+        } else if (part instanceof TankLocation) {
+            return campaignOptions.getAutoLogisticsNonRepairableLocation();
+        } else if (part instanceof AmmoBin) {
+            return campaignOptions.getAutoLogisticsAmmunition();
+        } else if (part instanceof Armor ) {
+            return campaignOptions.getAutoLogisticsArmor();
+        }
+
+        return campaignOptions.getAutoLogisticsOther();
+    }
+
+
 
     /**
      * Add data from an actual part to a PartInUse data element
@@ -2562,7 +2589,7 @@ public class Campaign implements ITechManager {
                 if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
                 } else {
-                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                    partInUse.setRequestedStock(getDefaultStockPercent(incomingPart));
                 }
                 inUse.put(partInUse, partInUse);
             }
@@ -2582,7 +2609,7 @@ public class Campaign implements ITechManager {
                 if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
                 } else {
-                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                    partInUse.setRequestedStock(getDefaultStockPercent((Part) maybePart));
                 }
                 inUse.put(partInUse, partInUse);
             }
