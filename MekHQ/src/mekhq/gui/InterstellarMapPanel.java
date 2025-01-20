@@ -46,6 +46,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
+import static megamek.common.ITechnology.RATING_A;
+
 /**
  * This is not functional yet. Just testing things out.
  * A lot of this code is borrowed from InterstellarMap.java in MekWars
@@ -599,26 +601,26 @@ public class InterstellarMapPanel extends JPanel {
                             double x = map2scrX(system.getX());
                             double y = map2scrY(system.getY());
                             int hpgRating = ObjectUtility.nonNull(system.getHPG(now), EquipmentType.RATING_X);
-                            if (hpgRating == EquipmentType.RATING_A) {
+                            if (hpgRating == RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(thick);
                                 g2.draw(arc);
                             }
-                            if (hpgRating == EquipmentType.RATING_A || hpgRating == EquipmentType.RATING_B) {
-                                g2.setPaint(Color.CYAN);
+                            if (hpgRating == RATING_A || hpgRating == EquipmentType.RATING_B) {
+                                g2.setPaint(Color.BLUE);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(thin);
                                 g2.draw(arc);
                             }
                             if (hpgRating == EquipmentType.RATING_C) {
-                                g2.setPaint(Color.CYAN);
+                                g2.setPaint(Color.ORANGE);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(dashed);
                                 g2.draw(arc);
                             }
                             if (hpgRating == EquipmentType.RATING_D) {
-                                g2.setPaint(darkCyan);
+                                g2.setPaint(Color.RED);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(dotted);
                                 g2.draw(arc);
@@ -629,14 +631,14 @@ public class InterstellarMapPanel extends JPanel {
                         PlanetarySystem p1 = link.primary;
                         PlanetarySystem p2 = link.secondary;
                         if (isSystemVisible(p1, false) || isSystemVisible(p2, false)) {
-                            if (link.rating == EquipmentType.RATING_A) {
+                            if (link.rating == RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(thick);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
                                         map2scrY(p2.getY())));
                             }
                             if (link.rating == EquipmentType.RATING_B) {
-                                g2.setPaint(Color.CYAN);
+                                g2.setPaint(Color.BLUE);
                                 g2.setStroke(dashed);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
                                         map2scrY(p2.getY())));
@@ -1097,7 +1099,7 @@ public class InterstellarMapPanel extends JPanel {
                 case EquipmentType.RATING_D -> new Color(59, 82, 139);
                 case EquipmentType.RATING_C -> new Color(33, 144, 140);
                 case EquipmentType.RATING_B -> new Color(93, 200, 99);
-                case EquipmentType.RATING_A -> new Color(253, 231, 37);
+                case RATING_A -> new Color(253, 231, 37);
                 default -> Color.BLACK;
             };
         }
@@ -1107,7 +1109,7 @@ public class InterstellarMapPanel extends JPanel {
                 case EquipmentType.RATING_D -> new Color(81, 18, 124);
                 case EquipmentType.RATING_C -> new Color(182, 54, 121);
                 case EquipmentType.RATING_B -> new Color(251, 136, 97);
-                case EquipmentType.RATING_A -> new Color(252, 253, 191);
+                case RATING_A -> new Color(252, 253, 191);
                 default -> Color.BLACK;
             };
         }
@@ -1117,7 +1119,7 @@ public class InterstellarMapPanel extends JPanel {
                 case EquipmentType.RATING_D -> new Color(126, 3, 168);
                 case EquipmentType.RATING_C -> new Color(204, 70, 120);
                 case EquipmentType.RATING_B -> new Color(248, 148, 65);
-                case EquipmentType.RATING_A -> new Color(240, 249, 33);
+                case RATING_A -> new Color(240, 249, 33);
                 default -> Color.BLACK;
             };
         }
@@ -1127,7 +1129,7 @@ public class InterstellarMapPanel extends JPanel {
                 case EquipmentType.RATING_D -> new Color(86, 15, 110);
                 case EquipmentType.RATING_C -> new Color(187, 55, 84);
                 case EquipmentType.RATING_B -> new Color(249, 140, 10);
-                case EquipmentType.RATING_A -> new Color(252, 255, 164);
+                case RATING_A -> new Color(252, 255, 164);
                 default -> Color.BLACK;
             };
         }
@@ -1137,7 +1139,7 @@ public class InterstellarMapPanel extends JPanel {
                 case EquipmentType.RATING_D -> new Color(66, 77, 107);
                 case EquipmentType.RATING_C -> new Color(124, 123, 120);
                 case EquipmentType.RATING_B -> new Color(188, 175, 111);
-                case EquipmentType.RATING_A -> new Color(255, 234, 70);
+                case RATING_A -> new Color(255, 234, 70);
                 default -> Color.BLACK;
             };
         }
@@ -1179,7 +1181,7 @@ public class InterstellarMapPanel extends JPanel {
                 case EquipmentType.RATING_D -> new Color(84, 84, 84);
                 case EquipmentType.RATING_C -> new Color(168, 168, 168);
                 case EquipmentType.RATING_B -> new Color(222, 73, 104);
-                case EquipmentType.RATING_A -> new Color(252, 253, 191);
+                case RATING_A -> new Color(252, 253, 191);
                 default -> Color.BLACK;
             };
         }
