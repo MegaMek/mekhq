@@ -2485,6 +2485,18 @@ public class Campaign implements ITechManager {
         return (null != result.getPartToBuy()) ? result : null;
     }
 
+    /**
+     * Determines the default stock percentage for a given part type.
+     *
+     * <p>This method uses the type of the provided {@link Part} to decide which
+     * default stock percentage to return. The values for each part type are
+     * retrieved from the campaign options.</p>
+     *
+     * @param part The {@link Part} for which the default stock percentage is to
+     *             be determined. The part must not be {@code null}.
+     * @return An {@code int} representing the default stock percentage for the
+     *         given part type, as defined in the campaign options.
+     */
     private int getDefaultStockPercent(Part part) {
         if (part instanceof HeatSink) {
             return campaignOptions.getAutoLogisticsHeatSink();
@@ -2508,8 +2520,6 @@ public class Campaign implements ITechManager {
 
         return campaignOptions.getAutoLogisticsOther();
     }
-
-
 
     /**
      * Add data from an actual part to a PartInUse data element

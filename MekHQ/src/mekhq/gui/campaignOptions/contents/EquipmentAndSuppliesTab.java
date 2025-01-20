@@ -432,12 +432,12 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and returns a {@code JPanel} for configuring acquisition-related options.
+     * Creates and returns a {@code JPanel} for configuring autoLogistics-related options.
      * This panel includes various components such as labels, checkboxes, and
      * spinners to allow users to set values for acquisition settings, including
      * penalties, waiting periods, maximum acquisitions, and stock percentages.
      *
-     * @return A {@code JPanel} populated with acquisition configuration components and their layout.
+     * @return A {@code JPanel} populated with autoLogistics configuration components and their layout.
      */
     private JPanel createAutoLogisticsPanel() {
         // Content
