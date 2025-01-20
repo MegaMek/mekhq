@@ -276,7 +276,6 @@ public class CampaignGUI extends JPanel {
 
         // Move the window
         frame.setLocation(x, y);
-//        frame.pack();
         initMenu();
         frame.setJMenuBar(menuBar);
         frame.getContentPane().setLayout(new BorderLayout());
