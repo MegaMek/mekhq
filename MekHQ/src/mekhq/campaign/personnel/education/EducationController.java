@@ -1945,7 +1945,7 @@ public class EducationController {
             : Intelligence.values().length / 2;
         passRate += intelligenceModifier;
 
-        final boolean flunked = Compute.randomInt(100) >= passRate;
+        final boolean flunked = Compute.randomInt(100) <= passRate;
 
         EducationLevel educationLevel;
         if (isCombatRole) {

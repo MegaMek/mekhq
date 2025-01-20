@@ -44,7 +44,7 @@ public class InsufficientAstechTimeNagLogic {
         // Calculate the total maintenance time needed using a traditional loop
         int need = 0;
         for (Unit unit : campaign.getHangar().getUnits()) {
-            if (!unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed()) {
+            if (unit.isMaintained() && unit.isPresent() && !unit.isSelfCrewed()) {
                 need += unit.getMaintenanceTime() * 6;
             }
         }

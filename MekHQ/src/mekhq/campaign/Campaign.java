@@ -280,6 +280,7 @@ public class Campaign implements ITechManager {
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
+    private List<Person> personnelWhoAdvancedInXP;
 
     private RetirementDefectionTracker retirementDefectionTracker;
     private List<String> turnoverRetirementInformation;
@@ -381,6 +382,7 @@ public class Campaign implements ITechManager {
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
+        personnelWhoAdvancedInXP = new ArrayList<>();
         retirementDefectionTracker = new RetirementDefectionTracker();
         turnoverRetirementInformation = new ArrayList<>();
         atbConfig = null;
@@ -663,6 +665,25 @@ public class Campaign implements ITechManager {
 
     public RetirementDefectionTracker getRetirementDefectionTracker() {
         return retirementDefectionTracker;
+    }
+
+    /**
+     * Sets the list of personnel who have advanced in experience points (XP) via vocational xp.
+     *
+     * @param personnelWhoAdvancedInXP a {@link List} of {@link Person} objects representing personnel
+     *                                 who have gained XP.
+     */
+    public void setPersonnelWhoAdvancedInXP(List<Person> personnelWhoAdvancedInXP) {
+        this.personnelWhoAdvancedInXP = personnelWhoAdvancedInXP;
+    }
+
+    /**
+     * Retrieves the list of personnel who have advanced in experience points (XP) via vocational xp.
+     *
+     * @return a {@link List} of {@link Person} objects representing personnel who have gained XP.
+     */
+    public List<Person> getPersonnelWhoAdvancedInXP() {
+        return personnelWhoAdvancedInXP;
     }
 
     public List<String> getTurnoverRetirementInformation() {
@@ -4278,11 +4299,19 @@ public class Campaign implements ITechManager {
             // apply for support personnel - combat troops reset with each new mm game
             processWeeklyEdgeResets(person);
 
-            processMonthlyVocationalXp(person);
+            if (processMonthlyVocationalXp(person)) {
+                personnelWhoAdvancedInXP.add(person);
+            }
 
             processAnniversaries(person);
 
             processMonthlyAutoAwards(person);
+        }
+
+        if (!personnelWhoAdvancedInXP.isEmpty()) {
+            addReport(String.format(resources.getString("gainedExperience.text"),
+                spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                personnelWhoAdvancedInXP.size(), CLOSING_SPAN_TAG));
         }
     }
 
@@ -4330,50 +4359,64 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Processes monthly vocational experience (XP) for a given person, awarding XP if certain
-     * conditions are met.
+     * Processes the monthly vocational experience (XP) gain for a given person based on specific
+     * eligibility criteria. If the person meets the conditions, XP is awarded and their progress
+     * is tracked.
      *
-     * <p>The method evaluates eligibility for XP gain based on the following criteria:
+     * <p>The method checks the following conditions to determine eligibility for XP gain:
      * <ul>
-     *     <li>The person must be active (e.g., not retired, deceased, or in edcuation).</li>
-     *     <li>The person must not be a child at the current date.</li>
-     *     <li>The person must not be a dependent.</li>
-     *     <li>The campaign must have idle XP enabled, and it must be the first day of the month.</li>
-     *     <li>The person must not currently have the status of a prisoner (Bondsmen, however, are eligible for XP).</li>
+     *     <li>The person must have an active status (e.g., not retired, deceased, or in education).</li>
+     *     <li>The person must not be a child on the current date.</li>
+     *     <li>The person must not be categorized as a dependent.</li>
+     *     <li>The campaign must enable idle XP, and the current date must be the first day of the month.</li>
+     *     <li>The person must not have the status of a prisoner (Bondsmen are exempt from this
+     *     and remain eligible for XP).</li>
      * </ul>
      *
-     * <p>If all conditions are met, the person accumulates idle months.
-     * Once the accumulated idle months reach the threshold defined in the campaign options, the
-     * person is eligible for an idle XP roll using a 2d6 check. If the roll meets or exceeds
-     * the target threshold, XP is awarded to the person, and their idle month count is reset.</p>
+     * <p>If all of these conditions are satisfied:
+     * <ul>
+     *     <li>The person’s idle month count is incremented.</li>
+     *     <li>If the accumulated idle months reach the threshold defined in the campaign options,
+     *     an idle XP roll (2d6) is performed.</li>
+     *     <li>If the roll result meets or exceeds the target threshold:
+     *         <ul>
+     *             <li>XP is awarded to the person based on the campaign's idle XP configuration.</li>
+     *             <li>The idle month count is reset.</li>
+     *         </ul>
+     *     </li>
+     *     <li>If the roll is unsuccessful, the idle month count is still reset.</li>
+     * </ul>
      *
-     * @param person the {@link Person} whose monthly vocational XP gain is being processed.
+     * @param person the {@link Person} whose monthly vocational XP is to be processed
+     * @return {@code true} if XP was successfully awarded during the process, {@code false} otherwise
      */
-    private void processMonthlyVocationalXp(Person person) {
+    private boolean processMonthlyVocationalXp(Person person) {
         if (!person.getStatus().isActive()) {
-            return;
+            return false;
         }
 
         if (person.isChild(currentDay)) {
-            return;
+            return false;
         }
 
         if (person.isDependent()) {
-            return;
+            return false;
         }
 
         if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can
             person.setIdleMonths(person.getIdleMonths() + 1);
             if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                 if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
                     person.awardXP(this, getCampaignOptions().getIdleXP());
-                    addReport(person.getHyperlinkedFullTitle() + " has gained "
-                            + getCampaignOptions().getIdleXP() + " XP");
+                    person.setIdleMonths(0);
+                    return true;
                 }
                 person.setIdleMonths(0);
             }
         }
+
+        return false;
     }
 
     /**
@@ -4658,6 +4701,7 @@ public class Campaign implements ITechManager {
         currentReport.clear();
         currentReportHTML="";
         newReports.clear();
+        personnelWhoAdvancedInXP.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
 
         // New Year Changes
@@ -5930,6 +5974,12 @@ public class Campaign implements ITechManager {
         }
 
         retirementDefectionTracker.writeToXML(pw, indent);
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelWhoAdvancedInXP");
+        for (Person person : personnelWhoAdvancedInXP) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personWhoAdvancedInXP", person.getId());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelWhoAdvancedInXP");
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
         for (Unit unit : automatedMothballUnits) {
