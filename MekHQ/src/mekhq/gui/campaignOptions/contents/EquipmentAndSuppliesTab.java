@@ -470,8 +470,8 @@ public class EquipmentAndSuppliesTab {
             50, 0, 10000, 1);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true,
-            "AcquisitionPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("AutoLogisticsPanel", true,
+            "AutoLogisticsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
