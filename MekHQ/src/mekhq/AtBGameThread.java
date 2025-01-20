@@ -98,7 +98,7 @@ public class AtBGameThread extends GameThread {
         client.addCloseClientListener(this);
 
         createController();
-        if (minimalGUI)
+        if (true)
         {
             var acarGui = new CommanderGUI(client, controller);
             localBots = acarGui;
@@ -507,6 +507,11 @@ public class AtBGameThread extends GameThread {
                         botClient.sendDone(true);
                     }
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
+                    if (swingGui != null && swingGui instanceof CommanderGUI commanderGUI) {
+                        commanderGUI.enableReady();
+                    }
+                    client.getLocalPlayer().setDone(true);
+                    client.sendDone(true);
                 }
             }
 
