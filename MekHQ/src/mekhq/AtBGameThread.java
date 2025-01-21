@@ -98,7 +98,7 @@ public class AtBGameThread extends GameThread {
         client.addCloseClientListener(this);
 
         createController();
-        if (true)
+        if (autoResolveBehaviorSettings != null && minimalGUI)
         {
             var acarGui = new CommanderGUI(client, controller);
             localBots = acarGui;
