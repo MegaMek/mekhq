@@ -4266,7 +4266,7 @@ public class CampaignOptions {
     }
 
     public boolean isUseAtB() {
-        return useAtB;
+        return useAtB || useStratCon;
     }
 
     public void setUseAtB(final boolean useAtB) {
