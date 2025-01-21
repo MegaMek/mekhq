@@ -31,6 +31,7 @@ import mekhq.utilities.ReportingUtilities;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
+import java.util.Objects;
 
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 
@@ -136,7 +137,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             String text = name + ", " + unitName + c3network + transport + tacticalTransport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
-            if((null != person) && (null != force) && (person.getId() == force.getForceCommanderID())) {
+            if((null != person) && (null != force) && (Objects.equals(person.getId(), force.getForceCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");

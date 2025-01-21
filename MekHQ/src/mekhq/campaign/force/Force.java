@@ -600,17 +600,18 @@ public class Force {
         if (eligibleCommanders.isEmpty()) {
             forceCommanderID = null;
             overrideForceCommanderID = null;
+            updateCombatTeamCommanderIfCombatTeam(campaign);
             return;
         }
 
         if (overrideForceCommanderID != null) {
             if (eligibleCommanders.contains(overrideForceCommanderID)) {
                 forceCommanderID = overrideForceCommanderID;
+                updateCombatTeamCommanderIfCombatTeam(campaign);
 
                 if (getParentForce() != null) {
                     getParentForce().updateCommander(campaign);
                 }
-
                 return;
             } else {
                 overrideForceCommanderID = null;
@@ -632,19 +633,19 @@ public class Force {
         }
 
         forceCommanderID = highestRankedPerson.getId();
+        updateCombatTeamCommanderIfCombatTeam(campaign);
 
         if (getParentForce() != null) {
             getParentForce().updateCommander(campaign);
         }
-
-        updateCombatTeamCommanderIfCombatTeam(campaign);
     }
 
     private void updateCombatTeamCommanderIfCombatTeam(Campaign campaign) {
         if (isCombatTeam()) {
-            campaign.getCombatTeamsTable().values().stream().filter(
-                    combatTeam -> combatTeam.getForceId() == getId())
-                    .forEach(combatTeam -> combatTeam.setCommander((UUID) null));
+            CombatTeam combatTeam = campaign.getCombatTeamsTable().getOrDefault(getId(), null);
+            if (combatTeam != null) {
+                combatTeam.setCommander(getForceCommanderID());
+            }
         }
     }
 

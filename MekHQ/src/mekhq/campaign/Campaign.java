@@ -535,7 +535,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the {@link Hashtable} containing all the {@link CombatTeam} objects after
+     * Returns the {@link Hashtable} using the combatTeam's {@code forceId} as the key
+     * and containing all the {@link CombatTeam} objects after
      * removing the ineligible ones. Although sanitization might not be necessary, it ensures that
      * there is no need for {@code isEligible()} checks when fetching the {@link Hashtable}.
      *
