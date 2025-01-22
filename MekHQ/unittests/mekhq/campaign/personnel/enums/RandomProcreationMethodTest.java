@@ -78,9 +78,6 @@ public class RandomProcreationMethodTest {
     @Test
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
         when(mockOptions.getRandomProcreationRelationshipDiceSize()).thenReturn(5);

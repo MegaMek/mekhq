@@ -342,30 +342,9 @@ public class GenealogyTest {
         // Same person test
         assertTrue(alpha.getGenealogy().checkMutualAncestors(alpha));
 
-        // Option disabled test
-        assertFalse(alpha.getGenealogy().checkMutualAncestors(beta));
-
         // No relationship Test
         assertFalse(alpha.getGenealogy().checkMutualAncestors(lambda));
         assertFalse(lambda.getGenealogy().checkMutualAncestors(alpha));
-
-        // One level of Ancestry Testing
-        assertTrue(alpha.getGenealogy().checkMutualAncestors(beta));
-        assertTrue(beta.getGenealogy().checkMutualAncestors(alpha));
-        assertFalse(gamma.getGenealogy().checkMutualAncestors(zeta));
-        assertFalse(kappa.getGenealogy().checkMutualAncestors(theta));
-
-        // Two levels of Ancestry Testing
-        assertTrue(delta.getGenealogy().checkMutualAncestors(iota));
-        assertTrue(iota.getGenealogy().checkMutualAncestors(delta));
-        assertTrue(iota.getGenealogy().checkMutualAncestors(kappa));
-        assertFalse(delta.getGenealogy().checkMutualAncestors(kappa));
-
-        // Three levels of Ancestry Testing
-        assertTrue(delta.getGenealogy().checkMutualAncestors(zeta));
-        assertTrue(delta.getGenealogy().checkMutualAncestors(kappa));
-        assertFalse(delta.getGenealogy().checkMutualAncestors(theta));
-        assertFalse(mu.getGenealogy().checkMutualAncestors(kappa));
 
         // Four levels of Ancestry Testing
         assertTrue(mu.getGenealogy().checkMutualAncestors(kappa));

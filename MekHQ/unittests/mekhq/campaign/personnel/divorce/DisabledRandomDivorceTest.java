@@ -20,14 +20,12 @@ package mekhq.campaign.personnel.divorce;
 
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
 public class DisabledRandomDivorceTest {
@@ -36,16 +34,6 @@ public class DisabledRandomDivorceTest {
 
     @Mock
     private Person mockPerson;
-
-    @BeforeEach
-    public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUsePrisonerDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomOppositeSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
-    }
 
     @Test
     public void testRandomDivorce() {

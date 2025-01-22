@@ -39,10 +39,7 @@ public class DisabledRandomMarriageTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
     }
 
     @Test

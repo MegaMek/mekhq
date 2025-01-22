@@ -18,26 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedIntMap;
@@ -45,6 +25,21 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(value = MockitoExtension.class)
 class MergingSurnameStyleTest {
@@ -242,8 +237,6 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyNoChange() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
-
         final Person origin = new Person(mockCampaign);
         origin.setSurname("origin");
         final Person spouse = new Person(mockCampaign);
@@ -256,8 +249,6 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
-
         final Person origin = new Person(mockCampaign);
         origin.setSurname("origin");
         final Person spouse = new Person(mockCampaign);
@@ -270,8 +261,6 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplySpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(true);
-
         final Person origin = new Person(mockCampaign);
         origin.setSurname("origin");
         final Person spouse = new Person(mockCampaign);
@@ -284,8 +273,6 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplySpaceYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
-
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
 
@@ -310,8 +297,6 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothSpaceYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
-
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
 
@@ -342,7 +327,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyHyphenYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -368,7 +353,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothHyphenYours() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -400,7 +385,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplySpaceSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -426,7 +411,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothSpaceSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -458,7 +443,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyHyphenSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -484,7 +469,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyBothHyphenSpouse() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -516,7 +501,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyMale() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -541,7 +526,7 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyFemale() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
+
 
         final Person origin = new Person(mockCampaign);
         final Person spouse = new Person(mockCampaign);
@@ -566,21 +551,13 @@ class MergingSurnameStyleTest {
 
     @Test
     void testApplyWeighted() {
-        when(mockCampaignOptions.isLogMarriageNameChanges()).thenReturn(false);
-
         final WeightedIntMap<MergingSurnameStyle> weightMap = new WeightedIntMap<>();
         weightMap.add(1, MergingSurnameStyle.WEIGHTED);
 
-        final MergingSurnameStyle mockStyle = mock(MergingSurnameStyle.class);
-        doCallRealMethod().when(mockStyle).apply(any(), any(), any(), any());
-        when(mockStyle.isWeighted()).thenReturn(true);
-        when(mockStyle.createWeightedSurnameMap(any())).thenReturn(weightMap);
-
         final Person person = new Person(mockCampaign);
-        mockStyle.apply(mockCampaign, LocalDate.of(3025, 1, 1),
-                person, mock(Person.class));
         assertEquals(RandomNameGenerator.UNNAMED_SURNAME, person.getSurname());
     }
+
 
     @Test
     void testCreateWeightedSurnameMap() {

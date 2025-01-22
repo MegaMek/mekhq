@@ -79,10 +79,7 @@ public class RandomMarriageMethodTest {
     @Test
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
         when(mockOptions.getRandomMarriageDiceSize()).thenReturn(5);
 
         assertInstanceOf(DisabledRandomMarriage.class, RandomMarriageMethod.NONE.getMethod(mockOptions));
