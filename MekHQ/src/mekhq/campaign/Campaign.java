@@ -4318,34 +4318,57 @@ public class Campaign implements ITechManager {
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
+        // Prep some data for vocational xp
+        int vocationalXpRate = campaignOptions.getVocationalXP();
+        if (hasActiveContract) {
+            if (campaignOptions.isUseAtB()) {
+                for (AtBContract contract : getActiveAtBContracts()) {
+                    if (!contract.getContractType().isGarrisonType()) {
+                        vocationalXpRate *= 2;
+                        break;
+                    }
+                }
+            } else {
+                vocationalXpRate *= 2;
+            }
+        }
+
+        // Process personnel
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
 
+            // Daily events
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
-
-            processWeeklyRelationshipEvents(person);
 
             person.resetMinutesLeft();
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
 
-            // Reset edge points to the purchased value each week. This should only
-            // apply for support personnel - combat troops reset with each new mm game
-            processWeeklyEdgeResets(person);
-
-            if (processMonthlyVocationalXp(person)) {
-                personnelWhoAdvancedInXP.add(person);
-            }
-
             processAnniversaries(person);
 
-            processMonthlyAutoAwards(person);
+            // Weekly events
+            if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
+                processWeeklyRelationshipEvents(person);
+
+                processWeeklyEdgeResets(person);
+            }
+
+            // Monthly events
+            if (currentDay.getDayOfMonth() == 1) {
+                processMonthlyAutoAwards(person);
+
+                if (vocationalXpRate > 0) {
+                    if (processMonthlyVocationalXp(person, vocationalXpRate)) {
+                        personnelWhoAdvancedInXP.add(person);
+                    }
+                }
+            }
         }
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
@@ -4392,45 +4415,29 @@ public class Campaign implements ITechManager {
      * @param person the person for whom weekly Edge resets will be processed
      */
     private void processWeeklyEdgeResets(Person person) {
-        if ((person.hasSupportRole(true) || person.isEngineer())
-                && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+        if ((person.hasSupportRole(true) || person.isEngineer())) {
             person.resetCurrentEdge();
         }
     }
 
     /**
-     * Processes the monthly vocational experience (XP) gain for a given person based on specific
-     * eligibility criteria. If the person meets the conditions, XP is awarded and their progress
-     * is tracked.
+     * Processes the monthly vocational experience (XP) gain for a given person based on their
+     * eligibility and the vocational experience rules defined in campaign options.
      *
-     * <p>The method checks the following conditions to determine eligibility for XP gain:
+     * <p>Eligibility for receiving vocational XP is determined by checking the following conditions:
      * <ul>
-     *     <li>The person must have an active status (e.g., not retired, deceased, or in education).</li>
-     *     <li>The person must not be a child on the current date.</li>
-     *     <li>The person must not be categorized as a dependent.</li>
-     *     <li>The campaign must enable idle XP, and the current date must be the first day of the month.</li>
-     *     <li>The person must not have the status of a prisoner (Bondsmen are exempt from this
-     *     and remain eligible for XP).</li>
-     * </ul>
-     *
-     * <p>If all of these conditions are satisfied:
-     * <ul>
-     *     <li>The person’s idle month count is incremented.</li>
-     *     <li>If the accumulated idle months reach the threshold defined in the campaign options,
-     *     an idle XP roll (2d6) is performed.</li>
-     *     <li>If the roll result meets or exceeds the target threshold:
-     *         <ul>
-     *             <li>XP is awarded to the person based on the campaign's idle XP configuration.</li>
-     *             <li>The idle month count is reset.</li>
-     *         </ul>
-     *     </li>
-     *     <li>If the roll is unsuccessful, the idle month count is still reset.</li>
+     *     <li>The person must have an <b>active status</b> (e.g., not retired, deceased, or in education).</li>
+     *     <li>The person must not be a <b>child</b> as of the current date.</li>
+     *     <li>The person must not be categorized as a <b>dependent</b>.</li>
+     *     <li>The person must not have the status of a <b>prisoner</b>.</li>
+     *     <b>Note:</b> Bondsmen are exempt from this restriction and are eligible for vocational XP.
      * </ul>
      *
      * @param person the {@link Person} whose monthly vocational XP is to be processed
+     * @param vocationalXpRate the amount of XP awarded on a successful roll
      * @return {@code true} if XP was successfully awarded during the process, {@code false} otherwise
      */
-    private boolean processMonthlyVocationalXp(Person person) {
+    private boolean processMonthlyVocationalXp(Person person, int vocationalXpRate) {
         if (!person.getStatus().isActive()) {
             return false;
         }
@@ -4443,16 +4450,22 @@ public class Campaign implements ITechManager {
             return false;
         }
 
-        if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can
-            person.setIdleMonths(person.getIdleMonths() + 1);
-            if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
-                if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                    person.awardXP(this, getCampaignOptions().getIdleXP());
-                    person.setIdleMonths(0);
-                    return true;
-                }
-                person.setIdleMonths(0);
+        if (person.getPrisonerStatus().isCurrentPrisoner()) {
+            // Prisoners can't gain vocational XP, while Bondsmen can
+            return false;
+        }
+
+        int checkFrequency = campaignOptions.getVocationalXPCheckFrequency();
+        int targetNumber = campaignOptions.getVocationalXPTargetNumber();
+
+        person.setVocationalXPTimer(person.getVocationalXPTimer() + 1);
+        if (person.getVocationalXPTimer() >= checkFrequency) {
+            if (Compute.d6(2) >= targetNumber) {
+                person.awardXP(this, vocationalXpRate);
+                person.setVocationalXPTimer(0);
+                return true;
+            } else {
+                person.setVocationalXPTimer(0);
             }
         }
 
@@ -4519,35 +4532,33 @@ public class Campaign implements ITechManager {
      * @param person the person for whom the monthly auto awards are being processed
      */
     private void processMonthlyAutoAwards(Person person) {
-        if (getLocalDate().getDayOfMonth() == 1) {
-            double multiplier = 0;
+        double multiplier = 0;
 
-            int score = 0;
+        int score = 0;
 
-            if (person.getPrimaryRole().isSupport(true)) {
-                int dice = person.getExperienceLevel(this, false);
+        if (person.getPrimaryRole().isSupport(true)) {
+            int dice = person.getExperienceLevel(this, false);
 
-                if (dice > 0) {
-                    score = Compute.d6(dice);
-                }
-
-                multiplier += 0.5;
+            if (dice > 0) {
+                score = Compute.d6(dice);
             }
 
-            if (person.getSecondaryRole().isSupport(true)) {
-                int dice = person.getExperienceLevel(this, true);
-
-                if (dice > 0) {
-                    score += Compute.d6(dice);
-                }
-
-                multiplier += 0.5;
-            } else if (person.getSecondaryRole().isNone()) {
-                multiplier += 0.5;
-            }
-
-            person.changeAutoAwardSupportPoints((int) (score * multiplier));
+            multiplier += 0.5;
         }
+
+        if (person.getSecondaryRole().isSupport(true)) {
+            int dice = person.getExperienceLevel(this, true);
+
+            if (dice > 0) {
+                score += Compute.d6(dice);
+            }
+
+            multiplier += 0.5;
+        } else if (person.getSecondaryRole().isNone()) {
+            multiplier += 0.5;
+        }
+
+        person.changeAutoAwardSupportPoints((int) (score * multiplier));
     }
 
     /**

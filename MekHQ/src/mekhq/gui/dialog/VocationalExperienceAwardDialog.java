@@ -22,6 +22,8 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
@@ -150,16 +152,47 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
     }
 
     /**
-     * Constructs the out-of-character (OOC) message to be displayed in the dialog.
+     * Constructs an out-of-character (OOC) message to provide context for XP advancements
+     * based on the campaign's settings and current state.
      *
-     * <p>This message provides additional context regarding the XP gained, referencing
-     * campaign settings such as the idle XP awarded.</p>
+     * <p>The generated message includes details about the idle XP gained, as determined by
+     * the campaign's configuration and active contracts. If the campaign has an active
+     * contract that is not a garrison type (when using AtB settings), or simply has an
+     * active contract otherwise, the default XP advancement rate is doubled.</p>
      *
-     * @param campaign the {@link Campaign} containing campaign options and XP settings
-     * @return a string representing the out-of-character message
+     * <p>This method integrates campaign options such as:</p>
+     * <ul>
+     *     <li>The default vocational XP advancement rate ({@code VocationalXP})</li>
+     *     <li>The status of whether the campaign is using the AtB (Against the Bot)
+     *         system ({@code isUseAtB})</li>
+     *     <li>The type of active employment contracts (e.g., garrison or non-garrison)</li>
+     * </ul>
+     *
+     * <p>This information is formatted into a predefined message string using localized
+     * resource strings.</p>
+     *
+     * @param campaign the {@link Campaign} containing the current campaign state,
+     *                 settings, and active contracts
+     * @return a string representing the out-of-character (OOC) message to be displayed
      */
     private static String createOutOfCharacterMessage(Campaign campaign) {
-        int advancement = campaign.getCampaignOptions().getIdleXP();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        int advancement = campaignOptions.getVocationalXP();
+
+        if (campaign.hasActiveContract()) {
+            if (campaignOptions.isUseAtB()) {
+                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                    if (!contract.getContractType().isGarrisonType()) {
+                        advancement *= 2;
+                        break;
+                    }
+                }
+            } else {
+                advancement *= 2;
+            }
+        }
+
         return String.format(resources.getString("dialog.ooc"), advancement);
     }
 }
