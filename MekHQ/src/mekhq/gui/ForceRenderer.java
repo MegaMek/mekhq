@@ -136,7 +136,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             String text = name + ", " + unitName + c3network + transport + tacticalTransport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
-            if((null != person) && (null != force) && (person.getId() == force.getForceCommanderID())) {
+            if((null != person) && (null != force) && (person.getId().equals(force.getForceCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");
