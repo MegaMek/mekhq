@@ -102,7 +102,22 @@ MEKHQ VERSION HISTORY:
 + PR #5806: Refactored BV Display Logic in StratconScenario.java
 + PR #5813: Replaced ':' with '@' in internal AI Bot Name
 + Fix #5724: Fix astech time calculations for units that do not require maintenance 
-+ Fix #5818: Fixed assigning/unassigning transports from TOE at the Force level & infantry compartments use the correct weight for infantry squads 
++ Fix #5818: Fixed assigning/unassigning transports from TOE at the Force level & infantry compartments use the correct weight for infantry squads
++ Fix #3701: Corrected preset picker display on Linux
++ Fix #5810: Fixed peacetime operating cost settings
++ Fix #5826: Fixed Scenario Info Display for Uncloaked Scenarios
++ PR #5830: Convoy Message Copy Editing
++ Fix #5831: Added null Protection for Units Involved in Automated Mothballing
++ PR #5832: Corrected MHQDialogImmersive Constructor Usage
++ PR #5835: Implemented Granular autoLogistics Settings
++ Fix #5836: Combat Force commanders should be updated when a Force's Commander is updated
++ PR #5839: Refactored HPG Network Logic and Improved Visualization Clarity
++ Fix #5840: Refactored Loot Preview to Use JEditorPane not JTextArea
++ Fix #5841: Corrected isUseAtB to account for useStratCon
++ Fix #5844: Units can only be assigned a transport that is in the TOE
++ PR #5847: Added Methods for Star Radius Estimation and Spectral Type Parsing
++ PR #5848: Fixed Parsing of routedPayout to Handle Non-Numeric Characters
++ PR #5850: Rebranded Idle XP into Vocational XP
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
