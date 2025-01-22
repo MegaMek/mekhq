@@ -5440,6 +5440,18 @@ public class Unit implements ITechnology {
 
         setMothballTime(0);
         setMothballed(true);
+
+        // We don't want to clear transport assignments, but we do want to remove the
+        // transport from the list of potential transports, if it's a transport.
+        if (campaign != null) {
+            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
+            }
+
+            if (!getTransportCapabilities(TACTICAL_TRANSPORT).isEmpty()) {
+                getCampaign().removeCampaignTransporter(TACTICAL_TRANSPORT, this);
+            }
+        }
     }
 
     /**
@@ -5512,6 +5524,18 @@ public class Unit implements ITechnology {
         if (mothballInfo != null) {
             mothballInfo.restorePreMothballInfo(this, getCampaign());
             mothballInfo = null;
+        }
+
+        // If this unit is a transport, let's add it to the campaign's
+        // transporter map.
+        if (campaign != null) {
+            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
+            }
+
+            if (!getTransportCapabilities(TACTICAL_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(TACTICAL_TRANSPORT, this);
+            }
         }
     }
 
@@ -5910,6 +5934,20 @@ public class Unit implements ITechnology {
         return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
     }
 
+    /**
+     * Not always opposite to isUnmaintained() - both are false for units that do not require maintenance.
+     * @return true if unit requires maintenance and has a tech assigned, false otherwise.
+     * @see #isUnmaintained()
+     */
+    public boolean isMaintained() {
+        return requiresMaintenance() && (getTech() != null);
+    }
+
+    /**
+     * Not always opposite to isMaintained() - both are false for units that do not require maintenance.
+     * @return true if unit requires maintenance and does not have a tech assigned, false otherwise.
+     * @see #isMaintained()
+     */
     public boolean isUnmaintained() {
         return requiresMaintenance() && (getTech() == null);
     }
@@ -6509,6 +6547,9 @@ public class Unit implements ITechnology {
             if (hasTransportedUnits(campaignTransportType)) {
                 getTransportedUnitsSummary(campaignTransportType).fixReferences(campaign, this);
                 initializeTransportSpace(campaignTransportType);
+                if (isMothballed() && campaign != null) {
+
+                }
             }
         }
     }

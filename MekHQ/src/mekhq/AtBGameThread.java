@@ -511,7 +511,7 @@ public class AtBGameThread extends GameThread {
     }
 
     private void setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {
-        var botName = player.getName() + ":AI";
+        var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
         var botClient = new Princess(botName, client.getHost(), client.getPort());
