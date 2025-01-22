@@ -753,7 +753,7 @@ public class FinancesTab {
         options.setLoanLimits(useLoanLimitsBox.isSelected());
         options.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
-        options.setShowPeacetimeCost(usePeacetimeCostBox.isSelected());
+        options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
         options.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
         options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
@@ -818,7 +818,7 @@ public class FinancesTab {
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
         usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaint());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
-        usePeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
+        usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
         comboFinancialYearDuration = new MMComboBox<>("comboFinancialYearDuration",
                 FinancialYearDuration.values());
