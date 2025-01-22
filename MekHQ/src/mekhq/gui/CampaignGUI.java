@@ -1518,10 +1518,6 @@ public class CampaignGUI extends JPanel {
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
             getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
         } else {
-            getCampaign().getDivorce().setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
-            getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
-            getCampaign().getDivorce().setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
-            getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
             if (getCampaign().getDivorce().getMethod().isDiceRoll()) {
                 ((RandomDivorce) getCampaign().getDivorce()).setDivorceDiceSize(
                         newOptions.getRandomDivorceDiceSize());
@@ -1533,7 +1529,6 @@ public class CampaignGUI extends JPanel {
         } else {
             getCampaign().getMarriage()
                     .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
-            getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
             if (getCampaign().getMarriage().getMethod().isDiceRoll()) {
                 ((RandomMarriage) getCampaign().getMarriage()).setMarriageDiceSize(
                         newOptions.getRandomMarriageDiceSize());

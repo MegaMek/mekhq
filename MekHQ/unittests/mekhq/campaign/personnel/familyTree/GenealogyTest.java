@@ -340,40 +340,40 @@ public class GenealogyTest {
     @Test
     public void testCheckMutualAncestors() {
         // Same person test
-        assertTrue(alpha.getGenealogy().checkMutualAncestors(alpha, 4));
+        assertTrue(alpha.getGenealogy().checkMutualAncestors(alpha));
 
         // Option disabled test
-        assertFalse(alpha.getGenealogy().checkMutualAncestors(beta, 0));
+        assertFalse(alpha.getGenealogy().checkMutualAncestors(beta));
 
         // No relationship Test
-        assertFalse(alpha.getGenealogy().checkMutualAncestors(lambda, 4));
-        assertFalse(lambda.getGenealogy().checkMutualAncestors(alpha, 4));
+        assertFalse(alpha.getGenealogy().checkMutualAncestors(lambda));
+        assertFalse(lambda.getGenealogy().checkMutualAncestors(alpha));
 
         // One level of Ancestry Testing
-        assertTrue(alpha.getGenealogy().checkMutualAncestors(beta, 1));
-        assertTrue(beta.getGenealogy().checkMutualAncestors(alpha, 1));
-        assertFalse(gamma.getGenealogy().checkMutualAncestors(zeta, 1));
-        assertFalse(kappa.getGenealogy().checkMutualAncestors(theta, 1));
+        assertTrue(alpha.getGenealogy().checkMutualAncestors(beta));
+        assertTrue(beta.getGenealogy().checkMutualAncestors(alpha));
+        assertFalse(gamma.getGenealogy().checkMutualAncestors(zeta));
+        assertFalse(kappa.getGenealogy().checkMutualAncestors(theta));
 
         // Two levels of Ancestry Testing
-        assertTrue(delta.getGenealogy().checkMutualAncestors(iota, 2));
-        assertTrue(iota.getGenealogy().checkMutualAncestors(delta, 2));
-        assertTrue(iota.getGenealogy().checkMutualAncestors(kappa, 2));
-        assertFalse(delta.getGenealogy().checkMutualAncestors(kappa, 2));
+        assertTrue(delta.getGenealogy().checkMutualAncestors(iota));
+        assertTrue(iota.getGenealogy().checkMutualAncestors(delta));
+        assertTrue(iota.getGenealogy().checkMutualAncestors(kappa));
+        assertFalse(delta.getGenealogy().checkMutualAncestors(kappa));
 
         // Three levels of Ancestry Testing
-        assertTrue(delta.getGenealogy().checkMutualAncestors(zeta, 3));
-        assertTrue(delta.getGenealogy().checkMutualAncestors(kappa, 3));
-        assertFalse(delta.getGenealogy().checkMutualAncestors(theta, 3));
-        assertFalse(mu.getGenealogy().checkMutualAncestors(kappa, 3));
+        assertTrue(delta.getGenealogy().checkMutualAncestors(zeta));
+        assertTrue(delta.getGenealogy().checkMutualAncestors(kappa));
+        assertFalse(delta.getGenealogy().checkMutualAncestors(theta));
+        assertFalse(mu.getGenealogy().checkMutualAncestors(kappa));
 
         // Four levels of Ancestry Testing
-        assertTrue(mu.getGenealogy().checkMutualAncestors(kappa, 4));
-        assertTrue(mu.getGenealogy().checkMutualAncestors(eta, 4));
-        assertFalse(delta.getGenealogy().checkMutualAncestors(epsilon, 4));
-        assertTrue(nu.getGenealogy().checkMutualAncestors(alpha, 4));
-        assertFalse(nu.getGenealogy().checkMutualAncestors(eta, 4));
-        assertFalse(nu.getGenealogy().checkMutualAncestors(zeta, 4));
+        assertTrue(mu.getGenealogy().checkMutualAncestors(kappa));
+        assertTrue(mu.getGenealogy().checkMutualAncestors(eta));
+        assertFalse(delta.getGenealogy().checkMutualAncestors(epsilon));
+        assertTrue(nu.getGenealogy().checkMutualAncestors(alpha));
+        assertFalse(nu.getGenealogy().checkMutualAncestors(eta));
+        assertFalse(nu.getGenealogy().checkMutualAncestors(zeta));
     }
     //endregion Boolean Checks
 

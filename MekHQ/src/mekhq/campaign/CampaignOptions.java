@@ -306,15 +306,11 @@ public class CampaignOptions {
     private boolean announceChildBirthdays;
 
     // Marriage
-    private int checkMutualAncestorsDepth;
     private int noInterestInMarriageDiceSize;
-    private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
     private boolean useRandomSameSexMarriages; // legacy, pre-50.01
     private boolean useRandomClanPersonnelMarriages;
-    private boolean useRandomPrisonerMarriages;
-    private int randomMarriageAgeRange;
     private int randomMarriageDiceSize;
     private int randomSameSexMarriageDiceSize;
     private int randomNewDependentMarriage;
@@ -322,10 +318,6 @@ public class CampaignOptions {
     // Divorce
     private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
     private RandomDivorceMethod randomDivorceMethod;
-    private boolean useRandomOppositeSexDivorce;
-    private boolean useRandomSameSexDivorce;
-    private boolean useRandomClanPersonnelDivorce;
-    private boolean useRandomPrisonerDivorce;
     private int randomDivorceDiceSize;
 
     // Procreation
@@ -334,10 +326,7 @@ public class CampaignOptions {
     private boolean assignNonPrisonerBabiesFounderTag;
     private boolean assignChildrenOfFoundersFounderTag;
     private boolean useMaternityLeave;
-    private boolean determineFatherAtBirth;
-    private boolean displayTrueDueDate;
     private int noInterestInChildrenDiceSize;
-    private boolean logProcreation;
     private RandomProcreationMethod randomProcreationMethod;
     private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
@@ -873,9 +862,7 @@ public class CampaignOptions {
         setAnnounceChildBirthdays(true);
 
         // Marriage
-        setCheckMutualAncestorsDepth(4);
         setNoInterestInMarriageDiceSize(10);
-        setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
         getMarriageSurnameWeights().put(MergingSurnameStyle.YOURS, 55);
@@ -892,8 +879,6 @@ public class CampaignOptions {
         getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, 160);
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
         setUseRandomClanPersonnelMarriages(false);
-        setUseRandomPrisonerMarriages(false);
-        setRandomMarriageAgeRange(10);
         setRandomMarriageDiceSize(5000);
         setRandomSameSexMarriageDiceSize(14);
         setRandomNewDependentMarriage(20);
@@ -905,10 +890,6 @@ public class CampaignOptions {
         getDivorceSurnameWeights().put(SplittingSurnameStyle.BOTH_CHANGE_SURNAME, 30);
         getDivorceSurnameWeights().put(SplittingSurnameStyle.BOTH_KEEP_SURNAME, 50);
         setRandomDivorceMethod(RandomDivorceMethod.NONE);
-        setUseRandomOppositeSexDivorce(true);
-        setUseRandomSameSexDivorce(true);
-        setUseRandomClanPersonnelDivorce(true);
-        setUseRandomPrisonerDivorce(false);
         setRandomDivorceDiceSize(900);
 
         // Procreation
@@ -917,10 +898,7 @@ public class CampaignOptions {
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
         setUseMaternityLeave(true);
-        setDetermineFatherAtBirth(false);
-        setDisplayTrueDueDate(false);
         setNoInterestInChildrenDiceSize(3);
-        setLogProcreation(false);
         setRandomProcreationMethod(RandomProcreationMethod.NONE);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
@@ -2365,46 +2343,12 @@ public class CampaignOptions {
     // endregion Salary
 
     // region Marriage
-    /**
-     * This gets the number of recursions to use when checking mutual ancestors
-     * between two personnel
-     *
-     * @return the number of recursions to use
-     */
-    public int getCheckMutualAncestorsDepth() {
-        return checkMutualAncestorsDepth;
-    }
-
-    /**
-     * This sets the number of recursions to use when checking mutual ancestors
-     * between two personnel
-     *
-     * @param checkMutualAncestorsDepth the number of recursions
-     */
-    public void setCheckMutualAncestorsDepth(final int checkMutualAncestorsDepth) {
-        this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
-    }
-
     public int getNoInterestInMarriageDiceSize() {
         return noInterestInMarriageDiceSize;
     }
 
     public void setNoInterestInMarriageDiceSize(final int noInterestInMarriageDiceSize) {
         this.noInterestInMarriageDiceSize = noInterestInMarriageDiceSize;
-    }
-
-    /**
-     * @return whether to log a name change in a marriage
-     */
-    public boolean isLogMarriageNameChanges() {
-        return logMarriageNameChanges;
-    }
-
-    /**
-     * @param logMarriageNameChanges whether to log marriage name changes or not
-     */
-    public void setLogMarriageNameChanges(final boolean logMarriageNameChanges) {
-        this.logMarriageNameChanges = logMarriageNameChanges;
     }
 
     /**
@@ -2452,34 +2396,6 @@ public class CampaignOptions {
 
     public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
         this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
-    }
-
-    public boolean isUseRandomPrisonerMarriages() {
-        return useRandomPrisonerMarriages;
-    }
-
-    public void setUseRandomPrisonerMarriages(final boolean useRandomPrisonerMarriages) {
-        this.useRandomPrisonerMarriages = useRandomPrisonerMarriages;
-    }
-
-    /**
-     * A random marriage can only happen between two people whose ages differ (+/-)
-     * by the returned value
-     *
-     * @return the age range ages can differ (+/-)
-     */
-    public int getRandomMarriageAgeRange() {
-        return randomMarriageAgeRange;
-    }
-
-    /**
-     * A random marriage can only happen between two people whose ages differ (+/-)
-     * by this value
-     *
-     * @param randomMarriageAgeRange the new maximum age range
-     */
-    public void setRandomMarriageAgeRange(final int randomMarriageAgeRange) {
-        this.randomMarriageAgeRange = randomMarriageAgeRange;
     }
 
     /**
@@ -2548,38 +2464,6 @@ public class CampaignOptions {
         this.randomDivorceMethod = randomDivorceMethod;
     }
 
-    public boolean isUseRandomOppositeSexDivorce() {
-        return useRandomOppositeSexDivorce;
-    }
-
-    public void setUseRandomOppositeSexDivorce(final boolean useRandomOppositeSexDivorce) {
-        this.useRandomOppositeSexDivorce = useRandomOppositeSexDivorce;
-    }
-
-    public boolean isUseRandomSameSexDivorce() {
-        return useRandomSameSexDivorce;
-    }
-
-    public void setUseRandomSameSexDivorce(final boolean useRandomSameSexDivorce) {
-        this.useRandomSameSexDivorce = useRandomSameSexDivorce;
-    }
-
-    public boolean isUseRandomClanPersonnelDivorce() {
-        return useRandomClanPersonnelDivorce;
-    }
-
-    public void setUseRandomClanPersonnelDivorce(final boolean useRandomClanPersonnelDivorce) {
-        this.useRandomClanPersonnelDivorce = useRandomClanPersonnelDivorce;
-    }
-
-    public boolean isUseRandomPrisonerDivorce() {
-        return useRandomPrisonerDivorce;
-    }
-
-    public void setUseRandomPrisonerDivorce(final boolean useRandomPrisonerDivorce) {
-        this.useRandomPrisonerDivorce = useRandomPrisonerDivorce;
-    }
-
     public int getRandomDivorceDiceSize() {
         return randomDivorceDiceSize;
     }
@@ -2643,55 +2527,12 @@ public class CampaignOptions {
         this.useMaternityLeave = useMaternityLeave;
     }
 
-    /**
-     * @return whether to determine the father at birth instead of at conception
-     */
-    public boolean isDetermineFatherAtBirth() {
-        return determineFatherAtBirth;
-    }
-
-    /**
-     * @param determineFatherAtBirth whether to determine the father at birth instead of at conception
-     */
-    public void setDetermineFatherAtBirth(final boolean determineFatherAtBirth) {
-        this.determineFatherAtBirth = determineFatherAtBirth;
-    }
-
-    /**
-     * @return whether to show the expected or actual due date for personnel
-     */
-    public boolean isDisplayTrueDueDate() {
-        return displayTrueDueDate;
-    }
-
-    /**
-     * @param displayTrueDueDate whether to show the expected or actual due date for
-     *                           personnel
-     */
-    public void setDisplayTrueDueDate(final boolean displayTrueDueDate) {
-        this.displayTrueDueDate = displayTrueDueDate;
-    }
-
     public int getNoInterestInChildrenDiceSize() {
         return noInterestInChildrenDiceSize;
     }
 
     public void setNoInterestInChildrenDiceSize(final int noInterestInChildrenDiceSize) {
         this.noInterestInChildrenDiceSize = noInterestInChildrenDiceSize;
-    }
-
-    /**
-     * @return whether to log procreation
-     */
-    public boolean isLogProcreation() {
-        return logProcreation;
-    }
-
-    /**
-     * @param logProcreation whether to log procreation
-     */
-    public void setLogProcreation(final boolean logProcreation) {
-        this.logProcreation = logProcreation;
     }
 
     public RandomProcreationMethod getRandomProcreationMethod() {
@@ -4938,9 +4779,7 @@ public class CampaignOptions {
         // endregion Announcements
 
         // region Marriage
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInMarriageDiceSize", getNoInterestInMarriageDiceSize());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
         for (final Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
@@ -4948,8 +4787,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "marriageSurnameWeights");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages", isUseRandomClanPersonnelMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageDiceSize", getRandomMarriageDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomSameSexMarriageDiceSize", getRandomSameSexMarriageDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomNewDependentMarriage", getRandomNewDependentMarriage());
@@ -4962,10 +4799,6 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "divorceSurnameWeights");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDivorce", isUseRandomClanPersonnelDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDivorceDiceSize", getRandomDivorceDiceSize());
         //endregion Divorce
 
@@ -4975,10 +4808,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaternityLeave", isUseMaternityLeave());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayTrueDueDate", isDisplayTrueDueDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInChildrenDiceSize", getNoInterestInChildrenDiceSize());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelProcreation",
                 isUseRandomClanPersonnelProcreation());
@@ -5661,12 +5491,8 @@ public class CampaignOptions {
                     // endregion anniversaries
 
                     // region Marriage
-                } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
-                    retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInMarriageDiceSize")) {
                     retVal.setNoInterestInMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChanges")) {
-                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageSurnameWeights")) {
                     if (!wn2.hasChildNodes()) {
                         continue;
@@ -5686,10 +5512,6 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelMarriages")
                         || wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerMarriages")) {
-                    retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
-                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageDiceSize")) {
                     retVal.setRandomMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomSameSexMarriageDiceSize")) {
@@ -5719,14 +5541,6 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceMethod")) {
                     retVal.setRandomDivorceMethod(RandomDivorceMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomOppositeSexDivorce")) {
-                    retVal.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexDivorce")) {
-                    retVal.setUseRandomSameSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelDivorce")) {
-                    retVal.setUseRandomClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDivorce")) {
-                    retVal.setUseRandomPrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceDiceSize")) {
                     retVal.setRandomDivorceDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Divorce
@@ -5742,14 +5556,8 @@ public class CampaignOptions {
                     retVal.setAssignChildrenOfFoundersFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMaternityLeave")) {
                     retVal.setUseMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
-                    retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
-                    retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInChildrenDiceSize")) {
                     retVal.setNoInterestInChildrenDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("logProcreation")) {
-                    retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationMethod")) {
                     retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelProcreation")) {
@@ -6243,13 +6051,9 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
-                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.6 Removal
                     retVal.setRandomMarriageMethod(Boolean.parseBoolean(wn2.getTextContent().trim())
                             ? RandomMarriageMethod.DICE_ROLL : RandomMarriageMethod.NONE);
-                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.6 Removal
-                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.6 Removal
                     final String[] values = wn2.getTextContent().split(",");
                     if (values.length == 13) {
@@ -6262,8 +6066,6 @@ public class CampaignOptions {
                     } else {
                         logger.error("Unknown length of randomMarriageSurnameWeights");
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
-                    retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) { // Legacy - 0.49.4 Removal
                     retVal.setUseStaticRATs(true);
                 } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) { // Legacy - 0.49.4 Removal

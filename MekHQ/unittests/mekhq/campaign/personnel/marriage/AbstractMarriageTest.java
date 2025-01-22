@@ -182,10 +182,10 @@ public class AbstractMarriageTest {
 
         // Can't be closely related
         when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn(null);
-        when(mockGenealogy.checkMutualAncestors(any(), anyInt())).thenReturn(true);
+        when(mockGenealogy.checkMutualAncestors(any())).thenReturn(true);
         assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
 
-        when(mockGenealogy.checkMutualAncestors(any(), anyInt())).thenReturn(false);
+        when(mockGenealogy.checkMutualAncestors(any())).thenReturn(false);
 
         // Random Marriages require both to be current prisoners or both to not be current prisoners
         // Free - Free
