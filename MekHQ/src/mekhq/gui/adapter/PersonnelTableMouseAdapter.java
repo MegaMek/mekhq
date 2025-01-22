@@ -1554,8 +1554,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
         if (oneSelected && person.getStatus().isActive()) {
-            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign().getLocalDate(), person, false) == null)) {
+            if (gui.getCampaign().getMarriage().canMarry(gui.getCampaign().getLocalDate(), person, false) == null) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -1621,10 +1620,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce() && (Stream.of(selected)
+        if (Stream.of(selected)
                 .anyMatch(p -> gui.getCampaign()
                         .getDivorce()
-                        .canDivorce(person, false) == null))) {
+                        .canDivorce(person, false) == null)) {
             menu = new JMenu(resources.getString("removeSpouse.text"));
 
             for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
@@ -2728,9 +2727,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(miCommander);
         }
 
-        if ((gui.getCampaign().getCampaignOptions().isUseManualDivorce()
-                || !gui.getCampaign().getCampaignOptions().getRandomDivorceMethod().isNone())
-                && Stream.of(selected).allMatch(p -> p.getGenealogy().hasSpouse())
+        if (Stream.of(selected).allMatch(p -> p.getGenealogy().hasSpouse())
                 && Stream.of(selected).allMatch(p -> p.isDivorceable() == person.isDivorceable())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miDivorceable.text"));
             cbMenuItem.setToolTipText(resources.getString("miDivorceable.toolTipText"));
@@ -2769,9 +2766,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if ((gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
-                && Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
+        if (Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
             cbMenuItem.setToolTipText(wordWrap(resources.getString("miMarriageable.toolTipText")));
             cbMenuItem.setName("miMarriageable");
@@ -2783,9 +2778,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if ((gui.getCampaign().getCampaignOptions().isUseManualProcreation()
-                || !gui.getCampaign().getCampaignOptions().getRandomProcreationMethod().isNone())
-                && Stream.of(selected).allMatch(p -> p.getGender().isFemale())
+        if (Stream.of(selected).allMatch(p -> p.getGender().isFemale())
                 && Stream.of(selected).allMatch(p -> p.isTryingToConceive() == person.isTryingToConceive())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
             cbMenuItem.setToolTipText(
@@ -2988,23 +2981,21 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
 
-            if (gui.getCampaign().getCampaignOptions().isUseManualProcreation()) {
-                if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
-                        .canProcreate(gui.getCampaign().getLocalDate(), p, false) == null)) {
-                    menuItem = new JMenuItem(
-                            resources.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
-                    menuItem.setActionCommand(CMD_ADD_PREGNANCY);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                }
+            if (Stream.of(selected).anyMatch(p -> gui.getCampaign().getProcreation()
+                    .canProcreate(gui.getCampaign().getLocalDate(), p, false) == null)) {
+                menuItem = new JMenuItem(
+                        resources.getString(oneSelected ? "addPregnancy.text" : "addPregnancies.text"));
+                menuItem.setActionCommand(CMD_ADD_PREGNANCY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
 
-                if (Stream.of(selected).anyMatch(Person::isPregnant)) {
-                    menuItem = new JMenuItem(
-                            resources.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
-                    menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
-                    menuItem.addActionListener(this);
-                    menu.add(menuItem);
-                }
+            if (Stream.of(selected).anyMatch(Person::isPregnant)) {
+                menuItem = new JMenuItem(
+                        resources.getString(oneSelected ? "removePregnancy.text" : "removePregnancies.text"));
+                menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {

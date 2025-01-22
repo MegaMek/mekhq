@@ -56,9 +56,6 @@ public class RelationshipsTab {
 
     //start Marriage Tab
     private JPanel pnlMarriageGeneralOptions;
-    private JCheckBox chkUseManualMarriages;
-    private JCheckBox chkUseClanPersonnelMarriages;
-    private JCheckBox chkUsePrisonerMarriages;
     private JLabel lblNoInterestInMarriageDiceSize;
     private JSpinner spnNoInterestInMarriageDiceSize;
     private JLabel lblCheckMutualAncestorsDepth;
@@ -81,10 +78,6 @@ public class RelationshipsTab {
     //end Marriage Tab
 
     //start Divorce Tab
-    private JCheckBox chkUseManualDivorce;
-    private JCheckBox chkUseClanPersonnelDivorce;
-    private JCheckBox chkUsePrisonerDivorce;
-
     private JPanel pnlRandomDivorce;
     private JLabel lblRandomDivorceMethod;
     private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
@@ -97,9 +90,6 @@ public class RelationshipsTab {
     //end Divorce Tab
 
     //start Procreation Tab
-    private JCheckBox chkUseManualProcreation;
-    private JCheckBox chkUseClanPersonnelProcreation;
-    private JCheckBox chkUsePrisonerProcreation;
     private JLabel lblMultiplePregnancyOccurrences;
     private JSpinner spnMultiplePregnancyOccurrences;
     private JLabel lblBabySurnameStyle;
@@ -152,9 +142,6 @@ public class RelationshipsTab {
      */
     private void initializeProcreationTab() {
         pnlProcreationGeneralOptionsPanel = new JPanel();
-        chkUseManualProcreation = new JCheckBox();
-        chkUseClanPersonnelProcreation = new JCheckBox();
-        chkUsePrisonerProcreation = new JCheckBox();
         lblMultiplePregnancyOccurrences = new JLabel();
         spnMultiplePregnancyOccurrences = new JSpinner();
         lblBabySurnameStyle = new JLabel();
@@ -186,10 +173,6 @@ public class RelationshipsTab {
      * This tab controls general divorce settings and allows configuring random divorce options.
      */
     private void initializeDivorceTab() {
-        chkUseManualDivorce = new JCheckBox();
-        chkUseClanPersonnelDivorce = new JCheckBox();
-        chkUsePrisonerDivorce = new JCheckBox();
-
         pnlRandomDivorce = new JPanel();
         lblRandomDivorceMethod = new JLabel();
         comboRandomDivorceMethod = new MMComboBox<>("comboRandomDivorceMethod", RandomDivorceMethod.values());
@@ -207,9 +190,6 @@ public class RelationshipsTab {
      */
     private void initializeMarriageTab() {
         pnlMarriageGeneralOptions = new JPanel();
-        chkUseManualMarriages = new JCheckBox();
-        chkUseClanPersonnelMarriages = new JCheckBox();
-        chkUsePrisonerMarriages = new JCheckBox();
         lblNoInterestInMarriageDiceSize = new JLabel();
         spnNoInterestInMarriageDiceSize = new JSpinner();
         lblCheckMutualAncestorsDepth = new JLabel();
@@ -279,10 +259,6 @@ public class RelationshipsTab {
      */
     private JPanel createMarriageGeneralOptionsPanel() {
         // Contents
-        chkUseManualMarriages = new CampaignOptionsCheckBox("UseManualMarriages");
-        chkUseClanPersonnelMarriages = new CampaignOptionsCheckBox("UseClanPersonnelMarriages");
-        chkUsePrisonerMarriages = new CampaignOptionsCheckBox("UsePrisonerMarriages");
-
         lblNoInterestInMarriageDiceSize = new CampaignOptionsLabel("NoInterestInMarriageDiceSize");
         spnNoInterestInMarriageDiceSize = new CampaignOptionsSpinner("NoInterestInMarriageDiceSize",
             10, 1, 100000, 1);
@@ -300,15 +276,6 @@ public class RelationshipsTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(chkUseManualMarriages, layout);
-
-        layout.gridy++;
-        panel.add(chkUseClanPersonnelMarriages, layout);
-
-        layout.gridy++;
-        panel.add(chkUsePrisonerMarriages, layout);
-
-        layout.gridy++;
         panel.add(lblNoInterestInMarriageDiceSize, layout);
         layout.gridx++;
         panel.add(spnNoInterestInMarriageDiceSize, layout);
@@ -426,27 +393,9 @@ public class RelationshipsTab {
             getImageDirectory() + "logo_escorpion_imperio.png");
 
         // Contents
-        chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
-        chkUseClanPersonnelDivorce = new CampaignOptionsCheckBox("UseClanPersonnelDivorce");
-        chkUsePrisonerDivorce = new CampaignOptionsCheckBox("UsePrisonerDivorce");
-
         pnlRandomDivorce = createRandomDivorcePanel();
 
         // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("DivorceTabLeft");
-        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
-
-        layoutLeft.gridwidth = 1;
-        layoutLeft.gridx = 0;
-        layoutLeft.gridy = 0;
-        panelLeft.add(chkUseManualDivorce, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseClanPersonnelDivorce, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUsePrisonerDivorce, layoutLeft);
-
         final JPanel panelParent = new CampaignOptionsStandardPanel("DivorceTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
 
@@ -457,9 +406,6 @@ public class RelationshipsTab {
 
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
-        panelParent.add(panelLeft, layoutParent);
-
-        layoutParent.gridx++;
         panelParent.add(pnlRandomDivorce, layoutParent);
 
         // Create Parent Panel and return
@@ -575,10 +521,6 @@ public class RelationshipsTab {
      */
     private JPanel createProcreationGeneralOptionsPanel() {
         // Contents
-        chkUseManualProcreation = new CampaignOptionsCheckBox("UseManualProcreation");
-        chkUseClanPersonnelProcreation = new CampaignOptionsCheckBox("UseClanPersonnelProcreation");
-        chkUsePrisonerProcreation = new CampaignOptionsCheckBox("UsePrisonerProcreation");
-
         lblMultiplePregnancyOccurrences = new CampaignOptionsLabel("MultiplePregnancyOccurrences");
         spnMultiplePregnancyOccurrences = new CampaignOptionsSpinner("MultiplePregnancyOccurrences",
             50, 1, 1000, 1);
@@ -616,16 +558,6 @@ public class RelationshipsTab {
         layout.gridy = 0;
         layout.gridx = 0;
         layout.gridwidth = 1;
-        panel.add(chkUseManualProcreation, layout);
-
-        layout.gridy++;
-        panel.add(chkUseClanPersonnelProcreation, layout);
-
-        layout.gridy++;
-        panel.add(chkUsePrisonerProcreation, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
         panel.add(lblMultiplePregnancyOccurrences, layout);
         layout.gridx++;
         panel.add(spnMultiplePregnancyOccurrences, layout);
@@ -759,35 +691,26 @@ public class RelationshipsTab {
         }
 
         // Marriage
-        chkUseManualMarriages.setSelected(options.isUseManualMarriages());
-        chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
-        chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
         spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInMarriageDiceSize());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
         chkUseRandomClanPersonnelMarriages.setSelected(options.isUseRandomClanPersonnelMarriages());
-        chkUseRandomPrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
+        chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
         spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
         spnRandomSameSexMarriageDiceSize.setValue(options.getRandomSameSexMarriageDiceSize());
         spnRandomNewDependentMarriage.setValue(options.getRandomNewDependentMarriage());
 
         // Divorce
-        chkUseManualDivorce.setSelected(options.isUseManualDivorce());
-        chkUseClanPersonnelDivorce.setSelected(options.isUseClanPersonnelDivorce());
-        chkUsePrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
         comboRandomDivorceMethod.setSelectedItem(options.getRandomDivorceMethod());
         chkUseRandomOppositeSexDivorce.setSelected(options.isUseRandomOppositeSexDivorce());
         chkUseRandomSameSexDivorce.setSelected(options.isUseRandomSameSexDivorce());
-        chkUseRandomClanPersonnelDivorce.setSelected(options.isUseClanPersonnelDivorce());
-        chkUseRandomPrisonerDivorce.setSelected(options.isUsePrisonerDivorce());
+        chkUseRandomClanPersonnelDivorce.setSelected(options.isUseRandomClanPersonnelDeath());
+        chkUseRandomPrisonerDivorce.setSelected(options.isUseRandomPrisonerDivorce());
         spnRandomDivorceDiceSize.setValue(options.getRandomDivorceDiceSize());
 
         // Procreation
-        chkUseManualProcreation.setSelected(options.isUseManualProcreation());
-        chkUseClanPersonnelProcreation.setSelected(options.isUseClanPersonnelProcreation());
-        chkUsePrisonerProcreation.setSelected(options.isUsePrisonerProcreation());
         spnMultiplePregnancyOccurrences.setValue(options.getMultiplePregnancyOccurrences());
         comboBabySurnameStyle.setSelectedItem(options.getBabySurnameStyle());
         chkAssignNonPrisonerBabiesFounderTag.setSelected(options.isAssignNonPrisonerBabiesFounderTag());
@@ -798,7 +721,6 @@ public class RelationshipsTab {
         chkUseMaternityLeave.setSelected(options.isUseMaternityLeave());
         chkLogProcreation.setSelected(options.isLogProcreation());
         comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
-        chkUseRelationshiplessRandomProcreation.setSelected(options.isUseRelationshiplessRandomProcreation());
         chkUseRandomClanPersonnelProcreation.setSelected(options.isUseRandomClanPersonnelProcreation());
         chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
         spnRandomProcreationRelationshipDiceSize.setValue(options.getRandomProcreationRelationshipDiceSize());
@@ -818,9 +740,6 @@ public class RelationshipsTab {
         }
 
         // Marriage
-        options.setUseManualMarriages(chkUseManualMarriages.isSelected());
-        options.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
-        options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
         options.setNoInterestInMarriageDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
         options.setCheckMutualAncestorsDepth((int) spnCheckMutualAncestorsDepth.getValue());
         options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
@@ -833,9 +752,6 @@ public class RelationshipsTab {
         options.setRandomNewDependentMarriage((int) spnRandomNewDependentMarriage.getValue());
 
         // Divorce
-        options.setUseManualDivorce(chkUseManualDivorce.isSelected());
-        options.setUseClanPersonnelDivorce(chkUseClanPersonnelDivorce.isSelected());
-        options.setUsePrisonerDivorce(chkUsePrisonerDivorce.isSelected());
         options.setRandomDivorceMethod(comboRandomDivorceMethod.getSelectedItem());
         options.setUseRandomOppositeSexDivorce(chkUseRandomOppositeSexDivorce.isSelected());
         options.setUseRandomSameSexDivorce(chkUseRandomSameSexDivorce.isSelected());
@@ -844,9 +760,6 @@ public class RelationshipsTab {
         options.setRandomDivorceDiceSize((int) spnRandomDivorceDiceSize.getValue());
 
         // Procreation
-        options.setUseManualProcreation(chkUseManualProcreation.isSelected());
-        options.setUseClanPersonnelProcreation(chkUseClanPersonnelProcreation.isSelected());
-        options.setUsePrisonerProcreation(chkUsePrisonerProcreation.isSelected());
         options.setMultiplePregnancyOccurrences((int) spnMultiplePregnancyOccurrences.getValue());
         options.setBabySurnameStyle(comboBabySurnameStyle.getSelectedItem());
         options.setAssignNonPrisonerBabiesFounderTag(chkAssignNonPrisonerBabiesFounderTag.isSelected());
@@ -857,7 +770,6 @@ public class RelationshipsTab {
         options.setUseMaternityLeave(chkUseMaternityLeave.isSelected());
         options.setLogProcreation(chkLogProcreation.isSelected());
         options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
-        options.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());
         options.setUseRandomClanPersonnelProcreation(chkUseRandomClanPersonnelProcreation.isSelected());
         options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
         options.setRandomProcreationRelationshipDiceSize((int) spnRandomProcreationRelationshipDiceSize.getValue());

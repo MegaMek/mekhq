@@ -47,8 +47,6 @@ import java.util.ResourceBundle;
 public abstract class AbstractDivorce {
     //region Variable Declarations
     private final RandomDivorceMethod method;
-    private boolean useClanPersonnelDivorce;
-    private boolean usePrisonerDivorce;
     private boolean useRandomOppositeSexDivorce;
     private boolean useRandomSameSexDivorce;
     private boolean useRandomClanPersonnelDivorce;
@@ -61,8 +59,6 @@ public abstract class AbstractDivorce {
     //region Constructors
     protected AbstractDivorce(final RandomDivorceMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelDivorce(options.isUseClanPersonnelDivorce());
-        setUsePrisonerDivorce(options.isUsePrisonerDivorce());
         setUseRandomOppositeSexDivorce(options.isUseRandomOppositeSexDivorce());
         setUseRandomSameSexDivorce(options.isUseRandomSameSexDivorce());
         setUseRandomClanPersonnelDivorce(options.isUseRandomClanPersonnelDivorce());
@@ -73,22 +69,6 @@ public abstract class AbstractDivorce {
     //region Getters/Setters
     public RandomDivorceMethod getMethod() {
         return method;
-    }
-
-    public boolean isUseClanPersonnelDivorce() {
-        return useClanPersonnelDivorce;
-    }
-
-    public void setUseClanPersonnelDivorce(final boolean useClanPersonnelDivorce) {
-        this.useClanPersonnelDivorce = useClanPersonnelDivorce;
-    }
-
-    public boolean isUsePrisonerDivorce() {
-        return usePrisonerDivorce;
-    }
-
-    public void setUsePrisonerDivorce(final boolean usePrisonerDivorce) {
-        this.usePrisonerDivorce = usePrisonerDivorce;
     }
 
     public boolean isUseRandomOppositeSexDivorce() {
@@ -137,14 +117,6 @@ public abstract class AbstractDivorce {
             return resources.getString("cannotDivorce.NotDivorceable.text");
         } else if (!person.getGenealogy().getSpouse().isDivorceable()) {
             return resources.getString("cannotDivorce.SpouseNotDivorceable.text");
-        } else if (!isUseClanPersonnelDivorce() && person.isClanPersonnel()) {
-            return resources.getString("cannotDivorce.ClanPersonnel.text");
-        } else if (!isUseClanPersonnelDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-            return resources.getString("cannotDivorce.ClanPersonnelSpouse.text");
-        } else if (!isUsePrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotDivorce.Prisoner.text");
-        } else if (!isUsePrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotDivorce.PrisonerSpouse.text");
         } else if (randomDivorce) {
             if (!isUseRandomClanPersonnelDivorce() && person.isClanPersonnel()) {
                 return resources.getString("cannotDivorce.RandomClanPersonnel.text");

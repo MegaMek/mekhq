@@ -45,8 +45,6 @@ import java.util.ResourceBundle;
 public abstract class AbstractMarriage {
     //region Variable Declarations
     private final RandomMarriageMethod method;
-    private boolean useClanPersonnelMarriages;
-    private boolean usePrisonerMarriages;
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
 
@@ -57,8 +55,6 @@ public abstract class AbstractMarriage {
     //region Constructors
     protected AbstractMarriage(final RandomMarriageMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
-        setUsePrisonerMarriages(options.isUsePrisonerMarriages());
         setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
         setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
     }
@@ -67,22 +63,6 @@ public abstract class AbstractMarriage {
     //region Getters/Setters
     public RandomMarriageMethod getMethod() {
         return method;
-    }
-
-    public boolean isUseClanPersonnelMarriages() {
-        return useClanPersonnelMarriages;
-    }
-
-    public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
-        this.useClanPersonnelMarriages = useClanPersonnelMarriages;
-    }
-
-    public boolean isUsePrisonerMarriages() {
-        return usePrisonerMarriages;
-    }
-
-    public void setUsePrisonerMarriages(final boolean usePrisonerMarriages) {
-        this.usePrisonerMarriages = usePrisonerMarriages;
     }
 
     public boolean isUseRandomClanPersonnelMarriages() {
@@ -120,10 +100,6 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.Deployed.text");
         } else if (person.isChild(today)) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
-            return resources.getString("cannotMarry.ClanPersonnel.text");
-        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotMarry.Prisoner.text");
         } else if (randomMarriage) {
             if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanPersonnel.text");

@@ -306,9 +306,6 @@ public class CampaignOptions {
     private boolean announceChildBirthdays;
 
     // Marriage
-    private boolean useManualMarriages;
-    private boolean useClanPersonnelMarriages;
-    private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
     private int noInterestInMarriageDiceSize;
     private boolean logMarriageNameChanges;
@@ -323,9 +320,6 @@ public class CampaignOptions {
     private int randomNewDependentMarriage;
 
     // Divorce
-    private boolean useManualDivorce;
-    private boolean useClanPersonnelDivorce;
-    private boolean usePrisonerDivorce;
     private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
     private RandomDivorceMethod randomDivorceMethod;
     private boolean useRandomOppositeSexDivorce;
@@ -335,9 +329,6 @@ public class CampaignOptions {
     private int randomDivorceDiceSize;
 
     // Procreation
-    private boolean useManualProcreation;
-    private boolean useClanPersonnelProcreation;
-    private boolean usePrisonerProcreation;
     private int multiplePregnancyOccurrences;
     private BabySurnameStyle babySurnameStyle;
     private boolean assignNonPrisonerBabiesFounderTag;
@@ -348,7 +339,6 @@ public class CampaignOptions {
     private int noInterestInChildrenDiceSize;
     private boolean logProcreation;
     private RandomProcreationMethod randomProcreationMethod;
-    private boolean useRelationshiplessRandomProcreation;
     private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
     private int randomProcreationRelationshipDiceSize;
@@ -883,9 +873,6 @@ public class CampaignOptions {
         setAnnounceChildBirthdays(true);
 
         // Marriage
-        setUseManualMarriages(true);
-        setUseClanPersonnelMarriages(false);
-        setUsePrisonerMarriages(true);
         setCheckMutualAncestorsDepth(4);
         setNoInterestInMarriageDiceSize(10);
         setLogMarriageNameChanges(false);
@@ -912,9 +899,6 @@ public class CampaignOptions {
         setRandomNewDependentMarriage(20);
 
         // Divorce
-        setUseManualDivorce(true);
-        setUseClanPersonnelDivorce(true);
-        setUsePrisonerDivorce(false);
         setDivorceSurnameWeights(new HashMap<>());
         getDivorceSurnameWeights().put(SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME, 10);
         getDivorceSurnameWeights().put(SplittingSurnameStyle.SPOUSE_CHANGES_SURNAME, 10);
@@ -928,9 +912,6 @@ public class CampaignOptions {
         setRandomDivorceDiceSize(900);
 
         // Procreation
-        setUseManualProcreation(true);
-        setUseClanPersonnelProcreation(false);
-        setUsePrisonerProcreation(true);
         setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common, so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
@@ -941,7 +922,6 @@ public class CampaignOptions {
         setNoInterestInChildrenDiceSize(3);
         setLogProcreation(false);
         setRandomProcreationMethod(RandomProcreationMethod.NONE);
-        setUseRelationshiplessRandomProcreation(false);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
         setRandomProcreationRelationshipDiceSize(500);
@@ -2386,36 +2366,6 @@ public class CampaignOptions {
 
     // region Marriage
     /**
-     * @return whether to use manual marriages
-     */
-    public boolean isUseManualMarriages() {
-        return useManualMarriages;
-    }
-
-    /**
-     * @param useManualMarriages whether to use manual marriages
-     */
-    public void setUseManualMarriages(final boolean useManualMarriages) {
-        this.useManualMarriages = useManualMarriages;
-    }
-
-    public boolean isUseClanPersonnelMarriages() {
-        return useClanPersonnelMarriages;
-    }
-
-    public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
-        this.useClanPersonnelMarriages = useClanPersonnelMarriages;
-    }
-
-    public boolean isUsePrisonerMarriages() {
-        return usePrisonerMarriages;
-    }
-
-    public void setUsePrisonerMarriages(final boolean usePrisonerMarriages) {
-        this.usePrisonerMarriages = usePrisonerMarriages;
-    }
-
-    /**
      * This gets the number of recursions to use when checking mutual ancestors
      * between two personnel
      *
@@ -2582,30 +2532,6 @@ public class CampaignOptions {
     // endregion Marriage
 
     // region Divorce
-    public boolean isUseManualDivorce() {
-        return useManualDivorce;
-    }
-
-    public void setUseManualDivorce(final boolean useManualDivorce) {
-        this.useManualDivorce = useManualDivorce;
-    }
-
-    public boolean isUseClanPersonnelDivorce() {
-        return useClanPersonnelDivorce;
-    }
-
-    public void setUseClanPersonnelDivorce(final boolean useClanPersonnelDivorce) {
-        this.useClanPersonnelDivorce = useClanPersonnelDivorce;
-    }
-
-    public boolean isUsePrisonerDivorce() {
-        return usePrisonerDivorce;
-    }
-
-    public void setUsePrisonerDivorce(final boolean usePrisonerDivorce) {
-        this.usePrisonerDivorce = usePrisonerDivorce;
-    }
-
     public Map<SplittingSurnameStyle, Integer> getDivorceSurnameWeights() {
         return divorceSurnameWeights;
     }
@@ -2664,30 +2590,6 @@ public class CampaignOptions {
     // endregion Divorce
 
     // region Procreation
-    public boolean isUseManualProcreation() {
-        return useManualProcreation;
-    }
-
-    public void setUseManualProcreation(final boolean useManualProcreation) {
-        this.useManualProcreation = useManualProcreation;
-    }
-
-    public boolean isUseClanPersonnelProcreation() {
-        return useClanPersonnelProcreation;
-    }
-
-    public void setUseClanPersonnelProcreation(final boolean useClanPersonnelProcreation) {
-        this.useClanPersonnelProcreation = useClanPersonnelProcreation;
-    }
-
-    public boolean isUsePrisonerProcreation() {
-        return usePrisonerProcreation;
-    }
-
-    public void setUsePrisonerProcreation(final boolean usePrisonerProcreation) {
-        this.usePrisonerProcreation = usePrisonerProcreation;
-    }
-
     /**
      * @return the X occurrences for there to be a single multiple child occurrence (i.e., 1 in X)
      */
@@ -2798,20 +2700,6 @@ public class CampaignOptions {
 
     public void setRandomProcreationMethod(final RandomProcreationMethod randomProcreationMethod) {
         this.randomProcreationMethod = randomProcreationMethod;
-    }
-
-    /**
-     * @return whether to use random procreation for personnel without a spouse
-     */
-    public boolean isUseRelationshiplessRandomProcreation() {
-        return useRelationshiplessRandomProcreation;
-    }
-
-    /**
-     * @param useRelationshiplessRandomProcreation whether to use random procreation without a spouse
-     */
-    public void setUseRelationshiplessRandomProcreation(final boolean useRelationshiplessRandomProcreation) {
-        this.useRelationshiplessRandomProcreation = useRelationshiplessRandomProcreation;
     }
 
     public boolean isUseRandomClanPersonnelProcreation() {
@@ -5050,9 +4938,6 @@ public class CampaignOptions {
         // endregion Announcements
 
         // region Marriage
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInMarriageDiceSize", getNoInterestInMarriageDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
@@ -5071,9 +4956,6 @@ public class CampaignOptions {
         //endregion Marriage
 
         // region Divorce
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualDivorce", isUseManualDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelDivorce", isUseClanPersonnelDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerDivorce", isUsePrisonerDivorce());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "divorceSurnameWeights");
         for (final Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
@@ -5088,9 +4970,6 @@ public class CampaignOptions {
         //endregion Divorce
 
         // region Procreation
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualProcreation", isUseManualProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelProcreation", isUseClanPersonnelProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "babySurnameStyle", getBabySurnameStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
@@ -5101,8 +4980,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInChildrenDiceSize", getNoInterestInChildrenDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRelationshiplessRandomProcreation",
-                isUseRelationshiplessRandomProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelProcreation",
                 isUseRandomClanPersonnelProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
@@ -5784,12 +5661,6 @@ public class CampaignOptions {
                     // endregion anniversaries
 
                     // region Marriage
-                } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
-                    retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelMarriages")) {
-                    retVal.setUseClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerMarriages")) {
-                    retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                     retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInMarriageDiceSize")) {
@@ -5832,12 +5703,6 @@ public class CampaignOptions {
                     //endregion Marriage
 
                     // region Divorce
-                } else if (wn2.getNodeName().equalsIgnoreCase("useManualDivorce")) {
-                    retVal.setUseManualDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelDivorce")) {
-                    retVal.setUseClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerDivorce")) {
-                    retVal.setUsePrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("divorceSurnameWeights")) {
                     if (!wn2.hasChildNodes()) {
                         continue;
@@ -5867,12 +5732,6 @@ public class CampaignOptions {
                     //endregion Divorce
 
                     // region Procreation
-                } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
-                    retVal.setUseManualProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelProcreation")) {
-                    retVal.setUseClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerProcreation")) {
-                    retVal.setUsePrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("multiplePregnancyOccurrences")) {
                     retVal.setMultiplePregnancyOccurrences(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("babySurnameStyle")) {
@@ -5893,8 +5752,6 @@ public class CampaignOptions {
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationMethod")) {
                     retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
-                    retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelProcreation")) {
                     retVal.setUseRandomClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerProcreation")) {

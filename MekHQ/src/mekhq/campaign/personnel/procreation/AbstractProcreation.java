@@ -52,9 +52,6 @@ import static mekhq.campaign.personnel.education.EducationController.setInitialE
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
-    private boolean useClanPersonnelProcreation;
-    private boolean usePrisonerProcreation;
-    private boolean useRelationshiplessProcreation;
     private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
 
@@ -68,9 +65,6 @@ public abstract class AbstractProcreation {
     //region Constructors
     protected AbstractProcreation(final RandomProcreationMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelProcreation(options.isUseClanPersonnelProcreation());
-        setUsePrisonerProcreation(options.isUsePrisonerProcreation());
-        setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
         setUseRandomClanPersonnelProcreation(options.isUseRandomClanPersonnelProcreation());
         setUseRandomPrisonerProcreation(options.isUseRandomPrisonerProcreation());
     }
@@ -79,30 +73,6 @@ public abstract class AbstractProcreation {
     //region Getters/Setters
     public RandomProcreationMethod getMethod() {
         return method;
-    }
-
-    public boolean isUseClanPersonnelProcreation() {
-        return useClanPersonnelProcreation;
-    }
-
-    public void setUseClanPersonnelProcreation(final boolean useClanPersonnelProcreation) {
-        this.useClanPersonnelProcreation = useClanPersonnelProcreation;
-    }
-
-    public boolean isUsePrisonerProcreation() {
-        return usePrisonerProcreation;
-    }
-
-    public void setUsePrisonerProcreation(final boolean usePrisonerProcreation) {
-        this.usePrisonerProcreation = usePrisonerProcreation;
-    }
-
-    public boolean isUseRelationshiplessProcreation() {
-        return useRelationshiplessProcreation;
-    }
-
-    public void setUseRelationshiplessProcreation(final boolean useRelationshiplessProcreation) {
-        this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
 
     public boolean isUseRandomClanPersonnelProcreation() {
@@ -206,14 +176,8 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Child.text");
         } else if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.ClanPersonnel.text");
-        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotProcreate.Prisoner.text");
         } else if (randomProcreation) {
-            if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
-                return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
+            if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
