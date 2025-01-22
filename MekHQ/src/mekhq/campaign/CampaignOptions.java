@@ -159,13 +159,7 @@ public class CampaignOptions {
     private int autoLogisticsOther;
 
     // Delivery
-    private int nDiceTransitTime;
-    private int constantTransitTime;
     private int unitTransitTime;
-    private int acquireMinimumTime;
-    private int acquireMinimumTimeUnit;
-    private int acquireMosBonus;
-    private int acquireMosUnit;
 
     // Planetary Acquisition
     private boolean usePlanetaryAcquisition;
@@ -681,13 +675,7 @@ public class CampaignOptions {
         autoLogisticsOther = 50;
 
         // Delivery
-        nDiceTransitTime = 1;
-        constantTransitTime = 0;
         unitTransitTime = TRANSIT_UNIT_MONTH;
-        acquireMinimumTime = 1;
-        acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
-        acquireMosBonus = 1;
-        acquireMosUnit = TRANSIT_UNIT_MONTH;
 
         // Planetary Acquisition
         usePlanetaryAcquisition = false;
@@ -4007,60 +3995,12 @@ public class CampaignOptions {
         this.acquisitionSupportStaffOnly = acquisitionSupportStaffOnly;
     }
 
-    public int getNDiceTransitTime() {
-        return nDiceTransitTime;
-    }
-
-    public void setNDiceTransitTime(final int nDiceTransitTime) {
-        this.nDiceTransitTime = nDiceTransitTime;
-    }
-
-    public int getConstantTransitTime() {
-        return constantTransitTime;
-    }
-
-    public void setConstantTransitTime(final int constantTransitTime) {
-        this.constantTransitTime = constantTransitTime;
-    }
-
     public int getUnitTransitTime() {
         return unitTransitTime;
     }
 
     public void setUnitTransitTime(final int unitTransitTime) {
         this.unitTransitTime = unitTransitTime;
-    }
-
-    public int getAcquireMosUnit() {
-        return acquireMosUnit;
-    }
-
-    public void setAcquireMosUnit(final int acquireMosUnit) {
-        this.acquireMosUnit = acquireMosUnit;
-    }
-
-    public int getAcquireMosBonus() {
-        return acquireMosBonus;
-    }
-
-    public void setAcquireMosBonus(final int acquireMosBonus) {
-        this.acquireMosBonus = acquireMosBonus;
-    }
-
-    public int getAcquireMinimumTimeUnit() {
-        return acquireMinimumTimeUnit;
-    }
-
-    public void setAcquireMinimumTimeUnit(final int acquireMinimumTimeUnit) {
-        this.acquireMinimumTimeUnit = acquireMinimumTimeUnit;
-    }
-
-    public int getAcquireMinimumTime() {
-        return acquireMinimumTime;
-    }
-
-    public void setAcquireMinimumTime(final int acquireMinimumTime) {
-        this.acquireMinimumTime = acquireMinimumTime;
     }
 
     public boolean isUsePlanetaryAcquisition() {
@@ -4815,13 +4755,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", acquisitionSkill);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", techLevel);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nDiceTransitTime", nDiceTransitTime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "constantTransitTime", constantTransitTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTransitTime", unitTransitTime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMosBonus", acquireMosBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMosUnit", acquireMosUnit);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMinimumTime", acquireMinimumTime);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryAcquisition", usePlanetaryAcquisition);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionFactionLimit",
                 getPlanetAcquisitionFactionLimit().name());
@@ -5425,20 +5359,8 @@ public class CampaignOptions {
                     retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
                     retVal.acquisitionSkill = wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {
-                    retVal.nDiceTransitTime = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("constantTransitTime")) {
-                    retVal.constantTransitTime = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTransitTime")) {
                     retVal.unitTransitTime = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosBonus")) {
-                    retVal.acquireMosBonus = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosUnit")) {
-                    retVal.acquireMosUnit = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTime")) {
-                    retVal.acquireMinimumTime = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTimeUnit")) {
-                    retVal.acquireMinimumTimeUnit = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanAcquisitionPenalty")) {
                     retVal.clanAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
