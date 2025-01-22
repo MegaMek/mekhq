@@ -183,7 +183,6 @@ public class SelectPresetDialog extends JDialog {
         pack();
         setAlwaysOnTop(true);
         setResizable(false);
-        setSize(UIUtil.scaleForGUI(575, 250));
         setLocationRelativeTo(null);
         setVisible(true);
     }
