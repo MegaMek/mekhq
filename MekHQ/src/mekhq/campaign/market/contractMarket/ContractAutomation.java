@@ -165,6 +165,11 @@ public class ContractAutomation {
         ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
 
         for (Unit unit : units) {
+            if (unit == null) {
+                // <50.03 compatibility handler
+                continue;
+            }
+
             if (unit.isMothballed()) {
                 activateUnitAction.execute(campaign, unit);
                 MekHQ.triggerEvent(new UnitChangedEvent(unit));
