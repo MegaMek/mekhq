@@ -64,10 +64,8 @@ public class CampaignOptions {
     // that haven't been invented yet, or that are completely extinct
     public static final int TECH_UNKNOWN = 5;
 
-    public static final int TRANSIT_UNIT_DAY = 0;
     public static final int TRANSIT_UNIT_WEEK = 1;
     public static final int TRANSIT_UNIT_MONTH = 2;
-    public static final int TRANSIT_UNIT_NUM = 3;
 
     public static final String S_TECH = "Tech";
     public static final String S_AUTO = "Automatic Success";
@@ -84,15 +82,6 @@ public class CampaignOptions {
             case TECH_ADVANCED -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
             case TECH_EXPERIMENTAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
             case TECH_UNOFFICIAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default -> "Unknown";
-        };
-    }
-
-    public static String getTransitUnitName(final int unit) {
-        return switch (unit) {
-            case TRANSIT_UNIT_DAY -> "Days";
-            case TRANSIT_UNIT_WEEK -> "Weeks";
-            case TRANSIT_UNIT_MONTH -> "Months";
             default -> "Unknown";
         };
     }
