@@ -1414,9 +1414,11 @@ public class Campaign implements ITechManager {
 
         unit.initializeAllTransportSpace();
 
-        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
-                addCampaignTransport(campaignTransportType, unit);
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
             }
         }
 
@@ -1461,8 +1463,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Deletes an entry from the list of specified list of transports. This gets
-     * updated when
-     * the transport is removed from the campaign for one reason or another
+     * updated when the transport should no longer be in the CampaignTransporterMap,
+     * such as when a Transport is mothballed or removed from the campaign.
      * @see CampaignTransporterMap
      * @param campaignTransportType Transport Type (enum) we're checking
      * @param unit - The ship we want to remove from this Set
@@ -1559,9 +1561,11 @@ public class Campaign implements ITechManager {
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 
-        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
-                addCampaignTransport(campaignTransportType, unit);
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
             }
         }
 
@@ -5218,6 +5222,17 @@ public class Campaign implements ITechManager {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             if (hasTransports(campaignTransportType)) {
                 removeCampaignTransporter(campaignTransportType, unit);
+            }
+
+            // If we remove a transport unit from the campaign,
+            // we need to remove any transported units from it
+            // and clear the transport assignments for those
+            // transported units
+            if (unit.getTransportedUnitsSummary(campaignTransportType).hasTransportedUnits()) {
+                List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnitsSummary(campaignTransportType).getTransportedUnits());
+                for (Unit transportedUnit : transportedUnits) {
+                    transportedUnit.unloadFromTransport(campaignTransportType);
+                }
             }
         }
 
