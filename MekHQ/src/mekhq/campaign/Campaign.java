@@ -7024,8 +7024,11 @@ public class Campaign implements ITechManager {
 
         if (getCampaignOptions().isUseAtB() &&
                 getCampaignOptions().isRestrictPartsByMission()) {
-            int AtBPartsAvailability = findAtBPartsAvailabilityLevel();
-            target.addModifier(AtBPartsAvailability, "Contract");
+            int contractAvailability = findAtBPartsAvailabilityLevel();
+
+            if (contractAvailability != 0) {
+                target.addModifier(contractAvailability, "Contract");
+            }
         }
 
         return target;
