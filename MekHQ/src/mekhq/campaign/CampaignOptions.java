@@ -148,7 +148,15 @@ public class CampaignOptions {
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
     private int maxAcquisitions;
-    private double defaultStockPercent;
+
+    // autoLogistics
+    private int autoLogisticsHeatSink;
+    private int autoLogisticsMekHead;
+    private int autoLogisticsMekLocation;
+    private int autoLogisticsNonRepairableLocation;
+    private int autoLogisticsArmor;
+    private int autoLogisticsAmmunition;
+    private int autoLogisticsOther;
 
     // Delivery
     private int nDiceTransitTime;
@@ -662,7 +670,15 @@ public class CampaignOptions {
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
         maxAcquisitions = 0;
-        defaultStockPercent = 10.0;
+
+        // autoLogistics
+        autoLogisticsHeatSink = 250;
+        autoLogisticsMekHead = 200;
+        autoLogisticsMekLocation = 100;
+        autoLogisticsNonRepairableLocation = 0;
+        autoLogisticsArmor = 500;
+        autoLogisticsAmmunition = 500;
+        autoLogisticsOther = 50;
 
         // Delivery
         nDiceTransitTime = 1;
@@ -4257,12 +4273,60 @@ public class CampaignOptions {
         this.maxAcquisitions = maxAcquisitions;
     }
 
-    public double getDefaultStockPercent() {
-        return defaultStockPercent;
+    public int getAutoLogisticsHeatSink() {
+        return autoLogisticsHeatSink;
     }
 
-    public void setDefaultStockPercent(double defaultStockPercent) {
-        this.defaultStockPercent = defaultStockPercent;
+    public void setAutoLogisticsHeatSink(int autoLogisticsHeatSink) {
+        this.autoLogisticsHeatSink = autoLogisticsHeatSink;
+    }
+
+    public int getAutoLogisticsMekHead() {
+        return autoLogisticsMekHead;
+    }
+
+    public void setAutoLogisticsMekHead(int autoLogisticsMekHead) {
+        this.autoLogisticsMekHead = autoLogisticsMekHead;
+    }
+
+    public int getAutoLogisticsMekLocation() {
+        return autoLogisticsMekLocation;
+    }
+
+    public void setAutoLogisticsMekLocation(int autoLogisticsMekLocation) {
+        this.autoLogisticsMekLocation = autoLogisticsMekLocation;
+    }
+
+    public int getAutoLogisticsNonRepairableLocation() {
+        return autoLogisticsNonRepairableLocation;
+    }
+
+    public void setAutoLogisticsNonRepairableLocation(int autoLogisticsNonRepairableLocation) {
+        this.autoLogisticsNonRepairableLocation = autoLogisticsNonRepairableLocation;
+    }
+
+    public int getAutoLogisticsArmor() {
+        return autoLogisticsArmor;
+    }
+
+    public void setAutoLogisticsArmor(int autoLogisticsArmor) {
+        this.autoLogisticsArmor = autoLogisticsArmor;
+    }
+
+    public int getAutoLogisticsAmmunition() {
+        return autoLogisticsAmmunition;
+    }
+
+    public void setAutoLogisticsAmmunition(int autoLogisticsAmmunition) {
+        this.autoLogisticsAmmunition = autoLogisticsAmmunition;
+    }
+
+    public int getAutoLogisticsOther() {
+        return autoLogisticsOther;
+    }
+
+    public void setAutoLogisticsOther(int autoLogisticsOther) {
+        this.autoLogisticsOther = autoLogisticsOther;
     }
 
     public boolean isUseAtB() {
@@ -4790,7 +4854,15 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficialMaintenance", isUseUnofficialMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultStockPercent", defaultStockPercent);
+
+        // autoLogistics
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsHeatSink", autoLogisticsHeatSink);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsMekHead", autoLogisticsMekHead);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsMekLocation", autoLogisticsMekLocation);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsNonRepairableLocation", autoLogisticsNonRepairableLocation);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsArmor", autoLogisticsArmor);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsAmmunition", autoLogisticsAmmunition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
         // region General Personnel
@@ -5455,8 +5527,22 @@ public class CampaignOptions {
                     retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                     retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("defaultStockPercent")) {
-                    retVal.defaultStockPercent = Double.parseDouble(wn2.getTextContent().trim());
+
+                    // autoLogistics
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsHeatSink")) {
+                    retVal.autoLogisticsHeatSink = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsMekHead")) {
+                    retVal.autoLogisticsMekHead = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsMekLocation")) {
+                    retVal.autoLogisticsMekLocation = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
+                    retVal.autoLogisticsNonRepairableLocation = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsArmor")) {
+                    retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsAmmunition")) {
+                    retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsOther")) {
+                    retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel

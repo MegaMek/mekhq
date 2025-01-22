@@ -81,6 +81,7 @@ import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -2480,8 +2481,44 @@ public class Campaign implements ITechManager {
             part = ((MissingPart) part).getNewPart();
         }
         PartInUse result = new PartInUse(part);
-        result.setRequestedStock(getCampaignOptions().getDefaultStockPercent());
+        result.setRequestedStock(getDefaultStockPercent(part));
         return (null != result.getPartToBuy()) ? result : null;
+    }
+
+    /**
+     * Determines the default stock percentage for a given part type.
+     *
+     * <p>This method uses the type of the provided {@link Part} to decide which
+     * default stock percentage to return. The values for each part type are
+     * retrieved from the campaign options.</p>
+     *
+     * @param part The {@link Part} for which the default stock percentage is to
+     *             be determined. The part must not be {@code null}.
+     * @return An {@code int} representing the default stock percentage for the
+     *         given part type, as defined in the campaign options.
+     */
+    private int getDefaultStockPercent(Part part) {
+        if (part instanceof HeatSink) {
+            return campaignOptions.getAutoLogisticsHeatSink();
+        } else if (part instanceof MekLocation) {
+            if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
+                return campaignOptions.getAutoLogisticsMekHead();
+            }
+
+            if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
+                return campaignOptions.getAutoLogisticsNonRepairableLocation();
+            }
+
+            return campaignOptions.getAutoLogisticsMekLocation();
+        } else if (part instanceof TankLocation) {
+            return campaignOptions.getAutoLogisticsNonRepairableLocation();
+        } else if (part instanceof AmmoBin) {
+            return campaignOptions.getAutoLogisticsAmmunition();
+        } else if (part instanceof Armor ) {
+            return campaignOptions.getAutoLogisticsArmor();
+        }
+
+        return campaignOptions.getAutoLogisticsOther();
     }
 
     /**
@@ -2562,7 +2599,7 @@ public class Campaign implements ITechManager {
                 if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
                 } else {
-                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                    partInUse.setRequestedStock(getDefaultStockPercent(incomingPart));
                 }
                 inUse.put(partInUse, partInUse);
             }
@@ -2582,7 +2619,7 @@ public class Campaign implements ITechManager {
                 if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
                 } else {
-                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                    partInUse.setRequestedStock(getDefaultStockPercent((Part) maybePart));
                 }
                 inUse.put(partInUse, partInUse);
             }

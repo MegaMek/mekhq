@@ -73,9 +73,25 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnAcquireWaitingPeriod;
     private JLabel lblMaxAcquisitions;
     private JSpinner spnMaxAcquisitions;
-    private JLabel lblDefaultStockPercent;
-    private JSpinner spnDefaultStockPercent;
     //end Acquisition Tab
+
+    //start autoLogistics Tab
+    private JPanel pnlAutoLogistics;
+    private JLabel lblAutoLogisticsHeatSink;
+    private JSpinner spnAutoLogisticsHeatSink;
+    private JLabel lblAutoLogisticsMekHead;
+    private JSpinner spnAutoLogisticsMekHead;
+    private JLabel lblAutoLogisticsMekLocation;
+    private JSpinner spnAutoLogisticsMekLocation;
+    private JLabel lblAutoLogisticsNonRepairableLocation;
+    private JSpinner spnAutoLogisticsNonRepairableLocation;
+    private JLabel lblAutoLogisticsArmor;
+    private JSpinner spnAutoLogisticsArmor;
+    private JLabel lblAutoLogisticsAmmunition;
+    private JSpinner spnAutoLogisticsAmmunition;
+    private JLabel lblAutoLogisticsOther;
+    private JSpinner spnAutoLogisticsOther;
+    //end autoLogistics Tab
 
     //start Delivery Tab
     private JPanel pnlDeliveries;
@@ -153,6 +169,7 @@ public class EquipmentAndSuppliesTab {
      */
     void initialize() {
         initializeAcquisitionTab();
+        initializeAutoLogisticsTab();
         initializeDelivery();
         initializePlanetaryAcquisitionsTab();
         initializeTechLimitsTab();
@@ -254,8 +271,29 @@ public class EquipmentAndSuppliesTab {
 
         lblMaxAcquisitions = new JLabel();
         spnMaxAcquisitions = new JSpinner();
-        lblDefaultStockPercent = new JLabel();
-        spnDefaultStockPercent = new JSpinner();
+    }
+
+    /**
+     * Initializes the components and settings for the autoLogistics tab in the EquipmentAndSuppliesTab.
+     * This method sets up the GUI components required for configuring acquisition-related options,
+     * including panels, labels, spinners, combo boxes, and checkboxes.
+     */
+    private void initializeAutoLogisticsTab() {
+        pnlAutoLogistics = new JPanel();
+        lblAutoLogisticsHeatSink = new JLabel();
+        spnAutoLogisticsHeatSink = new JSpinner();
+        lblAutoLogisticsMekHead = new JLabel();
+        spnAutoLogisticsMekHead = new JSpinner();
+        lblAutoLogisticsMekLocation = new JLabel();
+        spnAutoLogisticsMekLocation = new JSpinner();
+        lblAutoLogisticsNonRepairableLocation = new JLabel();
+        spnAutoLogisticsNonRepairableLocation = new JSpinner();
+        lblAutoLogisticsArmor = new JLabel();
+        spnAutoLogisticsArmor = new JSpinner();
+        lblAutoLogisticsAmmunition = new JLabel();
+        spnAutoLogisticsAmmunition = new JSpinner();
+        lblAutoLogisticsOther = new JLabel();
+        spnAutoLogisticsOther = new JSpinner();
     }
 
     /**
@@ -290,6 +328,7 @@ public class EquipmentAndSuppliesTab {
             getImageDirectory() + "logo_clan_cloud_cobra.png");
 
         pnlAcquisitions = createAcquisitionPanel();
+        pnlAutoLogistics = createAutoLogisticsPanel();
         pnlDeliveries = createDeliveryPanel();
 
         // Layout the Panel
@@ -307,6 +346,10 @@ public class EquipmentAndSuppliesTab {
 
         layoutParent.gridx++;
         panel.add(pnlDeliveries, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(pnlAutoLogistics, layoutParent);
 
 
         // Create Parent Panel and return
@@ -342,10 +385,6 @@ public class EquipmentAndSuppliesTab {
         lblMaxAcquisitions = new CampaignOptionsLabel("MaxAcquisitions");
         spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions",
             0,0, 100, 1);
-
-        lblDefaultStockPercent = new CampaignOptionsLabel("DefaultStockPercent");
-        spnDefaultStockPercent = new CampaignOptionsSpinner("DefaultStockPercent",
-                10.0, 0.0, 10000, 0.5);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true,
@@ -389,11 +428,94 @@ public class EquipmentAndSuppliesTab {
         layout.gridx++;
         panel.add(spnMaxAcquisitions, layout);
 
+        return panel;
+    }
+
+    /**
+     * Creates and returns a {@code JPanel} for configuring autoLogistics-related options.
+     * This panel includes various components such as labels, checkboxes, and
+     * spinners to allow users to set values for acquisition settings, including
+     * penalties, waiting periods, maximum acquisitions, and stock percentages.
+     *
+     * @return A {@code JPanel} populated with autoLogistics configuration components and their layout.
+     */
+    private JPanel createAutoLogisticsPanel() {
+        // Content
+        lblAutoLogisticsMekHead = new CampaignOptionsLabel("AutoLogisticsMekHead");
+        spnAutoLogisticsMekHead = new CampaignOptionsSpinner("AutoLogisticsMekHead",
+            200, 0, 10000, 1);
+
+        lblAutoLogisticsMekLocation = new CampaignOptionsLabel("AutoLogisticsMekLocation");
+        spnAutoLogisticsMekLocation = new CampaignOptionsSpinner("AutoLogisticsMekLocation",
+            100, 0, 10000, 1);
+
+        lblAutoLogisticsNonRepairableLocation = new CampaignOptionsLabel("AutoLogisticsNonRepairableLocation");
+        spnAutoLogisticsNonRepairableLocation = new CampaignOptionsSpinner("AutoLogisticsNonRepairableLocation",
+            0, 0, 10000, 1);
+
+        lblAutoLogisticsArmor = new CampaignOptionsLabel("AutoLogisticsArmor");
+        spnAutoLogisticsArmor = new CampaignOptionsSpinner("AutoLogisticsArmor",
+            500, 0, 10000, 1);
+
+        lblAutoLogisticsAmmunition = new CampaignOptionsLabel("AutoLogisticsAmmunition");
+        spnAutoLogisticsAmmunition = new CampaignOptionsSpinner("AutoLogisticsAmmunition",
+            500, 0, 10000, 1);
+
+        lblAutoLogisticsHeatSink = new CampaignOptionsLabel("AutoLogisticsHeatSink");
+        spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink",
+            250, 0, 10000, 1);
+
+        lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther");
+        spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther",
+            50, 0, 10000, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("AutoLogisticsPanel", true,
+            "AutoLogisticsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblAutoLogisticsMekHead, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsMekHead, layout);
+
         layout.gridx = 0;
         layout.gridy++;
-        panel.add(lblDefaultStockPercent, layout);
+        panel.add(lblAutoLogisticsMekLocation, layout);
         layout.gridx++;
-        panel.add(spnDefaultStockPercent, layout);
+        panel.add(spnAutoLogisticsMekLocation, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsNonRepairableLocation, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsNonRepairableLocation, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsHeatSink, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsHeatSink, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsArmor, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsArmor, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsAmmunition, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsAmmunition, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAutoLogisticsOther, layout);
+        layout.gridx++;
+        panel.add(spnAutoLogisticsOther, layout);
 
         return panel;
     }
@@ -914,7 +1036,17 @@ public class EquipmentAndSuppliesTab {
         options.setIsAcquisitionPenalty((int) spnAcquireIsPenalty.getValue());
         options.setWaitingPeriod((int) spnAcquireWaitingPeriod.getValue());
         options.setMaxAcquisitions((int) spnMaxAcquisitions.getValue());
-        options.setDefaultStockPercent((double) spnDefaultStockPercent.getValue());
+
+        // autoLogistics
+        options.setAutoLogisticsMekHead((int) spnAutoLogisticsMekHead.getValue());
+        options.setAutoLogisticsMekLocation((int) spnAutoLogisticsMekLocation.getValue());
+        options.setAutoLogisticsNonRepairableLocation((int) spnAutoLogisticsNonRepairableLocation.getValue());
+        options.setAutoLogisticsArmor((int) spnAutoLogisticsArmor.getValue());
+        options.setAutoLogisticsAmmunition((int) spnAutoLogisticsAmmunition.getValue());
+        options.setAutoLogisticsHeatSink((int) spnAutoLogisticsHeatSink.getValue());
+        options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
+
+
 
         // Delivery
         options.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
@@ -985,7 +1117,15 @@ public class EquipmentAndSuppliesTab {
         spnAcquireIsPenalty.setValue(options.getIsAcquisitionPenalty());
         spnAcquireWaitingPeriod.setValue(options.getWaitingPeriod());
         spnMaxAcquisitions.setValue(options.getMaxAcquisitions());
-        spnDefaultStockPercent.setValue(options.getDefaultStockPercent());
+
+        // autoLogistics
+        spnAutoLogisticsMekHead.setValue(options.getAutoLogisticsMekHead());
+        spnAutoLogisticsMekLocation.setValue(options.getAutoLogisticsMekLocation());
+        spnAutoLogisticsNonRepairableLocation.setValue(options.getAutoLogisticsNonRepairableLocation());
+        spnAutoLogisticsArmor.setValue(options.getAutoLogisticsArmor());
+        spnAutoLogisticsAmmunition.setValue(options.getAutoLogisticsAmmunition());
+        spnAutoLogisticsHeatSink.setValue(options.getAutoLogisticsHeatSink());
+        spnAutoLogisticsOther.setValue(options.getAutoLogisticsOther());
 
         // Delivery
         spnNDiceTransitTime.setValue(options.getNDiceTransitTime());
