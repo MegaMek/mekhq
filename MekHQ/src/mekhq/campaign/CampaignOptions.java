@@ -489,9 +489,9 @@ public class CampaignOptions {
     private int nTasksXP;
     private int successXP;
     private int mistakeXP;
-    private int idleXP;
-    private int monthsIdleXP;
-    private int targetIdleXP;
+    private int vocationalXP;
+    private int vocationalXPCheckFrequency;
+    private int vocationalXPTargetNumber;
     private int contractNegotiationXP;
     private int adminXP;
     private int adminXPPeriod;
@@ -1107,9 +1107,9 @@ public class CampaignOptions {
         nTasksXP = 25;
         successXP = 0;
         mistakeXP = 0;
-        idleXP = 0;
-        monthsIdleXP = 2;
-        targetIdleXP = 10;
+        vocationalXP = 1;
+        vocationalXPCheckFrequency = 1;
+        vocationalXPTargetNumber = 7;
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
@@ -3887,28 +3887,28 @@ public class CampaignOptions {
         this.assignPortraitOnRoleChange = assignPortraitOnRoleChange;
     }
 
-    public int getIdleXP() {
-        return idleXP;
+    public int getVocationalXP() {
+        return vocationalXP;
     }
 
-    public void setIdleXP(final int idleXP) {
-        this.idleXP = idleXP;
+    public void setVocationalXP(final int vocationalXP) {
+        this.vocationalXP = vocationalXP;
     }
 
-    public int getTargetIdleXP() {
-        return targetIdleXP;
+    public int getVocationalXPTargetNumber() {
+        return vocationalXPTargetNumber;
     }
 
-    public void setTargetIdleXP(final int targetIdleXP) {
-        this.targetIdleXP = targetIdleXP;
+    public void setVocationalXPTargetNumber(final int vocationalXPTargetNumber) {
+        this.vocationalXPTargetNumber = vocationalXPTargetNumber;
     }
 
-    public int getMonthsIdleXP() {
-        return monthsIdleXP;
+    public int getVocationalXPCheckFrequency() {
+        return vocationalXPCheckFrequency;
     }
 
-    public void setMonthsIdleXP(final int monthsIdleXP) {
-        this.monthsIdleXP = monthsIdleXP;
+    public void setVocationalXPCheckFrequency(final int vocationalXPCheckFrequency) {
+        this.vocationalXPCheckFrequency = vocationalXPCheckFrequency;
     }
 
     public int getContractNegotiationXP() {
@@ -4728,9 +4728,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tasksXP", tasksXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mistakeXP", mistakeXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "successXP", successXP);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleXP", idleXP);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetIdleXP", targetIdleXP);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "monthsIdleXP", monthsIdleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXP", vocationalXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPTargetNumber", vocationalXPTargetNumber);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPCheckFrequency", vocationalXPCheckFrequency);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractNegotiationXP", contractNegotiationXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminWeeklyXP", adminXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminXPPeriod", adminXPPeriod);
@@ -5323,12 +5323,18 @@ public class CampaignOptions {
                     retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
                     retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
-                    retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
-                    retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
-                    retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXP")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+                    retVal.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTargetNumber")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
+                    retVal.vocationalXPTargetNumber = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPCheckFrequency")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
+                    retVal.vocationalXPCheckFrequency = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
                     retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
