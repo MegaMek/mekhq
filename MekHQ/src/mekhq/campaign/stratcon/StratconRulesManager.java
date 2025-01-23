@@ -691,18 +691,18 @@ public class StratconRulesManager {
             switch (commandRights) {
                 case INTEGRATED -> {
                     scenario.setTurningPoint(true);
-                    if (randomInt(4) == 0) {
+                    if (randomInt(3) == 0) {
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case HOUSE, LIAISON -> {
-                    if (randomInt(4) == 0) {
+                    if (randomInt(3) == 0) {
                         scenario.setTurningPoint(true);
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case INDEPENDENT -> {
-                    if (randomInt(4) == 0) {
+                    if (randomInt(3) == 0) {
                         scenario.setTurningPoint(true);
                     }
                 }

@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 /**
  * A table model for displaying scenarios
  */
@@ -109,6 +112,22 @@ public class ScenarioTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
+            if (campaign.getCampaignOptions().isUseStratCon()) {
+                if (scenario instanceof AtBScenario) {
+                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(campaign);
+
+                    if (stratconScenario != null) {
+                        boolean isTurningPoint = stratconScenario.isTurningPoint();
+                        String openingSpan = isTurningPoint
+                            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
+                            : "";
+                        String closingSpan = isTurningPoint ? CLOSING_SPAN_TAG : "";
+                        return String.format("<html>%s%s%s</html", openingSpan,
+                            scenario.getName(), closingSpan);
+                    }
+                }
+            }
+
             return scenario.getName();
         } else if (col == COL_STATUS) {
             return scenario.getStatus();
