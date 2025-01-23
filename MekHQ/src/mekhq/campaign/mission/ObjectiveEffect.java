@@ -66,6 +66,10 @@ public class ObjectiveEffect {
          *
          */
         SupportPointUpdate("%d Support Points", true),
+        /* changes the size of supply cache
+         *
+         */
+        SupplyCache("%d Looted Supplies", true),
         /*
          *  changes the contract morale up or down
          */
