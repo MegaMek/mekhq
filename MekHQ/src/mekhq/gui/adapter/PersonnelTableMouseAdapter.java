@@ -49,6 +49,7 @@ import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -143,6 +144,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
+    private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
 
     private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
@@ -1125,6 +1127,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_PERSONALITY: {
                 for (Person person : people) {
                     PersonalityController.generatePersonality(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_ADD_RANDOM_ABILITY: {
+                SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+                for (Person person : people) {
+                    singleSpecialAbilityGenerator.rollSPA(gui.getCampaign(), person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -3017,6 +3027,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (gui.getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
                 menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
                 menuItem.setActionCommand(CMD_PERSONALITY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+
+            if (gui.getCampaign().getCampaignOptions().isUseAbilities()) {
+                menuItem = new JMenuItem(resources.getString("addRandomSPA.text"));
+                menuItem.setActionCommand(CMD_ADD_RANDOM_ABILITY);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }

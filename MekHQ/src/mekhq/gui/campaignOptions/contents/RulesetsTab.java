@@ -1069,7 +1069,7 @@ public class RulesetsTab {
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
 
         // Legacy
-        options.setUseAtB(chkUseAtB.isSelected());
+        options.setUseAtB(chkUseAtB.isSelected() && !chkUseStratCon.isSelected());
         options.setUseVehicles(chkUseVehicles.isSelected());
         options.setDoubleVehicles(chkDoubleVehicles.isSelected());
         options.setUseAero(chkOpForUsesAero.isSelected());
@@ -1143,7 +1143,7 @@ public class RulesetsTab {
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
 
         // Legacy
-        chkUseAtB.setSelected(options.isUseAtB());
+        chkUseAtB.setSelected(options.isUseAtB() && !options.isUseStratCon());
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkDoubleVehicles.setSelected(options.isDoubleVehicles());
         chkOpForUsesAero.setSelected(options.isUseAero());

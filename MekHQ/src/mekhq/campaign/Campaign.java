@@ -81,6 +81,7 @@ import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -535,7 +536,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the {@link Hashtable} containing all the {@link CombatTeam} objects after
+     * Returns the {@link Hashtable} using the combatTeam's {@code forceId} as the key
+     * and containing all the {@link CombatTeam} objects after
      * removing the ineligible ones. Although sanitization might not be necessary, it ensures that
      * there is no need for {@code isEligible()} checks when fetching the {@link Hashtable}.
      *
@@ -1412,9 +1414,11 @@ public class Campaign implements ITechManager {
 
         unit.initializeAllTransportSpace();
 
-        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
-                addCampaignTransport(campaignTransportType, unit);
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
             }
         }
 
@@ -1459,8 +1463,8 @@ public class Campaign implements ITechManager {
 
     /**
      * Deletes an entry from the list of specified list of transports. This gets
-     * updated when
-     * the transport is removed from the campaign for one reason or another
+     * updated when the transport should no longer be in the CampaignTransporterMap,
+     * such as when a Transport is mothballed or removed from the campaign.
      * @see CampaignTransporterMap
      * @param campaignTransportType Transport Type (enum) we're checking
      * @param unit - The ship we want to remove from this Set
@@ -1557,9 +1561,11 @@ public class Campaign implements ITechManager {
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
 
-        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-            if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
-                addCampaignTransport(campaignTransportType, unit);
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
             }
         }
 
@@ -2480,8 +2486,44 @@ public class Campaign implements ITechManager {
             part = ((MissingPart) part).getNewPart();
         }
         PartInUse result = new PartInUse(part);
-        result.setRequestedStock(getCampaignOptions().getDefaultStockPercent());
+        result.setRequestedStock(getDefaultStockPercent(part));
         return (null != result.getPartToBuy()) ? result : null;
+    }
+
+    /**
+     * Determines the default stock percentage for a given part type.
+     *
+     * <p>This method uses the type of the provided {@link Part} to decide which
+     * default stock percentage to return. The values for each part type are
+     * retrieved from the campaign options.</p>
+     *
+     * @param part The {@link Part} for which the default stock percentage is to
+     *             be determined. The part must not be {@code null}.
+     * @return An {@code int} representing the default stock percentage for the
+     *         given part type, as defined in the campaign options.
+     */
+    private int getDefaultStockPercent(Part part) {
+        if (part instanceof HeatSink) {
+            return campaignOptions.getAutoLogisticsHeatSink();
+        } else if (part instanceof MekLocation) {
+            if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
+                return campaignOptions.getAutoLogisticsMekHead();
+            }
+
+            if (((MekLocation) part).getLoc() == Mek.LOC_CT) {
+                return campaignOptions.getAutoLogisticsNonRepairableLocation();
+            }
+
+            return campaignOptions.getAutoLogisticsMekLocation();
+        } else if (part instanceof TankLocation) {
+            return campaignOptions.getAutoLogisticsNonRepairableLocation();
+        } else if (part instanceof AmmoBin) {
+            return campaignOptions.getAutoLogisticsAmmunition();
+        } else if (part instanceof Armor ) {
+            return campaignOptions.getAutoLogisticsArmor();
+        }
+
+        return campaignOptions.getAutoLogisticsOther();
     }
 
     /**
@@ -2562,7 +2604,7 @@ public class Campaign implements ITechManager {
                 if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
                 } else {
-                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                    partInUse.setRequestedStock(getDefaultStockPercent(incomingPart));
                 }
                 inUse.put(partInUse, partInUse);
             }
@@ -2582,7 +2624,7 @@ public class Campaign implements ITechManager {
                 if (partsInUseRequestedStockMap.containsKey(partInUse.getDescription())) {
                     partInUse.setRequestedStock(partsInUseRequestedStockMap.get(partInUse.getDescription()));
                 } else {
-                    partInUse.setRequestedStock(campaignOptions.getDefaultStockPercent());
+                    partInUse.setRequestedStock(getDefaultStockPercent((Part) maybePart));
                 }
                 inUse.put(partInUse, partInUse);
             }
@@ -4276,34 +4318,57 @@ public class Campaign implements ITechManager {
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
+        // Prep some data for vocational xp
+        int vocationalXpRate = campaignOptions.getVocationalXP();
+        if (hasActiveContract) {
+            if (campaignOptions.isUseAtB()) {
+                for (AtBContract contract : getActiveAtBContracts()) {
+                    if (!contract.getContractType().isGarrisonType()) {
+                        vocationalXpRate *= 2;
+                        break;
+                    }
+                }
+            } else {
+                vocationalXpRate *= 2;
+            }
+        }
+
+        // Process personnel
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
 
+            // Daily events
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
-
-            processWeeklyRelationshipEvents(person);
 
             person.resetMinutesLeft();
             person.setAcquisition(0);
 
             processAdvancedMedicalEvents(person);
 
-            // Reset edge points to the purchased value each week. This should only
-            // apply for support personnel - combat troops reset with each new mm game
-            processWeeklyEdgeResets(person);
-
-            if (processMonthlyVocationalXp(person)) {
-                personnelWhoAdvancedInXP.add(person);
-            }
-
             processAnniversaries(person);
 
-            processMonthlyAutoAwards(person);
+            // Weekly events
+            if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
+                processWeeklyRelationshipEvents(person);
+
+                processWeeklyEdgeResets(person);
+            }
+
+            // Monthly events
+            if (currentDay.getDayOfMonth() == 1) {
+                processMonthlyAutoAwards(person);
+
+                if (vocationalXpRate > 0) {
+                    if (processMonthlyVocationalXp(person, vocationalXpRate)) {
+                        personnelWhoAdvancedInXP.add(person);
+                    }
+                }
+            }
         }
 
         if (!personnelWhoAdvancedInXP.isEmpty()) {
@@ -4350,45 +4415,29 @@ public class Campaign implements ITechManager {
      * @param person the person for whom weekly Edge resets will be processed
      */
     private void processWeeklyEdgeResets(Person person) {
-        if ((person.hasSupportRole(true) || person.isEngineer())
-                && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+        if ((person.hasSupportRole(true) || person.isEngineer())) {
             person.resetCurrentEdge();
         }
     }
 
     /**
-     * Processes the monthly vocational experience (XP) gain for a given person based on specific
-     * eligibility criteria. If the person meets the conditions, XP is awarded and their progress
-     * is tracked.
+     * Processes the monthly vocational experience (XP) gain for a given person based on their
+     * eligibility and the vocational experience rules defined in campaign options.
      *
-     * <p>The method checks the following conditions to determine eligibility for XP gain:
+     * <p>Eligibility for receiving vocational XP is determined by checking the following conditions:
      * <ul>
-     *     <li>The person must have an active status (e.g., not retired, deceased, or in education).</li>
-     *     <li>The person must not be a child on the current date.</li>
-     *     <li>The person must not be categorized as a dependent.</li>
-     *     <li>The campaign must enable idle XP, and the current date must be the first day of the month.</li>
-     *     <li>The person must not have the status of a prisoner (Bondsmen are exempt from this
-     *     and remain eligible for XP).</li>
-     * </ul>
-     *
-     * <p>If all of these conditions are satisfied:
-     * <ul>
-     *     <li>The person’s idle month count is incremented.</li>
-     *     <li>If the accumulated idle months reach the threshold defined in the campaign options,
-     *     an idle XP roll (2d6) is performed.</li>
-     *     <li>If the roll result meets or exceeds the target threshold:
-     *         <ul>
-     *             <li>XP is awarded to the person based on the campaign's idle XP configuration.</li>
-     *             <li>The idle month count is reset.</li>
-     *         </ul>
-     *     </li>
-     *     <li>If the roll is unsuccessful, the idle month count is still reset.</li>
+     *     <li>The person must have an <b>active status</b> (e.g., not retired, deceased, or in education).</li>
+     *     <li>The person must not be a <b>child</b> as of the current date.</li>
+     *     <li>The person must not be categorized as a <b>dependent</b>.</li>
+     *     <li>The person must not have the status of a <b>prisoner</b>.</li>
+     *     <b>Note:</b> Bondsmen are exempt from this restriction and are eligible for vocational XP.
      * </ul>
      *
      * @param person the {@link Person} whose monthly vocational XP is to be processed
+     * @param vocationalXpRate the amount of XP awarded on a successful roll
      * @return {@code true} if XP was successfully awarded during the process, {@code false} otherwise
      */
-    private boolean processMonthlyVocationalXp(Person person) {
+    private boolean processMonthlyVocationalXp(Person person, int vocationalXpRate) {
         if (!person.getStatus().isActive()) {
             return false;
         }
@@ -4401,16 +4450,22 @@ public class Campaign implements ITechManager {
             return false;
         }
 
-        if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can
-            person.setIdleMonths(person.getIdleMonths() + 1);
-            if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
-                if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                    person.awardXP(this, getCampaignOptions().getIdleXP());
-                    person.setIdleMonths(0);
-                    return true;
-                }
-                person.setIdleMonths(0);
+        if (person.getPrisonerStatus().isCurrentPrisoner()) {
+            // Prisoners can't gain vocational XP, while Bondsmen can
+            return false;
+        }
+
+        int checkFrequency = campaignOptions.getVocationalXPCheckFrequency();
+        int targetNumber = campaignOptions.getVocationalXPTargetNumber();
+
+        person.setVocationalXPTimer(person.getVocationalXPTimer() + 1);
+        if (person.getVocationalXPTimer() >= checkFrequency) {
+            if (Compute.d6(2) >= targetNumber) {
+                person.awardXP(this, vocationalXpRate);
+                person.setVocationalXPTimer(0);
+                return true;
+            } else {
+                person.setVocationalXPTimer(0);
             }
         }
 
@@ -4477,35 +4532,33 @@ public class Campaign implements ITechManager {
      * @param person the person for whom the monthly auto awards are being processed
      */
     private void processMonthlyAutoAwards(Person person) {
-        if (getLocalDate().getDayOfMonth() == 1) {
-            double multiplier = 0;
+        double multiplier = 0;
 
-            int score = 0;
+        int score = 0;
 
-            if (person.getPrimaryRole().isSupport(true)) {
-                int dice = person.getExperienceLevel(this, false);
+        if (person.getPrimaryRole().isSupport(true)) {
+            int dice = person.getExperienceLevel(this, false);
 
-                if (dice > 0) {
-                    score = Compute.d6(dice);
-                }
-
-                multiplier += 0.5;
+            if (dice > 0) {
+                score = Compute.d6(dice);
             }
 
-            if (person.getSecondaryRole().isSupport(true)) {
-                int dice = person.getExperienceLevel(this, true);
-
-                if (dice > 0) {
-                    score += Compute.d6(dice);
-                }
-
-                multiplier += 0.5;
-            } else if (person.getSecondaryRole().isNone()) {
-                multiplier += 0.5;
-            }
-
-            person.changeAutoAwardSupportPoints((int) (score * multiplier));
+            multiplier += 0.5;
         }
+
+        if (person.getSecondaryRole().isSupport(true)) {
+            int dice = person.getExperienceLevel(this, true);
+
+            if (dice > 0) {
+                score += Compute.d6(dice);
+            }
+
+            multiplier += 0.5;
+        } else if (person.getSecondaryRole().isNone()) {
+            multiplier += 0.5;
+        }
+
+        person.changeAutoAwardSupportPoints((int) (score * multiplier));
     }
 
     /**
@@ -5181,6 +5234,17 @@ public class Campaign implements ITechManager {
             if (hasTransports(campaignTransportType)) {
                 removeCampaignTransporter(campaignTransportType, unit);
             }
+
+            // If we remove a transport unit from the campaign,
+            // we need to remove any transported units from it
+            // and clear the transport assignments for those
+            // transported units
+            if (unit.getTransportedUnitsSummary(campaignTransportType).hasTransportedUnits()) {
+                List<Unit> transportedUnits = new ArrayList<>(unit.getTransportedUnitsSummary(campaignTransportType).getTransportedUnits());
+                for (Unit transportedUnit : transportedUnits) {
+                    transportedUnit.unloadFromTransport(campaignTransportType);
+                }
+            }
         }
 
         // If this unit was assigned to a transport ship, remove it from the transport
@@ -5190,7 +5254,10 @@ public class Campaign implements ITechManager {
                     .unloadFromTransportShip(unit);
         }
 
-        // finally remove the unit
+        // remove from automatic mothballing
+        automatedMothballUnits.remove(unit);
+
+        // finally, remove the unit
         getHangar().removeUnit(unit.getId());
 
         checkDuplicateNamesDuringDelete(unit.getEntity());
@@ -5781,10 +5848,28 @@ public class Campaign implements ITechManager {
         return fameAndInfamy;
     }
 
+    /**
+     * Retrieves the list of units that are configured for automated mothballing.
+     *
+     * <p>Automated mothballing is a mechanism where certain units are automatically
+     * placed into a mothballed state, reducing their active maintenance costs
+     * and operational demands over time.</p>
+     *
+     * @return A {@link List} of {@link Unit} objects that are set for automated
+     *         mothballing. Returns an empty list if no units are configured.
+     */
     public List<Unit> getAutomatedMothballUnits() {
         return automatedMothballUnits;
     }
 
+    /**
+     * Sets the list of units that are configured for automated mothballing.
+     *
+     * <p>Replaces the current list of units that have undergone automated mothballing.</p>
+     *
+     * @param automatedMothballUnits A {@link List} of {@link Unit} objects
+     *                               to configure for automated mothballing.
+     */
     public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
         this.automatedMothballUnits = automatedMothballUnits;
     }
@@ -5981,6 +6066,11 @@ public class Campaign implements ITechManager {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "automatedMothballUnits");
         for (Unit unit : automatedMothballUnits) {
+            if (unit == null) {
+                // <50.03 compatibility handler
+                continue;
+            }
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");

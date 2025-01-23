@@ -1260,7 +1260,8 @@ public class AtBContract extends Contract {
                 } else if (wn2.getNodeName().equalsIgnoreCase("routEnd")) {
                     routEnd = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("routedPayout")) {
-                    double value = Double.parseDouble(wn2.getTextContent().trim());
+                    String cleanValue = wn2.getTextContent().trim().replaceAll("[^0-9.]", "");
+                    double value = Double.parseDouble(cleanValue);
                     routedPayout = Money.of(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
                     partsAvailabilityLevel = Integer.parseInt(wn2.getTextContent());

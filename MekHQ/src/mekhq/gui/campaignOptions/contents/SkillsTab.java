@@ -21,6 +21,7 @@ package mekhq.gui.campaignOptions.contents;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.campaignOptions.components.*;
 
@@ -56,6 +57,8 @@ public class SkillsTab {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/CampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
+    private final CampaignOptions campaignOptions;
+
     private Map<String, JSpinner> allTargetNumbers;
     private Map<String, List<JLabel>> allSkillLevels;
     private Map<String, List<JSpinner>> allSkillCosts;
@@ -64,13 +67,21 @@ public class SkillsTab {
     private List<Double> storedValuesSpinners = new ArrayList<>();
     private List<SkillLevel> storedValuesComboBoxes = new ArrayList<>();
 
+    private JPanel pnlEdgeCost;
+    private JLabel lblEdgeCost;
+    private JSpinner spnEdgeCost;
+
     private static final MMLogger logger = MMLogger.create(SkillsTab.class);
 
     /**
      * Constructs a new `SkillsTab` instance and initializes the necessary data
      * structures for managing skill configurations.
+     *
+     * @param campaignOptions the {@code CampaignOptions} instance that holds the settings
+     *                        to be modified or displayed in this tab.
      */
-    public SkillsTab() {
+    public SkillsTab(CampaignOptions campaignOptions) {
+        this.campaignOptions = campaignOptions;
         initialize();
     }
 
@@ -95,6 +106,10 @@ public class SkillsTab {
         storedTargetNumber = 0;
         storedValuesSpinners = new ArrayList<>();
         storedValuesComboBoxes = new ArrayList<>();
+
+        pnlEdgeCost = new JPanel();
+        lblEdgeCost = new JLabel();
+        spnEdgeCost = new JSpinner();
     }
 
     /**
@@ -142,6 +157,10 @@ public class SkillsTab {
             skillPanels.add(skillPanel);
         }
 
+        // Content
+        pnlEdgeCost = createEdgeCostPanel();
+        pnlEdgeCost.setVisible(!isCombatTab);
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel(isCombatTab ?
             "CombatSkillsTab" : "SupportSkillsTab", true);
@@ -169,6 +188,11 @@ public class SkillsTab {
         layout.gridy = 0;
         panel.add(headerPanel, layout);
 
+        layout.gridwidth = 2;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlEdgeCost, layout);
+
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy++;
@@ -193,6 +217,31 @@ public class SkillsTab {
 
         // Create Parent Panel
         return createParentPanel(panel, "CombatSkillsTab");
+    }
+
+    /**
+     * Creates a panel to configure and display the edge cost option in the SkillsTab.
+     *
+     * @return A {@link JPanel} containing the label and spinner for the edge cost configuration.
+     */
+    private JPanel createEdgeCostPanel() {
+        lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
+        spnEdgeCost = new CampaignOptionsSpinner("EdgeCost",
+            100, 0, 500, 1);
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("EdgeCostPanel",
+            true, "EdgeCostPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblEdgeCost, layout);
+        layout.gridx++;
+        panel.add(spnEdgeCost, layout);
+
+        return panel;
     }
 
     /**
@@ -420,7 +469,7 @@ public class SkillsTab {
      * </p>
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(new HashMap<>());
+        loadValuesFromCampaignOptions(null, new HashMap<>());
     }
 
     /**
@@ -434,7 +483,13 @@ public class SkillsTab {
      * @param presetSkillValues an optional map of preset skill values. If null
      *                          or empty, default skill values are used instead.
      */
-    public void loadValuesFromCampaignOptions(Map<String, SkillType> presetSkillValues) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+                                              Map<String, SkillType> presetSkillValues) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         String[] skills = SkillType.getSkillList(); // default skills
 
         for (String skillName : skills) {
@@ -472,12 +527,12 @@ public class SkillsTab {
                     SkillLevel levelToSet = determineMilestoneLevel(i, greenIndex, regularIndex,
                         veteranIndex, eliteIndex);
                     milestones.get(i).setSelectedItem(levelToSet);
-
-                    logger.debug(String.format("Updated milestone at index %d for skill: %s to %s",
-                        i, skillName, levelToSet));
                 }
             }
         }
+
+        // Edge Costs
+        spnEdgeCost.setValue(options.getEdgeCost());
     }
 
     /**
@@ -519,11 +574,19 @@ public class SkillsTab {
      * with the configured target numbers, costs, and milestones for each skill.
      * </p>
      *
+     * @param presetCampaignOptions the {@link CampaignOptions} instance to save settings to,
+     *                              or {@code null} to update the current campaign options.
      * @param presetSkills an optional map of preset skill values. Overrides default
      *                     values if provided. Null values will use the campaign's
      *                     default values.
      */
-    public void applyCampaignOptionsToCampaign(@Nullable Map<String, SkillType> presetSkills) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+                                               @Nullable Map<String, SkillType> presetSkills) {
+        CampaignOptions options = presetCampaignOptions;
+        if (presetCampaignOptions == null) {
+            options = this.campaignOptions;
+        }
+
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
             if (presetSkills != null) {
@@ -544,6 +607,9 @@ public class SkillsTab {
             // Update Skill Milestones
             updateSkillMilestones(type);
         }
+
+        // Edge Costs
+        options.setEdgeCost((int) spnEdgeCost.getValue());
     }
 
     /**

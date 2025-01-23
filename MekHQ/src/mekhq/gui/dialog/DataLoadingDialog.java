@@ -172,7 +172,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         setSize(getSplash().getPreferredSize());
         pack();
         fitAndCenter();
-        getFrame().setVisible(false);
+        getFrame().setVisible(true);
     }
     // endregion Initialization
 

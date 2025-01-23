@@ -533,7 +533,16 @@ public class Force {
         return forceCommanderID;
     }
 
-    public void setForceCommanderID(UUID commanderID) {
+    /**
+     * Sets the force commander ID to the provided UUID.
+     * You probably want to use
+     * setOverrideForceCommanderID(UUID) followed by
+     * updateCommander(campaign).
+     * @see #setOverrideForceCommanderID(UUID)
+     * @see #updateCommander(Campaign)
+     * @param commanderID UUID of the commander
+     */
+    private void setForceCommanderID(UUID commanderID) {
         forceCommanderID = commanderID;
     }
 
@@ -591,17 +600,18 @@ public class Force {
         if (eligibleCommanders.isEmpty()) {
             forceCommanderID = null;
             overrideForceCommanderID = null;
+            updateCombatTeamCommanderIfCombatTeam(campaign);
             return;
         }
 
         if (overrideForceCommanderID != null) {
             if (eligibleCommanders.contains(overrideForceCommanderID)) {
                 forceCommanderID = overrideForceCommanderID;
+                updateCombatTeamCommanderIfCombatTeam(campaign);
 
                 if (getParentForce() != null) {
                     getParentForce().updateCommander(campaign);
                 }
-
                 return;
             } else {
                 overrideForceCommanderID = null;
@@ -623,9 +633,19 @@ public class Force {
         }
 
         forceCommanderID = highestRankedPerson.getId();
+        updateCombatTeamCommanderIfCombatTeam(campaign);
 
         if (getParentForce() != null) {
             getParentForce().updateCommander(campaign);
+        }
+    }
+
+    private void updateCombatTeamCommanderIfCombatTeam(Campaign campaign) {
+        if (isCombatTeam()) {
+            CombatTeam combatTeam = campaign.getCombatTeamsTable().getOrDefault(getId(), null);
+            if (combatTeam != null) {
+                combatTeam.setCommander(getForceCommanderID());
+            }
         }
     }
 
