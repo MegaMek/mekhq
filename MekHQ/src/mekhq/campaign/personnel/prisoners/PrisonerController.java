@@ -32,7 +32,9 @@ public class PrisonerController {
     private final boolean isClan;
 
     private final int ATTEMPT_COUNT = 3; // This will need tweaking till we're happy with the result
-    private final int DEFECTION_CHANCE = 1000;
+    private final int DEFECTION_CHANCE = 100;
+    private final int MERCENARY_DIVIDER = 3;
+    private final int CLAN_DEZGRA_MULTIPLIER = 5;
 
     // SAR Modifiers (based on CamOps pg 223)
     final int HAS_BATTLEFIELD_CONTROL = 1;
@@ -117,16 +119,42 @@ public class PrisonerController {
         }
 
         // Attempt defection
-        int roll = randomInt(DEFECTION_CHANCE);
+        int roll = attemptDefection(potentialPrisoner, true);
 
         if (roll == 0) {
-            potentialPrisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
+            if (potentialPrisoner.isClanPersonnel()) {
+                potentialPrisoner.setPrisonerStatus(campaign, BONDSMAN, true);
+            } else {
+                potentialPrisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
+            }
         } else {
             potentialPrisoner.setPrisonerStatus(campaign, PRISONER, true);
         }
 
         // If defection has failed, convert to normal prisoner
         handlePostCapture(potentialPrisoner);
+    }
+
+    private int attemptDefection(Person potentialPrisoner, boolean isNPC) {
+        int adjustedDefectionChance = DEFECTION_CHANCE;
+        if (potentialPrisoner.getOriginFaction().isMercenary()) {
+            adjustedDefectionChance /= MERCENARY_DIVIDER;
+        }
+
+        if (potentialPrisoner.isClanPersonnel()) {
+            if (isNPC) {
+                Faction campaignFaction = campaign.getFaction();
+                if (campaignFaction.isPirate() || campaignFaction.isMercenary()) {
+                    adjustedDefectionChance *= CLAN_DEZGRA_MULTIPLIER;
+                }
+            } else {
+                if (searchingFaction.isPirate() || searchingFaction.isMercenary()) {
+                    adjustedDefectionChance *= CLAN_DEZGRA_MULTIPLIER;
+                }
+            }
+        }
+
+        return randomInt(adjustedDefectionChance);
     }
 
     public void attemptCaptureOfPlayerCharacter(Person potentialPrisoner, boolean wasPickedUp) {
@@ -149,7 +177,7 @@ public class PrisonerController {
         }
 
         // Attempt defection
-        int roll = randomInt(DEFECTION_CHANCE);
+        int roll = attemptDefection(potentialPrisoner, false);
 
         if (roll == 0) {
             potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DEFECTED);
