@@ -807,7 +807,9 @@ public class MarketsTab {
         options.setJumpShipContractPercent((double) spnJumpShipPercent.getValue());
         options.setWarShipContractPercent((double) spnWarShipPercent.getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
+        options.setMercSizeLimited(chkMercSizeLimited.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
+        options.setUseInfantryDontCount(useInfantryDoseNotCountBox.isSelected());
         options.setOverageRepaymentInFinalPayment(chkOverageRepaymentInFinalPayment.isSelected());
     }
 }

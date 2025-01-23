@@ -820,8 +820,7 @@ public class FinancesTab {
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
         usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
-        comboFinancialYearDuration = new MMComboBox<>("comboFinancialYearDuration",
-                FinancialYearDuration.values());
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
         payForPartsBox.setSelected(options.isPayForParts());
         payForRepairsBox.setSelected(options.isPayForRepairs());
