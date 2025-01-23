@@ -23,7 +23,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -144,41 +146,16 @@ public class AbstractDeathTest {
         when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockPerson.isImmortal()).thenReturn(true);
         assertNotNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
-        
+
         // Age Group must be enabled
         when(mockPerson.isImmortal()).thenReturn(false);
         assertNotNull(mockDeath.canDie(mockPerson, AgeGroup.CHILD, true));
-
-        // Can't be Clan Personnel with Random Clan Death Disabled
-        when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockDeath.isUseRandomClanPersonnelDeath()).thenReturn(false);
-        when(mockDeath.isUseRandomPrisonerDeath()).thenReturn(true);
-        assertNotNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
-
-        // Can be Non-Clan Personnel with Random Clan Death Disabled
-        when(mockPerson.isClanPersonnel()).thenReturn(false);
-        assertNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
-
-        // Can be a Non-Prisoner with Random Prisoner Death Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(mockDeath.isUseRandomPrisonerDeath()).thenReturn(false);
-        assertNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
-
-        // Can't be a Prisoner with Random Prisoner Death Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-        assertNotNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
-
-        // Can be a Clan Prisoner with Random Clan and Random Prisoner Death Enabled
-        lenient().when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockDeath.isUseRandomClanPersonnelDeath()).thenReturn(true);
-        when(mockDeath.isUseRandomPrisonerDeath()).thenReturn(true);
-        assertNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
     }
 
     //region New Day
     @Test
-    public void testProcessNewDay() {
-        doCallRealMethod().when(mockDeath).processNewDay(any(), any(), any());
+    public void testProcessNewWeek() {
+        doCallRealMethod().when(mockDeath).processNewWeek(any(), any(), any());
         when(mockDeath.getCause(any(), any(), anyInt())).thenReturn(PersonnelStatus.DISEASE);
 
         final Person mockPerson = mock(Person.class);
@@ -189,21 +166,21 @@ public class AbstractDeathTest {
 
             // Can't be dead
             when(mockDeath.canDie(any(), any(), anyBoolean())).thenReturn("Dead");
-            assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+            assertFalse(mockDeath.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
 
             // Randomly Dies - Change Status Works Properly
             when(mockDeath.canDie(any(), any(), anyBoolean())).thenReturn(null);
             when(mockDeath.randomlyDies(anyInt(), any())).thenReturn(true);
             when(mockPerson.getStatus()).thenReturn(PersonnelStatus.DISEASE);
-            assertTrue(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+            assertTrue(mockDeath.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
 
             // Randomly Dies - Issue Changing Status
             when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-            assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+            assertFalse(mockDeath.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
 
             // Doesn't Randomly Die
             when(mockDeath.randomlyDies(anyInt(), any())).thenReturn(false);
-            assertFalse(mockDeath.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
+            assertFalse(mockDeath.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson));
         }
     }
     //endregion New Day

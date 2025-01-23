@@ -54,8 +54,6 @@ public abstract class AbstractDeath {
     // region Variable Declarations
     private final RandomDeathMethod method;
     private Map<AgeGroup, Boolean> enabledAgeGroups;
-    private boolean useRandomClanPersonnelDeath;
-    private boolean useRandomPrisonerDeath;
     private final boolean enableRandomDeathSuicideCause;
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
 
@@ -68,8 +66,6 @@ public abstract class AbstractDeath {
             final boolean initializeCauses) {
         this.method = method;
         setEnabledAgeGroups(options.getEnabledRandomDeathAgeGroups());
-        setUseRandomClanPersonnelDeath(options.isUseRandomClanPersonnelDeath());
-        setUseRandomPrisonerDeath(options.isUseRandomPrisonerDeath());
         this.enableRandomDeathSuicideCause = options.isUseRandomDeathSuicideCause();
         this.causes = new HashMap<>();
         if (initializeCauses && !method.isNone()) {
@@ -89,22 +85,6 @@ public abstract class AbstractDeath {
 
     public void setEnabledAgeGroups(final Map<AgeGroup, Boolean> enabledAgeGroups) {
         this.enabledAgeGroups = enabledAgeGroups;
-    }
-
-    public boolean isUseRandomClanPersonnelDeath() {
-        return useRandomClanPersonnelDeath;
-    }
-
-    public void setUseRandomClanPersonnelDeath(final boolean useRandomClanPersonnelDeath) {
-        this.useRandomClanPersonnelDeath = useRandomClanPersonnelDeath;
-    }
-
-    public boolean isUseRandomPrisonerDeath() {
-        return useRandomPrisonerDeath;
-    }
-
-    public void setUseRandomPrisonerDeath(final boolean useRandomPrisonerDeath) {
-        this.useRandomPrisonerDeath = useRandomPrisonerDeath;
     }
 
     public boolean isEnableRandomDeathSuicideCause() {
@@ -133,10 +113,6 @@ public abstract class AbstractDeath {
                 return resources.getString("cannotDie.Immortal.text");
             } else if (!getEnabledAgeGroups().get(ageGroup)) {
                 return resources.getString("cannotDie.AgeGroupDisabled.text");
-            } else if (!isUseRandomClanPersonnelDeath() && person.isClanPersonnel()) {
-                return resources.getString("cannotDie.RandomClanPersonnel.text");
-            } else if (!isUseRandomPrisonerDeath() && person.getPrisonerStatus().isCurrentPrisoner()) {
-                return resources.getString("cannotDie.RandomPrisoner.text");
             }
         }
 
@@ -145,14 +121,14 @@ public abstract class AbstractDeath {
 
     // region New Day
     /**
-     * Processes new day random death for an individual.
+     * Processes new week random death for an individual.
      *
      * @param campaign the campaign to process
      * @param today    the current day
      * @param person   the person to process
      */
-    public boolean processNewDay(final Campaign campaign, final LocalDate today,
-            final Person person) {
+    public boolean processNewWeek(final Campaign campaign, final LocalDate today,
+                                  final Person person) {
         final int age = person.getAge(today);
         final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
         if (canDie(person, ageGroup, true) != null) {

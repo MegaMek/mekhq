@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,16 +20,16 @@ package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.death.*;
+import mekhq.campaign.personnel.death.AbstractDeath;
+import mekhq.campaign.personnel.death.DisabledRandomDeath;
+import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 
 import java.util.ResourceBundle;
 
 public enum RandomDeathMethod {
     //region Enum Declarations
     NONE("RandomDeathMethod.NONE.text", "RandomDeathMethod.NONE.toolTipText"),
-    PERCENTAGE("RandomDeathMethod.PERCENTAGE.text", "RandomDeathMethod.PERCENTAGE.toolTipText"),
-    EXPONENTIAL("RandomDeathMethod.EXPONENTIAL.text", "RandomDeathMethod.EXPONENTIAL.toolTipText"),
-    AGE_RANGE("RandomDeathMethod.AGE_RANGE.text", "RandomDeathMethod.AGE_RANGE.toolTipText");
+    RANDOM("RandomDeathMethod.RANDOM.text", "RandomDeathMethod.RANDOM.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -57,16 +57,8 @@ public enum RandomDeathMethod {
         return this == NONE;
     }
 
-    public boolean isPercentage() {
-        return this == PERCENTAGE;
-    }
-
-    public boolean isExponential() {
-        return this == EXPONENTIAL;
-    }
-
-    public boolean isAgeRange() {
-        return this == AGE_RANGE;
+    public boolean isRandom() {
+        return this == RANDOM;
     }
     //endregion Boolean Comparison Methods
 
@@ -75,17 +67,10 @@ public enum RandomDeathMethod {
     }
 
     public AbstractDeath getMethod(final CampaignOptions options, final boolean initializeCauses) {
-        switch (this) {
-            case PERCENTAGE:
-                return new PercentageRandomDeath(options, initializeCauses);
-            case EXPONENTIAL:
-                return new ExponentialRandomDeath(options, initializeCauses);
-            case AGE_RANGE:
-                return new AgeRangeRandomDeath(options, initializeCauses);
-            case NONE:
-            default:
-                return new DisabledRandomDeath(options, initializeCauses);
-        }
+        return switch (this) {
+            case RANDOM -> new ExponentialRandomDeath(options, initializeCauses);
+            case NONE -> new DisabledRandomDeath(options, initializeCauses);
+        };
     }
 
     @Override

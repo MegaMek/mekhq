@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,10 +20,8 @@ package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
-import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -50,8 +48,8 @@ public class RandomDeathMethodTest {
     public void testGetToolTipText() {
         assertEquals(resources.getString("RandomDeathMethod.NONE.toolTipText"),
                 RandomDeathMethod.NONE.getToolTipText());
-        assertEquals(resources.getString("RandomDeathMethod.AGE_RANGE.toolTipText"),
-                RandomDeathMethod.AGE_RANGE.getToolTipText());
+        assertEquals(resources.getString("RandomDeathMethod.RANDOM.toolTipText"),
+                RandomDeathMethod.RANDOM.getToolTipText());
     }
     //endregion Getters
 
@@ -68,34 +66,12 @@ public class RandomDeathMethodTest {
     }
 
     @Test
-    public void testIsPercentage() {
+    public void testIsDiceRoll() {
         for (final RandomDeathMethod randomDeathMethod : methods) {
-            if (randomDeathMethod == RandomDeathMethod.PERCENTAGE) {
-                assertTrue(randomDeathMethod.isPercentage());
+            if (randomDeathMethod == RandomDeathMethod.RANDOM) {
+                assertTrue(randomDeathMethod.isRandom());
             } else {
-                assertFalse(randomDeathMethod.isPercentage());
-            }
-        }
-    }
-
-    @Test
-    public void testIsExponential() {
-        for (final RandomDeathMethod randomDeathMethod : methods) {
-            if (randomDeathMethod == RandomDeathMethod.EXPONENTIAL) {
-                assertTrue(randomDeathMethod.isExponential());
-            } else {
-                assertFalse(randomDeathMethod.isExponential());
-            }
-        }
-    }
-
-    @Test
-    public void testIsAgeRange() {
-        for (final RandomDeathMethod randomDeathMethod : methods) {
-            if (randomDeathMethod == RandomDeathMethod.AGE_RANGE) {
-                assertTrue(randomDeathMethod.isAgeRange());
-            } else {
-                assertFalse(randomDeathMethod.isAgeRange());
+                assertFalse(randomDeathMethod.isRandom());
             }
         }
     }
@@ -105,10 +81,7 @@ public class RandomDeathMethodTest {
     public void testGetMethod() {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.getEnabledRandomDeathAgeGroups()).thenReturn(new HashMap<>());
-        when(mockOptions.isUseRandomClanPersonnelDeath()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
-        when(mockOptions.getPercentageRandomDeathChance()).thenReturn(0.5);
         when(mockOptions.getExponentialRandomDeathMaleValues()).thenReturn(new double[] { 1d });
         when(mockOptions.getExponentialRandomDeathFemaleValues()).thenReturn(new double[] { 1d });
 
@@ -116,20 +89,16 @@ public class RandomDeathMethodTest {
         for (final TenYearAgeRange range : TenYearAgeRange.values()) {
             ageRangeMap.put(range, 1d);
         }
-        when(mockOptions.getAgeRangeRandomDeathMaleValues()).thenReturn(ageRangeMap);
-        when(mockOptions.getAgeRangeRandomDeathFemaleValues()).thenReturn(ageRangeMap);
 
         assertInstanceOf(DisabledRandomDeath.class, RandomDeathMethod.NONE.getMethod(mockOptions));
-        assertInstanceOf(PercentageRandomDeath.class, RandomDeathMethod.PERCENTAGE.getMethod(mockOptions, false));
-        assertInstanceOf(ExponentialRandomDeath.class, RandomDeathMethod.EXPONENTIAL.getMethod(mockOptions, false));
-        assertInstanceOf(AgeRangeRandomDeath.class, RandomDeathMethod.AGE_RANGE.getMethod(mockOptions, false));
+        assertInstanceOf(ExponentialRandomDeath.class, RandomDeathMethod.RANDOM.getMethod(mockOptions, false));
     }
 
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("RandomDeathMethod.NONE.text"),
                 RandomDeathMethod.NONE.toString());
-        assertEquals(resources.getString("RandomDeathMethod.EXPONENTIAL.text"),
-                RandomDeathMethod.EXPONENTIAL.toString());
+        assertEquals(resources.getString("RandomDeathMethod.RANDOM.text"),
+                RandomDeathMethod.RANDOM.toString());
     }
 }

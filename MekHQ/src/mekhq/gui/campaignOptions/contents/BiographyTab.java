@@ -38,7 +38,6 @@ import mekhq.gui.campaignOptions.components.*;
 import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;
-import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 import java.util.*;
 
@@ -109,14 +108,10 @@ public class BiographyTab {
     //end Backgrounds Tab
 
     //start Death Tab
-    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     private JLabel lblRandomDeathMethod;
     private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
-    private JCheckBox chkUseRandomClanPersonnelDeath;
-    private JCheckBox chkUseRandomPrisonerDeath;
+    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     private JCheckBox chkUseRandomDeathSuicideCause;
-    private JLabel lblPercentageRandomDeathChance;
-    private JSpinner spnPercentageRandomDeathChance;
 
     private JPanel pnlDeathAgeGroup;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
@@ -281,14 +276,10 @@ public class BiographyTab {
      * </ul>
      */
     private void initializeDeathTab() {
-        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
         lblRandomDeathMethod = new JLabel();
         comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
-        chkUseRandomClanPersonnelDeath = new JCheckBox();
-        chkUseRandomPrisonerDeath = new JCheckBox();
+        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
         chkUseRandomDeathSuicideCause = new JCheckBox();
-        lblPercentageRandomDeathChance = new JLabel();
-        spnPercentageRandomDeathChance = new JSpinner();
 
         pnlDeathAgeGroup = new JPanel();
         chkEnabledRandomDeathAgeGroups = new HashMap<>();
@@ -756,8 +747,6 @@ public class BiographyTab {
             getImageDirectory() + "logo_clan_fire_mandrills.png");
 
         // Contents
-        chkKeepMarriedNameUponSpouseDeath = new CampaignOptionsCheckBox("KeepMarriedNameUponSpouseDeath");
-
         lblRandomDeathMethod = new CampaignOptionsLabel("RandomDeathMethod");
         comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -771,17 +760,8 @@ public class BiographyTab {
                 return this;
             }
         });
-
-        chkUseRandomClanPersonnelDeath = new CampaignOptionsCheckBox("UseRandomClanPersonnelDeath");
-        chkUseRandomPrisonerDeath = new CampaignOptionsCheckBox("UseRandomPrisonerDeath");
+        chkKeepMarriedNameUponSpouseDeath = new CampaignOptionsCheckBox("KeepMarriedNameUponSpouseDeath");
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
-
-        lblPercentageRandomDeathChance = new CampaignOptionsLabel("PercentageRandomDeathChance");
-        spnPercentageRandomDeathChance = new CampaignOptionsSpinner("PercentageRandomDeathChance",
-            0, 0, 100, 0.000001);
-        NumberEditor editor = new NumberEditor(spnPercentageRandomDeathChance,
-            "0.000000");
-        spnPercentageRandomDeathChance.setEditor(editor);
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
@@ -791,10 +771,6 @@ public class BiographyTab {
 
         layoutLeft.gridy = 0;
         layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 2;
-        panelLeft.add(chkKeepMarriedNameUponSpouseDeath, layoutLeft);
-
-        layoutLeft.gridy++;
         layoutLeft.gridwidth = 1;
         panelLeft.add(lblRandomDeathMethod, layoutLeft);
         layoutLeft.gridx++;
@@ -802,18 +778,10 @@ public class BiographyTab {
 
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomClanPersonnelDeath, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(chkUseRandomPrisonerDeath, layoutLeft);
+        panelLeft.add(chkKeepMarriedNameUponSpouseDeath, layoutLeft);
 
         layoutLeft.gridy++;
         panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
-
-        layoutLeft.gridy++;
-        panelLeft.add(lblPercentageRandomDeathChance, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnPercentageRandomDeathChance, layoutLeft);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -1344,10 +1312,7 @@ public class BiographyTab {
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
         comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
-        chkUseRandomClanPersonnelDeath.setSelected(options.isUseRandomClanPersonnelDeath());
-        chkUseRandomPrisonerDeath.setSelected(options.isUseRandomPrisonerDeath());
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
-        spnPercentageRandomDeathChance.setValue(options.getPercentageRandomDeathChance());
 
         Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
@@ -1437,10 +1402,7 @@ public class BiographyTab {
         // Death
         options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
-        options.setUseRandomClanPersonnelDeath(chkUseRandomClanPersonnelDeath.isSelected());
-        options.setUseRandomPrisonerDeath(chkUseRandomPrisonerDeath.isSelected());
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setPercentageRandomDeathChance((double) spnPercentageRandomDeathChance.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());

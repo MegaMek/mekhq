@@ -39,8 +39,6 @@ public class DisabledRandomDeathTest {
     @BeforeEach
     public void beforeEach() {
         when(mockOptions.getEnabledRandomDeathAgeGroups()).thenReturn(new HashMap<>());
-        when(mockOptions.isUseRandomClanPersonnelDeath()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
     }
 
