@@ -18,15 +18,15 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
+import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
-import mekhq.MekHQ;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PrisonerStatusTest {
     // region Variable Declarations

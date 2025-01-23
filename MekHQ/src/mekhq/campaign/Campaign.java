@@ -95,6 +95,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;

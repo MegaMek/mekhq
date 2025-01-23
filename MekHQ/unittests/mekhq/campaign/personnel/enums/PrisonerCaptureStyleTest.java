@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.prisoners.enums.PrisonerCaptureStyle;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;

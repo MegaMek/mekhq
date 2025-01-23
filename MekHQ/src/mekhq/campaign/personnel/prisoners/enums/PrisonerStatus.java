@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.enums;
-
-import java.util.ResourceBundle;
+package mekhq.campaign.personnel.prisoners.enums;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum PrisonerStatus {
     // region Enum Declarations
