@@ -4813,15 +4813,13 @@ public class Campaign implements ITechManager {
         // check for anything in finances
         finances.newDay(this, yesterday, getLocalDate());
 
-        // process removal of old personnel data on the last day of each month
-        if ((campaignOptions.isUsePersonnelRemoval())
-                && (currentDay.getMonth().length(false) == currentDay.getDayOfMonth())) {
+        // process removal of old personnel data on the first day of each month
+        if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
             processPersonnelRemoval();
         }
 
         // this duplicates any turnover information so that it is still available on the
-        // new day.
-        // otherwise, it's only available if the user inspects history records
+        // new day. otherwise, it's only available if the user inspects history records
         if (!turnoverRetirementInformation.isEmpty()) {
             for (String entry : turnoverRetirementInformation) {
                 addReport(entry);
