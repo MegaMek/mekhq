@@ -30,7 +30,6 @@ import mekhq.campaign.personnel.enums.RandomDeathMethod;
  * The death rates are calculated weekly, compared with a randomly generated value,
  * and returned as a boolean indicating whether the person dies or not.
  */
-
 public class ExponentialRandomDeath extends AbstractDeath {
     //region Variable Declarations
     /**
