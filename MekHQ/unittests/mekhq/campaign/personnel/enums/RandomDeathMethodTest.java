@@ -82,8 +82,6 @@ public class RandomDeathMethodTest {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.getEnabledRandomDeathAgeGroups()).thenReturn(new HashMap<>());
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
-        when(mockOptions.getExponentialRandomDeathMaleValues()).thenReturn(new double[] { 1d });
-        when(mockOptions.getExponentialRandomDeathFemaleValues()).thenReturn(new double[] { 1d });
 
         final Map<TenYearAgeRange, Double> ageRangeMap = new HashMap<>();
         for (final TenYearAgeRange range : TenYearAgeRange.values()) {

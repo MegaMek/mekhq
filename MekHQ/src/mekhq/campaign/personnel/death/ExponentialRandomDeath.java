@@ -63,26 +63,6 @@ public class ExponentialRandomDeath extends AbstractDeath {
     }
     //endregion Constructors
 
-    //region Getters/Setters
-    /**
-     * Gets the coefficients representing the male exponential death rate equation.
-     *
-     * @return The male-specific death rate coefficients (c, n, k).
-     */
-    public double[] getMaleDeathRate() {
-        return MALE_DEATH_RATE;
-    }
-
-    /**
-     * Gets the coefficients representing the female exponential death rate equation.
-     *
-     * @return The female-specific death rate coefficients (c, n, k).
-     */
-    public double[] getFemaleDeathRate() {
-        return FEMALE_DEATH_RATE;
-    }
-    //endregion Getters/Setters
-
     /**
      * Determines if a person dies a random death based on gender-specific exponential equations.
      * The calculation uses weekly probabilities derived from gender-specific coefficients and age,
@@ -97,16 +77,11 @@ public class ExponentialRandomDeath extends AbstractDeath {
      */
     @Override
     public boolean randomlyDies(final int age, final Gender gender) {
-        double deathRate;
-        if (gender.isMale()) {
-            deathRate = getMaleDeathRate()[0] * Math.pow(10, getMaleDeathRate()[1]) *
-                Math.exp(getMaleDeathRate()[2] * age * 7);  // Multiply age by 7 for weekly rate
-        } else {
-            deathRate = getFemaleDeathRate()[0] * Math.pow(10, getFemaleDeathRate()[1]) *
-                Math.exp(getFemaleDeathRate()[2] * age * 7);  // Multiply age by 7 for weekly rate
-        }
+        double[] deathRateArray = gender.isMale() ? MALE_DEATH_RATE : FEMALE_DEATH_RATE;
+        double chanceOfDeath = deathRateArray[0] * Math.pow(10, deathRateArray[1])
+            * Math.exp(deathRateArray[2] * age * 7); // Multiply character age by 7 for weekly rate
 
         // Compare the random float with the calculated weekly death rate
-        return Compute.randomFloat() < deathRate;
+        return Compute.randomFloat() < chanceOfDeath;
     }
 }

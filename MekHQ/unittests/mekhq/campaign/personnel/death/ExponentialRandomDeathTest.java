@@ -44,8 +44,6 @@ public class ExponentialRandomDeathTest {
     public void beforeEach() {
         when(mockOptions.getEnabledRandomDeathAgeGroups()).thenReturn(new HashMap<>());
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
-        when(mockOptions.getExponentialRandomDeathMaleValues()).thenReturn(new double[] { 5.4757, -7.0, 0.0709 });
-        when(mockOptions.getExponentialRandomDeathFemaleValues()).thenReturn(new double[] { 2.4641, -7.0, 0.0752 });
     }
 
     @Test
