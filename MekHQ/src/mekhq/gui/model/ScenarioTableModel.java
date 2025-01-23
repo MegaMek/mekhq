@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mekhq.campaign.mission.enums.ScenarioStatus.CURRENT;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -114,6 +115,10 @@ public class ScenarioTableModel extends DataTableModel {
         if (col == COL_NAME) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
                 if (scenario instanceof AtBScenario) {
+                    if (scenario.getStatus() != CURRENT) {
+                        return scenario.getName();
+                    }
+
                     StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(campaign);
 
                     if (stratconScenario != null) {
@@ -121,9 +126,19 @@ public class ScenarioTableModel extends DataTableModel {
                         String openingSpan = isTurningPoint
                             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                             : "";
-                        String closingSpan = isTurningPoint ? CLOSING_SPAN_TAG : "";
-                        return String.format("<html>%s%s%s</html", openingSpan,
-                            scenario.getName(), closingSpan);
+
+                        String colorblindHelper = isTurningPoint ? " \u26A0" : "";
+
+                        boolean isObjective = stratconScenario.isStrategicObjective();
+                        openingSpan = isObjective
+                            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                            : openingSpan;
+                        colorblindHelper += isObjective ? " \u26A1" : "";
+
+                        String closingSpan = isTurningPoint || isObjective ? CLOSING_SPAN_TAG : "";
+
+                        return String.format("<html>%s%s%s%s</html", openingSpan,
+                            scenario.getName(), closingSpan, colorblindHelper);
                     }
                 }
             }

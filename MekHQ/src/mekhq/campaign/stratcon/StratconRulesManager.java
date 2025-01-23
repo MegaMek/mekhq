@@ -686,23 +686,25 @@ public class StratconRulesManager {
             return;
         }
 
+        boolean isObjective = scenario.isStrategicObjective();
+
         if (template == null || !template.getStratConScenarioType().isResupply()) {
             ContractCommandRights commandRights = contract.getCommandRights();
             switch (commandRights) {
                 case INTEGRATED -> {
                     scenario.setTurningPoint(true);
-                    if (randomInt(3) == 0) {
+                    if (randomInt(3) == 0 || isObjective) {
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case HOUSE, LIAISON -> {
-                    if (randomInt(3) == 0) {
+                    if (randomInt(3) == 0 || isObjective) {
                         scenario.setTurningPoint(true);
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case INDEPENDENT -> {
-                    if (randomInt(3) == 0) {
+                    if (randomInt(3) == 0 || isObjective) {
                         scenario.setTurningPoint(true);
                     }
                 }
