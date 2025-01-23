@@ -129,13 +129,7 @@ public class ScenarioTableModel extends DataTableModel {
 
                         String colorblindHelper = isTurningPoint ? " \u26A0" : "";
 
-                        boolean isObjective = stratconScenario.isStrategicObjective();
-                        openingSpan = isObjective
-                            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                            : openingSpan;
-                        colorblindHelper += isObjective ? " \u26A1" : "";
-
-                        String closingSpan = isTurningPoint || isObjective ? CLOSING_SPAN_TAG : "";
+                        String closingSpan = isTurningPoint ? CLOSING_SPAN_TAG : "";
 
                         return String.format("<html>%s%s%s%s</html", openingSpan,
                             scenario.getName(), closingSpan, colorblindHelper);

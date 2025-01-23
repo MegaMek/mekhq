@@ -549,6 +549,7 @@ public class StratconRulesManager {
         scenario.setActionDate(null);
         scenario.setReturnDate(null);
         scenario.setStrategicObjective(true);
+        scenario.setTurningPoint(true);
         scenario.getBackingScenario().setCloaked(true);
 
         trackState.addScenario(scenario);
