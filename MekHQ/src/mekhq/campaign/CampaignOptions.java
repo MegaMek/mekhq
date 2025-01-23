@@ -48,6 +48,9 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static mekhq.campaign.personnel.enums.RandomDeathMethod.NONE;
+import static mekhq.campaign.personnel.enums.RandomDeathMethod.RANDOM;
+
 /**
  * @author natit
  */
@@ -949,7 +952,7 @@ public class CampaignOptions {
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
-        setRandomDeathMethod(RandomDeathMethod.NONE);
+        setRandomDeathMethod(NONE);
         setEnabledRandomDeathAgeGroups(new HashMap<>());
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ELDER, true);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ADULT, true);
@@ -5824,7 +5827,14 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
                     retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMethod")) {
-                    retVal.setRandomDeathMethod(RandomDeathMethod.valueOf(wn2.getTextContent().trim()));
+                    // <50.04 compatibility handler
+                    if (wn2.getTextContent().trim().equalsIgnoreCase(NONE.name())) {
+                        retVal.setRandomDeathMethod(NONE);
+                    } else {
+                        retVal.setRandomDeathMethod(RANDOM);
+                    }
+                    // Replace above with below when compatibility handler is removed.
+//                    retVal.setRandomDeathMethod(RandomDeathMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enabledRandomDeathAgeGroups")) {
                     if (!wn2.hasChildNodes()) {
                         continue;
