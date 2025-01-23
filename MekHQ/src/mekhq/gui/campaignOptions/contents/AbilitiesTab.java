@@ -28,7 +28,10 @@ import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo.AbilityCategory;
-import mekhq.gui.campaignOptions.components.*;
+import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
+import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
 
 import javax.swing.*;
@@ -62,10 +65,6 @@ public class AbilitiesTab {
     private JPanel maneuveringTab;
     private JPanel utilityTab;
 
-    private JPanel pnlEdgeCost;
-    private JLabel lblEdgeCost;
-    private JSpinner spnEdgeCost;
-
     /**
      * Constructor for the {@code AbilitiesTab} class.
      * Initializes the tab by creating containers for ability categories and populating
@@ -87,10 +86,6 @@ public class AbilitiesTab {
         maneuveringTab = new JPanel();
         utilityTab = new JPanel();
         buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
-
-        pnlEdgeCost = new JPanel();
-        lblEdgeCost = new JLabel();
-        spnEdgeCost = new JSpinner();
     }
 
     /**
@@ -249,23 +244,6 @@ public class AbilitiesTab {
         };
 
         // Contents
-        if (abilityCategory == COMBAT_ABILITY) {
-            pnlEdgeCost = new CampaignOptionsStandardPanel("EdgeCostPanel", true,
-                "EdgeCostPanel");
-            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(pnlEdgeCost);
-
-            lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
-            spnEdgeCost = new CampaignOptionsSpinner("EdgeCost",
-                100, 0, 500, 1);
-
-            layout.gridwidth = 1;
-            layout.gridx = 0;
-            layout.gridy++;
-            pnlEdgeCost.add(lblEdgeCost, layout);
-            layout.gridx++;
-            pnlEdgeCost.add(spnEdgeCost, layout);
-        }
-
         JButton btnEnableAll = new CampaignOptionsButton("AddAll");
         btnEnableAll.addActionListener(e -> {
             for (CampaignOptionsAbilityInfo abilityInfo : allAbilityInfo.values()) {
@@ -293,13 +271,6 @@ public class AbilitiesTab {
         layout.gridy = 0;
         panel.add(headerPanel, layout);
 
-        if (abilityCategory == COMBAT_ABILITY) {
-            layout.gridwidth = 1;
-            layout.gridx = 0;
-            layout.gridy++;
-            panel.add(pnlEdgeCost, layout);
-        }
-
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy++;
@@ -320,7 +291,7 @@ public class AbilitiesTab {
                 JPanel abilityPanel = createSPAPanel(abilityInfo);
 
                 layout.gridx = abilityCounter % 3;
-                layout.gridy = 3 + (abilityCounter / 3);
+                layout.gridy = 2 + (abilityCounter / 3);
                 abilityCounter++;
 
                 layout.gridwidth = 1;
