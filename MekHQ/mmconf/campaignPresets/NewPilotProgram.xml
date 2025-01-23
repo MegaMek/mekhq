@@ -176,7 +176,7 @@
 		<acquireMosUnit>2</acquireMosUnit>
 		<acquireMinimumTime>1</acquireMinimumTime>
 		<acquireMinimumTimeUnit>2</acquireMinimumTimeUnit>
-		<usePlanetaryAcquisition>true</usePlanetaryAcquisition>
+		<usePlanetaryAcquisition>false</usePlanetaryAcquisition>
 		<planetAcquisitionFactionLimit>NEUTRAL</planetAcquisitionFactionLimit>
 		<planetAcquisitionNoClanCrossover>true</planetAcquisitionNoClanCrossover>
 		<noClanPartsFromIS>false</noClanPartsFromIS>
