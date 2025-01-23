@@ -92,6 +92,7 @@ import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -4969,6 +4970,8 @@ public class Campaign implements ITechManager {
      * @return The updated number of dependents.
      */
     int dependentsRollForRemoval(List<Person> dependents, int dependentCapacity) {
+        List<Person> dependentsToRemove = new ArrayList<>();
+
         if (getCampaignOptions().isUseRandomDependentRemoval()) {
             for (Person dependent : dependents) {
                 if (!isRemovalEligible(dependent, currentDay)) {
@@ -4984,11 +4987,29 @@ public class Campaign implements ITechManager {
                 int targetNumber = 5 - getAtBUnitRatingMod();
 
                 if (roll <= targetNumber) {
-                    addReport(String.format(resources.getString("dependentLeavesForce.text"),
-                            dependent.getFullTitle()));
+                    dependentsToRemove.add(dependent);
 
-                    removePerson(dependent, false);
+                    Genealogy genealogy = dependent.getGenealogy();
+                    for (Person child : genealogy.getChildren()) {
+                        if (child.isChild(currentDay)) {
+                            dependentsToRemove.add(child);
+                        }
+                    }
+
+                    Person spouse = genealogy.getSpouse();
+                    if (spouse.isDependent()) {
+                        dependentsToRemove.add(spouse);
+                    }
                 }
+            }
+
+            if (!dependentsToRemove.isEmpty()) {
+                addReport(String.format(resources.getString("dependentLeavesForce.text"),
+                    dependentsToRemove.size(), dependentsToRemove.size() == 1 ? "" : "s"));
+            }
+
+            for (Person dependent : dependentsToRemove) {
+                dependent.changeStatus(this, currentDay, PersonnelStatus.LEFT);
             }
         }
 
@@ -5063,7 +5084,7 @@ public class Campaign implements ITechManager {
             PersonnelStatus status = person.getStatus();
 
             if (status.isDepartedUnit()) {
-                if (shouldRemovePerson(person, status)) {
+                if (shouldRemovePerson(person)) {
                     personnelToRemove.add(person);
                 }
             }
@@ -5080,39 +5101,50 @@ public class Campaign implements ITechManager {
 
     /**
      * Determines whether a person's records should be removed from the campaign
-     * based on their status and retirement month.
+     * based on their retirement date, date of death, personnel status, and genealogy activity.
+     *
+     * <p>The method evaluates the following conditions in order:
+     * <ul>
+     *   <li>If the person has a retirement date and retirees are exempt from removal as per
+     *   campaign options, the method returns {@code false}.</li>
+     *   <li>If the person has a date of death, and cemeteries are exempt from removal as per
+     *   campaign options, the method returns {@code false}.</li>
+     *   <li>If the person has an active genealogy, the method returns {@code false}.</li>
+     *   <li>If the person's retirement date is more than one month ago, the method returns {@code true}.</li>
+     *   <li>If the person's date of death is more than one month ago, the method returns {@code true}.</li>
+     * </ul>
+     *
+     * <p>If none of the above conditions are met, the method returns {@code false}.
      *
      * @param person The individual being checked.
-     * @param status The personnel status of the individual.
-     * @return true if the person should be removed, false otherwise.
+     * @return {@code true} if the person should be removed, {@code false} otherwise.
      */
-    private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
-        // don't remove a character if they are related to a genealogy
-        // with at least one member still present in the campaign
-        Map<FamilialRelationshipType, List<Person>> family = person.getGenealogy().getFamily();
 
-        if (family.keySet().stream()
-                .flatMap(relationshipType -> family.get(relationshipType).stream())
-                .anyMatch(relation -> relation.getStatus().isDepartedUnit())) {
+    private boolean shouldRemovePerson(Person person) {
+        // We do these checks first, as they're cheaper than parsing the entire genealogy
+        LocalDate retirementDate = person.getRetirement();
+        if (retirementDate != null && campaignOptions.isUseRemovalExemptRetirees()) {
             return false;
         }
 
-        int retirementMonthValue;
-
-        if (person.getRetirement() != null) {
-            retirementMonthValue = person.getRetirement().getMonthValue();
-        } else {
-            person.setRetirement(getLocalDate());
+        LocalDate deathDate = person.getDateOfDeath();
+        if (deathDate != null && campaignOptions.isUseRemovalExemptCemetery()) {
             return false;
         }
 
-        // return true if the individual has left the campaign for over a month
-        // *AND*
-        // is dead (and we're not exempting the cemetery) *OR* is retired (and we're not
-        // exempting retirees)
-        return (retirementMonthValue < (getLocalDate().getMonthValue() + 1)) &&
-                (((status.isDead()) && (!campaignOptions.isUseRemovalExemptCemetery()))
-                        || ((status.isRetired()) && (!campaignOptions.isUseRemovalExemptRetirees())));
+        // Do not remove if the character has an active genealogy
+        Genealogy genealogy = person.getGenealogy();
+
+        if (genealogy.isActive()) {
+            return false;
+        }
+
+        // Did the departure occur more than a month ago?
+        LocalDate aMonthAgo = currentDay.minusMonths(1);
+        if (retirementDate != null && retirementDate.isBefore(aMonthAgo)) {
+            return true;
+        }
+        return deathDate != null && deathDate.isBefore(aMonthAgo);
     }
 
     /**
