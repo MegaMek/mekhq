@@ -365,7 +365,6 @@ public class CampaignOptions {
     private Integer militaryAcademyAccidents;
 
     // Death
-    private boolean keepMarriedNameUponSpouseDeath;
     private RandomDeathMethod randomDeathMethod;
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
     private boolean useRandomDeathSuicideCause;
@@ -951,7 +950,6 @@ public class CampaignOptions {
         setMilitaryAcademyAccidents(10000);
 
         // Death
-        setKeepMarriedNameUponSpouseDeath(true);
         setRandomDeathMethod(NONE);
         setEnabledRandomDeathAgeGroups(new HashMap<>());
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ELDER, true);
@@ -2817,21 +2815,6 @@ public class CampaignOptions {
     // endregion Procreation
 
     // region Death
-    /**
-     * @return whether to keep ones married name upon spouse death or not
-     */
-    public boolean isKeepMarriedNameUponSpouseDeath() {
-        return keepMarriedNameUponSpouseDeath;
-    }
-
-    /**
-     * @param keepMarriedNameUponSpouseDeath whether to keep ones married name upon
-     *                                       spouse death or not
-     */
-    public void setKeepMarriedNameUponSpouseDeath(final boolean keepMarriedNameUponSpouseDeath) {
-        this.keepMarriedNameUponSpouseDeath = keepMarriedNameUponSpouseDeath;
-    }
-
     public boolean isUseEducationModule() {
         return useEducationModule;
     }
@@ -5026,8 +5009,6 @@ public class CampaignOptions {
         // endregion Education
 
         // region Death
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath",
-                isKeepMarriedNameUponSpouseDeath());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "enabledRandomDeathAgeGroups");
         for (final Entry<AgeGroup, Boolean> entry : getEnabledRandomDeathAgeGroups().entrySet()) {
@@ -5824,8 +5805,6 @@ public class CampaignOptions {
                     // endregion Education
 
                     // region Death
-                } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
-                    retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMethod")) {
                     // <50.04 compatibility handler
                     if (wn2.getTextContent().trim().equalsIgnoreCase(NONE.name())) {

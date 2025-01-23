@@ -110,7 +110,6 @@ public class BiographyTab {
     //start Death Tab
     private JLabel lblRandomDeathMethod;
     private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
-    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     private JCheckBox chkUseRandomDeathSuicideCause;
 
     private JPanel pnlDeathAgeGroup;
@@ -278,7 +277,6 @@ public class BiographyTab {
     private void initializeDeathTab() {
         lblRandomDeathMethod = new JLabel();
         comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
-        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
         chkUseRandomDeathSuicideCause = new JCheckBox();
 
         pnlDeathAgeGroup = new JPanel();
@@ -760,7 +758,6 @@ public class BiographyTab {
                 return this;
             }
         });
-        chkKeepMarriedNameUponSpouseDeath = new CampaignOptionsCheckBox("KeepMarriedNameUponSpouseDeath");
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
@@ -777,9 +774,6 @@ public class BiographyTab {
         panelLeft.add(comboRandomDeathMethod, layoutLeft);
 
         layoutLeft.gridx = 0;
-        layoutLeft.gridy++;
-        panelLeft.add(chkKeepMarriedNameUponSpouseDeath, layoutLeft);
-
         layoutLeft.gridy++;
         panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
 
@@ -1310,7 +1304,6 @@ public class BiographyTab {
         chkExtraRandomOrigin.setSelected(originOptions.isExtraRandomOrigin());
 
         // Death
-        chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
         comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
 
@@ -1400,7 +1393,6 @@ public class BiographyTab {
         options.setRandomOriginOptions(originOptions);
 
         // Death
-        options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());
         options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
         for (final AgeGroup ageGroup : AgeGroup.values()) {

@@ -5527,10 +5527,6 @@ public class Campaign implements ITechManager {
             if (p.getGenealogy().hasSpouse()) {
                 if (!personnel.containsKey(p.getGenealogy().getSpouse().getId())) {
                     p.getGenealogy().setSpouse(null);
-                    if (!getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
-                            && (p.getMaidenName() != null)) {
-                        p.setSurname(p.getMaidenName());
-                    }
                     p.setMaidenName(null);
                 }
             }
