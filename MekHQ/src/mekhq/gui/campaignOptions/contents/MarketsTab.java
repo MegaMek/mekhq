@@ -454,8 +454,7 @@ public class MarketsTab {
     private void initializeContractMarket() {
         pnlContractMarketGeneralOptions = new JPanel();
         lblContractMarketMethod = new JLabel();
-        comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod",
-            ContractMarketMethod.values());
+        comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod");
         lblContractSearchRadius = new JLabel();
         spnContractSearchRadius = new JSpinner();
         chkVariableContractLength = new JCheckBox();
@@ -530,8 +529,10 @@ public class MarketsTab {
     private JPanel createContractMarketGeneralOptionsPanel() {
         // Contents
         lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
-        comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod",
-            ContractMarketMethod.values());
+        comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod");
+        DefaultComboBoxModel<ContractMarketMethod> model = new DefaultComboBoxModel<>(ContractMarketMethod.values());
+        model.removeElement(ContractMarketMethod.CAM_OPS);
+        comboContractMarketMethod.setModel(model);
 
         lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
         spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius",
