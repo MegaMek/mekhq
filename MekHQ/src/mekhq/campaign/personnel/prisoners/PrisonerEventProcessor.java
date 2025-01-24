@@ -10,10 +10,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -22,6 +19,7 @@ import static java.util.Calendar.MONDAY;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.rating.CamOpsReputation.CommandRating.getPersonalityValue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -36,10 +34,18 @@ public class PrisonerEventProcessor {
     // However, that lacks nuance, so we've changed it to -1 per prisoner to a maximum of -50.
     private static final int MAX_CRIME_PENALTY = 50;
     private final int DEFAULT_EVENT_CHANCE = STALEMATE.ordinal();
+    private final int MINIMUM_PRISONER_COUNT = 25;
 
-    // Dialog Options
+    // Fixed Dialog Options
     private static int CHOICE_FREE = 3;
     private static int CHOICE_EXECUTE = 4;
+
+    // Major Event Responses
+    public enum ResponseType {
+        RESPONSE_NEUTRAL, RESPONSE_POSITIVE, RESPONSE_NEGATIVE
+    }
+    private Map<Integer, List<ResponseType>> majorEventResponses = new HashMap<>();
+    private final int RESPONSE_TARGET_NUMBER = 7;
 
     public PrisonerEventProcessor(Campaign campaign) {
         this.campaign = campaign;
@@ -79,23 +85,118 @@ public class PrisonerEventProcessor {
 
         // Weekly events
         if (today.getDayOfWeek().getValue() == MONDAY) {
+            int totalPrisoners = campaign.getCurrentPrisoners().size();
             int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
             int prisonerCapacity = calculatePrisonerCapacity(campaign);
 
-            boolean majorEvent =  prisonerCapacityUsage > prisonerCapacity;
-            boolean minorEvent = !majorEvent && prisonerCapacityUsage > (prisonerCapacity * 0.75);
+
+            boolean majorEvent = prisonerCapacityUsage > prisonerCapacity
+                && (totalPrisoners >= MINIMUM_PRISONER_COUNT);
+
+            boolean minorEvent = !majorEvent
+                && (prisonerCapacityUsage > (prisonerCapacity * 0.75));
 
             if (minorEvent) {
-                int escalation = d6(1);
-                if (escalation == 1) {
+                boolean isEscalation = d6(1) == 0;
+                if ((totalPrisoners >= MINIMUM_PRISONER_COUNT) && isEscalation) {
                     majorEvent = true;
                 } else{
                     processMinorEvent();
                 }
             }
 
-            if (majorEvent) {}
+            if (majorEvent) {
+                buildMajorEventResponses();
+
+                int event = randomInt(10);
+                PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, 0,
+                    event, false);
+                int choice = eventDialog.getDialogChoice();
+
+                int responseModifier = 0;
+                Person campaignCommander = campaign.getFlaggedCommander();
+                if (campaignCommander != null) {
+                    responseModifier = getPersonalityValue(campaign, campaignCommander);
+                }
+
+                ResponseType response = majorEventResponses.get(event).get(choice);
+
+                switch (response) {
+                    case RESPONSE_NEUTRAL -> {}
+                    case RESPONSE_POSITIVE -> responseModifier += 3;
+                    case RESPONSE_NEGATIVE -> responseModifier -= 3;
+                }
+
+                int responseCheck = d6(2) + responseModifier;
+                if (responseCheck >= RESPONSE_TARGET_NUMBER) {
+                    // success
+                } else {
+                    // failure
+                }
+            }
         }
+    }
+
+    private void buildMajorEventResponses() {
+        // event 0
+        majorEventResponses.put(0, List.of(
+                ResponseType.RESPONSE_NEGATIVE,
+                ResponseType.RESPONSE_NEGATIVE,
+                ResponseType.RESPONSE_NEUTRAL));
+
+        // event 1
+        majorEventResponses.put(1, List.of(
+                ResponseType.RESPONSE_POSITIVE,
+                ResponseType.RESPONSE_NEGATIVE,
+                ResponseType.RESPONSE_NEUTRAL));
+
+        // event 2
+        majorEventResponses.put(2, List.of(
+            ResponseType.RESPONSE_POSITIVE,
+            ResponseType.RESPONSE_NEUTRAL,
+            ResponseType.RESPONSE_NEGATIVE));
+
+        // event 3
+        majorEventResponses.put(3, List.of(
+            ResponseType.RESPONSE_POSITIVE,
+            ResponseType.RESPONSE_NEUTRAL,
+            ResponseType.RESPONSE_NEGATIVE));
+
+        // event 4
+        majorEventResponses.put(4, List.of(
+            ResponseType.RESPONSE_NEUTRAL,
+            ResponseType.RESPONSE_NEUTRAL,
+            ResponseType.RESPONSE_NEUTRAL));
+
+        // event 5
+        majorEventResponses.put(5, List.of(
+            ResponseType.RESPONSE_NEUTRAL,
+            ResponseType.RESPONSE_NEGATIVE,
+            ResponseType.RESPONSE_NEGATIVE));
+
+        // event 6
+        majorEventResponses.put(6, List.of(
+            ResponseType.RESPONSE_POSITIVE,
+            ResponseType.RESPONSE_NEGATIVE,
+            ResponseType.RESPONSE_NEUTRAL));
+
+        // event 7
+        majorEventResponses.put(7, List.of(
+            ResponseType.RESPONSE_NEGATIVE,
+            ResponseType.RESPONSE_POSITIVE,
+            ResponseType.RESPONSE_NEGATIVE));
+
+        // event 8
+        majorEventResponses.put(8, List.of(
+            ResponseType.RESPONSE_POSITIVE,
+            ResponseType.RESPONSE_NEUTRAL,
+            ResponseType.RESPONSE_NEGATIVE));
+
+        // event 9
+        majorEventResponses.put(9, List.of(
+            ResponseType.RESPONSE_POSITIVE,
+            ResponseType.RESPONSE_NEGATIVE,
+            ResponseType.RESPONSE_NEUTRAL));
     }
 
     private void processMinorEvent() {
@@ -105,8 +206,8 @@ public class PrisonerEventProcessor {
         int prisonerPortion = max(1, (int) round(prisoners.size() * 0.1));
 
         int event = randomInt(50);
-        PrisonerEventDialog minorEventDialog = new PrisonerEventDialog(campaign, prisonerPortion, event);
-        int choice = minorEventDialog.getDialogChoice();
+        PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, prisonerPortion, event, true);
+        int choice = eventDialog.getDialogChoice();
 
         if (choice == CHOICE_FREE) {
             for (int i = 0; i < prisonerPortion; i++) {

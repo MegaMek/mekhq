@@ -16,30 +16,38 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
     private static final ResourceBundle resources = ResourceBundle.getBundle(
         BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
-    public PrisonerEventDialog(Campaign campaign, int prisonerPortion, int eventRoll) {
-        super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, eventRoll),
-            createButtons(eventRoll, prisonerPortion), createOutOfCharacterMessage(), 0,
+    public PrisonerEventDialog(Campaign campaign, int prisonerPortion, int eventRoll, boolean isMinor) {
+        super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, eventRoll, isMinor),
+            createButtons(eventRoll, prisonerPortion, isMinor), createOutOfCharacterMessage(), 0,
             null, null, null);
     }
 
-    private static List<ButtonLabelTooltipPair> createButtons(int eventRoll, int prisonerPortion) {
-        ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
-            resources.getString("responseMinorA" + eventRoll + ".button"),
-            resources.getString("responseMinorA" + eventRoll + ".tooltip"));
-        ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
-            resources.getString("responseMinorB" + eventRoll + ".button"),
-            resources.getString("responseMinorB" + eventRoll + ".tooltip"));
-        ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
-            resources.getString("responseMinorC" + eventRoll + ".button"),
-            resources.getString("responseMinorC" + eventRoll + ".tooltip"));
-        ButtonLabelTooltipPair btnFree = new ButtonLabelTooltipPair(
-            String.format(resources.getString("free.button"), prisonerPortion),
-            resources.getString("free.tooltip"));
-        ButtonLabelTooltipPair btnExecute = new ButtonLabelTooltipPair(
-            String.format(resources.getString("execute.button"), prisonerPortion),
-            resources.getString("execute.tooltip"));
+    private static List<ButtonLabelTooltipPair> createButtons(int eventRoll, int prisonerPortion,
+                                                              boolean isMinor) {
+        String typeKey = isMinor ? "Minor" : "Major";
 
-        return List.of(btnResponseA, btnResponseB, btnResponseC, btnFree, btnExecute);
+        ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
+            resources.getString("response" + typeKey + 'A' + eventRoll + ".button"),
+            resources.getString("response" + typeKey + 'A' + eventRoll + ".tooltip"));
+        ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
+            resources.getString("response" + typeKey + 'B' + eventRoll + ".button"),
+            resources.getString("response" + typeKey + 'B' + eventRoll + ".tooltip"));
+        ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
+            resources.getString("response" + typeKey + 'C' + eventRoll + ".button"),
+            resources.getString("response" + typeKey + 'C' + eventRoll + ".tooltip"));
+
+        if (isMinor) {
+            ButtonLabelTooltipPair btnFree = new ButtonLabelTooltipPair(
+                String.format(resources.getString("free.button"), prisonerPortion),
+                resources.getString("free.tooltip"));
+            ButtonLabelTooltipPair btnExecute = new ButtonLabelTooltipPair(
+                String.format(resources.getString("execute.button"), prisonerPortion),
+                resources.getString("execute.tooltip"));
+
+            return List.of(btnResponseA, btnResponseB, btnResponseC, btnFree, btnExecute);
+        }
+
+        return List.of(btnResponseA, btnResponseB, btnResponseC);
     }
 
     private static @Nullable Person getSpeaker(Campaign campaign) {
@@ -67,9 +75,12 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
         }
     }
 
-    private static String createInCharacterMessage(Campaign campaign, int eventRoll) {
+    private static String createInCharacterMessage(Campaign campaign, int eventRoll, boolean isMinor) {
+        String typeKey = isMinor ? "Minor" : "Major";
+
         String commanderAddress = campaign.getCommanderAddress(false);
-        return String.format(resources.getString("eventMinor" + eventRoll + ".message"), commanderAddress);
+        return String.format(resources.getString("event" + typeKey + eventRoll + ".message"),
+            commanderAddress);
     }
 
     private static String createOutOfCharacterMessage() {
