@@ -29,17 +29,6 @@ import java.util.ResourceBundle;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 
-/**
- * Dialog to inform and handle campaign-loading problems within MekHQ.
- *
- * <p>This dialog prompts the user with both in-character and out-of-character messages,
- * providing actionable options if any issues arise during campaign load, such as version
- * incompatibility or missing contracts.</p>
- *
- * <p>The dialog presents two options: "Cancel" to abort loading the campaign or
- * "Continue Regardless" to proceed despite the detected issues. It dynamically generates
- * text based on the problem type and campaign information.</p>
- */
 public class DefectionOffer extends MHQDialogImmersive {
     private static final String BUNDLE_KEY = "mekhq.resources.DefectionOffer";
     private static final ResourceBundle resources = ResourceBundle.getBundle(
