@@ -83,11 +83,11 @@ public class ResupplyUtilities {
         for (Force force : campaign.getAllForces()) {
             Force parentForce = force.getParentForce();
 
-            if (parentForce != null && (force.getParentForce().isConvoyForce())) {
+            if (parentForce != null && (force.getParentForce().getForceType().isConvoy())) {
                 continue;
             }
 
-            if (force.isConvoyForce() && force.getScenarioId() == scenarioId) {
+            if (force.getForceType().isConvoy() && force.getScenarioId() == scenarioId) {
                 new DialogAbandonedConvoy(campaign, contract, force);
 
                 for (UUID unitID : force.getAllUnits(false)) {

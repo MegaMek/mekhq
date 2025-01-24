@@ -372,7 +372,7 @@ public class Resupply {
                 continue;
             }
 
-            if (!force.isCombatForce()) {
+            if (!force.getForceType().isStandard()) {
                 continue;
             }
 
@@ -862,42 +862,45 @@ public class Resupply {
         totalPlayerCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.isConvoyForce()) {
+            if (!force.getForceType().isConvoy()) {
+                continue;
+            }
+
+            // This ensures each convoy is only counted once
+            if (force.getParentForce() != null && force.getParentForce().getForceType().isConvoy()) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
-            if (force.isConvoyForce()) {
-                boolean hasCargo = false;
-                for (UUID unitId : force.getAllUnits(false)) {
-                    try {
-                        Unit unit = campaign.getUnit(unitId);
-                        Entity entity = unit.getEntity();
+            boolean hasCargo = false;
+            for (UUID unitId : force.getAllUnits(false)) {
+                try {
+                    Unit unit = campaign.getUnit(unitId);
+                    Entity entity = unit.getEntity();
 
-                        if (unit.isDamaged()
-                            || !unit.isFullyCrewed()
-                            || isProhibitedUnitType(entity, true)) {
-                            continue;
-                        }
-
-                        double individualCargo = unit.getCargoCapacity();
-
-                        if (individualCargo > 0) {
-                            hasCargo = true;
-                        }
-
-                        cargoCapacitySubTotal += individualCargo;
-                    } catch (Exception ignored) {
-                        // If we run into an exception, it's because we failed to get Unit or Entity.
-                        // In either case, we just ignore that unit.
+                    if (unit.isDamaged()
+                        || !unit.isFullyCrewed()
+                        || isProhibitedUnitType(entity, true)) {
+                        continue;
                     }
+
+                    double individualCargo = unit.getCargoCapacity();
+
+                    if (individualCargo > 0) {
+                        hasCargo = true;
+                    }
+
+                    cargoCapacitySubTotal += individualCargo;
+                } catch (Exception ignored) {
+                    // If we run into an exception, it's because we failed to get Unit or Entity.
+                    // In either case, we just ignore that unit.
                 }
+            }
 
-                if (hasCargo) {
-                    if (cargoCapacitySubTotal > 0) {
-                        totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                        playerConvoys.put(force, cargoCapacitySubTotal);
-                    }
+            if (hasCargo) {
+                if (cargoCapacitySubTotal > 0) {
+                    totalPlayerCargoCapacity += cargoCapacitySubTotal;
+                    playerConvoys.put(force, cargoCapacitySubTotal);
                 }
             }
         }

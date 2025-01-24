@@ -36,8 +36,8 @@ public class StaticChecks {
                         .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
-    public static boolean areAllCombatForces(Vector<Force> forces) {
-        return forces.stream().allMatch(Force::isCombatForce);
+    public static boolean areAllStandardForces(Vector<Force> forces) {
+        return forces.stream().allMatch(force -> force.getForceType().isStandard());
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {
