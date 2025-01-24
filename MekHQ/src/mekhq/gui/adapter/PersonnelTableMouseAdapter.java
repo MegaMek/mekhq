@@ -84,6 +84,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.personnel.prisoners.PrisonerEventProcessor.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
@@ -1289,6 +1290,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().removePerson(prisoner);
             }
         }
+
+        processAdHocExecution(gui.getCampaign(), prisoners.length);
     }
 
     private void loadGMToolsForPerson(Person person) {

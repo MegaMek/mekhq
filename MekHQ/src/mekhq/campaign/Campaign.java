@@ -95,6 +95,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
+import mekhq.campaign.personnel.prisoners.PrisonerEventProcessor;
 import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
@@ -165,7 +166,6 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
-import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.performPrisonerChecks;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
@@ -4805,8 +4805,9 @@ public class Campaign implements ITechManager {
             processRandomDependents();
         }
 
-        if (hasActiveContract && currentDay.getDayOfMonth() == 1) {
-            performPrisonerChecks(this);
+        // Prisoner events can occur on Monday or the 1st of the month depending on the type of event
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+            new PrisonerEventProcessor(this);
         }
 
         resetAstechMinutes();

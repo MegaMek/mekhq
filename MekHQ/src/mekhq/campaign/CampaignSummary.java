@@ -35,8 +35,8 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.calculatePrisonerCapacity;
-import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.calculatePrisonerCapacityUsage;
+import static mekhq.campaign.personnel.prisoners.PrisonerEventProcessor.calculatePrisonerCapacity;
+import static mekhq.campaign.personnel.prisoners.PrisonerEventProcessor.calculatePrisonerCapacityUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
