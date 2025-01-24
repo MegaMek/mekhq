@@ -1481,7 +1481,6 @@ public class ResolveScenarioTracker {
         scenario.generateStub(campaign);
 
         // and create trackers for ransomed prisoners and units
-        Money prisonerRansoms = Money.zero();
         Money unitRansoms = Money.zero();
 
         // ok lets do the whole enchilada and go ahead and update campaign
@@ -1561,9 +1560,7 @@ public class ResolveScenarioTracker {
                 continue;
             }
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
-            if (status.isRansomed()) {
-                prisonerRansoms = prisonerRansoms.plus(person.getRansomValue(getCampaign()));
-            } else if (status.isCaptured()) {
+            if (status.isCaptured()) {
                 prisonerController.processCaptureOfNPC(person);
 
                 if (status.getHits() > person.getHits()) {
@@ -1577,14 +1574,6 @@ public class ResolveScenarioTracker {
                 ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(),
                     mission.getName());
             }
-        }
-
-        if (prisonerRansoms.isGreaterThan(Money.zero())) {
-            getCampaign().getFinances().credit(TransactionType.RANSOM, getCampaign().getLocalDate(),
-                    prisonerRansoms, "Prisoner ransoms for " + getScenario().getName());
-            getCampaign().addReport(prisonerRansoms.toAmountAndSymbolString()
-                    + " has been credited to your account for prisoner ransoms following "
-                    + getScenario().getName() + '.');
         }
         // endregion Prisoners
 
@@ -1978,7 +1967,6 @@ public class ResolveScenarioTracker {
         // for prisoners we have to track a whole person
         private final Person person;
         private boolean captured;
-        private boolean ransomed = false;
 
         public OppositionPersonnelStatus(String n, String u, Person p) {
             super(n, u, 0, p.getId());
@@ -1995,14 +1983,6 @@ public class ResolveScenarioTracker {
 
         public void setCaptured(boolean set) {
             captured = set;
-        }
-
-        public boolean isRansomed() {
-            return ransomed;
-        }
-
-        public void setRansomed(boolean ransomed) {
-            this.ransomed = ransomed;
         }
     }
 
