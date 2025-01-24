@@ -21,6 +21,8 @@ package mekhq.campaign.personnel.randomEvents;
 
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
@@ -251,6 +253,54 @@ public class PersonalityController {
             throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateIntelligence: "
                             + roll);
+        }
+    }
+
+    /**
+     * Calculates the total value of a person's personality characteristics.
+     *
+     * @param campaign the current campaign
+     * @param person   the person to calculate the personality value for
+     * @return the total personality value of the person in the campaign
+     */
+    public static int getPersonalityValue(Campaign campaign, Person person) {
+        if (person == null) {
+            return 0;
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseRandomPersonalityReputation()) {
+            int personalityValue = 0;
+            int modifier;
+
+            Aggression aggression = person.getAggression();
+            if (!person.getAggression().isNone()) {
+                modifier = aggression.isTraitPositive() ? 1 : -1;
+                personalityValue += aggression.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            Ambition ambition = person.getAmbition();
+            if (!person.getAmbition().isNone()) {
+                modifier = ambition.isTraitPositive() ? 1 : -1;
+                personalityValue += ambition.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            Greed greed = person.getGreed();
+            if (!person.getGreed().isNone()) {
+                modifier = greed.isTraitPositive() ? 1 : -1;
+                personalityValue += greed.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            Social social = person.getSocial();
+            if (!person.getSocial().isNone()) {
+                modifier = social.isTraitPositive() ? 1 : -1;
+                personalityValue += social.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            return personalityValue;
+        } else {
+            return 0;
         }
     }
 }

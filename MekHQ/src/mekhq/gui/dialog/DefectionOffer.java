@@ -37,7 +37,7 @@ public class DefectionOffer extends MHQDialogImmersive {
     public DefectionOffer(Campaign campaign, Person defector, boolean isBondsman) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign,
                 defector, isBondsman), createButtons(), createOutOfCharacterMessage(isBondsman),
-            0, null, null, null);
+            null, null, null);
     }
 
     private static List<ButtonLabelTooltipPair> createButtons() {

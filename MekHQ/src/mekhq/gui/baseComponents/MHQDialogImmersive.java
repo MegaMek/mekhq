@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static java.lang.Math.round;
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -95,7 +96,6 @@ public class MHQDialogImmersive extends JDialog {
      * @param centerMessage The main message displayed in the dialog's center.
      * @param buttons The list of {@link ButtonLabelTooltipPair} actions for the dialog.
      * @param outOfCharacterMessage Optional out-of-character message below the buttons.
-     * @param defaultChoiceIndex Default button index assumed when the user closes the dialog.
      * @param leftWidth Optional width for the left panel; defaults to a pre-defined width if null.
      * @param centerWidth Optional width for the center panel; defaults if null.
      * @param rightWidth Optional width for the right panel; defaults if null.
@@ -103,16 +103,14 @@ public class MHQDialogImmersive extends JDialog {
     public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
                               @Nullable Person rightSpeaker, String centerMessage,
                               List<ButtonLabelTooltipPair> buttons,
-                              @Nullable String outOfCharacterMessage, int defaultChoiceIndex,
-                              @Nullable Integer leftWidth, @Nullable Integer centerWidth,
-                              @Nullable Integer rightWidth) {
+                              @Nullable String outOfCharacterMessage, @Nullable Integer leftWidth,
+                              @Nullable Integer centerWidth, @Nullable Integer rightWidth) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
 
-        initialize(leftSpeaker, rightSpeaker, defaultChoiceIndex, leftWidth, centerWidth,
-            rightWidth);
+        initialize(leftSpeaker, rightSpeaker, leftWidth, centerWidth, rightWidth);
 
         // Title
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
@@ -181,11 +179,11 @@ public class MHQDialogImmersive extends JDialog {
         add(southPanel, BorderLayout.SOUTH);
 
         // Dialog settings
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setModal(true);
         setLocationRelativeTo(null);
         int preferredWidth = (int) round(CENTER_WIDTH + LEFT_WIDTH + RIGHT_WIDTH * 1.1);
-        setPreferredSize(new Dimension(preferredWidth, UIUtil.scaleForGUI(400)));
+        setPreferredSize(new Dimension(preferredWidth, (int) round(getPreferredSize().height * 1.1)));
         pack();
         setVisible(true);
     }
@@ -195,16 +193,13 @@ public class MHQDialogImmersive extends JDialog {
      *
      * @param leftSpeaker The left speaker for the dialog.
      * @param rightSpeaker The right speaker for the dialog.
-     * @param defaultChoiceIndex Default choice assigned when dialog is dismissed.
      * @param leftWidth Optional custom width for the left panel.
      * @param centerWidth Optional custom width for the center panel.
      * @param rightWidth Optional custom width for the right panel.
      */
     private void initialize(@Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
-                            int defaultChoiceIndex, @Nullable Integer leftWidth,
-                            @Nullable Integer centerWidth, @Nullable Integer rightWidth) {
-        dialogChoice = defaultChoiceIndex;
-
+                            @Nullable Integer leftWidth, @Nullable Integer centerWidth,
+                            @Nullable Integer rightWidth) {
         if (leftSpeaker == null) {
             LEFT_WIDTH = 0;
         } else {
@@ -306,20 +301,35 @@ public class MHQDialogImmersive extends JDialog {
      * @param buttons A list of button label-tooltip pairs defining the content of the buttons.
      */
     private void populateButtonPanel(List<ButtonLabelTooltipPair> buttons) {
+        buttonPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        gbc.anchor = GridBagConstraints.CENTER;
+
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
             JButton button = new JButton(buttonStrings.btnLabel());
 
             String tooltip = buttonStrings.btnTooltip();
             if (tooltip != null) {
-                button.setToolTipText(tooltip);
+                button.setToolTipText(wordWrap(tooltip));
             }
+
+            button.setMinimumSize(button.getPreferredSize());
 
             button.addActionListener(evt -> {
                 dialogChoice = buttons.indexOf(buttonStrings);
                 dispose();
             });
 
-            buttonPanel.add(button);
+            buttonPanel.add(button, gbc);
+
+            gbc.gridx++;
+            if (gbc.gridx % 3 == 0) {
+                gbc.gridx = 0;
+                gbc.gridy++;
+            }
         }
     }
 

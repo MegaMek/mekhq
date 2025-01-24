@@ -59,7 +59,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign),
-            createButtons(), createOutOfCharacterMessage(campaign), 0, null,
+            createButtons(), createOutOfCharacterMessage(campaign), null,
             UIUtil.scaleForGUI(800), null);
 
         setModal(false);

@@ -1,5 +1,6 @@
 package mekhq.campaign.personnel.prisoners;
 
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -8,23 +9,27 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
+import mekhq.gui.dialog.prisonerDialogs.PrisonerEventResultsDialog;
+import mekhq.gui.dialog.prisonerDialogs.PrisonerWarningDialog;
+import mekhq.gui.dialog.prisonerDialogs.PrisonerWarningResultsDialog;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static java.util.Calendar.MONDAY;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.rating.CamOpsReputation.CommandRating.getPersonalityValue;
+import static mekhq.campaign.personnel.randomEvents.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 public class PrisonerEventProcessor {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerMinorEventDialog";
+    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerEventDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(
         BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
@@ -37,13 +42,14 @@ public class PrisonerEventProcessor {
     private final int MINIMUM_PRISONER_COUNT = 25;
 
     // Fixed Dialog Options
-    private static int CHOICE_FREE = 3;
-    private static int CHOICE_EXECUTE = 4;
+    private static int CHOICE_FREE = 1;
+    private static int CHOICE_EXECUTE = 2;
 
     // Major Event Responses
     public enum ResponseType {
         RESPONSE_NEUTRAL, RESPONSE_POSITIVE, RESPONSE_NEGATIVE
     }
+
     private Map<Integer, List<ResponseType>> majorEventResponses = new HashMap<>();
     private final int RESPONSE_TARGET_NUMBER = 7;
 
@@ -84,57 +90,98 @@ public class PrisonerEventProcessor {
         }
 
         // Weekly events
-        if (today.getDayOfWeek().getValue() == MONDAY) {
+        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
             int totalPrisoners = campaign.getCurrentPrisoners().size();
             int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
             int prisonerCapacity = calculatePrisonerCapacity(campaign);
 
+            int overflow = prisonerCapacityUsage - prisonerCapacity;
 
-            boolean majorEvent = prisonerCapacityUsage > prisonerCapacity
-                && (totalPrisoners >= MINIMUM_PRISONER_COUNT);
-
-            boolean minorEvent = !majorEvent
-                && (prisonerCapacityUsage > (prisonerCapacity * 0.75));
-
-            if (minorEvent) {
-                boolean isEscalation = d6(1) == 0;
-                if ((totalPrisoners >= MINIMUM_PRISONER_COUNT) && isEscalation) {
-                    majorEvent = true;
-                } else{
-                    processMinorEvent();
-                }
+            if (overflow <= 0) {
+                // No risk of event
+                return;
             }
 
+            boolean minorEvent = randomInt(100) < overflow;
+            // Does the minor event escalate into a major event?
+            boolean majorEvent = minorEvent
+                && (totalPrisoners > MINIMUM_PRISONER_COUNT)
+                && (randomInt(100) < overflow);
+
+            Person speaker = getSpeaker(campaign);
+            // If there is no event, throw up a warning and give the player an opportunity to do
+            // something about the situation.
+            if (!minorEvent) {
+                processWarning(campaign, overflow, speaker);
+                return;
+            }
+
+            // Major Event
             if (majorEvent) {
-                buildMajorEventResponses();
-
-                int event = randomInt(10);
-                PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, 0,
-                    event, false);
-                int choice = eventDialog.getDialogChoice();
-
-                int responseModifier = 0;
-                Person campaignCommander = campaign.getFlaggedCommander();
-                if (campaignCommander != null) {
-                    responseModifier = getPersonalityValue(campaign, campaignCommander);
-                }
-
-                ResponseType response = majorEventResponses.get(event).get(choice);
-
-                switch (response) {
-                    case RESPONSE_NEUTRAL -> {}
-                    case RESPONSE_POSITIVE -> responseModifier += 3;
-                    case RESPONSE_NEGATIVE -> responseModifier -= 3;
-                }
-
-                int responseCheck = d6(2) + responseModifier;
-                if (responseCheck >= RESPONSE_TARGET_NUMBER) {
-                    // success
-                } else {
-                    // failure
-                }
+                processMajorEvent(campaign, speaker);
+                return;
             }
+
+            processMinorEvent(speaker, overflow);
         }
+    }
+
+    private void processWarning(Campaign campaign, int overflow, Person speaker) {
+        List<Person> prisoners = campaign.getCurrentPrisoners();
+        Collections.shuffle(prisoners);
+
+        int setFree = max(1, (int) round(overflow * 1.1));
+        setFree = min(setFree, prisoners.size());
+        int executions = max(1, (int) round(prisoners.size() * 0.1));
+        executions = min(executions, prisoners.size());
+
+        PrisonerWarningDialog warningDialog = new PrisonerWarningDialog(campaign, speaker, executions, setFree);
+        int choice = warningDialog.getDialogChoice();
+
+        if (choice == CHOICE_FREE) {
+            for (int i = 0; i < setFree; i++) {
+                Person prisoner = prisoners.get(i);
+                campaign.addReport(String.format(resources.getString("free.report"),
+                    prisoner.getFullName()));
+                campaign.removePerson(prisoner, false);
+            }
+
+            new PrisonerWarningResultsDialog(campaign, speaker, false);
+            return;
+        }
+
+        if (choice == CHOICE_EXECUTE) {
+            processExecutions(executions, prisoners);
+            new PrisonerWarningResultsDialog(campaign, speaker, true);
+        }
+    }
+
+    private void processMajorEvent(Campaign campaign, Person speaker) {
+        buildMajorEventResponses();
+
+        int event = randomInt(10);
+        PrisonerEventDialog eventDialog =
+            new PrisonerEventDialog(campaign, speaker, event, false);
+
+        int choice = eventDialog.getDialogChoice();
+
+        int responseModifier = 0;
+        if (speaker != null) {
+            responseModifier = getPersonalityValue(campaign, speaker);
+        }
+
+        ResponseType response = majorEventResponses.get(event).get(choice);
+
+        switch (response) {
+            case RESPONSE_NEUTRAL -> {}
+            case RESPONSE_POSITIVE -> responseModifier += 3;
+            case RESPONSE_NEGATIVE -> responseModifier -= 3;
+        }
+
+        int responseCheck = d6(2) + responseModifier;
+        boolean isSuccessful = responseCheck >= RESPONSE_TARGET_NUMBER;
+
+        new PrisonerEventResultsDialog(campaign, speaker, event, choice, false, isSuccessful);
     }
 
     private void buildMajorEventResponses() {
@@ -199,40 +246,20 @@ public class PrisonerEventProcessor {
             ResponseType.RESPONSE_NEUTRAL));
     }
 
-    private void processMinorEvent() {
-        List<Person> prisoners = campaign.getCurrentPrisoners();
-        Collections.shuffle(prisoners);
-
-        int prisonerPortion = max(1, (int) round(prisoners.size() * 0.1));
-
+    private void processMinorEvent(@Nullable Person speaker, int overflow) {
         int event = randomInt(50);
-        PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, prisonerPortion, event, true);
-        int choice = eventDialog.getDialogChoice();
-
-        if (choice == CHOICE_FREE) {
-            for (int i = 0; i < prisonerPortion; i++) {
-                Person prisoner = prisoners.get(i);
-                campaign.addReport(String.format(resources.getString("free.report"),
-                    prisoner.getFullName()));
-                campaign.removePerson(prisoner, false);
-            }
-            return;
-        }
-
-        if (choice == CHOICE_EXECUTE) {
-            processExecutions(prisonerPortion, prisoners);
-        }
+        new PrisonerEventDialog(campaign, speaker, event, true);
     }
 
-    private void processExecutions(int prisonerPortion, List<Person> prisoners) {
-        for (int i = 0; i < prisonerPortion; i++) {
+    private void processExecutions(int executions, List<Person> prisoners) {
+        for (int i = 0; i < executions; i++) {
             Person prisoner = prisoners.get(i);
             campaign.addReport(String.format(resources.getString("execute.report"),
                 prisoner.getFullName()));
             campaign.removePerson(prisoner, false);
         }
 
-        processAdHocExecution(campaign, prisonerPortion);
+        processAdHocExecution(campaign, executions);
     }
 
     public static void processAdHocExecution(Campaign campaign, int victims) {
@@ -333,5 +360,30 @@ public class PrisonerEventProcessor {
         }
 
         return prisonerCapacity + campaign.getTemporaryPrisonerCapacity();
+    }
+
+    private static @Nullable Person getSpeaker(Campaign campaign) {
+        List<Force> securityForces = new ArrayList<>();
+
+        for (Force force : campaign.getAllForces()) {
+            if (force.getForceType().isSecurity()) {
+                securityForces.add(force);
+            }
+        }
+
+        Collections.shuffle(securityForces);
+        Force designatedForce = securityForces.get(0);
+
+        Person speaker = null;
+        UUID speakerId = designatedForce.getForceCommanderID();
+        if (speakerId != null) {
+            speaker = campaign.getPerson(speakerId);
+        }
+
+        if (speaker == null) {
+            return campaign.getSeniorAdminPerson(TRANSPORT);
+        } else {
+            return speaker;
+        }
     }
 }

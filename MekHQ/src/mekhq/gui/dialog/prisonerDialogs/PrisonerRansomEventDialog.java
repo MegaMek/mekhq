@@ -40,7 +40,7 @@ public class PrisonerRansomEventDialog extends MHQDialogImmersive {
     public PrisonerRansomEventDialog(Campaign campaign, List<Person> prisoners, Money payment, boolean isFriendlyPOWs) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign,
                 payment, prisoners, isFriendlyPOWs), createButtons(), createOutOfCharacterMessage(isFriendlyPOWs),
-            0, null, null, null);
+            null, null, null);
 
         setModal(false);
         setAlwaysOnTop(true);
