@@ -26,21 +26,22 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.calculatePrisonerCapacity;
+import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting,
@@ -368,25 +369,45 @@ public class CampaignSummary {
      * @return A summary of fatigue related facilities.
      */
     public String getFacilityReport() {
+        final String WARNING = " \u26A0";
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        int personnelCount;
-        if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
-            personnelCount = campaign.getActiveCombatPersonnel().size();
-        } else {
-            personnelCount = campaign.getActivePersonnel().size();
-        }
-        personnelCount -= campaign.getCurrentPrisoners().size();
+        boolean exceedsCapacity;
+        String color;
+        String closingSpan;
+        String colorBlindWarning;
 
-        StringBuilder report = new StringBuilder();
+        StringBuilder report = new StringBuilder("<html>");
 
+        // Field Kitchens
         if (campaignOptions.isUseFatigue()) {
-            report.append(String.format("Kitchens (%s/%s)  ",
-                    personnelCount,
-                    Fatigue.checkFieldKitchenCapacity(campaign)));
+            int personnelCount;
+            if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
+                personnelCount = campaign.getActiveCombatPersonnel().size();
+            } else {
+                personnelCount = campaign.getActivePersonnel().size();
+            }
+            personnelCount -= campaign.getCurrentPrisoners().size();
+
+            int fieldKitchenCapacity = checkFieldKitchenCapacity(campaign);
+
+            exceedsCapacity = personnelCount > fieldKitchenCapacity;
+
+            color = exceedsCapacity
+                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
+                : "";
+            closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
+            colorBlindWarning = exceedsCapacity ? WARNING : "";
+            report.append(String.format("Kitchens %s(%s/%s)%s%s",
+                color, personnelCount, checkFieldKitchenCapacity(campaign), closingSpan, colorBlindWarning));
         }
 
+        // Hospital Beds
         if (campaignOptions.isUseAdvancedMedical()) {
+            if (campaignOptions.isUseFatigue()) {
+                report.append("<br>");
+            }
+
             int patients = (int) campaign.getPatients().stream()
                     .filter(patient -> patient.getDoctorId() != null)
                     .count();
@@ -396,15 +417,38 @@ public class CampaignSummary {
                     .mapToInt(person -> campaignOptions.getMaximumPatients())
                     .sum();
 
-            report.append(String.format("Hospital Beds (%s/%s)",
-                    patients,
-                    doctorCapacity));
+            exceedsCapacity = patients > doctorCapacity;
+
+            color = exceedsCapacity
+                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                : "";
+            closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
+            colorBlindWarning = exceedsCapacity ? WARNING : "";
+
+            report.append(String.format("Hospital Beds %s(%s/%s)%s%s",
+                color, patients, doctorCapacity, closingSpan, colorBlindWarning));
         }
 
-        return report.toString();
-    }
+        // Prisoners
+        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
+            if (campaignOptions.isUseFatigue() || campaignOptions.isUseAdvancedMedical()) {
+                report.append("<br>");
+            }
+            int prisoners = campaign.getCurrentPrisoners().size();
+            int prisonerCapacity = calculatePrisonerCapacity(campaign);
 
-    private String createCsv(Collection<?> coll) {
-        return StringUtils.join(coll, ",");
+            exceedsCapacity = prisoners > prisonerCapacity;
+
+            color = exceedsCapacity
+                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                : "";
+            closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
+            colorBlindWarning = exceedsCapacity ? WARNING : "";
+
+            report.append(String.format("Prisoner Capacity %s(%s/%s)%s%s",
+                color, prisoners, prisonerCapacity, closingSpan, colorBlindWarning));
+        }
+
+        return report.append("</html>").toString();
     }
 }

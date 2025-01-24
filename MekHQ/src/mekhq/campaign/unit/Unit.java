@@ -80,10 +80,10 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
@@ -6042,6 +6042,10 @@ public class Unit implements ITechnology {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    public boolean isBattleArmor() {
+        return (getEntity() != null) && getEntity().isBattleArmor();
     }
 
     public boolean isIntroducedBy(int year) {
