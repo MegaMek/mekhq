@@ -24,14 +24,14 @@ public class PrisonerMinorEventDialog extends MHQDialogImmersive {
 
     private static List<ButtonLabelTooltipPair> createButtons(int eventRoll, int prisonerPortion) {
         ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
-            resources.getString("responseA" + eventRoll + ".button"),
-            resources.getString("responseA" + eventRoll + ".tooltip"));
+            resources.getString("responseMinorA" + eventRoll + ".button"),
+            resources.getString("responseMinorA" + eventRoll + ".tooltip"));
         ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
-            resources.getString("responseB" + eventRoll + ".button"),
-            resources.getString("responseB" + eventRoll + ".tooltip"));
+            resources.getString("responseMinorB" + eventRoll + ".button"),
+            resources.getString("responseMinorB" + eventRoll + ".tooltip"));
         ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
-            resources.getString("responseC" + eventRoll + ".button"),
-            resources.getString("responseC" + eventRoll + ".tooltip"));
+            resources.getString("responseMinorC" + eventRoll + ".button"),
+            resources.getString("responseMinorC" + eventRoll + ".tooltip"));
         ButtonLabelTooltipPair btnFree = new ButtonLabelTooltipPair(
             String.format(resources.getString("free.button"), prisonerPortion),
             resources.getString("free.tooltip"));
@@ -69,7 +69,7 @@ public class PrisonerMinorEventDialog extends MHQDialogImmersive {
 
     private static String createInCharacterMessage(Campaign campaign, int eventRoll) {
         String commanderAddress = campaign.getCommanderAddress(false);
-        return String.format(resources.getString("event" + eventRoll + ".message"), commanderAddress);
+        return String.format(resources.getString("eventMinor" + eventRoll + ".message"), commanderAddress);
     }
 
     private static String createOutOfCharacterMessage() {
