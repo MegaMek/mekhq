@@ -2,7 +2,7 @@
  * Force.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -76,8 +76,7 @@ public class Force {
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
-    private boolean combatForce;
-    private boolean convoyForce;
+    private ForceType forceType;
     private boolean isCombatTeam;
     private int overrideCombatTeam;
     private FormationLevel formationLevel;
@@ -100,8 +99,7 @@ public class Force {
         setForceIcon(new LayeredForceIcon());
         setCamouflage(new Camouflage());
         setDescription("");
-        this.combatForce = true;
-        this.convoyForce = false;
+        this.forceType = ForceType.STANDARD;
         this.isCombatTeam = false;
         this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
@@ -160,39 +158,21 @@ public class Force {
         this.desc = d;
     }
 
-    public boolean isCombatForce() {
-        return combatForce && !convoyForce;
+    public ForceType getForceType() {
+        return forceType;
     }
 
-    public void setCombatForce(boolean combatForce, boolean setForSubForces) {
-        this.combatForce = combatForce;
+    public void setForceType(ForceType forceType, boolean setForSubForces) {
+        this.forceType = forceType;
         if (setForSubForces) {
             for (Force force : subForces) {
-                force.setCombatForce(combatForce, true);
+                force.setForceType(forceType, true);
             }
         }
     }
 
     public boolean isCombatTeam() {
         return isCombatTeam;
-    }
-
-    /**
-     * @return {@code true} if this is a convoy force, {@code false} otherwise.
-     */
-    public boolean isConvoyForce() {
-        return convoyForce;
-    }
-
-    /**
-     * Sets the status of the force as a convoy force. If requested, propagate this status to all
-     * sub-forces recursively.
-     *
-     * @param convoyForce {@code true} to mark force as a convoy force, {@code false} to mark force
-     *                     as non-convoy.
-     */
-    public void setConvoyForce(boolean convoyForce) {
-        this.convoyForce = convoyForce;
     }
 
     public void setCombatTeamStatus(final boolean isCombatTeam) {
@@ -403,21 +383,21 @@ public class Force {
     }
 
     /**
-     * @param combatForcesOnly to only include combat forces or to also include
+     * @param standardForcesOnly to only include combat forces or to also include
      *                         support forces
      * @return all the unit ids in this force and all of its subforces
      */
-    public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
+    public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
         Vector<UUID> allUnits;
 
-        if (combatForcesOnly && !isCombatForce() && !isConvoyForce()) {
+        if (standardForcesOnly && forceType.isStandard()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
         }
 
         for (Force force : subForces) {
-            allUnits.addAll(force.getAllUnits(combatForcesOnly));
+            allUnits.addAll(force.getAllUnits(standardForcesOnly));
         }
 
         return allUnits;
@@ -725,8 +705,7 @@ public class Force {
         if (!getDescription().isBlank()) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "convoyForce", convoyForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceType", forceType.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
@@ -774,10 +753,9 @@ public class Force {
                     force.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     force.setDescription(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
-                    force.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
-                    force.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceType")) {
+                    force.setForceType(ForceType.fromOrdinal(
+                        Integer.parseInt(wn2.getTextContent().trim())), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
                     force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {

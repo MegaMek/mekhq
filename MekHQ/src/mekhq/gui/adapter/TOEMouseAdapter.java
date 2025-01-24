@@ -32,6 +32,7 @@ import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -130,9 +131,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String PASTE_ICON = "PASTE_ICON";
     private static final String SUBFORCES_PASTE_ICON = "SUBFORCES_PASTE_ICON";
     private static final String CHANGE_NAME = "CHANGE_NAME";
-    private static final String CHANGE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS";
-    private static final String CHANGE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES";
-    private static final String CHANGE_CONVOY_STATUS = "CHANGE_CONVOY_STATUS";
+
+    private static final String COMMAND_CHANGE_FORCE_TYPE_STANDARD = "COMMAND_CHANGE_FORCE_TYPE_STANDARD|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_TYPE_SUPPORT = "COMMAND_CHANGE_FORCE_TYPE_SUPPORT|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_TYPE_CONVOY = "COMMAND_CHANGE_FORCE_TYPE_CONVOY|FORCE|empty|";
+    private static final String COMMAND_CHANGE_FORCE_TYPE_SECURITY = "COMMAND_CHANGE_FORCE_TYPE_SECURITY|FORCE|empty|";
     private static final String CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE";
     private static final String REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE";
 
@@ -143,9 +146,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_PASTE_FORCE_ICON = "PASTE_ICON|FORCE|empty|";
     private static final String COMMAND_SUBFORCES_PASTE_FORCE_ICON = "SUBFORCES_PASTE_ICON|FORCE|empty|";
     private static final String COMMAND_CHANGE_FORCE_NAME = "CHANGE_NAME|FORCE|empty|";
-    private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUS = "CHANGE_COMBAT_STATUS|FORCE|empty|";
-    private static final String COMMAND_CHANGE_FORCE_COMBAT_STATUSES = "CHANGE_COMBAT_STATUSES|FORCE|empty|";
-    private static final String COMMAND_CHANGE_FORCE_CONVOY_STATUS = "CHANGE_CONVOY_STATUS|FORCE|empty|";
     private static final String COMMAND_CHANGE_STRATEGIC_FORCE_OVERRIDE = "CHANGE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
     private static final String COMMAND_REMOVE_STRATEGIC_FORCE_OVERRIDE = "REMOVE_STRATEGIC_FORCE_OVERRIDE|FORCE|empty|";
 
@@ -423,46 +423,27 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), singleForce));
                 }
             }
-        } else if (command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUS)) {
+        } else if (command.contains("COMMAND_CHANGE_FORCE_TYPE")) {
             if (singleForce == null) {
                 return;
             }
 
-            final boolean combatForce = !singleForce.isCombatForce();
+            ForceType forceType = ForceType.STANDARD;
+            if (command.contains("SUPPORT")) {
+                forceType = ForceType.SUPPORT;
+            }
 
-            final boolean subforces = command.contains(TOEMouseAdapter.CHANGE_COMBAT_STATUSES);
+            if (command.contains("CONVOY")) {
+                forceType = ForceType.CONVOY;
+            }
+
+            if (command.contains("SECURITY")) {
+                forceType = ForceType.SECURITY;
+            }
+
             for (final Force force : forces) {
-                force.setCombatForce(combatForce, subforces);
-                force.setConvoyForce(false);
-
-
-            }
-
-            for (Force formation : gui.getCampaign().getAllForces()) {
-                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
-            }
-
-            gui.getTOETab().refreshForceView();
-        } else if (command.contains(TOEMouseAdapter.CHANGE_CONVOY_STATUS)) {
-            if (singleForce == null) {
-                return;
-            }
-
-            final boolean convoyForce = !singleForce.isConvoyForce();
-            for (final Force force : forces) {
-                force.setConvoyForce(convoyForce);
-            }
-
-            for (Force parentForce : singleForce.getAllParents()) {
-                parentForce.setConvoyForce(false);
-            }
-
-            for (Force childForce : singleForce.getAllSubForces()) {
-                childForce.setConvoyForce(false);
-            }
-
-            for (Force formation : gui.getCampaign().getAllForces()) {
-                MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+                force.setForceType(forceType, true);
+                MekHQ.triggerEvent(new OrganizationChangedEvent(force));
             }
 
             gui.getTOETab().refreshForceView();
@@ -1079,25 +1060,28 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (gui.getCampaign().getCampaignOptions().isUseAtB()) {
-                menuItem = new JMenuItem(force.isCombatForce() ? "Make Support Force" : "Remove Support Designation");
-                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUS + forceIds);
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
+                menu = new JMenu("Change Force Type");
 
-                menuItem = new JMenuItem(force.isCombatForce() ?
-                    "Mark All Forces as Support Forces" : "Remove Support Designation from All Forces");
-                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
+                menuItem = new JMenuItem("Make Standard Force");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_STANDARD + forceIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!force.isConvoyForce());
-                popup.add(menuItem);
+                menu.add(menuItem);
 
-                if (gui.getCampaign().getCampaignOptions().isUseStratCon()) {
-                    menuItem = new JMenuItem(!force.isConvoyForce() ?
-                        "Mark force as a Resupply Convoy" : "Remove Resupply Convoy Designation");
-                    menuItem.setActionCommand(COMMAND_CHANGE_FORCE_CONVOY_STATUS + forceIds);
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
+                menuItem = new JMenuItem("Make Support Force");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SUPPORT + forceIds);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem("Make Convoy Force");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_CONVOY + forceIds);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+
+                menuItem = new JMenuItem("Make Security Force");
+                menuItem.setActionCommand(COMMAND_CHANGE_FORCE_TYPE_SECURITY + forceIds);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                popup.add(menu);
 
                 JMenuItem optionStrategicForceOverride = new JMenuItem((force.isCombatTeam() ?
                     "Never" : "Always") + " Consider Force a Combat Team");
@@ -1113,7 +1097,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (StaticChecks.areAllForcesUndeployed(gui.getCampaign(), forces)
-                    && StaticChecks.areAllCombatForces(forces)) {
+                    && StaticChecks.areAllStandardForces(forces)) {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;

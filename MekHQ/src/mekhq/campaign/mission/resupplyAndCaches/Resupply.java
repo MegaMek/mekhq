@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Entity;
@@ -372,7 +390,7 @@ public class Resupply {
                 continue;
             }
 
-            if (!force.isCombatForce()) {
+            if (!force.getForceType().isStandard()) {
                 continue;
             }
 
@@ -862,42 +880,45 @@ public class Resupply {
         totalPlayerCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.isConvoyForce()) {
+            if (!force.getForceType().isConvoy()) {
+                continue;
+            }
+
+            // This ensures each convoy is only counted once
+            if (force.getParentForce() != null && force.getParentForce().getForceType().isConvoy()) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
-            if (force.isConvoyForce()) {
-                boolean hasCargo = false;
-                for (UUID unitId : force.getAllUnits(false)) {
-                    try {
-                        Unit unit = campaign.getUnit(unitId);
-                        Entity entity = unit.getEntity();
+            boolean hasCargo = false;
+            for (UUID unitId : force.getAllUnits(false)) {
+                try {
+                    Unit unit = campaign.getUnit(unitId);
+                    Entity entity = unit.getEntity();
 
-                        if (unit.isDamaged()
-                            || !unit.isFullyCrewed()
-                            || isProhibitedUnitType(entity, true)) {
-                            continue;
-                        }
-
-                        double individualCargo = unit.getCargoCapacity();
-
-                        if (individualCargo > 0) {
-                            hasCargo = true;
-                        }
-
-                        cargoCapacitySubTotal += individualCargo;
-                    } catch (Exception ignored) {
-                        // If we run into an exception, it's because we failed to get Unit or Entity.
-                        // In either case, we just ignore that unit.
+                    if (unit.isDamaged()
+                        || !unit.isFullyCrewed()
+                        || isProhibitedUnitType(entity, true)) {
+                        continue;
                     }
+
+                    double individualCargo = unit.getCargoCapacity();
+
+                    if (individualCargo > 0) {
+                        hasCargo = true;
+                    }
+
+                    cargoCapacitySubTotal += individualCargo;
+                } catch (Exception ignored) {
+                    // If we run into an exception, it's because we failed to get Unit or Entity.
+                    // In either case, we just ignore that unit.
                 }
+            }
 
-                if (hasCargo) {
-                    if (cargoCapacitySubTotal > 0) {
-                        totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                        playerConvoys.put(force, cargoCapacitySubTotal);
-                    }
+            if (hasCargo) {
+                if (cargoCapacitySubTotal > 0) {
+                    totalPlayerCargoCapacity += cargoCapacitySubTotal;
+                    playerConvoys.put(force, cargoCapacitySubTotal);
                 }
             }
         }

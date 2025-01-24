@@ -73,9 +73,6 @@ public class CombatTeam {
     public static final int STAR_SIZE = 5;
     public static final int LEVEL_II_SIZE = 6;
 
-    public static final long ETYPE_GROUND = ETYPE_MEK |
-            ETYPE_TANK | Entity.ETYPE_INFANTRY | ETYPE_PROTOMEK;
-
     /** Indicates a lance has no assigned mission */
     public static final int NO_MISSION = -1;
 
@@ -311,7 +308,7 @@ public class CombatTeam {
             return false;
         }
 
-        if (!force.isCombatForce()) {
+        if (!force.getForceType().isStandard()) {
             force.setCombatTeamStatus(false);
             return false;
         }
@@ -373,12 +370,8 @@ public class CombatTeam {
                 return false;
             }
 
-            if (parentForce.isConvoyForce()) {
+            if (!parentForce.getForceType().isStandard()) {
                 force.setCombatTeamStatus(false);
-                return false;
-            }
-
-            if (!parentForce.isCombatForce()) {
                 return false;
             }
         }

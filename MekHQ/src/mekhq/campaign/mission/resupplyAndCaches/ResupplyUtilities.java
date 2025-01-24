@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -83,11 +83,11 @@ public class ResupplyUtilities {
         for (Force force : campaign.getAllForces()) {
             Force parentForce = force.getParentForce();
 
-            if (parentForce != null && (force.getParentForce().isConvoyForce())) {
+            if (parentForce != null && (force.getParentForce().getForceType().isConvoy())) {
                 continue;
             }
 
-            if (force.isConvoyForce() && force.getScenarioId() == scenarioId) {
+            if (force.getForceType().isConvoy() && force.getScenarioId() == scenarioId) {
                 new DialogAbandonedConvoy(campaign, contract, force);
 
                 for (UUID unitID : force.getAllUnits(false)) {
