@@ -10,11 +10,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.dialog.DefectionOffer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Math.max;
 import static megamek.common.Board.T_SPACE;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -45,9 +47,7 @@ public class PrisonerController {
     final int SAR_HAS_ACTIVE_PROBE = 1; // largest only
 
     final int NOT_IN_PLANET_ORBIT = -2;
-    final int SAR_INCLUDES_SMALL_CRAFT = 1; // largest only
     final int SAR_INCLUDES_DROPSHIP = 2; // largest only
-    final int SAR_INCLUDES_WARSHIP = 3; // largest only
 
     private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
@@ -111,37 +111,39 @@ public class PrisonerController {
         return captureSuccessful;
     }
 
-    public void processCaptureOfNPC(Person potentialPrisoner) {
+    public void processCaptureOfNPC(Person prisoner) {
         if (isClan) {
-            potentialPrisoner.setPrisonerStatus(campaign, BONDSMAN, true);
-            handlePostCapture(potentialPrisoner);
+            prisoner.setPrisonerStatus(campaign, BONDSMAN, true);
+            handlePostCapture(prisoner);
             return;
         }
 
         // Attempt defection
-        int roll = attemptDefection(potentialPrisoner, true);
+        int roll = attemptDefection(prisoner, true);
 
         if (roll == 0) {
-            if (potentialPrisoner.isClanPersonnel()) {
-                potentialPrisoner.setPrisonerStatus(campaign, BONDSMAN, true);
+            if (prisoner.isClanPersonnel()) {
+                prisoner.setPrisonerStatus(campaign, BONDSMAN, true);
             } else {
-                potentialPrisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
+                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
             }
+
+            new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
         } else {
-            potentialPrisoner.setPrisonerStatus(campaign, PRISONER, true);
+            prisoner.setPrisonerStatus(campaign, PRISONER, true);
         }
 
         // If defection has failed, convert to normal prisoner
-        handlePostCapture(potentialPrisoner);
+        handlePostCapture(prisoner);
     }
 
-    private int attemptDefection(Person potentialPrisoner, boolean isNPC) {
+    private int attemptDefection(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
-        if (potentialPrisoner.getOriginFaction().isMercenary()) {
+        if (potentialDefector.getOriginFaction().isMercenary()) {
             adjustedDefectionChance /= MERCENARY_DIVIDER;
         }
 
-        if (potentialPrisoner.isClanPersonnel()) {
+        if (potentialDefector.isClanPersonnel()) {
             if (isNPC) {
                 Faction campaignFaction = campaign.getFaction();
                 if (campaignFaction.isPirate() || campaignFaction.isMercenary()) {
@@ -153,6 +155,8 @@ public class PrisonerController {
                 }
             }
         }
+
+        adjustedDefectionChance = max(adjustedDefectionChance, 1);
 
         return randomInt(adjustedDefectionChance);
     }
