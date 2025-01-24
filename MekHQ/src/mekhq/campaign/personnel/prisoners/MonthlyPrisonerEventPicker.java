@@ -80,6 +80,6 @@ public class MonthlyPrisonerEventPicker {
             }
         }
 
-        return prisonerCapacity;
+        return prisonerCapacity + campaign.getTemporaryPrisonerCapacity();
     }
 }

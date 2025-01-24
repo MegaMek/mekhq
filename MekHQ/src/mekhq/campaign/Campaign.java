@@ -306,6 +306,7 @@ public class Campaign implements ITechManager {
     private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
+    private int temporaryPrisonerCapacity;
 
      //options relating to parts in use and restock
     private boolean ignoreMothballed;
@@ -395,6 +396,7 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
+        temporaryPrisonerCapacity = 0;
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
@@ -5878,6 +5880,14 @@ public class Campaign implements ITechManager {
      */
     public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
         this.automatedMothballUnits = automatedMothballUnits;
+    }
+
+    public int getTemporaryPrisonerCapacity() {
+        return temporaryPrisonerCapacity;
+    }
+
+    public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
+        this.temporaryPrisonerCapacity = temporaryPrisonerCapacity;
     }
 
     public void writeToXML(final PrintWriter pw) {
