@@ -165,7 +165,7 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
-import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.rollForMonthlyPrisonerEvent;
+import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.performPrisonerChecks;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
@@ -4806,7 +4806,7 @@ public class Campaign implements ITechManager {
         }
 
         if (hasActiveContract && currentDay.getDayOfMonth() == 1) {
-            rollForMonthlyPrisonerEvent(this);
+            performPrisonerChecks(this);
         }
 
         resetAstechMinutes();
@@ -6090,6 +6090,7 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
 
         // Customised planetary events
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");

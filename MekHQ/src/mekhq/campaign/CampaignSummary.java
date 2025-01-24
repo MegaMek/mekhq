@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.calculatePrisonerCapacity;
+import static mekhq.campaign.personnel.prisoners.MonthlyPrisonerEventPicker.calculatePrisonerCapacityUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
@@ -434,19 +435,22 @@ public class CampaignSummary {
             if (campaignOptions.isUseFatigue() || campaignOptions.isUseAdvancedMedical()) {
                 report.append("<br>");
             }
-            int prisoners = campaign.getCurrentPrisoners().size();
+            int capacityUsage = calculatePrisonerCapacityUsage(campaign);
             int prisonerCapacity = calculatePrisonerCapacity(campaign);
 
-            exceedsCapacity = prisoners > prisonerCapacity;
+            exceedsCapacity = capacityUsage > prisonerCapacity;
 
-            color = exceedsCapacity
-                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+            color = capacityUsage > (prisonerCapacity * 0.75) // at risk of a minor event
+                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
                 : "";
+            color = exceedsCapacity // at risk of a major event
+                ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                : color;
             closingSpan = exceedsCapacity ? CLOSING_SPAN_TAG : "";
             colorBlindWarning = exceedsCapacity ? WARNING : "";
 
-            report.append(String.format("Prisoner Capacity %s(%s/%s)%s%s",
-                color, prisoners, prisonerCapacity, closingSpan, colorBlindWarning));
+            report.append(String.format("Prisoners %s(%s/%s)%s%s",
+                color, capacityUsage, prisonerCapacity, closingSpan, colorBlindWarning));
         }
 
         return report.append("</html>").toString();

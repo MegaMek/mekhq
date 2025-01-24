@@ -7,34 +7,73 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
+import static java.util.Calendar.MONDAY;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 
 public class MonthlyPrisonerEventPicker {
     private static int DEFAULT_EVENT_CHANCE = STALEMATE.ordinal();
 
-    public static void rollForMonthlyPrisonerEvent(Campaign campaign) {
-        if (campaign.hasActiveContract()) {
-            Contract contract = campaign.getActiveContracts().get(0);
+    public static void performPrisonerChecks(Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
 
-            int ransomEventChance = DEFAULT_EVENT_CHANCE;
-            if (contract instanceof AtBContract) {
-                ransomEventChance = ((AtBContract) contract).getMoraleLevel().ordinal();
-            }
+        // Monthly events
+        if (today.getDayOfMonth() == 1) {
+            // reset temporary prisoner capacity
+            campaign.setTemporaryPrisonerCapacity(0);
 
-            int roll = d6(2);
-            if (roll <= ransomEventChance) {
-                boolean isFriendlyPOWs = false;
+            // Check for ransom events
+            if (campaign.hasActiveContract()) {
+                Contract contract = campaign.getActiveContracts().get(0);
 
-                if (!campaign.getFriendlyPrisoners().isEmpty()) {
-                    isFriendlyPOWs = d6(1) <= 2;
+                int ransomEventChance = DEFAULT_EVENT_CHANCE;
+                if (contract instanceof AtBContract) {
+                    ransomEventChance = ((AtBContract) contract).getMoraleLevel().ordinal();
                 }
 
-                new PrisonerRansomEvent(campaign, isFriendlyPOWs);
+                int roll = d6(2);
+                if (roll <= ransomEventChance) {
+                    boolean isFriendlyPOWs = false;
+
+                    if (!campaign.getFriendlyPrisoners().isEmpty()) {
+                        isFriendlyPOWs = d6(1) <= 2;
+                    }
+
+                    new PrisonerRansomEvent(campaign, isFriendlyPOWs);
+                }
             }
         }
+
+        // Weekly events
+        if (today.getDayOfWeek().getValue() == MONDAY) {
+            int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
+            int prisonerCapacity = calculatePrisonerCapacity(campaign);
+
+            boolean majorEvent =  prisonerCapacityUsage > prisonerCapacity;
+            boolean minorEvent = !majorEvent && prisonerCapacityUsage > (prisonerCapacity * 0.75);
+
+
+        }
+    }
+
+    public static int calculatePrisonerCapacityUsage(Campaign campaign) {
+        int prisonerCapacityUsage = 0;
+
+        for (Person prisoner : campaign.getCurrentPrisoners()) {
+            if (prisoner.needsFixing()) {
+                if (prisoner.getDoctorId() != null) {
+                    // Injured prisoners without doctors increase prisoner unhappiness, increasing capacity usage.
+                    prisonerCapacityUsage++;
+                }
+            }
+
+            prisonerCapacityUsage++;
+        }
+
+        return prisonerCapacityUsage;
     }
 
     public static int calculatePrisonerCapacity(Campaign campaign) {
