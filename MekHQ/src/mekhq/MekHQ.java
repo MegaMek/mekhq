@@ -495,7 +495,6 @@ public class MekHQ implements GameListener {
     @Override
     public void gameEnd(GameEndEvent e) {
         // Why Empty?
-        System.out.println(e);
     }
 
     @Override
