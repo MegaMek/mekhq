@@ -27,6 +27,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.CommanderGUI;
+import megamek.client.ui.swing.ILocalBots;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -495,6 +496,11 @@ public class AtBGameThread extends GameThread {
                     }
                 }
 
+                if (swingGui instanceof ILocalBots iLocalBots) {
+                    for (var botClient : botClients) {
+                        iLocalBots.getLocalBots().put(botClient.getName(), botClient);
+                    }
+                }
 
                 // if AtB was loaded with the auto resolve bot behavior settings then it loads a new bot,
                 // set to the players team
@@ -509,6 +515,10 @@ public class AtBGameThread extends GameThread {
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
                     if (swingGui != null && swingGui instanceof CommanderGUI commanderGUI) {
                         commanderGUI.enableReady();
+                        commanderGUI.getLocalBots().put(bot.getName(), bot);
+                    }
+                    if (swingGui instanceof ILocalBots iLocalBots) {
+                        iLocalBots.getLocalBots().put(bot.getName(), bot);
                     }
                     client.getLocalPlayer().setDone(true);
                     client.sendDone(true);
