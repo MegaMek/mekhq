@@ -7,7 +7,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.prisonerDialogs.PrisonerMinorEventDialog;
+import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -105,7 +105,7 @@ public class PrisonerEventProcessor {
         int prisonerPortion = max(1, (int) round(prisoners.size() * 0.1));
 
         int event = randomInt(50);
-        PrisonerMinorEventDialog minorEventDialog = new PrisonerMinorEventDialog(campaign, prisonerPortion, event);
+        PrisonerEventDialog minorEventDialog = new PrisonerEventDialog(campaign, prisonerPortion, event);
         int choice = minorEventDialog.getDialogChoice();
 
         if (choice == CHOICE_FREE) {

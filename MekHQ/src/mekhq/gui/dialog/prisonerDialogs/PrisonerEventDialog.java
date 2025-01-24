@@ -11,12 +11,12 @@ import java.util.*;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 
-public class PrisonerMinorEventDialog extends MHQDialogImmersive {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerMinorEventDialog";
+public class PrisonerEventDialog extends MHQDialogImmersive {
+    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerEventDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(
         BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
-    public PrisonerMinorEventDialog(Campaign campaign, int prisonerPortion, int eventRoll) {
+    public PrisonerEventDialog(Campaign campaign, int prisonerPortion, int eventRoll) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, eventRoll),
             createButtons(eventRoll, prisonerPortion), createOutOfCharacterMessage(), 0,
             null, null, null);
