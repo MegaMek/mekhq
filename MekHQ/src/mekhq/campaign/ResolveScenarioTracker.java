@@ -41,7 +41,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.prisoners.PrisonerController;
+import mekhq.campaign.personnel.prisoners.CapturePrisoners;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -96,7 +96,7 @@ public class ResolveScenarioTracker {
     IClient client;
     Boolean control;
     private PostGameResolution victoryEvent;
-    private final PrisonerController prisonerController;
+    private final CapturePrisoners prisonerController;
 
     private static final MMLogger logger = MMLogger.create(ResolveScenarioTracker.class);
 
@@ -154,10 +154,10 @@ public class ResolveScenarioTracker {
                 sarQuality = contract.getEnemyQuality();
             }
         }
-        prisonerController = new PrisonerController(campaign, searchingFaction, scenario, sarQuality);
+        prisonerController = new CapturePrisoners(campaign, searchingFaction, scenario, sarQuality);
     }
 
-    public PrisonerController getPrisonerController() {
+    public CapturePrisoners getPrisonerController() {
         return prisonerController;
     }
 

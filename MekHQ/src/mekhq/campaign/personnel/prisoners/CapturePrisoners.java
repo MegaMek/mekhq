@@ -28,7 +28,7 @@ import static mekhq.campaign.personnel.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.personnel.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.campaign.personnel.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
 
-public class PrisonerController {
+public class CapturePrisoners {
     private final Campaign campaign;
     private final Faction searchingFaction;
     private final boolean isClan;
@@ -51,8 +51,8 @@ public class PrisonerController {
 
     private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
-    public PrisonerController(Campaign campaign, @Nullable Faction searchingFaction, Scenario scenario,
-                              @Nullable Integer sarQuality) {
+    public CapturePrisoners(Campaign campaign, @Nullable Faction searchingFaction, Scenario scenario,
+                            @Nullable Integer sarQuality) {
         this.campaign = campaign;
         this.searchingFaction = searchingFaction;
 
@@ -219,8 +219,14 @@ public class PrisonerController {
         // 'Recruit' prisoner
         PrisonerStatus prisonerStatus = prisoner.getPrisonerStatus();
         campaign.recruitPerson(prisoner, prisonerStatus);
+
         if (prisonerStatus.isPrisonerDefector()) {
             campaign.addReport(String.format("You have convinced %s to defect.",
+                prisoner.getHyperlinkedName()));
+        }
+
+        if (prisonerStatus.isBondsman()) {
+            campaign.addReport(String.format("You have taken %s as a Bondsman.",
                 prisoner.getHyperlinkedName()));
         }
     }
