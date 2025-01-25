@@ -18,10 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import megamek.codeUtilities.StringUtility;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
@@ -29,6 +25,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
+
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public enum MergingSurnameStyle {
     // region Enum Declarations
@@ -266,14 +266,12 @@ public enum MergingSurnameStyle {
                 break;
         }
 
-        if (campaign.getCampaignOptions().isLogMarriageNameChanges()) {
-            if (!spouse.getSurname().equals(spouseSurname)) {
-                PersonalLogger.marriageNameChange(spouse, origin, today);
-            }
+        if (!spouse.getSurname().equals(spouseSurname)) {
+            PersonalLogger.marriageNameChange(spouse, origin, today);
+        }
 
-            if (!origin.getSurname().equals(surname)) {
-                PersonalLogger.marriageNameChange(origin, spouse, today);
-            }
+        if (!origin.getSurname().equals(surname)) {
+            PersonalLogger.marriageNameChange(origin, spouse, today);
         }
     }
 

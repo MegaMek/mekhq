@@ -52,9 +52,6 @@ import static mekhq.campaign.personnel.education.EducationController.setInitialE
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
-    private boolean useClanPersonnelProcreation;
-    private boolean usePrisonerProcreation;
-    private boolean useRelationshiplessProcreation;
     private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
 
@@ -68,9 +65,6 @@ public abstract class AbstractProcreation {
     //region Constructors
     protected AbstractProcreation(final RandomProcreationMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelProcreation(options.isUseClanPersonnelProcreation());
-        setUsePrisonerProcreation(options.isUsePrisonerProcreation());
-        setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
         setUseRandomClanPersonnelProcreation(options.isUseRandomClanPersonnelProcreation());
         setUseRandomPrisonerProcreation(options.isUseRandomPrisonerProcreation());
     }
@@ -79,30 +73,6 @@ public abstract class AbstractProcreation {
     //region Getters/Setters
     public RandomProcreationMethod getMethod() {
         return method;
-    }
-
-    public boolean isUseClanPersonnelProcreation() {
-        return useClanPersonnelProcreation;
-    }
-
-    public void setUseClanPersonnelProcreation(final boolean useClanPersonnelProcreation) {
-        this.useClanPersonnelProcreation = useClanPersonnelProcreation;
-    }
-
-    public boolean isUsePrisonerProcreation() {
-        return usePrisonerProcreation;
-    }
-
-    public void setUsePrisonerProcreation(final boolean usePrisonerProcreation) {
-        this.usePrisonerProcreation = usePrisonerProcreation;
-    }
-
-    public boolean isUseRelationshiplessProcreation() {
-        return useRelationshiplessProcreation;
-    }
-
-    public void setUseRelationshiplessProcreation(final boolean useRelationshiplessProcreation) {
-        this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
 
     public boolean isUseRandomClanPersonnelProcreation() {
@@ -175,11 +145,9 @@ public abstract class AbstractProcreation {
      * @param mother the mother of the baby
      */
     protected @Nullable Person determineFather(final Campaign campaign, final Person mother) {
-        return (campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse())
-                ? mother.getGenealogy().getSpouse()
-                : ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
-                        ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA)))
-                        : null);
+        return ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
+                ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA)))
+                : null);
     }
     //endregion Determination Methods
 
@@ -206,14 +174,8 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Child.text");
         } else if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.ClanPersonnel.text");
-        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotProcreate.Prisoner.text");
         } else if (randomProcreation) {
-            if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
-                return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
+            if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
@@ -290,13 +252,11 @@ public abstract class AbstractProcreation {
                     babyAmount).trim());
         }
 
-        if (campaign.getCampaignOptions().isLogProcreation()) {
-            MedicalLogger.hasConceived(mother, today, babyAmount);
+        MedicalLogger.hasConceived(mother, today, babyAmount);
 
-            if (mother.getGenealogy().hasSpouse()) {
-                PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(),
-                        mother.getFullName(), today, babyAmount);
-            }
+        if (mother.getGenealogy().hasSpouse()) {
+            PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(),
+                    mother.getFullName(), today, babyAmount);
         }
     }
 
@@ -350,7 +310,7 @@ public abstract class AbstractProcreation {
             campaign.addReport(String.format(resources.getString("babyBorn.report"),
                     mother.getHyperlinkedName(), baby.getHyperlinkedName(),
                     GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
-            logAndUpdateFamily(campaign, today, mother, baby, father);
+            logAndUpdateFamily(today, mother, baby, father);
 
             // Founder Tag Assignment
             if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
@@ -400,18 +360,15 @@ public abstract class AbstractProcreation {
     /**
      * Logs the birth of a baby and updates the genealogy information of the family.
      *
-     * @param campaign the ongoing campaign
      * @param today the current date
      * @param mother the mother of the baby
      * @param baby the newborn baby
      * @param father the father of the baby, null if unknown
      */
-    private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby, Person father) {
-        if (campaign.getCampaignOptions().isLogProcreation()) {
-            MedicalLogger.deliveredBaby(mother, baby, today);
-            if (father != null) {
-                PersonalLogger.ourChildBorn(father, baby, mother.getFullName(), today);
-            }
+    private static void logAndUpdateFamily(LocalDate today, Person mother, Person baby, Person father) {
+        MedicalLogger.deliveredBaby(mother, baby, today);
+        if (father != null) {
+            PersonalLogger.ourChildBorn(father, baby, mother.getFullName(), today);
         }
 
         // Create genealogy information
@@ -473,7 +430,7 @@ public abstract class AbstractProcreation {
             setInitialEducationLevel(campaign, baby);
 
             // Create reports and log the birth
-            logAndUpdateFamily(campaign, today, mother, baby, father);
+            logAndUpdateFamily(today, mother, baby, father);
 
             // add to the list of babies
             babies.add(baby);

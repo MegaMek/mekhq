@@ -251,19 +251,17 @@ public class Genealogy {
      * genealogies
      *
      * @param person the person to check if they are related or not
-     * @param depth  the depth to check mutual ancestry up to
      * @return true if they have mutual ancestors, otherwise false
      */
-    public boolean checkMutualAncestors(final Person person, final int depth) {
+    public boolean checkMutualAncestors(final Person person) {
+        final int ANCESTOR_DEPTH = 4;
+
         if (getOrigin().equals(person)) {
             // Same person will always return true, to prevent any weirdness
             return true;
-        } else if (depth == 0) {
-            // Check is disabled, return false for no mutual ancestors
-            return false;
         } else {
-            final Set<Person> originAncestors = getAncestors(depth);
-            return person.getGenealogy().getAncestors(depth).stream().anyMatch(originAncestors::contains);
+            final Set<Person> originAncestors = getAncestors(ANCESTOR_DEPTH);
+            return person.getGenealogy().getAncestors(ANCESTOR_DEPTH).stream().anyMatch(originAncestors::contains);
         }
     }
 

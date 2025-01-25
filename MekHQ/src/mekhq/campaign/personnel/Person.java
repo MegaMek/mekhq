@@ -1583,9 +1583,7 @@ public class Person {
     }
 
     public String getDueDateAsString(final Campaign campaign) {
-        final LocalDate date = campaign.getCampaignOptions().isDisplayTrueDueDate()
-                ? getDueDate()
-                : getExpectedDueDate();
+        final LocalDate date = getExpectedDueDate();
         return (date == null) ? "" : MekHQ.getMHQOptions().getDisplayFormattedDate(date);
     }
 

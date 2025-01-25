@@ -45,10 +45,9 @@ import java.util.ResourceBundle;
 public abstract class AbstractMarriage {
     //region Variable Declarations
     private final RandomMarriageMethod method;
-    private boolean useClanPersonnelMarriages;
-    private boolean usePrisonerMarriages;
     private boolean useRandomClanPersonnelMarriages;
-    private boolean useRandomPrisonerMarriages;
+
+    private final int RANDOM_MARRIAGE_MAX_AGE_DIFFERENCE = 10;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
@@ -57,10 +56,7 @@ public abstract class AbstractMarriage {
     //region Constructors
     protected AbstractMarriage(final RandomMarriageMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
-        setUsePrisonerMarriages(options.isUsePrisonerMarriages());
         setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
-        setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
     }
     //endregion Constructors
 
@@ -69,36 +65,12 @@ public abstract class AbstractMarriage {
         return method;
     }
 
-    public boolean isUseClanPersonnelMarriages() {
-        return useClanPersonnelMarriages;
-    }
-
-    public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
-        this.useClanPersonnelMarriages = useClanPersonnelMarriages;
-    }
-
-    public boolean isUsePrisonerMarriages() {
-        return usePrisonerMarriages;
-    }
-
-    public void setUsePrisonerMarriages(final boolean usePrisonerMarriages) {
-        this.usePrisonerMarriages = usePrisonerMarriages;
-    }
-
     public boolean isUseRandomClanPersonnelMarriages() {
         return useRandomClanPersonnelMarriages;
     }
 
     public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
         this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
-    }
-
-    public boolean isUseRandomPrisonerMarriages() {
-        return useRandomPrisonerMarriages;
-    }
-
-    public void setUseRandomPrisonerMarriages(final boolean useRandomPrisonerMarriages) {
-        this.useRandomPrisonerMarriages = useRandomPrisonerMarriages;
     }
     //endregion Getters/Setters
 
@@ -120,15 +92,9 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.Deployed.text");
         } else if (person.isChild(today)) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
-            return resources.getString("cannotMarry.ClanPersonnel.text");
-        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotMarry.Prisoner.text");
         } else if (randomMarriage) {
             if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanPersonnel.text");
-            } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
-                return resources.getString("cannotMarry.RandomPrisoner.text");
             }
         }
 
@@ -156,8 +122,7 @@ public abstract class AbstractMarriage {
 
         if (person.equals(potentialSpouse)
                 || (canMarry(today, potentialSpouse, randomMarriage) != null)
-                || person.getGenealogy().checkMutualAncestors(potentialSpouse,
-                        campaign.getCampaignOptions().getCheckMutualAncestorsDepth())) {
+                || person.getGenealogy().checkMutualAncestors(potentialSpouse)) {
             return false;
         } else if (randomMarriage) {
             return person.getPrisonerStatus().isCurrentPrisoner() == potentialSpouse.getPrisonerStatus().isCurrentPrisoner();
@@ -383,7 +348,7 @@ public abstract class AbstractMarriage {
         // Calculate person's age and the maximum and minimum allowable spouse ages
         int personAge = person.getAge(today);
         int externalSpouseAge = externalSpouse.getAge(today);
-        int maximumAgeDifference = campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        int maximumAgeDifference = RANDOM_MARRIAGE_MAX_AGE_DIFFERENCE;
         int externalSpouseMinAge = Math.max (18, personAge - maximumAgeDifference);
         int externalSpouseMaxAge = personAge + maximumAgeDifference;
 
@@ -424,7 +389,7 @@ public abstract class AbstractMarriage {
         }
 
         final int ageDifference = Math.abs(potentialSpouse.getAge(today) - person.getAge(today));
-        return ageDifference <= campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        return ageDifference <= RANDOM_MARRIAGE_MAX_AGE_DIFFERENCE;
     }
     //endregion Random Marriage
     //endregion New Day

@@ -530,16 +530,16 @@ public enum PersonnelTableModelColumn {
                         Unit refitUnit = person.getTechUnits().stream()
                             .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
                             .findFirst().orElse(null);
-                        String refitString = null != refitUnit ? 
+                        String refitString = null != refitUnit ?
                                 "<b>Refitting</b> " + refitUnit.getName() : "";
                         if (person.getTechUnits().size() == 1) {
                             unit = person.getTechUnits().get(0);
                             if (unit != null) {
-                                return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
+                                return "<html>" + ReportingUtilities.separateIf(refitString, ", ",
                                         unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") + "</html>";
                             }
                         } else {
-                            return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
+                            return "<html>" + ReportingUtilities.separateIf(refitString, ", ",
                                     person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)")
                                     + "</html>";
                         }
@@ -870,12 +870,9 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case DATES -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE, RETIREMENT_DATE -> true;
+                case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE, RETIREMENT_DATE, DUE_DATE -> true;
                 case RECRUITMENT_DATE -> campaign.getCampaignOptions().isUseTimeInService();
                 case LAST_RANK_CHANGE_DATE -> campaign.getCampaignOptions().isUseTimeInRank();
-                case DUE_DATE ->
-                    campaign.getCampaignOptions().isUseManualProcreation()
-                            || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
                 default -> false;
             };
             case FLAGS -> switch (this) {

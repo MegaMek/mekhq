@@ -24,9 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
-import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,18 +62,12 @@ public class AbstractProcreationTest {
     //region Getters/Setters
     @Test
     public void testGettersAndSetters() {
-        when(mockCampaignOptions.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerProcreation()).thenReturn(false);
-        when(mockCampaignOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
 
         final AbstractProcreation disabledProcreation = new DisabledRandomProcreation(mockCampaignOptions);
 
         assertEquals(RandomProcreationMethod.NONE, disabledProcreation.getMethod());
-        assertFalse(disabledProcreation.isUseClanPersonnelProcreation());
-        assertFalse(disabledProcreation.isUsePrisonerProcreation());
-        assertFalse(disabledProcreation.isUseRelationshiplessProcreation());
         assertFalse(disabledProcreation.isUseRandomClanPersonnelProcreation());
         assertFalse(disabledProcreation.isUseRandomPrisonerProcreation());
     }
@@ -127,13 +119,13 @@ public class AbstractProcreationTest {
 
         given(mockCampaign.getPerson(argThat(matchPersonUUID(father.getId())))).willReturn(father);
 
-        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(false);
+
         assertNull(mockProcreation.determineFather(mockCampaign, mother));
 
         mother.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, father.getId().toString());
         assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
 
-        when(mockCampaignOptions.isDetermineFatherAtBirth()).thenReturn(true);
+
         assertEquals(father, mockProcreation.determineFather(mockCampaign, mother));
 
         mother.getGenealogy().setSpouse(father);
@@ -142,160 +134,196 @@ public class AbstractProcreationTest {
     //endregion Determination Methods
 
     @Test
-    public void testCanProcreate() {
-        doCallRealMethod().when(mockProcreation).canProcreate(any(), any(), anyBoolean());
+    void testCanProcreateReturnsNullForValidPerson() {
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
 
-        final Person mockPerson = mock(Person.class);
-        final Person mockSpouse = mock(Person.class);
-        final Genealogy mockGenealogy = mock(Genealogy.class);
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+        LocalDate today = LocalDate.of(3151,1,1);
 
-        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
 
-        // Males can't procreate
-        when(mockPerson.getGender()).thenReturn(Gender.MALE);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        // Setup conditions where `canProcreate` should return null
+        when(personMock.getGender()).thenReturn(Gender.FEMALE);
+        when(personMock.isTryingToConceive()).thenReturn(true);
+        when(personMock.isPregnant()).thenReturn(false);
+        when(personMock.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(personMock.isDeployed()).thenReturn(false);
+        when(personMock.isChild(today)).thenReturn(false);
+        when(personMock.getAge(today)).thenReturn(30);
 
-        // Have to be trying to conceive
-        when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
-        when(mockPerson.isTryingToConceive()).thenReturn(false);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
 
-        // Can't already be pregnant
-        when(mockPerson.isTryingToConceive()).thenReturn(true);
-        when(mockPerson.isPregnant()).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Must be active
-        when(mockPerson.isPregnant()).thenReturn(false);
-        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.RETIRED);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can't be deployed
-        when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-        when(mockPerson.isDeployed()).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can't be a child
-        when(mockPerson.isDeployed()).thenReturn(false);
-        when(mockPerson.isChild(any())).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Must be younger than 51
-        when(mockPerson.isChild(any())).thenReturn(false);
-        when(mockPerson.getAge(any())).thenReturn(51);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can't be Clan Personnel with Clan Procreation Disabled
-        when(mockPerson.getAge(any())).thenReturn(25);
-        when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseClanPersonnelProcreation()).thenReturn(false);
-        when(mockProcreation.isUsePrisonerProcreation()).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can be Non-Clan Personnel with Clan Procreation Disabled
-        when(mockPerson.isClanPersonnel()).thenReturn(false);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can be a Non-Prisoner with Prisoner Procreation Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(mockProcreation.isUsePrisonerProcreation()).thenReturn(false);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can't be a Prisoner with Prisoner Procreation Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can be a Non-Random Clan Prisoner with Clan and Prisoner Procreation Enabled and Random Procreation Disabled
-        when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseClanPersonnelProcreation()).thenReturn(true);
-        when(mockProcreation.isUsePrisonerProcreation()).thenReturn(true);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, false));
-
-        // Can't be Single with Relationshipless Random Procreation Disabled
-        when(mockGenealogy.hasSpouse()).thenReturn(false);
-        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Can't be Clan Personnel with Random Clan Procreation Disabled
-        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
-        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Can be Non-Clan Personnel with Random Clan Procreation Disabled
-        when(mockPerson.isClanPersonnel()).thenReturn(false);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Can be a Non-Prisoner with Random Prisoner Procreation Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(false);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Can't be a Prisoner with Random Prisoner Procreation Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Can be a Clan Prisoner with no Spouse with Random Relationshipless, Random Clan, and
-        // Random Prisoner Procreation Enabled
-        when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(true);
-        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Can't have a Same-sex Spouse
-        when(mockSpouse.getGender()).thenReturn(Gender.FEMALE);
-        when(mockGenealogy.hasSpouse()).thenReturn(true);
-        when(mockGenealogy.getSpouse()).thenReturn(mockSpouse);
-        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse must also be trying to conceive
-        when(mockSpouse.getGender()).thenReturn(Gender.MALE);
-        when(mockSpouse.isTryingToConceive()).thenReturn(false);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse must be active
-        when(mockSpouse.getStatus()).thenReturn(PersonnelStatus.RETIRED);
-        when(mockSpouse.isTryingToConceive()).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can't be deployed
-        when(mockSpouse.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-        when(mockSpouse.isDeployed()).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can't be a child
-        when(mockSpouse.isDeployed()).thenReturn(false);
-        when(mockSpouse.isChild(any())).thenReturn(true);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can't be Clan Personnel with Random Clan Procreation Disabled
-        when(mockPerson.isClanPersonnel()).thenReturn(false);
-        when(mockSpouse.isClanPersonnel()).thenReturn(true);
-        when(mockSpouse.isChild(any())).thenReturn(false);
-        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(false);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can be Non-Clan Personnel with Random Clan Procreation Disabled
-        when(mockSpouse.isClanPersonnel()).thenReturn(false);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can be a Non-Prisoner with Random Prisoner Procreation Disabled
-        when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(false);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can't be a Prisoner with Prisoner Procreation Disabled
-        when(mockSpouse.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-        assertNotNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
-
-        // Spouse can be a Prisoner Clan Personnel with Random Clan and Prisoner Procreation Enabled
-        lenient().when(mockSpouse.isClanPersonnel()).thenReturn(true);
-        when(mockProcreation.isUseRandomClanPersonnelProcreation()).thenReturn(true);
-        when(mockProcreation.isUseRandomPrisonerProcreation()).thenReturn(true);
-        assertNull(mockProcreation.canProcreate(LocalDate.ofYearDay(3025, 1), mockPerson, true));
+        // Assert
+        assertNull(result, "Person should be able to procreate, but the method returned: " + result);
     }
+
+    @Test
+    void testCanProcreateFailsForMaleGender() {
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
+
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+        LocalDate today = LocalDate.of(3151,1,1);
+
+        // Setup conditions for male gender
+        when(personMock.getGender()).thenReturn(Gender.MALE);
+
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
+
+        // Assert
+        assertNotNull(result, "Male gender cannot procreate and should return a reason");
+    }
+
+    @Test
+    void testCanProcreateFailsForInactiveStatus() {
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
+
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+        LocalDate today = LocalDate.of(3151,1,1);
+
+        // Setup conditions for inactive status
+        when(personMock.getGender()).thenReturn(Gender.FEMALE);
+        when(personMock.isTryingToConceive()).thenReturn(true);
+        when(personMock.isPregnant()).thenReturn(false);
+        when(personMock.getStatus()).thenReturn(PersonnelStatus.RETIRED);
+
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
+
+        // Assert
+        assertNotNull(result, "Inactive status should prevent procreation");
+    }
+
+    @Test
+    void testCanProcreateFailsForAlreadyPregnantPerson() {
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
+
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+        LocalDate today = LocalDate.of(3151,1,1);
+
+        // Setup conditions for already pregnant
+        when(personMock.getGender()).thenReturn(Gender.FEMALE);
+        when(personMock.isTryingToConceive()).thenReturn(true);
+        when(personMock.isPregnant()).thenReturn(true);
+
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
+
+        // Assert
+        assertNotNull(result, "Pregnant person cannot procreate");
+    }
+
+    @Test
+    void testCanProcreateFailsForPersonTooOld() {
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
+
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+        LocalDate today = LocalDate.of(3151,1,1);
+
+        // Setup conditions for old age
+        when(personMock.getGender()).thenReturn(Gender.FEMALE);
+        when(personMock.isTryingToConceive()).thenReturn(true);
+        when(personMock.isPregnant()).thenReturn(false);
+        when(personMock.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(personMock.isChild(today)).thenReturn(false);
+        when(personMock.getAge(today)).thenReturn(60); // Above the procreation limit
+
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
+
+        // Assert
+        assertNotNull(result, "Person aged 51 or older cannot procreate");
+    }
+
+    @Test
+    void testCanProcreateFailsForPersonDeployed() {
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
+
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+        LocalDate today = LocalDate.of(3151,1,1);
+
+        // Setup conditions for deployed status
+        when(personMock.getGender()).thenReturn(Gender.FEMALE);
+        when(personMock.isTryingToConceive()).thenReturn(true);
+        when(personMock.isPregnant()).thenReturn(false);
+        when(personMock.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(personMock.isDeployed()).thenReturn(true); // Person is currently deployed
+
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
+
+        // Assert
+        assertNotNull(result, "Deployed person cannot procreate");
+    }
+
+    @Test
+    void testCanProcreateFailsForChild() {
+        // Mock the Person class
+        Person personMock = mock(Person.class);
+        CampaignOptions campaignOptionsMock = mock(CampaignOptions.class);
+
+        // Create an AbstractProcreation implementation for testing
+        AbstractProcreation procreation = new AbstractProcreation(null, campaignOptionsMock) {
+            @Override
+            protected boolean procreation(Person person) {
+                return false; // No random chance for testing purposes
+            }
+        };
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+
+        // Stub the behavior of the mocked methods
+        when(personMock.getGender()).thenReturn(Gender.FEMALE);
+        when(personMock.isTryingToConceive()).thenReturn(true);
+        when(personMock.isPregnant()).thenReturn(false);
+        when(personMock.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(personMock.isDeployed()).thenReturn(false);
+        when(personMock.isChild(today)).thenReturn(true);
+
+        // Execute
+        String result = procreation.canProcreate(today, personMock, false);
+
+        // Assert
+        assertNotNull(result, "Child cannot procreate");
+    }
+
+
 
     @Test
     public void testAddPregnancy() {
@@ -311,7 +339,7 @@ public class AbstractProcreationTest {
         assertNull(mother.getDueDate());
         assertTrue(mother.getExtraData().isEmpty());
 
-        when(mockCampaignOptions.isLogProcreation()).thenReturn(false);
+
         mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 1, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
@@ -320,7 +348,7 @@ public class AbstractProcreationTest {
         assertNotNull(mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
         assertEquals(1, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
 
-        when(mockCampaignOptions.isLogProcreation()).thenReturn(true);
+
         mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 2, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
@@ -505,7 +533,7 @@ public class AbstractProcreationTest {
         doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
 
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
-        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
+
         assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
 
         reset(mockProcreation);

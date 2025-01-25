@@ -62,8 +62,6 @@ public class AbstractDivorceTest {
         final Person mockPerson = mock(Person.class);
 
         // Can't be Clan Personnel with Random Clan Divorce Disabled
-        when(mockDivorce.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(true);
         assertNotNull(mockDivorce.canDivorce(mockPerson, true));
 
         // Can be Non-Clan Personnel with Random Clan Divorce Disabled
@@ -72,7 +70,6 @@ public class AbstractDivorceTest {
 
         // Can be a Non-Prisoner with Random Prisoner Divorce Disabled
         when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(false);
         assertNull(mockDivorce.canDivorce(mockPerson, true));
 
         // Can't be a Prisoner with Random Prisoner Divorce Disabled
@@ -81,8 +78,6 @@ public class AbstractDivorceTest {
 
         // Can be a Clan Prisoner with Random Clan and Random Prisoner Divorce Enabled
         lenient().when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockDivorce.isUseRandomClanPersonnelDivorce()).thenReturn(true);
-        when(mockDivorce.isUseRandomPrisonerDivorce()).thenReturn(true);
         assertNull(mockDivorce.canDivorce(mockPerson, true));
     }
 

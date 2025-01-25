@@ -43,12 +43,6 @@ public class PercentageRandomDivorceTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUsePrisonerDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomOppositeSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
         when(mockOptions.getRandomDivorceDiceSize()).thenReturn(5);
     }
 
