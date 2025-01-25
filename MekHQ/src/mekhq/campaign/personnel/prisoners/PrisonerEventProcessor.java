@@ -1,6 +1,7 @@
 package mekhq.campaign.personnel.prisoners;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -122,7 +123,7 @@ public class PrisonerEventProcessor {
                 return;
             }
 
-            processMinorEvent(speaker, overflow);
+            processMinorEvent(speaker);
         }
     }
 
@@ -165,23 +166,35 @@ public class PrisonerEventProcessor {
 
         int choice = eventDialog.getDialogChoice();
 
+        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice);
+
+        new PrisonerEventResultsDialog(campaign, speaker, event, choice, false, isSuccessful);
+    }
+
+    private boolean makeEventCheck(Campaign campaign, Person speaker, int event, int choice) {
         int responseModifier = 0;
         if (speaker != null) {
             responseModifier = getPersonalityValue(campaign, speaker);
         }
 
-        ResponseType response = majorEventResponses.get(event).get(choice);
+        try {
+            ResponseType response = majorEventResponses.get(event).get(choice);
 
-        switch (response) {
-            case RESPONSE_NEUTRAL -> {}
-            case RESPONSE_POSITIVE -> responseModifier += 3;
-            case RESPONSE_NEGATIVE -> responseModifier -= 3;
+            switch (response) {
+                case RESPONSE_NEUTRAL -> {
+                }
+                case RESPONSE_POSITIVE -> responseModifier += 3;
+                case RESPONSE_NEGATIVE -> responseModifier -= 3;
+            }
+        } catch (Exception e) {
+            // This most likely means the item was missing from the event map
+            final MMLogger logger = MMLogger.create(PrisonerEventProcessor.class);
+            logger.error(String.format("Error: %s", e.getMessage()));
         }
 
         int responseCheck = d6(2) + responseModifier;
-        boolean isSuccessful = responseCheck >= RESPONSE_TARGET_NUMBER;
 
-        new PrisonerEventResultsDialog(campaign, speaker, event, choice, false, isSuccessful);
+        return responseCheck >= RESPONSE_TARGET_NUMBER;
     }
 
     private void buildMajorEventResponses() {
@@ -246,9 +259,12 @@ public class PrisonerEventProcessor {
             ResponseType.RESPONSE_NEUTRAL));
     }
 
-    private void processMinorEvent(@Nullable Person speaker, int overflow) {
+    private void processMinorEvent(@Nullable Person speaker) {
         int event = randomInt(50);
-        new PrisonerEventDialog(campaign, speaker, event, true);
+        PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, speaker, event, true);
+        int choice = eventDialog.getDialogChoice();
+        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice);
+        new PrisonerEventResultsDialog(campaign, speaker, event, choice, true, isSuccessful);
     }
 
     private void processExecutions(int executions, List<Person> prisoners) {
@@ -287,16 +303,21 @@ public class PrisonerEventProcessor {
         String message = hasBackfired
             ? resources.getString("execute.backfired")
             : resources.getString("execute.successful");
-        String color = hasBackfired
+        String messageColor = hasBackfired
             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
             : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
+        String crimeColor = hasBackfired
+            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+            : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
         String crimeMessage = crimeNoticed
-            ? String.format(resources.getString("execute.crimeNoticed"), penalty)
-            : resources.getString("execute.crimeUnnoticed");
+            ? String.format(resources.getString("execute.crimeNoticed"),
+            crimeColor, CLOSING_SPAN_TAG, penalty)
+            : String.format(resources.getString("execute.crimeUnnoticed"),
+            crimeColor, CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(String.format(message, color, CLOSING_SPAN_TAG, crimeMessage));
+        campaign.addReport(String.format(message, messageColor, CLOSING_SPAN_TAG, crimeMessage));
     }
 
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {

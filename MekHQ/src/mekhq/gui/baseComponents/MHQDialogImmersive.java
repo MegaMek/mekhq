@@ -34,7 +34,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static java.lang.Math.max;
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 
@@ -200,14 +202,22 @@ public class MHQDialogImmersive extends JDialog {
     private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons) {
         northPanel = new JPanel(new BorderLayout());
 
+        // Buttons panel
+        buttonPanel = new JPanel();
+        populateButtonPanel(buttons);
+
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
         editorPane.setBorder(BorderFactory.createEmptyBorder());
-        editorPane.setText(String.format("<div style='width: %s'>%s</div>", CENTER_WIDTH, centerMessage));
 
+        // Use inline CSS to set font family, size, and other style properties
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
+            max(buttonPanel.getPreferredSize().width, CENTER_WIDTH), fontStyle, centerMessage));
+        setFontScaling(editorPane, false, 1.1);
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
@@ -219,14 +229,18 @@ public class MHQDialogImmersive extends JDialog {
         JScrollPane scrollPane = new JScrollPane(editorPane);
         scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        northPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Create a container with a border for the padding
+        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
+        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, 0, 0, 0)); // Padding above
+        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
+
+        // Add the scrollPane with padding to the northPanel
+        northPanel.add(scrollPaneContainer, BorderLayout.CENTER);
 
         // Ensure the scrollbars default to the top-left position
         SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
-        // Buttons panel
-        buttonPanel = new JPanel();
-        populateButtonPanel(buttons);
         northPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         return northPanel;
@@ -256,17 +270,16 @@ public class MHQDialogImmersive extends JDialog {
      * @param outOfCharacterMessage The OOC message to display.
      */
     private void populateOutOfCharacterPanel(String outOfCharacterMessage) {
-        JPanel pnlOutOfCharacter = new JPanel(new BorderLayout());
+        JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
         pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
 
-        int bottomPanelWidth = CENTER_WIDTH + leftSpeakerWidth + rightSpeakerWidth;
-
         JLabel lblOutOfCharacter = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                bottomPanelWidth, outOfCharacterMessage));
+            String.format("<html><div style='width: %dpx'>%s</div></html>",
+                CENTER_WIDTH, outOfCharacterMessage));
+        lblOutOfCharacter.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE,
+            INSERT_SIZE, INSERT_SIZE));
 
-        lblOutOfCharacter.setHorizontalAlignment(SwingConstants.CENTER);
-        pnlOutOfCharacter.add(lblOutOfCharacter, BorderLayout.CENTER);
+        pnlOutOfCharacter.add(lblOutOfCharacter);
 
         southPanel.add(pnlOutOfCharacter, BorderLayout.SOUTH);
     }
