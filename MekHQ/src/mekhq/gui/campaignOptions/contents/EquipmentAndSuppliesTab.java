@@ -1046,8 +1046,6 @@ public class EquipmentAndSuppliesTab {
         options.setAutoLogisticsHeatSink((int) spnAutoLogisticsHeatSink.getValue());
         options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
 
-
-
         // Delivery
         options.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
         options.setConstantTransitTime((int) spnConstantTransitTime.getValue());
@@ -1062,7 +1060,7 @@ public class EquipmentAndSuppliesTab {
         options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
         options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
+        options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {

@@ -26,6 +26,7 @@ import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
+import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.ui.dialogs.AutoResolveChanceDialog;
 import megamek.client.ui.dialogs.AutoResolveProgressDialog;
@@ -81,6 +82,8 @@ import java.io.ObjectInputFilter.Config;
 import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.UUID;
+
+import static megamek.MMConstants.LOCALHOST_IP;
 
 /**
  * The main class of the application.
@@ -450,15 +453,20 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         }
-
-        client = new Client(playerName, "127.0.0.1", port);
+        // Refactor this into a factory
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
+            client = new HeadlessClient(playerName, LOCALHOST_IP, port);
+        } else {
+            client = new Client(playerName, LOCALHOST_IP, port);
+        }
 
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        // Start the game thread
+        // Start the game thread - also refactor this into a factory
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings, useExperimentalPacarGui, true);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
@@ -534,7 +542,6 @@ public class MekHQ implements GameListener {
         if (gameThread.stopRequested()) {
             return;
         }
-
         try {
             boolean control = yourSideControlsTheBattlefieldDialogAsk(
                 MHQInternationalization.getText("ResolveDialog.control.message"),
@@ -555,9 +562,10 @@ public class MekHQ implements GameListener {
 
             PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
 
-            gameThread.requestStop();
         } catch (Exception ex) {
             logger.error(ex, "gameVictory()");
+        } finally {
+            gameThread.requestStop();
         }
     }
 

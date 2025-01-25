@@ -118,6 +118,7 @@ public class RulesetsTab {
     private JLabel lblAutoResolveMethod;
     private MMComboBox<AutoResolveMethod> comboAutoResolveMethod;
     private JCheckBox chkAutoResolveVictoryChanceEnabled;
+    private JCheckBox chkAutoResolveExperimentalPacarGuiEnabled;
     private JLabel lblAutoResolveNumberOfScenarios;
     private JSpinner spnAutoResolveNumberOfScenarios;
     //end Universal Options
@@ -250,7 +251,7 @@ public class RulesetsTab {
         chkAutoResolveVictoryChanceEnabled = new JCheckBox();
         lblAutoResolveNumberOfScenarios = new JLabel();
         spnAutoResolveNumberOfScenarios = new JSpinner();
-
+        chkAutoResolveExperimentalPacarGuiEnabled = new JCheckBox();
         // Here we set up the options, so they can be used across both the AtB and StratCon tabs
         substantializeUniversalOptions();
     }
@@ -384,6 +385,7 @@ public class RulesetsTab {
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
                 250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled");
+        chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox("AutoResolveExperimentalPacarGuiEnabled");
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoResolvePanel", true,
@@ -397,8 +399,11 @@ public class RulesetsTab {
         layout.gridx++;
         panel.add(comboAutoResolveMethod, layout);
         layout.gridx++;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         panel.add(chkAutoResolveVictoryChanceEnabled, layout);
+        layout.gridx++;
+        layout.gridwidth = 1;
+        panel.add(chkAutoResolveExperimentalPacarGuiEnabled, layout);
 
         layout.gridwidth = 1;
         layout.gridy++;
@@ -1056,6 +1061,7 @@ public class RulesetsTab {
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
         options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
         options.setAutoResolveNumberOfScenarios((int) spnAutoResolveNumberOfScenarios.getValue());
+        options.setAutoResolveExperimentalPacarGuiEnabled(chkAutoResolveExperimentalPacarGuiEnabled.isSelected());
 
         // StratCon
         options.setUseStratCon(chkUseStratCon.isSelected());
@@ -1063,7 +1069,7 @@ public class RulesetsTab {
         options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
 
         // Legacy
-        options.setUseAtB(chkUseAtB.isSelected());
+        options.setUseAtB(chkUseAtB.isSelected() && !chkUseStratCon.isSelected());
         options.setUseVehicles(chkUseVehicles.isSelected());
         options.setDoubleVehicles(chkDoubleVehicles.isSelected());
         options.setUseAero(chkOpForUsesAero.isSelected());
@@ -1128,6 +1134,7 @@ public class RulesetsTab {
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
+        chkAutoResolveExperimentalPacarGuiEnabled.setSelected(options.isAutoResolveExperimentalPacarGuiEnabled());
         spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
 
         // StratCon
@@ -1136,7 +1143,7 @@ public class RulesetsTab {
         chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
 
         // Legacy
-        chkUseAtB.setSelected(options.isUseAtB());
+        chkUseAtB.setSelected(options.isUseAtB() && !options.isUseStratCon());
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkDoubleVehicles.setSelected(options.isDoubleVehicles());
         chkOpForUsesAero.setSelected(options.isUseAero());

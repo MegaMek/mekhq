@@ -118,6 +118,17 @@ MEKHQ VERSION HISTORY:
 + PR #5847: Added Methods for Star Radius Estimation and Spectral Type Parsing
 + PR #5848: Fixed Parsing of routedPayout to Handle Non-Numeric Characters
 + PR #5850: Rebranded Idle XP into Vocational XP
++ Fix #5718: Added GM Option to Assign Random SPAs
++ Fix #5817: Fixed Force Updates after Removal in TOEMouseAdapter
++ Fix #5822: Updated Premade Presets for 50.03
++ Fix #5828: Restored Missing Kill Credits for DropShips and Turrets
++ PR #5854: Refactored Preset Dialog Chooser to Include Description
++ Fix #5857, #5862: Fixed Incorrect Tooltips in Campaign Options IIC
++ Fix #5860: Fixed Loading & Saving of Some Campaign Options
++ PR #5864: Remove Unnecessary Edge Trigger Logging
++ PR #5866: Temporarily Removed CamOps Contract Market
++ PR #5812: adding new GUI for Princess ACAR
++ PR #5870: Adjusted Randomness of Turning Points and Highlighted Them in Briefing Room
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

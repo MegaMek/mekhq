@@ -2863,7 +2863,6 @@ public class Person {
      */
     private static void removeUnusedEdgeTriggers(Person retVal, List<String> edgeOptionList) {
         for (String edgeTrigger : edgeOptionList) {
-            logger.info(edgeTrigger);
             String advName = Crew.parseAdvantageName(edgeTrigger);
 
             try {
