@@ -13,6 +13,12 @@ plugins {
     id 'org.ec4j.editorconfig' version '0.1.0'
 }
 
+repositories {
+    mavenCentral()
+    maven { url "https://www.jetbrains.com/intellij-repository/releases" }
+    maven { url "https://jetbrains.bintray.com/intellij-third-party-dependencies" }
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -69,6 +75,7 @@ ext {
 }
 
 dependencies {
+    implementation 'com.jetbrains.intellij.java:java-gui-forms-rt:243.22562.242'
     implementation "org.megamek:megamek${mmBranchTag}:${version}"
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
         // We may want to specify different branches for MM and MML, so we need to exclude the transitive MM dependency
