@@ -118,11 +118,12 @@ public class MekHQ implements GameListener {
     private CampaignController campaignController;
     private CampaignGUI campaignGUI;
 
-    private IconPackage iconPackage = new IconPackage();
+    private final IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
+    private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -745,11 +746,28 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
-        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? defaultTheme : themeName;
 
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(theme);
+                if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
+                    // Ensure OSX key bindings are used for copy, paste etc
+                    addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("FormattedTextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
+                }
+
+                UIUtil.updateAfterUiChange();
+                return;
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
+                logger.error(e, "setLookAndFeel()");
+            }
+            try {
+                UIManager.setLookAndFeel(defaultTheme);
                 if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
                     // Ensure OSX key bindings are used for copy, paste etc
                     addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
