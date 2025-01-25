@@ -21,6 +21,7 @@
 package mekhq.campaign.unit;
 
 import megamek.Version;
+import megamek.common.force.Force;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -55,6 +56,7 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
+        forceID = Force.NO_FORCE;
         drivers = new ArrayList<>();
         gunners = new ArrayList<>();
         vesselCrew = new ArrayList<>();
