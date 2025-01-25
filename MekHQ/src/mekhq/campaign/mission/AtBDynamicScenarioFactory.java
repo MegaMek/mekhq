@@ -1352,7 +1352,6 @@ public class AtBDynamicScenarioFactory {
         scenario.getScenarioObjectives().clear();
 
         for (ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
-            logger.info("templateObjective:"+ templateObjective.toString());
             ScenarioObjective actualObjective = translateTemplateObjective(scenario, campaign, templateObjective);
 
             scenario.getScenarioObjectives().add(actualObjective);
