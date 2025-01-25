@@ -219,6 +219,7 @@ public class CampaignGUI extends JPanel {
         tabMain.setToolTipText("");
         tabMain.setMinimumSize(new Dimension(600, 200));
         tabMain.setPreferredSize(new Dimension(900, 300));
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         addStandardTab(MHQTabType.COMMAND_CENTER);
         addStandardTab(MHQTabType.TOE);
@@ -275,7 +276,6 @@ public class CampaignGUI extends JPanel {
 
         // Move the window
         frame.setLocation(x, y);
-
         initMenu();
         frame.setJMenuBar(menuBar);
         frame.getContentPane().setLayout(new BorderLayout());
