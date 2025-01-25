@@ -167,8 +167,9 @@ public class Person {
     private UUID doctorId;
     private List<Unit> techUnits;
 
+    private int vocationalXPTimer;
+
     // days of rest
-    private int idleMonths;
     private int daysToWaitForHealing;
 
     // Our rank
@@ -1307,12 +1308,12 @@ public class Person {
         this.status = status;
     }
 
-    public int getIdleMonths() {
-        return idleMonths;
+    public int getVocationalXPTimer() {
+        return vocationalXPTimer;
     }
 
-    public void setIdleMonths(final int idleMonths) {
-        this.idleMonths = idleMonths;
+    public void setVocationalXPTimer(final int vocationalXPTimer) {
+        this.vocationalXPTimer = vocationalXPTimer;
     }
 
     public int getDaysToWaitForHealing() {
@@ -1974,8 +1975,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
             }
 
-            if (idleMonths > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleMonths", idleMonths);
+            if (vocationalXPTimer > 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPTimer", vocationalXPTimer);
             }
 
             if (!genealogy.isEmpty()) {
@@ -2336,8 +2337,10 @@ public class Person {
                     retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTimer")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
+                    retVal.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
@@ -2860,7 +2863,6 @@ public class Person {
      */
     private static void removeUnusedEdgeTriggers(Person retVal, List<String> edgeOptionList) {
         for (String edgeTrigger : edgeOptionList) {
-            logger.info(edgeTrigger);
             String advName = Crew.parseAdvantageName(edgeTrigger);
 
             try {

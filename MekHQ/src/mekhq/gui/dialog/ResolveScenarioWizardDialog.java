@@ -173,7 +173,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JTextArea txtMissingPilots;
     private JTextArea txtDeadPilots;
     private JTextArea txtSalvage;
-    private JTextArea txtRewards;
+    private JEditorPane txtRewards;
     //endregion Preview Panel components
     private boolean aborted = true;
 
@@ -1056,7 +1056,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtMissingPilots = new JTextArea();
         txtDeadPilots = new JTextArea();
         txtSalvage = new JTextArea();
-        txtRewards = new JTextArea();
+        txtRewards = new JEditorPane();
         JLabel lblStatus = new JLabel();
 
         pnlPreview.setLayout(new GridBagLayout());
@@ -1089,9 +1089,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(pnlStatus, gridBagConstraints);
 
         txtRewards.setText(resourceMap.getString("none"));
+        txtRewards.setContentType("text/html");
         txtRewards.setEditable(false);
-        txtRewards.setLineWrap(true);
-        txtRewards.setWrapStyleWord(true);
         txtRewards.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtRewards.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));

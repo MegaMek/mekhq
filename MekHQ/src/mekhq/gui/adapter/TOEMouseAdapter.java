@@ -39,7 +39,8 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.HangarSorter;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -509,6 +510,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                     gui.getCampaign().removeForce(force);
                 }
+            }
+
+            // We cycle through all forces because we need to assess how the removal affected them,
+            // Even for truly huge campaigns this is still very cheap.
+            for (Force force : forces) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), force));
             }
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
@@ -1165,9 +1172,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             if (!unitsInForces.isEmpty()) {
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
                 unassignShipTransportMenuClass(unitsInForces, popup);
+                unassignFromShipTransportMenuClass(unitsInForces, popup);
 
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
                 unassignTacticalTransportMenuClass(unitsInForces, popup);
+                unassignFromTacticalTransportMenuClass(unitsInForces, popup);
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);
@@ -1396,9 +1405,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToShipTransportMenu(gui.getCampaign(), new HashSet<>(units)));
             unassignShipTransportMenuClass(units, popup);
+            unassignFromShipTransportMenuClass(units, popup);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(units)));
             unassignTacticalTransportMenuClass(units, popup);
+            unassignFromTacticalTransportMenuClass(units, popup);
 
             if (!multipleSelection) {
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
@@ -1515,6 +1526,36 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             transportToUpdate.initializeTransportSpace(campaignTransportType);
             gui.getCampaign().updateTransportInTransports(campaignTransportType, transportToUpdate);
             MekHQ.triggerEvent(new UnitChangedEvent(transportToUpdate));
+        }
+    }
+
+    private void unassignFromTransportAction(CampaignTransportType campaignTransportType, Unit... units) {
+        for (Unit transport : units) {
+            if (transport.hasTransportedUnits(campaignTransportType)) {
+                unassignTransportAction(campaignTransportType,
+                    transport.getTransportedUnits(campaignTransportType).toArray(new Unit[0]));
+            }
+        }
+    }
+
+    private void unassignFromShipTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
+        if (units.stream().allMatch(Unit::hasShipTransportedUnits) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassignFrom.SHIP_TRANSPORT.text"));
+            menuItem.addActionListener(evt -> {
+                unassignFromTransportAction(SHIP_TRANSPORT, units.toArray(new Unit[0]));});
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
+        }
+    }
+
+    private void unassignFromTacticalTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
+        if (units.stream().allMatch(Unit::hasTacticalTransportedUnits) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassignFrom.TACTICAL_TRANSPORT.text"));
+            menuItem.addActionListener(evt -> {
+                unassignFromTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
+            });
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
         }
     }
 }

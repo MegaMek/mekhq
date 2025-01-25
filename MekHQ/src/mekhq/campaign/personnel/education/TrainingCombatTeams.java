@@ -99,6 +99,7 @@ public class TrainingCombatTeams {
      */
     private static void processTraining(final Campaign campaign, final CombatTeam combatTeam) {
         // First, identify the Combat Team's commander
+        combatTeam.refreshCommander(campaign);
         Person commander = combatTeam.getCommander(campaign);
 
         if (commander == null) {
