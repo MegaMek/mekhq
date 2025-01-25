@@ -48,6 +48,9 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static mekhq.campaign.personnel.enums.RandomDeathMethod.NONE;
+import static mekhq.campaign.personnel.enums.RandomDeathMethod.RANDOM;
+
 /**
  * @author natit
  */
@@ -362,17 +365,9 @@ public class CampaignOptions {
     private Integer militaryAcademyAccidents;
 
     // Death
-    private boolean keepMarriedNameUponSpouseDeath;
     private RandomDeathMethod randomDeathMethod;
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
-    private boolean useRandomClanPersonnelDeath;
-    private boolean useRandomPrisonerDeath;
     private boolean useRandomDeathSuicideCause;
-    private double percentageRandomDeathChance;
-    private double[] exponentialRandomDeathMaleValues;
-    private double[] exponentialRandomDeathFemaleValues;
-    private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
-    private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
     // endregion Life Paths Tab
 
     //region Turnover and Retention
@@ -956,8 +951,7 @@ public class CampaignOptions {
         setMilitaryAcademyAccidents(10000);
 
         // Death
-        setKeepMarriedNameUponSpouseDeath(true);
-        setRandomDeathMethod(RandomDeathMethod.NONE);
+        setRandomDeathMethod(NONE);
         setEnabledRandomDeathAgeGroups(new HashMap<>());
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ELDER, true);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ADULT, true);
@@ -967,39 +961,6 @@ public class CampaignOptions {
         getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
         setUseRandomDeathSuicideCause(false);
-        setUseRandomClanPersonnelDeath(true);
-        setUseRandomPrisonerDeath(true);
-        setPercentageRandomDeathChance(0.00002);
-        // The following four setups are all based on the 2018 US death rate:
-        // https://www.statista.com/statistics/241572/death-rate-by-age-and-sex-in-the-us/
-        setExponentialRandomDeathMaleValues(5.4757, -7.0, 0.0709); // base equation of 2 * 10^-4 * e^(0.0709 * age) per
-                                                                   // year, divided by 365.25
-        setExponentialRandomDeathFemaleValues(2.4641, -7.0, 0.0752); // base equation of 9 * 10^-5 * e^(0.0752 * age)
-                                                                     // per year, divided by 365.25
-        setAgeRangeRandomDeathMaleValues(new HashMap<>());
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.UNDER_ONE, 613.1);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.ONE_FOUR, 27.5);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FIVE_FOURTEEN, 14.7);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FIFTEEN_TWENTY_FOUR, 100.1);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR, 176.1);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR, 249.5);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR, 491.8);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR, 1119.0);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR, 2196.5);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR, 5155.0);
-        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 14504.0);
-        setAgeRangeRandomDeathFemaleValues(new HashMap<>());
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.UNDER_ONE, 500.0);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.ONE_FOUR, 20.4);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FIVE_FOURTEEN, 11.8);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FIFTEEN_TWENTY_FOUR, 38.8);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR, 80.0);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR, 140.2);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR, 302.5);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR, 670.0);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR, 1421.0);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR, 3788.0);
-        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 12870.0);
         // endregion Life Paths Tab
 
         // region Turnover and Retention
@@ -2856,21 +2817,6 @@ public class CampaignOptions {
     // endregion Procreation
 
     // region Death
-    /**
-     * @return whether to keep ones married name upon spouse death or not
-     */
-    public boolean isKeepMarriedNameUponSpouseDeath() {
-        return keepMarriedNameUponSpouseDeath;
-    }
-
-    /**
-     * @param keepMarriedNameUponSpouseDeath whether to keep ones married name upon
-     *                                       spouse death or not
-     */
-    public void setKeepMarriedNameUponSpouseDeath(final boolean keepMarriedNameUponSpouseDeath) {
-        this.keepMarriedNameUponSpouseDeath = keepMarriedNameUponSpouseDeath;
-    }
-
     public boolean isUseEducationModule() {
         return useEducationModule;
     }
@@ -3021,68 +2967,12 @@ public class CampaignOptions {
         this.enabledRandomDeathAgeGroups = enabledRandomDeathAgeGroups;
     }
 
-    public boolean isUseRandomClanPersonnelDeath() {
-        return useRandomClanPersonnelDeath;
-    }
-
-    public void setUseRandomClanPersonnelDeath(final boolean useRandomClanPersonnelDeath) {
-        this.useRandomClanPersonnelDeath = useRandomClanPersonnelDeath;
-    }
-
-    public boolean isUseRandomPrisonerDeath() {
-        return useRandomPrisonerDeath;
-    }
-
-    public void setUseRandomPrisonerDeath(final boolean useRandomPrisonerDeath) {
-        this.useRandomPrisonerDeath = useRandomPrisonerDeath;
-    }
-
     public boolean isUseRandomDeathSuicideCause() {
         return useRandomDeathSuicideCause;
     }
 
     public void setUseRandomDeathSuicideCause(final boolean useRandomDeathSuicideCause) {
         this.useRandomDeathSuicideCause = useRandomDeathSuicideCause;
-    }
-
-    public double getPercentageRandomDeathChance() {
-        return percentageRandomDeathChance;
-    }
-
-    public void setPercentageRandomDeathChance(final double percentageRandomDeathChance) {
-        this.percentageRandomDeathChance = percentageRandomDeathChance;
-    }
-
-    public double[] getExponentialRandomDeathMaleValues() {
-        return exponentialRandomDeathMaleValues;
-    }
-
-    public void setExponentialRandomDeathMaleValues(final double... exponentialRandomDeathMaleValues) {
-        this.exponentialRandomDeathMaleValues = exponentialRandomDeathMaleValues;
-    }
-
-    public double[] getExponentialRandomDeathFemaleValues() {
-        return exponentialRandomDeathFemaleValues;
-    }
-
-    public void setExponentialRandomDeathFemaleValues(final double... exponentialRandomDeathFemaleValues) {
-        this.exponentialRandomDeathFemaleValues = exponentialRandomDeathFemaleValues;
-    }
-
-    public Map<TenYearAgeRange, Double> getAgeRangeRandomDeathMaleValues() {
-        return ageRangeRandomDeathMaleValues;
-    }
-
-    public void setAgeRangeRandomDeathMaleValues(final Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues) {
-        this.ageRangeRandomDeathMaleValues = ageRangeRandomDeathMaleValues;
-    }
-
-    public Map<TenYearAgeRange, Double> getAgeRangeRandomDeathFemaleValues() {
-        return ageRangeRandomDeathFemaleValues;
-    }
-
-    public void setAgeRangeRandomDeathFemaleValues(final Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues) {
-        this.ageRangeRandomDeathFemaleValues = ageRangeRandomDeathFemaleValues;
     }
     // endregion Death
 
@@ -5121,31 +5011,16 @@ public class CampaignOptions {
         // endregion Education
 
         // region Death
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath",
-                isKeepMarriedNameUponSpouseDeath());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "enabledRandomDeathAgeGroups");
         for (final Entry<AgeGroup, Boolean> entry : getEnabledRandomDeathAgeGroups().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enabledRandomDeathAgeGroups");
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDeath", isUseRandomClanPersonnelDeath());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDeath", isUseRandomPrisonerDeath());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDeathChance", getPercentageRandomDeathChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "exponentialRandomDeathMaleValues",
-                getExponentialRandomDeathMaleValues());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "exponentialRandomDeathFemaleValues",
-                getExponentialRandomDeathFemaleValues());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathMaleValues");
-        for (final Entry<TenYearAgeRange, Double> entry : getAgeRangeRandomDeathMaleValues().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
-        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathMaleValues");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathFemaleValues");
-        for (final Entry<TenYearAgeRange, Double> entry : getAgeRangeRandomDeathFemaleValues().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
-        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathFemaleValues");
         // endregion Death
         // endregion Life Paths Tab
@@ -5933,10 +5808,15 @@ public class CampaignOptions {
                     // endregion Education
 
                     // region Death
-                } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
-                    retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMethod")) {
-                    retVal.setRandomDeathMethod(RandomDeathMethod.valueOf(wn2.getTextContent().trim()));
+                    // <50.04 compatibility handler
+                    if (wn2.getTextContent().trim().equalsIgnoreCase(NONE.name())) {
+                        retVal.setRandomDeathMethod(NONE);
+                    } else {
+                        retVal.setRandomDeathMethod(RANDOM);
+                    }
+                    // Replace above with below when compatibility handler is removed.
+//                    retVal.setRandomDeathMethod(RandomDeathMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enabledRandomDeathAgeGroups")) {
                     if (!wn2.hasChildNodes()) {
                         continue;
@@ -5952,59 +5832,8 @@ public class CampaignOptions {
 
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelDeath")) {
-                    retVal.setUseRandomClanPersonnelDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDeath")) {
-                    retVal.setUseRandomPrisonerDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
                     retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDeathChance")) {
-                    retVal.setPercentageRandomDeathChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("exponentialRandomDeathMaleValues")) {
-                    final String[] values = wn2.getTextContent().trim().split(",");
-                    retVal.setExponentialRandomDeathMaleValues(Arrays.stream(values)
-                            .mapToDouble(Double::parseDouble)
-                            .toArray());
-                } else if (wn2.getNodeName().equalsIgnoreCase("exponentialRandomDeathFemaleValues")) {
-                    final String[] values = wn2.getTextContent().trim().split(",");
-                    retVal.setExponentialRandomDeathFemaleValues(Arrays.stream(values)
-                            .mapToDouble(Double::parseDouble)
-                            .toArray());
-                } else if (wn2.getNodeName().equalsIgnoreCase("ageRangeRandomDeathMaleValues")) {
-                    if (!wn2.hasChildNodes()) {
-                        continue;
-                    }
-                    final NodeList nl2 = wn2.getChildNodes();
-                    for (int i = 0; i < nl2.getLength(); i++) {
-                        final Node wn3 = nl2.item(i);
-                        try {
-                            retVal.getAgeRangeRandomDeathMaleValues().put(
-                                    TenYearAgeRange.valueOf(wn3.getNodeName()),
-                                    Double.parseDouble(wn3.getTextContent().trim()));
-                        } catch (Exception ignored) {
-
-                        }
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("ageRangeRandomDeathFemaleValues")) {
-                    if (!wn2.hasChildNodes()) {
-                        continue;
-                    }
-                    final NodeList nl2 = wn2.getChildNodes();
-                    for (int i = 0; i < nl2.getLength(); i++) {
-                        final Node wn3 = nl2.item(i);
-                        try {
-                            retVal.getAgeRangeRandomDeathFemaleValues().put(
-                                    TenYearAgeRange.valueOf(wn3.getNodeName()),
-                                    Double.parseDouble(wn3.getTextContent().trim()));
-                        } catch (Exception ignored) {
-
-                        }
-                    }
-                    // endregion Death
-                    // endregion Life Paths Tab
-
-                    // region Finances Tab
-                    // region Turnover and Retention
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {

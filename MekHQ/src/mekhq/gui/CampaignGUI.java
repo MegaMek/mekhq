@@ -54,9 +54,6 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
-import mekhq.campaign.personnel.death.ExponentialRandomDeath;
-import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
@@ -70,9 +67,9 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
-import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
@@ -1493,26 +1490,6 @@ public class CampaignGUI extends JPanel {
         if ((randomDeathMethod != newOptions.getRandomDeathMethod())
                 || (useRandomDeathSuicideCause != newOptions.isUseRandomDeathSuicideCause())) {
             getCampaign().setDeath(newOptions.getRandomDeathMethod().getMethod(newOptions));
-        } else {
-            getCampaign().getDeath().setUseRandomClanPersonnelDeath(newOptions.isUseRandomClanPersonnelDeath());
-            getCampaign().getDeath().setUseRandomPrisonerDeath(newOptions.isUseRandomPrisonerDeath());
-            switch (getCampaign().getDeath().getMethod()) {
-                case PERCENTAGE:
-                    ((PercentageRandomDeath) getCampaign().getDeath()).setPercentage(
-                            newOptions.getPercentageRandomDeathChance());
-                    break;
-                case EXPONENTIAL:
-                    ((ExponentialRandomDeath) getCampaign().getDeath()).setMale(
-                            newOptions.getExponentialRandomDeathMaleValues());
-                    ((ExponentialRandomDeath) getCampaign().getDeath()).setFemale(
-                            newOptions.getExponentialRandomDeathFemaleValues());
-                    break;
-                case AGE_RANGE:
-                    ((AgeRangeRandomDeath) getCampaign().getDeath()).adjustRangeValues(newOptions);
-                    break;
-                default:
-                    break;
-            }
         }
 
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {

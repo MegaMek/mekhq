@@ -4340,11 +4340,6 @@ public class Campaign implements ITechManager {
             }
 
             // Daily events
-            if (getDeath().processNewDay(this, getLocalDate(), person)) {
-                // The person has died, so don't continue to process the dead
-                continue;
-            }
-
             person.resetMinutesLeft();
             person.setAcquisition(0);
 
@@ -4354,7 +4349,10 @@ public class Campaign implements ITechManager {
 
             // Weekly events
             if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-                processWeeklyRelationshipEvents(person);
+                if (!getDeath().processNewWeek(this, getLocalDate(), person)) {
+                    // If the character has died, we don't need to process relationship events
+                    processWeeklyRelationshipEvents(person);
+                }
 
                 processWeeklyEdgeResets(person);
             }
@@ -4772,7 +4770,7 @@ public class Campaign implements ITechManager {
         personnelMarket.generatePersonnelForDay(this);
 
         // TODO : AbstractContractMarket : Uncomment
-        // getContractMarket().processNewDay(this);
+        // getContractMarket().processNewWeek(this);
         unitMarket.processNewDay(this);
 
         // Process New Day for AtB
@@ -5529,10 +5527,6 @@ public class Campaign implements ITechManager {
             if (p.getGenealogy().hasSpouse()) {
                 if (!personnel.containsKey(p.getGenealogy().getSpouse().getId())) {
                     p.getGenealogy().setSpouse(null);
-                    if (!getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
-                            && (p.getMaidenName() != null)) {
-                        p.setSurname(p.getMaidenName());
-                    }
                     p.setMaidenName(null);
                 }
             }

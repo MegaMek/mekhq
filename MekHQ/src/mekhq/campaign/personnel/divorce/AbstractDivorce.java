@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -181,8 +181,7 @@ public abstract class AbstractDivorce {
      * @param person the person whose spouse has died
      */
     public void widowed(final Campaign campaign, final LocalDate today, final Person person) {
-        divorce(campaign, today, person, campaign.getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
-                ? SplittingSurnameStyle.BOTH_KEEP_SURNAME : SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME);
+        divorce(campaign, today, person, SplittingSurnameStyle.BOTH_KEEP_SURNAME);
     }
 
     /**

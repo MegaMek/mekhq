@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,8 +39,6 @@ public class DisabledRandomDeathTest {
     @BeforeEach
     public void beforeEach() {
         when(mockOptions.getEnabledRandomDeathAgeGroups()).thenReturn(new HashMap<>());
-        when(mockOptions.isUseRandomClanPersonnelDeath()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerDeath()).thenReturn(false);
         when(mockOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
     }
 
