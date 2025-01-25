@@ -171,27 +171,23 @@ public enum AtBContractType {
     }
 
     /**
-     * AtB Rules apply an additional -1 from 2950 to 3040, which is superseded by
-     * MekHQ's era
-     * variation code
+     * Determines the availability level of parts and units based on the type of operation being
+     * conducted.
+     *
+     * <p>The availability level is represented as an integer and varies depending on the specific
+     * mission type. Higher values indicate worse availability, while lower values signify more
+     * restricted access to parts.
+     *
+     * @return an integer representing the availability level of parts for the current mission type.
      */
     public int calculatePartsAvailabilityLevel() {
-        switch (this) {
-            case GUERRILLA_WARFARE:
-                return 0;
-            case DIVERSIONARY_RAID:
-            case OBJECTIVE_RAID:
-            case RECON_RAID:
-            case EXTRACTION_RAID:
-                return 1;
-            case PLANETARY_ASSAULT:
-            case RELIEF_DUTY:
-                return 2;
-            case PIRATE_HUNTING:
-                return 3;
-            default:
-                return 4;
-        }
+        return switch (this) {
+            case GUERRILLA_WARFARE -> 2;
+            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> 1;
+            case PLANETARY_ASSAULT, RELIEF_DUTY -> 0;
+            case PIRATE_HUNTING -> -1;
+            default -> -2;
+        };
     }
 
     /**
