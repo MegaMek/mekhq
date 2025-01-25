@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,8 +36,8 @@ public class StaticChecks {
                         .map(campaign::getUnit).noneMatch(unit -> (unit != null) && unit.isDeployed());
     }
 
-    public static boolean areAllCombatForces(Vector<Force> forces) {
-        return forces.stream().allMatch(Force::isCombatForce);
+    public static boolean areAllStandardForces(Vector<Force> forces) {
+        return forces.stream().allMatch(force -> force.getForceType().isStandard());
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {

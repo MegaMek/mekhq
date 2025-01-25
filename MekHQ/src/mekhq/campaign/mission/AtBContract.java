@@ -2027,7 +2027,7 @@ public class AtBContract extends Contract {
         int playerGBV = 0;
         int playerUnitCount = 0;
         for (Force force : campaign.getAllForces()) {
-            if (!force.isCombatForce()) {
+            if (!force.getForceType().isStandard()) {
                 continue;
             }
 
