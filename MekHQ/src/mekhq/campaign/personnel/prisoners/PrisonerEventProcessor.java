@@ -41,18 +41,84 @@ public class PrisonerEventProcessor {
     private static final int MAX_CRIME_PENALTY = 50;
     private final int DEFAULT_EVENT_CHANCE = STALEMATE.ordinal();
     private final int MINIMUM_PRISONER_COUNT = 25;
+    private final int RESPONSE_TARGET_NUMBER = 7;
 
     // Fixed Dialog Options
     private static int CHOICE_FREE = 1;
     private static int CHOICE_EXECUTE = 2;
 
-    // Major Event Responses
+    // Enums
     public enum ResponseType {
         RESPONSE_NEUTRAL, RESPONSE_POSITIVE, RESPONSE_NEGATIVE
     }
 
-    private Map<Integer, List<ResponseType>> majorEventResponses = new HashMap<>();
-    private final int RESPONSE_TARGET_NUMBER = 7;
+    // Initialize all major events with their response lists
+
+    // Choice Qualities
+    private final Map<Integer, List<ResponseType>> majorEventResponses = Map.of(
+            0, List.of(ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL),
+            1, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL),
+            2, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE),
+            3, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE),
+            4, List.of(ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEUTRAL),
+            5, List.of(ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEGATIVE),
+            6, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL),
+            7, List.of(ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE),
+            8, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE),
+            9, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL));
+
+    private final Map<Integer, List<ResponseType>> minorEventResponses = Map.ofEntries(
+            Map.entry(0, List.of(ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL)),
+            Map.entry(1, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL)),
+            Map.entry(2, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(3, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(4, List.of(ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEUTRAL)),
+            Map.entry(5, List.of(ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(6, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL)),
+            Map.entry(7, List.of(ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(8, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(9, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEGATIVE, ResponseType.RESPONSE_NEUTRAL)),
+            Map.entry(10, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(11, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(12, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(13, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(14, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(15, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(16, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(17, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(18, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(19, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(20, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(21, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(22, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(23, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(24, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(25, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(26, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(27, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(28, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(29, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(30, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(31, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(32, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(33, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(34, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(35, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(36, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(37, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(38, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(39, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(40, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(41, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(42, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(43, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(44, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(45, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(46, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(47, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(48, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE)),
+            Map.entry(49, List.of(ResponseType.RESPONSE_POSITIVE, ResponseType.RESPONSE_NEUTRAL, ResponseType.RESPONSE_NEGATIVE))
+    );
 
     public PrisonerEventProcessor(Campaign campaign) {
         this.campaign = campaign;
@@ -158,27 +224,30 @@ public class PrisonerEventProcessor {
     }
 
     private void processMajorEvent(Campaign campaign, Person speaker) {
-        buildMajorEventResponses();
-
         int event = randomInt(10);
         PrisonerEventDialog eventDialog =
             new PrisonerEventDialog(campaign, speaker, event, false);
 
         int choice = eventDialog.getDialogChoice();
 
-        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice);
+        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice, false);
 
         new PrisonerEventResultsDialog(campaign, speaker, event, choice, false, isSuccessful);
     }
 
-    private boolean makeEventCheck(Campaign campaign, Person speaker, int event, int choice) {
+    private boolean makeEventCheck(Campaign campaign, Person speaker, int event, int choice, boolean isMinor) {
         int responseModifier = 0;
         if (speaker != null) {
             responseModifier = getPersonalityValue(campaign, speaker);
         }
 
         try {
-            ResponseType response = majorEventResponses.get(event).get(choice);
+            ResponseType response;
+            if (isMinor) {
+                response = minorEventResponses.get(event).get(choice);
+            } else {
+                response = majorEventResponses.get(event).get(choice);
+            }
 
             switch (response) {
                 case RESPONSE_NEUTRAL -> {
@@ -197,73 +266,11 @@ public class PrisonerEventProcessor {
         return responseCheck >= RESPONSE_TARGET_NUMBER;
     }
 
-    private void buildMajorEventResponses() {
-        // event 0
-        majorEventResponses.put(0, List.of(
-                ResponseType.RESPONSE_NEGATIVE,
-                ResponseType.RESPONSE_NEGATIVE,
-                ResponseType.RESPONSE_NEUTRAL));
-
-        // event 1
-        majorEventResponses.put(1, List.of(
-                ResponseType.RESPONSE_POSITIVE,
-                ResponseType.RESPONSE_NEGATIVE,
-                ResponseType.RESPONSE_NEUTRAL));
-
-        // event 2
-        majorEventResponses.put(2, List.of(
-            ResponseType.RESPONSE_POSITIVE,
-            ResponseType.RESPONSE_NEUTRAL,
-            ResponseType.RESPONSE_NEGATIVE));
-
-        // event 3
-        majorEventResponses.put(3, List.of(
-            ResponseType.RESPONSE_POSITIVE,
-            ResponseType.RESPONSE_NEUTRAL,
-            ResponseType.RESPONSE_NEGATIVE));
-
-        // event 4
-        majorEventResponses.put(4, List.of(
-            ResponseType.RESPONSE_NEUTRAL,
-            ResponseType.RESPONSE_NEUTRAL,
-            ResponseType.RESPONSE_NEUTRAL));
-
-        // event 5
-        majorEventResponses.put(5, List.of(
-            ResponseType.RESPONSE_NEUTRAL,
-            ResponseType.RESPONSE_NEGATIVE,
-            ResponseType.RESPONSE_NEGATIVE));
-
-        // event 6
-        majorEventResponses.put(6, List.of(
-            ResponseType.RESPONSE_POSITIVE,
-            ResponseType.RESPONSE_NEGATIVE,
-            ResponseType.RESPONSE_NEUTRAL));
-
-        // event 7
-        majorEventResponses.put(7, List.of(
-            ResponseType.RESPONSE_NEGATIVE,
-            ResponseType.RESPONSE_POSITIVE,
-            ResponseType.RESPONSE_NEGATIVE));
-
-        // event 8
-        majorEventResponses.put(8, List.of(
-            ResponseType.RESPONSE_POSITIVE,
-            ResponseType.RESPONSE_NEUTRAL,
-            ResponseType.RESPONSE_NEGATIVE));
-
-        // event 9
-        majorEventResponses.put(9, List.of(
-            ResponseType.RESPONSE_POSITIVE,
-            ResponseType.RESPONSE_NEGATIVE,
-            ResponseType.RESPONSE_NEUTRAL));
-    }
-
     private void processMinorEvent(@Nullable Person speaker) {
         int event = randomInt(50);
         PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, speaker, event, true);
         int choice = eventDialog.getDialogChoice();
-        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice);
+        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice, true);
         new PrisonerEventResultsDialog(campaign, speaker, event, choice, true, isSuccessful);
     }
 
