@@ -18,16 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import megamek.common.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -39,6 +29,12 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(ProcurementTableMouseAdapter.class);
@@ -172,7 +168,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             return false;
         }
         final Object equipment = acquisition.getNewEquipment();
-        final int transitTime = gui.getCampaign().calculatePartTransitTime(0);
+        final int transitTime = gui.getCampaign().calculatePartTransitTime(acquisition.getAvailability());
         final boolean success;
         if (equipment instanceof Part) {
             success = gui.getCampaign().getQuartermaster().buyPart((Part) equipment, transitTime);

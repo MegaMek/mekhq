@@ -152,6 +152,9 @@ import java.util.stream.Collectors;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
+import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
@@ -816,7 +819,7 @@ public class Campaign implements ITechManager {
 
         long numDays = ChronoUnit.DAYS.between(getShipSearchStart(), getLocalDate());
         if (numDays > 21) {
-            int roll = Compute.d6(2);
+            int roll = d6(2);
             TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
             setShipSearchStart(null);
             report.append("<br/>Ship search target: ").append(target.getValueAsString()).append(" roll: ")
@@ -877,7 +880,7 @@ public class Campaign implements ITechManager {
         Entity en = mekFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
-                : calculatePartTransitTime(Compute.d6(2) - 2);
+                : calculatePartTransitTime(en.calcYearAvailability(getGameYear(), useClanTechBase(), getTechFaction()));
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
         PartQuality quality = PartQuality.QUALITY_D;
@@ -2002,11 +2005,11 @@ public class Campaign implements ITechManager {
 
             // set loyalty
             if (experienceLevel <= 0) {
-                person.setLoyalty(Compute.d6(3) + 2);
+                person.setLoyalty(d6(3) + 2);
             } else if (experienceLevel == 1) {
-                person.setLoyalty(Compute.d6(3) + 1);
+                person.setLoyalty(d6(3) + 1);
             } else {
-                person.setLoyalty(Compute.d6(3));
+                person.setLoyalty(d6(3));
             }
 
             if (experienceLevel >= 0) {
@@ -2180,7 +2183,7 @@ public class Campaign implements ITechManager {
             bloodnameTarget += Math.min(0, getRankSystem().getOfficerCut() - person.getRankNumeric());
         }
 
-        if (ignoreDice || (Compute.d6(2) >= bloodnameTarget)) {
+        if (ignoreDice || (d6(2) >= bloodnameTarget)) {
             final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
 
             final Bloodname bloodname = Bloodname.randomBloodname(
@@ -2840,7 +2843,7 @@ public class Campaign implements ITechManager {
         report += doctor.getHyperlinkedFullTitle() + " attempts to heal "
                 + medWork.getFullName();
         TargetRoll target = getTargetFor(medWork, doctor);
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         report = report + ",  needs " + target.getValueAsString()
                 + " and rolls " + roll + ':';
         int xpGained = 0;
@@ -2850,7 +2853,7 @@ public class Campaign implements ITechManager {
                 && doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL)) {
             if ((roll == 2) && (doctor.getCurrentEdge() > 0) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 doctor.changeCurrentEdge(-1);
-                roll = Compute.d6(2);
+                roll = d6(2);
                 report += medWork.fail() + '\n' + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
                         + " rolls " + roll + ':';
             }
@@ -3365,7 +3368,7 @@ public class Campaign implements ITechManager {
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
         }
-        if (Compute.d6(2) < target.getValue()) {
+        if (d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>"
@@ -3448,7 +3451,7 @@ public class Campaign implements ITechManager {
             return false;
         }
 
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
@@ -3456,17 +3459,13 @@ public class Campaign implements ITechManager {
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && (person.getCurrentEdge() > 0)) {
             person.changeCurrentEdge(-1);
-            roll = Compute.d6(2);
+            roll = d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
-        }
-        int mos = roll - target.getValue();
-        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
-            mos = roll - 2;
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
             if (transitDays < 0) {
-                transitDays = calculatePartTransitTime(mos);
+                transitDays = calculatePartTransitTime(acquisition.getAvailability());
             }
             report = report + acquisition.find(transitDays);
             found = true;
@@ -3656,7 +3655,7 @@ public class Campaign implements ITechManager {
                 int roll;
                 String wrongType = "";
                 if (tech.isRightTechTypeFor(theRefit)) {
-                    roll = Compute.d6(2);
+                    roll = d6(2);
                 } else {
                     roll = Utilities.roll3d6();
                     wrongType = " <b>Warning: wrong tech type for this refit.</b>";
@@ -3666,7 +3665,7 @@ public class Campaign implements ITechManager {
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
                         && (tech.getCurrentEdge() > 0)) {
                     tech.changeCurrentEdge(-1);
-                    roll = tech.isRightTechTypeFor(theRefit) ? Compute.d6(2) : Utilities.roll3d6();
+                    roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
                         tech.setEdgeUsed(tech.getEdgeUsed() - 1);
@@ -3857,7 +3856,7 @@ public class Campaign implements ITechManager {
         int roll;
         String wrongType = "";
         if (tech.isRightTechTypeFor(partWork)) {
-            roll = Compute.d6(2);
+            roll = d6(2);
         } else {
             roll = Utilities.roll3d6();
             wrongType = " <b>Warning: wrong tech type for this repair.</b>";
@@ -3879,7 +3878,7 @@ public class Campaign implements ITechManager {
                                     || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                             && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
-                roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
+                roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
                 // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
@@ -4058,7 +4057,7 @@ public class Campaign implements ITechManager {
 
                 if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
                     LocalDate newRoutEndDate = contract.getStartDate()
-                        .plusMonths(max(1, Compute.d6() - 3))
+                        .plusMonths(max(1, d6() - 3))
                         .minusDays(1);
                     contract.setRoutEndDate(newRoutEndDate);
                 }
@@ -4273,7 +4272,7 @@ public class Campaign implements ITechManager {
     private void processResupply(AtBContract contract) {
         boolean isGuerrilla = contract.getContractType().isGuerrillaWarfare();
 
-        if (!isGuerrilla || Compute.d6(1) > 4) {
+        if (!isGuerrilla || d6(1) > 4) {
             ResupplyType resupplyType = isGuerrilla ? ResupplyType.RESUPPLY_SMUGGLER : ResupplyType.RESUPPLY_NORMAL;
             Resupply resupply = new Resupply(this, contract, resupplyType);
             performResupply(resupply, contract);
@@ -4460,7 +4459,7 @@ public class Campaign implements ITechManager {
 
         person.setVocationalXPTimer(person.getVocationalXPTimer() + 1);
         if (person.getVocationalXPTimer() >= checkFrequency) {
-            if (Compute.d6(2) >= targetNumber) {
+            if (d6(2) >= targetNumber) {
                 person.awardXP(this, vocationalXpRate);
                 person.setVocationalXPTimer(0);
                 return true;
@@ -4540,7 +4539,7 @@ public class Campaign implements ITechManager {
             int dice = person.getExperienceLevel(this, false);
 
             if (dice > 0) {
-                score = Compute.d6(dice);
+                score = d6(dice);
             }
 
             multiplier += 0.5;
@@ -4550,7 +4549,7 @@ public class Campaign implements ITechManager {
             int dice = person.getExperienceLevel(this, true);
 
             if (dice > 0) {
-                score += Compute.d6(dice);
+                score += d6(dice);
             }
 
             multiplier += 0.5;
@@ -8135,55 +8134,42 @@ public class Campaign implements ITechManager {
         // if you are delivering from the same planet then no transit times
         int currentTransitTime = (distance > 0) ? (int) Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
         int originTransitTime = (distance > 0) ? (int) Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
-        int amazonFreeShipping = Compute.d6(1 + jumps);
+        int amazonFreeShipping = d6(1 + jumps);
         return (recharges * 7) + currentTransitTime + originTransitTime + amazonFreeShipping;
     }
 
-    /***
-     * Calculate transit times based on the margin of success from an acquisition
-     * roll. The values here
-     * are all based on what the user entered for the campaign options.
+    /**
+     * Calculates the transit time for the arrival of parts or supplies based on  the availability
+     * of the item, a random roll, and campaign-specific transit time settings.
      *
-     * @param mos - an integer of the margin of success of an acquisition roll
-     * @return the number of days that supplies will take to arrive.
+     * <p>The transit time is calculated using the following factors:
+     * <ul>
+     *     <li>A fixed base modifier value defined by campaign rules.</li>
+     *     <li>A random roll of 1d6 to add variability to the calculation.</li>
+     *     <li>The availability value of the requested parts or supplies from the acquisition details.</li>
+     * </ul>
+     *
+     * <p>The calculated duration is applied in units (days, weeks, or months) based on the campaign's
+     * configuration for transit time.</p>
+     *
+     * @param availability the availability code of the part or unit being acquired as an integer.
+     * @return the number of days required for the parts or units to arrive based on the
+     * calculated transit time.
      */
-    public int calculatePartTransitTime(int mos) {
-        int nDice = getCampaignOptions().getNDiceTransitTime();
-        int time = getCampaignOptions().getConstantTransitTime();
-        if (nDice > 0) {
-            time += Compute.d6(nDice);
-        }
+    public int calculatePartTransitTime(int availability) {
+        final int BASE_MODIFIER = 7; // CamOps p51
+        final int roll = d6(1);
+        final int total = max(1, (BASE_MODIFIER + roll + availability) / 4); // CamOps p51
+
         // now step forward through the calendar
-        LocalDate arrivalDate = getLocalDate();
-        arrivalDate = switch (getCampaignOptions().getUnitTransitTime()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH -> arrivalDate.plusMonths(time);
-            case CampaignOptions.TRANSIT_UNIT_WEEK -> arrivalDate.plusWeeks(time);
-            default -> arrivalDate.plusDays(time);
+        LocalDate arrivalDate = currentDay;
+        arrivalDate = switch (campaignOptions.getUnitTransitTime()) {
+            case TRANSIT_UNIT_MONTH -> arrivalDate.plusMonths(total);
+            case TRANSIT_UNIT_WEEK -> arrivalDate.plusWeeks(total);
+            default -> arrivalDate.plusDays(total);
         };
 
-        // now adjust for MoS and minimums
-        int mosBonus = getCampaignOptions().getAcquireMosBonus() * mos;
-        arrivalDate = switch (getCampaignOptions().getAcquireMosUnit()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH -> arrivalDate.minusMonths(mosBonus);
-            case CampaignOptions.TRANSIT_UNIT_WEEK -> arrivalDate.minusWeeks(mosBonus);
-            default -> arrivalDate.minusDays(mosBonus);
-        };
-
-        // now establish minimum date and if this is before
-        LocalDate minimumDate = getLocalDate();
-        minimumDate = switch (getCampaignOptions().getAcquireMinimumTimeUnit()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH ->
-                minimumDate.plusMonths(getCampaignOptions().getAcquireMinimumTime());
-            case CampaignOptions.TRANSIT_UNIT_WEEK ->
-                minimumDate.plusWeeks(getCampaignOptions().getAcquireMinimumTime());
-            default -> minimumDate.plusDays(getCampaignOptions().getAcquireMinimumTime());
-        };
-
-        if (arrivalDate.isBefore(minimumDate)) {
-            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), minimumDate));
-        } else {
-            return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
-        }
+        return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), arrivalDate));
     }
 
     /**
@@ -8524,7 +8510,7 @@ public class Campaign implements ITechManager {
         }
 
         partReport += ", TN " + target.getValue() + '[' + target.getDesc() + ']';
-        int roll = Compute.d6(2);
+        int roll = d6(2);
         int margin = roll - target.getValue();
         partReport += " rolled a " + roll + ", margin of " + margin;
 
