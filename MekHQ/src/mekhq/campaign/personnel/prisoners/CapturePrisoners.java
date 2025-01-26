@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static java.lang.Math.max;
 import static megamek.common.Board.T_SPACE;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -155,8 +154,6 @@ public class CapturePrisoners {
                 }
             }
         }
-
-        adjustedDefectionChance = max(adjustedDefectionChance, 1);
 
         return randomInt(adjustedDefectionChance);
     }

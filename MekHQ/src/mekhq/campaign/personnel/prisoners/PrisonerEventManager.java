@@ -18,7 +18,10 @@ import mekhq.gui.dialog.prisonerDialogs.PrisonerWarningResultsDialog;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -28,13 +31,12 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.randomEvents.PersonalityController.getPersonalityValue;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 public class PrisonerEventManager {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerEventDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
 
     private final Campaign campaign;
     private final Person speaker;
@@ -152,8 +154,7 @@ public class PrisonerEventManager {
         if (choice == CHOICE_FREE) {
             for (int i = 0; i < setFree; i++) {
                 Person prisoner = prisoners.get(i);
-                campaign.addReport(String.format(resources.getString("free.report"),
-                    prisoner.getFullName()));
+                campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "free.report", prisoner.getFullName()));
                 campaign.removePerson(prisoner, false);
             }
 
@@ -194,8 +195,8 @@ public class PrisonerEventManager {
     private void processExecutions(int executions, List<Person> prisoners) {
         for (int i = 0; i < executions; i++) {
             Person prisoner = prisoners.get(i);
-            campaign.addReport(String.format(resources.getString("execute.report"),
-                prisoner.getFullName()));
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "execute.report",
+                    prisoner.getFullName()));
             campaign.removePerson(prisoner, false);
         }
 
@@ -224,9 +225,8 @@ public class PrisonerEventManager {
         }
 
         // Build the report
-        String message = hasBackfired
-            ? resources.getString("execute.backfired")
-            : resources.getString("execute.successful");
+        String key = getFormattedTextAt(RESOURCE_BUNDLE, hasBackfired ? "execute.backfired" : "execute.successful");
+
         String messageColor = hasBackfired
             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
             : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
@@ -234,14 +234,16 @@ public class PrisonerEventManager {
         String crimeColor = hasBackfired
             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
             : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
+
         String crimeMessage = crimeNoticed
-            ? String.format(resources.getString("execute.crimeNoticed"),
-            crimeColor, CLOSING_SPAN_TAG, penalty)
-            : String.format(resources.getString("execute.crimeUnnoticed"),
-            crimeColor, CLOSING_SPAN_TAG);
+            ? getFormattedTextAt(RESOURCE_BUNDLE, "execute.crimeNoticed",
+                crimeColor, CLOSING_SPAN_TAG, penalty)
+            : getFormattedTextAt(RESOURCE_BUNDLE, "execute.crimeUnnoticed",
+                crimeColor, CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(String.format(message, messageColor, CLOSING_SPAN_TAG, crimeMessage));
+        campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG,
+                crimeMessage);
     }
 
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {

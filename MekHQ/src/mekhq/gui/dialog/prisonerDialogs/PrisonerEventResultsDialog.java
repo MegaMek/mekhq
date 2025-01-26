@@ -1,19 +1,17 @@
 package mekhq.gui.dialog.prisonerDialogs;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
-import java.util.ResourceBundle;
+
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerEventResultsDialog extends MHQDialogImmersive {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerEventDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
 
     static final String FORWARD_RESPONSE = "response.";
     static final String SUFFIX_SUCCESS = ".success";
@@ -30,7 +28,7 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
         String resourceKey = isSuccessful ? "successful.button" : "failure.button";
 
         ButtonLabelTooltipPair btnConfirmation =
-            new ButtonLabelTooltipPair(resources.getString(resourceKey), null);
+            new ButtonLabelTooltipPair(getFormattedTextAt(RESOURCE_BUNDLE, resourceKey), null);
 
         return List.of(btnConfirmation);
     }
@@ -39,11 +37,11 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
                                                    int choiceIndex, boolean isSuccessful) {
         String suffix = isSuccessful ? SUFFIX_SUCCESS : SUFFIX_FAILURE;
         String commanderAddress = campaign.getCommanderAddress(false);
-        return String.format(resources.getString(FORWARD_RESPONSE + choiceIndex + '.' + event.name() + suffix),
+        return getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + choiceIndex + '.' + event.name() + suffix,
             commanderAddress);
     }
 
     private static String createOutOfCharacterMessage() {
-        return resources.getString("result.ooc");
+        return getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
     }
 }

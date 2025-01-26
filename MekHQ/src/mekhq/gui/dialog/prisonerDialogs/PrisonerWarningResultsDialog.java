@@ -1,20 +1,17 @@
 package mekhq.gui.dialog.prisonerDialogs;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static megamek.common.Compute.randomInt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerEventDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
 
     public PrisonerWarningResultsDialog(Campaign campaign, @Nullable Person speaker, boolean isExecute) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, isExecute),
@@ -24,7 +21,7 @@ public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
 
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnUnderstood = new ButtonLabelTooltipPair(
-            resources.getString("btnUnderstood.button"), null);
+                getFormattedTextAt(RESOURCE_BUNDLE, "btnUnderstood.button"), null);
 
         return List.of(btnUnderstood);
     }
@@ -36,10 +33,10 @@ public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
         String resourceKey = executeKey + "Event" + eventRoll + ".message";
 
         String commanderAddress = campaign.getCommanderAddress(false);
-        return String.format(resources.getString(resourceKey), commanderAddress);
+        return getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
     }
 
     private static String createOutOfCharacterMessage() {
-        return resources.getString("result.ooc");
+        return getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
     }
 }

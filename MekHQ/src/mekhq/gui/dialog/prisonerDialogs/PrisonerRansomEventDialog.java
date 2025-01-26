@@ -19,7 +19,6 @@
 package mekhq.gui.dialog.prisonerDialogs;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -27,15 +26,13 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerRansomEventDialog extends MHQDialogImmersive {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerRansomEvent";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerRansomEvent";
 
     public PrisonerRansomEventDialog(Campaign campaign, List<Person> prisoners, Money payment, boolean isFriendlyPOWs) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign,
@@ -65,9 +62,9 @@ public class PrisonerRansomEventDialog extends MHQDialogImmersive {
 
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(
-            resources.getString("decline.button"), null);
+            getFormattedTextAt(RESOURCE_BUNDLE, "decline.button"), null);
         ButtonLabelTooltipPair btnAccept = new ButtonLabelTooltipPair(
-            resources.getString("accept.button"), null);
+            getFormattedTextAt(RESOURCE_BUNDLE, "accept.button"), null);
 
         return List.of(btnDecline, btnAccept);
     }
@@ -81,7 +78,8 @@ public class PrisonerRansomEventDialog extends MHQDialogImmersive {
         String commanderAddress = campaign.getCommanderAddress(false);
         StringBuilder message = new StringBuilder();
         String key = isFriendlyPOWs ? "pows" : "prisoners";
-        message.append(String.format(resources.getString(key + ".message"), commanderAddress, payment));
+        message.append(getFormattedTextAt(RESOURCE_BUNDLE, key + ".message",
+            commanderAddress, payment));
 
         // Create a table to hold the personnel
         message.append("<br><table style='width:100%; text-align:left;'>");
@@ -106,6 +104,6 @@ public class PrisonerRansomEventDialog extends MHQDialogImmersive {
 
     private static String createOutOfCharacterMessage(boolean isFriendlyPOWs) {
         String key = isFriendlyPOWs ? "pows" : "prisoners";
-        return resources.getString(key + ".ooc");
+        return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ooc");
     }
 }

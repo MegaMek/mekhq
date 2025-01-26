@@ -1,6 +1,5 @@
 package mekhq.campaign.personnel.prisoners;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -10,15 +9,13 @@ import mekhq.gui.dialog.prisonerDialogs.PrisonerRansomEventDialog;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static java.lang.Math.max;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerRansomEvent {
-    private static final String BUNDLE_KEY = "mekhq.resources.PrisonerRansomEvent";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerRansomEvent";
 
     private static final int RANSOM_COST_DIVIDER = 10;
     private static final int RANSOM_COST_MULTIPLIER = 10;
@@ -88,16 +85,16 @@ public class PrisonerRansomEvent {
 
     private void handleRansomOutcome(Campaign campaign, List<Person> ransomList, Money ransom,
                                   boolean isFriendlyPOWs) {
-    if (isFriendlyPOWs) {
-        // Debit funds and return POWs to active duty
-        campaign.getFinances().debit(TransactionType.RANSOM, campaign.getLocalDate(), ransom,
-            resources.getString("ransom.entry"));
-        ransomList.forEach(pow -> pow.changeStatus(campaign, campaign.getLocalDate(), ACTIVE));
-    } else {
-        // Credit funds and remove enemy prisoners from campaign
-        campaign.getFinances().credit(TransactionType.RANSOM, campaign.getLocalDate(), ransom,
-            resources.getString("ransom.entry"));
-        ransomList.forEach(campaign::removePerson);
-    }
+        if (isFriendlyPOWs) {
+            // Debit funds and return POWs to active duty
+            campaign.getFinances().debit(TransactionType.RANSOM, campaign.getLocalDate(), ransom,
+                getFormattedTextAt(RESOURCE_BUNDLE, "ransom.entry"));
+            ransomList.forEach(pow -> pow.changeStatus(campaign, campaign.getLocalDate(), ACTIVE));
+        } else {
+            // Credit funds and remove enemy prisoners from campaign
+            campaign.getFinances().credit(TransactionType.RANSOM, campaign.getLocalDate(), ransom,
+                getFormattedTextAt(RESOURCE_BUNDLE, "ransom.entry"));
+            ransomList.forEach(campaign::removePerson);
+        }
     }
 }
