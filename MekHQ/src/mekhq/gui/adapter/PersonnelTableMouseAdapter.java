@@ -84,7 +84,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
-import static mekhq.campaign.personnel.prisoners.PrisonerEventProcessor.processAdHocExecution;
+import static mekhq.campaign.personnel.prisoners.PrisonerEventManager.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);

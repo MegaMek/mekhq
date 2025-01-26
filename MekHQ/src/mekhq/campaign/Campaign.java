@@ -95,7 +95,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
-import mekhq.campaign.personnel.prisoners.PrisonerEventProcessor;
+import mekhq.campaign.personnel.prisoners.PrisonerEventManager;
 import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
@@ -4807,7 +4807,7 @@ public class Campaign implements ITechManager {
 
         // Prisoner events can occur on Monday or the 1st of the month depending on the type of event
         if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
-            new PrisonerEventProcessor(this);
+            new PrisonerEventManager(this);
         }
 
         resetAstechMinutes();
