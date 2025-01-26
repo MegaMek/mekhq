@@ -1,13 +1,14 @@
 package mekhq.campaign.personnel.prisoners;
 
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.personnel.prisoners.enums.ResponseQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
@@ -36,6 +37,7 @@ public class PrisonerEventManager {
         BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
     private final Campaign campaign;
+    private final Person speaker;
 
     // CamOps states that executing prisoners incurs a -50 reputation penalty.
     // However, that lacks nuance, so we've changed it to -1 per prisoner to a maximum of -50.
@@ -45,11 +47,12 @@ public class PrisonerEventManager {
     private final int RESPONSE_TARGET_NUMBER = 7;
 
     // Fixed Dialog Options
-    private static int CHOICE_FREE = 1;
-    private static int CHOICE_EXECUTE = 2;
+    private final int CHOICE_FREE = 1;
+    private final int CHOICE_EXECUTE = 2;
 
     public PrisonerEventManager(Campaign campaign) {
         this.campaign = campaign;
+        this.speaker = getSpeaker();
 
         if (campaign.getCurrentPrisoners().isEmpty()) {
             return;
@@ -103,25 +106,38 @@ public class PrisonerEventManager {
                 && (totalPrisoners > MINIMUM_PRISONER_COUNT)
                 && (randomInt(100) < overflow);
 
-            Person speaker = getSpeaker(campaign);
             // If there is no event, throw up a warning and give the player an opportunity to do
             // something about the situation.
             if (!minorEvent) {
-                processWarning(campaign, overflow, speaker);
+                processWarning(overflow);
                 return;
             }
 
-            // Major Event
-            if (majorEvent) {
-                processMajorEvent(campaign, speaker);
-                return;
-            }
-
-            processMinorEvent(speaker);
+            // Random Event
+            processRandomEvent(majorEvent);
         }
     }
 
-    private void processWarning(Campaign campaign, int overflow, Person speaker) {
+    private void processRandomEvent(boolean majorEvent) {
+        PrisonerEventData eventData;
+        if (majorEvent) {
+            eventData = pickEvent(true);
+        } else {
+            eventData = pickEvent(false);
+        }
+        PrisonerEvent event = eventData.prisonerEvent();
+
+        PrisonerEventDialog eventDialog =
+            new PrisonerEventDialog(campaign, speaker, event);
+
+        int choiceIndex = eventDialog.getDialogChoice();
+
+        boolean isSuccessful = makeEventCheck(eventData, choiceIndex);
+
+        new PrisonerEventResultsDialog(campaign, speaker, event, choiceIndex, isSuccessful);
+    }
+
+    private void processWarning(int overflow) {
         List<Person> prisoners = campaign.getCurrentPrisoners();
         Collections.shuffle(prisoners);
 
@@ -151,55 +167,28 @@ public class PrisonerEventManager {
         }
     }
 
-    private void processMajorEvent(Campaign campaign, Person speaker) {
-        int event = randomInt(10);
-        PrisonerEventDialog eventDialog =
-            new PrisonerEventDialog(campaign, speaker, event, false);
-
-        int choice = eventDialog.getDialogChoice();
-
-        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice, false);
-
-        new PrisonerEventResultsDialog(campaign, speaker, event, choice, false, isSuccessful);
+    private PrisonerEventData pickEvent(boolean isMajor) {
+        List<PrisonerEventData> allMajorEvents = campaign.getRandomEventLibraries().getPrisonerEvents(isMajor);
+        Collections.shuffle(allMajorEvents);
+        return ObjectUtility.getRandomItem(allMajorEvents);
     }
 
-    private boolean makeEventCheck(Campaign campaign, Person speaker, int event, int choice, boolean isMinor) {
+    private boolean makeEventCheck(PrisonerEventData eventData, int choiceIndex) {
         int responseModifier = 0;
         if (speaker != null) {
             responseModifier = getPersonalityValue(campaign, speaker);
         }
 
-        try {
-            ResponseQuality response;
-            if (isMinor) {
-                response = minorEventResponses.get(event).get(choice);
-            } else {
-                response = majorEventResponses.get(event).get(choice);
-            }
-
-            switch (response) {
-                case RESPONSE_NEUTRAL -> {
-                }
-                case RESPONSE_POSITIVE -> responseModifier += 3;
-                case RESPONSE_NEGATIVE -> responseModifier -= 3;
-            }
-        } catch (Exception e) {
-            // This most likely means the item was missing from the event map
-            final MMLogger logger = MMLogger.create(PrisonerEventManager.class);
-            logger.error(String.format("Error: %s", e.getMessage()));
+        ResponseQuality responseQuality = eventData.responseMap().get(choiceIndex).quality();
+        switch (responseQuality) {
+            case RESPONSE_NEUTRAL -> {} // No modifier
+            case RESPONSE_POSITIVE -> responseModifier += 3;
+            case RESPONSE_NEGATIVE -> responseModifier -= 3;
         }
 
         int responseCheck = d6(2) + responseModifier;
 
         return responseCheck >= RESPONSE_TARGET_NUMBER;
-    }
-
-    private void processMinorEvent(@Nullable Person speaker) {
-        int event = randomInt(50);
-        PrisonerEventDialog eventDialog = new PrisonerEventDialog(campaign, speaker, event, true);
-        int choice = eventDialog.getDialogChoice();
-        boolean isSuccessful = makeEventCheck(campaign, speaker, event, choice, true);
-        new PrisonerEventResultsDialog(campaign, speaker, event, choice, true, isSuccessful);
     }
 
     private void processExecutions(int executions, List<Person> prisoners) {
@@ -318,7 +307,7 @@ public class PrisonerEventManager {
         return prisonerCapacity + campaign.getTemporaryPrisonerCapacity();
     }
 
-    private static @Nullable Person getSpeaker(Campaign campaign) {
+    private @Nullable Person getSpeaker() {
         List<Force> securityForces = new ArrayList<>();
 
         for (Force force : campaign.getAllForces()) {

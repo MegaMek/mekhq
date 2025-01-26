@@ -99,6 +99,7 @@ import mekhq.campaign.personnel.prisoners.PrisonerEventManager;
 import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
+import mekhq.campaign.personnel.randomEvents.RandomEventLibraries;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -308,10 +309,16 @@ public class Campaign implements ITechManager {
     private List<Unit> automatedMothballUnits;
     private int temporaryPrisonerCapacity;
 
-     //options relating to parts in use and restock
+    //options relating to parts in use and restock
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
+
+    // Random Events
+    // We deliberately don't write this data to the save file as we want it rebuilt every time the
+    // campaign loads. This ensures updates can be applied and there is no risk of bugs being
+    // permanently locked into the campaign file.
+    RandomEventLibraries randomEventLibraries = new RandomEventLibraries();
 
     /**
      * Represents the different types of administrative specializations.
@@ -5889,6 +5896,10 @@ public class Campaign implements ITechManager {
 
     public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
         this.temporaryPrisonerCapacity = temporaryPrisonerCapacity;
+    }
+
+    public RandomEventLibraries getRandomEventLibraries() {
+        return randomEventLibraries;
     }
 
     public void writeToXML(final PrintWriter pw) {

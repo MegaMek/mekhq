@@ -4,6 +4,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
@@ -14,34 +15,39 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
     private static final ResourceBundle resources = ResourceBundle.getBundle(
         BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
-    public PrisonerEventDialog(Campaign campaign, @Nullable Person speaker, int eventRoll, boolean isMinor) {
-        super(campaign, speaker, null, createInCharacterMessage(campaign, eventRoll, isMinor),
-            createButtons(eventRoll, isMinor), createOutOfCharacterMessage(),
-            null, null, null);
+    static final String FORWARD_EVENT = "event.";
+    static final String SUFFIX_MESSAGE = ".message";
+
+    static final String FORWARD_RESPONSE = "response.";
+    static final String OPTION_INDEX_0 = "0.";
+    static final String OPTION_INDEX_1 = "1.";
+    static final String OPTION_INDEX_2 = "2.";
+    static final String SUFFIX_BUTTON = ".button";
+    static final String SUFFIX_TOOLTIP = ".tooltip";
+
+    public PrisonerEventDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event) {
+        super(campaign, speaker, null, createInCharacterMessage(campaign, event),
+            createButtons(event), createOutOfCharacterMessage(), null, null, null);
     }
 
-    private static List<ButtonLabelTooltipPair> createButtons(int eventRoll, boolean isMinor) {
-        String typeKey = isMinor ? "Minor" : "Major";
-
+    private static List<ButtonLabelTooltipPair> createButtons(PrisonerEvent event) {
         ButtonLabelTooltipPair btnResponseA = new ButtonLabelTooltipPair(
-            resources.getString("response" + typeKey + 'A' + eventRoll + ".button"),
-            resources.getString("response" + typeKey + 'A' + eventRoll + ".tooltip"));
+            resources.getString(FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_BUTTON),
+            resources.getString(FORWARD_RESPONSE + OPTION_INDEX_0 + event.name() + SUFFIX_TOOLTIP));
         ButtonLabelTooltipPair btnResponseB = new ButtonLabelTooltipPair(
-            resources.getString("response" + typeKey + 'B' + eventRoll + ".button"),
-            resources.getString("response" + typeKey + 'B' + eventRoll + ".tooltip"));
+            resources.getString(FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_BUTTON),
+            resources.getString(FORWARD_RESPONSE + OPTION_INDEX_1 + event.name() + SUFFIX_TOOLTIP));
         ButtonLabelTooltipPair btnResponseC = new ButtonLabelTooltipPair(
-            resources.getString("response" + typeKey + 'C' + eventRoll + ".button"),
-            resources.getString("response" + typeKey + 'C' + eventRoll + ".tooltip"));
+            resources.getString(FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_BUTTON),
+            resources.getString(FORWARD_RESPONSE + OPTION_INDEX_2 + event.name() + SUFFIX_TOOLTIP));
 
         return List.of(btnResponseA, btnResponseB, btnResponseC);
     }
 
-    private static String createInCharacterMessage(Campaign campaign, int eventRoll, boolean isMinor) {
-        String typeKey = isMinor ? "Minor" : "Major";
-        String fullResourceKey = "event" + typeKey + eventRoll + ".message";
-
+    private static String createInCharacterMessage(Campaign campaign, PrisonerEvent event) {
         String commanderAddress = campaign.getCommanderAddress(false);
-        return String.format(resources.getString(fullResourceKey), commanderAddress);
+        return String.format(resources.getString(FORWARD_EVENT + event.name() + SUFFIX_MESSAGE),
+            commanderAddress);
     }
 
     private static String createOutOfCharacterMessage() {

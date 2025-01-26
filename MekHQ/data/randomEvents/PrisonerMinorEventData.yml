@@ -1,0 +1,27 @@
+events:
+    # This is the internal identification enum for the event.
+    # Only acceptable values are in the PrisonerEvent enum.
+  - prisonerEvent: ARGUMENT
+    # Must have 3 entries using values from the ResponseQuality enum.
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        # Must contain at least one entry using values from the EventResultEffect enum.
+        effects:
+          - NONE
+      - quality: RESPONSE_NEUTRAL
+        effects:
+          - NONE
+      - quality: RESPONSE_NEUTRAL
+        effects:
+          - NONE
+  - prisonerEvent: SINGING
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effects:
+          - NONE
+      - quality: RESPONSE_NEUTRAL
+        effects:
+          - NONE
+      - quality: RESPONSE_NEUTRAL
+        effects:
+          - NONE

@@ -4,6 +4,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
@@ -14,26 +15,14 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
     private static final ResourceBundle resources = ResourceBundle.getBundle(
         BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
-    public enum ResponseKey {
-        RESPONSE_A('A'),
-        RESPONSE_B('B'),
-        RESPONSE_C('C');
+    static final String FORWARD_RESPONSE = "response.";
+    static final String SUFFIX_SUCCESS = ".success";
+    static final String SUFFIX_FAILURE = ".failure";
 
-        private final char choiceKey;
-
-        ResponseKey(char choiceKey) {
-            this.choiceKey = choiceKey;
-        }
-
-        public char getChoiceKey() {
-            return choiceKey;
-        }
-    }
-
-    public PrisonerEventResultsDialog(Campaign campaign, @Nullable Person speaker, int eventRoll,
-                                     int choice, boolean isMinor, boolean isSuccessful) {
-        super(campaign, speaker, null, createInCharacterMessage(campaign, eventRoll,
-                choice, isMinor, isSuccessful), createButtons(isSuccessful), createOutOfCharacterMessage(),
+    public PrisonerEventResultsDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event,
+                                     int choiceIndex, boolean isSuccessful) {
+        super(campaign, speaker, null, createInCharacterMessage(campaign, event,
+                choiceIndex, isSuccessful), createButtons(isSuccessful), createOutOfCharacterMessage(),
             null, null, null);
     }
 
@@ -46,15 +35,12 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
         return List.of(btnConfirmation);
     }
 
-    private static String createInCharacterMessage(Campaign campaign, int eventRoll, int choice,
-                                                   boolean isMinor, boolean isSuccessful) {
-        String magnitudeKey = isMinor ? "Minor" : "Major";
-        String resultsKey = isSuccessful ? "success" : "failure";
-        char choiceKey = ResponseKey.values()[choice].getChoiceKey();
-        String fullResourceKey = "response" + magnitudeKey + choiceKey + eventRoll + '.' + resultsKey;
-
+    private static String createInCharacterMessage(Campaign campaign, PrisonerEvent event,
+                                                   int choiceIndex, boolean isSuccessful) {
+        String suffix = isSuccessful ? SUFFIX_SUCCESS : SUFFIX_FAILURE;
         String commanderAddress = campaign.getCommanderAddress(false);
-        return String.format(resources.getString(fullResourceKey), commanderAddress);
+        return String.format(resources.getString(FORWARD_RESPONSE + choiceIndex + '.' + event.name() + suffix),
+            commanderAddress);
     }
 
     private static String createOutOfCharacterMessage() {
