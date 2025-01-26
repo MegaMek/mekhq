@@ -131,6 +131,7 @@ MEKHQ VERSION HISTORY:
 + PR #5870: Adjusted Randomness of Turning Points and Highlighted Them in Briefing Room
 + PR #5875: Rolled Back Window Size Setting
 + PR #5878: Fixed Mothball Info Saving & Loading Bug
++ PR #5879: Added Jackson Dependencies for YAML Processing in MekHQ
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.
