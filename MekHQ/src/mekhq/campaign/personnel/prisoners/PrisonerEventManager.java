@@ -250,6 +250,7 @@ public class PrisonerEventManager {
         int prisonerCapacityUsage = 0;
 
         for (Person prisoner : campaign.getCurrentPrisoners()) {
+            // TODO this needs to be optional
             if (prisoner.needsFixing()) {
                 if (prisoner.getDoctorId() != null) {
                     // Injured prisoners without doctors increase prisoner unhappiness, increasing capacity usage.
@@ -268,8 +269,9 @@ public class PrisonerEventManager {
         // handle 100 prisoners. As there are usually around 28 soldiers in a CI platoon and 5 BA
         // in a BA Squad, we extrapolated from there to more easily handle different platoon and
         // squad sizes.
-        final int PRISONER_CAPACITY_CI = 4;
-        final int PRISONER_CAPACITY_BA = 20;
+        final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 4;
+        final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
+        final int PRISONER_CAPACITY_OTHER = 1;
 
         int prisonerCapacity = 0;
 
@@ -284,22 +286,35 @@ public class PrisonerEventManager {
                     continue;
                 }
 
+                if (!unit.isAvailable()) {
+                    continue;
+                }
+
                 if (unit.isBattleArmor()) {
                     int crewSize = unit.getCrew().size();
                     for (int trooper = 0; trooper < crewSize; trooper++) {
                         if (unit.isBattleArmorSuitOperable(trooper)) {
-                            prisonerCapacity += PRISONER_CAPACITY_BA;
+                            prisonerCapacity += PRISONER_CAPACITY_BATTLE_ARMOR;
                         }
                     }
 
-                    prisonerCapacity += crewSize * PRISONER_CAPACITY_BA;
+                    prisonerCapacity += crewSize * PRISONER_CAPACITY_BATTLE_ARMOR;
                     continue;
                 }
 
                 if (unit.isConventionalInfantry()) {
                     for (Person soldier : unit.getCrew()) {
-                        if (!soldier.needsFixing() && !soldier.needsAMFixing()) {
-                            prisonerCapacity += PRISONER_CAPACITY_CI;
+                        if (!soldier.needsFixing()) {
+                            prisonerCapacity += PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
+                        }
+                    }
+                }
+
+                // TODO This needs to be an optional rule
+                if (!unit.isDamaged()) {
+                    for (Person crewMember : unit.getCrew()) {
+                        if (!crewMember.needsFixing()) {
+                            prisonerCapacity += PRISONER_CAPACITY_OTHER;
                         }
                     }
                 }
