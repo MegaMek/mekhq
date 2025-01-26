@@ -15,8 +15,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven { url "https://www.jetbrains.com/intellij-repository/releases" }
-    maven { url "https://jetbrains.bintray.com/intellij-third-party-dependencies" }
 }
 
 java {
@@ -75,7 +73,6 @@ ext {
 }
 
 dependencies {
-    implementation 'com.jetbrains.intellij.java:java-gui-forms-rt:243.22562.242'
     implementation "org.megamek:megamek${mmBranchTag}:${version}"
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
         // We may want to specify different branches for MM and MML, so we need to exclude the transitive MM dependency

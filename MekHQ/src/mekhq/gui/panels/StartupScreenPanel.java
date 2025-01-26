@@ -18,6 +18,8 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.swing.ai.editor.AiProfileEditor;
+import megamek.client.ui.swing.util.MegaMekController;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.widget.MegaMekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
@@ -146,11 +148,26 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         });
 
         MegaMekButton btnLoadLastCampaign = new MegaMekButton(resources.getString("btnLoadLastCampaign.text"),
-                UIComponents.MainMenuButton.getComp(), true);
+            UIComponents.MainMenuButton.getComp(), true);
         btnLoadLastCampaign.setEnabled(lastSaveFile != null);
         btnLoadLastCampaign.addActionListener(evt -> {
             btnLoadLastCampaign.setEnabled(false);
             startCampaign(lastSaveFile);
+        });
+
+        MegaMekButton btnOpenAiEditor = new MegaMekButton(resources.getString("btnAiEditor.text"),
+            UIComponents.MainMenuButton.getComp(), true);
+        btnOpenAiEditor.addActionListener(evt -> {
+            btnOpenAiEditor.setEnabled(false);
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    showAiEditor();
+                } finally {
+                    btnOpenAiEditor.setEnabled(true);
+                }
+            });
+
         });
 
         MegaMekButton btnLoadStoryArc = new MegaMekButton(resources.getString("btnLoadStoryArc.text"),
@@ -195,6 +212,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadLastCampaign.setPreferredSize(minButtonDim);
         btnLoadStoryArc.setMinimumSize(minButtonDim);
         btnLoadStoryArc.setPreferredSize(minButtonDim);
+        btnOpenAiEditor.setMinimumSize(minButtonDim);
         btnQuit.setMinimumSize(minButtonDim);
         btnQuit.setPreferredSize(minButtonDim);
 
@@ -234,6 +252,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         c.gridy++;
         add(btnLoadStoryArc, c);
         c.gridy++;
+        add(btnOpenAiEditor, c);
+        c.gridy++;
         add(btnQuit, c);
 
         getFrame().setResizable(false);
@@ -256,6 +276,11 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     // region Button Actions
     private void startCampaign(final @Nullable File file) {
         startCampaign(file, null);
+    }
+
+    private void showAiEditor() {
+        MegaMekController controller = new MegaMekController();
+        controller.aiEditor = new AiProfileEditor(controller);
     }
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {

@@ -29,7 +29,9 @@ import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.MMToggleButton;
 import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.ai.editor.AiProfileEditor;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.client.ui.swing.util.MegaMekController;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -977,6 +979,18 @@ public class CampaignGUI extends JPanel {
             });
 
         menuManage.add(miAutoResolveBehaviorEditor);
+
+        JMenuItem miAiEditor = new JMenuItem(resourceMap.getString("miAiEditor.text"));
+        miAiEditor.setToolTipText(resourceMap.getString("miAiEditor.tooltip"));
+        miAiEditor
+            .addActionListener(evt -> {
+                SwingUtilities.invokeLater(() -> {
+                    MegaMekController controller = new MegaMekController();
+                    controller.aiEditor = new AiProfileEditor(controller);
+                });
+            });
+
+        menuManage.add(miAiEditor);
 
         menuBar.add(menuManage);
         // endregion Manage Campaign Menu
