@@ -502,11 +502,10 @@ public class AtBContract extends Contract {
                 // This works with the regenerated Scenario Odds to crease very high intensity
                 // spikes in otherwise low-key Garrison-type contracts.
                 AtBMoraleLevel newMoraleLevel = switch (roll) {
-                    case 0,1 -> STALEMATE;
                     case 2,3,4,5 -> ADVANCING;
                     case 6,7 -> DOMINATING;
                     case 8 -> OVERWHELMING;
-                    default -> STALEMATE;
+                    default -> STALEMATE; // 0-1
                 };
 
                 // If we have a StratCon enabled contract, regenerate Scenario Odds
@@ -529,7 +528,7 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
+                if (contractType.isGarrisonDuty()) {
                     updateEnemy(campaign, today); // mix it up a little
                 }
             }
@@ -642,7 +641,7 @@ public class AtBContract extends Contract {
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
         if (moraleLevel.isRouted()) {
-            if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
+            if (contractType.isGarrisonType() || contractType.isReliefDuty()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
             } else {
                 campaign.addReport("With the enemy routed, any remaining objectives have been" +
