@@ -10,10 +10,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A utility class that manages the loading and retrieval of random event data
+ * from YAML files. Organizes the events into separate lists for later use.
+ */
 public class RandomEventLibraries {
     // file addresses
+    /**
+     * Directory path where event YAML files are located.
+     */
     private final String DIRECTORY = "data/randomEvents/";
+
+    /**
+     * File extension for the YAML files.
+     */
     private final String EXTENSION = ".yml";
+
     private final String PRISONER_EVENTS_MAJOR = DIRECTORY + "PrisonerMajorEventData" + EXTENSION;
     private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
 
@@ -21,10 +33,21 @@ public class RandomEventLibraries {
     private List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
     private List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
 
+    /**
+     * Constructs a {@code RandomEventLibraries} object and initializes the event data
+     * by loading it from the YAML files.
+     */
     public RandomEventLibraries() {
         buildPrisonerEventData();
     }
 
+    /**
+     * Retrieves a list of prisoner events based on their severity (major or minor).
+     *
+     * @param isMajor {@code true} to retrieve major prisoner events, {@code false} to retrieve
+     *                           minor prisoner events.
+     * @return a {@link List} of {@link PrisonerEventData} corresponding to the specified event severity.
+     */
     public List<PrisonerEventData> getPrisonerEvents(boolean isMajor) {
         if (isMajor) {
             return prisonerEventsMajor;
@@ -33,6 +56,14 @@ public class RandomEventLibraries {
         }
     }
 
+    /**
+     * Loads prisoner event data from predefined YAML files ({@code PRISONER_EVENTS_MAJOR} and
+     * {@code PRISONER_EVENTS_MINOR}) and organizes the individual events into major and minor
+     * event lists.
+     * <p>
+     * Uses Jackson for YAML deserialization via the {@link ObjectMapper}.
+     * </p>
+     */
     private void buildPrisonerEventData() {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
@@ -57,7 +88,6 @@ public class RandomEventLibraries {
                         prisonerEventsMinor.add(event);
                     }
                 }
-
             } catch (IOException e) {
                 throw new RuntimeException("Error reading prisoner event data from file: " + eventFile, e);
             }
