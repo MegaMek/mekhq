@@ -4837,7 +4837,7 @@ public class Campaign implements ITechManager {
 
         // Random Events
         if (currentDay.equals(EVENT_DATE_CLARION_NOTE) ||
-            (currentDay.isBefore(EVENT_DATE_GRAY_MONDAY.plusDays(4)))) {
+            (currentDay.isBefore(EVENT_DATE_GRAY_MONDAY.plusDays(5)))) {
             new GrayMonday(this, currentDay);
         }
 
