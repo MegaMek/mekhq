@@ -19,16 +19,17 @@
 package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory.CampaignProblemType;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.CampaignFactory.CampaignProblemType.CANT_LOAD_FROM_NEWER_VERSION;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * Dialog to inform and handle campaign-loading problems within MekHQ.
@@ -42,7 +43,9 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * text based on the problem type and campaign information.</p>
  */
 public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignHasProblemOnLoad";
+    private static final String BUNDLE_KEY = "mekhq.resources.CampaignHasProblemOnLoad";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(
+        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
     /**
      * Constructs the dialog to handle campaign load problems.
@@ -57,7 +60,8 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      */
     public CampaignHasProblemOnLoad(Campaign campaign, CampaignProblemType problemType) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign, problemType),
-            createButtons(problemType), createOutOfCharacterMessage(problemType), null);
+            createButtons(problemType), createOutOfCharacterMessage(problemType), 0,
+            null, null, null);
     }
 
     /**
@@ -79,10 +83,10 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      */
     private static List<ButtonLabelTooltipPair> createButtons(CampaignProblemType problemType) {
         ButtonLabelTooltipPair btnCancel = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "cancel.button"), null);
+            resources.getString("cancel.button"), null);
 
         ButtonLabelTooltipPair btnContinue = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "continue.button"), null);
+            resources.getString("continue.button"), null);
 
         if (problemType == CANT_LOAD_FROM_NEWER_VERSION) {
             return List.of(btnCancel);
@@ -119,7 +123,7 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
         String typeKey = problemType.toString();
         String commanderAddress = campaign.getCommanderAddress(false);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, typeKey + ".message", commanderAddress);
+        return String.format(resources.getString(typeKey + ".message"), commanderAddress);
     }
 
     /**
@@ -133,6 +137,6 @@ public class CampaignHasProblemOnLoad extends MHQDialogImmersive {
      */
     private static String createOutOfCharacterMessage(CampaignProblemType problemType) {
         String typeKey = problemType.toString();
-        return getFormattedTextAt(RESOURCE_BUNDLE, typeKey + ".ooc");
+        return resources.getString(typeKey + ".ooc");
     }
 }

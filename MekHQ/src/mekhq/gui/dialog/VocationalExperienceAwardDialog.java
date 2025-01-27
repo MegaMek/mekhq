@@ -18,7 +18,9 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
@@ -27,10 +29,10 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * A dialog that displays a notification to the commander about personnel
@@ -42,7 +44,9 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * personnel records via hyperlinks.</p>
  */
 public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.VocationalExperienceAwardDialog";
+    private static final String BUNDLE_KEY = "mekhq.resources.VocationalExperienceAwardDialog";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(
+        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
 
     /**
      * Constructs the {@link VocationalExperienceAwardDialog}.
@@ -55,7 +59,8 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign),
-            createButtons(), createOutOfCharacterMessage(campaign), null);
+            createButtons(), createOutOfCharacterMessage(campaign), 0, null,
+            UIUtil.scaleForGUI(800), null);
 
         setModal(false);
         setAlwaysOnTop(true);
@@ -88,7 +93,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnConfirm = new ButtonLabelTooltipPair(
-            getFormattedTextAt(RESOURCE_BUNDLE, "confirm.button"), null);
+            resources.getString("confirm.button"), null);
 
         return List.of(btnConfirm);
     }
@@ -123,7 +128,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
 
         StringBuilder message = new StringBuilder();
         message.append(commanderAddress);
-        message.append(getFormattedTextAt(RESOURCE_BUNDLE, "dialog.message"));
+        message.append(resources.getString("dialog.message"));
 
         // Create a table to hold the personnel
         message.append("<br><table style='width:100%; text-align:left;'>");
@@ -188,6 +193,6 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
             }
         }
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "dialog.ooc", advancement);
+        return String.format(resources.getString("dialog.ooc"), advancement);
     }
 }
