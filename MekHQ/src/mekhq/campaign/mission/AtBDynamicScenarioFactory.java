@@ -1823,7 +1823,7 @@ public class AtBDynamicScenarioFactory {
         // These roles were picked as their pool is relatively small, or they are exclusive in nature.
         // This ensures we have a greater chance of successfully pulling an appropriate unit.
         List<MissionRole> bypassedRoles = List.of(CIVILIAN, SUPPORT, ARTILLERY, MISSILE_ARTILLERY,
-            APC, SPECOPS, ENGINEER, MINESWEEPER, MINELAYER);
+            MIXED_ARTILLERY, APC, SPECOPS, ENGINEER, MINESWEEPER, MINELAYER);
 
         for (MissionRole role : rolesByType) {
             if (bypassedRoles.contains(role)) {
