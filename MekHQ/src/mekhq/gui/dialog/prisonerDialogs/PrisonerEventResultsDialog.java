@@ -21,7 +21,7 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
                                      int choiceIndex, boolean isSuccessful) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, event,
                 choiceIndex, isSuccessful), createButtons(isSuccessful), createOutOfCharacterMessage(),
-            null, null, null);
+            null);
     }
 
     private static List<ButtonLabelTooltipPair> createButtons(boolean isSuccessful) {

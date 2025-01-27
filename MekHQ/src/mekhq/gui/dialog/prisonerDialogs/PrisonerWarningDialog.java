@@ -16,7 +16,7 @@ public class PrisonerWarningDialog extends MHQDialogImmersive {
                                  @Nullable Integer executeCount, @Nullable Integer freeCount) {
         super(campaign, speaker, null, createInCharacterMessage(campaign),
             createButtons( executeCount, freeCount), createOutOfCharacterMessage(),
-            null, null, null);
+            null);
     }
 
     private static List<ButtonLabelTooltipPair> createButtons(@Nullable Integer executeCount,

@@ -25,7 +25,7 @@ public class PrisonerEventDialog extends MHQDialogImmersive {
 
     public PrisonerEventDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, event),
-            createButtons(event), createOutOfCharacterMessage(), null, null, null);
+            createButtons(event), createOutOfCharacterMessage(), null);
     }
 
     private static List<ButtonLabelTooltipPair> createButtons(PrisonerEvent event) {
