@@ -2,6 +2,7 @@
  * CurrencyManager.java
  *
  * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
+ * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -127,6 +128,26 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return this.uiAmountAndNamePrinter;
     }
 
+    /**
+     * Retrieves the default currency for the current campaign, based on the campaign's
+     * date, planetary system, and faction details.
+     * <p>
+     * This method ensures the default currency is updated if the campaign's date or
+     * planetary system has changed since the last check. It uses various conditions
+     * to determine the appropriate default currency, including:
+     * </p>
+     * <ul>
+     *   <li>The year range validity for each currency</li>
+     *   <li>Special cases for Clan factions (e.g., "KSK" or "SFC" currencies)</li>
+     *   <li>The "default" status of available currencies</li>
+     * </ul>
+     *
+     * If no campaign is active, the backup currency is returned. Certain decisions
+     * regarding currency selection (e.g., based on contracts or planetary factions)
+     * are currently disabled.
+     *
+     * @return the default {@link Currency} for the campaign.
+     */
     public synchronized Currency getDefaultCurrency() {
         if (this.campaign == null) {
             return this.backupCurrency;
