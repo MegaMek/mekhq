@@ -19,30 +19,27 @@
 package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class DefectionOffer extends MHQDialogImmersive {
-    private static final String BUNDLE_KEY = "mekhq.resources.DefectionOffer";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(
-        BUNDLE_KEY, MekHQ.getMHQOptions().getLocale());
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.DefectionOffer";
 
     public DefectionOffer(Campaign campaign, Person defector, boolean isBondsman) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign,
                 defector, isBondsman), createButtons(), createOutOfCharacterMessage(isBondsman),
-            null, null, null);
+            null);
     }
 
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnDefectorUnderstood = new ButtonLabelTooltipPair(
-            resources.getString("understood.button"), null);
+            getFormattedTextAt(RESOURCE_BUNDLE, "understood.button"), null);
 
         return List.of(btnDefectorUnderstood);
     }
@@ -61,17 +58,17 @@ public class DefectionOffer extends MHQDialogImmersive {
             if (!originFaction.contains("Clan")) {
                 originFaction = "The " + originFaction;
             }
-            return String.format(resources.getString(typeKey + ".message"),
+            return getFormattedTextAt(RESOURCE_BUNDLE, typeKey + ".message",
                 commanderAddress, defector.getFullName(), originFaction, defector.getFirstName());
         }
 
-        return String.format(resources.getString(typeKey + ".message"),
+        return getFormattedTextAt(RESOURCE_BUNDLE, typeKey + ".message",
             commanderAddress, defector.getFullName(),
             defector.getOriginFaction().getFullName(campaign.getGameYear()));
     }
 
     private static String createOutOfCharacterMessage(boolean isBondsman) {
         String typeKey = isBondsman ? "bondsman" : "defector";
-        return resources.getString(typeKey + ".ooc");
+        return getFormattedTextAt(RESOURCE_BUNDLE, typeKey + ".ooc");
     }
 }

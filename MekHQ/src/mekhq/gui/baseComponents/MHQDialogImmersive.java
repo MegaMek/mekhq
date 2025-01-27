@@ -21,7 +21,6 @@ package mekhq.gui.baseComponents;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -32,13 +31,13 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static java.lang.Math.max;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers,
@@ -52,6 +51,8 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * allowing for dynamic configurations based on the input parameters.</p>
  */
 public class MHQDialogImmersive extends JDialog {
+    private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
     private Campaign campaign;
 
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
@@ -63,9 +64,7 @@ public class MHQDialogImmersive extends JDialog {
     private JPanel southPanel;
     private JPanel buttonPanel;
     private Person leftSpeaker;
-    private int leftSpeakerWidth;
     private Person rightSpeaker;
-    private int rightSpeakerWidth;
 
     private int dialogChoice;
 
@@ -97,15 +96,12 @@ public class MHQDialogImmersive extends JDialog {
      * @param centerMessage The main message displayed in the dialog's center.
      * @param buttons The list of {@link ButtonLabelTooltipPair} actions for the dialog.
      * @param outOfCharacterMessage Optional out-of-character message below the buttons.
-     * @param leftWidth Optional width for the left panel; defaults to a pre-defined width if null.
      * @param centerWidth Optional width for the center panel; defaults if null.
-     * @param rightWidth Optional width for the right panel; defaults if null.
      */
     public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
                               @Nullable Person rightSpeaker, String centerMessage,
-                              List<ButtonLabelTooltipPair> buttons,
-                              @Nullable String outOfCharacterMessage, @Nullable Integer leftWidth,
-                              @Nullable Integer centerWidth, @Nullable Integer rightWidth) {
+                              List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
+                              @Nullable Integer centerWidth) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
@@ -114,9 +110,7 @@ public class MHQDialogImmersive extends JDialog {
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
         // Title
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -367,12 +361,6 @@ public class MHQDialogImmersive extends JDialog {
         // Add the image and description to the speakerBox
         speakerBox.add(imageLabel);
         speakerBox.add(leftDescription);
-
-        if (isLeftSpeaker) {
-            leftSpeakerWidth = speakerBox.getPreferredSize().width;
-        } else {
-            rightSpeakerWidth = speakerBox.getPreferredSize().width;
-        }
 
         return speakerBox;
     }
