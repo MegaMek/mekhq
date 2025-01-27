@@ -138,6 +138,7 @@ public abstract class AbstractMarriage {
         if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
         }
+
         if (randomMarriage) {
             if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanPersonnel.text");
