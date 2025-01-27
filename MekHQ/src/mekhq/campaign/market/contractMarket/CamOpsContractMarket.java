@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,9 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.randomEvents.GrayMonday.isIsGrayMonday;
+
 /**
  * Contract Market as described in Campaign Operations, 4th printing.
  */
@@ -65,6 +68,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
+        boolean isGrayMonday = isIsGrayMonday(campaign);
+
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
             return;
         }
@@ -80,6 +85,18 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         int negotiationSkill = findNegotiationSkill(campaign);
         int numOffers = getNumberOfOffers(
             rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) - BASE_NEGOTIATION_TARGET);
+
+        if (isGrayMonday) {
+            for (int i = 0; i < numOffers; i++) {
+                if (d6() <= 2) {
+                    numOffers--;
+                }
+            }
+        }
+
+        if (numOffers == 0) {
+            return;
+        }
 
         for (int i = 0; i < numOffers; i++) {
             addAtBContract(campaign);
