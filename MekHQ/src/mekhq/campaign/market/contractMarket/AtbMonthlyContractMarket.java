@@ -522,6 +522,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
+        if (isIsGrayMonday(campaign)) {
+            multiplier *= 0.25;
+        }
 
         return multiplier;
     }
