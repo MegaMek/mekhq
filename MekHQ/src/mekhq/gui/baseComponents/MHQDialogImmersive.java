@@ -21,7 +21,6 @@ package mekhq.gui.baseComponents;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -32,11 +31,13 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
 import java.util.List;
-import java.util.ResourceBundle;
 
-import static java.lang.Math.round;
+import static java.lang.Math.max;
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers,
@@ -50,14 +51,14 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
  * allowing for dynamic configurations based on the input parameters.</p>
  */
 public class MHQDialogImmersive extends JDialog {
+    private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
     private Campaign campaign;
 
-    private int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
-    private int RIGHT_WIDTH = UIUtil.scaleForGUI(200);
 
-    private final int INSERT_SIZE = UIUtil.scaleForGUI(10);
-    private final int IMAGE_WIDTH = 100; // This is scaled to GUI by 'scaleImageIconToWidth'
+    private final int INSERT_SIZE = UIUtil.scaleForGUI(5);
+    private final int IMAGE_WIDTH = 125; // This is scaled to GUI by 'scaleImageIconToWidth'
 
     private JPanel northPanel;
     private JPanel southPanel;
@@ -95,29 +96,21 @@ public class MHQDialogImmersive extends JDialog {
      * @param centerMessage The main message displayed in the dialog's center.
      * @param buttons The list of {@link ButtonLabelTooltipPair} actions for the dialog.
      * @param outOfCharacterMessage Optional out-of-character message below the buttons.
-     * @param defaultChoiceIndex Default button index assumed when the user closes the dialog.
-     * @param leftWidth Optional width for the left panel; defaults to a pre-defined width if null.
      * @param centerWidth Optional width for the center panel; defaults if null.
-     * @param rightWidth Optional width for the right panel; defaults if null.
      */
     public MHQDialogImmersive(Campaign campaign, @Nullable Person leftSpeaker,
                               @Nullable Person rightSpeaker, String centerMessage,
-                              List<ButtonLabelTooltipPair> buttons,
-                              @Nullable String outOfCharacterMessage, int defaultChoiceIndex,
-                              @Nullable Integer leftWidth, @Nullable Integer centerWidth,
-                              @Nullable Integer rightWidth) {
+                              List<ButtonLabelTooltipPair> buttons, @Nullable String outOfCharacterMessage,
+                              @Nullable Integer centerWidth) {
         // Initialize
         this.campaign = campaign;
         this.leftSpeaker = leftSpeaker;
         this.rightSpeaker = rightSpeaker;
 
-        initialize(leftSpeaker, rightSpeaker, defaultChoiceIndex, leftWidth, centerWidth,
-            rightWidth);
+        CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
         // Title
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale());
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -142,7 +135,7 @@ public class MHQDialogImmersive extends JDialog {
         }
 
         // Center box for the message
-        JPanel pnlCenter = createCenterBox(centerMessage);
+        JPanel pnlCenter = createCenterBox(centerMessage, buttons);
         constraints.gridx = gridx;
         constraints.gridy = 0;
         constraints.weightx = 2;
@@ -165,14 +158,8 @@ public class MHQDialogImmersive extends JDialog {
         // Add mainPanel to dialog
         add(mainPanel, BorderLayout.CENTER);
 
-        // Buttons panel
-        buttonPanel = new JPanel();
-        populateButtonPanel(buttons);
-
         // Bottom panel, for OOC information
         southPanel = new JPanel(new BorderLayout());
-        southPanel.add(buttonPanel, BorderLayout.CENTER);
-
         if (outOfCharacterMessage != null) {
             populateOutOfCharacterPanel(outOfCharacterMessage);
         }
@@ -181,63 +168,50 @@ public class MHQDialogImmersive extends JDialog {
         add(southPanel, BorderLayout.SOUTH);
 
         // Dialog settings
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setModal(true);
-        setLocationRelativeTo(null);
-        int preferredWidth = (int) round(CENTER_WIDTH + LEFT_WIDTH + RIGHT_WIDTH * 1.1);
-        setPreferredSize(new Dimension(preferredWidth, UIUtil.scaleForGUI(400)));
         pack();
+        setLocationRelativeTo(null); // Needs to be after pack
         setVisible(true);
     }
 
     /**
-     * Performs initialization logic for setting default dialog settings and widths.
+     * Creates and returns a central panel containing the main dialog message and a button panel.
+     * This panel is designed to display a central message, typically in HTML format,
+     * using a {@link JEditorPane}, along with an optional list of buttons displayed below the message.
+     * <ul>
+     *   <li>The message is placed in the {@link JEditorPane}, styled for a consistent width.</li>
+     *   <li>The panel includes a scrollable viewport if the message content overflows.</li>
+     *   <li>An additional button panel is added at the bottom of the central panel.</li>
+     * </ul>
      *
-     * @param leftSpeaker The left speaker for the dialog.
-     * @param rightSpeaker The right speaker for the dialog.
-     * @param defaultChoiceIndex Default choice assigned when dialog is dismissed.
-     * @param leftWidth Optional custom width for the left panel.
-     * @param centerWidth Optional custom width for the center panel.
-     * @param rightWidth Optional custom width for the right panel.
+     * @param centerMessage The main dialog message as a string, typically in HTML format.
+     *                      This can include basic HTML for formatting purposes.
+     * @param buttons       A list of {@link ButtonLabelTooltipPair} objects defining the buttons to
+     *                      be displayed at the bottom of the panel. These buttons can have labels,
+     *                      tooltips, and custom actions.
+     * @return A {@link JPanel} with the message displayed in the center and buttons at the bottom.
      */
-    private void initialize(@Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
-                            int defaultChoiceIndex, @Nullable Integer leftWidth,
-                            @Nullable Integer centerWidth, @Nullable Integer rightWidth) {
-        dialogChoice = defaultChoiceIndex;
 
-        if (leftSpeaker == null) {
-            LEFT_WIDTH = 0;
-        } else {
-            LEFT_WIDTH = (leftWidth != null) ? leftWidth : LEFT_WIDTH;
-        }
-
-        CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
-
-        if (rightSpeaker == null) {
-            RIGHT_WIDTH = 0;
-        } else {
-            RIGHT_WIDTH = (rightWidth != null) ? rightWidth : RIGHT_WIDTH;
-        }
-    }
-
-    /**
-     * Creates and returns the central panel that contains the main dialog message.
-     *
-     * @param centerMessage The main message as a string, typically in HTML format.
-     * @return A {@link JPanel} containing the message displayed at the center.
-     */
-    private JPanel createCenterBox(String centerMessage) {
+    private JPanel createCenterBox(String centerMessage, List<ButtonLabelTooltipPair> buttons) {
         northPanel = new JPanel(new BorderLayout());
-        northPanel.setBorder(BorderFactory.createEtchedBorder());
+
+        // Buttons panel
+        buttonPanel = new JPanel();
+        populateButtonPanel(buttons);
 
         // Create a JEditorPane for the center message
         JEditorPane editorPane = new JEditorPane();
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
-        editorPane.setText(
-            String.format("<div style='text-align:center;'>%s</div>", centerMessage)
-        );
+        editorPane.setFocusable(false);
+        editorPane.setBorder(BorderFactory.createEmptyBorder());
 
+        // Use inline CSS to set font family, size, and other style properties
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>",
+            max(buttonPanel.getPreferredSize().width, CENTER_WIDTH), fontStyle, centerMessage));
+        setFontScaling(editorPane, false, 1.1);
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
@@ -248,11 +222,20 @@ public class MHQDialogImmersive extends JDialog {
         // Wrap the JEditorPane in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(editorPane);
         scrollPane.setMinimumSize(new Dimension(CENTER_WIDTH, scrollPane.getHeight()));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        northPanel.add(scrollPane, BorderLayout.CENTER);
+        // Create a container with a border for the padding
+        JPanel scrollPaneContainer = new JPanel(new BorderLayout());
+        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, 0, 0, 0)); // Padding above
+        scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
+
+        // Add the scrollPane with padding to the northPanel
+        northPanel.add(scrollPaneContainer, BorderLayout.CENTER);
 
         // Ensure the scrollbars default to the top-left position
         SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+
+        northPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         return northPanel;
     }
@@ -281,17 +264,16 @@ public class MHQDialogImmersive extends JDialog {
      * @param outOfCharacterMessage The OOC message to display.
      */
     private void populateOutOfCharacterPanel(String outOfCharacterMessage) {
-        JPanel pnlOutOfCharacter = new JPanel(new BorderLayout());
+        JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
         pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
 
-        int bottomPanelWidth = CENTER_WIDTH + LEFT_WIDTH + RIGHT_WIDTH;
-
         JLabel lblOutOfCharacter = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                bottomPanelWidth, outOfCharacterMessage));
+            String.format("<html><div style='width: %dpx'>%s</div></html>",
+                CENTER_WIDTH, outOfCharacterMessage));
+        lblOutOfCharacter.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE,
+            INSERT_SIZE, INSERT_SIZE));
 
-        lblOutOfCharacter.setHorizontalAlignment(SwingConstants.CENTER);
-        pnlOutOfCharacter.add(lblOutOfCharacter, BorderLayout.CENTER);
+        pnlOutOfCharacter.add(lblOutOfCharacter);
 
         southPanel.add(pnlOutOfCharacter, BorderLayout.SOUTH);
     }
@@ -306,20 +288,36 @@ public class MHQDialogImmersive extends JDialog {
      * @param buttons A list of button label-tooltip pairs defining the content of the buttons.
      */
     private void populateButtonPanel(List<ButtonLabelTooltipPair> buttons) {
+        buttonPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
             JButton button = new JButton(buttonStrings.btnLabel());
 
             String tooltip = buttonStrings.btnTooltip();
             if (tooltip != null) {
-                button.setToolTipText(tooltip);
+                button.setToolTipText(wordWrap(tooltip));
             }
+
+            button.setMinimumSize(button.getPreferredSize());
 
             button.addActionListener(evt -> {
                 dialogChoice = buttons.indexOf(buttonStrings);
                 dispose();
             });
 
-            buttonPanel.add(button);
+            buttonPanel.add(button, gbc);
+
+            gbc.gridx++;
+            if (gbc.gridx % 3 == 0) { // Move to a new row after every third button
+                gbc.gridx = 0;
+                gbc.gridy++;
+            }
         }
     }
 
@@ -335,12 +333,11 @@ public class MHQDialogImmersive extends JDialog {
      */
     private JPanel buildSpeakerPanel(boolean isLeftSpeaker) {
         final Person speaker = isLeftSpeaker ? leftSpeaker : rightSpeaker;
-        final int width = isLeftSpeaker ? LEFT_WIDTH : RIGHT_WIDTH;
-        final float alignment = isLeftSpeaker ? Component.RIGHT_ALIGNMENT : Component.LEFT_ALIGNMENT;
 
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
-        speakerBox.setAlignmentX(alignment);
+        speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, Integer.MAX_VALUE));
 
         // Get speaker details
         String speakerName = speaker.getFullTitle();
@@ -357,13 +354,12 @@ public class MHQDialogImmersive extends JDialog {
         // Speaker description (below the icon)
         StringBuilder speakerDescription = getSpeakerDescription(campaign, speaker, speakerName);
         JLabel leftDescription = new JLabel(
-            String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                width, speakerDescription));
+            String.format("<html><div style='width:%dpx; text-align:center;'>%s</div></html>",
+                IMAGE_WIDTH, speakerDescription));
         leftDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Add the image and description to the speakerBox
         speakerBox.add(imageLabel);
-        speakerBox.add(Box.createRigidArea(new Dimension(0, INSERT_SIZE)));
         speakerBox.add(leftDescription);
 
         return speakerBox;
