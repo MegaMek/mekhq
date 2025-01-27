@@ -518,12 +518,15 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Adjust pay based on difficulty if FG3 is enabled
-        int difficulty = clamp(contract.calculateContractDifficulty(campaign), 0, 10);
-        int baseDifficulty = 5; // 2.5 skulls
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            int difficulty = clamp(contract.calculateContractDifficulty(campaign), 0, 10);
+            int baseDifficulty = 5; // 2.5 skulls
 
-        double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
+            double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
 
-        modifier += difficultyDifference;
+            modifier += difficultyDifference;
+        }
+
         return modifier;
     }
 
