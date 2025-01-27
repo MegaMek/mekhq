@@ -1956,8 +1956,7 @@ public class AtBContract extends Contract {
      * <p>
      * <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's power cannot be calculated.
      * </p>
-     * <b>Mapped Result Explanation:</b>
-     * <p>
+     * <p><b>Mapped Result Explanation:</b></p>
      * The method divides the absolute percentage difference between enemy and player forces by 20
      * (rounding up), then adjusts the difficulty accordingly:
      * <ul>
@@ -1966,7 +1965,7 @@ public class AtBContract extends Contract {
      *   <li>If an error is encountered, the difficulty is returned as -99</li>
      * </ul>
      * The result is clamped to fit between the valid range of 1 and 10. Or -99 if an error is encounterd.
-     * </p>
+     *
      */
     public int calculateContractDifficulty(Campaign campaign) {
         final int ERROR = -99;
