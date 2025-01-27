@@ -97,7 +97,7 @@ public class GrayMonday {
             }
 
             campaign.getContractMarket().getContracts().clear();
-            
+
             getFormattedTextAt(RESOURCE_BUNDLE, "employer.report");
         }
     }
