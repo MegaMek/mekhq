@@ -43,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.randomEvents.GrayMonday.isIsGrayMonday;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -70,7 +70,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isIsGrayMonday(campaign);
+        boolean isGrayMonday = isGrayMonday(campaign);
 
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
@@ -523,7 +523,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // This should always be the last modifier
-        if (isIsGrayMonday(campaign)) {
+        if (isGrayMonday(campaign)) {
             multiplier *= 0.25;
         }
 

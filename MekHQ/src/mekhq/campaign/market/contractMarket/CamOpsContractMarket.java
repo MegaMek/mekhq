@@ -39,7 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.randomEvents.GrayMonday.isIsGrayMonday;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
  * Contract Market as described in Campaign Operations, 4th printing.
@@ -68,7 +68,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        boolean isGrayMonday = isIsGrayMonday(campaign);
+        boolean isGrayMonday = isGrayMonday(campaign);
 
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
             return;

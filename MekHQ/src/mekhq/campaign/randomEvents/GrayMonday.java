@@ -127,7 +127,7 @@ public class GrayMonday {
      * @return {@code true} if the Gray Monday event should be active based on the campaign
      *         configuration and current date, {@code false} otherwise
      */
-    public static boolean isIsGrayMonday(Campaign campaign) {
+    public static boolean isGrayMonday(Campaign campaign) {
         LocalDate today = campaign.getLocalDate();
         boolean isGrayMonday = campaign.getCampaignOptions().isSimulateGrayMonday();
         isGrayMonday = isGrayMonday
