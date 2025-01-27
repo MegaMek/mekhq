@@ -37,6 +37,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.forceCo
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code DialogInterception} class is responsible for displaying a UI dialog when an
@@ -49,7 +50,7 @@ public class DialogInterception extends JDialog{
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a dialog for an interception event that occurs during a resupply operation.
@@ -63,7 +64,7 @@ public class DialogInterception extends JDialog{
      *    generated from the resources.
      * 4. Builds a GUI with Swing components:
      *    - A description panel containing a localized, HTML-styled message.
-     *    - An image panel displaying the speaker's icon (sized to a width of 100px).
+     *    - An image panel displaying the speaker's icon (sized to a width of 100 px).
      * 5. Adds confirmation buttons to the dialog, allowing users to close it.
      * 6. Displays the dialog as modal to block further user interaction until dismissed.
      *
@@ -78,7 +79,7 @@ public class DialogInterception extends JDialog{
         final Campaign campaign = resupply.getCampaign();
         final AtBContract contract = resupply.getContract();
 
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -104,7 +105,7 @@ public class DialogInterception extends JDialog{
             speakerName = speaker.getFullTitle();
         } else {
             if (targetConvoy == null) {
-                speakerName = String.format(resources.getString("dialogBorderConvoySpeakerDefault.text"),
+                speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "dialogBorderConvoySpeakerDefault.text",
                     contract.getEmployerName(campaign.getGameYear()));
             } else {
                 speakerName = campaign.getName();
@@ -147,18 +148,16 @@ public class DialogInterception extends JDialog{
         if (targetConvoy != null) {
             if (forceContainsOnlyVTOLForces(campaign, targetConvoy)
                 || forceContainsOnlyAerialForces(campaign, targetConvoy)) {
-                message = String.format(
-                    resources.getString("statusUpdateIntercepted.boilerplate"),
+                message = getFormattedTextAt(RESOURCE_BUNDLE, "statusUpdateIntercepted.boilerplate",
                         campaign.getCommanderAddress(false),
-                        resources.getString("interceptionInstructions.text"));
+                    getFormattedTextAt(RESOURCE_BUNDLE,"interceptionInstructions.text"));
             }
         }
 
         if (message.isBlank()) {
-            message = String.format(
-                resources.getString("statusUpdateIntercepted" + randomInt(20) + ".text"),
+            message = getFormattedTextAt(RESOURCE_BUNDLE, "statusUpdateIntercepted" + randomInt(20) + ".text",
                     campaign.getCommanderAddress(false),
-                    resources.getString("interceptionInstructions.text"));
+                getFormattedTextAt(RESOURCE_BUNDLE, "interceptionInstructions.text"));
         }
 
         JLabel rightDescription = new JLabel(
@@ -179,7 +178,7 @@ public class DialogInterception extends JDialog{
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        JButton confirmButton = new JButton(resources.getString("logisticsReceived.text"));
+        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "logisticsReceived.text"));
         confirmButton.addActionListener(e -> dispose());
         buttonPanel.add(confirmButton);
 
@@ -191,7 +190,7 @@ public class DialogInterception extends JDialog{
         JLabel lblInfo = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 RIGHT_WIDTH + LEFT_WIDTH,
-                String.format(resources.getString("documentation.prompt"))));
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

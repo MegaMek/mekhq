@@ -29,7 +29,6 @@ import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
@@ -37,6 +36,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimat
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * This class provides utility methods to display dialogs related to the beginning of a contract.
@@ -48,7 +48,7 @@ public class DialogContractStart extends JDialog {
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a dialog at the start of a contract, providing summarized details about the mission
@@ -64,7 +64,7 @@ public class DialogContractStart extends JDialog {
      * @param contract the active contract.
      */
     public DialogContractStart(Campaign campaign, AtBContract contract) {
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -139,7 +139,7 @@ public class DialogContractStart extends JDialog {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        JButton confirmButton = new JButton(resources.getString("convoyConfirm.text"));
+        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "convoyConfirm.text"));
         confirmButton.addActionListener(e -> dispose());
         buttonPanel.add(confirmButton);
 
@@ -151,7 +151,7 @@ public class DialogContractStart extends JDialog {
         JLabel lblInfo = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 RIGHT_WIDTH + LEFT_WIDTH,
-                String.format(resources.getString("documentation.prompt"))));
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -239,17 +239,17 @@ public class DialogContractStart extends JDialog {
         String commanderTitle = campaign.getCommanderAddress(false);
 
         if (contract.getContractType().isGuerrillaWarfare()) {
-            String convoyMessageTemplate = resources.getString("contractStartMessageGuerrilla.text");
-            convoyMessage = String.format(convoyMessageTemplate, commanderTitle);
+            String convoyMessageTemplate = "contractStartMessageGuerrilla.text";
+            convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE, convoyMessageTemplate, commanderTitle);
         } else {
-            String convoyMessageTemplate = resources.getString("contractStartMessageGeneric.text");
+            String convoyMessageTemplate = "contractStartMessageGeneric.text";
             if (contract.getCommandRights().isIndependent()) {
-                convoyMessageTemplate = resources.getString("contractStartMessageIndependent.text");
+                convoyMessageTemplate = "contractStartMessageIndependent.text";
             }
 
-            convoyMessage = String.format(convoyMessageTemplate, commanderTitle,
-                estimateCargoRequirements(campaign, contract), totalPlayerCargoCapacity,
-                playerConvoys, playerConvoys != 1 ? "s" : "");
+            convoyMessage = getFormattedTextAt(RESOURCE_BUNDLE, convoyMessageTemplate, commanderTitle,
+                estimateCargoRequirements(campaign, contract), totalPlayerCargoCapacity, playerConvoys,
+                playerConvoys != 1 ? "s" : "");
         }
 
         int width = UIUtil.scaleForGUI(500);
