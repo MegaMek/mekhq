@@ -444,6 +444,7 @@ public class CampaignOptions {
     private boolean showPeacetimeCost;
     private FinancialYearDuration financialYearDuration;
     private boolean newFinancialYearFinancesToCSVExport;
+    private boolean simulateGrayMonday;
 
     // Price Multipliers
     private double commonPartPriceMultiplier;
@@ -1071,6 +1072,7 @@ public class CampaignOptions {
         showPeacetimeCost = false;
         setFinancialYearDuration(FinancialYearDuration.ANNUAL);
         newFinancialYearFinancesToCSVExport = false;
+        simulateGrayMonday = false;
 
         // Price Multipliers
         setCommonPartPriceMultiplier(1.0);
@@ -3398,6 +3400,14 @@ public class CampaignOptions {
         this.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExport;
     }
 
+    public boolean isSimulateGrayMonday() {
+        return simulateGrayMonday;
+    }
+
+    public void setSimulateGrayMonday(final boolean simulateGrayMonday) {
+        this.simulateGrayMonday = simulateGrayMonday;
+    }
+
     // region Price Multipliers
     public double getCommonPartPriceMultiplier() {
         return commonPartPriceMultiplier;
@@ -5170,6 +5180,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "financialYearDuration", financialYearDuration.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newFinancialYearFinancesToCSVExport",
                 newFinancialYearFinancesToCSVExport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateGrayMonday", simulateGrayMonday);
 
         // region Price Multipliers
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
@@ -6126,6 +6137,8 @@ public class CampaignOptions {
                     retVal.setFinancialYearDuration(FinancialYearDuration.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("simulateGrayMonday")) {
+                    retVal.simulateGrayMonday = Boolean.parseBoolean(wn2.getTextContent().trim());
 
                     // region Price Multipliers
                 } else if (wn2.getNodeName().equalsIgnoreCase("commonPartPriceMultiplier")) {

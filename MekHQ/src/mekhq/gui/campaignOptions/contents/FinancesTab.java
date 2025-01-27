@@ -58,6 +58,7 @@ public class FinancesTab {
     private JLabel lblFinancialYearDuration;
     private MMComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
+    private JCheckBox simulateGrayMonday;
 
     private JPanel pnlPayments;
     private JCheckBox payForPartsBox;
@@ -166,6 +167,8 @@ public class FinancesTab {
             FinancialYearDuration.values());
 
         newFinancialYearFinancesToCSVExportBox = new JCheckBox();
+
+        simulateGrayMonday = new JCheckBox();
 
         // Payments
         pnlPayments = new JPanel();
@@ -352,6 +355,8 @@ public class FinancesTab {
 
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
+        simulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -383,6 +388,9 @@ public class FinancesTab {
         layout.gridy++;
         layout.gridwidth = 2;
         panel.add(newFinancialYearFinancesToCSVExportBox, layout);
+
+        layout.gridy++;
+        panel.add(simulateGrayMonday, layout);
 
         return panel;
     }
@@ -757,6 +765,7 @@ public class FinancesTab {
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
         options.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
         options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
+        options.setSimulateGrayMonday(simulateGrayMonday.isSelected());
         options.setPayForParts(payForPartsBox.isSelected());
         options.setPayForRepairs(payForRepairsBox.isSelected());
         options.setPayForUnits(payForUnitsBox.isSelected());
@@ -822,6 +831,7 @@ public class FinancesTab {
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
         comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
+        simulateGrayMonday.setSelected(options.isSimulateGrayMonday());
         payForPartsBox.setSelected(options.isPayForParts());
         payForRepairsBox.setSelected(options.isPayForRepairs());
         payForUnitsBox.setSelected(options.isPayForUnits());
