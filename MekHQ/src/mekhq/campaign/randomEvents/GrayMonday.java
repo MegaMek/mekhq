@@ -132,7 +132,7 @@ public class GrayMonday {
         boolean isGrayMonday = campaign.getCampaignOptions().isSimulateGrayMonday();
         isGrayMonday = isGrayMonday
             && today.isAfter(EVENT_DATE_GRAY_MONDAY.minusDays(1))
-            && EVENT_DATE_GRAY_MONDAY.isBefore(today.plusMonths(3));
+            && EVENT_DATE_GRAY_MONDAY.isBefore(today.plusMonths(12));
         return isGrayMonday;
     }
 }

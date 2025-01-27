@@ -522,6 +522,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
+        // This should always be the last modifier
         if (isIsGrayMonday(campaign)) {
             multiplier *= 0.25;
         }
