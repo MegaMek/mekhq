@@ -68,7 +68,7 @@ import java.util.stream.IntStream;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
-import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
+import static megamek.client.ratgenerator.MissionRole.*;
 import static megamek.common.Compute.randomInt;
 import static megamek.common.UnitType.*;
 import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
@@ -581,9 +581,9 @@ public class AtBDynamicScenarioFactory {
         if (allowsConvInfantry && (isTainted || isLowPressure || isLowGravity)) {
             Collection<MissionRole> infantryRoles = new HashSet<>();
             if (isLowGravity) {
-                infantryRoles.add(MissionRole.MARINE);
+                infantryRoles.add(MARINE);
             } else {
-                infantryRoles.add(MissionRole.XCT);
+                infantryRoles.add(XCT);
             }
             if (requiredRoles.containsKey(INFANTRY)) {
                 requiredRoles.get(INFANTRY).addAll(infantryRoles);
@@ -601,19 +601,19 @@ public class AtBDynamicScenarioFactory {
                 if (!requiredRoles.containsKey(MEK)) {
                     requiredRoles.put(MEK, new HashSet<>());
                 }
-                requiredRoles.get(MEK).add((MissionRole.ARTILLERY));
+                requiredRoles.get(MEK).add((ARTILLERY));
             }
             if (artilleryCarriers == SPECIAL_UNIT_TYPE_ATB_MIX || artilleryCarriers == TANK) {
                 if (!requiredRoles.containsKey(TANK)) {
                     requiredRoles.put(TANK, new HashSet<>());
                 }
-                requiredRoles.get(TANK).add((MissionRole.ARTILLERY));
+                requiredRoles.get(TANK).add((ARTILLERY));
             }
             if (artilleryCarriers == INFANTRY) {
                 if (!requiredRoles.containsKey(INFANTRY)) {
                     requiredRoles.put(INFANTRY, new HashSet<>());
                 }
-                requiredRoles.get(INFANTRY).add((MissionRole.ARTILLERY));
+                requiredRoles.get(INFANTRY).add((ARTILLERY));
             }
         }
 
@@ -1782,11 +1782,13 @@ public class AtBDynamicScenarioFactory {
         params.setFaction(faction);
         params.setQuality(quality);
         params.setUnitType(unitType);
-        params.setWeightClass(weightClass);
         params.setYear(campaign.getGameYear());
+        params.setMissionRoles(rolesByType);
 
         if (rolesByType != null && !rolesByType.isEmpty()) {
-            params.setMissionRoles(rolesByType);
+            params.setWeightClass(shouldBypassWeightClass(rolesByType)
+                ? UNIT_WEIGHT_UNSPECIFIED
+                : weightClass);
         }
 
         // Vehicles and infantry require some additional processing
@@ -1803,6 +1805,33 @@ public class AtBDynamicScenarioFactory {
         }
 
         return createEntityWithCrew(faction, skill, campaign, unitData);
+    }
+
+    /**
+     * Determines whether the weight class constraints should be bypassed based on the given mission roles.
+     * <p>
+     * This method evaluates if the provided {@code rolesByType} contain any of the predefined mission roles
+     * that should bypass the weight class restrictions. The bypassed roles are selected because they use
+     * relatively small or exclusive unit pools, which improves the likelihood of successfully finding
+     * an appropriate unit.
+     * </p>
+     *
+     * @param rolesByType a collection of mission roles to evaluate.
+     * @return {@code true} if any role in {@code rolesByType} matches one of the predefined bypassed roles.
+     */
+    private static boolean shouldBypassWeightClass(Collection<MissionRole> rolesByType) {
+        // These roles were picked as their pool is relatively small, or they are exclusive in nature.
+        // This ensures we have a greater chance of successfully pulling an appropriate unit.
+        List<MissionRole> bypassedRoles = List.of(CIVILIAN, SUPPORT, ARTILLERY, MISSILE_ARTILLERY,
+            APC, SPECOPS, ENGINEER, MINESWEEPER, MINELAYER);
+
+        for (MissionRole role : rolesByType) {
+            if (bypassedRoles.contains(role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1884,9 +1913,9 @@ public class AtBDynamicScenarioFactory {
         if (unitData == null) {
 
             // If XCT troops were requested but none were found, generate without the role
-            if (useTempXCT && params.getMissionRoles().contains(MissionRole.XCT)) {
+            if (useTempXCT && params.getMissionRoles().contains(XCT)) {
                 noXCTParams = params.clone();
-                noXCTParams.getMissionRoles().remove(MissionRole.XCT);
+                noXCTParams.getMissionRoles().remove(XCT);
                 unitData = campaign.getUnitGenerator().generate(noXCTParams);
                 temporaryXCT = true;
             }
@@ -1996,13 +2025,13 @@ public class AtBDynamicScenarioFactory {
             transportedRoles.put(INFANTRY,
                     requiredRoles.containsKey(INFANTRY) ? new ArrayList<>(requiredRoles.get(INFANTRY))
                             : new ArrayList<>());
-            transportedRoles.get(INFANTRY).remove((MissionRole.ARTILLERY));
+            transportedRoles.get(INFANTRY).remove((ARTILLERY));
 
             transportedRoles.put(BATTLE_ARMOR,
                     requiredRoles.containsKey(BATTLE_ARMOR)
                             ? new ArrayList<>(requiredRoles.get(BATTLE_ARMOR))
                             : new ArrayList<>());
-            transportedRoles.get(BATTLE_ARMOR).remove((MissionRole.ARTILLERY));
+            transportedRoles.get(BATTLE_ARMOR).remove((ARTILLERY));
         }
 
         List<Entity> transportedUnits = new ArrayList<>();
@@ -2099,9 +2128,9 @@ public class AtBDynamicScenarioFactory {
                     if (transportedUnit == null && allowInfantry) {
                         newParams.setMissionRoles(requiredRoles.getOrDefault(INFANTRY, new HashSet<>()));
                         if (transport.getUnitType() == VTOL
-                                && !newParams.getMissionRoles().contains(MissionRole.XCT)) {
+                                && !newParams.getMissionRoles().contains(XCT)) {
                             UnitGeneratorParameters paratrooperParams = newParams.clone();
-                            paratrooperParams.addMissionRole(MissionRole.PARATROOPER);
+                            paratrooperParams.addMissionRole(PARATROOPER);
                             transportedUnit = generateTransportedInfantryUnit(paratrooperParams, bayCapacity, skill,
                                     true, campaign);
                         } else {
@@ -2179,7 +2208,7 @@ public class AtBDynamicScenarioFactory {
         // include other types
         if (bayCapacity <= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
 
-            if (newParams.getMissionRoles().contains(MissionRole.PARATROOPER)) {
+            if (newParams.getMissionRoles().contains(PARATROOPER)) {
                 newParams.setMovementModes(IUnitGenerator.ALL_INFANTRY_MODES);
             } else {
                 newParams.getMovementModes().add(EntityMovementMode.INF_LEG);
@@ -2190,9 +2219,9 @@ public class AtBDynamicScenarioFactory {
             if (unitData == null) {
 
                 // If XCT troops were requested but none were found, generate without the role
-                if (useTempXCT && newParams.getMissionRoles().contains(MissionRole.XCT)) {
+                if (useTempXCT && newParams.getMissionRoles().contains(XCT)) {
                     noXCTParams = newParams.clone();
-                    noXCTParams.getMissionRoles().remove(MissionRole.XCT);
+                    noXCTParams.getMissionRoles().remove(XCT);
                     unitData = campaign.getUnitGenerator().generate(noXCTParams);
                     temporaryXCT = true;
                 }
@@ -2221,9 +2250,9 @@ public class AtBDynamicScenarioFactory {
             if (unitData == null) {
 
                 // If XCT troops were requested but none were found, generate without the role
-                if (useTempXCT && newParams.getMissionRoles().contains(MissionRole.XCT)) {
+                if (useTempXCT && newParams.getMissionRoles().contains(XCT)) {
                     noXCTParams = newParams.clone();
-                    noXCTParams.getMissionRoles().remove(MissionRole.XCT);
+                    noXCTParams.getMissionRoles().remove(XCT);
                     unitData = campaign.getUnitGenerator().generate(noXCTParams);
                     temporaryXCT = true;
                 }
@@ -2283,7 +2312,7 @@ public class AtBDynamicScenarioFactory {
         if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
             newParams.setFilter(inf -> inf.getTons() <= bayCapacity);
         } else {
-            newParams.addMissionRole(MissionRole.MECHANIZED_BA);
+            newParams.addMissionRole(MECHANIZED_BA);
         }
 
         MekSummary unitData = campaign.getUnitGenerator().generate(newParams);
@@ -2292,7 +2321,7 @@ public class AtBDynamicScenarioFactory {
         if (unitData == null) {
             if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
                 newParams.setFilter(null);
-                newParams.addMissionRole((MissionRole.MECHANIZED_BA));
+                newParams.addMissionRole((MECHANIZED_BA));
                 unitData = campaign.getUnitGenerator().generate(newParams);
             }
             if (unitData == null) {
@@ -2371,7 +2400,7 @@ public class AtBDynamicScenarioFactory {
         params.setFaction(factionCode);
         params.setQuality(quality);
         params.setYear(campaign.getGameYear());
-        params.addMissionRole(MissionRole.MECHANIZED_BA);
+        params.addMissionRole(MECHANIZED_BA);
         params.setWeightClass(UNIT_WEIGHT_UNSPECIFIED);
 
         Entity transportedUnit = generateTransportedBAUnit(params, IUnitGenerator.NO_WEIGHT_LIMIT, skill, false,
@@ -2914,19 +2943,19 @@ public class AtBDynamicScenarioFactory {
         if (requiredRoles != null && !requiredRoles.isEmpty()) {
             for (int curType : requiredRoles.keySet()) {
 
-                if (requiredRoles.get(curType).contains(MissionRole.RECON)) {
+                if (requiredRoles.get(curType).contains(RECON)) {
                     if (curType == MEK || curType == PROTOMEK) {
                         weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_MEDIUM);
                     }
                 }
 
-                if (requiredRoles.get(curType).contains(MissionRole.APC)) {
+                if (requiredRoles.get(curType).contains(APC)) {
                     if (curType == TANK || curType == VTOL) {
                         weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_MEDIUM);
                     }
                 }
 
-                if (requiredRoles.get(curType).contains(MissionRole.CAVALRY)) {
+                if (requiredRoles.get(curType).contains(CAVALRY)) {
                     if (curType == MEK) {
                         weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
                     } else if (curType == TANK || curType == PROTOMEK) {
@@ -2934,7 +2963,7 @@ public class AtBDynamicScenarioFactory {
                     }
                 }
 
-                if (requiredRoles.get(curType).contains(MissionRole.RAIDER)) {
+                if (requiredRoles.get(curType).contains(RAIDER)) {
                     if (curType == MEK || curType == PROTOMEK) {
                         weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
                     }
