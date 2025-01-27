@@ -1954,8 +1954,8 @@ public class AtBContract extends Contract {
      *    <li>10 = extremely difficult</li>
      * </ul>
      * <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's power cannot be calculated.
-     *
-     * <h3>Mapped Result Explanation:</h3>
+     * <p>
+     * <b>Mapped Result Explanation:</b>
      * <p>
      * The method divides the absolute percentage difference between enemy and player forces by 20
      * (rounding up), then adjusts the difficulty accordingly:
