@@ -202,7 +202,8 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Inactive.text");
         } else if (person.isDeployed()) {
             return resources.getString("cannotProcreate.Deployed.text");
-        } else if (person.isChild(today)) {
+        // Not allowing under-18s to procreate is project policy
+        } else if (person.isChild(today, true)) {
             return resources.getString("cannotProcreate.Child.text");
         } else if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
@@ -226,7 +227,11 @@ public abstract class AbstractProcreation {
                     return resources.getString("cannotProcreate.InactiveSpouse.text");
                 } else if (person.getGenealogy().getSpouse().isDeployed()) {
                     return resources.getString("cannotProcreate.DeployedSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isChild(today)) {
+                // Not allowing under-18s to procreate is project policy
+                // This conditional shouldn't be relevant in 2025, due to changes made in 2024.
+                // However, we're keeping it as we don't want campaigns from pre-policy
+                // implementation being able to circumnavigate project policy.
+                } else if (person.getGenealogy().getSpouse().isChild(today, true)) {
                     return resources.getString("cannotProcreate.ChildSpouse.text");
                 } else if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                     return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
