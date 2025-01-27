@@ -1768,13 +1768,9 @@ public class AtBDynamicScenarioFactory {
      * @return A randomly selected Entity from the parameters specified, with crew.
      *         May return null.
      */
-    public static @Nullable Entity getEntity(String faction,
-            SkillLevel skill,
-            int quality,
-            int unitType,
-            int weightClass,
-            @Nullable Collection<MissionRole> rolesByType,
-            Campaign campaign) {
+    public static @Nullable Entity getEntity(String faction, SkillLevel skill, int quality, int unitType,
+                                             int weightClass, @Nullable Collection<MissionRole> rolesByType,
+                                             Campaign campaign) {
         MekSummary unitData;
 
         // Set up random unit generation parameters
@@ -1784,6 +1780,11 @@ public class AtBDynamicScenarioFactory {
         params.setUnitType(unitType);
         params.setWeightClass(weightClass);
         params.setYear(campaign.getGameYear());
+
+        // This filter is to ensure we don't generate trailers or other units that cannot move
+        if (unitType != GUN_EMPLACEMENT) {
+            params.setFilter(mekSummary -> mekSummary.getWalkMp() >= 1);
+        }
 
         if (rolesByType != null && !rolesByType.isEmpty()) {
             params.setMissionRoles(rolesByType);
