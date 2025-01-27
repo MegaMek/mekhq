@@ -492,6 +492,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Unofficial modifiers
+        double unofficialMultiplier = getUnofficialMultiplier(campaign, contract);
+
+        if (unofficialMultiplier > 0) {
+            multiplier *= (1.0 + unofficialMultiplier);
+        } else if (unofficialMultiplier < 0) {
+            multiplier *= (1.0 - unofficialMultiplier);
+        }
+
+        return multiplier;
+    }
+
+    private static double getUnofficialMultiplier(Campaign campaign, AtBContract contract) {
         double modifier = 0; // we apply these modifiers all together to avoid spiking the final pay
 
         // Adjust pay based on the percentage of the players' forces required by the contract
@@ -512,14 +524,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
 
         modifier += difficultyDifference;
-
-        if (modifier > 0) {
-            multiplier *= (1.0 + modifier);
-        } else if (modifier < 0) {
-            multiplier *= (1.0 - modifier);
-        }
-
-        return multiplier;
+        return modifier;
     }
 
     @Override
