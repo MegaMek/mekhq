@@ -1009,8 +1009,17 @@ public class AtBContract extends Contract {
                             break;
                         case 2:
                             text += "Internal Dissension";
-                            specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
-                            specialEventScenarioType = AtBScenario.AMBUSH;
+                            if (!campaign.getCampaignOptions().isUseStratCon()) {
+                                specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
+                                specialEventScenarioType = AtBScenario.AMBUSH;
+                            } else {
+                                StratconCampaignState campaignState = getStratconCampaignState();
+
+                                if (campaignState != null) {
+                                    text += ": -1 Support Point";
+                                    campaignState.addSupportPoints(-1);
+                                }
+                            }
                             break;
                         case 3:
                             text += "ComStar Interdict: Base availability level decreases one level for the rest of the contract.";
