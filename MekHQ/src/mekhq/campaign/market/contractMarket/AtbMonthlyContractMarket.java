@@ -41,6 +41,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Set;
 
+import static java.lang.Math.floor;
+import static megamek.codeUtilities.MathUtility.clamp;
+import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
+
 /**
  * Contract offers that are generated monthly under AtB rules.
  *
@@ -451,12 +455,16 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        int unitRatingMod = campaign.getAtBUnitRatingMod();
         double multiplier = 1.0;
-        // IntOps reputation factor then Dragoons rating
+
+        // Operations tempo
+        multiplier *= contract.getContractType().getOperationsTempoMultiplier();
+
+        // Reputation multiplier
         if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (unitRatingMod * 0.2) + 0.5;
+            multiplier *= (campaign.getReputation().getReputationRating() * 0.2) + 0.5;
         } else {
+            int unitRatingMod = campaign.getAtBUnitRatingMod();
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
                 multiplier *= 2.0;
             } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
@@ -468,8 +476,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        multiplier *= contract.getContractType().getOperationsTempoMultiplier();
-
+        // Employer multiplier
         final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
         final Faction enemy = contract.getEnemy();
         if (employer.isISMajorOrSuperPower() || employer.isClan()) {
@@ -484,28 +491,43 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        // Adjust pay based on the percentage of the players' forces required by the contract
-        int requiredCombatTeams = contract.getRequiredCombatTeams();
-        double totalCombatTeams = campaign.getAllCombatTeams().size();
-        totalCombatTeams /= COMBAT_FORCE_DIVIDER;
+        // Unofficial modifiers
+        double unofficialMultiplier = getUnofficialMultiplier(campaign, contract);
 
-        if (totalCombatTeams > 0) {
-            multiplier *= (double) requiredCombatTeams / totalCombatTeams;
+        if (unofficialMultiplier > 0) {
+            multiplier *= (1.0 + unofficialMultiplier);
+        } else if (unofficialMultiplier < 0) {
+            multiplier *= (1.0 - unofficialMultiplier);
+        }
+
+        return multiplier;
+    }
+
+    private static double getUnofficialMultiplier(Campaign campaign, AtBContract contract) {
+        double modifier = 0; // we apply these modifiers all together to avoid spiking the final pay
+
+        // Adjust pay based on the percentage of the players' forces required by the contract
+        int maximumLanceCount = campaign.getAllCombatTeams().size();
+        int reserveLanceCount = (int) floor(maximumLanceCount / COMBAT_FORCE_DIVIDER);
+        int requiredCombatTeams = contract.getRequiredCombatTeams();
+
+        if (reserveLanceCount > 0) { // Ensure we don't divide by zero
+            double reservesDifference = ((requiredCombatTeams - reserveLanceCount) / (double) reserveLanceCount);
+
+            modifier += reservesDifference;
         }
 
         // Adjust pay based on difficulty if FG3 is enabled
         if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            double skulls = contract.calculateContractDifficulty(campaign);
-            skulls -= 5; // 5 skulls (or 2.5) is equivalent to the player force, so no modifier.
+            int difficulty = clamp(contract.calculateContractDifficulty(campaign), 0, 10);
+            int baseDifficulty = 5; // 2.5 skulls
 
-            if (skulls != 0) {
-                skulls *= 0.05; // each half-skull is a 5% pay change
-                multiplier *= (1 + skulls);
-            }
+            double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
+
+            modifier += difficultyDifference;
         }
 
-
-        return multiplier;
+        return modifier;
     }
 
     @Override
@@ -552,7 +574,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (campaign.getCampaignOptions().isMercSizeLimited() &&
                 campaign.getFaction().isMercenary()) {
             int max = (unitRatingMod + 1) * 12;
-            int numMods = (AtBContract.getEffectiveNumUnits(campaign) - max) / 2;
+            int numMods = (getEffectiveNumUnits(campaign) - max) / 2;
             while (numMods > 0) {
                 mods.mods[Compute.randomInt(4)]--;
                 numMods--;

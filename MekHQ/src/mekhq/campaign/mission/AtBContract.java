@@ -1944,10 +1944,36 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Calculates the contract difficulty based on the given campaign and parameters.
+     * Calculates the difficulty of a contract based on the relative power of enemy forces,
+     * player forces, and any allied forces involved in the campaign.
      *
-     * @param campaign The campaign object containing the necessary data.
-     * @return The contract difficulty as an integer value.
+     * <p>The method evaluates the enemy's estimated power against the player's strengths
+     * and considers allied contributions depending on the assigned command rights.
+     * The result is a difficulty level mapped between 1 and 10, where higher values
+     * represent more challenging contracts.</p>
+     *
+     * @param campaign The {@link Campaign} object representing the current game state.
+     *                 Used to extract information about the player's forces, enemy forces,
+     *                 and allied forces.
+     *
+     * @return An integer representing the difficulty of the contract:
+     * <ul>
+     *    <li>1 = very easy</li>
+     *    <li>10 = extremely difficult</li>
+     * </ul>
+     * <p>
+     * <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's power cannot be calculated.
+     * </p>
+     * <p><b>Mapped Result Explanation:</b></p>
+     * The method divides the absolute percentage difference between enemy and player forces by 20
+     * (rounding up), then adjusts the difficulty accordingly:
+     * <ul>
+     *   <li>If the player's forces are stronger, the difficulty is adjusted downward from a baseline of 5.</li>
+     *   <li>If the enemy's forces are stronger, the difficulty is adjusted upward from a baseline of 5.</li>
+     *   <li>If an error is encountered, the difficulty is returned as -99</li>
+     * </ul>
+     * The result is clamped to fit between the valid range of 1 and 10. Or -99 if an error is encounterd.
+     *
      */
     public int calculateContractDifficulty(Campaign campaign) {
         final int ERROR = -99;
