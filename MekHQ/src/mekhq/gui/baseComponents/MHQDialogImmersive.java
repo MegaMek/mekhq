@@ -58,7 +58,7 @@ public class MHQDialogImmersive extends JDialog {
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
 
     private final int INSERT_SIZE = UIUtil.scaleForGUI(5);
-    private final int IMAGE_WIDTH = 125; // This is scaled to GUI by 'scaleImageIconToWidth'
+    protected final int IMAGE_WIDTH = 125; // This is scaled to GUI by 'scaleImageIconToWidth'
 
     private JPanel northPanel;
     private JPanel southPanel;
@@ -110,7 +110,7 @@ public class MHQDialogImmersive extends JDialog {
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
         // Title
-        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
+        setTitle();
 
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -123,7 +123,7 @@ public class MHQDialogImmersive extends JDialog {
 
         // Left box for speaker details
         if (leftSpeaker != null) {
-            JPanel pnlLeftSpeaker = buildSpeakerPanel(true);
+            JPanel pnlLeftSpeaker = buildSpeakerPanel(leftSpeaker, campaign);
 
             // Add pnlLeftSpeaker to mainPanel
             constraints.gridx = gridx;
@@ -145,7 +145,7 @@ public class MHQDialogImmersive extends JDialog {
 
         // Right box for speaker details
         if (rightSpeaker != null) {
-            JPanel pnlRightSpeaker = buildSpeakerPanel(false);
+            JPanel pnlRightSpeaker = buildSpeakerPanel(rightSpeaker, campaign);
 
             // Add pnlRightSpeaker to mainPanel
             constraints.gridx = gridx;
@@ -173,6 +173,13 @@ public class MHQDialogImmersive extends JDialog {
         pack();
         setLocationRelativeTo(null); // Needs to be after pack
         setVisible(true);
+    }
+
+    /**
+     * Sets the title of the dialog window using localized text.
+     */
+    protected void setTitle() {
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
     }
 
     /**
@@ -226,7 +233,7 @@ public class MHQDialogImmersive extends JDialog {
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
-        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, 0, 0, 0)); // Padding above
+        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, 0, INSERT_SIZE, 0));
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
         // Add the scrollPane with padding to the northPanel
@@ -327,20 +334,21 @@ public class MHQDialogImmersive extends JDialog {
      * This method creates a vertically stacked panel that includes the person's icon, title,
      * and any additional descriptive information (e.g., roles, forces, or campaign affiliations).
      *
-     * @param isLeftSpeaker Indicates if the individual is displayed on the left side of the dialog.
-     *                      This affects alignment and panel width.
+     * @param speaker The character shown in the dialog, can be {@code null} for no speaker
+     * @param campaign      The current campaign.
      * @return A {@link JPanel} forming the speaker's dialog box.
      */
-    private JPanel buildSpeakerPanel(boolean isLeftSpeaker) {
-        final Person speaker = isLeftSpeaker ? leftSpeaker : rightSpeaker;
-
+    protected JPanel buildSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
         speakerBox.setLayout(new BoxLayout(speakerBox, BoxLayout.Y_AXIS));
         speakerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         speakerBox.setMaximumSize(new Dimension(IMAGE_WIDTH, Integer.MAX_VALUE));
 
         // Get speaker details
-        String speakerName = speaker.getFullTitle();
+        String speakerName = campaign.getName();
+        if (speaker != null) {
+            speakerName = speaker.getFullTitle();
+        }
 
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
