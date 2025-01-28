@@ -171,7 +171,7 @@ public class NewsItem {
     }
 
     public String getFullDescription() {
-        return "<h1>" + getHeadline() + "</h1><br><p>" + description + "</p>";
+        return "<h1>" + getHeadline() + "</h1>" + description;
     }
 
     // JAXB marshalling support
