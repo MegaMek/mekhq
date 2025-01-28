@@ -890,7 +890,18 @@ public class AtBContract extends Contract {
 
         Entity newUnit = getEntity(faction, REGULAR, quality, unitType,
             UNIT_WEIGHT_UNSPECIFIED, null, campaign);
-        campaign.addNewUnit(newUnit, false, 0);
+
+        if (newUnit != null) {
+            campaign.addNewUnit(newUnit, false, 0);
+        } else {
+            // Second chance generation
+            newUnit = getEntity(campaign.getFaction().getShortName(), REGULAR, quality, unitType,
+                UNIT_WEIGHT_UNSPECIFIED, null, campaign);
+
+            if (newUnit != null) {
+                campaign.addNewUnit(newUnit, false, 0);
+            }
+        }
     }
 
     public boolean isSubcontract() {

@@ -1889,8 +1889,6 @@ public class AtBDynamicScenarioFactory {
     public static Entity getTankEntity(UnitGeneratorParameters params,
             SkillLevel skill,
             Campaign campaign) {
-        MekSummary ms;
-
         // useful debugging statement that forces generation of specific units rather
         // than random ones
         // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill,
@@ -1906,11 +1904,15 @@ public class AtBDynamicScenarioFactory {
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
-            if (!params.getMissionRoles().isEmpty()) {
-                logger.warn(String.format("Unable to randomly generate %s %s with roles: %s",
+            if (params.getMissionRoles() != null && !params.getMissionRoles().isEmpty()) {
+                logger.info(String.format("Unable to randomly generate %s %s with roles: %s",
                         params.getWeightClass(),
                         getTypeName(TANK),
                         params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+            } else {
+                logger.info(String.format("Unable to randomly generate %s %s with no roles.",
+                    params.getWeightClass(),
+                    getTypeName(TANK)));
             }
             return null;
         }
