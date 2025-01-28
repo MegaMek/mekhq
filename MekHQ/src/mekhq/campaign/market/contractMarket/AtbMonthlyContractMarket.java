@@ -409,15 +409,40 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         return contract;
     }
 
+    /**
+     * Creates and adds a follow-up contract based on the just concluded contract.
+     * <p>
+     * This method generates a new contract (`AtBContract`) as a follow-up to the provided `contract`.
+     * Certain properties of the original contract, such as employer, enemy, skill, system location,
+     * and other details, are carried over or modified as necessary based on the contract type.
+     * The method ensures that the follow-up contract contains all necessary details and is
+     * correctly initialized.
+     * </p>
+     *
+     * <p>
+     * <b>Order Dependency:</b> The operations in this method must match the order specified in
+     * `generateAtBContract` to maintain compatibility and consistency.
+     * </p>
+     *
+     * @param campaign the {@link Campaign} to which the follow-up contract belongs.
+     *                 This is used for retrieving campaign-wide settings and applying modifiers.
+     * @param contract the {@link AtBContract} that serves as the base for generating the follow-up contract.
+     *                 Key details from this contract are reused or adapted for the follow-up.
+     */
     private void addFollowup(Campaign campaign,
             AtBContract contract) {
         if (followupContracts.containsValue(contract.getId())) {
             return;
         }
+
+        // The order in this method needs to match generateAtBContract
+
         AtBContract followup = new AtBContract("Followup Contract");
+        lastId++;
+        followup.setId(lastId);
+        contractIds.put(lastId, followup);
+
         followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
-        followup.setEnemyCode(contract.getEnemyCode());
-        followup.setSystemId(contract.getSystemId());
         switch (contract.getContractType()) {
             case DIVERSIONARY_RAID:
                 followup.setContractType(AtBContractType.OBJECTIVE_RAID);
@@ -431,23 +456,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             default:
                 break;
         }
-        followup.setAllySkill(contract.getAllySkill());
-        followup.setAllyQuality(contract.getAllyQuality());
+
+        followup.setEnemyCode(contract.getEnemyCode());
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
+        setAttacker(followup);
+        followup.setSystemId(contract.getSystemId());
+        followup.setAllySkill(contract.getAllySkill());
+        followup.setAllyQuality(contract.getAllyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
-
-        contract.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, contract, false));
-        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
-
+        followup.setRequiredCombatTeams(calculateRequiredCombatTeams(campaign, followup, false));
+        followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
-
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
-        lastId++;
-        followup.setId(lastId);
-        contractIds.put(lastId, followup);
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());
