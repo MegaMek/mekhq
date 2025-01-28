@@ -126,14 +126,14 @@ public class NewsDialog extends MHQDialogImmersive {
         final String NETWORK_NAME = network.name;
         String networkCode = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".network");
         String networkName = "";
-        if (networkCode.equals(CHATTERWEB_NETWORK_NAME)) {
+        if (NETWORK_NAME.equals(CHATTERWEB_NETWORK_NAME)) {
             networkName = campaign.getFaction().getFullName(campaign.getGameYear());
-        } else if (!networkCode.equals("affiliateNewsNetworks")) {
+        } else if (!NETWORK_NAME.equals(AFFILIATE_NETWORK_NAME)) {
             networkName = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".name");
         }
 
         String networkSlogan = "";
-        if (!networkCode.equals(AFFILIATE_NETWORK_NAME)) {
+        if (!NETWORK_NAME.equals(AFFILIATE_NETWORK_NAME)) {
             networkSlogan = getFormattedTextAt(RESOURCE_BUNDLE, NETWORK_NAME + ".slogan");
         }
 
@@ -187,20 +187,17 @@ public class NewsDialog extends MHQDialogImmersive {
     private static List<NewsNetwork> getNewsNetworks() {
         // TODO Replace placeholder images
         NewsNetwork hegemonyNewsNetwork = new NewsNetwork(
-            "hegemonyNewsNetwork", 2025, 2027,
+            "hegemonyNewsNetwork", 2315, 2767,
             "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony.png");
         NewsNetwork starNews = new NewsNetwork(
-            "starNews", 2027, 2029,
+            "starNews", 2570, 2780,
             "data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
         NewsNetwork comStarNewsBureau = new NewsNetwork(
-            "comStarNewsBureau", 2029, 2031,
+            "comStarNewsBureau", 2826, 3061,
             "data/images/universe/factions/logo_comstar.png");
         NewsNetwork interstellarNewsNetwork = new NewsNetwork(
-            "interstellarNewsNetwork", 2031, 2033,
+            "interstellarNewsNetwork", 3062, 3152,
             "data/images/universe/factions/logo_solaris_VII.png");
-        NewsNetwork linkNet = new NewsNetwork(
-            "linkNet", 2033, 2035,
-            "data/images/universe/factions/logo_security_forces.png");
 
         // These two should always be last
         NewsNetwork chatterweb = new NewsNetwork(CHATTERWEB_NETWORK_NAME, 0, 0,
@@ -210,7 +207,7 @@ public class NewsDialog extends MHQDialogImmersive {
             "data/images/universe/factions/logo_mercenaries.png");
 
         return List.of(hegemonyNewsNetwork, starNews, comStarNewsBureau, interstellarNewsNetwork,
-            linkNet, chatterweb, affiliateNewsNetworks);
+            chatterweb, affiliateNewsNetworks);
     }
 
     /**
