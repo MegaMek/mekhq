@@ -502,11 +502,10 @@ public class AtBContract extends Contract {
                 // This works with the regenerated Scenario Odds to crease very high intensity
                 // spikes in otherwise low-key Garrison-type contracts.
                 AtBMoraleLevel newMoraleLevel = switch (roll) {
-                    case 0,1 -> STALEMATE;
                     case 2,3,4,5 -> ADVANCING;
                     case 6,7 -> DOMINATING;
                     case 8 -> OVERWHELMING;
-                    default -> STALEMATE;
+                    default -> STALEMATE; // 0-1
                 };
 
                 // If we have a StratCon enabled contract, regenerate Scenario Odds
@@ -529,7 +528,7 @@ public class AtBContract extends Contract {
                 moraleLevel = newMoraleLevel;
                 routEnd = null;
 
-                if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
+                if (contractType.isGarrisonDuty()) {
                     updateEnemy(campaign, today); // mix it up a little
                 }
             }
@@ -642,7 +641,7 @@ public class AtBContract extends Contract {
 
         // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
         if (moraleLevel.isRouted()) {
-            if (contractType.isGarrisonType() && !contractType.isRiotDuty()) {
+            if (contractType.isGarrisonType() || contractType.isReliefDuty()) {
                 routEnd = today.plusMonths(max(1, d6() - 3)).minusDays(1);
             } else {
                 campaign.addReport("With the enemy routed, any remaining objectives have been" +
@@ -1009,8 +1008,17 @@ public class AtBContract extends Contract {
                             break;
                         case 2:
                             text += "Internal Dissension";
-                            specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
-                            specialEventScenarioType = AtBScenario.AMBUSH;
+                            if (!campaign.getCampaignOptions().isUseStratCon()) {
+                                specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
+                                specialEventScenarioType = AtBScenario.AMBUSH;
+                            } else {
+                                StratconCampaignState campaignState = getStratconCampaignState();
+
+                                if (campaignState != null) {
+                                    text += ": -1 Support Point";
+                                    campaignState.addSupportPoints(-1);
+                                }
+                            }
                             break;
                         case 3:
                             text += "ComStar Interdict: Base availability level decreases one level for the rest of the contract.";
@@ -1936,10 +1944,36 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Calculates the contract difficulty based on the given campaign and parameters.
+     * Calculates the difficulty of a contract based on the relative power of enemy forces,
+     * player forces, and any allied forces involved in the campaign.
      *
-     * @param campaign The campaign object containing the necessary data.
-     * @return The contract difficulty as an integer value.
+     * <p>The method evaluates the enemy's estimated power against the player's strengths
+     * and considers allied contributions depending on the assigned command rights.
+     * The result is a difficulty level mapped between 1 and 10, where higher values
+     * represent more challenging contracts.</p>
+     *
+     * @param campaign The {@link Campaign} object representing the current game state.
+     *                 Used to extract information about the player's forces, enemy forces,
+     *                 and allied forces.
+     *
+     * @return An integer representing the difficulty of the contract:
+     * <ul>
+     *    <li>1 = very easy</li>
+     *    <li>10 = extremely difficult</li>
+     * </ul>
+     * <p>
+     * <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's power cannot be calculated.
+     * </p>
+     * <p><b>Mapped Result Explanation:</b></p>
+     * The method divides the absolute percentage difference between enemy and player forces by 20
+     * (rounding up), then adjusts the difficulty accordingly:
+     * <ul>
+     *   <li>If the player's forces are stronger, the difficulty is adjusted downward from a baseline of 5.</li>
+     *   <li>If the enemy's forces are stronger, the difficulty is adjusted upward from a baseline of 5.</li>
+     *   <li>If an error is encountered, the difficulty is returned as -99</li>
+     * </ul>
+     * The result is clamped to fit between the valid range of 1 and 10. Or -99 if an error is encounterd.
+     *
      */
     public int calculateContractDifficulty(Campaign campaign) {
         final int ERROR = -99;

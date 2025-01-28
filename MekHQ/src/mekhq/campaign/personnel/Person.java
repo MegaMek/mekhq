@@ -1474,8 +1474,33 @@ public class Person {
         return id;
     }
 
+    /**
+     * Checks if the person is considered a child based on their age and today's date.
+     *
+     * <p>This method uses the default context where the person is not being checked
+     * for procreation-specific thresholds.</p>
+     *
+     * @param today the current date to calculate the age against
+     * @return {@code true} if the person's age is less than 16; {@code false} otherwise
+     */
     public boolean isChild(final LocalDate today) {
-        return getAge(today) < 18;
+        return isChild(today, false);
+    }
+
+    /**
+     * Checks if the person is considered a child based on their age, today's date, and procreation
+     * status.
+     *
+     * @param today the current date to calculate the age against
+     * @param use18 if {@code true}, the threshold considers a person a child
+     *                      if their age is less than 18; otherwise, the default age threshold of
+     *                      16 applies
+     * @return {@code true} if the person's age is less than the specified threshold
+     *         (procreation or default), {@code false} otherwise
+     */
+    public boolean isChild(final LocalDate today, boolean use18) {
+        int age = getAge(today);
+        return age < (use18 ? 18 : 16);
     }
 
     public Genealogy getGenealogy() {
