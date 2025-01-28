@@ -880,17 +880,25 @@ public class AtBContract extends Contract {
      * @param unitType  the type of unit for the bonus
      */
     private void addBonusUnit(Campaign campaign, int unitType) {
-        String faction = employerCode;
-        int quality = allyQuality;
+        // Determine faction and quality
+        String faction = (randomInt(2) > 0) ? enemyCode : employerCode;
+        int quality = (faction.equals(enemyCode)) ? enemyQuality : allyQuality;
 
-        if (randomInt(2) > 0) {
-            faction = enemyCode;
-            quality = enemyQuality;
-        }
-
+        // Try to generate the new unit
         Entity newUnit = getEntity(faction, REGULAR, quality, unitType,
             UNIT_WEIGHT_UNSPECIFIED, null, campaign);
-        campaign.addNewUnit(newUnit, false, 0);
+
+        // If failed, try again with the campaign's faction
+        if (newUnit == null) {
+            String defaultFaction = campaign.getFaction().getShortName();
+            newUnit = getEntity(defaultFaction, REGULAR, quality, unitType,
+                UNIT_WEIGHT_UNSPECIFIED, null, campaign);
+        }
+
+        // Add the unit to the campaign if successfully generated
+        if (newUnit != null) {
+            campaign.addNewUnit(newUnit, false, 0);
+        }
     }
 
     public boolean isSubcontract() {
