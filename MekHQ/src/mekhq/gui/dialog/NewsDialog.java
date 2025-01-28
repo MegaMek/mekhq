@@ -186,11 +186,14 @@ public class NewsDialog extends MHQDialogImmersive {
      */
     private static List<NewsNetwork> getNewsNetworks() {
         // TODO Replace placeholder images
+        NewsNetwork terranNewsNetwork = new NewsNetwork(
+            "terranNewsNetwork", 0, 2314,
+            "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony.png");
         NewsNetwork hegemonyNewsNetwork = new NewsNetwork(
             "hegemonyNewsNetwork", 2315, 2767,
-            "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony.png");
-        NewsNetwork starNews = new NewsNetwork(
-            "starNews", 2570, 2780,
+            "data/images/force/Pieces/Logos/Inner Sphere/Terran Hegemony (Alternate, House Cameron).png");
+        NewsNetwork starlightBroadcasting = new NewsNetwork(
+            "starlightBroadcasting", 2570, 2780,
             "data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
         NewsNetwork comStarNewsBureau = new NewsNetwork(
             "comStarNewsBureau", 2826, 3061,
@@ -206,8 +209,8 @@ public class NewsDialog extends MHQDialogImmersive {
             AFFILIATE_NETWORK_NAME, 0, 0,
             "data/images/universe/factions/logo_mercenaries.png");
 
-        return List.of(hegemonyNewsNetwork, starNews, comStarNewsBureau, interstellarNewsNetwork,
-            chatterweb, affiliateNewsNetworks);
+        return List.of(terranNewsNetwork, hegemonyNewsNetwork, starlightBroadcasting, comStarNewsBureau,
+            interstellarNewsNetwork, chatterweb, affiliateNewsNetworks);
     }
 
     /**
