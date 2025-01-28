@@ -617,7 +617,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        ArrayList<Entity> generatedEntities = new ArrayList<>();
+        List<Entity> generatedEntities = new ArrayList<>();
         boolean stopGenerating = false;
         String currentLanceWeightString = "";
 
@@ -807,8 +807,6 @@ public class AtBDynamicScenarioFactory {
             // For BV-scaled forces, check whether to stop generating after each formation is
             // generated.
             if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-                // Check random number vs. percentage of the BV budget already generated, with
-                // the percentage chosen based on unit rating
                 double currentPercentage = ((double) forceBV / forceBVBudget) * 100;
 
                 stopGenerating = currentPercentage > 100;
@@ -842,7 +840,21 @@ public class AtBDynamicScenarioFactory {
 
                 forceBV = 0;
 
+                boolean isClan = faction.isClan();
+
+                if (isClan) {
+                    logger.info("Faction is Clan, skipping culling");
+                }
+
                 for (Entity entity : generatedEntities) {
+                    if (isClan) {
+                        forceComposition.add(entity);
+                        int battleValue = getBattleValue(campaign, entity);
+                        forceBV += battleValue;
+
+                        continue;
+                    }
+
                     // We count transported units and their transporters as one unit when building a force.
                     // This prevents issues where we cull an APC, leaving infantry stranded.
                     if (entity.getTransportId() != Entity.NONE) {
@@ -947,6 +959,11 @@ public class AtBDynamicScenarioFactory {
         }
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
+        if (!contract.isBatchallAccepted()) {
+            logger.info("Player refused the contract's Batchall and is now being punished for their" +
+                " overconfidence. No bidding takes place.");
+        }
+
         if (generatedForce.getTeam() != 1
             && campaign.getCampaignOptions().isUseGenericBattleValue()
             && BatchallFactions.usesBatchalls(factionCode)
@@ -963,11 +980,27 @@ public class AtBDynamicScenarioFactory {
                 int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
+                forceBVBudget = (int) (playerBattleValue * forceMultiplier);
+
+                logger.info(String.format("Base bidding budget is %s BV2. This is seed force" +
+                    " multiplied by scenario force multiplier", forceBVBudget));
+
+                forceBVBudget = (int) round(forceBVBudget * getHonorRating(campaign, factionCode));
+
+                logger.info(String.format("Honor Rating changed it to %s BV2", forceBVBudget));
+
+                if (isScenarioModifier) {
+                    forceBVBudget = (int) round(forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100));
+
+                    logger.info(String.format("As this force came from a Scenario Modifier it's" +
+                        " budget has been modified based on campaign settings and is now: %s BV2",
+                        forceBVBudget));
+                }
+
                 // First bid away units that exceed the player's estimated Battle Value
-                forceBVBudget = (int) round(playerBattleValue * getHonorRating(campaign, factionCode));
                 forceBV = 0;
 
-                List<Entity> forceComposition = new ArrayList<>();
+                ArrayList<Entity> forceComposition = new ArrayList<>();
                 Collections.shuffle(generatedEntities);
 
                 for (Entity entity : generatedEntities) {
@@ -982,6 +1015,8 @@ public class AtBDynamicScenarioFactory {
 
                     if (forceBV > forceBVBudget) {
                         bidAwayForces.add(entity);
+                        logger.info(String.format("Bidding away %s (%s)", entity.getDisplayName(),
+                            entity.getCrew().getName()));
                         continue;
                     }
 
@@ -996,15 +1031,17 @@ public class AtBDynamicScenarioFactory {
                         forceBV += battleValue;
                     } else {
                         bidAwayForces.add(entity);
+                        logger.info(String.format("Bidding away %s (%s)", entity.getDisplayName(),
+                            entity.getCrew().getName()));
                     }
                 }
 
                 if (forceComposition.isEmpty()) {
+                    logger.info("We ended up with an empty force, grabbing a unit at random.");
                     implementForceCompositionFallback(generatedEntities, forceComposition);
                 }
 
-                generatedEntities.clear();
-                generatedEntities.addAll(forceComposition);
+                generatedForce.setFixedEntityList(forceComposition);
 
                 // We don't want to sub in Battle Armor for forces that are meant to only have a
                 // certain number of units.
@@ -1116,7 +1153,7 @@ public class AtBDynamicScenarioFactory {
      * @param generatedEntities An ArrayList of Entities that have been generated.
      * @param forceComposition  A List of Entities representing a force composition to be updated.
      */
-    private static void implementForceCompositionFallback(ArrayList<Entity> generatedEntities,
+    private static void implementForceCompositionFallback(List<Entity> generatedEntities,
                                                           List<Entity> forceComposition) {
         for (Entity entity : generatedEntities) {
             if (entity.getTransportId() != Entity.NONE) {
