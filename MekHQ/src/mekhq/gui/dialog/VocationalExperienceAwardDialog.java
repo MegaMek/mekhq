@@ -18,7 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -59,8 +58,7 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign),
-            createButtons(), createOutOfCharacterMessage(campaign), 0, null,
-            UIUtil.scaleForGUI(800), null);
+            createButtons(), createOutOfCharacterMessage(campaign), 0);
 
         setModal(false);
         setAlwaysOnTop(true);
