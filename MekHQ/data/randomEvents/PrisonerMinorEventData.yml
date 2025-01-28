@@ -7,21 +7,40 @@ events:
       - quality: RESPONSE_POSITIVE
         # Must contain at least one entry using values from the EventResultEffect enum.
         effects:
-          - NONE
+          - effect: NONE
+            isGuard: true
+            magnitude: 0
+            skillType: null
       - quality: RESPONSE_NEUTRAL
         effects:
-          - NONE
+          - effect: NONE
+            isGuard: true
+            magnitude: 0
+            skillType: null
       - quality: RESPONSE_NEUTRAL
         effects:
-          - NONE
+          - effect: NONE
+            isGuard: true
+            magnitude: 0
+            skillType: null
   - prisonerEvent: SINGING
     responseMap:
       - quality: RESPONSE_POSITIVE
         effects:
-          - NONE
+          - effect: NONE
+            isGuard: true
+            magnitude: 0
+            skillType: null
       - quality: RESPONSE_NEUTRAL
         effects:
-          - NONE
+          - effect: NONE
+            isGuard: true
+            magnitude: 0
+            skillType: null
       - quality: RESPONSE_NEUTRAL
         effects:
-          - NONE
+          - effect: NONE
+            isGuard: true
+            magnitude: 0
+            skillType: null
+

@@ -10,6 +10,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.personnel.prisoners.enums.ResponseQuality;
+import mekhq.campaign.personnel.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventResultsDialog;

@@ -1,6 +1,6 @@
 package mekhq.campaign.personnel.prisoners.yaml;
 
-import mekhq.campaign.personnel.prisoners.PrisonerEventData;
+import mekhq.campaign.personnel.prisoners.records.PrisonerEventData;
 
 import java.util.List;
 

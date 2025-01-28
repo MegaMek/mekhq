@@ -1,6 +1,5 @@
-package mekhq.campaign.personnel.prisoners.yaml;
+package mekhq.campaign.personnel.prisoners.records;
 
-import mekhq.campaign.personnel.prisoners.enums.EventResultEffect;
 import mekhq.campaign.personnel.prisoners.enums.ResponseQuality;
 
 import java.util.List;
@@ -10,9 +9,9 @@ import java.util.List;
  * Each response entry defines a response quality and its associated effects.
  *
  * @param quality the quality of the response, as defined by the {@link ResponseQuality} enum
- * @param effects a list of effects resulting from the response quality, as defined by the {@link EventResultEffect} enum
+ * @param effects a list of effects resulting from the response quality, as defined by the {@link EventResult} record
  */
 public record PrisonerResponseEntry(
     ResponseQuality quality,
-    List<EventResultEffect> effects
+    List<EventResult> effects
 ) { }
