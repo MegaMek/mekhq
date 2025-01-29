@@ -145,6 +145,11 @@ MEKHQ VERSION HISTORY:
 + PR #5893: Immersively Updated the Immersive Dialog to Be More Immersive
 + PR #5894: Added missing minimaps for MekHQ
 + PR #5900: Fixed Negative Contract Base Pay
++ PR #5874: Feature: minimap themes
++ PR #5908: Restored Missing Column Labels for Planetary Acquisition
++ Fix #5910: Added Fallback for AtB Bonus Unit Creation
++ PR #5912: Implemented NewsDialog for Immersive News Display
++ PR #5915: Update scenario panel facility objective text
 
 
 0.50.02 (2024-12-30 2130 UTC)
