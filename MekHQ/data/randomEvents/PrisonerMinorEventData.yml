@@ -3,7 +3,7 @@ events:
     # This is the internal identification enum for the event.
     # Only acceptable values are in the PrisonerEvent enum.
   - prisonerEvent: ARGUMENT
-    responseMap:
+    responseEntries:
       # Can only include values from the ResponseQuality enum. Must include three responses whose
       # index matches the response options presented to the player.
       - quality: RESPONSE_NEUTRAL
@@ -48,7 +48,7 @@ events:
             magnitude: 3
 
   - prisonerEvent: WILD_STORIES
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -80,7 +80,7 @@ events:
             skillType: S_LEADER
 
   - prisonerEvent: TAMPERING
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -109,7 +109,7 @@ events:
             magnitude: 10
 
   - prisonerEvent: CONVERSATIONS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -136,7 +136,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: RATIONS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -160,7 +160,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: TRADE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -187,7 +187,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: DRAINED
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: NONE
@@ -216,7 +216,7 @@ events:
             magnitude: -2
 
   - prisonerEvent: RESCUE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: SKILL
@@ -260,7 +260,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: REPAIRS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: SKILL
@@ -298,7 +298,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: SICKNESS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -328,7 +328,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: VETERAN
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: NONE
@@ -355,7 +355,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: GRAFFITI
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -383,7 +383,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: PRAYER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -405,7 +405,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: BARTERING
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -427,7 +427,7 @@ events:
           - effect: UNIQUE
 
   - prisonerEvent: OFFICER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: SKILL
@@ -475,7 +475,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: DICE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -502,7 +502,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: LOVERS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -524,7 +524,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: SOBBING
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -551,7 +551,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: PROPAGANDA
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -575,7 +575,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: SONGS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -599,7 +599,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: REFUSE_RATIONS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -631,7 +631,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: PLOTTING
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -663,7 +663,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: EQUIPMENT
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: NONE
@@ -687,7 +687,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: PLANNED_RESCUE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -717,7 +717,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: MISTAKE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -742,7 +742,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: LETTER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -765,7 +765,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: ILLNESS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -799,7 +799,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: DO_ANDROIDS_DREAM_OF_ELECTRONIC_SHEEP
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -822,7 +822,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: HEAVY_METAL
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -845,7 +845,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: PARANOIA
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -866,7 +866,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: TUNNEL
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: NONE
@@ -907,7 +907,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: PET_RODENT
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -929,7 +929,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: ESCAPE_ROPE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: INJURY
@@ -970,7 +970,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: UNDERCOVER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           # Change the origin faction of one prisoner to match employer
@@ -998,7 +998,7 @@ events:
             magnitude: -1
 
   - prisonerEvent: BRAND
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: LOYALTY_ONE
@@ -1038,7 +1038,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: SILENCE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1061,7 +1061,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: SINGING
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1085,7 +1085,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: PAPER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1109,7 +1109,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: HOLIDAY
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: NONE
@@ -1132,7 +1132,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: WHISPERS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: NONE
@@ -1154,7 +1154,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: LEADER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: SKILL
@@ -1197,7 +1197,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: ARGUMENTS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1219,7 +1219,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: SENTIMENTAL_ITEM
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1242,7 +1242,7 @@ events:
             magnitude: -10
 
   - prisonerEvent: MALNUTRITION
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: INJURY
@@ -1271,7 +1271,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: INJURIES
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: INJURY
@@ -1316,7 +1316,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: TERROR
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: NONE
@@ -1341,7 +1341,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: SCREAMING
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1364,7 +1364,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: PHOTO
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1389,7 +1389,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: GHOSTS
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY
@@ -1412,7 +1412,7 @@ events:
             magnitude: -5
 
   - prisonerEvent: VOICES
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: PRISONER_CAPACITY

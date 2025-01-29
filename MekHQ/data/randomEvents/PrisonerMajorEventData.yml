@@ -3,7 +3,7 @@ events:
   # This is the internal identification enum for the event.
   # Only acceptable values are in the PrisonerEvent enum.
   - prisonerEvent: BREAKOUT
-    responseMap:
+    responseEntries:
       # Can only include values from the ResponseQuality enum. Must include three responses whose
       # index matches the response options presented to the player.
       - quality: RESPONSE_NEUTRAL
@@ -79,7 +79,7 @@ events:
             magnitude: -50
 
   - prisonerEvent: RIOT
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: INJURY_PERCENT
@@ -148,7 +148,7 @@ events:
             magnitude: -25
 
   - prisonerEvent: MURDER
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: DEATH
@@ -196,7 +196,7 @@ events:
             magnitude: -25
 
   - prisonerEvent: FIRE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: DEATH_PERCENT
@@ -297,7 +297,7 @@ events:
             magnitude: -50
 
   - prisonerEvent: POISON
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           # 'Poison' (xd6 Fatigue) 10% of personnel
@@ -339,7 +339,7 @@ events:
             magnitude: 1
 
   - prisonerEvent: HOSTAGE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: DEATH_PERCENT
@@ -419,7 +419,7 @@ events:
             magnitude: 10
 
   - prisonerEvent: BOMB
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           - effect: ESCAPE
@@ -462,7 +462,7 @@ events:
             magnitude: -25
 
   - prisonerEvent: EXECUTION
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
           - effect: DEATH
@@ -514,7 +514,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: ABANDONED_TO_DIE
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
           # Generate 2d6 new prisoners & xd6 crime
@@ -562,7 +562,7 @@ events:
             magnitude: -15
 
   - prisonerEvent: UNITED
-    responseMap:
+    responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
           - effect: INJURY_PERCENT

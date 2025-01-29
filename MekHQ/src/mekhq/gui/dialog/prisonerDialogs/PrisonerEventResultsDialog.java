@@ -18,9 +18,9 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
     static final String SUFFIX_FAILURE = ".failure";
 
     public PrisonerEventResultsDialog(Campaign campaign, @Nullable Person speaker, PrisonerEvent event,
-                                     int choiceIndex, boolean isSuccessful) {
+                                      int choiceIndex, boolean isSuccessful, String eventReport) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, event,
-                choiceIndex, isSuccessful), createButtons(isSuccessful), createOutOfCharacterMessage(),
+                choiceIndex, isSuccessful), createButtons(isSuccessful), eventReport,
             null);
     }
 
@@ -39,9 +39,5 @@ public class PrisonerEventResultsDialog extends MHQDialogImmersive {
         String commanderAddress = campaign.getCommanderAddress(false);
         return getFormattedTextAt(RESOURCE_BUNDLE, FORWARD_RESPONSE + choiceIndex + '.' + event.name() + suffix,
             commanderAddress);
-    }
-
-    private static String createOutOfCharacterMessage() {
-        return getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
     }
 }

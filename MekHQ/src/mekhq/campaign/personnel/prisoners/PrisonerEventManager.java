@@ -66,7 +66,7 @@ public class PrisonerEventManager {
         // Monthly events
         if (today.getDayOfMonth() == 1) {
             // reset temporary prisoner capacity
-            campaign.setTemporaryPrisonerCapacity(0);
+            campaign.setTemporaryPrisonerCapacity(100);
 
             // Check for ransom events
             if (campaign.hasActiveContract()) {
@@ -137,7 +137,10 @@ public class PrisonerEventManager {
 
         boolean isSuccessful = makeEventCheck(eventData, choiceIndex);
 
-        new PrisonerEventResultsDialog(campaign, speaker, event, choiceIndex, isSuccessful);
+        EventEffectsManager effectsManager = new EventEffectsManager(campaign, eventData, choiceIndex, isSuccessful);
+        String eventReport = effectsManager.getEventReport();
+
+        new PrisonerEventResultsDialog(campaign, speaker, event, choiceIndex, isSuccessful, eventReport);
     }
 
     private void processWarning(int overflow) {
@@ -322,7 +325,9 @@ public class PrisonerEventManager {
             }
         }
 
-        return prisonerCapacity + campaign.getTemporaryPrisonerCapacity();
+        double modifier = (double) campaign.getTemporaryPrisonerCapacity() / 100;
+
+        return max(0, (int) round(prisonerCapacity * modifier));
     }
 
     private @Nullable Person getSpeaker() {

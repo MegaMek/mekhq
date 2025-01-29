@@ -224,7 +224,7 @@ public class EventEffectsManager {
             : "context.prisoner.singular");
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "INJURY.report",
-            colorOpen, context, CLOSING_SPAN_TAG, magnitude);
+            colorOpen, context, CLOSING_SPAN_TAG);
     }
 
     /**
@@ -274,16 +274,16 @@ public class EventEffectsManager {
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
                 ? "context.guard.plural"
                 : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
                 ? "context.prisoner.plural"
                 : "context.prisoner.singular");
         }
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount > 1
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
             ? "pluralizer.have"
             : "pluralizer.has");
 
@@ -330,20 +330,20 @@ public class EventEffectsManager {
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
                 ? "context.guard.plural"
                 : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
                 ? "context.prisoner.plural"
                 : "context.prisoner.singular");
         }
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
             ? "pluralizer.have"
             : "pluralizer.has");
 
-        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
             ? "DEATH.body.singular"
             : "DEATH.body.plural");
 
@@ -390,26 +390,26 @@ public class EventEffectsManager {
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
                 ? "context.guard.plural"
                 : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
                 ? "context.prisoner.plural"
                 : "context.prisoner.singular");
         }
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
             ? "pluralizer.have"
             : "pluralizer.has");
 
-        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
             ? "DEATH.body.singular"
             : "DEATH.body.plural");
 
         // We can reuse the same report as the DEATH effect, here too
         return getFormattedTextAt(RESOURCE_BUNDLE, "DEATH.report",
-            magnitude, colorOpen, context, CLOSING_SPAN_TAG, haveOrHas, bodyOrBodies);
+            targetCount, colorOpen, context, CLOSING_SPAN_TAG, haveOrHas, bodyOrBodies);
     }
 
     /**
@@ -534,11 +534,11 @@ public class EventEffectsManager {
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
                 ? "context.guard.plural"
                 : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
                 ? "context.prisoner.plural"
                 : "context.prisoner.singular");
         }
@@ -579,10 +579,10 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1 ?
+        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ?
             "context.prisoner.plural" : "context.prisoner.singular");
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
             ? "pluralizer.have"
             : "pluralizer.has");
 
@@ -618,16 +618,16 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1 ?
+        String context = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ?
             "context.prisoner.plural" : "context.prisoner.singular");
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
             ? "pluralizer.have"
             : "pluralizer.has");
 
         // We can reuse the same report as the ESCAPE effect, here too
         return getFormattedTextAt(RESOURCE_BUNDLE, "ESCAPE.report",
-            magnitude, context, haveOrHas, colorOpen, CLOSING_SPAN_TAG);
+            targetCount, context, haveOrHas, colorOpen, CLOSING_SPAN_TAG);
     }
 
 
@@ -700,11 +700,11 @@ public class EventEffectsManager {
 
         String context;
         if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
                 ? "context.guard.plural"
                 : "context.guard.singular");
         } else {
-            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() > 1
+            context = getFormattedTextAt(RESOURCE_BUNDLE, targets.size() != 1
                 ? "context.prisoner.plural"
                 : "context.prisoner.singular");
         }
@@ -753,7 +753,7 @@ public class EventEffectsManager {
         StratconCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 0
+        String context = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 0
             ? "SUPPORT_POINT.plural"
             : "SUPPORT_POINT.singular");
 
@@ -948,18 +948,18 @@ public class EventEffectsManager {
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
-        String context = getFormattedTextAt(RESOURCE_BUNDLE, prisonerCount > 1
+        String context = getFormattedTextAt(RESOURCE_BUNDLE, prisonerCount != 1
             ? "context.prisoner.plural"
             : "context.prisoner.singular");
 
-        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude > 1
+        String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, prisonerCount != 1
             ? "pluralizer.have"
             : "pluralizer.has");
 
         String crimeReport = getFormattedTextAt(RESOURCE_BUNDLE, "ABANDONED_TO_DIE.report.crime",
             colorOpen, CLOSING_SPAN_TAG, crimeChange);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "POISON.report",
+        return getFormattedTextAt(RESOURCE_BUNDLE, "ABANDONED_TO_DIE.report.prisoners",
             prisonerCount, context, haveOrHas, crimeReport);
     }
 }

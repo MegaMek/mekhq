@@ -403,7 +403,7 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
-        temporaryPrisonerCapacity = 0;
+        temporaryPrisonerCapacity = 100;
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
