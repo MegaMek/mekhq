@@ -636,6 +636,11 @@ public class Resupply {
 
             Part part = partInUse.getPartToBuy().getAcquisitionPart();
 
+            if ((resupplyType != ResupplyType.RESUPPLY_LOOT)
+                && (resupplyType != ResupplyType.RESUPPLY_SMUGGLER)) {
+                part.setBrandNew(true);
+            }
+
             if (part == null) {
                 continue;
             }
