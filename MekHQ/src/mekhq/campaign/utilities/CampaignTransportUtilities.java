@@ -227,6 +227,7 @@ public class CampaignTransportUtilities {
                 if (!(campaignTransportType.isShipTransport())) {
                     transporters.add(INFANTRY_COMPARTMENT);
                     transporters.add(CARGO_BAY);
+                    // TODO from MekHQ#5928: Add Cargo Container
                 }
 
                 if (entity instanceof BattleArmor baEntity) {
