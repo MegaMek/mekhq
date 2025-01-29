@@ -344,8 +344,8 @@ public class EventEffectsManager {
             : "pluralizer.has");
 
         String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1
-            ? "DEATH.body.singular"
-            : "DEATH.body.plural");
+            ? "DEATH.body.plural"
+            : "DEATH.body.singular");
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "DEATH.report",
             magnitude, colorOpen, context, CLOSING_SPAN_TAG, haveOrHas, bodyOrBodies);
@@ -404,8 +404,8 @@ public class EventEffectsManager {
             : "pluralizer.has");
 
         String bodyOrBodies = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1
-            ? "DEATH.body.singular"
-            : "DEATH.body.plural");
+            ? "DEATH.body.plural"
+            : "DEATH.body.singular");
 
         // We can reuse the same report as the DEATH effect, here too
         return getFormattedTextAt(RESOURCE_BUNDLE, "DEATH.report",
