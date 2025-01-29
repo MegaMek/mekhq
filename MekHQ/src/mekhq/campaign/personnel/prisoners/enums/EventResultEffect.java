@@ -26,17 +26,13 @@ public enum EventResultEffect {
 
     /**
      * Inflicts Hits (or Injuries) to a single guard or prisoner. The number of hits/injuries is
-     * equal to {@code magnitude}. A {@code magnitude} of 6+ will kill characters instead. If death
-     * is desired, use {@code DEATH} instead.
-     * <p>
-     *     <b>Note:</b> If this is called multiple times in the same response, it will always
-     *     affect different characters each time.
-     * </p>
+     * equal to {@code magnitude}. Any magnitude under 1 will be counted as 1, while magnitudes
+     * greater than 5 will be treated as 5.
      */
     INJURY,
 
     /**
-     * Inflicts d6+1 Hits to a percentage of guards or prisoners. The percentage of affected
+     * Inflicts d6 Hits to a percentage of guards or prisoners. The percentage of affected
      * characters is equal to {@code magnitude}.
      */
     INJURY_PERCENT,
@@ -76,13 +72,13 @@ public enum EventResultEffect {
     /**
      * Frees a set number of prisoners equal to {@code magnitude}.
      */
-    FREE,
+    ESCAPE,
 
     /**
      * Frees a percentage of prisoners. The percentage of affected characters is equal to
      * {@code magnitude}.
      */
-    FREE_PERCENT,
+    ESCAPE_PERCENT,
 
     /**
      * Modify the Fatigue of a single Prisoner or Guard by {@code magnitude}. Only has an effect if

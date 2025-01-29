@@ -1578,7 +1578,7 @@ public class Person {
         this.fatigue = fatigue;
     }
 
-    public void increaseFatigue(final int fatigue) {
+    public void changeFatigue(final int fatigue) {
         this.fatigue = this.fatigue + fatigue;
     }
 

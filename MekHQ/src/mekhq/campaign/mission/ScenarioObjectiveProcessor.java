@@ -399,7 +399,7 @@ public class ScenarioObjectiveProcessor {
                         if (dryRun) {
                             return String.format("%d support points will be added", numSupportPoints);
                         } else {
-                            contract.getStratconCampaignState().addSupportPoints(numSupportPoints);
+                            contract.getStratconCampaignState().changeSupportPoints(numSupportPoints);
                         }
                     }
                 }

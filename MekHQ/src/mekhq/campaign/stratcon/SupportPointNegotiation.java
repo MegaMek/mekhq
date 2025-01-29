@@ -159,7 +159,7 @@ public class SupportPointNegotiation {
 
         // Add points to the contract if positive
         if (negotiatedSupportPoints > 0) {
-            campaignState.addSupportPoints(negotiatedSupportPoints);
+            campaignState.changeSupportPoints(negotiatedSupportPoints);
         }
 
         // Add a report

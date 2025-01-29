@@ -181,7 +181,7 @@ public class PrisonerEventManager {
             responseModifier = getPersonalityValue(campaign, speaker);
         }
 
-        ResponseQuality responseQuality = eventData.responseMap().get(choiceIndex).quality();
+        ResponseQuality responseQuality = eventData.responseEntries().get(choiceIndex).quality();
         switch (responseQuality) {
             case RESPONSE_NEUTRAL -> {} // No modifier
             case RESPONSE_POSITIVE -> responseModifier += 3;

@@ -2241,14 +2241,50 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Provides a filtered list of personnel including only active Persons.
+     * @deprecated Use {@link #getActivePersonnel(boolean)} instead, as this method does not
+     *             provide flexibility to exclude prisoners from the result.
      *
-     * @return a {@link Person} <code>List</code> containing all active personnel
+     * <p>This method retrieves a filtered list of active personnel, but always includes prisoners
+     * in the result. It is now deprecated in favor of the more flexible overloaded method that
+     * accepts a parameter to specify whether prisoners should be excluded.</p>
+     *
+     * @return A {@link List} of {@link Person} objects containing all active personnel,
+     *         including prisoners.
      */
+    @Deprecated
     public List<Person> getActivePersonnel() {
-        return getPersonnel().stream()
-                .filter(p -> p.getStatus().isActive())
-                .collect(Collectors.toList());
+        return getActivePersonnel(false);
+    }
+
+    /**
+     * Retrieves a filtered list of personnel, including only those who are active. Optionally
+     * excludes prisoners from the filtered result based on the provided parameter.
+     *
+     * <p>This method iterates over the list of all personnel and filters <b>out</b> those who are
+     * not active or, if specified, those marked as prisoners. The resulting list contains only the
+     * personnel that satisfy the given conditions.</p>
+     *
+     * @param excludePrisoners A boolean flag indicating whether to exclude prisoners.
+     *                         If {@code true}, all personnel with prisoner status are removed
+     *                         from the resulting list.
+     * @return A {@link List} of {@link Person} objects containing only active personnel,
+     *         optionally excluding prisoners if the parameter is set to {@code true}.
+     */
+    public List<Person> getActivePersonnel(boolean excludePrisoners) {
+        List<Person> activePersonnel = new ArrayList<>();
+        for (Person person : getPersonnel()) {
+            if (!person.getStatus().isActive()) {
+                continue;
+            }
+
+            if (excludePrisoners && person.getPrisonerStatus().isPrisoner()) {
+                continue;
+            }
+
+            activePersonnel.add(person);
+        }
+
+        return activePersonnel;
     }
 
     /**
@@ -2261,7 +2297,7 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(true).stream()
             .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
             .collect(Collectors.toList());
     }

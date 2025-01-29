@@ -131,7 +131,7 @@ public class StratconCampaignState {
         return supportPoints;
     }
 
-    public void addSupportPoints(int number) {
+    public void changeSupportPoints(int number) {
         supportPoints += number;
     }
 

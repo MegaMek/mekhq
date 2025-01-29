@@ -1505,7 +1505,7 @@ public class ResolveScenarioTracker {
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
                 if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    person.increaseFatigue(
+                    person.changeFatigue(
                             campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
                 }
 
@@ -1536,7 +1536,7 @@ public class ResolveScenarioTracker {
             }
 
             if (!status.isDead()) {
-                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);

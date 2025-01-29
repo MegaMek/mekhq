@@ -160,7 +160,7 @@ public class CampaignManagementDialog extends JDialog {
     }
 
     private void gmAddSPHandler(ActionEvent e) {
-        currentCampaignState.addSupportPoints(1);
+        currentCampaignState.changeSupportPoints(1);
         btnGMRemoveSP.setEnabled(currentCampaignState.getSupportPoints() > 0);
         parent.updateCampaignState();
     }

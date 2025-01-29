@@ -18,11 +18,6 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
-import java.time.DayOfWeek;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-
 import megamek.common.MiscType;
 import megamek.common.equipment.MiscMounted;
 import mekhq.MekHQ;
@@ -31,6 +26,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
+
+import java.time.DayOfWeek;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * The Fatigue class contains static methods for calculating and processing
@@ -155,7 +155,7 @@ public class Fatigue {
                         fatigueAdjustment++;
                     }
 
-                    person.increaseFatigue(-fatigueAdjustment);
+                    person.changeFatigue(-fatigueAdjustment);
 
                     if (person.getFatigue() < 0) {
                         person.setFatigue(0);
