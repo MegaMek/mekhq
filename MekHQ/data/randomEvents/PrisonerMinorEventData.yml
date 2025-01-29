@@ -1,46 +1,1436 @@
+# All events in this yml are considered 'minor' events
 events:
     # This is the internal identification enum for the event.
     # Only acceptable values are in the PrisonerEvent enum.
   - prisonerEvent: ARGUMENT
-    # Must have 3 entries using values from the ResponseQuality enum.
+    responseMap:
+      # Can only include values from the ResponseQuality enum. Must include three responses whose
+      # index matches the response options presented to the player.
+      - quality: RESPONSE_NEUTRAL
+        # The effects caused by successfully resolving the event.
+        effectsSuccess:
+            # Can only include values from the EventResultEffect enum.
+            # Any response with the UNIQUE enum requires separate code support.
+            # Defaults to NONE, if not present.
+          - effect: PRISONER_CAPACITY
+            # TRUE to affect guards, otherwise false. Used by some EventResultEffect values.
+            # Defaults to FALSE, if not present.
+            isGuard: FALSE
+            # Intensity of the effect. Affects different effects differently. See EventResultEffect
+            # for more information. Defaults to 0, if not present.
+            magnitude: 5
+            # Can only include skill values from the SkillType class. Used by the 'SKILL'
+            # EventResultEffect. Defaults to "", if not present.
+            skillType: SKILL_NONE
+        # The effects caused by failing to resolve the event successfully.
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+          - effect: INJURY_PERCENT
+            isGuard: FALSE
+            magnitude: 10
+          - effect: INJURY
+            isGuard: TRUE
+            magnitude: 3
+
+  - prisonerEvent: WILD_STORIES
     responseMap:
       - quality: RESPONSE_POSITIVE
-        # Must contain at least one entry using values from the EventResultEffect enum.
-        effects:
-          - effect: NONE
-            isGuard: true
-            magnitude: 0
-            skillType: null
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
       - quality: RESPONSE_NEUTRAL
-        effects:
-          - effect: NONE
-            isGuard: true
-            magnitude: 0
-            skillType: null
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
       - quality: RESPONSE_NEUTRAL
-        effects:
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+
+  - prisonerEvent: TAMPERING
+    responseMap:
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
           - effect: NONE
-            isGuard: true
-            magnitude: 0
-            skillType: null
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+
+  - prisonerEvent: CONVERSATIONS
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: RATIONS
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: TRADE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+          - effect: INJURY_PERCENT
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+          - effect: INJURY_PERCENT
+            magnitude: 5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: DRAINED
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+          - effect: FATIGUE_ALL
+            isGuard: TRUE
+            magnitude: 10
+          - effect: LOYALTY_ALL
+            isGuard: TRUE
+            magnitude: -2
+
+  - prisonerEvent: RESCUE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 2
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: REPAIRS
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_TECH_MECHANIC
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_TECH_MECHANIC
+          - effect: PRISONER_CAPACITY
+            magnitude: -20
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_TECH_MECHANIC
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_TECH_MECHANIC
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_TECH_MECHANIC
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: SICKNESS
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: DEATH_PERCENT
+            isGuard: TRUE
+            magnitude: 10
+          - effect: DEATH_PERCENT
+            isGuard: FALSE
+            magnitude: 20
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+
+  - prisonerEvent: VETERAN
+    responseMap:
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: INJURY
+            isGuard: TRUE
+            magnitude: 1
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: GRAFFITI
+    responseMap:
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: PRAYER
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: BARTERING
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          # The OpFor has their morale bumped by one level
+          - effect: UNIQUE
+
+  - prisonerEvent: OFFICER
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: DICE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+          - effect: INJURY_PERCENT
+            isGuard: FALSE
+            magnitude: 5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: LOVERS
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: LOYALTY_ONE
+            isGuard: TRUE
+            magnitude: -3
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: SOBBING
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: DEATH
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: PROPAGANDA
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: SONGS
+    responseMap:
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: REFUSE_RATIONS
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+
+  - prisonerEvent: PLOTTING
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 1
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+
+  - prisonerEvent: EQUIPMENT
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: PLANNED_RESCUE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 2
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: MISTAKE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          # Remove all combat skills from a random Prisoner
+          - effect: UNIQUE
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: LETTER
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: ILLNESS
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: DEATH_PERCENT
+            isGuard: TRUE
+            magnitude: 5
+          - effect: DEATH_PERCENT
+            isGuard: FALSE
+            magnitude: 10
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: DEATH_PERCENT
+            isGuard: TRUE
+            magnitude: 10
+          - effect: DEATH_PERCENT
+            isGuard: FALSE
+            magnitude: 20
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: DO_ANDROIDS_DREAM_OF_ELECTRONIC_SHEEP
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: HEAVY_METAL
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: PARANOIA
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: TUNNEL
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 2
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+
+  - prisonerEvent: PET_RODENT
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: ESCAPE_ROPE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 2
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 2
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: UNDERCOVER
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          # Change the origin faction of one prisoner to match employer
+          - effect: UNIQUE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: DEATH
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          # Change the origin faction of one prisoner to match employer
+          - effect: UNIQUE
+          - effect: SUPPORT_POINT
+            magnitude: 1
+        effectsFailure:
+          # -1 Support Point
+          - effect: SUPPORT_POINT
+            magnitude: -1
+
+  - prisonerEvent: BRAND
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: LOYALTY_ONE
+            isGuard: FALSE
+            magnitude: -5
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: LOYALTY_ONE
+            isGuard: FALSE
+            magnitude: -5
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: LOYALTY_ONE
+            isGuard: FALSE
+            magnitude: -5
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: LOYALTY_ONE
+            isGuard: FALSE
+            magnitude: -5
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: LOYALTY_ONE
+            isGuard: FALSE
+            magnitude: -5
+        effectsFailure:
+          - effect: LOYALTY_ONE
+            isGuard: FALSE
+            magnitude: -5
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: SILENCE
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
   - prisonerEvent: SINGING
     responseMap:
-      - quality: RESPONSE_POSITIVE
-        effects:
-          - effect: NONE
-            isGuard: true
-            magnitude: 0
-            skillType: null
       - quality: RESPONSE_NEUTRAL
-        effects:
-          - effect: NONE
-            isGuard: true
-            magnitude: 0
-            skillType: null
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
       - quality: RESPONSE_NEUTRAL
-        effects:
-          - effect: NONE
-            isGuard: true
-            magnitude: 0
-            skillType: null
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
 
+  - prisonerEvent: PAPER
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: HOLIDAY
+    responseMap:
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: WHISPERS
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: LEADER
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+        effectsFailure:
+          - effect: SKILL
+            isGuard: FALSE
+            magnitude: 3
+            skillType: S_LEADER
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: ARGUMENTS
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: SENTIMENTAL_ITEM
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+
+  - prisonerEvent: MALNUTRITION
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: INJURIES
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 1
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: INJURY_PERCENT
+            isGuard: FALSE
+            magnitude: 5
+          - effect: INJURY_PERCENT
+            isGuard: TRUE
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+        effectsFailure:
+          - effect: INJURY
+            isGuard: FALSE
+            magnitude: 3
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: TERROR
+    responseMap:
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: SUPPORT_POINT
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+
+  - prisonerEvent: SCREAMING
+    responseMap:
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: PHOTO
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: SUPPORT_POINT
+            magnitude: 1
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+
+  - prisonerEvent: GHOSTS
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -10
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+
+  - prisonerEvent: VOICES
+    responseMap:
+      - quality: RESPONSE_POSITIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 5
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5
+      - quality: RESPONSE_NEGATIVE
+        effectsSuccess:
+          - effect: PRISONER_CAPACITY
+            magnitude: 10
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -15
+      - quality: RESPONSE_NEUTRAL
+        effectsSuccess:
+          - effect: NONE
+        effectsFailure:
+          - effect: PRISONER_CAPACITY
+            magnitude: -5

@@ -9,9 +9,13 @@ import java.util.List;
  * Each response entry defines a response quality and its associated effects.
  *
  * @param quality the quality of the response, as defined by the {@link ResponseQuality} enum
- * @param effects a list of effects resulting from the response quality, as defined by the {@link EventResult} record
+ * @param effectsSuccess a list of effects resulting from successful resolution of the event, as
+ *                      defined by the {@link EventResult} record
+ * @param effectsFailure a list of effects resulting from failing to resolve the event, as defined
+ *                      by the {@link EventResult} record
  */
 public record PrisonerResponseEntry(
     ResponseQuality quality,
-    List<EventResult> effects
+    List<EventResult> effectsSuccess,
+    List<EventResult> effectsFailure
 ) { }

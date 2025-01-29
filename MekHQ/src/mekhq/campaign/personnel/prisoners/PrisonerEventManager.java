@@ -334,13 +334,15 @@ public class PrisonerEventManager {
             }
         }
 
-        Collections.shuffle(securityForces);
-        Force designatedForce = securityForces.get(0);
-
         Person speaker = null;
-        UUID speakerId = designatedForce.getForceCommanderID();
-        if (speakerId != null) {
-            speaker = campaign.getPerson(speakerId);
+
+        if (!securityForces.isEmpty()) {
+            Collections.shuffle(securityForces);
+            Force designatedForce = securityForces.get(0);
+            UUID speakerId = designatedForce.getForceCommanderID();
+            if (speakerId != null) {
+                speaker = campaign.getPerson(speakerId);
+            }
         }
 
         if (speaker == null) {

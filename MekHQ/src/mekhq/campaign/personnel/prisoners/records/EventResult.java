@@ -1,8 +1,9 @@
 package mekhq.campaign.personnel.prisoners.records;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.personnel.SkillType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import mekhq.campaign.personnel.prisoners.enums.EventResultEffect;
+
+import static mekhq.campaign.personnel.prisoners.enums.EventResultEffect.NONE;
 
 /**
  * Represents the result of an event response, including the effect type,
@@ -14,9 +15,15 @@ import mekhq.campaign.personnel.prisoners.enums.EventResultEffect;
  * @param skillType An optional skill type associated with the effect
  */
 public record EventResult(
-    EventResultEffect effect,
-    boolean isGuard,
-    int magnitude,
-    @Nullable SkillType skillType
-) {}
+    @JsonProperty(value = "effect") EventResultEffect effect,
+    @JsonProperty(value = "isGuard") boolean isGuard,
+    @JsonProperty(value = "magnitude") int magnitude,
+    @JsonProperty(value = "skillType") String skillType
+) {
+    // Additional logic to provide defaults for missing properties
+    public EventResult {
+        effect = (effect != null) ? effect : NONE;
+        skillType = (skillType != null) ? skillType : "";
+    }
+}
 
