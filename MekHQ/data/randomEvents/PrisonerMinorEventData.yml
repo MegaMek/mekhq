@@ -994,7 +994,6 @@ events:
           - effect: SUPPORT_POINT
             magnitude: 1
         effectsFailure:
-          # -1 Support Point
           - effect: SUPPORT_POINT
             magnitude: -1
 
