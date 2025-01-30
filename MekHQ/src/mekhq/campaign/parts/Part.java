@@ -1540,13 +1540,13 @@ public abstract class Part implements IPartWork, ITechnology {
                 }
 
                 if (equipmentType != null) {
-                    if (equipmentType.hasFlag(WeaponType.F_LASER)) {
+                    if (equipmentType.hasFlag(WeaponTypeFlag.F_LASER)) {
                         imgBase = "laser";
-                    } else if (equipmentType.hasFlag(WeaponType.F_MISSILE)) {
+                    } else if (equipmentType.hasFlag(WeaponTypeFlag.F_MISSILE)) {
                         imgBase = "missile";
-                    } else if (equipmentType.hasFlag(WeaponType.F_BALLISTIC)) {
+                    } else if (equipmentType.hasFlag(WeaponTypeFlag.F_BALLISTIC)) {
                         imgBase = "ballistic";
-                    } else if (equipmentType.hasFlag(WeaponType.F_ARTILLERY)) {
+                    } else if (equipmentType.hasFlag(WeaponTypeFlag.F_ARTILLERY)) {
                         imgBase = "artillery";
                     }
                 }

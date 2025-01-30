@@ -983,7 +983,7 @@ public class ResolveScenarioTracker {
                     }
                 }
 
-                if (en.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+                if (en.hasWorkingMisc(EquipmentFlag.F_COMMAND_CONSOLE)) {
                     for (Person p : crew) {
                         if (!p.equals(commander) && !p.equals(driver)) {
                             console = p;

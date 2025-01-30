@@ -22,6 +22,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.EquipmentFlag;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -258,14 +259,14 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
             return false;
         }
         for (Mounted<?> m : unit.getEntity().getMisc()) {
-            if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
-                    type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+            if (m.getType() instanceof MiscType && m.getType().hasFlag(EquipmentFlag.F_BA_MEA) &&
+                    type instanceof MiscType && type.hasFlag(EquipmentFlag.F_BA_MANIPULATOR)
                     && this.getBaMountLocation() == m.getBaMountLoc()) {
                 return true;
             }
             /*
              * if (type instanceof InfantryWeapon &&
-             * m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
+             * m.getType() instanceof MiscType && m.getType().hasFlag(EquipmentFlag.F_AP_MOUNT)
              * && this.getBaMountLocation()== m.getBaMountLoc()) {
              * return true;
              * }

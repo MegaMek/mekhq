@@ -21,6 +21,7 @@
  */
 package mekhq.campaign.work;
 
+import megamek.common.EquipmentFlag;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -118,7 +119,7 @@ public interface IPartWork extends IWork {
         if (((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType))
                 || ((part instanceof MissingEquipmentPart) && (((MissingEquipmentPart) part).getType() instanceof WeaponType))) {
             return PartRepairType.WEAPON;
-        } else if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CLUB))) {
+        } else if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType().hasFlag(EquipmentFlag.F_CLUB))) {
             return PartRepairType.PHYSICAL_WEAPON;
         } else {
             return part.getRepairPartType();

@@ -215,22 +215,22 @@ public class MissingEquipmentPartTest {
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return MiscType.F_MEK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            return EquipmentFlag.F_MEK_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return MiscType.F_TANK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            return EquipmentFlag.F_TANK_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Aero Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return MiscType.F_FIGHTER_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            return EquipmentFlag.F_FIGHTER_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // WeaponType
@@ -244,29 +244,29 @@ public class MissingEquipmentPartTest {
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_MEK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_MEK_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_TANK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_TANK_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... or Fighter Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_AERO_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(missingPart.isOmniPoddable());
 
         // ... but not Capital scale.
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_AERO_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         when(weaponType.isCapital()).thenReturn(true);
         assertFalse(missingPart.isOmniPoddable());
     }
@@ -1088,7 +1088,7 @@ public class MissingEquipmentPartTest {
         // We're not the same if our sticker prices differ;
 
         // Setup a type with variable costs
-        doReturn(true).when(type).hasFlag(eq(MiscType.F_OFF_ROAD));
+        doReturn(true).when(type).hasFlag(eq(EquipmentFlag.F_OFF_ROAD));
         doReturn((double) EquipmentType.COST_VARIABLE).when(type).getRawCost();
 
         // Put the variable cost part back on a unit

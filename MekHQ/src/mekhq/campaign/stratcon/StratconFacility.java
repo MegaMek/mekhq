@@ -53,7 +53,7 @@ public class StratconFacility implements Cloneable {
         CommandCenter,
         EarlyWarningSystem,
         OrbitalDefense,
-        BaseOfOperations
+        BaseOfOperations,
     }
 
     private ForceAlignment owner;

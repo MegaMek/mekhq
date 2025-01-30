@@ -577,7 +577,7 @@ public class MekLocation extends Part {
 
         toReturn.append(getUnitTonnage())
             .append(" tons");
-            
+
         if (loc == Mek.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
             if (hasSensors()) {
@@ -738,11 +738,11 @@ public class MekLocation extends Part {
             if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
                 if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
                     EquipmentType equipmentType = slot.getMount().getType();
-                    if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
+                    if (equipmentType.hasFlag(EquipmentFlag.F_NULLSIG)) {
                         partsToSalvageOrScrap.add("Null-Signature System");
-                    } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
+                    } else if (equipmentType.hasFlag(EquipmentFlag.F_VOIDSIG)) {
                         partsToSalvageOrScrap.add("Void-Signature System");
-                    } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
+                    } else if (equipmentType.hasFlag(EquipmentFlag.F_CHAMELEON_SHIELD)) {
                         partsToSalvageOrScrap.add("Chameleon Shield");
                     }
                 }

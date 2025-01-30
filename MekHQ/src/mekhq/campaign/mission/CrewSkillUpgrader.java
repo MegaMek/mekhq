@@ -25,11 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.UnitType;
-import megamek.common.WeaponType;
+import megamek.common.*;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -297,11 +293,11 @@ public class CrewSkillUpgrader {
         int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
         WeaponType weaponType = (WeaponType) entity.getIndividualWeaponList().get(weaponIndex).getType();
 
-        if (weaponType.hasFlag(WeaponType.F_BALLISTIC)) {
+        if (weaponType.hasFlag(WeaponTypeFlag.F_BALLISTIC)) {
             return Crew.SPECIAL_BALLISTIC;
-        } else if (weaponType.hasFlag(WeaponType.F_ENERGY)) {
+        } else if (weaponType.hasFlag(WeaponTypeFlag.F_ENERGY)) {
             return Crew.SPECIAL_ENERGY;
-        } else if (weaponType.hasFlag(WeaponType.F_MISSILE)) {
+        } else if (weaponType.hasFlag(WeaponTypeFlag.F_MISSILE)) {
             return Crew.SPECIAL_MISSILE;
         } else {
             return Crew.SPECIAL_NONE;

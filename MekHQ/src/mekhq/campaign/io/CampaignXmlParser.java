@@ -1563,7 +1563,7 @@ public class CampaignXmlParser {
     private static boolean isLegacyMASC(Part p) {
         return (p instanceof EquipmentPart) &&
                 !(p instanceof MASC) &&
-                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
+                ((EquipmentPart) p).getType().hasFlag(EquipmentFlag.F_MASC) &&
                 (((EquipmentPart) p).getType() instanceof MiscType);
     }
 
@@ -1577,7 +1577,7 @@ public class CampaignXmlParser {
     private static boolean isLegacyMissingMASC(Part p) {
         return (p instanceof MissingEquipmentPart) &&
                 !(p instanceof MissingMASC) &&
-                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
+                ((MissingEquipmentPart) p).getType().hasFlag(EquipmentFlag.F_MASC) &&
                 (((MissingEquipmentPart) p).getType() instanceof MiscType);
     }
 

@@ -635,8 +635,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
                 StratconFacility facility = currentTrack.getFacility(currentCoords);
-
-                if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
+                if ((facility != null) && (facility.getFacilityType() != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == Allied ? Color.CYAN : Color.RED);
 
                     BufferedImage facilityImage = getFacilityImage(facility);

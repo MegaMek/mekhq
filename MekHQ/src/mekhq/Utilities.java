@@ -136,19 +136,19 @@ public class Utilities {
             }
 
             // Only Protos can use Proto-specific ammo
-            if (ammoType.hasFlag(AmmoType.F_PROTOMEK) && !(entity instanceof ProtoMek)) {
+            if (ammoType.hasFlag(AmmoTypeFlag.F_PROTOMEK) && !(entity instanceof ProtoMek)) {
                 continue;
             }
 
             // When dealing with machine guns, Protos can only use proto-specific machine
             // gun ammo
             if ((entity instanceof ProtoMek)
-                    && ammoType.hasFlag(AmmoType.F_MG)
-                    && !ammoType.hasFlag(AmmoType.F_PROTOMEK)) {
+                    && ammoType.hasFlag(AmmoTypeFlag.F_MG)
+                    && !ammoType.hasFlag(AmmoTypeFlag.F_PROTOMEK)) {
                 continue;
             }
 
-            if (ammoType.hasFlag(AmmoType.F_NUCLEAR) && ammoType.hasFlag(AmmoType.F_CAP_MISSILE)
+            if (ammoType.hasFlag(AmmoTypeFlag.F_NUCLEAR) && ammoType.hasFlag(AmmoTypeFlag.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
             }
@@ -156,10 +156,10 @@ public class Utilities {
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
             if ((ammoType.getRackSize() == currentAmmoType.getRackSize())
-                    && (ammoType.hasFlag(AmmoType.F_BATTLEARMOR) == currentAmmoType.hasFlag(AmmoType.F_BATTLEARMOR))
-                    && (ammoType.hasFlag(AmmoType.F_ENCUMBERING) == currentAmmoType.hasFlag(AmmoType.F_ENCUMBERING))
+                    && (ammoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR) == currentAmmoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR))
+                    && (ammoType.hasFlag(AmmoTypeFlag.F_ENCUMBERING) == currentAmmoType.hasFlag(AmmoTypeFlag.F_ENCUMBERING))
                     && ((ammoType.getTonnage(entity) == currentAmmoType.getTonnage(entity))
-                            || ammoType.hasFlag(AmmoType.F_CAP_MISSILE))) {
+                            || ammoType.hasFlag(AmmoTypeFlag.F_CAP_MISSILE))) {
                 ammoTypes.add(ammoType);
             }
         }

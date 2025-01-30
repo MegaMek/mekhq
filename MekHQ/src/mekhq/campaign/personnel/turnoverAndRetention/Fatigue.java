@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import megamek.common.EquipmentFlag;
 import megamek.common.MiscType;
 import megamek.common.equipment.MiscMounted;
 import mekhq.MekHQ;
@@ -61,7 +62,7 @@ public class Fatigue {
 
                 if (!miscItems.isEmpty()) {
                     fieldKitchenCount += (int) unit.getEntity().getMisc().stream()
-                            .filter(item -> item.getType().hasFlag(MiscType.F_FIELD_KITCHEN))
+                            .filter(item -> item.getType().hasFlag(EquipmentFlag.F_FIELD_KITCHEN))
                             .count();
                 }
             }

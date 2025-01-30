@@ -24,16 +24,10 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.util.Objects;
 
+import megamek.common.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -316,13 +310,13 @@ public class MissingEquipmentPart extends MissingPart {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MEK_EQUIPMENT)
-                    || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                    || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+            return type.hasFlag(EquipmentFlag.F_MEK_EQUIPMENT)
+                    || type.hasFlag(EquipmentFlag.F_TANK_EQUIPMENT)
+                    || type.hasFlag(EquipmentFlag.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MEK_WEAPON)
-                    || type.hasFlag(WeaponType.F_TANK_WEAPON)
-                    || type.hasFlag(WeaponType.F_AERO_WEAPON))
+            return (type.hasFlag(WeaponTypeFlag.F_MEK_WEAPON)
+                    || type.hasFlag(WeaponTypeFlag.F_TANK_WEAPON)
+                    || type.hasFlag(WeaponTypeFlag.F_AERO_WEAPON))
                     && !((WeaponType) type).isCapital();
         }
         return true;

@@ -51,7 +51,7 @@ public class HeatSink extends EquipmentPart {
      */
     @Override
     public Money getStickerPrice() {
-        if (type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
+        if (type.hasFlag(EquipmentFlag.F_DOUBLE_HEAT_SINK) || type.hasFlag(EquipmentFlag.F_LASER_HEAT_SINK)) {
             return Money.of(isOmniPodded() ? 7500 : 6000);
         } else {
             return Money.of(isOmniPodded() ? 2500 : 2000);

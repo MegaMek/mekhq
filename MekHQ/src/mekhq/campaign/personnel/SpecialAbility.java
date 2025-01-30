@@ -32,16 +32,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import megamek.common.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.Version;
-import megamek.common.EquipmentType;
-import megamek.common.Mounted;
-import megamek.common.TechConstants;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.util.weightedMaps.WeightedIntMap;
@@ -565,18 +562,18 @@ public class SpecialAbility {
         WeaponType wt = (WeaponType) et;
         if (wt.isCapital()
                 || wt.isSubCapital()
-                || wt.hasFlag(WeaponType.F_INFANTRY)
-                || wt.hasFlag(WeaponType.F_ONESHOT)
-                || wt.hasFlag(WeaponType.F_PROTOTYPE)) {
+                || wt.hasFlag(WeaponTypeFlag.F_INFANTRY)
+                || wt.hasFlag(WeaponTypeFlag.F_ONESHOT)
+                || wt.hasFlag(WeaponTypeFlag.F_PROTOTYPE)) {
             return false;
         }
 
         if (!role.isCivilian()
-                && !((wt.hasFlag(WeaponType.F_MEK_WEAPON) && !role.isMekWarrior())
-                        || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
-                        || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewMember())
-                        || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
-                        || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
+                && !((wt.hasFlag(WeaponTypeFlag.F_MEK_WEAPON) && !role.isMekWarrior())
+                        || (wt.hasFlag(WeaponTypeFlag.F_AERO_WEAPON) && !role.isAerospacePilot())
+                        || (wt.hasFlag(WeaponTypeFlag.F_TANK_WEAPON) && !role.isVehicleCrewMember())
+                        || (wt.hasFlag(WeaponTypeFlag.F_BA_WEAPON) && !role.isBattleArmour())
+                        || (wt.hasFlag(WeaponTypeFlag.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
             return false;
         }
 

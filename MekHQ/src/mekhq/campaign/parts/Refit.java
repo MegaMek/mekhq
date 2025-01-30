@@ -601,8 +601,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (newPart instanceof LargeCraftAmmoBin) {
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per
                     // capital missile
-                    if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE)
-                            || type.hasFlag(AmmoType.F_SCREEN)) {
+                    if (type.hasFlag(AmmoTypeFlag.F_CAP_MISSILE) || type.hasFlag(AmmoTypeFlag.F_CRUISE_MISSILE)
+                            || type.hasFlag(AmmoTypeFlag.F_SCREEN)) {
                         time += WORKHOUR * ammoBin.getFullShots();
                     } else {
                         time += (int) Math.ceil(15 * Math.max(1, newPart.getTonnage()));
@@ -721,10 +721,10 @@ public class Refit extends Part implements IAcquisitionWork {
                         if ((crits == oldCrits) && (oldType != null)
                                 // FIXME: WeaverThree - CamOps doesn't specifiy anything about weapon types
                                 // -- Not sure how best to resolve this quickly
-                                && (type.hasFlag(WeaponType.F_LASER) == oldType.hasFlag(WeaponType.F_LASER))
-                                && (type.hasFlag(WeaponType.F_MISSILE) == oldType.hasFlag(WeaponType.F_MISSILE))
-                                && (type.hasFlag(WeaponType.F_BALLISTIC) == oldType.hasFlag(WeaponType.F_BALLISTIC))
-                                && (type.hasFlag(WeaponType.F_ARTILLERY) == oldType.hasFlag(WeaponType.F_ARTILLERY))) {
+                                && (type.hasFlag(WeaponTypeFlag.F_LASER) == oldType.hasFlag(WeaponTypeFlag.F_LASER))
+                                && (type.hasFlag(WeaponTypeFlag.F_MISSILE) == oldType.hasFlag(WeaponTypeFlag.F_MISSILE))
+                                && (type.hasFlag(WeaponTypeFlag.F_BALLISTIC) == oldType.hasFlag(WeaponTypeFlag.F_BALLISTIC))
+                                && (type.hasFlag(WeaponTypeFlag.F_ARTILLERY) == oldType.hasFlag(WeaponTypeFlag.F_ARTILLERY))) {
                             thisPartRefitClass = CLASS_A;
                             matchFound = true;
                             matchIndex = index;
@@ -852,8 +852,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 AmmoType type = oldAmmoBin.getType();
                 if (remainingShots > 0) {
                     if (oldPart instanceof LargeCraftAmmoBin) {
-                        if (type.hasFlag(AmmoType.F_CAP_MISSILE) || type.hasFlag(AmmoType.F_CRUISE_MISSILE)
-                                || type.hasFlag(AmmoType.F_SCREEN)) {
+                        if (type.hasFlag(AmmoTypeFlag.F_CAP_MISSILE) || type.hasFlag(AmmoTypeFlag.F_CRUISE_MISSILE)
+                                || type.hasFlag(AmmoTypeFlag.F_SCREEN)) {
                             time += WORKHOUR * ((LargeCraftAmmoBin) oldPart).getFullShots();
                         } else {
                             time += 15 * Math.max(1, (int) oldPart.getTonnage());
@@ -2877,8 +2877,8 @@ public class Refit extends Part implements IAcquisitionWork {
             return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
         } else if (entity instanceof Mek) {
             Optional<MiscMounted> mount = entity.getMisc().stream()
-                    .filter(m -> m.getType().hasFlag(MiscType.F_HEAT_SINK)
-                            || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))
+                    .filter(m -> m.getType().hasFlag(EquipmentFlag.F_HEAT_SINK)
+                            || m.getType().hasFlag(EquipmentFlag.F_DOUBLE_HEAT_SINK))
                     .findAny();
             if (mount.isPresent()) {
                 return new HeatSink(0, mount.get().getType(), -1, false, campaign);

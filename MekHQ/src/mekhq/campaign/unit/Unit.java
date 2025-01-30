@@ -83,7 +83,7 @@ import java.util.stream.Collectors;
 import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
 import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static java.lang.Math.max;
-import static megamek.common.MiscType.F_CARGO;
+import static megamek.common.EquipmentFlag.F_CARGO;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
@@ -1152,7 +1152,7 @@ public class Unit implements ITechnology {
     public boolean hasTSM() {
         for (Mounted<?> mEquip : entity.getMisc()) {
             MiscType mtype = (MiscType) mEquip.getType();
-            if (null != mtype && mtype.hasFlag(MiscType.F_TSM)) {
+            if (null != mtype && mtype.hasFlag(EquipmentFlag.F_TSM)) {
                 return true;
             }
         }
@@ -1342,7 +1342,7 @@ public class Unit implements ITechnology {
     }
 
     public String getHeatSinkTypeString(int year) {
-        BigInteger heatSinkType = MiscType.F_HEAT_SINK;
+        var heatSinkType = EquipmentFlag.F_HEAT_SINK;
         boolean heatSinkIsClanTechBase = false;
 
         for (Mounted<?> mounted : getEntity().getEquipment()) {
@@ -1351,13 +1351,13 @@ public class Unit implements ITechnology {
             boolean isHeatSink = false;
 
             if (etype instanceof MiscType) {
-                if (etype.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-                    heatSinkType = MiscType.F_LASER_HEAT_SINK;
+                if (etype.hasFlag(EquipmentFlag.F_LASER_HEAT_SINK)) {
+                    heatSinkType = EquipmentFlag.F_LASER_HEAT_SINK;
                     isHeatSink = true;
-                } else if (etype.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
-                    heatSinkType = MiscType.F_DOUBLE_HEAT_SINK;
+                } else if (etype.hasFlag(EquipmentFlag.F_DOUBLE_HEAT_SINK)) {
+                    heatSinkType = EquipmentFlag.F_DOUBLE_HEAT_SINK;
                     isHeatSink = true;
-                } else if (etype.hasFlag(MiscType.F_HEAT_SINK)) {
+                } else if (etype.hasFlag(EquipmentFlag.F_HEAT_SINK)) {
                     isHeatSink = true;
                 }
             }
@@ -1371,9 +1371,9 @@ public class Unit implements ITechnology {
         }
 
         String heatSinkTypeString = heatSinkIsClanTechBase ? "(CL) " : "(IS) ";
-        if (heatSinkType.equals(MiscType.F_LASER_HEAT_SINK)) {
+        if (heatSinkType.equals(EquipmentFlag.F_LASER_HEAT_SINK)) {
             heatSinkTypeString += "Laser Heat Sink";
-        } else if (heatSinkType.equals(MiscType.F_DOUBLE_HEAT_SINK)) {
+        } else if (heatSinkType.equals(EquipmentFlag.F_DOUBLE_HEAT_SINK)) {
             heatSinkTypeString += "Double Heat Sink";
         } else {
             heatSinkTypeString += "Heat Sink";
@@ -1481,7 +1481,7 @@ public class Unit implements ITechnology {
         if (entity instanceof ProtoMek) {
             int sinks = 0;
             for (Mounted<?> mount : entity.getWeaponList()) {
-                if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
+                if (mount.getType().hasFlag(WeaponTypeFlag.F_ENERGY)) {
                     WeaponType wType = (WeaponType) mount.getType();
                     sinks += wType.getHeat();
                 }
@@ -3379,10 +3379,10 @@ public class Unit implements ITechnology {
                 if (!(m.getType() instanceof MiscType)) {
                     continue;
                 }
-                if (!(m.getType().hasFlag(MiscType.F_BA_MANIPULATOR) ||
-                        m.getType().hasFlag(MiscType.F_BA_MEA) ||
-                        m.getType().hasFlag(MiscType.F_AP_MOUNT) ||
-                        m.getType().hasFlag(MiscType.F_MAGNETIC_CLAMP))) {
+                if (!(m.getType().hasFlag(EquipmentFlag.F_BA_MANIPULATOR) ||
+                        m.getType().hasFlag(EquipmentFlag.F_BA_MEA) ||
+                        m.getType().hasFlag(EquipmentFlag.F_AP_MOUNT) ||
+                        m.getType().hasFlag(EquipmentFlag.F_MAGNETIC_CLAMP))) {
                     continue;
                 }
             }
@@ -3419,8 +3419,8 @@ public class Unit implements ITechnology {
 
                 }
             } else if (m.getType() instanceof MiscType
-                    && (m.getType().hasFlag(MiscType.F_HEAT_SINK)
-                            || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+                    && (m.getType().hasFlag(EquipmentFlag.F_HEAT_SINK)
+                            || m.getType().hasFlag(EquipmentFlag.F_DOUBLE_HEAT_SINK))) {
                 if (m.getLocation() == Entity.LOC_NONE) {
                     // heat sinks located in LOC_NONE are base unhittable heat sinks
                     continue;
@@ -3433,7 +3433,7 @@ public class Unit implements ITechnology {
                     addPart(epart);
                     partsToAdd.add(epart);
                 }
-            } else if ((m.getType() instanceof MiscType) && m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+            } else if ((m.getType() instanceof MiscType) && m.getType().hasFlag(EquipmentFlag.F_JUMP_JET)) {
                 int eqnum = entity.getEquipmentNum(m);
                 Part epart = jumpJets.get(eqnum);
                 if (null == epart) {
@@ -3475,7 +3475,7 @@ public class Unit implements ITechnology {
                         }
                         epart = new EquipmentPart((int) entity.getWeight(), type, eqnum, m.getSize(),
                                 m.isOmniPodMounted(), getCampaign());
-                        if ((type instanceof MiscType) && type.hasFlag(MiscType.F_MASC)) {
+                        if ((type instanceof MiscType) && type.hasFlag(EquipmentFlag.F_MASC)) {
                             epart = new MASC((int) entity.getWeight(), type, eqnum, getCampaign(),
                                     erating, m.isOmniPodMounted());
                         }
@@ -4583,7 +4583,7 @@ public class Unit implements ITechnology {
         // the tank to a single commander. As the console commander is not counted
         // against crew requirements,
         // we do not increase nCrew if present.
-        if ((entity instanceof Tank) && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+        if ((entity instanceof Tank) && entity.hasWorkingMisc(EquipmentFlag.F_COMMAND_CONSOLE)) {
             if ((techOfficer == null) || (techOfficer.getHits() > 0)) {
                 ((Tank) entity).setUsingConsoleCommander(true);
             }
@@ -4964,7 +4964,7 @@ public class Unit implements ITechnology {
         return (techOfficer == null) &&
                 (entity.getCrew().getCrewType().getTechPos() >= 0
                         // Use techOfficer field for secondary commander
-                        || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
+                        || (entity instanceof Tank && entity.hasWorkingMisc(EquipmentFlag.F_COMMAND_CONSOLE)));
     }
 
     public boolean canTakeTech() {
@@ -5639,7 +5639,7 @@ public class Unit implements ITechnology {
      */
     public boolean hasPrototypeTSM() {
         for (Mounted<?> m : getEntity().getMisc()) {
-            if (m.getType().hasFlag(MiscType.F_TSM) && m.getType().hasFlag(MiscType.F_PROTOTYPE)) {
+            if (m.getType().hasFlag(EquipmentFlag.F_TSM) && m.getType().hasFlag(EquipmentFlag.F_PROTOTYPE)) {
                 return true;
             }
         }

@@ -130,13 +130,13 @@ public class PartsStore {
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
             if (!et.isHittable() &&
-                    !(et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_BA_MANIPULATOR))) {
+                    !(et instanceof MiscType && ((MiscType) et).hasFlag(EquipmentFlag.F_BA_MANIPULATOR))) {
                 continue;
             }
             // TODO: we are still adding a lot of non-hittable equipment
             if (et instanceof AmmoType) {
                 AmmoType ammoType = (AmmoType) et;
-                if (ammoType.hasFlag(AmmoType.F_BATTLEARMOR)
+                if (ammoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR)
                         && (ammoType.getKgPerShot() > 0)) {
                     // BA ammo has one shot listed as the amount. Do it as 1 ton blocks if using
                     // kg/shot.
@@ -145,31 +145,31 @@ public class PartsStore {
                 } else {
                     parts.add(new AmmoStorage(0, ammoType, ammoType.getShots(), c));
                 }
-            } else if (et instanceof MiscType && (((MiscType) et).hasFlag(MiscType.F_HEAT_SINK)
-                    || ((MiscType) et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+            } else if (et instanceof MiscType && (((MiscType) et).hasFlag(EquipmentFlag.F_HEAT_SINK)
+                    || ((MiscType) et).hasFlag(EquipmentFlag.F_DOUBLE_HEAT_SINK))) {
                 Part p = new HeatSink(0, et, -1, false, c);
                 parts.add(p);
                 parts.add(new OmniPod(p, c));
                 parts.add(new HeatSink(0, et, -1, true, c));
-            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_JUMP_JET)) {
+            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(EquipmentFlag.F_JUMP_JET)) {
                 // need to do it by rating and unit tonnage
                 for (int ton = 10; ton <= 100; ton += 5) {
                     Part p = new JumpJet(ton, et, -1, false, c);
                     parts.add(p);
-                    if (!et.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                    if (!et.hasFlag(EquipmentFlag.F_BA_EQUIPMENT)) {
                         parts.add(new OmniPod(p, c));
                         parts.add(new JumpJet(ton, et, -1, true, c));
                     }
                 }
-            } else if ((et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_TANK_EQUIPMENT)
-                    && ((MiscType) et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
+            } else if ((et instanceof MiscType && ((MiscType) et).hasFlag(EquipmentFlag.F_TANK_EQUIPMENT)
+                    && ((MiscType) et).hasFlag(EquipmentFlag.F_CHASSIS_MODIFICATION))
                     || et instanceof BayWeapon
                     || et instanceof InfantryAttack) {
                 continue;
-            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_BA_EQUIPMENT)
-                    && !((MiscType) et).hasFlag(MiscType.F_BA_MANIPULATOR)) {
+            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(EquipmentFlag.F_BA_EQUIPMENT)
+                    && !((MiscType) et).hasFlag(EquipmentFlag.F_BA_MANIPULATOR)) {
                 continue;
-            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(MiscType.F_MASC)) {
+            } else if (et instanceof MiscType && ((MiscType) et).hasFlag(EquipmentFlag.F_MASC)) {
                 if (et.hasSubType(MiscType.S_SUPERCHARGER)) {
                     for (int rating = 10; rating <= 400; rating += 5) {
                         // eton 0.5 to 10.5 inclusive
@@ -211,13 +211,13 @@ public class PartsStore {
             } else {
                 boolean poddable = !et.isOmniFixedOnly();
                 if (et instanceof MiscType) {
-                    poddable &= et.hasFlag(MiscType.F_MEK_EQUIPMENT)
-                            || et.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                            || et.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+                    poddable &= et.hasFlag(EquipmentFlag.F_MEK_EQUIPMENT)
+                            || et.hasFlag(EquipmentFlag.F_TANK_EQUIPMENT)
+                            || et.hasFlag(EquipmentFlag.F_FIGHTER_EQUIPMENT);
                 } else if (et instanceof WeaponType) {
-                    poddable &= (et.hasFlag(WeaponType.F_MEK_WEAPON)
+                    poddable &= (et.hasFlag(WeaponTypeFlag.F_MEK_WEAPON)
                             || et.hasFlag(Weapon.F_TANK_WEAPON)
-                            || et.hasFlag(WeaponType.F_AERO_WEAPON))
+                            || et.hasFlag(WeaponTypeFlag.F_AERO_WEAPON))
                             && !((WeaponType) et).isCapital();
                 }
                 if (EquipmentPart.hasVariableTonnage(et)) {
@@ -439,7 +439,7 @@ public class PartsStore {
     private void stockArmor(Campaign c) {
         int amount;
         for (ArmorType armor : ArmorType.allArmorTypes()) {
-            if (armor.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+            if (armor.hasFlag(EquipmentFlag.F_BA_EQUIPMENT)) {
                 amount = (int) (5 * armor.getWeightPerPoint());
                 parts.add(new BaArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
             } else {

@@ -222,22 +222,22 @@ public class EquipmentPartTest {
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return MiscType.F_MEK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            return EquipmentFlag.F_MEK_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return MiscType.F_TANK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            return EquipmentFlag.F_TANK_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Aero Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return MiscType.F_FIGHTER_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+            return EquipmentFlag.F_FIGHTER_EQUIPMENT.equals(flag);
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // WeaponType
@@ -251,29 +251,29 @@ public class EquipmentPartTest {
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_MEK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_MEK_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_TANK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_TANK_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Fighter Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_AERO_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... but not Capital scale.
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+            return WeaponTypeFlag.F_AERO_WEAPON.equals(flag);
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         when(weaponType.isCapital()).thenReturn(true);
         assertFalse(equipmentPart.isOmniPoddable());
     }
@@ -1268,7 +1268,7 @@ public class EquipmentPartTest {
         assertEquals(250, equipmentPart.getBaseTime());
 
         // Finally, bomb bays on LAMs take 60 minutes
-        doReturn(true).when(type).hasFlag(MiscType.F_BOMB_BAY);
+        doReturn(true).when(type).hasFlag(EquipmentFlag.F_BOMB_BAY);
 
         // No hits, no time on the bomb bay.
         equipmentPart.setHits(0);
@@ -1322,7 +1322,7 @@ public class EquipmentPartTest {
         assertEquals(2, equipmentPart.getDifficulty());
 
         // Finally, bomb bays on LAMs have a fixed -1 difficulty
-        doReturn(true).when(type).hasFlag(MiscType.F_BOMB_BAY);
+        doReturn(true).when(type).hasFlag(EquipmentFlag.F_BOMB_BAY);
 
         equipmentPart.setHits(0);
         assertEquals(-1, equipmentPart.getDifficulty());
@@ -1383,7 +1383,7 @@ public class EquipmentPartTest {
         // We're not the same if our sticker prices differ;
 
         // Setup a type with variable costs
-        doReturn(true).when(type).hasFlag(eq(MiscType.F_OFF_ROAD));
+        doReturn(true).when(type).hasFlag(eq(EquipmentFlag.F_OFF_ROAD));
         doReturn((double) EquipmentType.COST_VARIABLE).when(type).getRawCost();
 
         // They're both variable cost, but the same misc type (and not on units)

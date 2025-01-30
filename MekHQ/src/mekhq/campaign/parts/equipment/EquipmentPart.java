@@ -23,17 +23,10 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -292,7 +285,7 @@ public class EquipmentPart extends Part {
         }
 
         final int hits = getHits();
-        if ((type instanceof MiscType) && type.hasFlag(MiscType.F_BOMB_BAY)) {
+        if ((type instanceof MiscType) && type.hasFlag(EquipmentFlag.F_BOMB_BAY)) {
             // LAM bomb bays only take 60 minutes to repair.
             return (hits > 0) ? 60 : 0;
         }
@@ -316,7 +309,7 @@ public class EquipmentPart extends Part {
             return 0;
         }
         // LAM bomb bays have a fixed -1 difficulty.
-        if ((type instanceof MiscType) && type.hasFlag(MiscType.F_BOMB_BAY)) {
+        if ((type instanceof MiscType) && type.hasFlag(EquipmentFlag.F_BOMB_BAY)) {
             return -1;
         }
         if (hits == 1) {
@@ -506,63 +499,63 @@ public class EquipmentPart extends Part {
         if (en != null) {
             varCost = Money.of(type.getCost(en, isArmored, getLocation(), getSize()));
         } else if (type instanceof MiscType) {
-            if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL) || type.hasFlag(MiscType.F_MASH)) {
+            if (type.hasFlag(EquipmentFlag.F_DRONE_CARRIER_CONTROL) || type.hasFlag(EquipmentFlag.F_MASH)) {
                 varCost = Money.of(10000 * getTonnage());
-            } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
+            } else if (type.hasFlag(EquipmentFlag.F_OFF_ROAD)) {
                 varCost = Money.of(10 * getTonnage() * getTonnage());
-            } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION)
-                    || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
+            } else if (type.hasFlag(EquipmentFlag.F_FLOTATION_HULL) || type.hasFlag(EquipmentFlag.F_VACUUM_PROTECTION)
+                    || type.hasFlag(EquipmentFlag.F_ENVIRONMENTAL_SEALING) || type.hasFlag(EquipmentFlag.F_OFF_ROAD)) {
                 // ??
-            } else if (type.hasFlag(MiscType.F_LIMITED_AMPHIBIOUS) || type.hasFlag((MiscType.F_FULLY_AMPHIBIOUS))) {
+            } else if (type.hasFlag(EquipmentFlag.F_LIMITED_AMPHIBIOUS) || type.hasFlag((EquipmentFlag.F_FULLY_AMPHIBIOUS))) {
                 varCost = Money.of(getTonnage() * 10000);
-            } else if (type.hasFlag(MiscType.F_DUNE_BUGGY)) {
+            } else if (type.hasFlag(EquipmentFlag.F_DUNE_BUGGY)) {
                 varCost = Money.of(10 * getTonnage() * getTonnage());
-            } else if (type.hasFlag(MiscType.F_MASC) && type.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+            } else if (type.hasFlag(EquipmentFlag.F_MASC) && type.hasFlag(EquipmentFlag.F_BA_EQUIPMENT)) {
                 // TODO: handle this one differently
                 // costValue = entity.getRunMP() * 75000;
-            } else if (type.hasFlag(MiscType.F_HEAD_TURRET) || type.hasFlag(MiscType.F_SHOULDER_TURRET)
-                    || type.hasFlag(MiscType.F_QUAD_TURRET)) {
+            } else if (type.hasFlag(EquipmentFlag.F_HEAD_TURRET) || type.hasFlag(EquipmentFlag.F_SHOULDER_TURRET)
+                    || type.hasFlag(EquipmentFlag.F_QUAD_TURRET)) {
                 varCost = Money.of(getTonnage() * 10000);
-            } else if (type.hasFlag(MiscType.F_SPONSON_TURRET)) {
+            } else if (type.hasFlag(EquipmentFlag.F_SPONSON_TURRET)) {
                 varCost = Money.of(getTonnage() * 4000);
-            } else if (type.hasFlag(MiscType.F_PINTLE_TURRET)) {
+            } else if (type.hasFlag(EquipmentFlag.F_PINTLE_TURRET)) {
                 varCost = Money.of(getTonnage() * 1000);
-            } else if (type.hasFlag(MiscType.F_ARMORED_MOTIVE_SYSTEM)) {
+            } else if (type.hasFlag(EquipmentFlag.F_ARMORED_MOTIVE_SYSTEM)) {
                 // TODO: handle this through motive system part
                 varCost = Money.of(getTonnage() * 100000);
-            } else if (type.hasFlag(MiscType.F_JET_BOOSTER)) {
+            } else if (type.hasFlag(EquipmentFlag.F_JET_BOOSTER)) {
                 // TODO: Handle this one through subtyping
                 // varCost = entity.getEngine().getRating() * 10000;
-            } else if (type.hasFlag(MiscType.F_DRONE_OPERATING_SYSTEM)) {
+            } else if (type.hasFlag(EquipmentFlag.F_DRONE_OPERATING_SYSTEM)) {
                 varCost = Money.of((getTonnage() * 10000) + 5000);
-            } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+            } else if (type.hasFlag(EquipmentFlag.F_TARGCOMP)) {
                 varCost = Money.of(getTonnage() * 10000);
-            } else if (type.hasFlag(MiscType.F_CLUB)
+            } else if (type.hasFlag(EquipmentFlag.F_CLUB)
                     && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
                 varCost = Money.of(getTonnage() * 5000);
-            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
+            } else if (type.hasFlag(EquipmentFlag.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
                 varCost = Money.of(getTonnage() * 10000);
-            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
+            } else if (type.hasFlag(EquipmentFlag.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
                 varCost = Money.of((1 + getTonnage()) * 10000);
-            } else if (type.hasFlag(MiscType.F_TRACKS)) {
+            } else if (type.hasFlag(EquipmentFlag.F_TRACKS)) {
                 // TODO: Handle this through subtyping
                 // varCost = (int) Math.ceil((500 * entity.getEngine().getRating() *
                 // entity.getWeight()) / 75);
-            } else if (type.hasFlag(MiscType.F_TALON)) {
+            } else if (type.hasFlag(EquipmentFlag.F_TALON)) {
                 varCost = Money.of(getTonnage() * 300);
-            } else if (type.hasFlag(MiscType.F_SPIKES)) {
+            } else if (type.hasFlag(EquipmentFlag.F_SPIKES)) {
                 varCost = Money.of(getTonnage() * 50);
-            } else if (type.hasFlag(MiscType.F_PARTIAL_WING)) {
+            } else if (type.hasFlag(EquipmentFlag.F_PARTIAL_WING)) {
                 varCost = Money.of(getTonnage() * 50000);
-            } else if (type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
+            } else if (type.hasFlag(EquipmentFlag.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
                 // TODO: subtype this one
                 // int multiplier = entity.locationIsLeg(loc) ? 700 : 500;
                 // costValue = (int) Math.ceil(entity.getWeight() * multiplier);
-            } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
+            } else if (type.hasFlag(EquipmentFlag.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
                 varCost = Money.of(getUnitTonnage() * 200);
-            } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
+            } else if (type.hasFlag(EquipmentFlag.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
                 varCost = Money.of(getUnitTonnage() * 150);
-            } else if (type.hasFlag(MiscType.F_NAVAL_C3)) {
+            } else if (type.hasFlag(EquipmentFlag.F_NAVAL_C3)) {
                 varCost = Money.of(getUnitTonnage() * 100000);
             }
         }
@@ -583,8 +576,8 @@ public class EquipmentPart extends Part {
      */
     public static boolean hasVariableTonnage(EquipmentType type) {
         return (type instanceof MiscType)
-                && (type.hasFlag(MiscType.F_TARGCOMP) || type.hasFlag(MiscType.F_CLUB)
-                        || type.hasFlag(MiscType.F_TALON));
+                && (type.hasFlag(EquipmentFlag.F_TARGCOMP) || type.hasFlag(EquipmentFlag.F_CLUB)
+                        || type.hasFlag(EquipmentFlag.F_TALON));
     }
 
     public static double getStartingTonnage(EquipmentType type) {
@@ -592,17 +585,17 @@ public class EquipmentPart extends Part {
     }
 
     public static double getMaxTonnage(EquipmentType type) {
-        if (type.hasFlag(MiscType.F_TALON) || (type.hasFlag(MiscType.F_CLUB)
+        if (type.hasFlag(EquipmentFlag.F_TALON) || (type.hasFlag(EquipmentFlag.F_CLUB)
                 && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB)))) {
             return 7;
-        } else if (type.hasFlag(MiscType.F_CLUB)
+        } else if (type.hasFlag(EquipmentFlag.F_CLUB)
                 && (type.hasSubType(MiscType.S_LANCE) || type.hasSubType(MiscType.S_SWORD))) {
             return 5;
-        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_MACE)) {
+        } else if (type.hasFlag(EquipmentFlag.F_CLUB) && type.hasSubType(MiscType.S_MACE)) {
             return 10;
-        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
+        } else if (type.hasFlag(EquipmentFlag.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
             return 5.5;
-        } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+        } else if (type.hasFlag(EquipmentFlag.F_TARGCOMP)) {
             // direct fire weapon weight divided by 4 - what is reasonably the highest - 15
             // tons?
             return 15;
@@ -611,7 +604,7 @@ public class EquipmentPart extends Part {
     }
 
     public static double getTonnageIncrement(EquipmentType type) {
-        if ((type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))) {
+        if ((type.hasFlag(EquipmentFlag.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))) {
             return 0.5;
         }
         return 1;
@@ -628,11 +621,11 @@ public class EquipmentPart extends Part {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MEK_EQUIPMENT) || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
-                    || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+            return type.hasFlag(EquipmentFlag.F_MEK_EQUIPMENT) || type.hasFlag(EquipmentFlag.F_TANK_EQUIPMENT)
+                    || type.hasFlag(EquipmentFlag.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MEK_WEAPON) || type.hasFlag(WeaponType.F_TANK_WEAPON)
-                    || type.hasFlag(WeaponType.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
+            return (type.hasFlag(WeaponTypeFlag.F_MEK_WEAPON) || type.hasFlag(WeaponTypeFlag.F_TANK_WEAPON)
+                    || type.hasFlag(WeaponTypeFlag.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
         }
         return true;
     }

@@ -25,16 +25,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import megamek.common.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.LandAirMek;
-import megamek.common.Mek;
-import megamek.common.MiscType;
-import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -263,11 +257,11 @@ public class MissingMekLocation extends MissingPart {
             } else if (slot.getType() == CriticalSlot.TYPE_EQUIPMENT) {
                 if ((slot.getMount() != null) && !slot.getMount().isDestroyed()) {
                     EquipmentType equipmentType = slot.getMount().getType();
-                    if (equipmentType.hasFlag(MiscType.F_NULLSIG)) {
+                    if (equipmentType.hasFlag(EquipmentFlag.F_NULLSIG)) {
                         partsToSalvageOrScrap.add("Null-Signature System");
-                    } else if (equipmentType.hasFlag(MiscType.F_VOIDSIG)) {
+                    } else if (equipmentType.hasFlag(EquipmentFlag.F_VOIDSIG)) {
                         partsToSalvageOrScrap.add("Void-Signature System");
-                    } else if (equipmentType.hasFlag(MiscType.F_CHAMELEON_SHIELD)) {
+                    } else if (equipmentType.hasFlag(EquipmentFlag.F_CHAMELEON_SHIELD)) {
                         partsToSalvageOrScrap.add("Chameleon Shield");
                     }
                 }

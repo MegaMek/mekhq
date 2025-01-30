@@ -2478,7 +2478,7 @@ public class Campaign implements ITechManager {
         // Makes no sense buying those separately from the chasis
         if ((part instanceof EquipmentPart)
                 && ((EquipmentPart) part).getType() != null
-                && (((EquipmentPart) part).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION))) {
+                && (((EquipmentPart) part).getType().hasFlag(EquipmentFlag.F_CHASSIS_MODIFICATION))) {
             return null;
         }
         // Replace a "missing" part with a corresponding "new" one.

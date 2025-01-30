@@ -22,6 +22,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.EquipmentFlag;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
@@ -105,15 +106,15 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
             return false;
         }
         for (Mounted<?> m : unit.getEntity().getEquipment()) {
-            if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
-                    type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+            if (m.getType() instanceof MiscType && m.getType().hasFlag(EquipmentFlag.F_BA_MEA) &&
+                    type instanceof MiscType && type.hasFlag(EquipmentFlag.F_BA_MANIPULATOR)
                     && this.getBaMountLocation() == m.getBaMountLoc()) {
                 return true;
             }
             // this is not quite right, they must be linked somehow
             /*
              * if (type instanceof InfantryWeapon &&
-             * m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
+             * m.getType() instanceof MiscType && m.getType().hasFlag(EquipmentFlag.F_AP_MOUNT)
              * && this.getBaMountLocation()== m.getBaMountLoc()) {
              * return true;
              * }

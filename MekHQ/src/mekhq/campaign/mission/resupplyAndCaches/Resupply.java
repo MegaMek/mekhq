@@ -25,7 +25,7 @@ import java.util.*;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.MiscType.F_SPONSON_TURRET;
+import static megamek.common.EquipmentFlag.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
@@ -636,8 +636,8 @@ public class Resupply {
      */
     private boolean checkExclusionList(Part part) {
         if (part instanceof EquipmentPart) {
-            List<BigInteger> excludedTypes = List.of(F_SPONSON_TURRET);
-            for (BigInteger excludedType : excludedTypes) {
+            var excludedTypes = List.of(F_SPONSON_TURRET);
+            for (var excludedType : excludedTypes) {
                 if (((EquipmentPart) part).getType().hasFlag(excludedType)) {
                     return true;
                 }

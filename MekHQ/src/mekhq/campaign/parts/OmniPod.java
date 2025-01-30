@@ -20,15 +20,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.*;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.TechAdvancement;
-import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -192,14 +187,14 @@ public class OmniPod extends Part {
                                     .get(EquipmentType.getStructureTypeName(EquipmentType.T_STRUCTURE_STANDARD));
                         }
                         if (et instanceof MiscType
-                                && (et.hasFlag(MiscType.F_HEAT_SINK)
-                                        || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
-                                        || et.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE))) {
+                                && (et.hasFlag(EquipmentFlag.F_HEAT_SINK)
+                                        || et.hasFlag(EquipmentFlag.F_DOUBLE_HEAT_SINK)
+                                        || et.hasFlag(EquipmentFlag.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE))) {
                             partType = new HeatSink(0, et, -1, false, campaign);
-                        } else if (et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
+                        } else if (et instanceof MiscType && et.hasFlag(EquipmentFlag.F_JUMP_JET)) {
                             partType = new JumpJet(tonnage, et, -1, false, campaign);
                         } else if (et instanceof MiscType
-                                && et.hasFlag(MiscType.F_MASC)
+                                && et.hasFlag(EquipmentFlag.F_MASC)
                                 && (et.getSubType() & MiscType.S_SUPERCHARGER) == 0) {
                             if (null != wn2.getAttributes().getNamedItem("rating")) {
                                 int rating = Integer
