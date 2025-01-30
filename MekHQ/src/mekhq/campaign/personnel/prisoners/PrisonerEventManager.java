@@ -141,8 +141,11 @@ public class PrisonerEventManager {
 
         Set<Person> escapees = effectsManager.getEscapees();
 
-        if (!escapees.isEmpty()) {
-            new PrisonEscapeScenario(campaign, escapees);
+        if (!escapees.isEmpty() && campaign.hasActiveAtBContract(false)) {
+            List<AtBContract> contracts = campaign.getActiveAtBContracts();
+            Collections.shuffle(contracts);
+
+            new PrisonEscapeScenario(campaign, contracts.get(0), escapees);
         }
     }
 

@@ -390,7 +390,7 @@ public class Force {
     public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
         Vector<UUID> allUnits;
 
-        if (standardForcesOnly && forceType.isStandard()) {
+        if (standardForcesOnly && !forceType.isStandard()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
