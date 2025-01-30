@@ -19,10 +19,7 @@ import mekhq.gui.dialog.prisonerDialogs.PrisonerWarningResultsDialog;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -141,6 +138,12 @@ public class PrisonerEventManager {
         String eventReport = effectsManager.getEventReport();
 
         new PrisonerEventResultsDialog(campaign, speaker, event, choiceIndex, isSuccessful, eventReport);
+
+        Set<Person> escapees = effectsManager.getEscapees();
+
+        if (!escapees.isEmpty()) {
+            new PrisonEscapeScenario(campaign, escapees);
+        }
     }
 
     private void processWarning(int overflow) {

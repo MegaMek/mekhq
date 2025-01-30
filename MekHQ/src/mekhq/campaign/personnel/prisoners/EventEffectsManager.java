@@ -2,6 +2,7 @@ package mekhq.campaign.personnel.prisoners;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
@@ -50,6 +51,7 @@ public class EventEffectsManager {
     private final Campaign campaign;
 
     private String eventReport = "";
+    private Set<Person> escapees = new HashSet<>();
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
 
@@ -106,6 +108,22 @@ public class EventEffectsManager {
      */
     public String getEventReport() {
         return eventReport;
+    }
+
+    /**
+     * Retrieves the set of prisoners who escaped as a result of the processed event.
+     *
+     * <p>The {@code getEscapees} method returns the prisoners that have escaped during the
+     * event handled by this {@link EventEffectsManager}. This allows other parts of the system
+     * to track and process the consequences of these escapes, such as adjusting campaign
+     * statistics or generating appropriate reports.</p>
+     *
+     * @return a {@link Set} of {@link Person} objects representing the individuals who have escaped,
+     * or an empty set if no escapes occurred.
+     */
+
+    public Set<Person> getEscapees() {
+        return escapees;
     }
 
     /**
@@ -574,8 +592,16 @@ public class EventEffectsManager {
 
         for (int i = 0; i < magnitude; i++) {
             Person target = getRandomItem(allPotentialTargets);
+
+            escapees.add(target);
+
             campaign.removePerson(target, false);
+
+            allPotentialTargets.remove(target);
         }
+
+        MMLogger logger = MMLogger.create(EventEffectsManager.class);
+        logger.info(escapees.toString());
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
@@ -611,10 +637,15 @@ public class EventEffectsManager {
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
+            escapees.add(target);
+
             campaign.removePerson(target, false);
 
             potentialTargets.remove(target);
         }
+
+        MMLogger logger = MMLogger.create(EventEffectsManager.class);
+        logger.info(escapees.toString());
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
 
@@ -918,7 +949,11 @@ public class EventEffectsManager {
      */
     private String eventEffectUniqueAbandonedToDie(EventResult result) {
         int magnitude = result.magnitude();
-        int crimeChange = d6(magnitude);
+
+        int crimeChange = 0;
+        if (magnitude > 0) {
+            crimeChange = d6(magnitude);
+        }
 
         if (crimeChange > 0) {
             campaign.setDateOfLastCrime(campaign.getLocalDate());
