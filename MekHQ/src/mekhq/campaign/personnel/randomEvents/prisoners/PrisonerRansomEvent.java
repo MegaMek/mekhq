@@ -4,7 +4,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.dialog.prisonerDialogs.PrisonerRansomEventDialog;
+import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerRansomEventDialog;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,7 +15,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerRansomEvent {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerRansomEvent";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private static final int RANSOM_COST_DIVIDER = 10;
     private static final int RANSOM_COST_MULTIPLIER = 10;

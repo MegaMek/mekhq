@@ -53,7 +53,7 @@ public class EventEffectsManager {
     private String eventReport = "";
     private Set<Person> escapees = new HashSet<>();
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
      * Constructs an {@code EventEffectsManager} object and processes the given event effects.

@@ -1,4 +1,4 @@
-package mekhq.gui.dialog.prisonerDialogs;
+package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -11,7 +11,7 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     public PrisonerWarningResultsDialog(Campaign campaign, @Nullable Person speaker, boolean isExecute) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, isExecute),

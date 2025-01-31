@@ -12,10 +12,10 @@ import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.personnel.randomEvents.prisoners.enums.ResponseQuality;
 import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
-import mekhq.gui.dialog.prisonerDialogs.PrisonerEventResultsDialog;
-import mekhq.gui.dialog.prisonerDialogs.PrisonerWarningDialog;
-import mekhq.gui.dialog.prisonerDialogs.PrisonerWarningResultsDialog;
+import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventDialog;
+import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventResultsDialog;
+import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningDialog;
+import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerWarningResultsDialog;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -34,7 +34,7 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 public class PrisonerEventManager {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
     private final Person speaker;

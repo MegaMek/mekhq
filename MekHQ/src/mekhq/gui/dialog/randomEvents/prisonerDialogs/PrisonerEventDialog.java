@@ -1,4 +1,4 @@
-package mekhq.gui.dialog.prisonerDialogs;
+package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -11,7 +11,7 @@ import java.util.List;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class PrisonerEventDialog extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEventDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     static final String FORWARD_EVENT = "event.";
     static final String SUFFIX_MESSAGE = ".message";
