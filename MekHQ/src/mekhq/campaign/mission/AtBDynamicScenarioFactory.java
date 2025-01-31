@@ -1823,11 +1823,9 @@ public class AtBDynamicScenarioFactory {
             params.setFilter(mekSummary -> mekSummary.getWalkMp() >= 1);
         }
 
-        if (rolesByType != null && !rolesByType.isEmpty()) {
-            params.setWeightClass(shouldBypassWeightClass(rolesByType)
-                ? UNIT_WEIGHT_UNSPECIFIED
-                : weightClass);
-        }
+        params.setWeightClass(shouldBypassWeightClass(rolesByType)
+            ? UNIT_WEIGHT_UNSPECIFIED
+            : weightClass);
 
         // Vehicles and infantry require some additional processing
         if (unitType == TANK) {
