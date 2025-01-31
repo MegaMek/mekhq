@@ -90,8 +90,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
             boolean inBackwater = true;
             if (currentFactions.size() > 1) {
-                // More than one faction, if any is *not* periphery, we're not in backwater
-                // either
+                // More than one faction, if any is *not* periphery, we're not in backwater either
                 for (Faction f : currentFactions) {
                     if (!f.isPeriphery()) {
                         inBackwater = false;
@@ -101,8 +100,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if (!onlyFaction.isPeriphery()) {
-                    for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(),
-                            30)) {
+                    for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
                         for (Faction f : key.getFactionSet(campaign.getLocalDate())) {
                             if (!onlyFaction.equals(f)) {
                                 inBackwater = false;
@@ -129,11 +127,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             if (campaign.getFaction().isMercenary() || campaign.getFaction().isPirate()) {
                 if (campaign.getCurrentSystem().isHiringHall(campaign.getLocalDate())) {
                     numContracts++;
-                    /*
-                     * Though the rules do not state these modifiers are mutually exclusive, the
-                     * fact that the
-                     * distance of Galatea from a border means that it has no advantage for Mercs
-                     * over border
+                    /* Though the rules do not state these modifiers are mutually exclusive, the fact that the
+                     * distance of Galatea from a border means that it has no advantage for Mercs over border
                      * worlds. Common sense dictates that worlds with hiring halls should not be
                      * subject to the -1 for backwater/interior.
                      */
@@ -142,16 +137,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     }
                 }
             } else {
-                /*
-                 * Per IOps Beta, government units determine number of contracts as on a system
-                 * with a great hall
-                 */
+                /* Per IOps Beta, government units determine number of contracts as on a system with a great hall */
                 numContracts++;
             }
 
             /*
-             * If located on a faction's capital (interpreted as the starting planet for
-             * that faction),
+             * If located on a faction's capital (interpreted as the starting planet for that faction),
              * generate one contract offer for that faction.
              */
             for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
@@ -231,8 +222,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         return generateAtBContract(campaign, employer, unitRatingMod, MAXIMUM_GENERATION_RETRIES);
     }
 
-    private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod,
-            int retries) {
+    private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
         if (employer == null) {
             logger.warn("Could not generate an AtB Contract because there was no employer!");
             return null;
@@ -272,10 +262,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
          * (ComStar, Mercs not under contract) are more likely to have garrison-type
          * contracts and less likely to have battle-type contracts unless at war.
          */
-        if (RandomFactionGenerator.getInstance().getFactionHints()
-                .isNeutral(Factions.getInstance().getFaction(employer)) &&
-                !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(
-                        Factions.getInstance().getFaction(employer),
+        if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Factions.getInstance().getFaction(employer)) &&
+                !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Factions.getInstance().getFaction(employer),
                         Factions.getInstance().getFaction(contract.getEnemyCode()), campaign.getLocalDate())) {
             if (contract.getContractType().isPlanetaryAssault()) {
                 contract.setContractType(AtBContractType.GARRISON_DUTY);
@@ -323,9 +311,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contract.setName(String.format("%s - %s - %s %s",
                 contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())),
-                employer,
-                contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
+                        contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
     }
@@ -415,8 +402,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
                 contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())),
-                contract.getEmployer(),
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;
@@ -425,30 +411,22 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     /**
      * Creates and adds a follow-up contract based on the just concluded contract.
      * <p>
-     * This method generates a new contract (`AtBContract`) as a follow-up to the
-     * provided `contract`.
-     * Certain properties of the original contract, such as employer, enemy, skill,
-     * system location,
-     * and other details, are carried over or modified as necessary based on the
-     * contract type.
-     * The method ensures that the follow-up contract contains all necessary details
-     * and is
+     * This method generates a new contract (`AtBContract`) as a follow-up to the provided `contract`.
+     * Certain properties of the original contract, such as employer, enemy, skill, system location,
+     * and other details, are carried over or modified as necessary based on the contract type.
+     * The method ensures that the follow-up contract contains all necessary details and is
      * correctly initialized.
      * </p>
      *
      * <p>
-     * <b>Order Dependency:</b> The operations in this method must match the order
-     * specified in
+     * <b>Order Dependency:</b> The operations in this method must match the order specified in
      * `generateAtBContract` to maintain compatibility and consistency.
      * </p>
      *
      * @param campaign the {@link Campaign} to which the follow-up contract belongs.
-     *                 This is used for retrieving campaign-wide settings and
-     *                 applying modifiers.
-     * @param contract the {@link AtBContract} that serves as the base for
-     *                 generating the follow-up contract.
-     *                 Key details from this contract are reused or adapted for the
-     *                 follow-up.
+     *                 This is used for retrieving campaign-wide settings and applying modifiers.
+     * @param contract the {@link AtBContract} that serves as the base for generating the follow-up contract.
+     *                 Key details from this contract are reused or adapted for the follow-up.
      */
     private void addFollowup(Campaign campaign,
             AtBContract contract) {
@@ -546,8 +524,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private static double getUnofficialMultiplier(Campaign campaign, AtBContract contract) {
         double modifier = 0; // we apply these modifiers all together to avoid spiking the final pay
 
-        // Adjust pay based on the percentage of the players' forces required by the
-        // contract
+        // Adjust pay based on the percentage of the players' forces required by the contract
         int maximumLanceCount = campaign.getAllCombatTeams().size();
         int reserveLanceCount = (int) floor(maximumLanceCount / COMBAT_FORCE_DIVIDER);
         int requiredCombatTeams = contract.getRequiredCombatTeams();
@@ -577,12 +554,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     public void checkForFollowup(Campaign campaign, AtBContract contract) {
         AtBContractType type = contract.getContractType();
         if (type.isDiversionaryRaid() || type.isReconRaid()
-                || type.isRiotDuty()) {
+            || type.isRiotDuty()) {
             int roll = Compute.d6();
             if (roll == 6) {
                 addFollowup(campaign, contract);
                 campaign.addReport(
-                        "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
+                    "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
             }
         }
     }
@@ -599,18 +576,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
          * the highest admin skill, or higher negotiation if the admin
          * skills are equal.
          */
-        Person adminCommand = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_ADMIN,
-                SkillType.S_NEG);
-        Person adminTransport = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_ADMIN,
-                SkillType.S_NEG);
-        Person adminLogistics = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN,
-                SkillType.S_NEG);
-        int adminCommandExp = (adminCommand == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        int adminTransportExp = (adminTransport == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        int adminLogisticsExp = (adminLogistics == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        Person adminCommand = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_ADMIN, SkillType.S_NEG);
+        Person adminTransport = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_ADMIN, SkillType.S_NEG);
+        Person adminLogistics = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN, SkillType.S_NEG);
+        int adminCommandExp = (adminCommand == null) ? SkillType.EXP_ULTRA_GREEN : adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        int adminTransportExp = (adminTransport == null) ? SkillType.EXP_ULTRA_GREEN : adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        int adminLogisticsExp = (adminLogistics == null) ? SkillType.EXP_ULTRA_GREEN : adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 
         /* Treat government units like merc units that have a retainer contract */
         if ((!campaign.getFaction().isMercenary() && !campaign.getFaction().isPirate())
