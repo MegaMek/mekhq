@@ -925,7 +925,7 @@ public class Utilities {
 
         // Clamp age, if necessary
         if (experienceLevel != EXP_NONE) {
-            age = max(18, age);
+            age = max(16, age);
         }
 
         return age;
