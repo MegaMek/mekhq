@@ -562,18 +562,18 @@ public class SpecialAbility {
         WeaponType wt = (WeaponType) et;
         if (wt.isCapital()
                 || wt.isSubCapital()
-                || wt.hasFlag(WeaponTypeFlag.F_INFANTRY)
-                || wt.hasFlag(WeaponTypeFlag.F_ONESHOT)
-                || wt.hasFlag(WeaponTypeFlag.F_PROTOTYPE)) {
+                || wt.hasFlag(EquipmentFlag.F_INFANTRY)
+                || wt.hasFlag(EquipmentFlag.F_ONESHOT)
+                || wt.hasFlag(EquipmentFlag.F_PROTOTYPE_WEAPON)) {
             return false;
         }
 
         if (!role.isCivilian()
-                && !((wt.hasFlag(WeaponTypeFlag.F_MEK_WEAPON) && !role.isMekWarrior())
-                        || (wt.hasFlag(WeaponTypeFlag.F_AERO_WEAPON) && !role.isAerospacePilot())
-                        || (wt.hasFlag(WeaponTypeFlag.F_TANK_WEAPON) && !role.isVehicleCrewMember())
-                        || (wt.hasFlag(WeaponTypeFlag.F_BA_WEAPON) && !role.isBattleArmour())
-                        || (wt.hasFlag(WeaponTypeFlag.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
+                && !((wt.hasFlag(EquipmentFlag.F_MEK_WEAPON) && !role.isMekWarrior())
+                        || (wt.hasFlag(EquipmentFlag.F_AERO_WEAPON) && !role.isAerospacePilot())
+                        || (wt.hasFlag(EquipmentFlag.F_TANK_WEAPON) && !role.isVehicleCrewMember())
+                        || (wt.hasFlag(EquipmentFlag.F_BA_WEAPON) && !role.isBattleArmour())
+                        || (wt.hasFlag(EquipmentFlag.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
             return false;
         }
 

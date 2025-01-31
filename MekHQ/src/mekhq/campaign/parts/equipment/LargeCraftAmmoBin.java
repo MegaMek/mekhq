@@ -20,7 +20,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import megamek.common.AmmoTypeFlag;
+import megamek.common.EquipmentFlag;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -312,9 +312,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
         } else {
             // Capital Missiles take a flat 60m per missile per errata
             // Better set this for cruise missiles and screen launchers too.
-            if (getType().hasFlag(AmmoTypeFlag.F_CAP_MISSILE)
-                    || getType().hasFlag(AmmoTypeFlag.F_CRUISE_MISSILE)
-                    || getType().hasFlag(AmmoTypeFlag.F_SCREEN)) {
+            if (getType().hasFlag(EquipmentFlag.F_CAP_MISSILE)
+                    || getType().hasFlag(EquipmentFlag.F_CRUISE_MISSILE_AMMO)
+                    || getType().hasFlag(EquipmentFlag.F_SCREEN)) {
                 return 60;
             }
             return (int) Math.ceil(15 * ammoTonnage);

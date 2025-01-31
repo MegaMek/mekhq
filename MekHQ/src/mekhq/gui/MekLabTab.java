@@ -459,7 +459,7 @@ public class MekLabTab extends CampaignGuiTab {
             }
 
             // one shot weapons count 1/4
-            if ((wtype.getAmmoType() == AmmoType.T_ROCKET_LAUNCHER) || wtype.hasFlag(WeaponTypeFlag.F_ONESHOT)) {
+            if ((wtype.getAmmoType() == AmmoType.T_ROCKET_LAUNCHER) || wtype.hasFlag(EquipmentFlag.F_ONESHOT)) {
                 weaponHeat *= 0.25;
             }
 

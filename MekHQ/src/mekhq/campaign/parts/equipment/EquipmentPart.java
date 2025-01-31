@@ -624,8 +624,8 @@ public class EquipmentPart extends Part {
             return type.hasFlag(EquipmentFlag.F_MEK_EQUIPMENT) || type.hasFlag(EquipmentFlag.F_TANK_EQUIPMENT)
                     || type.hasFlag(EquipmentFlag.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponTypeFlag.F_MEK_WEAPON) || type.hasFlag(WeaponTypeFlag.F_TANK_WEAPON)
-                    || type.hasFlag(WeaponTypeFlag.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
+            return (type.hasFlag(EquipmentFlag.F_MEK_WEAPON) || type.hasFlag(EquipmentFlag.F_TANK_WEAPON)
+                    || type.hasFlag(EquipmentFlag.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
         }
         return true;
     }

@@ -136,19 +136,19 @@ public class Utilities {
             }
 
             // Only Protos can use Proto-specific ammo
-            if (ammoType.hasFlag(AmmoTypeFlag.F_PROTOMEK) && !(entity instanceof ProtoMek)) {
+            if (ammoType.hasFlag(EquipmentFlag.F_PROTOMEK_ONLY) && !(entity instanceof ProtoMek)) {
                 continue;
             }
 
             // When dealing with machine guns, Protos can only use proto-specific machine
             // gun ammo
             if ((entity instanceof ProtoMek)
-                    && ammoType.hasFlag(AmmoTypeFlag.F_MG)
-                    && !ammoType.hasFlag(AmmoTypeFlag.F_PROTOMEK)) {
+                    && ammoType.hasFlag(EquipmentFlag.F_MG_AMMO)
+                    && !ammoType.hasFlag(EquipmentFlag.F_PROTOMEK_ONLY)) {
                 continue;
             }
 
-            if (ammoType.hasFlag(AmmoTypeFlag.F_NUCLEAR) && ammoType.hasFlag(AmmoTypeFlag.F_CAP_MISSILE)
+            if (ammoType.hasFlag(EquipmentFlag.F_NUCLEAR) && ammoType.hasFlag(EquipmentFlag.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
             }
@@ -156,10 +156,10 @@ public class Utilities {
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
             if ((ammoType.getRackSize() == currentAmmoType.getRackSize())
-                    && (ammoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR) == currentAmmoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR))
-                    && (ammoType.hasFlag(AmmoTypeFlag.F_ENCUMBERING) == currentAmmoType.hasFlag(AmmoTypeFlag.F_ENCUMBERING))
+                    && (ammoType.hasFlag(EquipmentFlag.F_BATTLEARMOR_ONLY) == currentAmmoType.hasFlag(EquipmentFlag.F_BATTLEARMOR_ONLY))
+                    && (ammoType.hasFlag(EquipmentFlag.F_ENCUMBERING) == currentAmmoType.hasFlag(EquipmentFlag.F_ENCUMBERING))
                     && ((ammoType.getTonnage(entity) == currentAmmoType.getTonnage(entity))
-                            || ammoType.hasFlag(AmmoTypeFlag.F_CAP_MISSILE))) {
+                            || ammoType.hasFlag(EquipmentFlag.F_CAP_MISSILE))) {
                 ammoTypes.add(ammoType);
             }
         }

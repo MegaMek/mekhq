@@ -601,8 +601,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 if (newPart instanceof LargeCraftAmmoBin) {
                     // Adding ammo requires base 15 minutes per ton of ammo or 60 minutes per
                     // capital missile
-                    if (type.hasFlag(AmmoTypeFlag.F_CAP_MISSILE) || type.hasFlag(AmmoTypeFlag.F_CRUISE_MISSILE)
-                            || type.hasFlag(AmmoTypeFlag.F_SCREEN)) {
+                    if (type.hasFlag(EquipmentFlag.F_CAP_MISSILE) || type.hasFlag(EquipmentFlag.F_CRUISE_MISSILE_AMMO)
+                            || type.hasFlag(EquipmentFlag.F_SCREEN)) {
                         time += WORKHOUR * ammoBin.getFullShots();
                     } else {
                         time += (int) Math.ceil(15 * Math.max(1, newPart.getTonnage()));
@@ -721,10 +721,10 @@ public class Refit extends Part implements IAcquisitionWork {
                         if ((crits == oldCrits) && (oldType != null)
                                 // FIXME: WeaverThree - CamOps doesn't specifiy anything about weapon types
                                 // -- Not sure how best to resolve this quickly
-                                && (type.hasFlag(WeaponTypeFlag.F_LASER) == oldType.hasFlag(WeaponTypeFlag.F_LASER))
-                                && (type.hasFlag(WeaponTypeFlag.F_MISSILE) == oldType.hasFlag(WeaponTypeFlag.F_MISSILE))
-                                && (type.hasFlag(WeaponTypeFlag.F_BALLISTIC) == oldType.hasFlag(WeaponTypeFlag.F_BALLISTIC))
-                                && (type.hasFlag(WeaponTypeFlag.F_ARTILLERY) == oldType.hasFlag(WeaponTypeFlag.F_ARTILLERY))) {
+                                && (type.hasFlag(EquipmentFlag.F_LASER) == oldType.hasFlag(EquipmentFlag.F_LASER))
+                                && (type.hasFlag(EquipmentFlag.F_MISSILE) == oldType.hasFlag(EquipmentFlag.F_MISSILE))
+                                && (type.hasFlag(EquipmentFlag.F_BALLISTIC) == oldType.hasFlag(EquipmentFlag.F_BALLISTIC))
+                                && (type.hasFlag(EquipmentFlag.F_ARTILLERY) == oldType.hasFlag(EquipmentFlag.F_ARTILLERY))) {
                             thisPartRefitClass = CLASS_A;
                             matchFound = true;
                             matchIndex = index;
@@ -852,8 +852,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 AmmoType type = oldAmmoBin.getType();
                 if (remainingShots > 0) {
                     if (oldPart instanceof LargeCraftAmmoBin) {
-                        if (type.hasFlag(AmmoTypeFlag.F_CAP_MISSILE) || type.hasFlag(AmmoTypeFlag.F_CRUISE_MISSILE)
-                                || type.hasFlag(AmmoTypeFlag.F_SCREEN)) {
+                        if (type.hasFlag(EquipmentFlag.F_CAP_MISSILE) || type.hasFlag(EquipmentFlag.F_CRUISE_MISSILE_AMMO)
+                                || type.hasFlag(EquipmentFlag.F_SCREEN)) {
                             time += WORKHOUR * ((LargeCraftAmmoBin) oldPart).getFullShots();
                         } else {
                             time += 15 * Math.max(1, (int) oldPart.getTonnage());

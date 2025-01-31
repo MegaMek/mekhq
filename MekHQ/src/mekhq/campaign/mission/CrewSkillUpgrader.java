@@ -293,11 +293,11 @@ public class CrewSkillUpgrader {
         int weaponIndex = Compute.randomInt(entity.getIndividualWeaponList().size());
         WeaponType weaponType = (WeaponType) entity.getIndividualWeaponList().get(weaponIndex).getType();
 
-        if (weaponType.hasFlag(WeaponTypeFlag.F_BALLISTIC)) {
+        if (weaponType.hasFlag(EquipmentFlag.F_BALLISTIC)) {
             return Crew.SPECIAL_BALLISTIC;
-        } else if (weaponType.hasFlag(WeaponTypeFlag.F_ENERGY)) {
+        } else if (weaponType.hasFlag(EquipmentFlag.F_ENERGY)) {
             return Crew.SPECIAL_ENERGY;
-        } else if (weaponType.hasFlag(WeaponTypeFlag.F_MISSILE)) {
+        } else if (weaponType.hasFlag(EquipmentFlag.F_MISSILE)) {
             return Crew.SPECIAL_MISSILE;
         } else {
             return Crew.SPECIAL_NONE;

@@ -1481,7 +1481,7 @@ public class Unit implements ITechnology {
         if (entity instanceof ProtoMek) {
             int sinks = 0;
             for (Mounted<?> mount : entity.getWeaponList()) {
-                if (mount.getType().hasFlag(WeaponTypeFlag.F_ENERGY)) {
+                if (mount.getType().hasFlag(EquipmentFlag.F_ENERGY)) {
                     WeaponType wType = (WeaponType) mount.getType();
                     sinks += wType.getHeat();
                 }

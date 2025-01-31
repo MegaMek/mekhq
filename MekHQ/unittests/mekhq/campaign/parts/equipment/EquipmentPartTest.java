@@ -251,28 +251,28 @@ public class EquipmentPartTest {
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponTypeFlag.F_MEK_WEAPON.equals(flag);
+            return EquipmentFlag.F_MEK_WEAPON.equals(flag);
         }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponTypeFlag.F_TANK_WEAPON.equals(flag);
+            return EquipmentFlag.F_TANK_WEAPON.equals(flag);
         }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Fighter Equipment ...
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponTypeFlag.F_AERO_WEAPON.equals(flag);
+            return EquipmentFlag.F_AERO_WEAPON.equals(flag);
         }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... but not Capital scale.
         doAnswer(inv -> {
             BigInteger flag = inv.getArgument(0);
-            return WeaponTypeFlag.F_AERO_WEAPON.equals(flag);
+            return EquipmentFlag.F_AERO_WEAPON.equals(flag);
         }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         when(weaponType.isCapital()).thenReturn(true);
         assertFalse(equipmentPart.isOmniPoddable());

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import megamek.common.*;
 import megamek.common.equipment.ArmorType;
@@ -136,7 +135,7 @@ public class PartsStore {
             // TODO: we are still adding a lot of non-hittable equipment
             if (et instanceof AmmoType) {
                 AmmoType ammoType = (AmmoType) et;
-                if (ammoType.hasFlag(AmmoTypeFlag.F_BATTLEARMOR)
+                if (ammoType.hasFlag(EquipmentFlag.F_BATTLEARMOR_ONLY)
                         && (ammoType.getKgPerShot() > 0)) {
                     // BA ammo has one shot listed as the amount. Do it as 1 ton blocks if using
                     // kg/shot.
@@ -215,9 +214,9 @@ public class PartsStore {
                             || et.hasFlag(EquipmentFlag.F_TANK_EQUIPMENT)
                             || et.hasFlag(EquipmentFlag.F_FIGHTER_EQUIPMENT);
                 } else if (et instanceof WeaponType) {
-                    poddable &= (et.hasFlag(WeaponTypeFlag.F_MEK_WEAPON)
+                    poddable &= (et.hasFlag(EquipmentFlag.F_MEK_WEAPON)
                             || et.hasFlag(Weapon.F_TANK_WEAPON)
-                            || et.hasFlag(WeaponTypeFlag.F_AERO_WEAPON))
+                            || et.hasFlag(EquipmentFlag.F_AERO_WEAPON))
                             && !((WeaponType) et).isCapital();
                 }
                 if (EquipmentPart.hasVariableTonnage(et)) {
