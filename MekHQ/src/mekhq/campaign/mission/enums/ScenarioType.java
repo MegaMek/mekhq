@@ -40,7 +40,8 @@ import megamek.logging.MMLogger;
 public enum ScenarioType {
     NONE,
     SPECIAL_LOSTECH,
-    SPECIAL_RESUPPLY;
+    SPECIAL_RESUPPLY,
+    SPECIAL_JAIL_BREAK;
 
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
@@ -54,6 +55,13 @@ public enum ScenarioType {
      */
     public boolean isResupply() {
         return this == SPECIAL_RESUPPLY;
+    }
+
+    /**
+     * @return {@code true} if the scenario is considered a Jail Break scenario, {@code false} otherwise.
+     */
+    public boolean isJailBreak() {
+        return this == SPECIAL_JAIL_BREAK;
     }
 
     /**

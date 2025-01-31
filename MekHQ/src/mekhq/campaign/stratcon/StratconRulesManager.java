@@ -40,6 +40,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
@@ -680,34 +681,34 @@ public class StratconRulesManager {
      */
     private static void determineIfTurningPointScenario(AtBContract contract, StratconScenario scenario) {
         ScenarioTemplate template = scenario.getScenarioTemplate();
-        boolean isResupply = scenario.getBackingScenario().getStratConScenarioType().isResupply();
+        ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+        boolean isResupply = scenarioType.isResupply();
+        boolean isJailBreak = scenarioType.isJailBreak();
 
-        if (isResupply) {
+        if (isResupply || isJailBreak) {
             scenario.setTurningPoint(false);
             return;
         }
 
         boolean isObjective = scenario.isStrategicObjective();
 
-        if (template == null || !template.getStratConScenarioType().isResupply()) {
-            ContractCommandRights commandRights = contract.getCommandRights();
-            switch (commandRights) {
-                case INTEGRATED -> {
+        ContractCommandRights commandRights = contract.getCommandRights();
+        switch (commandRights) {
+            case INTEGRATED -> {
+                scenario.setTurningPoint(true);
+                if (randomInt(3) == 0 || isObjective) {
+                    setAttachedUnitsModifier(scenario, contract);
+                }
+            }
+            case HOUSE, LIAISON -> {
+                if (randomInt(3) == 0 || isObjective) {
                     scenario.setTurningPoint(true);
-                    if (randomInt(3) == 0 || isObjective) {
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
+                    setAttachedUnitsModifier(scenario, contract);
                 }
-                case HOUSE, LIAISON -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
-                }
-                case INDEPENDENT -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                    }
+            }
+            case INDEPENDENT -> {
+                if (randomInt(3) == 0 || isObjective) {
+                    scenario.setTurningPoint(true);
                 }
             }
         }
@@ -2778,7 +2779,8 @@ public class StratconRulesManager {
 
                 track.removeScenario(scenario);
 
-                if (scenario.getBackingScenario().getStratConScenarioType().isResupply()) {
+                ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+                if (scenarioType.isResupply() || scenarioType.isJailBreak()) {
                     return true;
                 }
 
