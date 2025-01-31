@@ -5724,7 +5724,7 @@ public class Campaign implements ITechManager {
         return crimeRating + crimePirateModifier;
     }
 
-    public LocalDate getDateOfLastCrime() {
+    public @Nullable LocalDate getDateOfLastCrime() {
         return dateOfLastCrime;
     }
 

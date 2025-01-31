@@ -41,7 +41,7 @@ public class PrisonerEventManager {
 
     // CamOps states that executing prisoners incurs a -50 reputation penalty.
     // However, that lacks nuance, so we've changed it to -1 per prisoner to a maximum of -50.
-    private static final int MAX_CRIME_PENALTY = 50;
+    public static final int MAX_CRIME_PENALTY = 50;
     private final int DEFAULT_EVENT_CHANCE = STALEMATE.ordinal();
     private final int MINIMUM_PRISONER_COUNT = 25;
     private final int RESPONSE_TARGET_NUMBER = 7;
@@ -241,7 +241,7 @@ public class PrisonerEventManager {
             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
             : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 
-        String crimeColor = hasBackfired
+        String crimeColor = crimeNoticed
             ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
             : spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor());
 

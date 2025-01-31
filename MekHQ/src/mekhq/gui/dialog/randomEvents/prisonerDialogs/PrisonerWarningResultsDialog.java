@@ -35,7 +35,7 @@ public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
         return getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
     }
 
-    private static String createOutOfCharacterMessage() {
+    private static @Nullable String createOutOfCharacterMessage() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
     }
 }

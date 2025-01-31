@@ -149,8 +149,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
 
-    private static final String CMD_IMPRISON = "IMPRISON";
-    private static final String CMD_POW = "POW";
+    private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
     private static final String CMD_JETTISON = "JETTISON";
     private static final String CMD_RECRUIT = "RECRUIT";
@@ -631,15 +630,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_IMPRISON: {
-                for (Person person : people) {
-                    if (!person.getPrisonerStatus().isCurrentPrisoner()) {
-                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
-                    }
-                }
-                break;
-            }
-            case CMD_POW: {
+            case CMD_FREE: {
                 processPrisonerResolutionCommand(
                         people,
                         "confirmFree.format",
@@ -1455,15 +1446,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         popup.add(menu);
 
-        if (StaticChecks.areAnyFree(selected)) {
-            popup.add(newMenuItem(resources.getString("imprison.text"), CMD_IMPRISON));
+        if (gui.getCampaign().getLocation().isOnPlanet()) {
+            popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+            popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
         } else {
-            if (gui.getCampaign().getLocation().isOnPlanet()) {
-                popup.add(newMenuItem(resources.getString("makePrisonerOfWar.text"), CMD_POW));
-                popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
-            } else {
-                popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
-            }
+            popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
         }
 
         if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()
