@@ -38,7 +38,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 

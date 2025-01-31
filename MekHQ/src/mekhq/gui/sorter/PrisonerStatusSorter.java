@@ -18,7 +18,7 @@
  */
 package mekhq.gui.sorter;
 
-import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
 
 import java.util.Comparator;
 

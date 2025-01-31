@@ -26,7 +26,7 @@ import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

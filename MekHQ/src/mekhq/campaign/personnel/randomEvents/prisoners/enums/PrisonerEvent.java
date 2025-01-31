@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.prisoners.enums;
+package mekhq.campaign.personnel.randomEvents.prisoners.enums;
 
 public enum PrisonerEvent {
     ARGUMENT, WILD_STORIES, TAMPERING, CONVERSATIONS, RATIONS, TRADE, DRAINED, RESCUE, REPAIRS,

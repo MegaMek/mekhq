@@ -2,8 +2,8 @@ package mekhq.campaign.personnel.randomEvents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mekhq.campaign.personnel.prisoners.records.PrisonerEventData;
-import mekhq.campaign.personnel.prisoners.yaml.PrisonerEventDataWrapper;
+import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.personnel.randomEvents.prisoners.yaml.PrisonerEventDataWrapper;
 
 import java.io.File;
 import java.io.IOException;

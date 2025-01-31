@@ -41,7 +41,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.prisoners.CapturePrisoners;
+import mekhq.campaign.personnel.randomEvents.prisoners.CapturePrisoners;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;

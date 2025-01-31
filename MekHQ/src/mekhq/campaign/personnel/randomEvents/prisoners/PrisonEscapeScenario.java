@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.prisoners;
+package mekhq.campaign.personnel.randomEvents.prisoners;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Entity;
@@ -24,6 +24,8 @@ import java.util.*;
 import static megamek.common.Board.START_SW;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
+import static mekhq.campaign.personnel.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.campaign.stratcon.StratconRulesManager.getAvailableForceIDs;
 import static mekhq.campaign.stratcon.StratconRulesManager.sortForcesByMapType;
@@ -117,6 +119,13 @@ public class PrisonEscapeScenario {
                     break;
                 }
 
+                // If they don't have small arms, they're about to learn fast
+                if (!escapee.hasSkill(S_SMALL_ARMS)) {
+                    escapee.addSkill(S_SMALL_ARMS, 0, 0);
+                }
+
+                escapee.setPrimaryRole(campaign, SOLDIER);
+
                 mobUnit.addPilotOrSoldier(escapee, null, false);
                 assignedEscapees.add(escapee);
             }
@@ -127,6 +136,8 @@ public class PrisonEscapeScenario {
                     mobUnit.remove(crewMember, false);
                 }
             }
+
+            mobUnit.resetPilotAndEntity();
 
             mobs.add(mobUnit);
             escapees.removeAll(assignedEscapees);

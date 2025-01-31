@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.prisoners;
+package mekhq.campaign.personnel.randomEvents.prisoners;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -15,12 +15,12 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.prisoners.enums.EventResultEffect;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.personnel.prisoners.records.EventResult;
-import mekhq.campaign.personnel.prisoners.records.PrisonerEventData;
-import mekhq.campaign.personnel.prisoners.records.PrisonerResponseEntry;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.EventResultEffect;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerEvent;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.personnel.randomEvents.prisoners.records.EventResult;
+import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerResponseEntry;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -77,25 +77,27 @@ public class EventEffectsManager {
         for (EventResult result : results) {
             EventResultEffect effect = result.effect();
 
-            switch (effect) {
-                case NONE -> {}
-                case PRISONER_CAPACITY -> report.append(eventEffectPrisonerCapacity(result));
-                case INJURY -> report.append(eventEffectInjury(result));
-                case INJURY_PERCENT -> report.append(eventEffectInjuryPercent(result));
-                case DEATH -> report.append(eventEffectDeath(result));
-                case DEATH_PERCENT -> report.append(eventEffectDeathPercent(result));
-                case SKILL -> report.append(eventEffectSkill(result));
-                case LOYALTY_ONE -> report.append(eventEffectLoyaltyOne(result));
-                case LOYALTY_ALL -> report.append(eventEffectLoyaltyAll(result));
-                case ESCAPE -> report.append(eventEffectEscape(result));
-                case ESCAPE_PERCENT -> report.append(eventEffectEscapePercent(result));
-                case FATIGUE_ONE -> report.append(eventEffectFatigueOne(result));
-                case FATIGUE_ALL -> report.append(eventEffectFatigueAll(result));
-                case SUPPORT_POINT -> report.append(eventEffectSupportPoint(result));
-                case UNIQUE -> report.append(eventEffectUnique(eventData, result));
-            }
+            String incidentReport = switch (effect) {
+                case NONE -> "";
+                case PRISONER_CAPACITY -> eventEffectPrisonerCapacity(result);
+                case INJURY -> eventEffectInjury(result);
+                case INJURY_PERCENT -> eventEffectInjuryPercent(result);
+                case DEATH -> eventEffectDeath(result);
+                case DEATH_PERCENT -> eventEffectDeathPercent(result);
+                case SKILL -> eventEffectSkill(result);
+                case LOYALTY_ONE -> eventEffectLoyaltyOne(result);
+                case LOYALTY_ALL -> eventEffectLoyaltyAll(result);
+                case ESCAPE -> eventEffectEscape(result);
+                case ESCAPE_PERCENT -> eventEffectEscapePercent(result);
+                case FATIGUE_ONE -> eventEffectFatigueOne(result);
+                case FATIGUE_ALL -> eventEffectFatigueAll(result);
+                case SUPPORT_POINT -> eventEffectSupportPoint(result);
+                case UNIQUE -> eventEffectUnique(eventData, result);
+            };
 
-            report.append(' ');
+            if (!incidentReport.isEmpty()) {
+                report.append("- ").append(incidentReport).append("<br>");
+            }
         }
 
         eventReport = report.toString();

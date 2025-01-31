@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.prisoners;
+package mekhq.campaign.personnel.randomEvents.prisoners;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
@@ -8,9 +8,9 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.personnel.prisoners.enums.ResponseQuality;
-import mekhq.campaign.personnel.prisoners.records.PrisonerEventData;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerEvent;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.ResponseQuality;
+import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventDialog;
 import mekhq.gui.dialog.prisonerDialogs.PrisonerEventResultsDialog;

@@ -27,8 +27,8 @@ import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.gui.campaignOptions.components.*;
 
 import javax.swing.*;

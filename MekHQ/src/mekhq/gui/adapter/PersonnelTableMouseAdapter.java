@@ -50,8 +50,8 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
-import mekhq.campaign.personnel.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
+import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -85,7 +85,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
-import static mekhq.campaign.personnel.prisoners.PrisonerEventManager.processAdHocExecution;
+import static mekhq.campaign.personnel.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);

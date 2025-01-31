@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.prisoners.enums;
+package mekhq.campaign.personnel.randomEvents.prisoners.enums;
 
 import mekhq.MekHQ;
 
