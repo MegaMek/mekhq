@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.prisoners;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;

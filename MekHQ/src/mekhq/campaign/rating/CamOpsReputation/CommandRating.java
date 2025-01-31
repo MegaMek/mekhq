@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.personnel.randomEvents.PersonalityController.getPersonalityValue;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);

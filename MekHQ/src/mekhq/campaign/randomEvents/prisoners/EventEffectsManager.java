@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -15,12 +15,12 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.EventResultEffect;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.personnel.randomEvents.prisoners.records.EventResult;
-import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
-import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerResponseEntry;
+import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.records.EventResult;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;

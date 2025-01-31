@@ -35,12 +35,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.campaign.personnel.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
-import static mekhq.campaign.personnel.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacity;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.calculatePrisonerCapacityUsage;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 

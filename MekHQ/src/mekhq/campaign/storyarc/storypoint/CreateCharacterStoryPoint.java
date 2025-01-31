@@ -37,7 +37,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;

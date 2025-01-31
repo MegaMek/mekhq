@@ -24,7 +24,7 @@ import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

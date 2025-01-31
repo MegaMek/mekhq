@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
@@ -8,9 +8,9 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.ResponseQuality;
-import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
+import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventDialog;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEventResultsDialog;
@@ -28,7 +28,7 @@ import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.personnel.randomEvents.PersonalityController.getPersonalityValue;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;

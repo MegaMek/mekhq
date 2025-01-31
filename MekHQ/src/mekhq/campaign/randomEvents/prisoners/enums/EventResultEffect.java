@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.prisoners.enums;
 
 /**
  * Defines the possible effects of an event within the prisoner system.

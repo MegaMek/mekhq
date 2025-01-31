@@ -32,7 +32,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
+import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
 import mekhq.utilities.ReportingUtilities;
 
 import java.time.DayOfWeek;

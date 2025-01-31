@@ -1,6 +1,6 @@
-package mekhq.campaign.personnel.randomEvents.prisoners.yaml;
+package mekhq.campaign.randomEvents.prisoners.yaml;
 
-import mekhq.campaign.personnel.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
 
 import java.util.List;
 

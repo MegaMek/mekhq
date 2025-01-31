@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
@@ -25,10 +25,10 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.AllGroundTerrain;
 import static mekhq.campaign.personnel.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.MobType.HUGE;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.MobType.LARGE;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.MobType.MEDIUM;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.MobType.SMALL;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
 import static mekhq.campaign.stratcon.StratconContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratcon.StratconRulesManager.generateExternalScenario;
 import static mekhq.campaign.stratcon.StratconRulesManager.getAvailableForceIDs;

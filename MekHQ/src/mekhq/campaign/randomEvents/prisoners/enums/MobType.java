@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.prisoners.enums;
 
 public enum MobType {
     SMALL("Mob (Small)", 1, 5),

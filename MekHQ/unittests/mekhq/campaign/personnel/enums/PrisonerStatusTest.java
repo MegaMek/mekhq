@@ -19,7 +19,7 @@
 package mekhq.campaign.personnel.enums;
 
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;

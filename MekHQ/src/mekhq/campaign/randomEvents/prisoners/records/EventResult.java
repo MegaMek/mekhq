@@ -1,9 +1,9 @@
-package mekhq.campaign.personnel.randomEvents.prisoners.records;
+package mekhq.campaign.randomEvents.prisoners.records;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.EventResultEffect;
+import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
 
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.EventResultEffect.NONE;
+import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.NONE;
 
 /**
  * Represents the result of an event response, including the effect type,

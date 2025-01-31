@@ -17,7 +17,7 @@
  * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.personnel.randomEvents;
+package mekhq.campaign.randomEvents.personalities;
 
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
@@ -25,11 +25,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
+import mekhq.campaign.randomEvents.personalities.enums.*;
 
 import java.util.*;
 
-import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
+import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
     public static void generatePersonality(Person person) {

@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.Compute;
 import megamek.common.ITechnology;
@@ -8,7 +8,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.dialog.DefectionOffer;
 
@@ -23,9 +23,9 @@ import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
-import static mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
 
 public class CapturePrisoners {
     private final Campaign campaign;

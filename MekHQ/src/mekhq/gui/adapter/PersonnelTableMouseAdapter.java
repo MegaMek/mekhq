@@ -50,12 +50,12 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -85,7 +85,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
-import static mekhq.campaign.personnel.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
@@ -150,7 +150,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
 
     private static final String CMD_IMPRISON = "IMPRISON";
-    private static final String CMD_FREE = "FREE";
+    private static final String CMD_POW = "POW";
     private static final String CMD_EXECUTE = "EXECUTE";
     private static final String CMD_JETTISON = "JETTISON";
     private static final String CMD_RECRUIT = "RECRUIT";
@@ -639,7 +639,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_FREE: {
+            case CMD_POW: {
                 processPrisonerResolutionCommand(
                         people,
                         "confirmFree.format",
@@ -1459,7 +1459,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(newMenuItem(resources.getString("imprison.text"), CMD_IMPRISON));
         } else {
             if (gui.getCampaign().getLocation().isOnPlanet()) {
-                popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+                popup.add(newMenuItem(resources.getString("makePrisonerOfWar.text"), CMD_POW));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
             } else {
                 popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));

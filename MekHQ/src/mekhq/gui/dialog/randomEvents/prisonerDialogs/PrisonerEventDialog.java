@@ -3,7 +3,7 @@ package mekhq.gui.dialog.randomEvents.prisonerDialogs;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.randomEvents.prisoners.enums.PrisonerEvent;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.List;
