@@ -102,6 +102,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.RandomEventLibraries;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
+import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
@@ -4377,6 +4378,8 @@ public class Campaign implements ITechManager {
      * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
+        RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(this, faction, getAtBUnitRatingMod());
+
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
@@ -4405,6 +4408,10 @@ public class Campaign implements ITechManager {
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
+            }
+
+            if (person.getStatus().isMIA()) {
+                recovery.attemptRescueOfPlayerCharacter(person);
             }
 
             person.resetMinutesLeft();

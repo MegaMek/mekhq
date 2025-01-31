@@ -142,10 +142,12 @@ public class PrisonerEventManager {
         Set<Person> escapees = effectsManager.getEscapees();
 
         if (!escapees.isEmpty() && campaign.hasActiveAtBContract(false)) {
-            List<AtBContract> contracts = campaign.getActiveAtBContracts();
-            Collections.shuffle(contracts);
+            if (randomInt(100) < escapees.size()) {
+                List<AtBContract> contracts = campaign.getActiveAtBContracts();
+                Collections.shuffle(contracts);
 
-            new PrisonEscapeScenario(campaign, contracts.get(0), escapees);
+                new PrisonEscapeScenario(campaign, contracts.get(0), escapees);
+            }
         }
     }
 
@@ -281,7 +283,7 @@ public class PrisonerEventManager {
         // squad sizes.
         final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 4;
         final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
-        final int PRISONER_CAPACITY_OTHER = 1;
+        final int PRISONER_CAPACITY_OTHER = 2;
 
         int prisonerCapacity = 0;
 

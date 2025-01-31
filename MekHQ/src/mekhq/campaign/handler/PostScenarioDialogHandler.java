@@ -25,12 +25,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 
@@ -54,7 +54,6 @@ public class PostScenarioDialogHandler {
                               ResolveScenarioTracker tracker, boolean control) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
-        postCombatMissingInActionToPrisonerOfWarStatus(campaign, tracker, control);
         restartRats(campaign);
         cleanupTempImageFiles();
         // we need to trigger ScenarioResolvedEvent before stopping the thread or
@@ -102,7 +101,7 @@ public class PostScenarioDialogHandler {
 
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
                 Person person = campaign.getPerson(personId);
-                ResolveScenarioTracker.PersonStatus status = tracker.getPeopleStatus().get(personId);
+                PersonStatus status = tracker.getPeopleStatus().get(personId);
                 int injuryCount = 0;
 
                 if (!person.getStatus().isDead() || campaign.getCampaignOptions().isIssuePosthumousAwards()) {
@@ -123,16 +122,6 @@ public class PostScenarioDialogHandler {
 
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.PostScenarioController(campaign, personnel, scenarioKills, isCivilianHelp);
-        }
-    }
-
-    private static void postCombatMissingInActionToPrisonerOfWarStatus(Campaign campaign, ResolveScenarioTracker tracker, boolean control) {
-        for (UUID personId : tracker.getPeopleStatus().keySet()) {
-            Person person = campaign.getPerson(personId);
-
-            if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.POW);
-            }
         }
     }
 }
