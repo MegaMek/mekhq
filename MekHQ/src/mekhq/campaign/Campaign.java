@@ -243,8 +243,7 @@ public class Campaign implements ITechManager {
 
     private Boolean fieldKitchenWithinCapacity;
 
-    // this is updated and used per gaming session, it is enabled/disabled via the
-    // Campaign options
+    // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     // we're re-using the LogEntry class that is used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
@@ -491,8 +490,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the Hiring Hall level from the force's current system on the current
-     * date. If there
+     * Returns the Hiring Hall level from the force's current system on the current date. If there
      * is no hiring hall present, the level is HiringHallLevel.NONE.
      *
      * @return The Hiring Hall level of the current system at the present date.
@@ -1657,8 +1655,7 @@ public class Campaign implements ITechManager {
     // region Personnel
     // region Person Creation
     /**
-     * Creates a new dependent with given gender. The origin faction and planet are
-     * set to null.
+     * Creates a new dependent with given gender. The origin faction and planet are set to null.
      *
      * @param gender The {@link Gender} of the new dependent.
      * @return Return a {@link Person} object representing the new dependent.
@@ -1670,24 +1667,20 @@ public class Campaign implements ITechManager {
     /**
      * Creates a new dependent with given gender, origin faction and origin planet.
      *
-     * @param gender        The {@link Gender} of the new dependent.
-     * @param originFaction The {@link Faction} that represents the origin faction
-     *                      for the new dependent.
-     *                      This can be null, suggesting the faction will be chosen
-     *                      based on campaign options.
-     * @param originPlanet  The {@link Planet} that represents the origin planet for
-     *                      the new dependent.
-     *                      This can be null, suggesting the planet will be chosen
-     *                      based on campaign options.
+     * @param gender The {@link Gender} of the new dependent.
+     * @param originFaction The {@link Faction} that represents the origin faction for the new dependent.
+     *                      This can be null, suggesting the faction will be chosen based on campaign options.
+     * @param originPlanet The {@link Planet} that represents the origin planet for the new dependent.
+     *                     This can be null, suggesting the planet will be chosen based on campaign options.
      * @return Return a {@link Person} object representing the new dependent.
      */
     public Person newDependent(Gender gender, @Nullable Faction originFaction,
-            @Nullable Planet originPlanet) {
+                               @Nullable Planet originPlanet) {
         return newPerson(PersonnelRole.DEPENDENT,
-                PersonnelRole.NONE,
-                new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), originFaction),
-                new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions(), originPlanet),
-                gender);
+            PersonnelRole.NONE,
+            new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions(), originFaction),
+            new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions(), originPlanet),
+            gender);
     }
 
     /**
@@ -1806,8 +1799,8 @@ public class Campaign implements ITechManager {
 
     // region Personnel Recruitment
     /**
-     * @param p the person being added
-     * @return true, if the person is hired successfully, otherwise false
+     * @param p         the person being added
+     * @return          true, if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
         return recruitPerson(p, p.getPrisonerStatus(), false, true);
@@ -1918,8 +1911,7 @@ public class Campaign implements ITechManager {
                 if (!person.getGenealogy().hasSpouse()) {
                     List<Person> toRemove = new ArrayList<>();
 
-                    // there is a chance a departing spouse might take some of their children with
-                    // them
+                    // there is a chance a departing spouse might take some of their children with them
                     for (Person child : children) {
                         if (child.getGenealogy().getParents().contains(currentSpouse)) {
                             if (Compute.randomInt(2) == 0) {
@@ -1942,8 +1934,7 @@ public class Campaign implements ITechManager {
 
             // then we check for children
             if ((person.getGender().isFemale()) && (!person.isPregnant())) {
-                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person,
-                        true);
+                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
 
                 if (person.isPregnant()) {
 
@@ -1954,8 +1945,7 @@ public class Campaign implements ITechManager {
             }
 
             if ((currentSpouse != null) && (currentSpouse.getGender().isFemale()) && (!currentSpouse.isPregnant())) {
-                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining),
-                        currentSpouse, true);
+                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), currentSpouse, true);
 
                 if (currentSpouse.isPregnant()) {
 
@@ -1965,27 +1955,25 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            if ((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
+            if((person.isPregnant()) && (currentDate.isAfter(person.getDueDate()))) {
                 children.addAll(getProcreation().birthHistoric(this, localDate, person, babysFather));
                 babysFather = null;
             }
 
-            if ((currentSpouse != null) && (currentSpouse.isPregnant())
-                    && (currentDate.isAfter(currentSpouse.getDueDate()))) {
+            if((currentSpouse != null) && (currentSpouse.isPregnant()) && (currentDate.isAfter(currentSpouse.getDueDate()))) {
                 children.addAll(getProcreation().birthHistoric(this, localDate, currentSpouse, spousesBabysFather));
                 spousesBabysFather = null;
             }
         }
 
-        // with the simulation concluded, we add the current spouse (if any) and any
-        // remaining children to the unit
+        // with the simulation concluded, we add the current spouse (if any) and any remaining children to the unit
         if (currentSpouse != null) {
             recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                    currentSpouse.getHyperlinkedFullTitle(),
-                    person.getHyperlinkedFullTitle(),
-                    resources.getString("relativeJoinsForceSpouse.text")));
+                currentSpouse.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
+                resources.getString("relativeJoinsForceSpouse.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
         }
@@ -2030,16 +2018,16 @@ public class Campaign implements ITechManager {
             recruitPerson(child, PrisonerStatus.FREE, true, false);
 
             addReport(String.format(resources.getString("relativeJoinsForce.text"),
-                    child.getHyperlinkedFullTitle(),
-                    person.getHyperlinkedFullTitle(),
-                    resources.getString("relativeJoinsForceChild.text")));
+                child.getHyperlinkedFullTitle(),
+                person.getHyperlinkedFullTitle(),
+                resources.getString("relativeJoinsForceChild.text")));
 
             MekHQ.triggerEvent(new PersonChangedEvent(child));
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
-    // endregion Personnel Recruitment
+    //endregion Personnel Recruitment
 
     // region Bloodnames
     /**
@@ -2050,8 +2038,7 @@ public class Campaign implements ITechManager {
      * appropriate to the person's phenotype and the player's faction.
      *
      * @param person     The Bloodname candidate
-     * @param ignoreDice If true, skips the random roll and assigns a Bloodname
-     *                   automatically
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if person is non-clan or does not have a phenotype
@@ -2059,8 +2046,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        // Person already has a bloodname, we open up the dialog to ask if they want to
-        // keep the
+        // Person already has a bloodname, we open up the dialog to ask if they want to keep the
         // current bloodname or assign a new one
         if (!person.getBloodname().isEmpty()) {
             int result = JOptionPane.showConfirmDialog(null,
@@ -2271,7 +2257,6 @@ public class Campaign implements ITechManager {
 
     /**
      * Provides a filtered list of personnel including only active Dependents.
-     * 
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActiveDependents() {
@@ -2288,8 +2273,8 @@ public class Campaign implements ITechManager {
      */
     public List<Person> getCurrentPrisoners() {
         return getActivePersonnel().stream()
-                .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
-                .collect(Collectors.toList());
+            .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
+            .collect(Collectors.toList());
     }
 
     /**
@@ -2543,13 +2528,10 @@ public class Campaign implements ITechManager {
 
     /**
      * Add data from an actual part to a PartInUse data element
-     * 
-     * @param partInUse                part in use record to update
-     * @param incomingPart             new part that needs to be added to this
-     *                                 record
-     * @param ignoreMothballedUnits    don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this
-     *                                 quality
+     * @param partInUse part in use record to update
+     * @param incomingPart new part that needs to be added to this record
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
     private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
             boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
@@ -2572,11 +2554,9 @@ public class Campaign implements ITechManager {
 
     /**
      * Find all the parts that match this PartInUse and update their data
-     * 
-     * @param partInUse                part in use record to update
-     * @param ignoreMothballedUnits    don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this
-     *                                 quality
+     * @param partInUse part in use record to update
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
     public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
             PartQuality ignoreSparesUnderQuality) {
@@ -2588,26 +2568,24 @@ public class Campaign implements ITechManager {
             PartInUse newPartInUse = getPartInUse(incomingPart);
             if (partInUse.equals(newPartInUse)) {
                 updatePartInUseData(partInUse, incomingPart,
-                        ignoreMothballedUnits, ignoreSparesUnderQuality);
+                    ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
                 partInUse.setPlannedCount(partInUse.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                                : (Part) maybePart) * maybePart.getQuantity());
+                        + getQuantity((maybePart instanceof MissingPart) ?
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
             }
         }
     }
 
     /**
-     * Create a data set detailing all the parts being used (or not) and their
-     * warehouse spares
-     * 
-     * @param ignoreMothballedUnits    don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this
-     *                                 quality
+     * Create a data set detailing all the parts being used (or not) and their warehouse spares
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      * @return a Set of PartInUse data for display or inspection
      */
     public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
@@ -2651,14 +2629,15 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             partInUse.setPlannedCount(partInUse.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                            : (Part) maybePart) * maybePart.getQuantity());
+                    + getQuantity((maybePart instanceof MissingPart) ?
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
 
         }
         return inUse.keySet().stream()
-                // Hacky but otherwise we end up with zero lines when filtering things out
-                .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
-                .collect(Collectors.toSet());
+            // Hacky but otherwise we end up with zero lines when filtering things out
+            .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
+            .collect(Collectors.toSet());
     }
 
     @Deprecated
@@ -2776,16 +2755,14 @@ public class Campaign implements ITechManager {
      *                     excluded from the list.
      * @param eliteFirst   If TRUE and sorted also TRUE, then return the list sorted
      *                     from best to worst
-     * @param expanded     If TRUE, then include techs with expanded roles (e.g.
-     *                     Tech/Vessel skill)
+     * @param expanded     If TRUE, then include techs with expanded roles (e.g. Tech/Vessel skill)
      * @return The list of active {@link Person}s who qualify as technicians
-     *         ({@link Person#isTech()}), or who qualify as expanded technicians
-     *         ({@link Person#isTechExpanded()}).
+     *         ({@link Person#isTech()}), or who qualify as expanded technicians ({@link Person#isTechExpanded()}).
      */
     public List<Person> getTechsExpanded(final boolean noZeroMinute, final boolean eliteFirst, final boolean expanded) {
         final List<Person> techs = getActivePersonnel().stream()
                 .filter(person -> (expanded ? person.isTechExpanded() : person.isTech())
-                        && (!noZeroMinute || (person.getMinutesLeft() > 0)))
+                    && (!noZeroMinute || (person.getMinutesLeft() > 0)))
                 .collect(Collectors.toList());
 
         // also need to loop through and collect engineers on self-crewed vessels
@@ -3646,11 +3623,9 @@ public class Campaign implements ITechManager {
     }
 
     public void refit(Refit theRefit) {
-        Person tech = (theRefit.getUnit().getEngineer() == null) ? theRefit.getTech()
-                : theRefit.getUnit().getEngineer();
+        Person tech = (theRefit.getUnit().getEngineer() == null) ? theRefit.getTech() : theRefit.getUnit().getEngineer();
         if (tech == null) {
-            addReport("No tech is assigned to refit " + theRefit.getOriginalEntity().getShortName()
-                    + ". Refit cancelled.");
+            addReport("No tech is assigned to refit " + theRefit.getOriginalEntity().getShortName() + ". Refit cancelled.");
             theRefit.cancel();
             return;
         }
@@ -3711,7 +3686,7 @@ public class Campaign implements ITechManager {
                         if (daysLeft == 1) {
                             report += " tomorrow.</b>";
                         } else {
-                            report += " in " + daysLeft + " days.</b>";
+                        report += " in " + daysLeft + " days.</b>";
                         }
                     }
                 }
@@ -4207,10 +4182,8 @@ public class Campaign implements ITechManager {
      * It generates contract offers in the contract market,
      * updates ship search expiration and results,
      * processes ship search on Mondays,
-     * awards training experience to eligible training lances on active contracts on
-     * Mondays,
-     * adds or removes dependents at the start of the year if the options are
-     * enabled,
+     * awards training experience to eligible training lances on active contracts on Mondays,
+     * adds or removes dependents at the start of the year if the options are enabled,
      * rolls for morale at the start of the month,
      * and processes ATB scenarios.
      */
@@ -4250,7 +4223,7 @@ public class Campaign implements ITechManager {
                     report = resources.getString("garrisonDutyRouted.text");
                 } else if (oldMorale != newMorale) {
                     report = String.format(resources.getString("contractMoraleReport.text"),
-                            newMorale, contract.getName(), newMorale.getToolTipText());
+                        newMorale, contract.getName(), newMorale.getToolTipText());
                 }
 
                 if (!report.isBlank()) {
@@ -4279,7 +4252,7 @@ public class Campaign implements ITechManager {
             if (campaignOptions.isUseGenericBattleValue()) {
                 if (contract.getStartDate().equals(getLocalDate())) {
                     if (getCampaignOptions().isUseGenericBattleValue()
-                            && BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
+                        && BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
@@ -4501,11 +4474,9 @@ public class Campaign implements ITechManager {
 
     /**
      * Process weekly relationship events for a given {@link Person} on Monday.
-     * This method triggers specific events related to divorce, marriage,
-     * procreation, and maternity leave.
+     * This method triggers specific events related to divorce, marriage, procreation, and maternity leave.
      *
-     * @param person The {@link Person} for which to process weekly relationship
-     *               events
+     * @param person The {@link Person} for which to process weekly relationship events
      */
     private void processWeeklyRelationshipEvents(Person person) {
         if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -4516,21 +4487,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Process anniversaries for a given person, including birthdays and recruitment
-     * anniversaries.
+     * Process anniversaries for a given person, including birthdays and recruitment anniversaries.
      *
      * @param person The {@link Person} for whom the anniversaries will be processed
      */
     private void processAnniversaries(Person person) {
         if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
             if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
-                    && (campaignOptions.isAnnounceBirthdays())) {
+                && (campaignOptions.isAnnounceBirthdays())) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        person.getAge(getLocalDate()),
-                        CLOSING_SPAN_TAG));
+                    person.getHyperlinkedFullTitle(),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    person.getAge(getLocalDate()),
+                    CLOSING_SPAN_TAG));
             }
 
             LocalDate recruitmentDate = person.getRecruitment();
@@ -4539,29 +4508,26 @@ public class Campaign implements ITechManager {
                 int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
 
                 if ((recruitmentAnniversary.isEqual(getLocalDate()))
-                        && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
+                    && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
                     addReport(String.format(resources.getString("anniversaryRecruitment.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities
-                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            yearsOfEmployment, CLOSING_SPAN_TAG, name));
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        yearsOfEmployment, CLOSING_SPAN_TAG, name));
                 }
             }
         } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
             if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
                 addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities
-                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        person.getAge(getLocalDate()),
-                        CLOSING_SPAN_TAG));
+                    person.getHyperlinkedFullTitle(),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    person.getAge(getLocalDate()),
+                    CLOSING_SPAN_TAG));
             }
         }
     }
 
     /**
-     * Process monthly auto awards for a given person based on their roles and
-     * experience level.
+     * Process monthly auto awards for a given person based on their roles and experience level.
      *
      * @param person the person for whom the monthly auto awards are being processed
      */
@@ -4596,8 +4562,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves the date of birth of the youngest child among the provided list of
-     * children.
+     * Retrieves the date of birth of the youngest child among the provided list of children.
      *
      * @param children the list children
      * @return the date of birth of the youngest child
@@ -4996,8 +4961,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Randomly removes dependents from the given list if the campaign options allow
-     * random
+     * Randomly removes dependents from the given list if the campaign options allow random
      * dependent removal.
      *
      * @param dependents The list of dependents.
@@ -5032,11 +4996,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return The lower integer value between the given input and the randomly
-     *         generated integer.
+     * @return The lower integer value between the given input and the randomly generated integer.
      *
-     * @param firstRoll The input integer to compare with the randomly generated
-     *                  integer.
+     * @param firstRoll The input integer to compare with the randomly generated integer.
      */
     private int getLowerRandomInt(int firstRoll) {
         int secondRoll = Compute.randomInt(100);
@@ -5046,10 +5008,9 @@ public class Campaign implements ITechManager {
     /**
      * Checks if a dependent is eligible for removal.
      *
-     * @param dependent   the person to check
+     * @param dependent the person to check
      * @param currentDate the current date
-     * @return {@code true} if the person is eligible for removal, {@code false}
-     *         otherwise
+     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
      */
     boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
         boolean hasNonAdultChildren = dependent.getGenealogy().hasNonAdultChildren(currentDate);
@@ -5062,7 +5023,7 @@ public class Campaign implements ITechManager {
     /**
      * Randomly adds new dependents to the campaign.
      *
-     * @param dependentCount    the current number of dependents
+     * @param dependentCount the current number of dependents
      * @param dependentCapacity the maximum capacity for dependents
      */
     void dependentsAddNew(int dependentCount, int dependentCapacity) {
@@ -6092,8 +6053,7 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveBehaviorSettings",
-                    autoResolveBehaviorSettings.getDescription());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveBehaviorSettings", autoResolveBehaviorSettings.getDescription());
         }
 
         retirementDefectionTracker.writeToXML(pw, indent);
@@ -7567,13 +7527,12 @@ public class Campaign implements ITechManager {
     /**
      * Returns the Strategy skill of the designated commander in the campaign.
      *
-     * @return The value of the commander's strategy skill if a commander exists,
-     *         otherwise 0.
+     * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
      */
     public int getCommanderStrategy() {
         int cmdrStrategy = 0;
         if (getFlaggedCommander() != null &&
-                getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
+            getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
             cmdrStrategy = getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
         }
         return cmdrStrategy;
@@ -8518,7 +8477,7 @@ public class Campaign implements ITechManager {
                 qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
                         MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
                         "Overall quality improves from " + qualityOrig.toName(reverse)
-                                + " to " + quality.toName(reverse));
+                        + " to " + quality.toName(reverse));
             } else if (quality.toNumeric() < qualityOrig.toNumeric()) {
                 qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
@@ -8706,8 +8665,7 @@ public class Campaign implements ITechManager {
                 LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
-                        // If by some nightmare there is no date from the below, just use the first
-                        // entry.
+                        // If by some nightmare there is no date from the below, just use the first entry.
                         join = e.getDate();
                     }
 
@@ -8717,8 +8675,7 @@ public class Campaign implements ITechManager {
                     }
                 }
 
-                // For that one in a billion chance the log is empty. Clone today's date and
-                // subtract a year
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
@@ -8830,8 +8787,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a turnover prompt should be displayed based on campaign options and
-     * current date.
+     * Checks if a turnover prompt should be displayed based on campaign options and current date.
      *
      * @return An integer representing the user's choice:
      *         -1 if turnover prompt should not be displayed.
@@ -8893,7 +8849,8 @@ public class Campaign implements ITechManager {
                 JOptionPane.INFORMATION_MESSAGE,
                 null,
                 options,
-                options[0]);
+                options[0]
+        );
     }
 
     /**
@@ -9162,6 +9119,14 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
     }
+
+    /** 
+     * Wipes the Parts in use map for the purpose of resetting all values to their default
+     */
+    public void wipePartsInUseMap() {
+        this.partsInUseRequestedStockMap.clear();
+    }
+
     /**
      * Retrieves the campaign faction icon for the specified {@link Campaign}.
      * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
@@ -9181,10 +9146,13 @@ public class Campaign implements ITechManager {
         }
         return icon;
     }
-
-    public boolean checkLinkedScenario(int sID){
-        for(Scenario s : getScenarios()){
-            if(s.getId() == sID){
+    
+    /**
+     * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
+     */
+    public boolean checkLinkedScenario(int scenarioID) {
+        for (Scenario scenario : getScenarios()) {
+            if (scenario.getId() == scenarioID  && getScenario(scenario.getId())) {
                 return true;
             }
         }
