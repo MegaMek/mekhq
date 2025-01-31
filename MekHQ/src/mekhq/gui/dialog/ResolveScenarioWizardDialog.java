@@ -1617,9 +1617,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         StratconRulesManager.processScenarioCompletion(tracker);
-        
-        if (reinforcementsSent && tracker.getScenario().getStatus().isOverallVictory()
-            && tracker.getCampaign().checkLinkedScenario(tracker.getScenario().getId())) {
+
+        if (reinforcementsSent  && tracker.getScenario().getStatus().isOverallVictory()
+            && tracker.getScenario().getLinkedScenario() != 0) {
             StratconRulesManager.linkedScenerioProcessing(tracker, forces);
         }
         

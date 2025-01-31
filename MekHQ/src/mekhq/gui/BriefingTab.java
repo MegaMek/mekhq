@@ -1298,7 +1298,7 @@ public final class BriefingTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
         final boolean canStartGame = (
-            (getCampaign().checkLinkedScenario(scenario.getId())) && (scenario.canStartScenario(getCampaign()))
+            (!getCampaign().checkLinkedScenario(scenario.getId())) && (scenario.canStartScenario(getCampaign()))
             );
 
         btnStartGame.setEnabled(canStartGame);
