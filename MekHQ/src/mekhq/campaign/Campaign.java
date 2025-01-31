@@ -9159,6 +9159,14 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
     }
+
+    /** 
+     * Wipes the Parts in use map for the purpose of resetting all values to their default
+     */
+    public void wipePartsInUseMap() {
+        this.partsInUseRequestedStockMap.clear();
+    }
+
     /**
      * Retrieves the campaign faction icon for the specified {@link Campaign}.
      * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
