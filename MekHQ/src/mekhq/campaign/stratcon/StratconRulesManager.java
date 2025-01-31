@@ -40,6 +40,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
@@ -1627,7 +1628,7 @@ public class StratconRulesManager {
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
 
-        generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
+        generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, force);
 
         return INTERCEPTED;
     }
@@ -2916,6 +2917,7 @@ public class StratconRulesManager {
     public void startup() {
         MekHQ.registerHandler(this);
     }
+    
 
     /**
      * Event handler for the new day event.

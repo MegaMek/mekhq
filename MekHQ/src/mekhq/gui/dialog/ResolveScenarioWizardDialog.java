@@ -1617,6 +1617,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         StratconRulesManager.processScenarioCompletion(tracker);
+        
+        if (reinforcementsSent || tracker.getScenario().getStatus().isVictory()) {
+            StratconRulesManager.linkedScenerioProcessing(tracker, forces);
+        }
+        
+
         aborted = false;
         this.setVisible(false);
 
