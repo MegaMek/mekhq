@@ -9181,4 +9181,13 @@ public class Campaign implements ITechManager {
         }
         return icon;
     }
+
+    public boolean checkLinkedScenario(int sID){
+        for(Scenario s : getScenarios()){
+            if(s.getId() == sID){
+                return true;
+            }
+        }
+        return false;
+    }
 }
