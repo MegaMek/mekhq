@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -191,8 +191,19 @@ public class ForceViewPanel extends JScrollablePanel {
         int nexty = 0;
 
         if (null != type) {
-            lblType.setName("lblCommander2");
-            String forceType = (force.isCombatForce() ? "" : "Non-Combat ") + type + ' ' + resourceMap.getString("unit");
+            lblType.setName("lblType");
+
+            String forceType;
+            if (force.isCombatForce()) {
+                forceType = type + ' ' + force.getFormationLevel().toString();
+            } else {
+                if (force.isConvoyForce()) {
+                    forceType = "Resupply " + force.getFormationLevel().toString();
+                } else {
+                    forceType = "Support " + force.getFormationLevel().toString();
+                }
+            }
+
             lblType.setText("<html><i>" + forceType + "</i></html>");
             lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceType);
             gridBagConstraints = new GridBagConstraints();
@@ -471,7 +482,7 @@ public class ForceViewPanel extends JScrollablePanel {
             .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
             .append("</b> ")
             .append(person.getRoleDesc());
-                    
+
         toReturn.append("<br>");
 
         boolean isInjured = false;
@@ -482,13 +493,10 @@ public class ForceViewPanel extends JScrollablePanel {
                 isInjured = true;
                 int injuryCount = person.getInjuries().size();
 
-                StringBuilder injuriesMessage = new StringBuilder(16);
-                injuriesMessage.append(' ')
-                    .append(injuryCount)
-                    .append(injuryCount == 1 ? " injury" : " injuries");
-                
+                String injuriesMessage = " " + injuryCount + (injuryCount == 1 ? " injury" : " injuries");
+
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage.toString()));
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage));
             }
 
         } else {
@@ -497,16 +505,13 @@ public class ForceViewPanel extends JScrollablePanel {
                 isInjured = true;
                 int hitCount = unit.getEntity().getCrew().getHits();
 
-                StringBuilder hitsMessage = new StringBuilder(16);
-                hitsMessage.append(' ')
-                    .append(hitCount)
-                    .append(hitCount == 1 ? " hit" : " hits");
+                String hitsMessage = " " + hitCount + (hitCount == 1 ? " hit" : " hits");
 
                 toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage));
             }
         }
-   
+
         if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
             isFatigued = true;
             if (isInjured) {
@@ -514,15 +519,12 @@ public class ForceViewPanel extends JScrollablePanel {
             }
             toReturn.append(' ');
 
-            StringBuilder fatigueMessage = new StringBuilder(16);
-
-            fatigueMessage.append(person.getEffectiveFatigue(campaign));
-            fatigueMessage.append(" fatigue");
+            String fatigueMessage = person.getEffectiveFatigue(campaign) + " fatigue";
 
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage.toString()));
+                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage));
         }
-        
+
         if (!(isInjured || isFatigued)) {
             toReturn.append("&nbsp;");
         }
@@ -588,6 +590,12 @@ public class ForceViewPanel extends JScrollablePanel {
             if (unit.getCurrentInfantryCapacity() > 0) {
                 toReturn += "<br><i>" + "Infantry Bays: " + (int) unit.getCurrentInfantryCapacity() + " tons free.</i>";
             }
+        }
+        //Let's get preferred transport too
+        if (unit.hasTacticalTransportAssignment()) {
+            toReturn += "<br><i>" + "Transported by: ";
+            toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
+            toReturn += "</i>";
         }
         toReturn += "</font></html>";
         return toReturn;

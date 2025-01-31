@@ -21,90 +21,62 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
-import java.time.LocalDate;
-import java.util.List;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.getTotalPaymentsDue;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordLoanPaymentNag.unableToAffordLoans;
 
 /**
- * This class represents a nag dialog displayed when the campaign cannot afford its next loan payment
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that warns the user if the campaign's available funds are not enough to cover
+ * upcoming loan payments.
+ *
+ * <p>
+ * This dialog calculates the total amount due for loan payments scheduled for the next day
+ * and compares it against the campaign's available funds. If the funds are not enough to cover
+ * the payments, the dialog is displayed to alert the user and prompt corrective action.
+ * </p>
  */
 public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "UnableToAffordLoanPaymentNagDialog";
-    private static String DIALOG_TITLE = "UnableToAffordLoanPaymentNagDialog.title";
-    private static String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
-
     /**
-     * Determines if the campaign is unable to afford its due loan payments.
+     * Constructs the nag dialog for insufficient funds to cover loan payments.
      *
-     * @param campaign the campaign for which the loan payment affordability needs to be checked
-     * @return {@code true} if the campaign is unable to afford the loan payment, {@code false} otherwise
+     * <p>
+     * This constructor initializes the dialog with relevant information about the campaign.
+     * The displayed message includes the commander's name or title and the total amount due
+     * for loans that must be paid the next day.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    static boolean isUnableToAffordLoanPayment(Campaign campaign) {
+    public UnableToAffordLoanPaymentNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
+
         Money totalPaymentsDue = getTotalPaymentsDue(campaign);
 
-        // check if the campaign's funds are less than the total payments due tomorrow
-        return campaign.getFunds().isLessThan(totalPaymentsDue);
+        final String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false),
+            totalPaymentsDue.toAmountAndSymbolString()));
+        showDialog();
     }
 
     /**
-     * Calculates the total payments due tomorrow, across all current loans
+     * Checks if a nag dialog should be displayed for the inability to afford loan payments in the given campaign.
      *
-     * @param campaign the campaign for which to calculate the total payments due
-     * @return the total payments due as a {@link Money} object
-     */
-    static Money getTotalPaymentsDue(Campaign campaign) {
-        // gets the list of the campaign's current loans
-        List<Loan> loans = campaign.getFinances().getLoans();
-
-        // gets tomorrow's date
-        LocalDate tomorrow = campaign.getLocalDate().plusDays(1);
-
-        // initialize the total loan payment due tomorrow as zero
-        Money totalPaymentsDue = Money.zero();
-
-        // iterate over all loans
-        for (Loan loan : loans) {
-            // if a loan payment is due tomorrow, add its payment amount to the total payments due
-            if (loan.getNextPayment().equals(tomorrow)) {
-                totalPaymentsDue = totalPaymentsDue.plus(loan.getPaymentAmount());
-            }
-        }
-        return totalPaymentsDue;
-    }
-
-    //region Constructors
-    /**
-     * Creates a new instance of the {@link UnableToAffordLoanPaymentNagDialog} class.
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for the inability to afford loan payments has not been ignored in the user options.</li>
+     *     <li>If the campaign is unable to afford its loan payments.</li>
+     * </ul>
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public UnableToAffordLoanPaymentNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
-    }
-    //endregion Constructors
+    public static boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT;
 
-    /**
-     * Checks if the campaign is able to afford its next loan payment.
-     * If the campaign is unable to afford its next loan payment and the Nag dialog for the current
-     * key is not ignored, it sets the description using the specified format and returns {@code true}.
-     * Otherwise, it returns {@code false}.
-     */
-    @Override
-    protected boolean checkNag() {
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUnableToAffordLoanPayment(getCampaign())) {
-            setDescription(String.format(
-                    resources.getString(DIALOG_BODY),
-                    getTotalPaymentsDue(getCampaign()).toAmountAndSymbolString()));
-            return true;
-        }
-
-        return false;
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && unableToAffordLoans(campaign);
     }
 }

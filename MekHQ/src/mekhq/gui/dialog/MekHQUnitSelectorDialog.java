@@ -23,6 +23,7 @@ import megamek.client.ui.advancedsearch.MekSearchFilter;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.UnitOrder;
@@ -32,7 +33,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
+
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     //region Variable Declarations
@@ -125,6 +130,20 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     @Override
     protected void select(boolean isGM) {
         if (getSelectedEntity() != null) {
+            // Block the purchase if the unit type is unsupported
+            if (selectedUnit.getEntity() instanceof GunEmplacement) {
+                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                    MekHQ.getMHQOptions().getLocale());
+
+                campaign.addReport(String.format(
+                    resources.getString("mekSelectorDialog.unsupported.gunEmplacement"),
+                    spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    CLOSING_SPAN_TAG));
+
+                dispose();
+                return;
+            }
+
             if (isGM) {
                 PartQuality quality = PartQuality.QUALITY_D;
 

@@ -21,95 +21,63 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
-import java.util.Objects;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.getNextJumpCost;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordJumpNagLogic.unableToAffordNextJump;
 
 /**
- * This class represents a nag dialog displayed when the campaign can't afford its next jump
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that warns the user if the campaign's available funds are not enough to cover the
+ * next jump cost.
+ *
+ * <p>
+ * This dialog calculates the cost of the next jump based on the campaign's current location and
+ * contract options. It alerts the user when the campaign's available funds are less than the
+ * calculated jump cost, ensuring players are notified of financial constraints before moving
+ * to another system.
+ * </p>
  */
 public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "UnableToAffordJumpNagDialog";
-    private static String DIALOG_TITLE = "UnableToAffordJumpNagDialog.title";
-    private static String DIALOG_BODY = "UnableToAffordJumpNagDialog.text";
-
     /**
-     * Checks if the campaign is unable to afford the cost of the next jump.
+     * Constructs the nag dialog for insufficient funds to afford a jump.
      *
-     * @param campaign The campaign for which to check the affordability of the next jump.
-     * @return {@code true} if the campaign is unable to afford the cost of the next jump, {@code false} otherwise.
+     * <p>
+     * This constructor initializes the dialog with relevant campaign data. It formats the
+     * message to display the name or title of the commander and the calculated cost of the
+     * next jump, enabling the user to take appropriate financial action if necessary.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    static boolean isUnableToAffordNextJump (Campaign campaign) {
-        Money currentFunds = campaign.getFunds();
+    public UnableToAffordJumpNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
+
         Money nextJumpCost = getNextJumpCost(campaign);
 
-        if (nextJumpCost.isZero()) {
-            return false;
-        } else {
-            return currentFunds.isLessThan(nextJumpCost);
-        }
+        final String DIALOG_BODY = "UnableToAffordJumpNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false),
+            nextJumpCost.toAmountAndSymbolString()));
+        showDialog();
     }
 
     /**
-     * Calculates the cost of the next jump for a given campaign.
-     * <p>
-     * This method determines the cost of the next jump by using the campaign's
-     * options and calculates the cost per jump based on whether the contract pays
-     * based on the value of the units in the campaign's TO&E.
+     * Checks if a nag dialog should be displayed for the inability to afford the next jump in the given campaign.
      *
-     * @param campaign the campaign for which to calculate the next jump cost
-     * @return the cost of the next jump for the campaign
-     */
-    static Money getNextJumpCost(Campaign campaign) {
-        CurrentLocation location = campaign.getLocation();
-        JumpPath jumpPath = location.getJumpPath();
-
-        if (jumpPath == null) {
-            return Money.zero();
-        }
-
-        if (Objects.equals(jumpPath.getLastSystem(), location.getCurrentSystem())) {
-            return Money.zero();
-        }
-
-        boolean isContractPayBasedOnToeUnitsValue = campaign.getCampaignOptions().isEquipmentContractBase();
-
-        return campaign.calculateCostPerJump(true, isContractPayBasedOnToeUnitsValue);
-    }
-
-    //region Constructors
-    /**
-     * Creates a new instance of the {@link UnableToAffordJumpNagDialog} class.
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for the inability to afford the next jump has not been ignored in the user options.</li>
+     *     <li>If the campaign is unable to afford the next jump.</li>
+     * </ul>
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public UnableToAffordJumpNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
-    }
-    //endregion Constructors
+    public static boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP;
 
-    /**
-     * Checks if the campaign is able to afford its next jump.
-     * If the campaign is unable to afford its next jump and the Nag dialog for the current key is
-     * not ignored, it sets the description using the specified format and returns {@code true}.
-     * Otherwise, it returns {@code false}.
-     */
-    @Override
-    protected boolean checkNag() {
-        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUnableToAffordNextJump(getCampaign())) {
-            setDescription(String.format(
-                    resources.getString(DIALOG_BODY),
-                    getNextJumpCost(getCampaign()).toAmountAndSymbolString()));
-            return true;
-        }
-
-        return false;
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && unableToAffordNextJump(campaign);
     }
 }

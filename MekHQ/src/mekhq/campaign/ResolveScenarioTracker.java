@@ -21,7 +21,7 @@
  */
 package mekhq.campaign;
 
-import megamek.client.Client;
+import megamek.client.IClient;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.PostGameResolution;
@@ -30,6 +30,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import megamek.common.autoresolve.acar.SimulatedClient;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -47,9 +48,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
 
+import java.awt.Frame;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import javax.swing.JFrame;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -89,7 +93,7 @@ public class ResolveScenarioTracker {
     Campaign campaign;
     Scenario scenario;
     Optional<File> unitList = Optional.empty();
-    Client client;
+    IClient client;
     Boolean control;
     private PostGameResolution victoryEvent;
 
@@ -137,6 +141,10 @@ public class ResolveScenarioTracker {
         }
     }
 
+    public boolean isAutoResolve() {
+        return this.client instanceof SimulatedClient;
+    }
+
     public void findUnitFile() {
         unitList = FileDialogs.openUnits(null);
     }
@@ -145,7 +153,7 @@ public class ResolveScenarioTracker {
         return unitList.map(File::getAbsolutePath).orElse("No file selected");
     }
 
-    public void setClient(Client c) {
+    public void setClient(IClient c) {
         client = c;
     }
 
@@ -363,6 +371,12 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
+                // MekHQ doesn't support gun emplacements, so we don't want the player salvaging them
+                if (wreck instanceof GunEmplacement) {
+                    appendKillCredit(wreck);
+                    continue;
+                }
+
                 if (wreck.isDropShip() && scenario.getBoardType() != Scenario.T_SPACE) {
                     double dropShipBonusPercentage =
                         (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
@@ -371,7 +385,7 @@ public class ResolveScenarioTracker {
                         dropShipBonus = dropShipBonus.plus(
                             generateNewTestUnit(wreck).getSellValue().multipliedBy(dropShipBonusPercentage));
                     }
-
+                    appendKillCredit(wreck);
                     continue;
                 }
 
@@ -435,6 +449,7 @@ public class ResolveScenarioTracker {
 
         return us;
     }
+
 
     /**
      * This checks whether an entity has any blown off limbs. If the battlefield
@@ -1734,7 +1749,7 @@ public class ResolveScenarioTracker {
         }
 
         for (Loot loot : actualLoot) {
-            loot.getLoot(campaign, scenario);
+            loot.getLoot(campaign, scenario, unitsStatus);
         }
 
         scenario.setStatus(resolution);
@@ -2149,4 +2164,5 @@ public class ResolveScenarioTracker {
     public boolean playerHasBattlefieldControl() {
         return control;
     }
+    
 }

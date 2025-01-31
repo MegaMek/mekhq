@@ -4,7 +4,7 @@
         <facilityFileName>AlliedTankBase.xml</facilityFileName>
         <facilityFileName>AlliedAirBase.xml</facilityFileName>
         <facilityFileName>AlliedArtilleryBase.xml</facilityFileName>
-        <facilityFileName>AlliedSupplyDepot.xml</facilityFileName>
+        <facilityFileName>AlliedSpacePort.xml</facilityFileName>
         <facilityFileName>AlliedDataCenter.xml</facilityFileName>
         <facilityFileName>AlliedIndustrialFacility.xml</facilityFileName>
         <facilityFileName>AlliedCommsCenter.xml</facilityFileName>
@@ -16,7 +16,7 @@
         <facilityFileName>HostileTankBase.xml</facilityFileName>
         <facilityFileName>HostileAirBase.xml</facilityFileName>
         <facilityFileName>HostileArtilleryBase.xml</facilityFileName>
-        <facilityFileName>HostileSupplyDepot.xml</facilityFileName>
+        <facilityFileName>HostileSpacePort.xml</facilityFileName>
         <facilityFileName>HostileDataCenter.xml</facilityFileName>
         <facilityFileName>HostileIndustrialFacility.xml</facilityFileName>
         <facilityFileName>HostileCommsCenter.xml</facilityFileName>

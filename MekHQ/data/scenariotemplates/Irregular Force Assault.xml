@@ -153,6 +153,10 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>FIRE_SUPPORT</forceRole>
+                    <forceRole>INF_SUPPORT</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>

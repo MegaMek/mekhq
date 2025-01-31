@@ -74,6 +74,10 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>

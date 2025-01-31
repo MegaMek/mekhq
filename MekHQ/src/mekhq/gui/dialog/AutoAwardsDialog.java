@@ -145,7 +145,7 @@ public class AutoAwardsDialog extends JDialog {
         AutoAwardsTableModel model = new AutoAwardsTableModel(campaign);
         // This is where we insert the external data
         logger.info("Trying to pass data to AutoAwardsTableModel.java");
-        logger.info("Data being passed: {}", data);
+        logger.debug("Data being passed: {}", data);
         model.setData(data);
         logger.info("Attempt successful");
         personnelTable = new AutoAwardsTable(model);

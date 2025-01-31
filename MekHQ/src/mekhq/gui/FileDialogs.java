@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2018-2025 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,10 +24,10 @@ import java.util.Optional;
 
 import javax.swing.JFrame;
 
+import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;

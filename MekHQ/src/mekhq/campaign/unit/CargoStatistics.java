@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.parts.Part;
 
 /**
  * Provides methods to gather statistics on cargo in a campaign.
@@ -90,9 +91,13 @@ public class CargoStatistics {
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
 
-        cargoTonnage += getCampaign().getWarehouse().streamSpareParts().filter(p -> inTransit || p.isPresent())
-                            .mapToDouble(p -> p.getQuantity() * p.getTonnage())
-                            .sum();
+        // if we're in transit or the part is present and has a meaningful tonnage, accumulate it
+        // not sure what the "in transit" flag is for, but I'm leaving it to retain current behavior
+        for (Part part : getCampaign().getWarehouse().getSpareParts()) {
+            if ((inTransit || part.isPresent()) && !Double.isNaN(part.getTonnage())) {
+                cargoTonnage += part.getQuantity() * part.getTonnage();
+            }
+        }
 
         // place units in bays
         // FIXME: This has been temporarily disabled. It really needs DropShip assignments done to fix it correctly.

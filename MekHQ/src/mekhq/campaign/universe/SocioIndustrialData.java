@@ -67,7 +67,7 @@ public class SocioIndustrialData {
 
     /** @return the USILR rating as a HTML description */
     public String getHTMLDescription() {
-        // TODO: Internationalization
+        // TODO: MHQInternationalization
         // TODO: Some way to encode "advanced" ultra-tech worlds (rating "AA" for technological sophistication)
         // TODO: Some way to encode "regressed" worlds
         // Note that rating "E" isn't used in official USILR codes, but we add them for completeness

@@ -5,6 +5,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -12,6 +13,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
@@ -21,11 +23,11 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.util.*;
 
-import static java.lang.Math.floor;
-import static java.lang.Math.max;
-import static java.lang.Math.round;
+import static java.lang.Math.min;
 import static megamek.common.Compute.d6;
-import static mekhq.campaign.force.StrategicFormation.getStandardForceSize;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.VETERAN;
+import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
 /**
@@ -38,6 +40,12 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_SUPPORT = 2;
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
+
+    /**
+     * The portion of combat teams we expect to be performing combat actions.
+     * This is one in 'x' where 'x' is the value set here.
+     */
+    static final double COMBAT_FORCE_DIVIDER = 2;
 
 
     protected List<Contract> contracts = new ArrayList<>();
@@ -179,57 +187,130 @@ public abstract class AbstractContractMarket {
     }
 
     /**
-     * Determines the number of required lances to be deployed for a contract. For Mercenary subcontracts
-     * this defaults to 1; otherwise, the number is based on the number of combat units in the
-     * campaign. Modified by a 2d6 roll if {@code bypassVariance} is {@code false}.
-     * @param campaign the current campaign
-     * @param contract the relevant contract
-     * @param bypassVariance if {@code true} requirements will not be semi-randomized.
-     * @return The number of lances required to be deployed.
+     * Calculates the required number of combat teams for a contract based on campaign options,
+     * contract details, and variance factors.
+     *
+     * <p>
+     * This method determines the number of combat teams needed to deploy, taking into account factors such as:
+     * <ul>
+     *   <li>Whether the contract is a subcontract (returns 1 as a base case).</li>
+     *   <li>The base formation sizes (lance-level and company-level) and the effective unit forces.</li>
+     *   <li>The maximum deployable combat teams, adjusted based on campaign strategy options.</li>
+     *   <li>Whether variance bypass is enabled, applying a flat reduction to available forces.</li>
+     *   <li>Variance adjustments applied through a dice roll, affecting the availability of forces.</li>
+     * </ul>
+     * The method ensures values are clamped to maintain a minimum deployment of at least 1 combat
+     * team while not exceeding the maximum deployable combat teams.
+     *
+     * @param campaign        the campaign containing relevant options and faction information
+     * @param contract        the contract that specifies details such as subcontract status
+     * @param bypassVariance  a flag indicating whether variance adjustments should be bypassed
+     * @return the calculated number of required combat teams, ensuring it meets game rules and constraints
      */
-    public int calculateRequiredLances(Campaign campaign, AtBContract contract, boolean bypassVariance) {
-        int maxDeployedLances = max(calculateMaxDeployedLances(campaign), 1);
+    public int calculateRequiredCombatTeams(Campaign campaign, AtBContract contract, boolean bypassVariance) {
+        // Return 1 combat team if the contract is a subcontract
         if (contract.isSubcontract()) {
             return 1;
-        } else {
-            int formationSize = getStandardForceSize(campaign.getFaction());
-            int availableForces = max(getEffectiveNumUnits(campaign) / formationSize, 1);
-
-            // We allow for one reserve force per 3 depth 0 forces (lances, etc)
-            availableForces -= max((int) floor((double) availableForces / 3), 1);
-
-            if (!bypassVariance) {
-                int roll = d6(2);
-
-                if (roll == 2) {
-                    availableForces = (int) round((double) availableForces * 0.25);
-                } else if (roll == 3) {
-                    availableForces = (int) round((double) availableForces * 0.5);
-                } else if (roll < 5) {
-                    availableForces = (int) round((double) availableForces * 0.75);
-                } else if (roll == 12) {
-                    availableForces = (int) round((double) availableForces * 1.75);
-                } else if (roll == 11) {
-                    availableForces = (int) round((double) availableForces * 1.5);
-                } else if (roll > 9) {
-                    availableForces = (int) round((double) availableForces * 1.25);
-                }
-            }
-
-            return MathUtility.clamp(availableForces, 1, maxDeployedLances);
         }
+
+        // Calculate base formation size and effective unit force
+        Faction faction = campaign.getFaction();
+        int lanceLevelFormationSize = getStandardForceSize(faction);
+
+        int effectiveForces = Math.max(getEffectiveNumUnits(campaign) / lanceLevelFormationSize, 1);
+
+        // Calculate maximum deployed forces based on strategy options
+        int maxDeployableCombatTeams = effectiveForces;
+        if (campaign.getCampaignOptions().isUseStrategy()) {
+            maxDeployableCombatTeams = Math.max(calculateMaxDeployableCombatTeams(campaign), 1);
+        }
+
+        // Clamp available forces to the max deployable limit
+        int availableForces = Math.min(effectiveForces, maxDeployableCombatTeams);
+
+        // If bypassing variance, apply flat reduction (reduce force by 1/3)
+        if (bypassVariance) {
+            return Math.max(availableForces - calculateBypassVarianceReduction(availableForces), 1);
+        }
+
+        // Apply variance based on a die roll
+        int varianceRoll = d6(2);
+        double varianceFactor = calculateVarianceFactor(varianceRoll);
+
+        // Adjust available forces based on variance, ensuring minimum clamping
+        int adjustedForces = availableForces - (int) Math.floor((double) availableForces / varianceFactor);
+
+        if (adjustedForces < 1) {
+            adjustedForces = 1;
+        }
+
+        // Return the clamped value, ensuring it does not exceed max-deployable forces
+        return Math.min(adjustedForces, maxDeployableCombatTeams);
     }
 
     /**
-     * Determine the maximum number of lances the force can deploy. The result is based on the
-     * commander's Strategy skill and various campaign options.
-     * @param campaign
-     * @return the maximum number of lances that can be deployed on the contract.
+     * Calculates the variance factor based on the given roll value and a fixed formation size divisor.
+     *
+     * <p>
+     * The variance factor is determined by applying a multiplier to the fixed formation size divisor.
+     * The multiplier varies based on the roll value:
+     * <ul>
+     *   <li><b>Roll 2:</b> Multiplier is 0.75.</li>
+     *   <li><b>Roll 3:</b> Multiplier is 0.5.</li>
+     *   <li><b>Roll 4:</b> Multiplier is 0.25.</li>
+     *   <li><b>Rolls 10, 11, 12:</b> Multipliers are 1.25, 1.5, and 1.75 respectively.</li>
+     *   <li><b>Rolls 5-9:</b> Default multiplier is 1.0 (no change).</li>
+     * </ul>
+     *
+     * @param roll the roll value used to determine the multiplier
+     * @return the calculated variance factor as a double
      */
-    public int calculateMaxDeployedLances(Campaign campaign) {
-        return campaign.getCampaignOptions().getBaseStrategyDeployment() +
-            campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-                campaign.getCommanderStrategy();
+    private double calculateVarianceFactor(int roll) {
+        return switch (roll) {
+            case 2 -> COMBAT_FORCE_DIVIDER * 0.25;
+            case 3 -> COMBAT_FORCE_DIVIDER * 0.5;
+            case 4 -> COMBAT_FORCE_DIVIDER * 0.75;
+            case 10 -> COMBAT_FORCE_DIVIDER * 1.25;
+            case 11 -> COMBAT_FORCE_DIVIDER * 1.5;
+            case 12 -> COMBAT_FORCE_DIVIDER * 1.75;
+            default -> COMBAT_FORCE_DIVIDER; // 5-9
+        };
+    }
+
+    /**
+     * Calculates the bypass variance reduction based on the available forces.
+     *
+     * <p>
+     * The reduction is calculated by dividing the available forces by a fixed factor of 3
+     * and rounding down to the nearest whole number. This value is used in scenarios where
+     * variance adjustments are bypassed.
+     * </p>
+     *
+     * @param availableForces the total number of forces available
+     * @return the bypass variance reduction as an integer
+     */
+    private int calculateBypassVarianceReduction(int availableForces) {
+        return (int) Math.floor((double) availableForces / 3);
+    }
+
+    /**
+     * Calculates the maximum number of deployable combat teams based on the given campaign's options.
+     *
+     * <p>
+     * This method retrieves campaign options and calculates the total deployable combat teams using
+     * the base strategy deployment, additional strategy deployment, and the campaign's commander strategy.
+     * </p>
+     *
+     * @param campaign the campaign object containing the necessary data to perform the calculation
+     * @return the total number of deployable combat teams
+     */
+    public int calculateMaxDeployableCombatTeams(Campaign campaign) {
+        CampaignOptions options = campaign.getCampaignOptions();
+        int baseStrategyDeployment = options.getBaseStrategyDeployment();
+        int additionalStrategyDeployment = options.getAdditionalStrategyDeployment();
+        int commanderStrategy = campaign.getCommanderStrategy();
+
+        return baseStrategyDeployment + additionalStrategyDeployment * commanderStrategy;
     }
 
     protected SkillLevel getSkillRating(int roll) {
@@ -238,7 +319,7 @@ public abstract class AbstractContractMarket {
         } else if (roll <= 9) {
             return SkillLevel.REGULAR;
         } else if (roll <= 11) {
-            return SkillLevel.VETERAN;
+            return VETERAN;
         } else {
             return SkillLevel.ELITE;
         }
@@ -273,7 +354,7 @@ public abstract class AbstractContractMarket {
 
     protected void rollSalvageClause(AtBContract contract, int mod, int contractMaxSalvagePercentage) {
         contract.setSalvageExchange(false);
-        int roll = Math.min(d6(2) + mod, 13);
+        int roll = min(d6(2) + mod, 13);
         if (roll < 2) {
             contract.setSalvagePct(0);
         } else if (roll < 4) {
@@ -282,9 +363,9 @@ public abstract class AbstractContractMarket {
             do {
                 r = d6(2);
             } while (r < 4);
-            contract.setSalvagePct(Math.min((r - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePct(min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(Math.min((roll - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePct(min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
@@ -299,7 +380,7 @@ public abstract class AbstractContractMarket {
         } else if (roll == 8) {
             contract.setBattleLossComp(10);
         } else {
-            contract.setBattleLossComp(Math.min((roll - 8) * 20, 100));
+            contract.setBattleLossComp(min((roll - 8) * 20, 100));
         }
     }
 
@@ -375,65 +456,187 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    /**
+     * Sets the ally rating (skill and quality) for the contract.
+     * The ally rating is determined by modifiers influenced by the employer faction,
+     * contract type, historical context, and a random roll.
+     *
+     * <p>The calculated ally skill and quality ratings are assigned to the contract.</p>
+     *
+     * @param contract the contract for which the ally rating is being set.
+     * @param year     the year of the contract, used for calculating historical modifiers.
+     */
     protected void setAllyRating(AtBContract contract, int year) {
-        int mod = 0;
-        if (contract.getEnemy().isRebelOrPirate()) {
-            mod -= 1;
-        }
+        int mod = calculateFactionModifiers(contract.getEmployerFaction());
+        mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
 
-        if (contract.getContractType().isGuerrillaWarfare() || contract.getContractType().isCadreDuty()) {
-            mod -= 3;
-        } else if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isSecurityDuty()) {
-            mod -= 2;
-        }
-
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mod -= 1;
-        }
-
-        if (contract.getEnemy().isIndependent()) {
-            mod -= 2;
-        }
-
-        if (contract.getContractType().isPlanetaryAssault()) {
-            mod += 1;
-        }
-
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan() && !contract.isAttacker()) {
-            // facing front-line units
-            mod += 1;
-        }
+        // Assign ally skill rating
         contract.setAllySkill(getSkillRating(d6(2) + mod));
-        if (year > 2950 && year < 3039 &&
-            !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            mod -= 1;
+
+        // Apply historical modifiers
+        if (!contract.getEmployerFaction().isClan()) {
+            mod += calculateHistoricalModifiers(year);
+        } else {
+            // Apply Clan clamping
+            if (contract.isAttacker()) {
+                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setAllySkill(VETERAN);
+                }
+            } else {
+                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setAllySkill(SkillLevel.REGULAR);
+                }
+            }
         }
+
+        // Assign ally quality rating
         contract.setAllyQuality(getQualityRating(d6(2) + mod));
     }
 
+    /**
+     * Sets the enemy rating (skill and quality) for the contract.
+     * The enemy rating is determined by modifiers based on the enemy faction,
+     * whether the faction is attacking or defending, historical context, and a random roll.
+     *
+     * <p>The calculated enemy skill and quality ratings are assigned to the contract.</p>
+     *
+     * @param contract the contract for which the enemy rating is being set.
+     * @param year     the year of the contract, used for calculating historical modifiers.
+     */
     protected void setEnemyRating(AtBContract contract, int year) {
-        int mod = 0;
-        if (contract.getEnemy().isRebelOrPirate()) {
-            mod -= 2;
-        }
-        if (contract.getContractType().isGuerrillaWarfare()) {
-            mod += 2;
-        }
-        if (contract.getContractType().isPlanetaryAssault()) {
+        Faction enemyFaction = Factions.getInstance().getFaction(contract.getEnemyCode());
+        int mod = calculateFactionModifiers(enemyFaction);
+
+        // Adjust modifiers based on attack/defense roles
+        if (!contract.isAttacker()) {
             mod += 1;
         }
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mod -= 1;
-        }
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            mod += contract.isAttacker() ? 2 : 4;
-        }
+
+        // Assign enemy skill rating
         contract.setEnemySkill(getSkillRating(d6(2) + mod));
-        if (year > 2950 && year < 3039 &&
-            !Factions.getInstance().getFaction(contract.getEnemyCode()).isClan()) {
+
+        // Apply historical modifiers
+        if (!enemyFaction.isClan()) {
+            mod += calculateHistoricalModifiers(year);
+        } else {
+            // Apply Clan clamping
+            if (!contract.isAttacker()) {
+                if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
+                    contract.setAllySkill(VETERAN);
+                }
+            } else {
+                if (contract.getAllySkill().ordinal() < REGULAR.ordinal()) {
+                    contract.setAllySkill(SkillLevel.REGULAR);
+                }
+            }
+        }
+
+        // Assign enemy quality rating
+        contract.setEnemyQuality(getQualityRating(d6(2) + mod));
+    }
+
+    /**
+     * Calculates the modifiers for a faction based on its attributes, such as whether it is:
+     * a rebel, pirate, independent, a minor power, or a Clan faction.
+     *
+     * <p>Faction modifiers are determined as follows:</p>
+     * <ul>
+     *   <li>Rebel or Pirate factions receive a penalty of -3.</li>
+     *   <li>Independent factions receive a penalty of -2.</li>
+     *   <li>Minor powers receive a penalty of -1.</li>
+     *   <li>Clan factions receive a bonus of +4.</li>
+     * </ul>
+     *
+     * @param faction the faction for which the modifiers are being calculated.
+     * @return the calculated modifier for the faction.
+     */
+    private int calculateFactionModifiers(Faction faction) {
+        int mod = 0;
+
+        if (faction.isRebelOrPirate()) {
+            mod -= 3;
+        }
+
+        if (faction.isIndependent()) {
+            mod -= 2;
+        }
+
+        if (faction.isMinorPower()) {
             mod -= 1;
         }
-        contract.setEnemyQuality(getQualityRating(d6(2) + mod));
+
+        if (faction.isClan()) {
+            mod += 4;
+        }
+
+        return mod;
+    }
+
+    /**
+     * Calculates the modifiers for a contract based on its type and whether the faction
+     * is in an attacker role or defender role.
+     *
+     * <p>Contract type modifiers are determined as follows:</p>
+     * <ul>
+     *   <li>Guerrilla Warfare or Cadre Duty incurs a penalty of -3.</li>
+     *   <li>Garrison Duty or Security Duty incurs a penalty of -2.</li>
+     *   <li>An attacking faction receives a bonus of +1.</li>
+     * </ul>
+     *
+     * @param contractType the type of the contract (e.g., Guerrilla Warfare, Cadre Duty, etc.).
+     * @param isAttacker   a boolean indicating whether the faction is in an attacker role.
+     * @return the calculated modifier for the contract type.
+     */
+    private int calculateContractTypeModifiers(AtBContractType contractType, boolean isAttacker) {
+        int mod = 0;
+
+        if (contractType.isGuerrillaWarfare() || contractType.isCadreDuty()) {
+            mod -= 3;
+        } else if (contractType.isGarrisonDuty() || contractType.isSecurityDuty()) {
+            mod -= 2;
+        }
+
+        if (isAttacker) {
+            mod += 1;
+        }
+
+        return mod;
+    }
+
+    /**
+     * Calculates modifiers based on the historical period in which the given year falls.
+     * Modifiers are applied to non-Clan factions based on the progressive degradation or
+     * recovery of combat capabilities during the Succession Wars and Renaissance periods.
+     *
+     * <p>The modifiers are determined as follows:</p>
+     * <ul>
+     *   <li>The Second Succession War (2830-2865): a penalty of -1.</li>
+     *   <li>The Third Succession War (2866-3038): a penalty of -2.</li>
+     *   <li>The Renaissance start period (3039-3049): a penalty of -1.</li>
+     * </ul>
+     *
+     * @param year the year of the contract, which determines the historical period.
+     * @return the calculated historical modifier to be applied.
+     */
+    private int calculateHistoricalModifiers(int year) {
+        final int SECOND_SUCCESSION_WAR_START = 2830;
+        final int THIRD_SUCCESSION_WAR_START = 2866;
+        final int RENAISSANCE_START = 3039;
+        final int RENAISSANCE_END = 3049;
+
+        int mod = 0;
+
+        if ((year >= SECOND_SUCCESSION_WAR_START) && (year < THIRD_SUCCESSION_WAR_START)) {
+            mod -= 1;
+        } else if ((year >= THIRD_SUCCESSION_WAR_START) && (year < RENAISSANCE_START)) {
+            mod -= 2;
+        } else if (year >= RENAISSANCE_START) {
+            if (year < RENAISSANCE_END) {
+                mod -= 1;
+            }
+        }
+
+        return mod;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

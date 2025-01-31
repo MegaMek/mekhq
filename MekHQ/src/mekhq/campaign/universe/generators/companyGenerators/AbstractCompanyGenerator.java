@@ -46,7 +46,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
@@ -74,6 +73,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * Startup:
@@ -372,9 +373,9 @@ public abstract class AbstractCompanyGenerator {
      * @param numMekWarriors the number of MekWarriors in their force, used to
      *                       determine their rank
      */
-    protected abstract void generateCommandingOfficerRank(final Faction faction,
-            final CompanyGenerationPersonTracker tracker,
-            final int numMekWarriors);
+    protected abstract void generateCommandingOfficerRank(Faction faction,
+            CompanyGenerationPersonTracker tracker,
+            int numMekWarriors);
 
     /**
      * This generates the initial officer list and assigns the type
@@ -633,14 +634,10 @@ public abstract class AbstractCompanyGenerator {
         trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true));
 
         // Now that they are recruited, we can simulate backwards a few years and
-        // generate marriages
-        // and children
+        // generate marriages and children
         for (final CompanyGenerationPersonTracker tracker : trackers) {
-            if (tracker.getPerson().getExperienceLevel(campaign, false) > 0) {
-                tracker.getPerson().setEduHighestEducation(EducationLevel.COLLEGE);
-            } else {
-                tracker.getPerson().setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-            }
+            Person person = tracker.getPerson();
+            setInitialEducationLevel(campaign, person);
         }
 
         if (getOptions().isRunStartingSimulation()) {
@@ -650,7 +647,7 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson(), true);
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
@@ -956,9 +953,9 @@ public abstract class AbstractCompanyGenerator {
      * @return the MekSummary generated from the provided parameters, or null if
      *         generation fails
      */
-    protected abstract @Nullable MekSummary generateMekSummary(final Campaign campaign,
-            final AtBRandomMekParameters parameters,
-            final Faction faction);
+    protected abstract @Nullable MekSummary generateMekSummary(Campaign campaign,
+            AtBRandomMekParameters parameters,
+            Faction faction);
 
     /**
      * @param campaign    the campaign to generate for

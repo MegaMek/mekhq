@@ -33,7 +33,7 @@ import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
-import mekhq.campaign.icons.enums.LayeredForceIconOperationalStatus;
+import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -68,17 +68,18 @@ public class Force {
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
-    public static final int STRATEGIC_FORMATION_OVERRIDE_NONE = -1;
-    public static final int STRATEGIC_FORMATION_OVERRIDE_FALSE = 0;
-    public static final int STRATEGIC_FORMATION_OVERRIDE_TRUE = 1;
+    public static final int COMBAT_TEAM_OVERRIDE_NONE = -1;
+    public static final int COMBAT_TEAM_OVERRIDE_FALSE = 0;
+    public static final int COMBAT_TEAM_OVERRIDE_TRUE = 1;
 
     private String name;
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
-    private boolean isStrategicFormation;
-    private int overrideStrategicFormation;
+    private boolean convoyForce;
+    private boolean isCombatTeam;
+    private int overrideCombatTeam;
     private FormationLevel formationLevel;
     private FormationLevel overrideFormationLevel;
     private Force parentForce;
@@ -100,8 +101,9 @@ public class Force {
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
-        this.isStrategicFormation = false;
-        this.overrideStrategicFormation = STRATEGIC_FORMATION_OVERRIDE_NONE;
+        this.convoyForce = false;
+        this.isCombatTeam = false;
+        this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
         this.overrideFormationLevel = FormationLevel.NONE;
         this.parentForce = null;
@@ -159,7 +161,7 @@ public class Force {
     }
 
     public boolean isCombatForce() {
-        return combatForce;
+        return combatForce && !convoyForce;
     }
 
     public void setCombatForce(boolean combatForce, boolean setForSubForces) {
@@ -171,20 +173,38 @@ public class Force {
         }
     }
 
-    public boolean isStrategicFormation() {
-        return isStrategicFormation;
+    public boolean isCombatTeam() {
+        return isCombatTeam;
     }
 
-    public void setStrategicFormation(final boolean isStrategicFormation) {
-        this.isStrategicFormation = isStrategicFormation;
+    /**
+     * @return {@code true} if this is a convoy force, {@code false} otherwise.
+     */
+    public boolean isConvoyForce() {
+        return convoyForce;
     }
 
-    public int getOverrideStrategicFormation() {
-        return overrideStrategicFormation;
+    /**
+     * Sets the status of the force as a convoy force. If requested, propagate this status to all
+     * sub-forces recursively.
+     *
+     * @param convoyForce {@code true} to mark force as a convoy force, {@code false} to mark force
+     *                     as non-convoy.
+     */
+    public void setConvoyForce(boolean convoyForce) {
+        this.convoyForce = convoyForce;
     }
 
-    public void setOverrideStrategicFormation(final int overrideStrategicFormation) {
-        this.overrideStrategicFormation = overrideStrategicFormation;
+    public void setCombatTeamStatus(final boolean isCombatTeam) {
+        this.isCombatTeam = isCombatTeam;
+    }
+
+    public int getOverrideCombatTeam() {
+        return overrideCombatTeam;
+    }
+
+    public void setOverrideCombatTeam(final int overrideCombatTeam) {
+        this.overrideCombatTeam = overrideCombatTeam;
     }
 
     public FormationLevel getFormationLevel() {
@@ -384,13 +404,13 @@ public class Force {
 
     /**
      * @param combatForcesOnly to only include combat forces or to also include
-     *                         non-combat forces
+     *                         support forces
      * @return all the unit ids in this force and all of its subforces
      */
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
         Vector<UUID> allUnits;
 
-        if (combatForcesOnly && !isCombatForce()) {
+        if (combatForcesOnly && !isCombatForce() && !isConvoyForce()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
@@ -513,7 +533,16 @@ public class Force {
         return forceCommanderID;
     }
 
-    public void setForceCommanderID(UUID commanderID) {
+    /**
+     * Sets the force commander ID to the provided UUID.
+     * You probably want to use
+     * setOverrideForceCommanderID(UUID) followed by
+     * updateCommander(campaign).
+     * @see #setOverrideForceCommanderID(UUID)
+     * @see #updateCommander(Campaign)
+     * @param commanderID UUID of the commander
+     */
+    private void setForceCommanderID(UUID commanderID) {
         forceCommanderID = commanderID;
     }
 
@@ -569,18 +598,20 @@ public class Force {
         List<UUID> eligibleCommanders = getEligibleCommanders(campaign);
 
         if (eligibleCommanders.isEmpty()) {
+            forceCommanderID = null;
             overrideForceCommanderID = null;
+            updateCombatTeamCommanderIfCombatTeam(campaign);
             return;
         }
 
         if (overrideForceCommanderID != null) {
             if (eligibleCommanders.contains(overrideForceCommanderID)) {
                 forceCommanderID = overrideForceCommanderID;
+                updateCombatTeamCommanderIfCombatTeam(campaign);
 
                 if (getParentForce() != null) {
                     getParentForce().updateCommander(campaign);
                 }
-
                 return;
             } else {
                 overrideForceCommanderID = null;
@@ -602,9 +633,19 @@ public class Force {
         }
 
         forceCommanderID = highestRankedPerson.getId();
+        updateCombatTeamCommanderIfCombatTeam(campaign);
 
         if (getParentForce() != null) {
             getParentForce().updateCommander(campaign);
+        }
+    }
+
+    private void updateCombatTeamCommanderIfCombatTeam(Campaign campaign) {
+        if (isCombatTeam()) {
+            CombatTeam combatTeam = campaign.getCombatTeamsTable().getOrDefault(getId(), null);
+            if (combatTeam != null) {
+                combatTeam.setCommander(getForceCommanderID());
+            }
         }
     }
 
@@ -632,10 +673,10 @@ public class Force {
      * @return a list of the operational statuses for units in this force and in all
      *         of its subForces.
      */
-    public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
+    public List<OperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
         // First, update all subForces, collecting their unit statuses into a single
         // list
-        final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream()
+        final List<OperationalStatus> statuses = getSubForces().stream()
                 .flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream())
                 .collect(Collectors.toList());
 
@@ -643,7 +684,7 @@ public class Force {
         statuses.addAll(getUnits().stream()
                 .map(campaign::getUnit)
                 .filter(Objects::nonNull)
-                .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
+                .map(OperationalStatus::determineLayeredForceIconOperationalStatus)
                 .toList());
 
         // Can only update the icon for LayeredForceIcons, but still need to return the
@@ -662,7 +703,7 @@ public class Force {
             // the ordinal of the force's status. Then assign the operational status to
             // this.
             final int index = (int) round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
-            final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
+            final OperationalStatus status = OperationalStatus.values()[index];
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER,
                     new ArrayList<>());
             ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
@@ -685,11 +726,13 @@ public class Force {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideStrategicFormation", overrideStrategicFormation);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "convoyForce", convoyForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideForceCommanderID", overrideForceCommanderID);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "units");
@@ -709,44 +752,48 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "force");
     }
 
-    public static @Nullable Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        Force retVal = new Force("");
-        NamedNodeMap attrs = wn.getAttributes();
-        Node idNameNode = attrs.getNamedItem("id");
+    public static @Nullable Force generateInstanceFromXML(Node workingNode, Campaign campaign, Version version) {
+        Force force = new Force("");
+        NamedNodeMap attributes = workingNode.getAttributes();
+        Node idNameNode = attributes.getNamedItem("id");
         String idString = idNameNode.getTextContent();
 
         try {
-            NodeList nl = wn.getChildNodes();
-            retVal.id = Integer.parseInt(idString);
+            NodeList childNodes = workingNode.getChildNodes();
+            force.id = Integer.parseInt(idString);
 
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            for (int x = 0; x < childNodes.getLength(); x++) {
+                Node wn2 = childNodes.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.setName(wn2.getTextContent().trim());
+                    force.setName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase(StandardForceIcon.XML_TAG)) {
-                    retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
+                    force.setForceIcon(StandardForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
-                    retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
+                    force.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
-                    retVal.setCamouflage(Camouflage.parseFromXML(wn2));
+                    force.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.setDescription(wn2.getTextContent().trim());
+                    force.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
-                    retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("overrideStrategicFormation")) {
-                    retVal.setOverrideStrategicFormation(Integer.parseInt(wn2.getTextContent().trim()));
+                    force.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
+                    force.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
+                    force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
-                    retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                    force.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
-                    retVal.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                    force.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
-                    retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
+                    force.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
-                    retVal.techId = UUID.fromString(wn2.getTextContent());
+                    force.techId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideForceCommanderID")) {
+                    force.overrideForceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
-                    retVal.forceCommanderID = UUID.fromString(wn2.getTextContent());
+                    force.forceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
-                    processUnitNodes(retVal, wn2, version);
+                    processUnitNodes(force, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -763,19 +810,17 @@ public class Force {
                             continue;
                         }
 
-                        retVal.addSubForce(generateInstanceFromXML(wn3, c, version), true);
+                        force.addSubForce(generateInstanceFromXML(wn3, campaign, version), true);
                     }
                 }
             }
-            c.importForce(retVal);
+            campaign.importForce(force);
         } catch (Exception ex) {
             logger.error("", ex);
             return null;
         }
 
-        retVal.updateCommander(c);
-
-        return retVal;
+        return force;
     }
 
     private static void processUnitNodes(Force retVal, Node wn, Version version) {

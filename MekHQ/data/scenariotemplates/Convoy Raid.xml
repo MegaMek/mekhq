@@ -77,7 +77,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
+                <allowedUnitType>1</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
@@ -107,7 +107,6 @@
                 <roleChoices>
                     <forceRole>CIVILIAN</forceRole>
                     <forceRole>CARGO</forceRole>
-                    <forceRole>SUPPORT</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
             </value>

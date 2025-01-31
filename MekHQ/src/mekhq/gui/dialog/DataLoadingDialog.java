@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,16 +21,18 @@ package mekhq.gui.dialog;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.Entity;
+import megamek.common.GunEmplacement;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
+import mekhq.CampaignPreset;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -44,12 +46,15 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
-import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
+import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
+import mekhq.gui.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,14 +63,18 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
-import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.ABRIDGED;
+import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
+import static mekhq.gui.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
-public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChangeListener {
+public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
 
     // region Variable Declarations
@@ -75,21 +84,25 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
     private JLabel splash;
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
+    private boolean isInAppNewCampaign;
+
+    private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
 
     // endregion Variable Declarations
 
     // region Constructors
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
             final @Nullable File campaignFile) {
-        this(frame, application, campaignFile, null);
+        this(frame, application, campaignFile, null, false);
     }
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
-            final @Nullable File campaignFile, StoryArcStub stub) {
+            final @Nullable File campaignFile, StoryArcStub stub, final boolean isInAppNewCampaign) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
         this.storyArcStub = stub;
+        this.isInAppNewCampaign = isInAppNewCampaign;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
@@ -159,7 +172,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         setSize(getSplash().getPreferredSize());
         pack();
         fitAndCenter();
-        getFrame().setVisible(false);
+        getFrame().setVisible(true);
     }
     // endregion Initialization
 
@@ -295,6 +308,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 switch (presetSelectionDialog.getReturnState()) {
                     case PRESET_SELECTION_CANCELLED -> {
+                        if (isInAppNewCampaign) {
+                            application.exit(false);
+                        }
                         return null;
                     }
                     case PRESET_SELECTION_SELECT -> {
@@ -306,44 +322,26 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                         + presetSelectionDialog.getReturnState());
                 }
 
-                // Date
-                final LocalDate date = ((preset == null) || (preset.getDate() == null))
-                        ? campaign.getLocalDate()
-                        : preset.getDate();
-                final DateChooser dc = new DateChooser(dialog, date);
-                dc.setLocationRelativeTo(getFrame());
-                // user can either choose a date or cancel by closing
-                if (dc.showDateChooser() != DateChooser.OK_OPTION) {
-                    return null;
-                }
-
+                // MegaMek Options
                 if ((preset != null) && (preset.getGameOptions() != null)) {
                     campaign.setGameOptions(preset.getGameOptions());
                 }
 
-                // This must be after the date chooser to enable correct functionality.
-                setVisible(false);
-
                 // Campaign Options
-                if (isSelect && preset != null) {
-                    preset.applyContinuousToCampaign(campaign);
+                // This needs to be before we trigger the customize preset dialog
+                campaign.setLocalDate(DEFAULT_START_DATE);
+                campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+                campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
-                    // This needs to be after we've applied the preset
-                    campaign.setLocalDate(dc.getDate());
-                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                    campaign.setStartingSystem(preset.getPlanet());
+                CampaignOptionsDialogMode mode = isSelect ? ABRIDGED : STARTUP;
+                CampaignOptionsDialog optionsDialog =
+                    new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+                setVisible(false); // cede visibility to `optionsDialog`
+                optionsDialog.setVisible(true);
+                if (optionsDialog.wasCanceled()) {
+                    return null;
                 } else {
-                    // This needs to be before we trigger the customize preset dialog
-                    campaign.setLocalDate(dc.getDate());
-                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                    campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
-
-                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
-                    optionsDialog.setLocationRelativeTo(getFrame());
-                    optionsDialog.applyPreset(preset);
-                    if (optionsDialog.showDialog().isCancelled()) {
-                        return null;
-                    }
+                    setVisible(true); // restore loader visibility
                 }
 
                 // initialize reputation
@@ -416,10 +414,58 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     reputationController.initializeReputation(campaign);
                     campaign.setReputation(reputationController);
                 }
+
+                sellUnsupportedUnits(campaign);
                 // endregion Progress 7
             }
             campaign.setApp(getApplication());
             return campaign;
+        }
+
+
+
+        /**
+         * Sells unsupported units.
+         * <p>
+         * This method checks all units in the specified campaign and determines if they are unsupported.
+         * Currently, only gun emplacements are identified as unsupported and are sold upon campaign load.
+         * If unsupported units are sold, a notification is displayed to the user detailing the sold units,
+         * including their names and IDs. Additionally, personnel assigned to these units are
+         * automatically unassigned.
+         * </p>
+         *
+         * @param retVal The campaign being checked for unsupported units. This includes the unit list
+         *              and the quartermaster who handles the selling process.
+         */
+        private void sellUnsupportedUnits(Campaign retVal) {
+            List<Unit> soldUnits = new ArrayList<>();
+            for (Unit unit : retVal.getUnits()) {
+                Entity entity = unit.getEntity();
+
+                if (entity == null) {
+                    continue;
+                }
+
+                // We don't support Gun Emplacements in mhq.
+                // If the user has somehow acquired one, it is sold on load.
+                if (entity instanceof GunEmplacement) {
+                    soldUnits.add(unit);
+                }
+            }
+
+            if (!soldUnits.isEmpty()) {
+                StringBuilder message = new StringBuilder(resources.getString("unsupportedUnits.body"));
+
+                for (Unit soldUnit : soldUnits) {
+                    retVal.getQuartermaster().sellUnit(soldUnit);
+                    message.append("- ").append(soldUnit.getName()).append("<br>");
+                }
+
+                JOptionPane.showMessageDialog(null,
+                    String.format("<html>%s</html>", message),
+                    resources.getString("unsupportedUnits.title"),
+                    JOptionPane.WARNING_MESSAGE);
+            }
         }
 
         /**

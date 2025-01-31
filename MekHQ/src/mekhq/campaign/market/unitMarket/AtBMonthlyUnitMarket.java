@@ -243,21 +243,20 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
                         // this will need to be incremented by 1,
                         // whenever we add additional unit types to this special handler
-                        int roll = Compute.randomInt(2);
+                        int roll = Compute.randomInt(6);
 
                         // while this gives even chances for each role,
                         // it gives greater control to the user
                         // to define how often they want to see special units.
-                        // really, this is just a band-aid fix, and ideally we wouldn't be filtering out these units in the first place
+                        // really, this is just a Band-Aid fix, and ideally we wouldn't be filtering out these units in the first place
                         switch (roll) {
-                            case 0:
-                                missionRoles.add(MissionRole.SUPPORT);
-                                break;
-                            case 1:
-                                missionRoles.add(MissionRole.ARTILLERY);
-                                break;
-                            default:
-                                throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: " + roll);
+                            case 0 -> missionRoles.add(MissionRole.CIVILIAN);
+                            case 1 -> missionRoles.add(MissionRole.SUPPORT);
+                            case 2 -> missionRoles.add(MissionRole.CARGO);
+                            case 3, 4, 5 -> missionRoles.add(MissionRole.ARTILLERY);
+                            default -> throw new IllegalStateException(
+                                "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: "
+                                    + roll);
                         }
                     }
                 }

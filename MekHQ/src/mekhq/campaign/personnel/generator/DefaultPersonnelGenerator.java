@@ -24,9 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -34,6 +32,8 @@ import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelecto
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
 import java.util.Objects;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * Creates {@link Person} instances using the default MekHQ algorithm.
@@ -133,12 +133,8 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             person.setLoyalty(Compute.d6(3));
         }
 
-        // set education based on age
-        if (age < 16) {
-            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-        } else {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
+        // set starting education
+        setInitialEducationLevel(campaign, person);
 
         // generate personality
         PersonalityController.generatePersonality(person);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,9 +34,10 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -47,6 +48,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -78,7 +80,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static mekhq.campaign.force.StrategicFormation.recalculateStrategicFormations;
+import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 
@@ -138,6 +140,7 @@ public class CampaignXmlParser {
             throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
                     campaignEle.getAttribute("version")));
         }
+        retVal.setVersion(version);
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -236,6 +239,8 @@ public class CampaignXmlParser {
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
+
+
                 if (xn.equalsIgnoreCase("campaignOptions")) {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
@@ -284,11 +289,13 @@ public class CampaignXmlParser {
                     retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     retVal.getUnitMarket().fillFromXML(wn, retVal, version);
                     foundUnitMarket = true;
-                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("strategicFormations")) {
-                    processStrategicFormationNodes(retVal, wn);
+                } else if (xn.equalsIgnoreCase("lances") || xn.equalsIgnoreCase("combatTeams")) {
+                    processCombatTeamNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(
                             RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
+                } else if (xn.equalsIgnoreCase("personnelWhoAdvancedInXP")) {
+                    retVal.setPersonnelWhoAdvancedInXP(processPersonnelWhoAdvancedInXP(wn, retVal));
                 } else if (xn.equalsIgnoreCase("automatedMothballUnits")) {
                     retVal.setAutomatedMothballUnits(processAutomatedMothballNodes(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
@@ -306,6 +313,8 @@ public class CampaignXmlParser {
                         );
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
+                } else if (xn.equalsIgnoreCase("partsInUse")) {
+                    processPartsInUse(retVal, wn);
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
@@ -355,10 +364,10 @@ public class CampaignXmlParser {
 
         // determine if we've missed any lances and add those back into the campaign
         if (options.isUseAtB()) {
-            Hashtable<Integer, StrategicFormation> lances = retVal.getStrategicFormationsTable();
+            Hashtable<Integer, CombatTeam> lances = retVal.getCombatTeamsTable();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
-                    lances.put(f.getId(), new StrategicFormation(f.getId(), retVal));
+                    lances.put(f.getId(), new CombatTeam(f.getId(), retVal));
                     logger.warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
             }
@@ -427,6 +436,14 @@ public class CampaignXmlParser {
                 // force, so check to make sure they aren't already here
                 if (!s.isAssigned(unit, retVal)) {
                     s.addUnit(unit.getId());
+                }
+            }
+
+            //Update the campaign transport availability if this is a transport.
+            //If it's empty we should be able to just ignore it
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (unit.hasTransportedUnits(campaignTransportType)) {
+                    retVal.updateTransportInTransports(campaignTransportType, unit);
                 }
             }
         });
@@ -773,7 +790,7 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static void processStrategicFormationNodes(Campaign campaign, Node workingNode) {
+    private static void processCombatTeamNodes(Campaign campaign, Node workingNode) {
         NodeList workingNodes = workingNode.getChildNodes();
 
         // Okay, let's iterate through the children, eh?
@@ -786,17 +803,17 @@ public class CampaignXmlParser {
             }
 
             if (!wn2.getNodeName().equalsIgnoreCase("lance")
-                && !wn2.getNodeName().equalsIgnoreCase("strategicFormations")) {
+                && !wn2.getNodeName().equalsIgnoreCase("combatTeam")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger.error("Unknown node type not loaded in strategicFormations nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in combatTeam nodes: " + wn2.getNodeName());
                 continue;
             }
 
-            StrategicFormation strategicFormation = StrategicFormation.generateInstanceFromXML(wn2);
+            CombatTeam combatTeam = CombatTeam.generateInstanceFromXML(wn2);
 
-            if (strategicFormation != null) {
-                campaign.addStrategicFormation(strategicFormation);
+            if (combatTeam != null) {
+                campaign.addCombatTeam(combatTeam);
             }
         }
     }
@@ -857,7 +874,12 @@ public class CampaignXmlParser {
             }
         }
 
-        recalculateStrategicFormations(retVal);
+        // This removes the risk of having forces with invalid leadership getting locked in
+        for (Force force : retVal.getAllForces()) {
+            force.updateCommander(retVal);
+        }
+
+        recalculateCombatTeams(retVal);
         logger.info("Load of Force Organization complete!");
     }
 
@@ -953,6 +975,53 @@ public class CampaignXmlParser {
     private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
         logger.info("Loading Fame and Infamy Nodes from XML...");
         FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
+    }
+
+    /**
+     * Processes a list of personnel who advanced in experience points (XP) from a given XML node.
+     * <p>
+     * This method reads the child nodes of the provided XML {@code workingNode} and extracts the personnel
+     * listed under the "personWhoAdvancedInXP" nodes. It retrieves the corresponding {@link Person} objects
+     * from the provided {@link Campaign} using their unique UUIDs. If a person cannot be found, an error
+     * is logged. The method returns a list of processed {@link Person} objects.
+     * </p>
+     *
+     * @param workingNode The XML node containing the "personWhoAdvancedInXP" elements to be processed.
+     * @param campaign    The {@link Campaign} instance used to fetch the {@link Person} objects based on UUIDs.
+     * @return A {@link List} of {@link Person} objects representing the personnel who advanced in XP.
+     *         If no valid personnel are found, an empty list is returned.
+     */
+    private static List<Person> processPersonnelWhoAdvancedInXP(Node workingNode, Campaign campaign) {
+        logger.info("Loading personnelWhoAdvancedInXP Nodes from XML...");
+
+        List<Person> personWhoAdvancedInXP = new ArrayList<>();
+
+        NodeList workingList = workingNode.getChildNodes();
+        for (int x = 0; x < workingList.getLength(); x++) {
+            Node childNode = workingList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!childNode.getNodeName().equalsIgnoreCase("personWhoAdvancedInXP")) {
+                logger.error("Unknown node type not loaded in personnelWhoAdvancedInXP nodes: "
+                    + childNode.getNodeName());
+                continue;
+            }
+
+            Person person = campaign.getPerson(UUID.fromString(childNode.getTextContent()));
+
+            if (person == null) {
+                logger.error("Unknown UUID: " + childNode.getTextContent());
+            }
+
+            personWhoAdvancedInXP.add(person);
+        }
+
+        logger.info("Load personWhoAdvancedInXP Nodes Complete!");
+        return personWhoAdvancedInXP;
     }
 
     private static List<Unit> processAutomatedMothballNodes(Node workingNode, Campaign campaign) {
@@ -1606,6 +1675,79 @@ public class CampaignXmlParser {
                     Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }
+        }
+    }
+
+    private static void processPartsInUse(Campaign retVal, Node wn) {
+        NodeList wList = wn.getChildNodes();
+
+        for (int i = 0; i < wList.getLength(); i++) {
+            Node wn2 = wList.item(i);
+
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn2.getNodeName().equalsIgnoreCase("ignoreMothBalled")) {
+                retVal.setIgnoreMothballed(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("topUpWeekly")) {
+                retVal.setTopUpWeekly(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
+                PartQuality ignoreQuality = PartQuality.valueOf(wn2.getTextContent());
+                retVal.setIgnoreSparesUnderQuality(ignoreQuality);
+            } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
+                processPartsInUseRequestedStockMap(retVal, wn2);
+            } else {
+                logger.error("Unkown node type not loaded in PartInUse nodes: " + wn2.getNodeName());
+                continue;
+            }
+        }
+    }
+
+    private static void processPartsInUseRequestedStockMap(Campaign retVal, Node wn) {
+        NodeList wList = wn.getChildNodes();
+
+        Map<String, Double> partInUseStockMap = new LinkedHashMap<>();
+
+        for (int i = 0; i < wList.getLength(); i++) {
+            Node wn2 = wList.item(i);
+
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("partInUseMapEntry")) {
+                logger.error("Unkown node tpye not loaded in PartInUseStockMap nodes: " + wn2.getNodeName());
+            }
+
+            processPartsInUseRequestedStockMapVal(retVal, wn2, partInUseStockMap);
+
+        }
+
+        retVal.setPartsInUseRequestedStockMap(partInUseStockMap);
+    }
+
+    private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn, Map<String, Double> partsInUseRequestedStockMap) {
+        NodeList wList = wn.getChildNodes();
+
+        String key = null;
+        double val = 0;
+
+        for(int i = 0; i < wList.getLength(); i++) {
+            Node wn2 = wList.item(i);
+
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn2.getNodeName().equalsIgnoreCase("partInUseMapKey")) {
+                key = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMapVal")) {
+                val = Double.parseDouble(wn2.getTextContent());
+            }
+        }
+        if (key != null) {
+            partsInUseRequestedStockMap.put(key, val);
         }
     }
 

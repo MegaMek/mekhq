@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.apache.commons.csv.CSVFormat;
@@ -57,6 +58,9 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+
+import static java.lang.Math.max;
+import static mekhq.campaign.personnel.SkillType.*;
 
 public class Utilities {
     private static final MMLogger logger = MMLogger.create(Utilities.class);
@@ -344,11 +348,11 @@ public class Utilities {
         int roll = MathUtility.clamp(Compute.d6(2) + bonus, 1, 12);
 
         return switch (roll) {
-            case 1 -> SkillType.EXP_ULTRA_GREEN;
-            case 2, 3, 4, 5 -> SkillType.EXP_GREEN;
-            case 6, 7, 8, 9 -> SkillType.EXP_REGULAR;
-            case 10, 11 -> SkillType.EXP_VETERAN;
-            case 12 -> SkillType.EXP_ELITE;
+            case 1 -> EXP_ULTRA_GREEN;
+            case 2, 3, 4, 5 -> EXP_GREEN;
+            case 6, 7, 8, 9 -> EXP_REGULAR;
+            case 10, 11 -> EXP_VETERAN;
+            case 12 -> EXP_ELITE;
             default -> throw new IllegalStateException("Unexpected value in mekhq/Utilities.java/generateExpLevel: "
                     + roll);
         };
@@ -375,7 +379,7 @@ public class Utilities {
         } else if (dice == 6) {
             target += 2;
         }
-        return Math.max(target, 0);
+        return max(target, 0);
     }
 
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign c,
@@ -828,42 +832,100 @@ public class Utilities {
     }
 
     /**
-     * Calculates the age of a character based on their experience level and clan status.
+     * Calculates the age based on the experience level and clan status.
      *
-     * @param expLevel the experience level of the character represented by an integer value.
-     * @param clan     a boolean value indicating whether the character is a clan character.
-     * @return the age of the character calculated based on the provided expLevel and clan.
+     * <p>This method computes the age of a character by rolling a given number of exploding
+     * six-sided dice (d6) depending on the specified experience level. It starts with a base age
+     * and adds results of the rolls. If the character is part of a Clan, the dice rolls are halved
+     * (rounded up). Additionally, for all experience levels other than {@code EXP_NONE}, the final
+     * result is clamped to a minimum of 18.</p>
+     *
+     * <p>An exploding die roll occurs if the roll is 6. In such cases, another die is rolled, and
+     * the result is added to the previous roll (minus one).</p>
+     *
+     * <p>The calculated average age for each experience level is shown below:</p>
+     *
+     * <table border="1">
+     *   <caption><strong>Average Ages by Experience Level</strong></caption>
+     *   <tr>
+     *     <th>Experience Level</th>
+     *     <th>Non-Clan Average Age</th>
+     *     <th>Clan Average Age</th>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_NONE</td>
+     *     <td>29.4</td>
+     *     <td>29.4</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_GREEN</td>
+     *     <td>18</td>
+     *     <td>18</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_REGULAR</td>
+     *     <td>24.4</td>
+     *     <td>18.2</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_VETERAN</td>
+     *     <td>28.6</td>
+     *     <td>20.3</td>
+     *   </tr>
+     *   <tr>
+     *     <td>EXP_ELITE</td>
+     *     <td>32.8</td>
+     *     <td>22.4</td>
+     *   </tr>
+     * </table>
+     *
+     * @param experienceLevel The experience level of the character. Must be one of the constants
+     *                       defined in {@code SkillType}.
+     * @param isClan {@code true} if the character is part of a Clan, in which case dice rolls are
+     *                          halved (rounded up), {@code false} otherwise.
+     * @return The calculated age of the character based on the input parameters.
      */
-    public static int getAgeByExpLevel(int expLevel, boolean clan) {
-        int baseAge = 18;
+    public static int getAgeByExpLevel(int experienceLevel, boolean isClan) {
+        if (experienceLevel > EXP_ELITE) {
+            experienceLevel = EXP_ELITE;
+        }
 
-        int nDice = switch (expLevel) {
-            case SkillType.EXP_NONE -> 7;
-            case SkillType.EXP_GREEN -> 1;
-            case SkillType.EXP_REGULAR -> 2;
-            case SkillType.EXP_VETERAN -> 4;
-            case SkillType.EXP_ELITE -> 8;
-            default -> 0;
-        };
+        int baseAge = 16;
+
+        if (experienceLevel == EXP_NONE) {
+            baseAge = 0; // only use the result of the dice roll
+        }
 
         int age = baseAge;
 
-        for (int i = 0; i < nDice; i++) {
+        // How many dice to roll
+        int diceCount = switch (experienceLevel) {
+            case EXP_NONE -> 7;
+            case EXP_GREEN -> 1;
+            case EXP_REGULAR -> 2;
+            case EXP_VETERAN -> 3;
+            case EXP_ELITE -> 4;
+            default -> 0;
+        };
+
+        // Handle exploding dice
+        for (int i = 0; i < diceCount; i++) {
             int roll = Compute.d6(1);
 
             if (roll == 6) {
                 roll += (Compute.d6() - 1);
             }
 
-            if (clan) {
+            if (isClan && (experienceLevel != EXP_NONE)) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
 
             age += roll;
         }
 
-        if (expLevel == SkillType.EXP_NONE) {
-            age -= baseAge; // only use the result of the dice roll
+        // Clamp age, if necessary
+        if (experienceLevel != EXP_NONE) {
+            age = max(16, age);
         }
 
         return age;
@@ -889,7 +951,7 @@ public class Utilities {
 
     public static Money[] readMoneyArray(Node node, int minimumSize) {
         String[] values = node.getTextContent().split(",");
-        Money[] result = new Money[Math.max(values.length, minimumSize)];
+        Money[] result = new Money[max(values.length, minimumSize)];
 
         for (int i = 0; i < values.length; i++) {
             result[i] = Money.fromXmlString(values[i]);
@@ -1218,6 +1280,89 @@ public class Utilities {
         }
     }
 
+    /**
+     * Handles loading a player's transported units onto their transports once a
+     * megamek scenario has actually started.
+     *
+     *
+     * @param trnId          - The MM id of the transport entity we want to load
+     * @param toLoad         - Map of entity ids and transport assignments for the units we want to load
+     * @param client         - the player's Client instance
+     * @param loadTactical  - Should "tactical"-ly transported units be loaded?
+     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
+     * @see mekhq.campaign.enums.CampaignTransportType#TACTICAL_TRANSPORT
+     * @see ITransportAssignment
+     */
+    public static void loadPlayerTransports(int trnId, Map<Integer, ? extends ITransportAssignment> toLoad, Client client,
+                                            boolean loadTactical, boolean isAlreadyReset) {
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
+
+        if (!loadTactical) {
+            // Nothing to do. Get outta here!
+            return;
+        }
+        Entity transport = client.getEntity(trnId);
+
+        if (transport == null) {
+            return;
+        }
+
+        // Reset transporter status, as currentSpace might still retain updates from
+        // when the Unit
+        // was assigned to the Transport on the TO&E tab
+        if (!isAlreadyReset) {
+            transport.resetTransporter();
+        }
+
+        for (int id : toLoad.keySet()) {
+            Entity cargo = client.getEntity(id);
+            if (cargo == null) {
+                continue;
+            }
+
+            ITransportAssignment transportAssignment = toLoad.get(id);
+
+            if (transportAssignment == null) {
+                continue;
+            }
+
+            // Find a bay with space in it and update that space so the next unit can
+            // process, unless the unit isn't being loaded into a bay
+            if (transportAssignment.getTransportedLocation() instanceof Bay bay) {
+                cargo.setTargetBay(bay.getBayNumber());
+            } else {
+                if (transportAssignment.isTransportedInBay()) {
+                    cargo.setTargetBay(selectBestBayFor(cargo, transport));
+                }
+            }
+        }
+
+        // If we reset the transporters for the Ship transport, we'll need to save those units
+        // before we remove the fake capacity that was removed by selectBestBayFor
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(transport.getLoadedUnits());
+        }
+
+        // Reset transporter status again so that sendLoadEntity can process correctly
+        transport.resetTransporter();
+
+        //Restore the Ship transported entities
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            transport.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
+        for (int id : toLoad.keySet()) {
+            Entity cargo = client.getEntity(id);
+            if (!transport.canLoad(cargo, false)) {
+                continue;
+            }
+
+            //Transported units should deploy on their transport's turn
+            cargo.setDeployRound(transport.getDeployRound());
+
+            sendLoadEntity(client, id, trnId, cargo);
+        }
+    }
+
     private static void sendLoadEntity(Client client, int id, int trnId, Entity cargo) {
         client.sendLoadEntity(id, trnId, cargo.getTargetBay());
         // Add a wait to make sure that we don't start processing client.sendLoadEntity
@@ -1324,7 +1469,7 @@ public class Utilities {
     /**
      * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
      * @throws EntityLoadingException
-     */    
+     */
     public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
         MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);
 

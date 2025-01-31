@@ -33,7 +33,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
@@ -53,6 +52,8 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.UUID;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog}
@@ -137,28 +138,28 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         if (null == faction) {
             faction = campaign.getFaction();
         }
-        Person p = new Person(campaign, faction.getShortName());
+        Person person = new Person(campaign, faction.getShortName());
         if (null != primaryRole) {
-            p.setPrimaryRole(campaign, primaryRole);
+            person.setPrimaryRole(campaign, primaryRole);
         }
-        p.setClanPersonnel(clan);
-        if (p.isClanPersonnel() && null != phenotype) {
-            p.setPhenotype(phenotype);
+        person.setClanPersonnel(clan);
+        if (person.isClanPersonnel() && null != phenotype) {
+            person.setPhenotype(phenotype);
         }
 
-        p.setCommander(commander);
-        p.setGivenName(firstname);
-        p.setSurname(surname);
-        p.setBloodname(bloodname);
-        p.setBiography(biography);
-        p.setRank(rank);
+        person.setCommander(commander);
+        person.setGivenName(firstname);
+        person.setSurname(surname);
+        person.setBloodname(bloodname);
+        person.setBiography(biography);
+        person.setRank(rank);
         if (edge > 0) {
-            p.changeEdge(edge);
-            setEdgeTriggers(p);
+            person.changeEdge(edge);
+            setEdgeTriggers(person);
         }
 
         if (null != personId) {
-            p.setId(personId);
+            person.setId(personId);
         }
 
         // We need to generate basic skills in order to get any phenotype bonuses
@@ -177,20 +178,20 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         skillPrefs.setCombatSmallArmsBonus(-12);
         skillPrefs.setSupportSmallArmsBonus(-12);
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPrefs);
-        skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
+        skillGenerator.generateSkills(getCampaign(), person, SkillType.EXP_ULTRA_GREEN);
 
-        p.setDateOfBirth(getCampaign().getLocalDate().minusYears(age));
-
-        // set education
-        EducationController.setInitialEducation(campaign, p);
+        person.setDateOfBirth(getCampaign().getLocalDate().minusYears(age));
 
         // generate background
-        BackgroundsController.generateBackground(campaign, p);
+        BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(p);
+        PersonalityController.generatePersonality(person);
 
-        return p;
+        // set education
+        setInitialEducationLevel(campaign, person);
+
+        return person;
     }
 
     @Override

@@ -14,16 +14,14 @@
 
 package mekhq.gui.stratcon;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.DefaultListModel;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * List data model for the StratCon scenario wizard.
@@ -41,8 +39,7 @@ public class ScenarioWizardLanceModel extends DefaultListModel<Force> {
         }
 
         // let's sort these guys by alphabetical order
-        Collections.sort(sortedForces,
-                (Comparator<Force>) (Force o1, Force o2) -> o1.getName().compareTo(o2.getName()) );
+        sortedForces.sort(Comparator.comparing(Force::getName));
 
         super.addAll(sortedForces);
     }

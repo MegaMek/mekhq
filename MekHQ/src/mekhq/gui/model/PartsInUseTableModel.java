@@ -39,6 +39,7 @@ import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.event.*;
 
 import mekhq.MekHQ;
 import mekhq.campaign.parts.PartInUse;
@@ -55,14 +56,15 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_IN_USE = 1;
     public final static int COL_STORED = 2;
     public final static int COL_TONNAGE = 3;
-    public final static int COL_IN_TRANSFER = 4;
-    public final static int COL_COST = 5;
-    public final static int COL_BUTTON_BUY  = 6;
-    public final static int COL_BUTTON_BUY_BULK  = 7;
-    public final static int COL_BUTTON_SELL = 8;
-    public final static int COL_BUTTON_SELL_BULK = 9;
-    public final static int COL_BUTTON_GMADD  = 10;
-    public final static int COL_BUTTON_GMADD_BULK  = 11;
+    public final static int COL_REQUSTED_STOCK = 4;
+    public final static int COL_IN_TRANSFER = 5;
+    public final static int COL_COST = 6;
+    public final static int COL_BUTTON_BUY  = 7;
+    public final static int COL_BUTTON_BUY_BULK  = 8;
+    public final static int COL_BUTTON_SELL = 9;
+    public final static int COL_BUTTON_SELL_BULK = 10;
+    public final static int COL_BUTTON_GMADD  = 11;
+    public final static int COL_BUTTON_GMADD_BULK  = 12;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
             MekHQ.getMHQOptions().getLocale());
@@ -96,6 +98,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 return resourceMap.getString("ordered.heading");
             case COL_COST:
                 return resourceMap.getString("cost.heading");
+            case COL_REQUSTED_STOCK:
+                return resourceMap.getString("requestedStock.heading");
             default:
                 return EMPTY_CELL;
         }
@@ -103,27 +107,27 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-        PartInUse piu = getPartInUse(row);
+        PartInUse partInUse = getPartInUse(row);
         switch (column) {
             case COL_PART:
-                return piu.getDescription();
+                return partInUse.getDescription();
             case COL_IN_USE:
-                return FORMATTER.format(piu.getUseCount());
+                return FORMATTER.format(partInUse.getUseCount());
             case COL_STORED:
-                return (piu.getStoreCount() > 0) ? FORMATTER.format(piu.getStoreCount()) : EMPTY_CELL;
+                return (partInUse.getStoreCount() > 0) ? FORMATTER.format(partInUse.getStoreCount()) : EMPTY_CELL;
             case COL_TONNAGE:
-                return (piu.getStoreTonnage() > 0) ? FORMATTER.format(piu.getStoreTonnage()) : EMPTY_CELL;
+                return (partInUse.getStoreTonnage() > 0) ? FORMATTER.format(partInUse.getStoreTonnage()) : EMPTY_CELL;
             case COL_IN_TRANSFER:
-                if (piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0) {
-                    return FORMATTER.format(piu.getTransferCount());
-                } else if (piu.getPlannedCount() > 0) {
+                if (partInUse.getTransferCount() > 0 && partInUse.getPlannedCount() <= 0) {
+                    return FORMATTER.format(partInUse.getTransferCount());
+                } else if (partInUse.getPlannedCount() > 0) {
                     return String.format("%s [+%s]",
-                            FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
+                            FORMATTER.format(partInUse.getTransferCount()), FORMATTER.format(partInUse.getPlannedCount()));
                 } else {
                     return EMPTY_CELL;
                 }
             case COL_COST:
-                return piu.getCost().toAmountAndSymbolString();
+                return partInUse.getCost().toAmountAndSymbolString();
             case COL_BUTTON_BUY:
                 return resourceMap.getString("buy.text");
             case COL_BUTTON_BUY_BULK:
@@ -136,6 +140,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 return resourceMap.getString("add.text");
             case COL_BUTTON_GMADD_BULK:
                 return resourceMap.getString("addInBulk.text");
+            case COL_REQUSTED_STOCK:
+                return partInUse.getRequestedStock() + "%";
             default:
                 return EMPTY_CELL;
         }
@@ -155,6 +161,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_BUTTON_SELL_BULK:
             case COL_BUTTON_GMADD:
             case COL_BUTTON_GMADD_BULK:
+            case COL_REQUSTED_STOCK:
                 return true;
             default:
                 return false;
@@ -166,8 +173,8 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     @SuppressWarnings("unchecked")
-    public void updateRow(int row, PartInUse piu) {
-        ((ArrayList<PartInUse>) data).set(row, piu);
+    public void updateRow(int row, PartInUse partInUse) {
+        ((ArrayList<PartInUse>) data).set(row, partInUse);
         fireTableRowsUpdated(row, row);
     }
 
@@ -192,6 +199,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_TONNAGE:
             case COL_IN_TRANSFER:
             case COL_COST:
+            case COL_REQUSTED_STOCK:
                 return SwingConstants.RIGHT;
             default:
                 return SwingConstants.CENTER;
@@ -206,6 +214,7 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_BUTTON_BUY, COL_BUTTON_SELL -> 25;
             case COL_BUTTON_GMADD -> 65;
             case COL_BUTTON_BUY_BULK, COL_BUTTON_SELL_BULK -> 65;
+            case COL_REQUSTED_STOCK -> 45;
             default -> 100;
         };
     }
@@ -400,4 +409,24 @@ public class PartsInUseTableModel extends DataTableModel {
             return renderButton;
         }
     }
+
+    @Override
+    public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        if (columnIndex == COL_REQUSTED_STOCK) {
+            try {
+                //Quick String parsing here, we ignore anything that isn't a number or a . so that a user can input a % symbol or not, it's added regardless
+                double newVal = Double.parseDouble(value.toString().replaceAll("[^0-9.]", ""));
+                PartInUse partInUse = getPartInUse(rowIndex);
+                if (partInUse != null) {
+                    partInUse.setRequestedStock(newVal);
+                    fireTableCellUpdated(rowIndex, columnIndex);
+                }
+            } catch (NumberFormatException e) {
+                
+            }
+        } else {
+            super.setValueAt(value, rowIndex, columnIndex);
+        }
+    }
+
 }

@@ -57,7 +57,7 @@ public abstract class AbstractFactionSelector {
      * @param campaign The {@link Campaign} within which this {@link Faction} exists.
      * @return A {@link Faction} selected for {@code campaign}.
      */
-    public abstract @Nullable Faction selectFaction(final Campaign campaign);
+    public abstract @Nullable Faction selectFaction(Campaign campaign);
 
     /**
      * Clears any cache associated with faction selection.

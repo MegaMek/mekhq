@@ -33,7 +33,6 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
@@ -42,6 +41,8 @@ import mekhq.campaign.universe.Planet;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 
 /**
  * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the
@@ -193,43 +194,84 @@ public abstract class AbstractProcreation {
                                          final boolean randomProcreation) {
         if (person.getGender().isMale()) {
             return resources.getString("cannotProcreate.Gender.text");
-        } else if (!person.isTryingToConceive()) {
+        }
+
+        if (!person.isTryingToConceive()) {
             return resources.getString("cannotProcreate.NotTryingForABaby.text");
-        } else if (person.isPregnant()) {
+        }
+
+        if (person.isPregnant()) {
             return resources.getString("cannotProcreate.AlreadyPregnant.text");
-        } else if (!person.getStatus().isActive()) {
+        }
+
+        if (!person.getStatus().isActive()) {
             return resources.getString("cannotProcreate.Inactive.text");
-        } else if (person.isDeployed()) {
+        }
+
+        if (person.isDeployed()) {
             return resources.getString("cannotProcreate.Deployed.text");
-        } else if (person.isChild(today)) {
+        }
+
+        // Not allowing under-18s to procreate is project policy
+        if (person.isChild(today, true)) {
             return resources.getString("cannotProcreate.Child.text");
-        } else if (person.getAge(today) >= 51) {
+        }
+
+        if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
+        }
+
+        if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
             return resources.getString("cannotProcreate.ClanPersonnel.text");
-        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
+        }
+
+        if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotProcreate.Prisoner.text");
-        } else if (randomProcreation) {
+        }
+
+        if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
                 return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
+            }
+
+            if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanPersonnel.text");
-            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
+            }
+
+            if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
-            } else if (person.getGenealogy().hasSpouse()) {
+            }
+
+            if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
                     return resources.getString("cannotProcreate.FemaleSpouse.text");
-                } else if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
+                }
+
+                if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
                     return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
-                } else if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
+                }
+
+                if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
                     return resources.getString("cannotProcreate.InactiveSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isDeployed()) {
+                }
+
+                if (person.getGenealogy().getSpouse().isDeployed()) {
                     return resources.getString("cannotProcreate.DeployedSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isChild(today)) {
+                }
+
+                // Not allowing under-18s to procreate is project policy
+                // This conditional shouldn't be relevant in 2025, due to changes made in 2024.
+                // However, we're keeping it as we don't want campaigns from pre-policy
+                // implementation being able to circumnavigate project policy.
+                if (person.getGenealogy().getSpouse().isChild(today, true)) {
                     return resources.getString("cannotProcreate.ChildSpouse.text");
-                } else if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
+                }
+
+                if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                     return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
-                } else if (!isUseRandomPrisonerProcreation()
+                }
+
+                if (!isUseRandomPrisonerProcreation()
                         && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                     return resources.getString("cannotProcreate.PrisonerSpouse.text");
                 }
@@ -369,9 +411,7 @@ public abstract class AbstractProcreation {
             campaign.recruitPerson(baby, prisonerStatus, true, true);
 
             // if the mother is at school, add the baby to the list of tag alongs
-            if ((mother.getEduAcademyName() != null)
-                    && (!EducationController.getAcademy(mother.getEduAcademySet(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
-
+            if (mother.getStatus().isStudent()) {
                 mother.addEduTagAlong(baby.getId());
                 baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
             }
@@ -391,6 +431,11 @@ public abstract class AbstractProcreation {
 
         // Cleanup Data
         removePregnancy(mother);
+
+        // Return from Maternity leave
+        if (mother.getStatus().isOnMaternityLeave()) {
+            mother.changeStatus(campaign, today, PersonnelStatus.ACTIVE);
+        }
     }
 
     /**
@@ -466,11 +511,7 @@ public abstract class AbstractProcreation {
             baby.setLoyalty(Compute.d6(3) + 2);
 
             // set education based on age
-            if(baby.getAge(today) < 16) {
-                baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-            } else {
-                baby.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-            }
+            setInitialEducationLevel(campaign, baby);
 
             // Create reports and log the birth
             logAndUpdateFamily(campaign, today, mother, baby, father);
@@ -558,7 +599,17 @@ public abstract class AbstractProcreation {
             // They give birth if the due date has passed
             if ((today.isAfter(person.getDueDate())) || (today.isEqual(person.getDueDate()))) {
                 birth(campaign, today, person);
+
+                return;
             }
+
+            if (campaign.getCampaignOptions().isUseMaternityLeave()) {
+                if (person.getStatus().isActive()
+                    && (person.getDueDate().minusWeeks(20).isAfter(today.minusDays(1)))) {
+                    person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);
+                }
+            }
+
             return;
         }
 
@@ -602,5 +653,5 @@ public abstract class AbstractProcreation {
      * @param person the person to determine for
      * @return true if they do, otherwise false
      */
-    protected abstract boolean procreation(final Person person);
+    protected abstract boolean procreation(Person person);
 }

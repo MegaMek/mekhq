@@ -85,7 +85,7 @@ public abstract class EquipmentUnscrambler {
 
     protected abstract List<UnscrambleStep> createSteps();
 
-    protected abstract @Nullable String createReport(final EquipmentProposal proposal);
+    protected abstract @Nullable String createReport(EquipmentProposal proposal);
 
     public static EquipmentUnscrambler create(final Unit unit) {
         Objects.requireNonNull(unit, "Unit must not be null");

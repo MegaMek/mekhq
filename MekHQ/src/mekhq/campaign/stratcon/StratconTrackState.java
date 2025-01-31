@@ -282,6 +282,19 @@ public class StratconTrackState {
     }
 
     /**
+     * Handles the unassignment of a force from this track.
+     */
+    public void unassignUnit(int forceID) {
+        if (assignedForceCoords.containsKey(forceID)) {
+            assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
+            assignedForceCoords.remove(forceID);
+            assignedForceReturnDates.remove(forceID);
+            removeStickyForce(forceID);
+            getAssignedForceReturnDatesForStorage().remove(forceID);
+        }
+    }
+
+    /**
      * Restores the look up table of force IDs to return dates
      */
     public void restoreReturnDates() {
@@ -439,6 +452,26 @@ public class StratconTrackState {
      */
     public boolean hasActiveTrackReveal() {
         return getFacilities().values().stream().anyMatch(StratconFacility::getRevealTrack);
+    }
+
+    /**
+     * Determines the number of facilities on this track that actively reveal the track.
+     *
+     * <p>This method iterates through all facilities associated with the track and counts
+     * how many of them have the ability to reveal the track, as determined by the facility's
+     * {@link StratconFacility#getIncreaseScanRange()} method.</p>
+     *
+     * @return an integer representing the total number of facilities on this track
+     *         that are actively revealing it.
+     */
+    public int getScanRangeIncrease() {
+        int scanRange = 0;
+        for (StratconFacility facility : getFacilities().values()) {
+            if (facility.getIncreaseScanRange()) {
+                scanRange++;
+            }
+        }
+        return scanRange;
     }
 
     /**

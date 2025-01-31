@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Close Air Support</name>
     <shortBriefing>Provide air support, minimize losses.</shortBriefing>
-    <detailedBriefing>Provide air support to allied ground forces under heavy attack. Prioritize minimizing casualties while neutralizing enemy units. Expect anti-air defenses. Success depends on keeping at least 50% of allies alive and destroying half of the enemy force.</detailedBriefing>
+    <detailedBriefing>Provide air support to allied ground forces under heavy attack. Prioritize minimizing casualties while neutralizing enemy units. Success depends on keeping at least 50% of allies alive and destroying half of the enemy force.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>

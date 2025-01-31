@@ -33,21 +33,21 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
-import mekhq.campaign.Kill;
-import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.autoresolve.AutoResolveMethod;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.StrategicFormation;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -61,12 +61,14 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -385,7 +387,16 @@ public final class BriefingTab extends CampaignGuiTab {
         int xpAward = getMissionXpAward(cmd.getStatus(), mission);
 
         if (xpAward > 0) {
+            LocalDate today = getCampaign().getLocalDate();
             for (Person person : getCampaign().getActivePersonnel()) {
+                if (person.isChild(today)) {
+                    continue;
+                }
+
+                if (person.isDependent()) {
+                    continue;
+                }
+
                 person.awardXP(getCampaign(), xpAward);
             }
         }
@@ -477,10 +488,8 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // resolve bonus parts exchange
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
-            bonusPartExchange((AtBContract) mission);
         }
 
         // prompt autoAwards ceremony
@@ -493,7 +502,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
         }
 
-        // prompt enemy prisoner ransom & freeing
+        // prompt enemy prisoner ransom and freeing
         // this should always be placed after autoAwards, so that prisoners are not
         // factored into autoAwards
         if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
@@ -620,37 +629,6 @@ public final class BriefingTab extends CampaignGuiTab {
         };
     }
 
-    /**
-     * Credits the campaign finances with additional funds based on campaign
-     * settings and remaining Bonus Parts.
-     *
-     * @param mission the mission just concluded
-     */
-    private void bonusPartExchange(AtBContract mission) {
-        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale());
-
-        double bonusPartExchangeValue = getCampaign().getCampaignOptions().getBonusPartExchangeValue();
-
-        if (bonusPartExchangeValue != 0.0) {
-            int bonusPartMaxExchangeCount = getCampaign().getCampaignOptions().getBonusPartMaxExchangeCount();
-
-            int spareBonusParts = mission.getNumBonusParts();
-
-            if (bonusPartMaxExchangeCount != 0) {
-                spareBonusParts = Math.min(bonusPartMaxExchangeCount, spareBonusParts);
-            }
-
-            bonusPartExchangeValue *= spareBonusParts;
-
-            getCampaign().getFinances().credit(
-                    TransactionType.BONUS_EXCHANGE,
-                    getCampaign().getLocalDate(),
-                    Money.of(bonusPartExchangeValue),
-                    resourceMap.getString("spareBonusPartExchange.text"));
-        }
-    }
-
     private void deleteMission() {
         final Mission mission = comboMission.getSelectedItem();
         if (mission == null) {
@@ -700,83 +678,29 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void clearAssignedUnits() {
-        if (0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove all units from this scenario?",
+        if (0 == JOptionPane.showConfirmDialog(null,
+            "Do you really want to remove all units from this scenario?",
                 "Clear Units?", JOptionPane.YES_NO_OPTION)) {
             int row = scenarioTable.getSelectedRow();
             Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-            if (null == scenario) {
+
+            if (scenario == null) {
                 return;
             }
+
+            // This handles StratCon undeployment
+            if (scenario instanceof AtBScenario) {
+                StratconScenario stratConScenario = ((AtBScenario) scenario).getStratconScenario(getCampaign());
+
+                if (stratConScenario != null) {
+                    stratConScenario.resetScenario(getCampaign());
+                    return;
+                }
+            }
+
+            // This handles Legacy AtB undeployment
             scenario.clearAllForcesAndPersonnel(getCampaign());
         }
-    }
-
-    private void resolveScenario() {
-        int row = scenarioTable.getSelectedRow();
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        if (null == scenario) {
-            return;
-        }
-        boolean control = JOptionPane.showConfirmDialog(getFrame(),
-                "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
-        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
-        chooseFilesDialog.setVisible(true);
-        if (chooseFilesDialog.wasCancelled()) {
-            return;
-        }
-        // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
-        resolveDialog.setVisible(true);
-
-        if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            RetirementDefectionDialog dialog = new RetirementDefectionDialog(getCampaignGui(),
-                    getCampaign().getMission(scenario.getMissionId()), false);
-
-            if (!dialog.wasAborted()) {
-                getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
-            }
-        }
-
-        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-            HashMap<UUID, Integer> personnel = new HashMap<>();
-            HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-                PersonStatus status = tracker.getPeopleStatus().get(personId);
-                int injuryCount = 0;
-
-                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                    if (status.getHits() > person.getHitsPrior()) {
-                        injuryCount = status.getHits() - person.getHitsPrior();
-                    }
-                }
-
-                personnel.put(personId, injuryCount);
-                scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
-            }
-
-            boolean isCivilianHelp = false;
-
-            if (tracker.getScenario() instanceof AtBScenario) {
-                isCivilianHelp = ((AtBScenario) tracker.getScenario()).getScenarioType() == AtBScenario.CIVILIANHELP;
-            }
-
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
-        }
-
-        for (UUID personId : tracker.getPeopleStatus().keySet()) {
-            Person person = getCampaign().getPerson(personId);
-
-            if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.POW);
-            }
-        }
-
-        MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
     }
 
     private void printRecordSheets() {
@@ -852,8 +776,100 @@ public final class BriefingTab extends CampaignGuiTab {
         startScenario(null);
     }
 
+
+    /**
+     * Resolve the selected scenario by proving a MUL file
+     */
+    private void resolveScenario() {
+        Scenario scenario = getSelectedScenario();
+        if (null == scenario) {
+            return;
+        }
+        getCampaign().getApp().resolveScenario(scenario);
+    }
+
+    /**
+     * Auto-resolve the selected scenario.
+     * Can run both the auto resolve using princess or using the ACS engine
+     */
     private void autoResolveScenario() {
+        Scenario scenario = getSelectedScenario();
+        if (null == scenario) {
+            return;
+        }
+        promptAutoResolve(scenario);
+    }
+
+    private void runAbstractCombatAutoResolve(Scenario scenario) {
+        List<Unit> chosen = playerUnits(scenario, new StringBuilder());
+        if (chosen.isEmpty()) {
+            return;
+        }
+        getCampaign().getApp().startAutoResolve((AtBScenario) scenario, chosen);
+    }
+
+    private void runPrincessAutoResolve() {
         startScenario(getCampaign().getAutoResolveBehaviorSettings());
+    }
+
+    private void promptAutoResolve(Scenario scenario) {
+        // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum
+        // and it uses that to preselect the option that is currently set in the campaign options
+        Object[] options = new Object[]{
+            MHQInternationalization.getText("AutoResolveMethod.PRINCESS.text"),
+            MHQInternationalization.getText("AutoResolveMethod.ABSTRACT_COMBAT.text"),
+        };
+
+        var preSelectedOptionIndex = getCampaignOptions().getAutoResolveMethod().ordinal();
+
+        var selectedOption = JOptionPane.showOptionDialog(getFrame(),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.text"),
+            MHQInternationalization.getText("AutoResolveMethod.promptForAutoResolveMethod.title"),
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[preSelectedOptionIndex]);
+
+        if (selectedOption == JOptionPane.CLOSED_OPTION) {
+            return;
+        }
+
+        var autoResolveMethod = AutoResolveMethod.values()[selectedOption];
+
+        if (autoResolveMethod == AutoResolveMethod.PRINCESS) {
+            runPrincessAutoResolve();
+        } else if (autoResolveMethod == AutoResolveMethod.ABSTRACT_COMBAT) {
+            runAbstractCombatAutoResolve(scenario);
+        }
+    }
+
+
+    private List<Unit> playerUnits(Scenario scenario, StringBuilder undeployed) {
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
+        if (uids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Unit> chosen = new ArrayList<>();
+        for (UUID uid : uids) {
+            Unit u = getCampaign().getUnit(uid);
+
+            if ((null != u) && (null != u.getEntity())) {
+                if (null == u.checkDeployment()) {
+                    // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+                    chosen.add(u);
+                } else {
+                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
+                }
+            }
+        }
+        return chosen;
+    }
+
+    private Scenario getSelectedScenario() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
     private void startScenario(BehaviorSettings autoResolveBehaviorSettings) {
@@ -908,11 +924,12 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
         if ((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
-            StrategicFormation assignedLance = ((AtBScenario) scenario).getStrategicFormation(getCampaign());
-            if (assignedLance != null) {
-                int assignedForceId = assignedLance.getForceId();
+
+            CombatTeam combatTeam = ((AtBScenario) scenario).getCombatTeamById(getCampaign());
+            if (combatTeam != null) {
+                int assignedForceId = combatTeam.getForceId();
                 int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(StrategicFormation.findCommander(assignedForceId, getCampaign()));
+                Person commander = getCampaign().getPerson(CombatTeam.findCommander(assignedForceId, getCampaign()));
                 if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
@@ -1281,14 +1298,26 @@ public final class BriefingTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
         final boolean canStartGame = scenario.canStartScenario(getCampaign());
+
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
         btnLoadGame.setEnabled(canStartGame);
         btnGetMul.setEnabled(canStartGame);
-        btnClearAssignedUnits.setEnabled(canStartGame);
+
+        final boolean hasTrack = scenario.getHasTrack();
+        if (hasTrack) {
+            btnClearAssignedUnits.setEnabled(canStartGame && getCampaign().isGM());
+        } else {
+            btnClearAssignedUnits.setEnabled(canStartGame);
+        }
+
         btnResolveScenario.setEnabled(canStartGame);
-        btnAutoResolveScenario.setEnabled(canStartGame);
+        if (scenario instanceof AtBScenario) {
+            btnAutoResolveScenario.setEnabled(canStartGame);
+        }
         btnPrintRS.setEnabled(canStartGame);
+
+        
     }
 
     public void refreshLanceAssignments() {

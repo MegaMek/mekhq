@@ -109,58 +109,6 @@ public enum Greed {
 
     // region File I/O
     /**
-     * Parses a given string and returns the corresponding Greed enum.
-     * Accepts either the ENUM ordinal value, or its name
-     *
-     * @param greed the string to be parsed
-     * @return the Greed enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               Greed
-     */
-    @Deprecated
-    public static Greed parseFromString(final String greed) {
-        return switch (greed) {
-            case "0", "None" -> NONE;
-            // Minor Characteristics
-            case "1", "Astute" -> ASTUTE;
-            case "2", "Adept" -> ADEPT;
-            case "3", "Avaricious" -> AVARICIOUS;
-            case "4", "Dynamic" -> DYNAMIC;
-            case "5", "Eager" -> EAGER;
-            case "6", "Exploitative" -> EXPLOITATIVE;
-            case "7", "Fraudulent" -> FRAUDULENT;
-            case "8", "Generous" -> GENEROUS;
-            case "9", "Greedy" -> GREEDY;
-            case "10", "Hoarding" -> HOARDING;
-            case "11", "Insatiable" -> INSATIABLE;
-            case "12", "Insightful" -> INSIGHTFUL;
-            case "13", "Judicious" -> JUDICIOUS;
-            case "14", "Lustful" -> LUSTFUL;
-            case "15", "Mercenary" -> MERCENARY;
-            case "16", "Overreaching" -> OVERREACHING;
-            case "17", "Profitable" -> PROFITABLE;
-            case "18", "Savvy" -> SAVVY;
-            case "19", "Self-Serving" -> SELF_SERVING;
-            case "20", "Shameless" -> SHAMELESS;
-            case "21", "Shrewd" -> SHREWD;
-            case "22", "Tactical" -> TACTICAL;
-            case "23", "Unprincipled" -> UNPRINCIPLED;
-            case "24", "Voracious" -> VORACIOUS;
-            // Major Characteristics
-            case "25", "Corrupt" -> CORRUPT;
-            case "26", "Enterprising" -> ENTERPRISING;
-            case "27", "Intuitive" -> INTUITIVE;
-            case "28", "Meticulous" -> METICULOUS;
-            case "29", "Nefarious" -> NEFARIOUS;
-            case "30", "Thief" -> THIEF;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromString: "
-                                + greed);
-        };
-    }
-
-    /**
      * Returns the {@link Greed} associated with the given ordinal.
      *
      * @param ordinal the ordinal value of the {@link Greed}
@@ -168,13 +116,11 @@ public enum Greed {
      * {@code NONE} if not found
      */
     public static Greed fromOrdinal(int ordinal) {
-        for (Greed greed : values()) {
-            if (greed.ordinal() == ordinal) {
-                return greed;
-            }
+        if ((ordinal >= 0) && (ordinal < values().length)) {
+            return values()[ordinal];
         }
 
-        final MMLogger logger = MMLogger.create(Greed.class);
+        MMLogger logger = MMLogger.create(Greed.class);
         logger.error(String.format("Unknown Greed ordinal: %s - returning NONE.", ordinal));
 
         return NONE;
