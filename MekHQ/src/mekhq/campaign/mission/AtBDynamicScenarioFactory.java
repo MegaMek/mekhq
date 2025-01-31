@@ -1855,7 +1855,11 @@ public class AtBDynamicScenarioFactory {
      * @param rolesByType a collection of mission roles to evaluate.
      * @return {@code true} if any role in {@code rolesByType} matches one of the predefined bypassed roles.
      */
-    private static boolean shouldBypassWeightClass(Collection<MissionRole> rolesByType) {
+    private static boolean shouldBypassWeightClass(@Nullable Collection<MissionRole> rolesByType) {
+        if (rolesByType == null) {
+            return false;
+        }
+
         // These roles were picked as their pool is relatively small, or they are exclusive in nature.
         // This ensures we have a greater chance of successfully pulling an appropriate unit.
         List<MissionRole> bypassedRoles = List.of(CIVILIAN, SUPPORT, ARTILLERY, MISSILE_ARTILLERY,
