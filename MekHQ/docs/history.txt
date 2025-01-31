@@ -150,6 +150,10 @@ MEKHQ VERSION HISTORY:
 + Fix #5910: Added Fallback for AtB Bonus Unit Creation
 + PR #5912: Implemented NewsDialog for Immersive News Display
 + PR #5915: Update scenario panel facility objective text
++ PR #5925: Fixed Unit Role configuration in Resupply Scenario Templates
++ Fix #5934: Fixed Contract Multiplier Again
++ PR #5941: Corrected Weight Class Parameter Setting Logic
++ PR #5942: Renamed 'Fixed BV' to 'BV' in BotForce Scenario Details
 
 
 0.50.02 (2024-12-30 2130 UTC)
