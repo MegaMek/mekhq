@@ -9,6 +9,7 @@ import mekhq.gui.baseComponents.MHQDialogImmersive;
 import java.util.ArrayList;
 import java.util.List;
 
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -67,7 +68,8 @@ public class MissionEndPrisonerDialog extends MHQDialogImmersive {
         String key = "prisoners."
             + (isAllied ? "player" : "enemy") + '.'
             + (isSuccess ? "victory" : "defeat") + '.'
-            + (isGoodEvent ? "good" : "bad");
+            + (isGoodEvent ? "good" : "bad") + '.'
+            + randomInt(50);
 
         String commanderAddress = campaign.getCommanderAddress(false);
         return getFormattedTextAt(RESOURCE_BUNDLE, key,
