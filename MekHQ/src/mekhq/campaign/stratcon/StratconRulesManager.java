@@ -498,8 +498,7 @@ public class StratconRulesManager {
         finalizeBackingScenario(campaign, contract, track, true, scenario);
         scenario.setActionDate(campaign.getLocalDate());
         scenario.getBackingScenario().setStatus(ScenarioStatus.CURRENT);
-        scenario.getBackingScenario().setLinkedScenarioID(linkedScenario.getBackingScenario().getId());
-        linkedScenario.getBackingScenario().setLinkedScenarioID(scenario.getBackingScenario().getId());
+        scenario.getBackingScenario().setlinkedScenarioID(linkedScenario.getBackingScenario().getId());
     }
 
     /**
