@@ -173,7 +173,7 @@ public class CapturePrisoners {
         }
 
         if (isClan) {
-            potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.POW);
+            potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ENEMY_BONDSMAN);
             return;
         }
 

@@ -6,6 +6,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.gui.dialog.MissionEndPrisonerDefectorDialog;
 import mekhq.gui.dialog.MissionEndPrisonerDialog;
 
 import java.time.LocalDate;
@@ -27,8 +28,8 @@ public class PrisonerMissionEndEvent {
 
     private final Campaign campaign;
     private final AtBContract contract;
-    private final boolean isSuccess;
-    private final boolean isAllied;
+    private boolean isSuccess;
+    private boolean isAllied;
 
     private final int GOOD_EVENT_CHANCE = 20;
 
@@ -36,16 +37,20 @@ public class PrisonerMissionEndEvent {
     private final int CHOICE_RELEASE_THEM = 1;
     private final int CHOICE_EXECUTE_THEM = 2;
 
-    public PrisonerMissionEndEvent(Campaign campaign, AtBContract contract, boolean isSuccess, boolean isAllied) {
+    public PrisonerMissionEndEvent(Campaign campaign, AtBContract contract) {
         this.campaign = campaign;
         this.contract = contract;
-        this.isSuccess = isSuccess;
-        this.isAllied = isAllied;
-
-        handlePrisoners();
     }
 
-    public void handlePrisoners() {
+    public int handlePrisonerDefectors() {
+        MissionEndPrisonerDefectorDialog dialog = new MissionEndPrisonerDefectorDialog(campaign);
+        return dialog.getDialogChoice();
+    }
+
+    public void handlePrisoners(boolean isSuccess, boolean isAllied) {
+        this.isAllied = isAllied;
+        this.isSuccess = isSuccess;
+
         List<Person> prisoners = isAllied ? campaign.getFriendlyPrisoners() : campaign.getCurrentPrisoners();
         Money ransom = getRansom(prisoners);
         boolean isGoodEvent = determineGoodEvent(isAllied);

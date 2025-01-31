@@ -2323,6 +2323,17 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Provides a filtered list of personnel including only active prisoners who are willing to defect.
+     *
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getPrisonerDefectors() {
+        return getActivePersonnel().stream()
+            .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only friendly PoWs.
      *
      * @return a {@link Person} <code>List</code> containing all active personnel

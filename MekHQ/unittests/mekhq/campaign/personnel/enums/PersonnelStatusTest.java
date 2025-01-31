@@ -18,16 +18,15 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import mekhq.MekHQ;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.junit.jupiter.api.Test;
-
-import mekhq.MekHQ;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PersonnelStatusTest {
     // region Variable Declarations
@@ -93,6 +92,17 @@ class PersonnelStatusTest {
                 assertTrue(personnelStatus.isPoW());
             } else {
                 assertFalse(personnelStatus.isPoW());
+            }
+        }
+    }
+
+    @Test
+    void testIsEnemyBondsman() {
+        for (final PersonnelStatus personnelStatus : statuses) {
+            if (personnelStatus == PersonnelStatus.ENEMY_BONDSMAN) {
+                assertTrue(personnelStatus.isEnemyBondsman());
+            } else {
+                assertFalse(personnelStatus.isEnemyBondsman());
             }
         }
     }
@@ -290,6 +300,7 @@ class PersonnelStatusTest {
             switch (personnelStatus) {
                 case MIA:
                 case POW:
+                case ENEMY_BONDSMAN:
                 case ON_LEAVE:
                 case STUDENT:
                 case MISSING:
@@ -394,9 +405,10 @@ class PersonnelStatusTest {
         assertEquals(PersonnelStatus.SUICIDE, PersonnelStatus.parseFromString("21"));
         assertEquals(PersonnelStatus.SACKED, PersonnelStatus.parseFromString("22"));
         assertEquals(PersonnelStatus.ON_MATERNITY_LEAVE, PersonnelStatus.parseFromString("23"));
+        assertEquals(PersonnelStatus.ENEMY_BONDSMAN, PersonnelStatus.parseFromString("24"));
 
         // Error Case
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("24"));
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("25"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
     // endregion File I/O

@@ -73,6 +73,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
+import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 
 /**
@@ -374,6 +375,15 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
+        PrisonerMissionEndEvent prisoners = null;
+        if (mission instanceof AtBContract) {
+            prisoners = new PrisonerMissionEndEvent(getCampaign(), (AtBContract) mission);
+
+            if (!getCampaign().getPrisonerDefectors().isEmpty() && prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
+                return;
+            }
+        }
+
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
@@ -401,18 +411,15 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        // resolve friendly PoW ransoming
-        // this needs to be before turnover and autoAwards so friendly PoWs can be
-        // factored into those events
         if (mission instanceof AtBContract) {
+            boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
+
             if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
-                new PrisonerMissionEndEvent(getCampaign(), (AtBContract) mission,
-                    cmd.getStatus() == SUCCESS, true);
+                prisoners.handlePrisoners(wasOverallSuccess, true);
             }
 
             if (!getCampaign().getCurrentPrisoners().isEmpty()) {
-                new PrisonerMissionEndEvent(getCampaign(), (AtBContract) mission,
-                    cmd.getStatus() == SUCCESS, false);
+                prisoners.handlePrisoners(wasOverallSuccess, false);
             }
         }
 

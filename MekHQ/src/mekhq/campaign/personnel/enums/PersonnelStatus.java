@@ -80,7 +80,9 @@ public enum PersonnelStatus {
     UNDETERMINED("PersonnelStatus.UNDETERMINED.text", "PersonnelStatus.UNDETERMINED.toolTipText",
             "PersonnelStatus.UNDETERMINED.reportText", "PersonnelStatus.UNDETERMINED.logText"),
     SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText",
-        "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText");
+        "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText"),
+    ENEMY_BONDSMAN("PersonnelStatus.ENEMY_BONDSMAN.text", "PersonnelStatus.ENEMY_BONDSMAN.toolTipText",
+                     "PersonnelStatus.ENEMY_BONDSMAN.reportText", "PersonnelStatus.ENEMY_BONDSMAN.logText"),;
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -391,11 +393,22 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@code ENEMY_BONDSMAN} personnel status.
+     *
+     * @return {@code true} if the character has the {@code ENEMY_BONDS} personnel status {@code false}
+     * otherwise.
+     */
+    public boolean isEnemyBondsman() {
+        return this == ENEMY_BONDSMAN;
+    }
+
+    /**
      * @return {@code true} if a person is currently absent from the core force, otherwise
      *         {@code false}
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isOnMaternityLeave() || isAwol() || isStudent() || isMissing();
+        return isMIA() || isPoW() || isEnemyBondsman() || isOnLeave() || isOnMaternityLeave()
+            || isAwol() || isStudent() || isMissing();
     }
 
     /**
@@ -403,7 +416,7 @@ public enum PersonnelStatus {
      */
     public boolean isDepartedUnit() {
         return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected() || isMissing()
-                || isLeft();
+                || isLeft() || isEnemyBondsman();
     }
 
     /**
@@ -494,6 +507,8 @@ public enum PersonnelStatus {
                     return SACKED;
                 case 23:
                     return ON_MATERNITY_LEAVE;
+                case 24:
+                    return ENEMY_BONDSMAN;
                 default:
                     break;
             }
