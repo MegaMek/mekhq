@@ -26,11 +26,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 
 /**
@@ -79,6 +78,8 @@ public class SelectPresetDialog extends JDialog {
      */
     public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
         super(frame, resources.getString("presetDialog.title"), true);
+        final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
+        final int INSERT_SIZE = UIUtil.scaleForGUI(10);
         returnState = PRESET_SELECTION_CANCELLED;
 
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -101,9 +102,7 @@ public class SelectPresetDialog extends JDialog {
 
         JLabel descriptionLabel = new JLabel(String.format(
             "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
-            UIUtil.scaleForGUI(400),
-            resources.getString("presetDialog.description")));
-        setFontScaling(descriptionLabel, false, 1);
+            DIALOG_WIDTH, resources.getString("presetDialog.description")));
 
         final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());
@@ -122,7 +121,6 @@ public class SelectPresetDialog extends JDialog {
                                                           boolean cellHasFocus) {
                 if (value instanceof CampaignPreset preset) {
                     setText(preset.getTitle());
-                    setToolTipText(wordWrap(preset.getDescription()));
                 }
 
                 setHorizontalAlignment(JLabel.CENTER);
@@ -136,6 +134,7 @@ public class SelectPresetDialog extends JDialog {
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(descriptionLabel)
+                .addPreferredGap(ComponentPlacement.UNRELATED, INSERT_SIZE, INSERT_SIZE)
                 .addComponent(comboBox)
         );
 
@@ -148,9 +147,55 @@ public class SelectPresetDialog extends JDialog {
         JPanel outerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.CENTER;
-        outerPanel.add(centerPanel,gbc);
+
+        // Add padding/margin to outerPanel layout using an empty border
+        outerPanel.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE));
+        outerPanel.add(centerPanel, gbc);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setBorder(BorderFactory.createEtchedBorder());
+        JLabel newLabel = new JLabel();
+        newLabel.setHorizontalAlignment(JLabel.CENTER);
+        bottomPanel.add(newLabel);
+
+        // Add 10px gap between outerPanel and bottomPanel
+        gbc.gridy = 1;
+        gbc.insets = new Insets(10, 0, 0, 0);
+        outerPanel.add(bottomPanel, gbc);
+
+        comboBox.addActionListener(e -> {
+            Object selectedItem = comboBox.getSelectedItem();
+            if (selectedItem instanceof CampaignPreset preset) {
+                newLabel.setText(String.format(
+                    "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                    DIALOG_WIDTH * 0.9,
+                    preset.getDescription()));
+            } else {
+                newLabel.setText(String.format(
+                    "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                    DIALOG_WIDTH * 0.9,
+                    "No description available."));
+            }
+            revalidate();
+            repaint();
+        });
+
+        // Set the initial text in newLabel based on the currently selected item in comboBox
+        Object initialItem = comboBox.getSelectedItem();
+        if (initialItem instanceof CampaignPreset preset) {
+            newLabel.setText(String.format(
+                "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                DIALOG_WIDTH * 0.9,
+                preset.getDescription()));
+        } else {
+            newLabel.setText(String.format(
+                "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+                DIALOG_WIDTH * 0.9,
+                "No description available."));
+        }
 
         add(outerPanel, BorderLayout.CENTER);
+
         JPanel buttonPanel = new JPanel();
 
         JButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");

@@ -766,16 +766,27 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createTechModifiersPanel() {
         JLabel techLabel = new CampaignOptionsLabel("TechLabel");
-        techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Add the label
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        panel.add(techLabel, layout);
+
+        // Add the other elements
         for (int i = 0; i < 6; i++) {
             layout.gridx = 0;
-            layout.gridy = i;
+            layout.gridy = i + 1;
+            layout.gridwidth = 1;
+            layout.weightx = 0;
+            layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireTechBonus[i], layout);
+
             layout.gridx++;
             panel.add(spnPlanetAcquireTechBonus[i], layout);
         }
@@ -793,16 +804,27 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createIndustryModifiersPanel() {
         JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
-        industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Add the label
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        panel.add(industryLabel, layout);
+
+        // Add the other elements
         for (int i = 0; i < 6; i++) {
             layout.gridx = 0;
-            layout.gridy = i;
+            layout.gridy = i + 1;
+            layout.gridwidth = 1;
+            layout.weightx = 0;
+            layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireIndustryBonus[i], layout);
+
             layout.gridx++;
             panel.add(spnPlanetAcquireIndustryBonus[i], layout);
         }
@@ -819,16 +841,27 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createOutputModifiersPanel() {
         JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
-        outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        // Add the label
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        layout.weightx = 1.0;
+        panel.add(outputLabel, layout);
+
+        // Add the other elements
         for (int i = 0; i < 6; i++) {
             layout.gridx = 0;
-            layout.gridy = i;
+            layout.gridy = i + 1;
+            layout.gridwidth = 1;
+            layout.weightx = 0;
+            layout.anchor = GridBagConstraints.WEST;
             panel.add(lblPlanetAcquireOutputBonus[i], layout);
+
             layout.gridx++;
             panel.add(spnPlanetAcquireOutputBonus[i], layout);
         }
@@ -1046,8 +1079,6 @@ public class EquipmentAndSuppliesTab {
         options.setAutoLogisticsHeatSink((int) spnAutoLogisticsHeatSink.getValue());
         options.setAutoLogisticsOther((int) spnAutoLogisticsOther.getValue());
 
-
-
         // Delivery
         options.setNDiceTransitTime((int) spnNDiceTransitTime.getValue());
         options.setConstantTransitTime((int) spnConstantTransitTime.getValue());
@@ -1062,7 +1093,7 @@ public class EquipmentAndSuppliesTab {
         options.setMaxJumpsPlanetaryAcquisition((int) spnMaxJumpPlanetaryAcquisitions.getValue());
         options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedItem());
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
-        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
+        options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPenaltyClanPartsFromIS((int) spnPenaltyClanPartsFromIS.getValue());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {

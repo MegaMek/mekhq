@@ -118,6 +118,48 @@ MEKHQ VERSION HISTORY:
 + PR #5847: Added Methods for Star Radius Estimation and Spectral Type Parsing
 + PR #5848: Fixed Parsing of routedPayout to Handle Non-Numeric Characters
 + PR #5850: Rebranded Idle XP into Vocational XP
++ Fix #5718: Added GM Option to Assign Random SPAs
++ Fix #5817: Fixed Force Updates after Removal in TOEMouseAdapter
++ Fix #5822: Updated Premade Presets for 50.03
++ Fix #5828: Restored Missing Kill Credits for DropShips and Turrets
++ PR #5854: Refactored Preset Dialog Chooser to Include Description
++ Fix #5857, #5862: Fixed Incorrect Tooltips in Campaign Options IIC
++ Fix #5860: Fixed Loading & Saving of Some Campaign Options
++ PR #5864: Remove Unnecessary Edge Trigger Logging
++ PR #5866: Temporarily Removed CamOps Contract Market
++ PR #5812: adding new GUI for Princess ACAR
++ PR #5870: Adjusted Randomness of Turning Points and Highlighted Them in Briefing Room
++ PR #5875: Rolled Back Window Size Setting
++ PR #5878: Fixed Mothball Info Saving & Loading Bug
++ PR #5879: Added Jackson Dependencies for YAML Processing in MekHQ
++ Fix #5799: Differentiating between IS & Clan DHS & unbreaking commas in Parts in use
++ Fix #5811: Fixed Multiple Follow-up Contract Bugs
++ Fix #5823: Added Weight Bypass Based on Role
++ Fix #5882: Fixed Clan Bidding
++ Fix #5883: Corrected Edge Cost Calculations
++ Fix #5884: Refactored Age Checks; Updated Unit Tests for Procreation and Marriage
++ Fix #5885: Corrected Morale Logic and Contract Type Checks
++ Fix #5886: Added Movement Filter to Entity Generation Logic
++ PR #5889: Replaced Internal Dissension Events in StratCon
++ PR #5891: Added 1,247 New Callsigns
++ PR #5893: Immersively Updated the Immersive Dialog to Be More Immersive
++ PR #5894: Added missing minimaps for MekHQ
++ PR #5900: Fixed Negative Contract Base Pay
++ PR #5874: Feature: minimap themes
++ PR #5908: Restored Missing Column Labels for Planetary Acquisition
++ Fix #5910: Added Fallback for AtB Bonus Unit Creation
++ PR #5912: Implemented NewsDialog for Immersive News Display
++ PR #5915: Update scenario panel facility objective text
++ PR #5925: Fixed Unit Role configuration in Resupply Scenario Templates
++ Fix #5934: Fixed Contract Multiplier Again
++ PR #5941: Corrected Weight Class Parameter Setting Logic
++ PR #5942: Renamed 'Fixed BV' to 'BV' in BotForce Scenario Details
++ Fix #5921: Fixed Used Parts Multiplier Labels to Ignore Quality Reversal in Finances Tab
++ Fix #5917: Added Soldier Requirements Handling in UnitTableModel
++ PR #5930: Format Part Names as Italicized when Brand New
++ PR #5933: Fixed Overwriting of 'Brand New' Part State
++ Fix #5685: More control settings for autoLogistics
+
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

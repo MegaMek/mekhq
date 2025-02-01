@@ -39,7 +39,8 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.unit.*;
+import mekhq.campaign.unit.HangarSorter;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -509,6 +510,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                     gui.getCampaign().removeForce(force);
                 }
+            }
+
+            // We cycle through all forces because we need to assess how the removal affected them,
+            // Even for truly huge campaigns this is still very cheap.
+            for (Force force : forces) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent(gui.getCampaign(), force));
             }
         } else if (command.contains(TOEMouseAdapter.REMOVE_LANCE_TECH)) {
             if (null != singleForce && singleForce.getTechID() != null) {
