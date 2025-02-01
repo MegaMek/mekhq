@@ -162,37 +162,84 @@ public abstract class AbstractProcreation {
                                          final boolean randomProcreation) {
         if (person.getGender().isMale()) {
             return resources.getString("cannotProcreate.Gender.text");
-        } else if (!person.isTryingToConceive()) {
+        }
+
+        if (!person.isTryingToConceive()) {
             return resources.getString("cannotProcreate.NotTryingForABaby.text");
-        } else if (person.isPregnant()) {
+        }
+
+        if (person.isPregnant()) {
             return resources.getString("cannotProcreate.AlreadyPregnant.text");
-        } else if (!person.getStatus().isActive()) {
+        }
+
+        if (!person.getStatus().isActive()) {
             return resources.getString("cannotProcreate.Inactive.text");
-        } else if (person.isDeployed()) {
+        }
+
+        if (person.isDeployed()) {
             return resources.getString("cannotProcreate.Deployed.text");
-        } else if (person.isChild(today)) {
+        }
+
+        // Not allowing under-18s to procreate is project policy
+        if (person.isChild(today, true)) {
             return resources.getString("cannotProcreate.Child.text");
-        } else if (person.getAge(today) >= 51) {
+        }
+
+        if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (randomProcreation) {
+        }
+
+        if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
+            return resources.getString("cannotProcreate.ClanPersonnel.text");
+        }
+
+        if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
+            return resources.getString("cannotProcreate.Prisoner.text");
+        }
+
+        if (randomProcreation) {
+            if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
+                return resources.getString("cannotProcreate.NoSpouse.text");
+            }
+
             if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanPersonnel.text");
-            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
+            }
+
+            if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
-            } else if (person.getGenealogy().hasSpouse()) {
+            }
+
+            if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
                     return resources.getString("cannotProcreate.FemaleSpouse.text");
-                } else if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
+                }
+
+                if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
                     return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
-                } else if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
+                }
+
+                if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
                     return resources.getString("cannotProcreate.InactiveSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isDeployed()) {
+                }
+
+                if (person.getGenealogy().getSpouse().isDeployed()) {
                     return resources.getString("cannotProcreate.DeployedSpouse.text");
-                } else if (person.getGenealogy().getSpouse().isChild(today)) {
+                }
+
+                // Not allowing under-18s to procreate is project policy
+                // This conditional shouldn't be relevant in 2025, due to changes made in 2024.
+                // However, we're keeping it as we don't want campaigns from pre-policy
+                // implementation being able to circumnavigate project policy.
+                if (person.getGenealogy().getSpouse().isChild(today, true)) {
                     return resources.getString("cannotProcreate.ChildSpouse.text");
-                } else if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
+                }
+
+                if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
                     return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
-                } else if (!isUseRandomPrisonerProcreation()
+                }
+
+                if (!isUseRandomPrisonerProcreation()
                         && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                     return resources.getString("cannotProcreate.PrisonerSpouse.text");
                 }

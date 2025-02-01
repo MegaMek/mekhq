@@ -72,129 +72,288 @@ public class AbstractMarriageTest {
     //endregion Getters/Setters
 
     @Test
-    void testCannotMarry_NotMarriageable() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        when(mockPerson.isMarriageable()).thenReturn(false);
+    public void testNotMarriageable() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, false);
+        when(person.isMarriageable()).thenReturn(false);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
         assertNotNull(result);
     }
 
     @Test
-    void testCannotMarry_AlreadyMarried() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        Genealogy mockGenealogy = mock(Genealogy.class);
-        when(mockPerson.isMarriageable()).thenReturn(true);
-        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
-        when(mockGenealogy.hasSpouse()).thenReturn(true);
+    public void testAlreadyMarried() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, false);
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(true);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
         assertNotNull(result);
     }
 
     @Test
-    void testCannotMarry_Inactive() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        PersonnelStatus inactiveStatus = mock(PersonnelStatus.class);
-        when(mockPerson.isMarriageable()).thenReturn(true);
-        when(mockPerson.getGenealogy()).thenReturn(mock(Genealogy.class));
-        when(inactiveStatus.isActive()).thenReturn(false);
-        when(mockPerson.getStatus()).thenReturn(inactiveStatus);
+    public void testInactiveStatus() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, false);
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.STUDENT);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
         assertNotNull(result);
     }
 
     @Test
-    void testCannotMarry_Deployed() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        PersonnelStatus activeStatus = mock(PersonnelStatus.class);
-        when(mockPerson.isMarriageable()).thenReturn(true);
-        when(mockPerson.getGenealogy()).thenReturn(mock(Genealogy.class));
-        when(activeStatus.isActive()).thenReturn(true);
-        when(mockPerson.getStatus()).thenReturn(activeStatus);
-        when(mockPerson.isDeployed()).thenReturn(true);
+    public void testDeployed() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, false);
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(true);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
         assertNotNull(result);
     }
 
     @Test
-    void testCannotMarry_TooYoung() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        PersonnelStatus activeStatus = mock(PersonnelStatus.class);
-        when(mockPerson.isMarriageable()).thenReturn(true);
-        when(mockPerson.getGenealogy()).thenReturn(mock(Genealogy.class));
-        when(activeStatus.isActive()).thenReturn(true);
-        when(mockPerson.getStatus()).thenReturn(activeStatus);
-        when(mockPerson.isDeployed()).thenReturn(false);
-        when(mockPerson.isChild(any())).thenReturn(true);
+    public void testUnderage() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, false);
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(true);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
         assertNotNull(result);
     }
 
     @Test
-    void testCannotMarry_RandomClanPersonnel_Disabled() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        PersonnelStatus activeStatus = mock(PersonnelStatus.class);
-        when(mockPerson.isMarriageable()).thenReturn(true);
-        when(mockPerson.getGenealogy()).thenReturn(mock(Genealogy.class));
-        when(activeStatus.isActive()).thenReturn(true);
-        when(mockPerson.getStatus()).thenReturn(activeStatus);
-        when(mockPerson.isDeployed()).thenReturn(false);
-        when(mockPerson.isChild(any())).thenReturn(false);
-        when(mockPerson.isClanPersonnel()).thenReturn(true);
+    public void testClanPersonnelMarriageDisabled() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUseClanPersonnelMarriages(false);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
-        when(marriage.isUseRandomClanPersonnelMarriages()).thenReturn(false);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, true);
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+        when(person.isClanPersonnel()).thenReturn(true);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
         assertNotNull(result);
     }
 
     @Test
-    void testCanMarry_EligiblePerson() {
-        // Mock setup
-        Person mockPerson = mock(Person.class);
-        Genealogy mockGenealogy = mock(Genealogy.class);
-        PersonnelStatus activeStatus = mock(PersonnelStatus.class);
+    public void testPrisonerMarriageDisabled() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUsePrisonerMarriages(false);
 
-        when(mockPerson.isMarriageable()).thenReturn(true);
-        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
-        when(mockGenealogy.hasSpouse()).thenReturn(false);
-        when(activeStatus.isActive()).thenReturn(true);
-        when(mockPerson.getStatus()).thenReturn(activeStatus);
-        when(mockPerson.isDeployed()).thenReturn(false);
-        when(mockPerson.isChild(any())).thenReturn(false);
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
 
-        AbstractMarriage marriage = mock(AbstractMarriage.class, Mockito.CALLS_REAL_METHODS);
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+        when(person.isClanPersonnel()).thenReturn(false);
+        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
 
-        // Execute and assert
-        String result = marriage.canMarry(LocalDate.now(), mockPerson, false);
-        assertNull(result); // Eligible to marry, so result should be null
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testPrisonerMarriageDisabledBondsman() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUsePrisonerMarriages(false);
+
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
+
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+        when(person.isClanPersonnel()).thenReturn(false);
+        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.BONDSMAN);
+
+        // Act
+        String result = marriage.canMarry(date, person, false);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    public void testRandomClanMarriageDisabled() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUseClanPersonnelMarriages(true);
+
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
+
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+        when(person.isClanPersonnel()).thenReturn(true);
+        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+
+        // Act
+        String result = marriage.canMarry(date, person, true);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testRandomPrisonerMarriageDisabled() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUsePrisonerMarriages(true);
+
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
+
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+        when(person.isClanPersonnel()).thenReturn(false);
+        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
+
+        // Act
+        String result = marriage.canMarry(date, person, true);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testRandomPrisonerMarriageDisabledBondsman() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUsePrisonerMarriages(true);
+
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
+
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+        when(person.isClanPersonnel()).thenReturn(false);
+        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.BONDSMAN);
+
+        // Act
+        String result = marriage.canMarry(date, person, true);
+
+        // Assert
+        assertNull(result);
+    }
+
+    @Test
+    public void testNoBlockers() {
+        // Arrange
+        AbstractMarriage marriage = new RandomMarriage(mockCampaignOptions);
+        marriage.setUseClanPersonnelMarriages(true);
+        marriage.setUseRandomClanPersonnelMarriages(true);
+        marriage.setUsePrisonerMarriages(true);
+        marriage.setUseRandomPrisonerMarriages(true);
+
+        Person person = mock(Person.class);
+        LocalDate date = LocalDate.of(3025, 1, 1);
+        Genealogy genealogy = mock(Genealogy.class);
+
+        when(person.isMarriageable()).thenReturn(true);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isDeployed()).thenReturn(false);
+        when(person.isChild(date, true)).thenReturn(false);
+
+        // Act
+        String result = marriage.canMarry(date, person, true);
+
+        // Assert
+        assertNull(result);
     }
 
 

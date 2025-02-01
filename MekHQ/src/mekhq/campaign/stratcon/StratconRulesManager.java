@@ -40,6 +40,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
@@ -474,7 +475,7 @@ public class StratconRulesManager {
      * @param interceptedForce the {@link Force} that's being intercepted in the scenario
      */
      public static @Nullable void generateReinforcementInterceptionScenario(
-         Campaign campaign, AtBContract contract,
+         Campaign campaign, StratconScenario linkedScenario, AtBContract contract,
          StratconTrackState track, ScenarioTemplate template, Force interceptedForce) {
          StratconCoords scenarioCoords = getUnoccupiedCoords(track, false);
 
@@ -487,7 +488,9 @@ public class StratconRulesManager {
          }
 
          finalizeBackingScenario(campaign, contract, track, true, scenario);
-         scenario.setDeploymentDate(campaign.getLocalDate());
+         scenario.setActionDate(campaign.getLocalDate());
+         scenario.getBackingScenario().setStatus(ScenarioStatus.CURRENT);
+         scenario.getBackingScenario().setlinkedScenarioID(linkedScenario.getBackingScenario().getId());
      }
 
     /**
@@ -549,6 +552,7 @@ public class StratconRulesManager {
         scenario.setActionDate(null);
         scenario.setReturnDate(null);
         scenario.setStrategicObjective(true);
+        scenario.setTurningPoint(true);
         scenario.getBackingScenario().setCloaked(true);
 
         trackState.addScenario(scenario);
@@ -686,23 +690,25 @@ public class StratconRulesManager {
             return;
         }
 
+        boolean isObjective = scenario.isStrategicObjective();
+
         if (template == null || !template.getStratConScenarioType().isResupply()) {
             ContractCommandRights commandRights = contract.getCommandRights();
             switch (commandRights) {
                 case INTEGRATED -> {
                     scenario.setTurningPoint(true);
-                    if (randomInt(4) == 0) {
+                    if (randomInt(3) == 0 || isObjective) {
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case HOUSE, LIAISON -> {
-                    if (randomInt(4) == 0) {
+                    if (randomInt(3) == 0 || isObjective) {
                         scenario.setTurningPoint(true);
                         setAttachedUnitsModifier(scenario, contract);
                     }
                 }
                 case INDEPENDENT -> {
-                    if (randomInt(4) == 0) {
+                    if (randomInt(3) == 0 || isObjective) {
                         scenario.setTurningPoint(true);
                     }
                 }
@@ -1571,7 +1577,7 @@ public class StratconRulesManager {
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(force, campaign);
 
-        generateReinforcementInterceptionScenario(campaign, contract, track, scenarioTemplate, force);
+        generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, force);
 
         return INTERCEPTED;
     }
@@ -2640,6 +2646,36 @@ public class StratconRulesManager {
                     break;
                 }
             }
+        }
+    }
+
+    /**
+     * Processes completion of a Stratcon scenario that is linked to another scenario
+     * pulls forces off completed scenario and moves them to linked one.
+     * 
+     * Should only be used after a scenario is resolved
+     */
+    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
+        Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
+
+        if (nextScenario instanceof AtBScenario nextAtBScenario) {
+            StratconCampaignState campaignState = nextAtBScenario.getContract(tracker.getCampaign())
+                    .getStratconCampaignState();
+            if (campaignState == null) {
+                return;
+            }
+            for (StratconTrackState track : campaignState.getTracks()) {
+                if (track.getBackingScenariosMap().containsKey(nextScenario.getId())) {
+                    StratconScenario scenario = track.getBackingScenariosMap().get(nextScenario.getId());
+                    for (int forceID : forces) {
+                        track.unassignForce(forceID);
+                        nextScenario.addForces(forceID);
+                    }
+
+                }
+
+            }
+
         }
     }
 

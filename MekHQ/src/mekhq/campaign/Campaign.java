@@ -159,6 +159,7 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
@@ -2583,17 +2584,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Create a data set detailing all the parts being used (or not) and their warehouse spares
-     * @param ignoreMothballedUnits don't count parts in mothballed units
-     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
-     * @return a Set of PartInUse data for display or inspection
+     * Analyzes the warehouse inventory and returns a data set that summarizes the usage state of
+     * all parts, including their use counts, store counts, and planned counts, while filtering
+     * based on specific conditions.
+     *
+     * <p>This method aggregates all parts currently in use or available as spares, while taking
+     * into account constraints like ignoring mothballed units or filtering spares below a specific
+     * quality. It uses a map structure to efficiently track and update parts during processing.</p>
+     *
+     * @param ignoreMothballedUnits If {@code true}, parts from mothballed units will not be
+     *                             included in the results.
+     * @param isResupply If {@code true}, specific units (e.g., prohibited unit types) are skipped
+     *                  based on the current context as defined in {@code Resupply.isProhibitedUnitType()}.
+     * @param ignoreSparesUnderQuality Spare parts of a lower quality than the specified value will
+     *                                be excluded from the results.
+     * @return A {@link Set} of {@link PartInUse} objects detailing the state of each relevant part,
+     * including:
+     *         <ul>
+     *             <li>Use count: How many of this part are currently in use.</li>
+     *             <li>Store count: How many of this part are available as spares in the warehouse.</li>
+     *             <li>Planned count: The quantity of this part included in acquisition orders or
+     *             planned procurement.</li>
+     *             <li>Requested stock: The target or default quantity to maintain, as derived from
+     *             settings or requests.</li>
+     *         </ul>
+     *         Only parts with non-zero counts (use, store, or planned) will be included in the
+     *         result.
      */
+
     public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
-            PartQuality ignoreSparesUnderQuality) {
+            boolean isResupply, PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
         getWarehouse().forEachPart(incomingPart -> {
+            if (isResupply) {
+                Unit unit = incomingPart.getUnit();
+
+                Entity entity = null;
+                if (unit != null) {
+                    entity = unit.getEntity();
+                }
+
+                if (entity != null) {
+                    if (isProhibitedUnitType(entity, false)) {
+                        return;
+                    }
+                }
+            }
+
+
             PartInUse partInUse = getPartInUse(incomingPart);
             if (null == partInUse) {
                 return;
@@ -4828,7 +4868,7 @@ public class Campaign implements ITechManager {
         }
 
         if (topUpWeekly && currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, ignoreSparesUnderQuality));
+            int bought = stockUpPartsInUse(getPartsInUse(ignoreMothballed, false, ignoreSparesUnderQuality));
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 
@@ -9119,6 +9159,14 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
         }
     }
+
+    /** 
+     * Wipes the Parts in use map for the purpose of resetting all values to their default
+     */
+    public void wipePartsInUseMap() {
+        this.partsInUseRequestedStockMap.clear();
+    }
+
     /**
      * Retrieves the campaign faction icon for the specified {@link Campaign}.
      * If a custom icon is defined in the campaign's unit icon configuration, that icon is used.
@@ -9137,5 +9185,18 @@ public class Campaign implements ITechManager {
             icon = new ImageIcon(campaignIcon.getFilename());
         }
         return icon;
+    }
+    
+    /**
+     * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
+     */
+    public boolean checkLinkedScenario(int scenarioID) {
+        for (Scenario scenario : getScenarios()) {
+            if ((scenario.getLinkedScenario() == scenarioID)  
+                && (getScenario(scenario.getId()).getStatus().isCurrent())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
