@@ -5042,8 +5042,12 @@ public class Campaign implements ITechManager {
             }
 
             if (!dependentsToRemove.isEmpty()) {
+                String pluralizer = dependentsToRemove.size() == 1
+                    ? resources.getString("dependentLeavesForce.dependent.singular")
+                    : resources.getString("dependentLeavesForce.dependent.plural");
+
                 addReport(String.format(resources.getString("dependentLeavesForce.text"),
-                    dependentsToRemove.size(), dependentsToRemove.size() == 1 ? "" : "s"));
+                    dependentsToRemove.size(), pluralizer));
             }
 
             for (Person dependent : dependentsToRemove) {
@@ -9190,7 +9194,7 @@ public class Campaign implements ITechManager {
         }
     }
 
-    /** 
+    /**
      * Wipes the Parts in use map for the purpose of resetting all values to their default
      */
     public void wipePartsInUseMap() {
@@ -9216,13 +9220,13 @@ public class Campaign implements ITechManager {
         }
         return icon;
     }
-    
+
     /**
      * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
      */
     public boolean checkLinkedScenario(int scenarioID) {
         for (Scenario scenario : getScenarios()) {
-            if ((scenario.getLinkedScenario() == scenarioID)  
+            if ((scenario.getLinkedScenario() == scenarioID)
                 && (getScenario(scenario.getId()).getStatus().isCurrent())) {
                 return true;
             }
