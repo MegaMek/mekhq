@@ -80,10 +80,10 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
@@ -1552,7 +1552,7 @@ public class Unit implements ITechnology {
             if (mounted.getType().hasFlag(F_CARGO)) {
                 // isOperable doesn't check if the mounted location still exists, so we check for
                 // that first.
-                if ((entity.getInternal(mounted.getLocation()) > 0) && (mounted.isOperable())) {
+                if ((entity.getInternal(mounted.getLocation()) != 0) && (mounted.isOperable())) {
                     capacity += mounted.getTonnage();
                 }
             }
