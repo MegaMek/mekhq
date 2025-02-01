@@ -2330,7 +2330,7 @@ public class Campaign implements ITechManager {
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getPrisonerDefectors() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(false).stream()
             .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
             .collect(Collectors.toList());
     }
@@ -9247,7 +9247,7 @@ public class Campaign implements ITechManager {
         }
     }
 
-    /** 
+    /**
      * Wipes the Parts in use map for the purpose of resetting all values to their default
      */
     public void wipePartsInUseMap() {
@@ -9273,13 +9273,13 @@ public class Campaign implements ITechManager {
         }
         return icon;
     }
-    
+
     /**
      * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
      */
     public boolean checkLinkedScenario(int scenarioID) {
         for (Scenario scenario : getScenarios()) {
-            if ((scenario.getLinkedScenario() == scenarioID)  
+            if ((scenario.getLinkedScenario() == scenarioID)
                 && (getScenario(scenario.getId()).getStatus().isCurrent())) {
                 return true;
             }

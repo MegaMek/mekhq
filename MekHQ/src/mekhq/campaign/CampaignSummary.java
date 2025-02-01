@@ -386,9 +386,8 @@ public class CampaignSummary {
             if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
                 personnelCount = campaign.getActiveCombatPersonnel().size();
             } else {
-                personnelCount = campaign.getActivePersonnel().size();
+                personnelCount = campaign.getActivePersonnel(true).size();
             }
-            personnelCount -= campaign.getCurrentPrisoners().size();
 
             int fieldKitchenCapacity = checkFieldKitchenCapacity(campaign);
 
