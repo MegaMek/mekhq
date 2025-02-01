@@ -394,7 +394,7 @@ public final class BatchXPDialog extends JDialog {
                 return false;
             } else if ((null != primaryRole) && (p.getPrimaryRole() != primaryRole)) {
                 return false;
-            } else if ((null != expLevel) && (p.getExperienceLevel(campaign, false) != expLevel)) {
+            } else if ((null != expLevel) && (p.getExperienceLevel(campaign, false)+1 != expLevel)) {
                 return false;
             } else if (onlyOfficers && !p.getRank().isOfficer()) {
                 return false;
