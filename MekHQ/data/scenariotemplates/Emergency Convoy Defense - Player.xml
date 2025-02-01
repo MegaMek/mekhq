@@ -77,9 +77,6 @@
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
-                <roleChoices>
-                    <forceRole>ANTI_AIRCRAFT</forceRole>
-                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
