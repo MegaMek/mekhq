@@ -159,6 +159,10 @@ MEKHQ VERSION HISTORY:
 + PR #5930: Format Part Names as Italicized when Brand New
 + PR #5933: Fixed Overwriting of 'Brand New' Part State
 + Fix #5685: More control settings for autoLogistics
++ PR #5931: Refactored Part Handling in Resupply Module
++ Fix #5932: Added check for injuries that are not permanent before going on leave
++ PR #5946: Implemented Linked Scenarios for Interceptions
+
 
 
 0.50.02 (2024-12-30 2130 UTC)
