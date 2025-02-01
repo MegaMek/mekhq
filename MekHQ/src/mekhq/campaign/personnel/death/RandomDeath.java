@@ -46,6 +46,7 @@ import java.util.Map;
 
 import static java.lang.Math.round;
 import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
@@ -228,8 +229,12 @@ public class RandomDeath {
             return;
         }
 
-        final double weight = Double.parseDouble(statusNode.getTextContent().trim());
-        ageRangeCauses.add(weight, status);
+        try {
+            final double weight = Double.parseDouble(statusNode.getTextContent().trim());
+            ageRangeCauses.add(weight, status);
+        } catch (NumberFormatException e) {
+            logger.info("Unable to parse status node {}: {}", statusNode.getNodeName(), e.getMessage());
+        }
     }
 
     /**
@@ -406,8 +411,7 @@ public class RandomDeath {
             return getDefaultCause(ageGroup);
         }
 
-        final WeightedDoubleMap<PersonnelStatus> ageRangeCauses = genderedCauses
-            .get(TenYearAgeRange.determineAgeRange(age));
+        final WeightedDoubleMap<PersonnelStatus> ageRangeCauses = genderedCauses.get(determineAgeRange(age));
         if (ageRangeCauses == null) {
             return getDefaultCause(ageGroup);
         }
