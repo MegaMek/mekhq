@@ -70,9 +70,9 @@ import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
-import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
@@ -275,7 +275,6 @@ public class CampaignGUI extends JPanel {
 
         // Move the window
         frame.setLocation(x, y);
-
         initMenu();
         frame.setJMenuBar(menuBar);
         frame.getContentPane().setLayout(new BorderLayout());
@@ -1333,8 +1332,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news);
-            nrd.setVisible(true);
+            new NewsDialog(getCampaign(), news);
         }
     }
 

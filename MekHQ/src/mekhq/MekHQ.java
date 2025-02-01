@@ -26,6 +26,7 @@ import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
+import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.ui.dialogs.AutoResolveChanceDialog;
 import megamek.client.ui.dialogs.AutoResolveProgressDialog;
@@ -82,6 +83,8 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.UUID;
 
+import static megamek.MMConstants.LOCALHOST_IP;
+
 /**
  * The main class of the application.
  */
@@ -115,11 +118,12 @@ public class MekHQ implements GameListener {
     private CampaignController campaignController;
     private CampaignGUI campaignGUI;
 
-    private IconPackage iconPackage = new IconPackage();
+    private final IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
+    private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -450,15 +454,20 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         }
-
-        client = new Client(playerName, "127.0.0.1", port);
+        // Refactor this into a factory
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
+            client = new HeadlessClient(playerName, LOCALHOST_IP, port);
+        } else {
+            client = new Client(playerName, LOCALHOST_IP, port);
+        }
 
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        // Start the game thread
+        // Start the game thread - also refactor this into a factory
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings, useExperimentalPacarGui, true);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
@@ -534,7 +543,6 @@ public class MekHQ implements GameListener {
         if (gameThread.stopRequested()) {
             return;
         }
-
         try {
             boolean control = yourSideControlsTheBattlefieldDialogAsk(
                 MHQInternationalization.getText("ResolveDialog.control.message"),
@@ -555,9 +563,10 @@ public class MekHQ implements GameListener {
 
             PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
 
-            gameThread.requestStop();
         } catch (Exception ex) {
             logger.error(ex, "gameVictory()");
+        } finally {
+            gameThread.requestStop();
         }
     }
 
@@ -737,11 +746,28 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
-        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? defaultTheme : themeName;
 
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(theme);
+                if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
+                    // Ensure OSX key bindings are used for copy, paste etc
+                    addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("FormattedTextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
+                }
+
+                UIUtil.updateAfterUiChange();
+                return;
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
+                logger.error(e, "setLookAndFeel()");
+            }
+            try {
+                UIManager.setLookAndFeel(defaultTheme);
                 if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
                     // Ensure OSX key bindings are used for copy, paste etc
                     addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));

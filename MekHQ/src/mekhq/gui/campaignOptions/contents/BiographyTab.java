@@ -30,6 +30,7 @@ import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.RandomDeathMethod;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -1267,6 +1268,7 @@ public class BiographyTab {
 
         // Contents
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
+        rankSystemsPane.applyToCampaign();
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true);
@@ -1287,7 +1289,7 @@ public class BiographyTab {
     }
 
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, null);
+        loadValuesFromCampaignOptions(null, null, null);
     }
 
     /**
@@ -1295,9 +1297,11 @@ public class BiographyTab {
      *
      * @param presetCampaignOptions Optional preset campaign options, or `null` to use the campaign's active settings.
      * @param presetRandomOriginOptions Optional random origin options, or `null` to use the default origin settings.
+     * @param presetRankSystem Optional rank system, or `null` to use the default system.
      */
     public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-                                              @Nullable RandomOriginOptions presetRandomOriginOptions) {
+                                              @Nullable RandomOriginOptions presetRandomOriginOptions,
+                                              @Nullable RankSystem presetRankSystem) {
         CampaignOptions options = presetCampaignOptions;
         if (options == null) {
             options = this.campaignOptions;
@@ -1308,6 +1312,10 @@ public class BiographyTab {
             originOptions = this.randomOriginOptions;
         }
 
+        RankSystem rankSystem = presetRankSystem;
+        if (rankSystem == null) {
+            rankSystem = campaign.getRankSystem();
+        }
 
         // General
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
@@ -1374,6 +1382,9 @@ public class BiographyTab {
         for (int i = 0; i < chkUsePortrait.length; i++) {
             chkUsePortrait[i].setSelected(usePortraitForRole[i]);
         }
+
+        // Ranks
+        rankSystemsPane.getComboRankSystems().setSelectedItem(rankSystem);
     }
 
     /**
@@ -1460,5 +1471,8 @@ public class BiographyTab {
         for (int i = 0; i < chkUsePortrait.length; i++) {
             options.setUsePortraitForRole(i, chkUsePortrait[i].isSelected());
         }
+
+        // Ranks
+        rankSystemsPane.applyToCampaign();
     }
 }

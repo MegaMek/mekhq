@@ -21,6 +21,7 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -38,6 +39,7 @@ import java.util.Set;
  *
  */
 public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
+    private static final MMLogger logger = MMLogger.create(TacticalTransportedUnitsSummary.class);
 
     public TacticalTransportedUnitsSummary(Unit transport) {
         super(transport);
