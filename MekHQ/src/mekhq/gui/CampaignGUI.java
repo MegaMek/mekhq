@@ -272,7 +272,6 @@ public class CampaignGUI extends JPanel {
 
         // Move the window
         frame.setLocation(x, y);
-
         initMenu();
         frame.setJMenuBar(menuBar);
         frame.getContentPane().setLayout(new BorderLayout());
@@ -1330,8 +1329,7 @@ public class CampaignGUI extends JPanel {
     public void showNews(int id) {
         NewsItem news = getCampaign().getNews().getNewsItem(id);
         if (null != news) {
-            NewsReportDialog nrd = new NewsReportDialog(frame, news);
-            nrd.setVisible(true);
+            new NewsDialog(getCampaign(), news);
         }
     }
 

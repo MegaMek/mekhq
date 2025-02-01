@@ -71,7 +71,7 @@ import mekhq.campaign.parts.Armor;
 public class PartsReportDialog extends JDialog {
 
     private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
-    private JButton topUpButton, topUpGMButton;
+    private JButton topUpButton, topUpGMButton, resetRequestedStockButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
@@ -305,6 +305,15 @@ public class PartsReportDialog extends JDialog {
         topUpGMButton.setMargin(new Insets(10,20,10,20));
         topUpGMButton.addActionListener(evt -> topUpGM());
 
+        resetRequestedStockButton = new JButton();
+        resetRequestedStockButton.setText(resourceMap.getString("resetRequestedStockBtn.text"));
+        resetRequestedStockButton.setIcon(null);
+        resetRequestedStockButton.setFocusPainted(false);
+        resetRequestedStockButton.setEnabled(true);
+        resetRequestedStockButton.setBorder(null);
+        resetRequestedStockButton.setMargin(new Insets(10,20,10,20));
+        resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
+
         boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
         String[] qualities = {
             " ", // Combo box is blank for first one because it accepts everything and is default
@@ -343,6 +352,7 @@ public class PartsReportDialog extends JDialog {
                     .addComponent(topUpWeeklyCheck)
                     .addComponent(topUpButton)
                     .addComponent(topUpGMButton)
+                    .addComponent(resetRequestedStockButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnClose))));
 
@@ -355,6 +365,7 @@ public class PartsReportDialog extends JDialog {
                 .addComponent(topUpWeeklyCheck)
                 .addComponent(topUpButton)
                 .addComponent(topUpGMButton)
+                .addComponent(resetRequestedStockButton)
                 .addComponent(btnClose)));
 
         setPreferredSize(UIUtil.scaleForGUI(1400,1000));
@@ -465,4 +476,12 @@ public class PartsReportDialog extends JDialog {
     private void onClose() {
         storePartInUseRequestedStockMap();
     }  
+
+    /**
+     * Wipes the requested stock numbers back to their defaults
+     */
+    private void resetRequestedStock() {
+        campaign.wipePartsInUseMap();
+        updateOverviewPartsInUse();
+    }
 }

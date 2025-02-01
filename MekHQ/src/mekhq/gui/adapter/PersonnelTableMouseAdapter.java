@@ -79,6 +79,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -913,8 +914,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_BUY_EDGE: {
-                final int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                int baseCost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                double costMultiplier = gui.getCampaign().getCampaignOptions().getXpCostMultiplier();
                 for (Person person : people) {
+                    double intelligenceCostMultiplier = person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions());
+                    int cost = (int) round(baseCost * intelligenceCostMultiplier * costMultiplier);
+
                     selectedPerson.spendXP(cost);
                     person.changeEdge(1);
                     // Make the new edge point available to support personnel, but don't reset until
@@ -1943,7 +1948,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    cost = (int) Math.round((spa.getCost()
+                    cost = (int) round((spa.getCost()
                             * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                             * gui.getCampaign().getCampaignOptions().getXpCostMultiplier()));
                     String costDesc;
@@ -2239,8 +2244,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String type = SkillType.getSkillList()[i];
                 int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove()
                         : SkillType.getType(type).getCost(0);
-                cost = (int) Math
-                        .round(cost * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
+                cost = (int) round(cost * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                                 * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
                 if (cost >= 0) {
@@ -2262,7 +2266,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (gui.getCampaign().getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-                int cost = (int) Math.round(gui.getCampaign().getCampaignOptions().getEdgeCost()
+                int cost = (int) round(gui.getCampaign().getCampaignOptions().getEdgeCost()
                         * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                         * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
