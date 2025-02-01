@@ -178,7 +178,7 @@ public class PerformResupply {
             }
         }
 
-        logger.info(String.format("totalTonnage: %s", totalTonnage));
+        logger.info("totalTonnage: {}", totalTonnage);
 
 
         // This shouldn't occur, but we include it as insurance.
