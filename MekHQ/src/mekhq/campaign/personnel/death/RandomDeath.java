@@ -294,6 +294,11 @@ public class RandomDeath {
             ? (int) round(baseDieSize * Math.pow(REDUCTION_MULTIPLIER, (age - AGE_THRESHOLD)))
             : baseDieSize;
 
+        // At this point death is guaranteed, so no need to roll.
+        if (baseDieSize <= 1) {
+            return true;
+        }
+
         // Return random death outcome
         return randomInt(adjustedDieSize) == 0;
     }
