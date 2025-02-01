@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,6 +49,23 @@ import static java.lang.Math.round;
 import static megamek.common.Compute.randomInt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
+/**
+ * Handles logic for simulating random deaths in a campaign.
+ *
+ * <p>The {@code RandomDeath} class is responsible for determining whether a person dies randomly
+ * based on various factors such as age, gender, campaign settings, and defined death causes.
+ * It provides functionality to configure and process random deaths, manage XML-based cause sources,
+ * and track different categories of death causes.</p>
+ *
+ * <p><b>Core Features:</b></p>
+ * <ul>
+ *     <li>Supports enabling/disabling random death categories by age group.</li>
+ *     <li>Allows separate configuration for suicide-related deaths.</li>
+ *     <li>Adjusts random death chances based on age, gender, and campaign-wide configurations.</li>
+ *     <li>Parses random death causes from XML files, organized by gender and age range.</li>
+ *     <li>Provides detailed reasons and causes of death using weighted probability.</li>
+ * </ul>
+ */
 public class RandomDeath {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomDeath";
     private static final MMLogger logger = MMLogger.create(RandomDeath.class);
@@ -58,6 +75,15 @@ public class RandomDeath {
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
     private final int baseRandomDeathChance;
 
+    /**
+     * Constructs a {@code RandomDeath} object using campaign-specific options.
+     *
+     * <p>Initializes configurable options such as enabling specific age groups for random deaths,
+     * enabling or disabling suicide causes, and retrieving the base random death chances.
+     * The death causes map is also initialized by reading relevant files.</p>
+     *
+     * @param campaignOptions The campaign options containing random death configurations.
+     */
     public RandomDeath(final CampaignOptions campaignOptions) {
         enabledAgeGroups = campaignOptions.getEnabledRandomDeathAgeGroups();
         enableRandomDeathSuicideCause = campaignOptions.isUseRandomDeathSuicideCause();
@@ -67,6 +93,12 @@ public class RandomDeath {
         initializeCauses();
     }
 
+    /**
+     * Clears and reloads the random death causes from default and user-defined XML files.
+     *
+     * <p>Both the default XML file and the user-defined XML file are read and processed to populate
+     * the {@code causes} map.</p>
+     */
     public void initializeCauses() {
         causes.clear();
         initializeCausesFromFile(new File(MHQConstants.RANDOM_DEATH_CAUSES_FILE_PATH));
@@ -76,15 +108,15 @@ public class RandomDeath {
     /**
      * Initializes the random death causes by reading them from an XML file.
      *
-     * <p>The XML file contains structured information about different causes of random death,
-     * organized by gender, age range, and personnel status. The method parses this file, processes
-     * the data, and populates the `causes` map accordingly.</p>
+     * <p>The XML file contains structured data about causes of random deaths, organized by
+     * gender, age range, and personnel statuses. The method parses the file and populates
+     * the {@code causes} map.</p>
      *
      * @param file The XML file containing the cause definitions.
      */
     private void initializeCausesFromFile(final File file) {
         if (!file.exists()) {
-            logger.warn("File does not exist: " + file.getPath());
+            logger.warn("File does not exist: {}", file.getPath());
             return;
         }
 
@@ -94,7 +126,7 @@ public class RandomDeath {
         }
 
         final Version version = new Version(rootElement.getAttribute("version"));
-        logger.info("Parsing Random Death Causes from " + version + "-origin XML");
+        logger.info("Parsing Random Death Causes from {}-origin XML", version);
 
         final NodeList genderNodes = rootElement.getChildNodes();
         for (int i = 0; i < genderNodes.getLength(); i++) {
@@ -106,13 +138,13 @@ public class RandomDeath {
             try {
                 parseGenderNode(genderNode);
             } catch (Exception e) {
-                logger.error("Error parsing gender node: " + genderNode.getNodeName(), e);
+                logger.error("Error parsing gender node: {} - {}", genderNode.getNodeName(), e);
             }
         }
     }
 
     /**
-     * Parses the XML file into a DOM {@link Element}.
+     * Parses the specified XML file into a DOM {@link Element}.
      *
      * @param file The input file.
      * @return The root {@link Element} of the parsed XML document, or {@code null} if an error occurred.
@@ -125,15 +157,15 @@ public class RandomDeath {
             element.normalize();
             return element;
         } catch (Exception ex) {
-            logger.error("Failed to parse XML file: " + file.getPath(), ex);
+            logger.error("Failed to parse XML file: {} - {}", file.getPath(), ex);
             return null;
         }
     }
 
     /**
-     * Processes a top-level gender node and parses its child nodes.
+     * Processes a top-level gender node from the XML and parses its child nodes.
      *
-     * @param genderNode The node corresponding to a gender.
+     * @param genderNode The node representing a gender and its associated death causes.
      */
     private void parseGenderNode(final Node genderNode) {
         final Gender gender = Gender.valueOf(genderNode.getNodeName());
@@ -155,10 +187,10 @@ public class RandomDeath {
     }
 
     /**
-     * Processes an age range node and populates its causes.
+     * Processes an age range node and populates its associated causes.
      *
-     * @param gender The gender associated with the node.
-     * @param ageRangeNode The node corresponding to an age range.
+     * @param gender       The gender associated with the age range node.
+     * @param ageRangeNode The node representing an age range and its associated causes.
      */
     private void parseAgeRangeNode(final Gender gender, final Node ageRangeNode) {
         final TenYearAgeRange ageRange = TenYearAgeRange.valueOf(ageRangeNode.getNodeName());
@@ -181,10 +213,14 @@ public class RandomDeath {
     }
 
     /**
-     * Processes a status node and updates the age range causes map.
+     * Processes a status node and updates the details in the age range's causes map.
+     *
+     * <p>This method handles parsing of the text content (probability weight) and
+     * links it to the specified {@code PersonnelStatus}. Factors such as whether
+     * suicide causes are enabled are also considered.</p>
      *
      * @param ageRangeCauses The map of causes for a particular age range.
-     * @param statusNode The node corresponding to a personnel status.
+     * @param statusNode     The node representing a specific personnel status.
      */
     private void parseStatusNode(final WeightedDoubleMap<PersonnelStatus> ageRangeCauses, final Node statusNode) {
         final PersonnelStatus status = PersonnelStatus.valueOf(statusNode.getNodeName());
@@ -197,10 +233,11 @@ public class RandomDeath {
     }
 
     /**
-     * Validates an XML node to ensure it is meaningful (e.g., has child nodes).
+     * Determines if an XML node is invalid for processing.
      *
      * @param node The node to validate.
-     * @return {@code true} if the node is valid; {@code false} otherwise.
+     * @return {@code true} if the node is invalid (e.g., null or without child nodes),
+     *         {@code false} otherwise.
      */
     private boolean isInvalidNode(final Node node) {
         return node == null || !node.hasChildNodes();
@@ -217,14 +254,18 @@ public class RandomDeath {
     }
 
     /**
-     * Determines if a person randomly dies based on the campaign, age, and gender.
+     * Determines whether an individual dies randomly based on age, gender, and campaign configuration.
      *
-     * <p>The probability of death increases as a person's age exceeds a specific
-     * threshold, with the chance of death growing exponentially for extra years lived.</p>
+     * <p>The chance of random death is influenced by:</p>
+     * <ul>
+     *     <li>Age: The risk increases exponentially after a certain threshold.</li>
+     *     <li>Gender: Gender-based multipliers affect the base death chance.</li>
+     *     <li>Campaign settings: The base random death chance is configured globally.</li>
+     * </ul>
      *
-     * @param age The individual's age.
-     * @param gender The individual's gender. Currently unused but supports future extensibility.
-     * @return {@code true} if the person randomly dies; {@code false} otherwise.
+     * @param age    The age of the individual.
+     * @param gender The gender of the individual.
+     * @return {@code true} if the individual dies randomly; {@code false} otherwise.
      */
     public boolean randomlyDies(final int age, final Gender gender) {
         final int AGE_THRESHOLD = 90;
@@ -253,17 +294,20 @@ public class RandomDeath {
     }
 
     /**
-     * Determines if a person cannot die and returns a reason, if any.
+     * Checks whether a person is exempt from random death and provides a reason if applicable.
      *
-     * <p>Checks various conditions such as if the person is already dead, whether
-     * random death is enabled, if the person is immortal, or if the death for the
-     * provided age group is disabled. Returns {@code null} if none of these
-     * conditions prevent the person from dying.</p>
+     * <p>The following conditions are evaluated:</p>
+     * <ul>
+     *     <li>If the person is dead: Returns a reason indicating they are already dead.</li>
+     *     <li>If random death is enabled and the person is immortal: Returns the immortality reason.</li>
+     *     <li>If the person's age group is disabled for random deaths: Returns the reason for the
+     *         age group being excluded.</li>
+     * </ul>
      *
-     * @param person       The person to check.
-     * @param ageGroup     The age group of the person.
-     * @param randomDeath  Whether random death is enabled.
-     * @return A reason the person cannot die, or {@code null} if they can die.
+     * @param person      The individual to evaluate.
+     * @param ageGroup    The person's age group.
+     * @param randomDeath Whether random deaths are enabled in the campaign.
+     * @return A string describing why the individual cannot die, or {@code null} if no restrictions apply.
      */
     public @Nullable String canDie(final Person person, final AgeGroup ageGroup, final boolean randomDeath) {
         if (person.getStatus().isDead()) {
@@ -293,7 +337,18 @@ public class RandomDeath {
         return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, messageKey);
     }
 
-
+    /**
+     * Processes random death checks for the given individual in a weekly tick.
+     *
+     * <p>If the person dies, this method updates the campaign and individual status accordingly,
+     * and generates a detailed death report. Random death reasons and causes are evaluated as per
+     * the configuration and individual factors.</p>
+     *
+     * @param campaign The active campaign to update.
+     * @param today    The current date.
+     * @param person   The person being evaluated.
+     * @return {@code true} if the person dies during this week; otherwise, {@code false}.
+     */
     public boolean processNewWeek(final Campaign campaign, final LocalDate today,
                                   final Person person) {
         final int age = person.getAge(today);
@@ -319,6 +374,18 @@ public class RandomDeath {
         }
     }
 
+    /**
+     * Determines the reason or cause of death for a person.
+     *
+     * <p>Factors including age, gender, injuries, and other conditions like pregnancy
+     * are considered in determining the death cause. If no specific cause is found,
+     * a default cause is selected.</p>
+     *
+     * @param person   The person who has died.
+     * @param ageGroup The age group of the person.
+     * @param age      The person's age.
+     * @return The {@code PersonnelStatus} representing the cause of death.
+     */
     public PersonnelStatus getCause(final Person person, final AgeGroup ageGroup, final int age) {
         if (person.getStatus().isMIA()) {
             return PersonnelStatus.KIA;
@@ -349,6 +416,17 @@ public class RandomDeath {
         return (cause == null) ? getDefaultCause(ageGroup) : cause;
     }
 
+    /**
+     * Determines whether a person's death was caused by major or deadly injuries.
+     *
+     * <p>This method evaluates the person's injuries and checks if any of them are classified
+     * as "major or deadly." Only significant injuries are considered for this determination,
+     * while minor or chronic conditions are ignored.</p>
+     *
+     * @param person The person whose injuries are being evaluated.
+     * @return {@link PersonnelStatus#WOUNDS} if major or deadly injuries caused the death;
+     *         otherwise, {@link PersonnelStatus#ACTIVE} if no significant injuries are found.
+     */
     private PersonnelStatus determineIfInjuriesCausedTheDeath(final Person person) {
         // We care about injuries that are major or deadly. We do not want any chronic conditions nor scratches
         return person.getInjuries().stream().anyMatch(injury -> injury.getLevel().isMajorOrDeadly())
@@ -356,6 +434,17 @@ public class RandomDeath {
             : PersonnelStatus.ACTIVE;
     }
 
+    /**
+     * Determines the default cause of death based on the age group of the person.
+     *
+     * <p>The method assigns a default cause of death based on whether the person is considered
+     * elderly. Elderly persons are assigned {@link PersonnelStatus#OLD_AGE} as the cause,
+     * while younger individuals are assigned {@link PersonnelStatus#NATURAL_CAUSES}.</p>
+     *
+     * @param ageGroup The age group of the person.
+     * @return {@link PersonnelStatus#OLD_AGE} if the person is in the elder age group;
+     *         otherwise, {@link PersonnelStatus#NATURAL_CAUSES}.
+     */
     private PersonnelStatus getDefaultCause(final AgeGroup ageGroup) {
         return ageGroup.isElder() ? PersonnelStatus.OLD_AGE : PersonnelStatus.NATURAL_CAUSES;
     }

@@ -275,6 +275,7 @@ public class Campaign implements ITechManager {
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
+    private RandomDeath randomDeath;
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
@@ -376,6 +377,7 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new AtbMonthlyContractMarket());
         setUnitMarket(new DisabledUnitMarket());
+        randomDeath = new RandomDeath(campaignOptions);
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -4344,8 +4346,6 @@ public class Campaign implements ITechManager {
      * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
-        RandomDeath randomDeath = new RandomDeath(campaignOptions);
-
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
