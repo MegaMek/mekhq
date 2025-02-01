@@ -83,8 +83,10 @@ public class PartInUse {
         if (null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
             String descString = partToBuy.getAcquisitionName();
-            descString = descString.split(",")[0];
-            descString = descString.split("<")[0];
+            if( !(descString.contains("(") && descString.contains(")"))) {
+                descString = descString.split(",")[0];
+                descString = descString.split("<")[0];
+            }
             if(descString.equals("Turret")) {
                 descString += " " + part.getTonnage() + " tons";
             }
