@@ -20,10 +20,15 @@
 package mekhq.campaign;
 
 import megamek.Version;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.codeUtilities.MathUtility;
+import megamek.common.Configuration;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
+import megamek.common.preference.ClientPreferences;
+import megamek.common.preference.PreferenceManager;
+import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -44,6 +49,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
@@ -53,7 +59,7 @@ import java.util.Map.Entry;
  */
 public class CampaignOptions {
     private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
-
+    private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
     // region Magic Numbers
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
@@ -64,10 +70,8 @@ public class CampaignOptions {
     // that haven't been invented yet, or that are completely extinct
     public static final int TECH_UNKNOWN = 5;
 
-    public static final int TRANSIT_UNIT_DAY = 0;
     public static final int TRANSIT_UNIT_WEEK = 1;
     public static final int TRANSIT_UNIT_MONTH = 2;
-    public static final int TRANSIT_UNIT_NUM = 3;
 
     public static final String S_TECH = "Tech";
     public static final String S_AUTO = "Automatic Success";
@@ -84,15 +88,6 @@ public class CampaignOptions {
             case TECH_ADVANCED -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
             case TECH_EXPERIMENTAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
             case TECH_UNOFFICIAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default -> "Unknown";
-        };
-    }
-
-    public static String getTransitUnitName(final int unit) {
-        return switch (unit) {
-            case TRANSIT_UNIT_DAY -> "Days";
-            case TRANSIT_UNIT_WEEK -> "Weeks";
-            case TRANSIT_UNIT_MONTH -> "Months";
             default -> "Unknown";
         };
     }
@@ -148,7 +143,15 @@ public class CampaignOptions {
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
     private int maxAcquisitions;
-    private double defaultStockPercent;
+
+    // autoLogistics
+    private int autoLogisticsHeatSink;
+    private int autoLogisticsMekHead;
+    private int autoLogisticsMekLocation;
+    private int autoLogisticsNonRepairableLocation;
+    private int autoLogisticsArmor;
+    private int autoLogisticsAmmunition;
+    private int autoLogisticsOther;
 
     // Delivery
     private int nDiceTransitTime;
@@ -489,9 +492,9 @@ public class CampaignOptions {
     private int nTasksXP;
     private int successXP;
     private int mistakeXP;
-    private int idleXP;
-    private int monthsIdleXP;
-    private int targetIdleXP;
+    private int vocationalXP;
+    private int vocationalXPCheckFrequency;
+    private int vocationalXPTargetNumber;
     private int contractNegotiationXP;
     private int adminXP;
     private int adminXPPeriod;
@@ -600,8 +603,10 @@ public class CampaignOptions {
     private int scenarioModBV;
     private boolean autoConfigMunitions;
     private AutoResolveMethod autoResolveMethod;
+    private String strategicViewMinimapTheme;
     private boolean autoResolveVictoryChanceEnabled;
     private int autoResolveNumberOfScenarios;
+    private boolean autoResolveExperimentalPacarGuiEnabled;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -662,7 +667,15 @@ public class CampaignOptions {
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
         maxAcquisitions = 0;
-        defaultStockPercent = 10.0;
+
+        // autoLogistics
+        autoLogisticsHeatSink = 250;
+        autoLogisticsMekHead = 200;
+        autoLogisticsMekLocation = 100;
+        autoLogisticsNonRepairableLocation = 0;
+        autoLogisticsArmor = 500;
+        autoLogisticsAmmunition = 500;
+        autoLogisticsOther = 50;
 
         // Delivery
         nDiceTransitTime = 1;
@@ -1107,9 +1120,9 @@ public class CampaignOptions {
         nTasksXP = 25;
         successXP = 0;
         mistakeXP = 0;
-        idleXP = 0;
-        monthsIdleXP = 2;
-        targetIdleXP = 10;
+        vocationalXP = 1;
+        vocationalXPCheckFrequency = 1;
+        vocationalXPTargetNumber = 7;
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
@@ -1192,7 +1205,8 @@ public class CampaignOptions {
         autoResolveMethod = AutoResolveMethod.PRINCESS;
         autoResolveVictoryChanceEnabled = false;
         autoResolveNumberOfScenarios = 100;
-
+        autoResolveExperimentalPacarGuiEnabled = false;
+        strategicViewMinimapTheme = "gbc green.theme";
         // Unit Administration
         useAero = false;
         useVehicles = true;
@@ -3887,28 +3901,28 @@ public class CampaignOptions {
         this.assignPortraitOnRoleChange = assignPortraitOnRoleChange;
     }
 
-    public int getIdleXP() {
-        return idleXP;
+    public int getVocationalXP() {
+        return vocationalXP;
     }
 
-    public void setIdleXP(final int idleXP) {
-        this.idleXP = idleXP;
+    public void setVocationalXP(final int vocationalXP) {
+        this.vocationalXP = vocationalXP;
     }
 
-    public int getTargetIdleXP() {
-        return targetIdleXP;
+    public int getVocationalXPTargetNumber() {
+        return vocationalXPTargetNumber;
     }
 
-    public void setTargetIdleXP(final int targetIdleXP) {
-        this.targetIdleXP = targetIdleXP;
+    public void setVocationalXPTargetNumber(final int vocationalXPTargetNumber) {
+        this.vocationalXPTargetNumber = vocationalXPTargetNumber;
     }
 
-    public int getMonthsIdleXP() {
-        return monthsIdleXP;
+    public int getVocationalXPCheckFrequency() {
+        return vocationalXPCheckFrequency;
     }
 
-    public void setMonthsIdleXP(final int monthsIdleXP) {
-        this.monthsIdleXP = monthsIdleXP;
+    public void setVocationalXPCheckFrequency(final int vocationalXPCheckFrequency) {
+        this.vocationalXPCheckFrequency = vocationalXPCheckFrequency;
     }
 
     public int getContractNegotiationXP() {
@@ -4257,16 +4271,64 @@ public class CampaignOptions {
         this.maxAcquisitions = maxAcquisitions;
     }
 
-    public double getDefaultStockPercent() {
-        return defaultStockPercent;
+    public int getAutoLogisticsHeatSink() {
+        return autoLogisticsHeatSink;
     }
 
-    public void setDefaultStockPercent(double defaultStockPercent) {
-        this.defaultStockPercent = defaultStockPercent;
+    public void setAutoLogisticsHeatSink(int autoLogisticsHeatSink) {
+        this.autoLogisticsHeatSink = autoLogisticsHeatSink;
+    }
+
+    public int getAutoLogisticsMekHead() {
+        return autoLogisticsMekHead;
+    }
+
+    public void setAutoLogisticsMekHead(int autoLogisticsMekHead) {
+        this.autoLogisticsMekHead = autoLogisticsMekHead;
+    }
+
+    public int getAutoLogisticsMekLocation() {
+        return autoLogisticsMekLocation;
+    }
+
+    public void setAutoLogisticsMekLocation(int autoLogisticsMekLocation) {
+        this.autoLogisticsMekLocation = autoLogisticsMekLocation;
+    }
+
+    public int getAutoLogisticsNonRepairableLocation() {
+        return autoLogisticsNonRepairableLocation;
+    }
+
+    public void setAutoLogisticsNonRepairableLocation(int autoLogisticsNonRepairableLocation) {
+        this.autoLogisticsNonRepairableLocation = autoLogisticsNonRepairableLocation;
+    }
+
+    public int getAutoLogisticsArmor() {
+        return autoLogisticsArmor;
+    }
+
+    public void setAutoLogisticsArmor(int autoLogisticsArmor) {
+        this.autoLogisticsArmor = autoLogisticsArmor;
+    }
+
+    public int getAutoLogisticsAmmunition() {
+        return autoLogisticsAmmunition;
+    }
+
+    public void setAutoLogisticsAmmunition(int autoLogisticsAmmunition) {
+        this.autoLogisticsAmmunition = autoLogisticsAmmunition;
+    }
+
+    public int getAutoLogisticsOther() {
+        return autoLogisticsOther;
+    }
+
+    public void setAutoLogisticsOther(int autoLogisticsOther) {
+        this.autoLogisticsOther = autoLogisticsOther;
     }
 
     public boolean isUseAtB() {
-        return useAtB;
+        return useAtB || useStratCon;
     }
 
     public void setUseAtB(final boolean useAtB) {
@@ -4728,9 +4790,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tasksXP", tasksXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mistakeXP", mistakeXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "successXP", successXP);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleXP", idleXP);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetIdleXP", targetIdleXP);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "monthsIdleXP", monthsIdleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXP", vocationalXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPTargetNumber", vocationalXPTargetNumber);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPCheckFrequency", vocationalXPCheckFrequency);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractNegotiationXP", contractNegotiationXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminWeeklyXP", adminXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminXPPeriod", adminXPPeriod);
@@ -4790,7 +4852,15 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficialMaintenance", isUseUnofficialMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultStockPercent", defaultStockPercent);
+
+        // autoLogistics
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsHeatSink", autoLogisticsHeatSink);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsMekHead", autoLogisticsMekHead);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsMekLocation", autoLogisticsMekLocation);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsNonRepairableLocation", autoLogisticsNonRepairableLocation);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsArmor", autoLogisticsArmor);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsAmmunition", autoLogisticsAmmunition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", autoLogisticsOther);
 
         // region Personnel Tab
         // region General Personnel
@@ -5180,6 +5250,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveMethod", getAutoResolveMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveNumberOfScenarios", getAutoResolveNumberOfScenarios());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveUseExperimentalPacarGui", isAutoResolveExperimentalPacarGuiEnabled());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "strategicViewTheme", getStrategicViewTheme().getName());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -5323,12 +5395,18 @@ public class CampaignOptions {
                     retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
                     retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
-                    retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
-                    retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
-                    retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXP")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+                    retVal.vocationalXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTargetNumber")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
+                    retVal.vocationalXPTargetNumber = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPCheckFrequency")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
+                    retVal.vocationalXPCheckFrequency = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
                     retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
@@ -5455,8 +5533,22 @@ public class CampaignOptions {
                     retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                     retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("defaultStockPercent")) {
-                    retVal.defaultStockPercent = Double.parseDouble(wn2.getTextContent().trim());
+
+                    // autoLogistics
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsHeatSink")) {
+                    retVal.autoLogisticsHeatSink = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsMekHead")) {
+                    retVal.autoLogisticsMekHead = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsMekLocation")) {
+                    retVal.autoLogisticsMekLocation = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsNonRepairableLocation")) {
+                    retVal.autoLogisticsNonRepairableLocation = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsArmor")) {
+                    retVal.autoLogisticsArmor = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsAmmunition")) {
+                    retVal.autoLogisticsAmmunition = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoLogisticsOther")) {
+                    retVal.autoLogisticsOther = Integer.parseInt(wn2.getTextContent().trim());
 
                     // region Personnel Tab
                     // region General Personnel
@@ -6163,12 +6255,18 @@ public class CampaignOptions {
                     // region AtB Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                     retVal.setSkillLevel(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                    // region ACAR Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveMethod")) {
                     retVal.setAutoResolveMethod(AutoResolveMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveVictoryChanceEnabled")) {
                     retVal.setAutoResolveVictoryChanceEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveNumberOfScenarios")) {
                     retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveUseExperimentalPacarGui")) {
+                    retVal.setAutoResolveExperimentalPacarGuiEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("strategicViewTheme")) {
+                    retVal.setStrategicViewTheme(wn2.getTextContent().trim());
+                    // endregion ACAR Tab
                     // endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
@@ -6445,6 +6543,17 @@ public class CampaignOptions {
         this.autoResolveMethod = autoResolveMethod;
     }
 
+    public void setStrategicViewTheme(String minimapStyle) {
+        // it is persisted here to have something in the campaign options persisted that will change the GUI preference for the theme
+        this.strategicViewMinimapTheme = minimapStyle;
+        CLIENT_PREFERENCES.setStrategicViewTheme(minimapStyle);
+    }
+
+    public File getStrategicViewTheme() {
+        CLIENT_PREFERENCES.setStrategicViewTheme(strategicViewMinimapTheme);
+        return CLIENT_PREFERENCES.getStrategicViewTheme();
+    }
+
     public boolean isAutoResolveVictoryChanceEnabled() {
         return autoResolveVictoryChanceEnabled;
     }
@@ -6459,5 +6568,13 @@ public class CampaignOptions {
 
     public int getAutoResolveNumberOfScenarios() {
         return autoResolveNumberOfScenarios;
+    }
+
+    public boolean isAutoResolveExperimentalPacarGuiEnabled() {
+        return autoResolveExperimentalPacarGuiEnabled;
+    }
+
+    public void setAutoResolveExperimentalPacarGuiEnabled(boolean autoResolveExperimentalPacarGuiEnabled) {
+        this.autoResolveExperimentalPacarGuiEnabled = autoResolveExperimentalPacarGuiEnabled;
     }
 }

@@ -18,15 +18,13 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.ArrayList;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A table model for displaying parts
@@ -96,7 +94,15 @@ public class PartsTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
-            return "<html><nobr>" + part.getName() + "</nobr></html>";
+            String openBrace = "";
+            String closeBrace = "";
+
+            if (part.isBrandNew()) {
+                openBrace = "<i>";
+                closeBrace = "</i>";
+            }
+
+            return "<html><nobr>" + openBrace + part.getName() + closeBrace + "</nobr></html>";
         }
         if (col == COL_DETAIL) {
             return "<html><nobr>" + part.getDetails() + "</nobr></html>";

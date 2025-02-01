@@ -18,31 +18,13 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityListFile;
-import megamek.common.IStartingPositions;
-import megamek.common.UnitNameTracker;
+import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -50,6 +32,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BotForce implements IPlayerSettings {
     private static final MMLogger logger = MMLogger.create(BotForce.class);
@@ -470,7 +460,7 @@ public class BotForce implements IPlayerSettings {
                 getName() + " <i>" +
                 ((getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
                 " Start: " + IStartingPositions.START_LOCATION_NAMES[getStartingPos()] +
-                " Fixed BV: " + getTotalBV(c) +
+                " BV: " + getTotalBV(c) +
                 ((null == getBotForceRandomizer()) ? "" : "<br>Random: " + getBotForceRandomizer().getDescription(c)) +
                 "</html>", stubs);
     }

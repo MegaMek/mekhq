@@ -18,22 +18,16 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.*;
 
 /** Static method only helper class for stars */
 public final class StarUtil {
@@ -67,6 +61,7 @@ public final class StarUtil {
     public static final double SOLAR_TEMP = 5778.0;
     /** Gravitational constant (in m^3 kg^-1 s^-2 */
     public static final double GRAV_CONSTANT = 6.673848e-11;
+    private static final double STEFAN_BOLTZMANN_CONSTANT = 5.67e-8;
 
     // Temperature, mass, luminosity and size are all linked together. When
     // modifying those tables,
@@ -802,7 +797,63 @@ public final class StarUtil {
         return STAR_ICON_DATA.get(ObjectUtility.nonNull(system.getIcon(), "default"));
     }
 
-    private StarUtil() {
+    /**
+     * Estimates the radius of a star using its luminosity and temperature, based on the
+     * Stefan-Boltzmann law:
+     * <pre>
+     * R = √(L / (4πσT⁴))
+     * </pre>
+     *
+     * Where:
+     * <ul>
+     *     <li><b>R</b> is the radius of the star (in meters).</li>
+     *     <li><b>L</b> is the luminosity of the star (in watts).</li>
+     *     <li><b>T</b> is the effective temperature of the star (in Kelvin).</li>
+     *     <li><b>σ</b> is the Stefan-Boltzmann constant (5.67 × 10⁻⁸ W·m⁻²·K⁻⁴).</li>
+     * </ul>
+     *
+     * @param luminosity The luminosity of the star in watts. Must be greater than 0.
+     * @param temperature The effective temperature of the star in Kelvin. Must be greater than 0.
+     * @return The radius of the star in meters.
+     * @throws IllegalArgumentException if luminosity or temperature is less than or equal to 0.
+     */
+    public static double estimateStarRadius(double luminosity, double temperature) {
+        // Temperature raised to the 4th power
+        double temperaturePower4 = Math.pow(temperature, 4);
 
+        // Denominator: 4 * π * σ * T^4
+        double denominator = 4 * Math.PI * STEFAN_BOLTZMANN_CONSTANT * temperaturePower4;
+
+        // Radius calculation
+        return Math.sqrt(luminosity / denominator);
+    }
+
+    /**
+     * Calculates the spectral type number for a planetary system by combining its spectral class
+     * and spectral subclass. The spectral class is multiplied by 10, and the subclass is extracted
+     * as a numeric value from the provided spectral type string.
+     *
+     * <p>The spectral type is a combination of letters and numbers (e.g., "F5V").
+     * This method extracts the numeric part (e.g., "5") from the spectral type and adds it to the
+     * spectral class (multiplied by 10).</p>
+     *
+     * @param spectralClass The spectral class of the planetary system as an integer. Multiplied by
+     *                     10 in the calculation.
+     * @param spectralType The spectral type of the planetary system as a string (e.g., "F5V"),
+     *                     from which the subclass (numeric portion) will be extracted.
+     * @return The combined spectral type number, calculated as {@code spectralClass * 10 + spectralSubClass},
+     *         where {@code spectralSubClass} is the numeric portion of the spectral type string.
+     */
+    public static int getSpectralTypeNumber(int spectralClass, String spectralType) {
+        spectralClass *= 10;
+
+        int spectralSubClass = 5;
+        try {
+            spectralSubClass = Integer.parseInt(spectralType.replaceAll("\\D", ""));
+        } catch (NumberFormatException e) {
+            logger.info("Failed to fetch spectralSubClass from spectralType: " + spectralType);
+        }
+
+        return spectralClass + spectralSubClass;
     }
 }

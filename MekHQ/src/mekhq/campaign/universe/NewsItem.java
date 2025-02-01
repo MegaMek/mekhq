@@ -24,7 +24,6 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
-import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 
 import java.time.LocalDate;
@@ -172,9 +171,7 @@ public class NewsItem {
     }
 
     public String getFullDescription() {
-        return "<html><h1>" + getHeadline() + "</h1>("
-                + MekHQ.getMHQOptions().getDisplayFormattedDate(date)
-                + ")<br><p>" + getPrefix() + description + "</p></html>";
+        return "<h1>" + getHeadline() + "</h1>" + description;
     }
 
     // JAXB marshalling support

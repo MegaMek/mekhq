@@ -833,7 +833,9 @@ public class EducationController {
         int adultDiceSize = campaign.getCampaignOptions().getAdultDropoutChance();
         int childDiceSize = campaign.getCampaignOptions().getChildrenDropoutChance();
 
-        if (person.isChild(campaign.getLocalDate())) {
+        // Under 18s don't generally have the same capacity for self-determination as 18+
+        // characters, so we treat them as children - even though at 16 they can take Roles.
+        if (person.isChild(campaign.getLocalDate(), true)) {
             if (childDiceSize > 1) {
                 roll = Compute.randomInt(childDiceSize);
             } else {
@@ -996,7 +998,12 @@ public class EducationController {
         // been destroyed too.
         if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear())
                 || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
-            if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
+
+            // We use the 'use18' clause here because we don't want to upset players by having
+            // children killed when their academy is attacked unless the player has explicitly
+            // opted in. While players can assign 16-year-olds to combat roles and have them killed
+            // there, that doesn't have the same connotations.
+            if ((!person.isChild(campaign.getLocalDate(), true)) || (campaign.getCampaignOptions().isAllAges())) {
                 if (d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
                             person.getHyperlinkedFullTitle(),

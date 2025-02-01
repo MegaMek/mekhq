@@ -364,7 +364,7 @@ public class RelationshipsTab {
             14, 0, 100000, 1);
 
         lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
-        spnRandomNewDependentMarriage = new CampaignOptionsSpinner("RandomSameSexMarriageDiceSize",
+        spnRandomNewDependentMarriage = new CampaignOptionsSpinner("RandomNewDependentMarriage",
             20, 0, 100000, 1);
 
         // Layout the Panel

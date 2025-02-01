@@ -70,12 +70,12 @@ public class AdvancementTab {
     private JSpinner spnKills;
 
     private JPanel pnlMissions;
-    private JLabel lblIdleXP;
-    private JSpinner spnIdleXP;
-    private JLabel lblMonthsIdleXP;
-    private JSpinner spnMonthsIdleXP;
-    private JLabel lblTargetIdleXP;
-    private JSpinner spnTargetIdleXP;
+    private JLabel lblVocationalXP;
+    private JSpinner spnVocationalXP;
+    private JLabel lblVocationalXPFrequency;
+    private JSpinner spnVocationalXPFrequency;
+    private JLabel lblVocationalXPTargetNumber;
+    private JSpinner spnVocationalXPTargetNumber;
     private JLabel lblMissionXpFail;
     private JSpinner spnMissionXpFail;
     private JLabel lblMissionXpSuccess;
@@ -194,12 +194,12 @@ public class AdvancementTab {
         spnKills = new JSpinner();
 
         pnlMissions = new JPanel();
-        lblIdleXP = new JLabel();
-        spnIdleXP = new JSpinner();
-        lblMonthsIdleXP = new JLabel();
-        spnMonthsIdleXP = new JSpinner();
-        lblTargetIdleXP = new JLabel();
-        spnTargetIdleXP = new JSpinner();
+        lblVocationalXP = new JLabel();
+        spnVocationalXP = new JSpinner();
+        lblVocationalXPFrequency = new JLabel();
+        spnVocationalXPFrequency = new JSpinner();
+        lblVocationalXPTargetNumber = new JLabel();
+        spnVocationalXPTargetNumber = new JSpinner();
         lblMissionXpFail = new JLabel();
         spnMissionXpFail = new JSpinner();
         lblMissionXpSuccess = new JLabel();
@@ -382,14 +382,14 @@ public class AdvancementTab {
      */
     private JPanel createMissionsPanel() {
         // Contents
-        lblIdleXP = new CampaignOptionsLabel("IdleXP");
-        spnIdleXP = new CampaignOptionsSpinner("IdleXP",
+        lblVocationalXP = new CampaignOptionsLabel("VocationalXP");
+        spnVocationalXP = new CampaignOptionsSpinner("VocationalXP",
             0, 0, 20, 1);
-        lblMonthsIdleXP = new CampaignOptionsLabel("MonthsIdleXP");
-        spnMonthsIdleXP = new CampaignOptionsSpinner("MonthsIdleXP",
+        lblVocationalXPFrequency = new CampaignOptionsLabel("VocationalXPFrequency");
+        spnVocationalXPFrequency = new CampaignOptionsSpinner("VocationalXPFrequency",
             0, 0, 12, 1);
-        lblTargetIdleXP = new CampaignOptionsLabel("TargetIdleXP");
-        spnTargetIdleXP = new CampaignOptionsSpinner("TargetIdleXP",
+        lblVocationalXPTargetNumber = new CampaignOptionsLabel("VocationalXPTargetNumber");
+        spnVocationalXPTargetNumber = new CampaignOptionsSpinner("VocationalXPTargetNumber",
             2, 0, 12, 1);
 
         lblMissionXpFail = new CampaignOptionsLabel("MissionXpFail");
@@ -411,21 +411,21 @@ public class AdvancementTab {
         layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
-        panel.add(spnIdleXP, layout);
+        panel.add(spnVocationalXP, layout);
         layout.gridx++;
-        panel.add(lblIdleXP, layout);
+        panel.add(lblVocationalXP, layout);
         layout.gridx++;
-        panel.add(spnMonthsIdleXP, layout);
+        panel.add(spnVocationalXPFrequency, layout);
         layout.gridx++;
-        panel.add(lblMonthsIdleXP, layout);
+        panel.add(lblVocationalXPFrequency, layout);
 
         layout.gridx = 0;
         layout.gridy++;
         layout.gridwidth = 2;
-        panel.add(lblTargetIdleXP, layout);
+        panel.add(lblVocationalXPTargetNumber, layout);
         layout.gridx += 2;
         layout.gridwidth = 1;
-        panel.add(spnTargetIdleXP, layout);
+        panel.add(spnVocationalXPTargetNumber, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -925,9 +925,9 @@ public class AdvancementTab {
         spnScenarioXP.setValue(options.getScenarioXP());
         spnKillXP.setValue(options.getKillXPAward());
         spnKills.setValue(options.getKillsForXP());
-        spnIdleXP.setValue(options.getIdleXP());
-        spnMonthsIdleXP.setValue(options.getMonthsIdleXP());
-        spnTargetIdleXP.setValue(options.getTargetIdleXP());
+        spnVocationalXP.setValue(options.getVocationalXP());
+        spnVocationalXPFrequency.setValue(options.getVocationalXPCheckFrequency());
+        spnVocationalXPTargetNumber.setValue(options.getVocationalXPTargetNumber());
         spnMissionXpFail.setValue(options.getMissionXpFail());
         spnMissionXpSuccess.setValue(options.getMissionXpSuccess());
         spnMissionXpOutstandingSuccess.setValue(options.getMissionXpOutstandingSuccess());
@@ -980,45 +980,45 @@ public class AdvancementTab {
         }
 
         //start XP Awards Tab
-        options.setXpCostMultiplier((Double) spnXpCostMultiplier.getValue());
-        options.setTaskXP((Integer) spnTaskXP.getValue());
-        options.setNTasksXP((Integer) spnNTasksXP.getValue());
-        options.setSuccessXP((Integer) spnSuccessXP.getValue());
-        options.setMistakeXP((Integer) spnMistakeXP.getValue());
-        options.setScenarioXP((Integer) spnScenarioXP.getValue());
-        options.setKillXPAward((Integer) spnKillXP.getValue());
-        options.setKillsForXP((Integer) spnKills.getValue());
-        options.setIdleXP((Integer) spnIdleXP.getValue());
-        options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getValue());
-        options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
-        options.setMissionXpFail((Integer) spnMissionXpFail.getValue());
-        options.setMissionXpSuccess((Integer) spnMissionXpSuccess.getValue());
-        options.setMissionXpOutstandingSuccess((Integer) spnMissionXpOutstandingSuccess.getValue());
-        options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getValue());
-        options.setAdminXP((Integer) spnAdminWeeklyXP.getValue());
-        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
+        options.setXpCostMultiplier((double) spnXpCostMultiplier.getValue());
+        options.setTaskXP((int) spnTaskXP.getValue());
+        options.setNTasksXP((int) spnNTasksXP.getValue());
+        options.setSuccessXP((int) spnSuccessXP.getValue());
+        options.setMistakeXP((int) spnMistakeXP.getValue());
+        options.setScenarioXP((int) spnScenarioXP.getValue());
+        options.setKillXPAward((int) spnKillXP.getValue());
+        options.setKillsForXP((int) spnKills.getValue());
+        options.setVocationalXP((int) spnVocationalXP.getValue());
+        options.setVocationalXPCheckFrequency((int) spnVocationalXPFrequency.getValue());
+        options.setVocationalXPTargetNumber((int) spnVocationalXPTargetNumber.getValue());
+        options.setMissionXpFail((int) spnMissionXpFail.getValue());
+        options.setMissionXpSuccess((int) spnMissionXpSuccess.getValue());
+        options.setMissionXpOutstandingSuccess((int) spnMissionXpOutstandingSuccess.getValue());
+        options.setContractNegotiationXP((int) spnContractNegotiationXP.getValue());
+        options.setAdminXP((int) spnAdminWeeklyXP.getValue());
+        options.setAdminXPPeriod((int) spnAdminWeeklyXPPeriod.getValue());
 
         //start Skill Randomization Tab
         skillPreferences.setRandomizeSkill(chkExtraRandomness.isSelected());
         for (int i = 0; i < phenotypeSpinners.length; i++) {
-            options.setPhenotypeProbability(i, (Integer) phenotypeSpinners[i].getValue());
+            options.setPhenotypeProbability(i, (int) phenotypeSpinners[i].getValue());
         }
 
-        skillPreferences.setAntiMekProb((Integer) spnAntiMekSkill.getValue());
-        skillPreferences.setArtilleryProb((Integer) spnArtyProb.getValue());
-        skillPreferences.setArtilleryBonus((Integer) spnArtyBonus.getValue());
-        skillPreferences.setSecondSkillProb((Integer) spnSecondProb.getValue());
-        skillPreferences.setSecondSkillBonus((Integer) spnSecondBonus.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_GREEN, (Integer) spnTacticsGreen.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_REGULAR, (Integer) spnTacticsReg.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_VETERAN, (Integer) spnTacticsVet.getValue());
-        skillPreferences.setTacticsMod(SkillType.EXP_ELITE, (Integer) spnTacticsElite.getValue());
-        skillPreferences.setCombatSmallArmsBonus((Integer) spnCombatSA.getValue());
-        skillPreferences.setSupportSmallArmsBonus((Integer) spnSupportSA.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (Integer) spnAbilityGreen.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_REGULAR, (Integer) spnAbilityReg.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_VETERAN, (Integer) spnAbilityVet.getValue());
-        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ELITE, (Integer) spnAbilityElite.getValue());
+        skillPreferences.setAntiMekProb((int) spnAntiMekSkill.getValue());
+        skillPreferences.setArtilleryProb((int) spnArtyProb.getValue());
+        skillPreferences.setArtilleryBonus((int) spnArtyBonus.getValue());
+        skillPreferences.setSecondSkillProb((int) spnSecondProb.getValue());
+        skillPreferences.setSecondSkillBonus((int) spnSecondBonus.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_GREEN, (int) spnTacticsGreen.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_REGULAR, (int) spnTacticsReg.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_VETERAN, (int) spnTacticsVet.getValue());
+        skillPreferences.setTacticsMod(SkillType.EXP_ELITE, (int) spnTacticsElite.getValue());
+        skillPreferences.setCombatSmallArmsBonus((int) spnCombatSA.getValue());
+        skillPreferences.setSupportSmallArmsBonus((int) spnSupportSA.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_GREEN, (int) spnAbilityGreen.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_REGULAR, (int) spnAbilityReg.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_VETERAN, (int) spnAbilityVet.getValue());
+        skillPreferences.setSpecialAbilityBonus(SkillType.EXP_ELITE, (int) spnAbilityElite.getValue());
 
         if (presetRandomSkillPreferences == null) {
             campaign.setRandomSkillPreferences(randomSkillPreferences);

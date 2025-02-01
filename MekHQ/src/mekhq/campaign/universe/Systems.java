@@ -18,20 +18,6 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.FileInputStream;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
@@ -43,6 +29,15 @@ import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
+
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 /**
  * This will eventually replace the Planets object as our source of
@@ -56,6 +51,9 @@ public class Systems {
     private static final MMLogger logger = MMLogger.create(Systems.class);
 
     private static Systems systems;
+
+    private final int HPG_RADIUS_A_STATION = 50;
+    private final int HPG_RADIUS_B_STATION = 30;
 
     // Marshaller / unmarshaller instances
     private static Marshaller marshaller;
@@ -225,7 +223,7 @@ public class Systems {
         hpgNetworkCacheDate = null;
     }
 
-    public Collection<Systems.HPGLink> getHPGNetwork(LocalDate when) {
+    public Collection<HPGLink> getHPGNetwork(LocalDate when) {
         if ((null != when) && when.equals(hpgNetworkCacheDate)) {
             return hpgNetworkCache;
         }
@@ -233,13 +231,25 @@ public class Systems {
         Set<HPGLink> result = new HashSet<>();
         for (PlanetarySystem system : systemList.values()) {
             Integer hpg = system.getHPG(when);
-            if ((null != hpg) && (hpg == EquipmentType.RATING_A)) {
-                Collection<PlanetarySystem> neighbors = getNearbySystems(system, 50);
-                for (PlanetarySystem neighbor : neighbors) {
-                    hpg = neighbor.getHPG(when);
-                    if (null != hpg) {
-                        HPGLink link = new HPGLink(system, neighbor, hpg);
-                        result.add(link);
+            if (hpg != null) {
+                int distance = 0;
+                if (hpg == EquipmentType.RATING_A) {
+                    distance = HPG_RADIUS_A_STATION;
+                }
+
+                if (hpg == EquipmentType.RATING_B) {
+                    distance = HPG_RADIUS_B_STATION;
+                }
+
+                Collection<PlanetarySystem> neighbors = getNearbySystems(system, distance);
+
+                if (distance > 0) {
+                    for (PlanetarySystem neighbor : neighbors) {
+                        hpg = neighbor.getHPG(when);
+                        if (null != hpg) {
+                            HPGLink link = new HPGLink(system, neighbor, hpg);
+                            result.add(link);
+                        }
                     }
                 }
             }

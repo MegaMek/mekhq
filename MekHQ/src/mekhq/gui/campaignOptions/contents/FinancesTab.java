@@ -645,14 +645,12 @@ public class FinancesTab {
      * @return A JPanel containing labels and spinners for used parts price multipliers.
      */
     private JPanel createUsedPartsMultiplierPanel() {
-        boolean reverseQualities = campaign.getCampaignOptions().isReverseQualityNames();
-
         // Contents
         lblUsedPartPriceMultipliers = new JLabel[QUALITY_F.ordinal() + 1];
         spnUsedPartPriceMultipliers = new JSpinner[QUALITY_F.ordinal() + 1];
 
         for (PartQuality partQuality : PartQuality.values()) {
-            final String qualityLevel = partQuality.toName(reverseQualities);
+            final String qualityLevel = partQuality.toName(false);
             int ordinal = partQuality.ordinal();
 
             lblUsedPartPriceMultipliers[ordinal] = new JLabel(qualityLevel);
@@ -753,7 +751,7 @@ public class FinancesTab {
         options.setLoanLimits(useLoanLimitsBox.isSelected());
         options.setUsePercentageMaint(usePercentageMaintenanceBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
-        options.setShowPeacetimeCost(usePeacetimeCostBox.isSelected());
+        options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
         options.setFinancialYearDuration(comboFinancialYearDuration.getSelectedItem());
         options.setNewFinancialYearFinancesToCSVExport(newFinancialYearFinancesToCSVExportBox.isSelected());
@@ -818,10 +816,9 @@ public class FinancesTab {
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
         usePercentageMaintenanceBox.setSelected(options.isUsePercentageMaint());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
-        usePeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
+        usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
-        comboFinancialYearDuration = new MMComboBox<>("comboFinancialYearDuration",
-                FinancialYearDuration.values());
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
         payForPartsBox.setSelected(options.isPayForParts());
         payForRepairsBox.setSelected(options.isPayForRepairs());

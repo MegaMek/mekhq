@@ -36,6 +36,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mekhq.campaign.mission.enums.ScenarioStatus.CURRENT;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
 /**
  * A table model for displaying scenarios
  */
@@ -109,6 +113,30 @@ public class ScenarioTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
+            if (campaign.getCampaignOptions().isUseStratCon()) {
+                if (scenario instanceof AtBScenario) {
+                    if (scenario.getStatus() != CURRENT) {
+                        return scenario.getName();
+                    }
+
+                    StratconScenario stratconScenario = ((AtBScenario) scenario).getStratconScenario(campaign);
+
+                    if (stratconScenario != null) {
+                        boolean isTurningPoint = stratconScenario.isTurningPoint();
+                        String openingSpan = isTurningPoint
+                            ? spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor())
+                            : "";
+
+                        String colorblindHelper = isTurningPoint ? " \u26A0" : "";
+
+                        String closingSpan = isTurningPoint ? CLOSING_SPAN_TAG : "";
+
+                        return String.format("<html>%s%s%s%s</html", openingSpan,
+                            scenario.getName(), closingSpan, colorblindHelper);
+                    }
+                }
+            }
+
             return scenario.getName();
         } else if (col == COL_STATUS) {
             return scenario.getStatus();

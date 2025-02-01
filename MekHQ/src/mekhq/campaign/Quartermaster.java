@@ -103,7 +103,6 @@ public class Quartermaster {
         }
 
         part.setDaysToArrival(Math.max(transitDays, 0));
-        part.setBrandNew(false);
 
         // be careful in using this next line
         part.postProcessCampaignAddition();

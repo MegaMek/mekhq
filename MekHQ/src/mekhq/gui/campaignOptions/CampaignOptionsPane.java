@@ -264,7 +264,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         advancementTab.loadValuesFromCampaignOptions();
 
         // Skills
-        skillsTab = new SkillsTab();
+        skillsTab = new SkillsTab(campaignOptions);
 
         JTabbedPane skillsContentTabs = createSubTabs(Map.of(
             "combatSkillsTab", skillsTab.createSkillsTab(true),
@@ -417,7 +417,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Advancement
         advancementTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
-        skillsTab.applyCampaignOptionsToCampaign(presetSkills);
+        skillsTab.applyCampaignOptionsToCampaign(options, presetSkills);
         abilitiesTab.applyCampaignOptionsToCampaign(preset);
 
         // Logistics
@@ -457,14 +457,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Human Resources
         personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
-            presetCampaignOptions.getRandomOriginOptions());
+            presetCampaignOptions.getRandomOriginOptions(), campaignPreset.getRankSystem());
         relationshipsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
         turnoverAndRetentionTab.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
         advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions,
             campaignPreset.getRandomSkillPreferences());
-        skillsTab.loadValuesFromCampaignOptions(campaignPreset.getSkills());
+        skillsTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability tab is a special case, so handled differently to other tabs
         abilitiesTab.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
 

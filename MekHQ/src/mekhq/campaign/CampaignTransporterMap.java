@@ -73,6 +73,11 @@ public class CampaignTransporterMap {
      * @param transport Unit to get update our stored capacity
      */
     public void updateTransportInTransporterMap(Unit transport) {
+        // If this unit is mothballed, let's remove it from the map and return.
+        if (transport.isMothballed()) {
+            removeTransport(transport);
+            return;
+        }
         AbstractTransportedUnitsSummary transportedUnitsSummary = transport.getTransportedUnitsSummary(campaignTransportType);
         for (TransporterType transporterType : transportedUnitsSummary.getTransportCapabilities()) {
             if (transportersMap.containsKey(transporterType)) {
@@ -159,24 +164,24 @@ public class CampaignTransporterMap {
      * @param transport - The unit we want to remove from this Set
      */
     public void removeTransport(Unit transport) {
+        Map<TransporterType, Double> toRemoveMap = new HashMap<>();
         for ( TransporterType transporterType : transportersMap.keySet()) {
             for (Double capacity : transportersMap.get(transporterType).keySet()) {
-                transportersMap.get(transporterType).get(capacity).remove(transport.getId());
-                if (transportersMap.get(transporterType).get(capacity).isEmpty()) {
-                    transportersMap.get(transporterType).remove(capacity);
+                if (transportersMap.get(transporterType).get(capacity).contains(transport.getId())) {
+                    toRemoveMap.put(transporterType, capacity);
                 }
-            }
-            if (transportersMap.get(transporterType).isEmpty()) {
-                transportersMap.remove(transporterType);
             }
         }
 
-        // If we remove a transport ship from the campaign,
-        // we need to remove any transported units from it
-        if (transport.getTransportedUnitsSummary(campaignTransportType).hasTransportedUnits()) {
-            List<Unit> transportedUnits = new ArrayList<>(transport.getTransportedUnitsSummary(campaignTransportType).getTransportedUnits());
-            for (Unit transportedUnit : transportedUnits) {
-                transport.getTransportedUnitsSummary(campaignTransportType).removeTransportedUnit(transportedUnit);
+        for (TransporterType transporterTypeToRemove : toRemoveMap.keySet()) {
+            double capacity = toRemoveMap.get(transporterTypeToRemove);
+
+            transportersMap.get(transporterTypeToRemove).get(capacity).remove(transport.getId());
+            if (transportersMap.get(transporterTypeToRemove).get(capacity).isEmpty()) {
+                transportersMap.get(transporterTypeToRemove).remove(capacity);
+            }
+            if (transportersMap.get(transporterTypeToRemove).isEmpty()) {
+                transportersMap.remove(transporterTypeToRemove);
             }
         }
     }

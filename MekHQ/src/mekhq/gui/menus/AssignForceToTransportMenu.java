@@ -21,6 +21,7 @@ package mekhq.gui.menus;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
@@ -108,6 +109,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
             }
 
             Set<Unit> transports = campaign.getTransportsByType(campaignTransportType, transporterType, requiredTransportCapacity);
+            transports.removeIf(transport -> transport.getForceId() == Force.FORCE_NONE);
 
             if (!transports.isEmpty()) {
                 JScrollableMenu transporterTypeMenu = new JScrollableMenu(transporterType.toString(), transporterType.toString());

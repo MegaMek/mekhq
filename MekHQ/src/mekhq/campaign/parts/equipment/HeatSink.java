@@ -25,6 +25,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 
+import java.util.StringJoiner;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -113,5 +115,30 @@ public class HeatSink extends EquipmentPart {
     @Override
     public boolean isOmniPoddable() {
         return true;
+    }
+
+    /**
+     * Gets a string containing details regarding the part,
+     * and optionally include information on its repair
+     * status.
+     *
+     * @param includeRepairDetails {@code true} if the details
+     *                             should include information such as the number of
+     *                             hits or how much it would cost to repair the
+     *                             part.
+     * @return A string containing details regarding the part.
+     */
+    @Override
+    public String getDetails(boolean includeRepairDetails) {
+        StringJoiner sj = new StringJoiner(", ");
+        if (getName() != null && getName().equals("Double Heat Sink")) {
+            sj.add(getTechBaseName());
+        }
+
+        if( !super.getDetails(includeRepairDetails).isEmpty()) {
+            sj.add(super.getDetails(includeRepairDetails));
+        }
+
+        return sj.toString();
     }
 }

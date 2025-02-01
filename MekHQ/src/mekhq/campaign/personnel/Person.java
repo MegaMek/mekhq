@@ -167,8 +167,9 @@ public class Person {
     private UUID doctorId;
     private List<Unit> techUnits;
 
+    private int vocationalXPTimer;
+
     // days of rest
-    private int idleMonths;
     private int daysToWaitForHealing;
 
     // Our rank
@@ -1307,12 +1308,12 @@ public class Person {
         this.status = status;
     }
 
-    public int getIdleMonths() {
-        return idleMonths;
+    public int getVocationalXPTimer() {
+        return vocationalXPTimer;
     }
 
-    public void setIdleMonths(final int idleMonths) {
-        this.idleMonths = idleMonths;
+    public void setVocationalXPTimer(final int vocationalXPTimer) {
+        this.vocationalXPTimer = vocationalXPTimer;
     }
 
     public int getDaysToWaitForHealing() {
@@ -1472,8 +1473,33 @@ public class Person {
         return id;
     }
 
+    /**
+     * Checks if the person is considered a child based on their age and today's date.
+     *
+     * <p>This method uses the default context where the person is not being checked
+     * for procreation-specific thresholds.</p>
+     *
+     * @param today the current date to calculate the age against
+     * @return {@code true} if the person's age is less than 16; {@code false} otherwise
+     */
     public boolean isChild(final LocalDate today) {
-        return getAge(today) < 18;
+        return isChild(today, false);
+    }
+
+    /**
+     * Checks if the person is considered a child based on their age, today's date, and procreation
+     * status.
+     *
+     * @param today the current date to calculate the age against
+     * @param use18 if {@code true}, the threshold considers a person a child
+     *                      if their age is less than 18; otherwise, the default age threshold of
+     *                      16 applies
+     * @return {@code true} if the person's age is less than the specified threshold
+     *         (procreation or default), {@code false} otherwise
+     */
+    public boolean isChild(final LocalDate today, boolean use18) {
+        int age = getAge(today);
+        return age < (use18 ? 18 : 16);
     }
 
     public Genealogy getGenealogy() {
@@ -1974,8 +2000,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
             }
 
-            if (idleMonths > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleMonths", idleMonths);
+            if (vocationalXPTimer > 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPTimer", vocationalXPTimer);
             }
 
             if (!genealogy.isEmpty()) {
@@ -2336,8 +2362,10 @@ public class Person {
                     retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTimer")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
+                    retVal.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
@@ -2860,7 +2888,6 @@ public class Person {
      */
     private static void removeUnusedEdgeTriggers(Person retVal, List<String> edgeOptionList) {
         for (String edgeTrigger : edgeOptionList) {
-            logger.info(edgeTrigger);
             String advName = Crew.parseAdvantageName(edgeTrigger);
 
             try {
