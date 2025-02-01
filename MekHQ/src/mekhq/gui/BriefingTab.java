@@ -1317,9 +1317,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario instanceof AtBScenario) {
             btnAutoResolveScenario.setEnabled(canStartGame);
         }
-        btnPrintRS.setEnabled(canStartGame);
-
-        
+        btnPrintRS.setEnabled(canStartGame);   
     }
 
     public void refreshLanceAssignments() {

@@ -2658,8 +2658,8 @@ public class StratconRulesManager {
     public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
 
-        if (nextScenario instanceof AtBScenario) {
-            StratconCampaignState campaignState = ((AtBScenario) nextScenario).getContract(tracker.getCampaign())
+        if (nextScenario instanceof AtBScenario nextAtBScenario) {
+            StratconCampaignState campaignState = nextAtBScenario.getContract(tracker.getCampaign())
                     .getStratconCampaignState();
             if (campaignState == null) {
                 return;
