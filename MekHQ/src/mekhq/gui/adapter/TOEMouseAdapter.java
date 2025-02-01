@@ -68,6 +68,7 @@ import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
 import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.ForceType.SUPPORT;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
@@ -449,7 +450,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                 if (forceType.shouldStandardizeParents()) {
                     for (Force parentForce : force.getAllParents()) {
-                        parentForce.setForceType(forceType, false);
+                        parentForce.setForceType(STANDARD, false);
                     }
                 }
 
