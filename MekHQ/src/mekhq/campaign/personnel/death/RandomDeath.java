@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.death;
 
 import megamek.Version;
+import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
@@ -45,7 +46,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Math.round;
-import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -295,7 +295,7 @@ public class RandomDeath {
             : baseDieSize;
 
         // At this point death is guaranteed, so no need to roll.
-        if (baseDieSize <= 1) {
+        if (adjustedDieSize <= 1) {
             return true;
         }
 
@@ -457,4 +457,18 @@ public class RandomDeath {
     private PersonnelStatus getDefaultCause(final AgeGroup ageGroup) {
         return ageGroup.isElder() ? PersonnelStatus.OLD_AGE : PersonnelStatus.NATURAL_CAUSES;
     }
+
+    /**
+     * Generates a random integer up to the given bound (exclusive)
+     *
+     * <p>We use this custom method to make it easier to test the random components of the
+     * `randomlyDies` method.</p>
+     *
+     * @param bound The upper bound for the random number.
+     * @return A random integer between 0 (inclusive) and {@code bound} (exclusive).
+     */
+    protected int randomInt(int bound) {
+        return Compute.randomInt(bound);
+    }
+
 }

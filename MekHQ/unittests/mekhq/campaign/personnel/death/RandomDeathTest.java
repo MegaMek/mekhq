@@ -137,7 +137,12 @@ public class RandomDeathTest {
         CampaignOptions mockedOptions = mock(CampaignOptions.class);
         when(mockedOptions.getRandomDeathChance()).thenReturn(0);
 
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
+        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
+            @Override
+            protected int randomInt(int bound) {
+                return 0; // Doesn't matter because chance is zero
+            }
+        };
 
         assertFalse(randomDeath.randomlyDies(30, Gender.MALE));
     }
@@ -147,7 +152,12 @@ public class RandomDeathTest {
         CampaignOptions mockedOptions = mock(CampaignOptions.class);
         when(mockedOptions.getRandomDeathChance()).thenReturn(10);
 
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
+        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
+            @Override
+            protected int randomInt(int bound) {
+                return 1; // Simulate NOT rolling a 0
+            }
+        };
 
         assertFalse(randomDeath.randomlyDies(95, Gender.MALE));
     }
@@ -157,9 +167,45 @@ public class RandomDeathTest {
         CampaignOptions mockedOptions = mock(CampaignOptions.class);
         when(mockedOptions.getRandomDeathChance()).thenReturn(10);
 
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
+        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
+            @Override
+            protected int randomInt(int bound) {
+                return 0; // Simulate rolling a 0 (death)
+            }
+        };
 
-        assertFalse(randomDeath.randomlyDies(30, Gender.FEMALE));
+        assertTrue(randomDeath.randomlyDies(30, Gender.FEMALE));
+    }
+
+    @Test
+    public void testRandomlyDies_AdjustedDieSizeAboveOne() {
+        CampaignOptions mockedOptions = mock(CampaignOptions.class);
+        when(mockedOptions.getRandomDeathChance()).thenReturn(20); // Base chance
+
+        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
+            @Override
+            protected int randomInt(int bound) {
+                return 5; // Simulate NOT rolling a 0
+            }
+        };
+
+        assertFalse(randomDeath.randomlyDies(80, Gender.MALE));
+    }
+
+    @Test
+    public void testRandomlyDies_AgeThresholdGuaranteesDeath() {
+        CampaignOptions mockedOptions = mock(CampaignOptions.class);
+        when(mockedOptions.getRandomDeathChance()).thenReturn(10);
+
+        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
+            @Override
+            protected int randomInt(int bound) {
+                return 0; // Doesn't matter since death is guaranteed when adjustedDieSize <= 1
+            }
+        };
+
+        // If adjustedDieSize = 1, death is guaranteed without a random roll
+        assertTrue(randomDeath.randomlyDies(150, Gender.MALE));
     }
 
     @Test
