@@ -112,19 +112,34 @@ public abstract class AbstractMarriage {
     public @Nullable String canMarry(final LocalDate today, final Person person, final boolean randomMarriage) {
         if (!person.isMarriageable()) {
             return resources.getString("cannotMarry.NotMarriageable.text");
-        } else if (person.getGenealogy().hasSpouse()) {
+        }
+
+        if (person.getGenealogy().hasSpouse()) {
             return resources.getString("cannotMarry.AlreadyMarried.text");
-        } else if (!person.getStatus().isActive()) {
+        }
+
+        if (!person.getStatus().isActive()) {
             return resources.getString("cannotMarry.Inactive.text");
-        } else if (person.isDeployed()) {
+        }
+
+        if (person.isDeployed()) {
             return resources.getString("cannotMarry.Deployed.text");
-        } else if (person.isChild(today)) {
+        }
+
+        // Not allowing under-18s to marry is project policy
+        if (person.isChild(today, true)) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
+        }
+
+        if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
             return resources.getString("cannotMarry.ClanPersonnel.text");
-        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
+        }
+
+        if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
-        } else if (randomMarriage) {
+        }
+
+        if (randomMarriage) {
             if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
