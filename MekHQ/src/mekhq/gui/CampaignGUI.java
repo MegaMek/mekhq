@@ -54,6 +54,8 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.personnel.death.AbstractDeath;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
@@ -1485,9 +1487,12 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        AbstractDeath death = getCampaign().getDeath();
         if ((randomDeathMethod != newOptions.getRandomDeathMethod())
                 || (useRandomDeathSuicideCause != newOptions.isUseRandomDeathSuicideCause())) {
             getCampaign().setDeath(newOptions.getRandomDeathMethod().getMethod(newOptions));
+        } else if (death instanceof RandomDeath) {
+            ((RandomDeath) death).setPercentage(newOptions.getRandomDeathChance());
         }
 
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {

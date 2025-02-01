@@ -111,6 +111,8 @@ public class BiographyTab {
     private JLabel lblRandomDeathMethod;
     private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
     private JCheckBox chkUseRandomDeathSuicideCause;
+    private JLabel lblRandomDeathChance;
+    private JSpinner spnRandomDeathChance;
 
     private JPanel pnlDeathAgeGroup;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
@@ -278,6 +280,8 @@ public class BiographyTab {
         lblRandomDeathMethod = new JLabel();
         comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
         chkUseRandomDeathSuicideCause = new JCheckBox();
+        lblRandomDeathChance = new JLabel();
+        spnRandomDeathChance = new JSpinner();
 
         pnlDeathAgeGroup = new JPanel();
         chkEnabledRandomDeathAgeGroups = new HashMap<>();
@@ -760,6 +764,10 @@ public class BiographyTab {
         });
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
+        lblRandomDeathChance = new CampaignOptionsLabel("RandomDeathChance");
+        spnRandomDeathChance = new CampaignOptionsSpinner("RandomDeathChance",
+            0, 0, 100, 0.000001);
+
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
         // Layout the Panel
@@ -776,6 +784,11 @@ public class BiographyTab {
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(lblRandomDeathChance, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnRandomDeathChance, layoutLeft);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -1306,6 +1319,7 @@ public class BiographyTab {
         // Death
         comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
+        spnRandomDeathChance.setValue(options.getRandomDeathChance());
 
         Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
@@ -1395,6 +1409,7 @@ public class BiographyTab {
         // Death
         options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
+        options.setRandomDeathChance((double) spnRandomDeathChance.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());

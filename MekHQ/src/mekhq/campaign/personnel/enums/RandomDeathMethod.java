@@ -22,7 +22,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.death.AbstractDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
-import mekhq.campaign.personnel.death.ExponentialRandomDeath;
+import mekhq.campaign.personnel.death.RandomDeath;
 
 import java.util.ResourceBundle;
 
@@ -68,7 +68,7 @@ public enum RandomDeathMethod {
 
     public AbstractDeath getMethod(final CampaignOptions options, final boolean initializeCauses) {
         return switch (this) {
-            case RANDOM -> new ExponentialRandomDeath(options, initializeCauses);
+            case RANDOM -> new RandomDeath(options, initializeCauses);
             case NONE -> new DisabledRandomDeath(options, initializeCauses);
         };
     }

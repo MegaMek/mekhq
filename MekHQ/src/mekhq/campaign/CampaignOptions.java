@@ -20,15 +20,12 @@
 package mekhq.campaign;
 
 import megamek.Version;
-import megamek.client.ui.swing.GUIPreferences;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Configuration;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
-import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -374,6 +371,7 @@ public class CampaignOptions {
     private RandomDeathMethod randomDeathMethod;
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
     private boolean useRandomDeathSuicideCause;
+    private double randomDeathChance;
     // endregion Life Paths Tab
 
     //region Turnover and Retention
@@ -968,6 +966,7 @@ public class CampaignOptions {
         getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
         setUseRandomDeathSuicideCause(false);
+        setRandomDeathChance(0.00002);
         // endregion Life Paths Tab
 
         // region Turnover and Retention
@@ -2980,6 +2979,14 @@ public class CampaignOptions {
 
     public void setUseRandomDeathSuicideCause(final boolean useRandomDeathSuicideCause) {
         this.useRandomDeathSuicideCause = useRandomDeathSuicideCause;
+    }
+
+    public double getRandomDeathChance() {
+        return randomDeathChance;
+    }
+
+    public void setRandomDeathChance(final double randomDeathChance) {
+        this.randomDeathChance = randomDeathChance;
     }
     // endregion Death
 
@@ -5025,6 +5032,7 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enabledRandomDeathAgeGroups");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathChance", getRandomDeathChance());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathMaleValues");
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathMaleValues");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathFemaleValues");
@@ -5842,6 +5850,8 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
                     retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathChance")) {
+                    retVal.setRandomDeathChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
