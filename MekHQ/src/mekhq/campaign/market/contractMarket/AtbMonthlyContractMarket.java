@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import static java.lang.Math.floor;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
 import static megamek.common.Compute.d6;
@@ -501,22 +500,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         // Operations tempo
         multiplier *= contract.getContractType().getOperationsTempoMultiplier();
 
-        // Reputation multiplier
-        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (campaign.getReputation().getReputationRating() * 0.2) + 0.5;
-        } else {
-            int unitRatingMod = campaign.getAtBUnitRatingMod();
-            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
-                multiplier *= 2.0;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
-                multiplier *= 1.5;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
-                multiplier *= 0.8;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
-                multiplier *= 0.5;
-            }
-        }
-
         // Employer multiplier
         final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
         final Faction enemy = contract.getEnemy();
@@ -528,8 +511,20 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        if (enemy.isRebelOrPirate()) {
-            multiplier *= 1.1;
+        // Reputation multiplier
+        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+            multiplier *= (campaign.getReputation().getReputationModifier() * 0.2) + 0.5;
+        } else {
+            int unitRatingMod = campaign.getAtBUnitRatingMod();
+            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
+                multiplier *= 2.0;
+            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
+                multiplier *= 1.5;
+            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
+                multiplier *= 0.8;
+            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
+                multiplier *= 0.5;
+            }
         }
 
         // Unofficial modifiers
@@ -565,12 +560,14 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         // Adjust pay based on difficulty if FG3 is enabled
         if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            int difficulty = clamp(contract.calculateContractDifficulty(campaign), 0, 10);
+            int difficulty = contract.calculateContractDifficulty(campaign);
             int baseDifficulty = 5; // 2.5 skulls
 
-            double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
+            if (difficulty > 0) {
+                double difficultyDifference = ((difficulty - baseDifficulty) / (double) baseDifficulty);
 
-            modifier += difficultyDifference;
+                modifier += difficultyDifference;
+            }
         }
 
         return modifier;

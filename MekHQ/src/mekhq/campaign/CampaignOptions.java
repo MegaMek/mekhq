@@ -20,10 +20,15 @@
 package mekhq.campaign;
 
 import megamek.Version;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.codeUtilities.MathUtility;
+import megamek.common.Configuration;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
+import megamek.common.preference.ClientPreferences;
+import megamek.common.preference.PreferenceManager;
+import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -44,6 +49,7 @@ import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
@@ -53,7 +59,7 @@ import java.util.Map.Entry;
  */
 public class CampaignOptions {
     private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
-
+    private static final ClientPreferences CLIENT_PREFERENCES = PreferenceManager.getClientPreferences();
     // region Magic Numbers
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
@@ -598,6 +604,7 @@ public class CampaignOptions {
     private int scenarioModBV;
     private boolean autoConfigMunitions;
     private AutoResolveMethod autoResolveMethod;
+    private String strategicViewMinimapTheme;
     private boolean autoResolveVictoryChanceEnabled;
     private int autoResolveNumberOfScenarios;
     private boolean autoResolveExperimentalPacarGuiEnabled;
@@ -1201,7 +1208,7 @@ public class CampaignOptions {
         autoResolveVictoryChanceEnabled = false;
         autoResolveNumberOfScenarios = 100;
         autoResolveExperimentalPacarGuiEnabled = false;
-
+        strategicViewMinimapTheme = "gbc green.theme";
         // Unit Administration
         useAero = false;
         useVehicles = true;
@@ -5255,6 +5262,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveVictoryChanceEnabled", isAutoResolveVictoryChanceEnabled());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveNumberOfScenarios", getAutoResolveNumberOfScenarios());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoResolveUseExperimentalPacarGui", isAutoResolveExperimentalPacarGuiEnabled());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "strategicViewTheme", getStrategicViewTheme().getName());
         // endregion AtB Tab
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
@@ -6269,6 +6277,8 @@ public class CampaignOptions {
                     retVal.setAutoResolveNumberOfScenarios(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoResolveUseExperimentalPacarGui")) {
                     retVal.setAutoResolveExperimentalPacarGuiEnabled(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("strategicViewTheme")) {
+                    retVal.setStrategicViewTheme(wn2.getTextContent().trim());
                     // endregion ACAR Tab
                     // endregion AtB Tab
 
@@ -6544,6 +6554,17 @@ public class CampaignOptions {
 
     public void setAutoResolveMethod(final AutoResolveMethod autoResolveMethod) {
         this.autoResolveMethod = autoResolveMethod;
+    }
+
+    public void setStrategicViewTheme(String minimapStyle) {
+        // it is persisted here to have something in the campaign options persisted that will change the GUI preference for the theme
+        this.strategicViewMinimapTheme = minimapStyle;
+        CLIENT_PREFERENCES.setStrategicViewTheme(minimapStyle);
+    }
+
+    public File getStrategicViewTheme() {
+        CLIENT_PREFERENCES.setStrategicViewTheme(strategicViewMinimapTheme);
+        return CLIENT_PREFERENCES.getStrategicViewTheme();
     }
 
     public boolean isAutoResolveVictoryChanceEnabled() {

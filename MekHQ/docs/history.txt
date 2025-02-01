@@ -145,6 +145,20 @@ MEKHQ VERSION HISTORY:
 + PR #5893: Immersively Updated the Immersive Dialog to Be More Immersive
 + PR #5894: Added missing minimaps for MekHQ
 + PR #5900: Fixed Negative Contract Base Pay
++ PR #5874: Feature: minimap themes
++ PR #5908: Restored Missing Column Labels for Planetary Acquisition
++ Fix #5910: Added Fallback for AtB Bonus Unit Creation
++ PR #5912: Implemented NewsDialog for Immersive News Display
++ PR #5915: Update scenario panel facility objective text
++ PR #5925: Fixed Unit Role configuration in Resupply Scenario Templates
++ Fix #5934: Fixed Contract Multiplier Again
++ PR #5941: Corrected Weight Class Parameter Setting Logic
++ PR #5942: Renamed 'Fixed BV' to 'BV' in BotForce Scenario Details
++ Fix #5921: Fixed Used Parts Multiplier Labels to Ignore Quality Reversal in Finances Tab
++ Fix #5917: Added Soldier Requirements Handling in UnitTableModel
++ PR #5930: Format Part Names as Italicized when Brand New
++ PR #5933: Fixed Overwriting of 'Brand New' Part State
++ Fix #5685: More control settings for autoLogistics
 
 
 0.50.02 (2024-12-30 2130 UTC)

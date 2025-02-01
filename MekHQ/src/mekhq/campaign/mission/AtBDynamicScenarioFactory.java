@@ -1823,11 +1823,9 @@ public class AtBDynamicScenarioFactory {
             params.setFilter(mekSummary -> mekSummary.getWalkMp() >= 1);
         }
 
-        if (rolesByType != null && !rolesByType.isEmpty()) {
-            params.setWeightClass(shouldBypassWeightClass(rolesByType)
-                ? UNIT_WEIGHT_UNSPECIFIED
-                : weightClass);
-        }
+        params.setWeightClass(shouldBypassWeightClass(rolesByType)
+            ? UNIT_WEIGHT_UNSPECIFIED
+            : weightClass);
 
         // Vehicles and infantry require some additional processing
         if (unitType == TANK) {
@@ -1857,7 +1855,11 @@ public class AtBDynamicScenarioFactory {
      * @param rolesByType a collection of mission roles to evaluate.
      * @return {@code true} if any role in {@code rolesByType} matches one of the predefined bypassed roles.
      */
-    private static boolean shouldBypassWeightClass(Collection<MissionRole> rolesByType) {
+    private static boolean shouldBypassWeightClass(@Nullable Collection<MissionRole> rolesByType) {
+        if (rolesByType == null) {
+            return false;
+        }
+
         // These roles were picked as their pool is relatively small, or they are exclusive in nature.
         // This ensures we have a greater chance of successfully pulling an appropriate unit.
         List<MissionRole> bypassedRoles = List.of(CIVILIAN, SUPPORT, ARTILLERY, MISSILE_ARTILLERY,
@@ -1889,8 +1891,6 @@ public class AtBDynamicScenarioFactory {
     public static Entity getTankEntity(UnitGeneratorParameters params,
             SkillLevel skill,
             Campaign campaign) {
-        MekSummary ms;
-
         // useful debugging statement that forces generation of specific units rather
         // than random ones
         // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill,
@@ -1906,11 +1906,15 @@ public class AtBDynamicScenarioFactory {
         MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
-            if (!params.getMissionRoles().isEmpty()) {
-                logger.warn(String.format("Unable to randomly generate %s %s with roles: %s",
+            if (params.getMissionRoles() != null && !params.getMissionRoles().isEmpty()) {
+                logger.info(String.format("Unable to randomly generate %s %s with roles: %s",
                         params.getWeightClass(),
                         getTypeName(TANK),
                         params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+            } else {
+                logger.info(String.format("Unable to randomly generate %s %s with no roles.",
+                    params.getWeightClass(),
+                    getTypeName(TANK)));
             }
             return null;
         }

@@ -653,14 +653,12 @@ public class FinancesTab {
      * @return A JPanel containing labels and spinners for used parts price multipliers.
      */
     private JPanel createUsedPartsMultiplierPanel() {
-        boolean reverseQualities = campaign.getCampaignOptions().isReverseQualityNames();
-
         // Contents
         lblUsedPartPriceMultipliers = new JLabel[QUALITY_F.ordinal() + 1];
         spnUsedPartPriceMultipliers = new JSpinner[QUALITY_F.ordinal() + 1];
 
         for (PartQuality partQuality : PartQuality.values()) {
-            final String qualityLevel = partQuality.toName(reverseQualities);
+            final String qualityLevel = partQuality.toName(false);
             int ordinal = partQuality.ordinal();
 
             lblUsedPartPriceMultipliers[ordinal] = new JLabel(qualityLevel);

@@ -110,7 +110,7 @@ public class MHQDialogImmersive extends JDialog {
         CENTER_WIDTH = (centerWidth != null) ? centerWidth : CENTER_WIDTH;
 
         // Title
-        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
+        setTitle();
 
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -173,6 +173,13 @@ public class MHQDialogImmersive extends JDialog {
         pack();
         setLocationRelativeTo(null); // Needs to be after pack
         setVisible(true);
+    }
+
+    /**
+     * Sets the title of the dialog window using localized text.
+     */
+    protected void setTitle() {
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
     }
 
     /**
