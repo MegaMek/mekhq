@@ -9146,4 +9146,17 @@ public class Campaign implements ITechManager {
         }
         return icon;
     }
+    
+    /**
+     * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
+     */
+    public boolean checkLinkedScenario(int scenarioID) {
+        for (Scenario scenario : getScenarios()) {
+            if ((scenario.getLinkedScenario() == scenarioID)  
+                && (getScenario(scenario.getId()).getStatus().isCurrent())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
