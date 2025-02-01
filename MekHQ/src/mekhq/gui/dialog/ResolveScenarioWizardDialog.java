@@ -378,7 +378,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         btnSendReinforcements = new JButton("Continue as Reinforcements");
         btnSendReinforcements.setEnabled(tracker.getScenario().getLinkedScenario() != 0);
-        btnSendReinforcements.setActionCommand("1");
         btnSendReinforcements.setName("Confirm Reinforcement");
         btnSendReinforcements.addActionListener(new ReinforcementListener());
 
@@ -2021,10 +2020,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
 
     /**
-     * Event handler for "Continue as Reinforcment" Button that
-     * adjusts  boolean used after scenario resolution to signal 
-     * player want to send units to linked scenario
-     *
+     * Event handler for "Continue as Reinforcements" Button that
+     * adjusts boolean used after scenario resolution to signal 
+     * player wants to send units to linked scenario
      */
     private class ReinforcementListener implements ActionListener {
 
