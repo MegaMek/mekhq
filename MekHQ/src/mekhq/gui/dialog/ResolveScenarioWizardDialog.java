@@ -38,14 +38,18 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -111,6 +115,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JButton> btnsEditUnit;
     private List<UnitStatus> ustatuses;
     private List<JLabel> lblsUnitName;
+    private JButton btnSendReinforcements;
+    private boolean reinforcementsSent = false;
 
     // maps objectives to list of associated entity checkboxes
     private Map<ScenarioObjective, List<JCheckBox>> objectiveCheckboxes;
@@ -369,6 +375,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         int gridy = 2;
         int unitIndex = 0;
+
+        btnSendReinforcements = new JButton("Continue as Reinforcements");
+        btnSendReinforcements.setEnabled(tracker.getScenario().getLinkedScenario() != 0);
+        btnSendReinforcements.setName("Confirm Reinforcement");
+        btnSendReinforcements.addActionListener(new ReinforcementListener());
+
+
         for (Unit unit : tracker.getUnits()) {
             UnitStatus status = tracker.getUnitsStatus().get(unit.getId());
             ustatuses.add(status);
@@ -401,9 +414,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if (unitIndex == tracker.getUnits().size() - 1) {
-                gridBagConstraints.weighty = 1.0;
-            }
+           
             pnlUnitStatus.add(nameLbl, gridBagConstraints);
             gridBagConstraints.gridx = 1;
             pnlUnitStatus.add(chkTotaled, gridBagConstraints);
@@ -412,8 +423,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 3;
             pnlUnitStatus.add(btnEditUnit, gridBagConstraints);
             gridy++;
+            if (unitIndex == tracker.getUnits().size() - 1) {
+                gridBagConstraints.weighty = 1.0;
+                gridBagConstraints.gridy= gridy;
+                gridBagConstraints.gridx = 1;
+                pnlUnitStatus.add(btnSendReinforcements, gridBagConstraints);
+            }
             unitIndex++;
         }
+        
         return pnlUnitStatus;
     }
 
@@ -1570,6 +1588,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
             }
         }
+        List<Integer> forces = tracker.getScenario().getForceIDs();
 
         //now process
         tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText());
@@ -1597,8 +1616,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         StratconRulesManager.processScenarioCompletion(tracker);
+
+        if (reinforcementsSent  && tracker.getScenario().getStatus().isOverallVictory()
+            && tracker.getScenario().getLinkedScenario() != 0) {
+            StratconRulesManager.linkedScenarioProcessing(tracker, forces);
+        }
+        
+
         aborted = false;
         this.setVisible(false);
+
     }
 
     private void cancel() {
@@ -1987,6 +2014,30 @@ public class ResolveScenarioWizardDialog extends JDialog {
             UUID id = UUID.fromString(evt.getActionCommand());
             int idx = Integer.parseInt(((JButton) evt.getSource()).getName());
             editUnit(id, idx, salvage);
+        }
+    }
+
+
+
+    /**
+     * Event handler for "Continue as Reinforcements" Button that
+     * adjusts boolean used after scenario resolution to signal 
+     * player wants to send units to linked scenario
+     */
+    private class ReinforcementListener implements ActionListener {
+
+        public ReinforcementListener() {
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            reinforcementsSent = (!reinforcementsSent);
+
+            if(reinforcementsSent){
+            ((JButton)evt.getSource()).setBackground(new Color(6, 64, 43));
+            }else{
+            ((JButton) evt.getSource()).setBackground(UIManager.getColor("Button.background"));
+            }
         }
     }
 }
