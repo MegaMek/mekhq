@@ -1620,7 +1620,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         if (reinforcementsSent  && tracker.getScenario().getStatus().isOverallVictory()
             && tracker.getScenario().getLinkedScenario() != 0) {
-            StratconRulesManager.linkedScenerioProcessing(tracker, forces);
+            StratconRulesManager.linkedScenarioProcessing(tracker, forces);
         }
         
 
@@ -2018,6 +2018,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
+
+
+    /**
+     * Event handler for "Continue as Reinforcment" Button that
+     * adjusts  boolean used after scenario resolution to signal 
+     * player want to send units to linked scenario
+     *
+     */
     private class ReinforcementListener implements ActionListener {
 
         public ReinforcementListener() {

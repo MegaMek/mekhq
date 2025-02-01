@@ -2655,7 +2655,7 @@ public class StratconRulesManager {
      * 
      * Should only be used after a scenario is resolved
      */
-    public static void linkedScenerioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
+    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
 
         if (nextScenario instanceof AtBScenario) {
