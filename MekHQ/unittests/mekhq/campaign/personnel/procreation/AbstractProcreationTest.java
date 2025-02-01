@@ -24,7 +24,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -268,108 +270,6 @@ public class AbstractProcreationTest {
 
         // Act
         String result = procreation.canProcreate(date, person, false);
-
-        // Assert
-        assertNotNull(result);
-    }
-
-    @Test
-    public void testIsClanAndClanProcreationDisabled() {
-        // Arrange
-        AbstractProcreation procreation = new RandomProcreation(mockCampaignOptions);
-
-        Person person = mock(Person.class);
-        LocalDate date = LocalDate.of(3025, 1, 1);
-
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
-        when(person.isPregnant()).thenReturn(false);
-        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-        when(person.isDeployed()).thenReturn(false);
-        when(person.isChild(date, true)).thenReturn(false);
-        when(person.getAge(date)).thenReturn(21);
-        when(person.isClanPersonnel()).thenReturn(true);
-
-        // Act
-        String result = procreation.canProcreate(date, person, false);
-
-        // Assert
-        assertNotNull(result);
-    }
-
-    @Test
-    public void testIsPrisonerAndPrisonerProcreationDisabled() {
-        // Arrange
-        AbstractProcreation procreation = new RandomProcreation(mockCampaignOptions);
-
-        Person person = mock(Person.class);
-        LocalDate date = LocalDate.of(3025, 1, 1);
-
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
-        when(person.isPregnant()).thenReturn(false);
-        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-        when(person.isDeployed()).thenReturn(false);
-        when(person.isChild(date, true)).thenReturn(false);
-        when(person.getAge(date)).thenReturn(21);
-        when(person.isClanPersonnel()).thenReturn(false);
-        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-
-        // Act
-        String result = procreation.canProcreate(date, person, false);
-
-        // Assert
-        assertNotNull(result);
-    }
-
-    @Test
-    public void testIsPrisonerAndPrisonerProcreationDisabledBondsman() {
-        // Arrange
-        AbstractProcreation procreation = new RandomProcreation(mockCampaignOptions);
-
-        Person person = mock(Person.class);
-        LocalDate date = LocalDate.of(3025, 1, 1);
-
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
-        when(person.isPregnant()).thenReturn(false);
-        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-        when(person.isDeployed()).thenReturn(false);
-        when(person.isChild(date, true)).thenReturn(false);
-        when(person.getAge(date)).thenReturn(21);
-        when(person.isClanPersonnel()).thenReturn(false);
-        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.BONDSMAN);
-
-        // Act
-        String result = procreation.canProcreate(date, person, false);
-
-        // Assert
-        assertNull(result);
-    }
-
-    @Test
-    public void testRandomProcreationRelationshiplessProcreationDisabled() {
-        // Arrange
-        AbstractProcreation procreation = new RandomProcreation(mockCampaignOptions);
-
-        Person person = mock(Person.class);
-        Genealogy genealogy = mock(Genealogy.class);
-        LocalDate date = LocalDate.of(3025, 1, 1);
-
-        when(person.getGender()).thenReturn(Gender.FEMALE);
-        when(person.isTryingToConceive()).thenReturn(true);
-        when(person.isPregnant()).thenReturn(false);
-        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
-        when(person.isDeployed()).thenReturn(false);
-        when(person.isChild(date, true)).thenReturn(false);
-        when(person.getAge(date)).thenReturn(21);
-        when(person.isClanPersonnel()).thenReturn(false);
-        when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
-        when(person.getGenealogy()).thenReturn(genealogy);
-        when(genealogy.hasSpouse()).thenReturn(false);
-
-        // Act
-        String result = procreation.canProcreate(date, person, true);
 
         // Assert
         assertNotNull(result);

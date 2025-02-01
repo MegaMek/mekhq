@@ -189,19 +189,7 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.TooOld.text");
         }
 
-        if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.ClanPersonnel.text");
-        }
-
-        if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
-            return resources.getString("cannotProcreate.Prisoner.text");
-        }
-
         if (randomProcreation) {
-            if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
-                return resources.getString("cannotProcreate.NoSpouse.text");
-            }
-
             if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
                 return resources.getString("cannotProcreate.RandomClanPersonnel.text");
             }
