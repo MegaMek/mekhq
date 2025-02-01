@@ -371,7 +371,7 @@ public class CampaignOptions {
     private RandomDeathMethod randomDeathMethod;
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
     private boolean useRandomDeathSuicideCause;
-    private double randomDeathChance;
+    private int randomDeathChance;
     // endregion Life Paths Tab
 
     //region Turnover and Retention
@@ -966,7 +966,7 @@ public class CampaignOptions {
         getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
         setUseRandomDeathSuicideCause(false);
-        setRandomDeathChance(0.00002);
+        setRandomDeathChance(6000);
         // endregion Life Paths Tab
 
         // region Turnover and Retention
@@ -2981,11 +2981,11 @@ public class CampaignOptions {
         this.useRandomDeathSuicideCause = useRandomDeathSuicideCause;
     }
 
-    public double getRandomDeathChance() {
+    public int getRandomDeathChance() {
         return randomDeathChance;
     }
 
-    public void setRandomDeathChance(final double randomDeathChance) {
+    public void setRandomDeathChance(final int randomDeathChance) {
         this.randomDeathChance = randomDeathChance;
     }
     // endregion Death
@@ -5851,7 +5851,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
                     retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathChance")) {
-                    retVal.setRandomDeathChance(Double.parseDouble(wn2.getTextContent().trim()));
+                    retVal.setRandomDeathChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {

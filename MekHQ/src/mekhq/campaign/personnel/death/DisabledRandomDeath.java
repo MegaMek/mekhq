@@ -19,6 +19,7 @@
 package mekhq.campaign.personnel.death;
 
 import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDeathMethod;
 
@@ -30,7 +31,7 @@ public class DisabledRandomDeath extends AbstractDeath {
     //endregion Constructors
 
     @Override
-    public boolean randomlyDies(final int age, final Gender gender) {
+    public boolean randomlyDies(Campaign campaign, final int age, final Gender gender) {
         return false;
     }
 }

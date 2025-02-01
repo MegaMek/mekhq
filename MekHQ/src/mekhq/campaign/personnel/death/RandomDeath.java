@@ -18,10 +18,12 @@
  */
 package mekhq.campaign.personnel.death;
 
-import megamek.common.Compute;
 import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDeathMethod;
+
+import static megamek.common.Compute.randomInt;
 
 public class RandomDeath extends AbstractDeath {
     //region Variable Declarations
@@ -45,8 +47,30 @@ public class RandomDeath extends AbstractDeath {
     }
     //endregion Getters/Setters
 
+    /**
+     * Determines if a person randomly dies based on the campaign, age, and gender.
+     *
+     * <p>The probability of death increases as a person's age exceeds a specific
+     * threshold, with the chance of death growing exponentially for extra years lived.</p>
+     *
+     * @param campaign The campaign that defines the base random death chance.
+     * @param age The individual's age.
+     * @param gender The individual's gender. Currently unused but supports future extensibility.
+     * @return {@code true} if the person randomly dies; {@code false} otherwise.
+     */
     @Override
-    public boolean randomlyDies(final int age, final Gender gender) {
-        return Compute.randomFloat() < getPercentage();
+    public boolean randomlyDies(Campaign campaign, final int age, final Gender gender) {
+        final int AGE_THRESHOLD = 90;
+        final double REDUCTION_MULTIPLIER = 0.90;
+
+        int baseDieSize = campaign.getCampaignOptions().getRandomDeathChance();
+
+        // Calculate adjusted die size if the age exceeds the threshold
+        int adjustedDieSize = (age > AGE_THRESHOLD)
+            ? (int) Math.round(baseDieSize * Math.pow(REDUCTION_MULTIPLIER, (age - AGE_THRESHOLD)))
+            : baseDieSize;
+
+        // Return random death outcome
+        return randomInt(adjustedDieSize) < getPercentage();
     }
 }

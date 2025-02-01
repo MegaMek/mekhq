@@ -766,7 +766,7 @@ public class BiographyTab {
 
         lblRandomDeathChance = new CampaignOptionsLabel("RandomDeathChance");
         spnRandomDeathChance = new CampaignOptionsSpinner("RandomDeathChance",
-            0, 0, 100, 0.000001);
+            6000, 1, 10000, 1);
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
@@ -1409,7 +1409,7 @@ public class BiographyTab {
         // Death
         options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setRandomDeathChance((double) spnRandomDeathChance.getValue());
+        options.setRandomDeathChance((int) spnRandomDeathChance.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());

@@ -135,7 +135,7 @@ public abstract class AbstractDeath {
             return false;
         }
 
-        if (randomlyDies(age, person.getGender())) {
+        if (randomlyDies(campaign, age, person.getGender())) {
             // We double-report here, to make sure the user definitely notices that a random death has occurred.
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
@@ -152,11 +152,12 @@ public abstract class AbstractDeath {
 
     // region Random Death
     /**
-     * @param age    the person's age
-     * @param gender the person's gender
+     * @param campaign the current campaign
+     * @param age      the person's age
+     * @param gender   the person's gender
      * @return true if the person is selected to randomly die, otherwise false
      */
-    public abstract boolean randomlyDies(int age, Gender gender);
+    public abstract boolean randomlyDies(Campaign campaign, int age, Gender gender);
     // endregion Random Death
     // endregion New Day
 
