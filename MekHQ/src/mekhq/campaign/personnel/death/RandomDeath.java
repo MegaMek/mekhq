@@ -31,7 +31,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
-import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
@@ -47,6 +46,7 @@ import java.util.Map;
 
 import static java.lang.Math.round;
 import static megamek.common.Compute.randomInt;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
@@ -334,7 +334,7 @@ public class RandomDeath {
      * @return The localized reason message.
      */
     private String getCannotDieMessage(final String messageKey) {
-        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, messageKey);
+        return getFormattedTextAt(RESOURCE_BUNDLE, messageKey);
     }
 
     /**
