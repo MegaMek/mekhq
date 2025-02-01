@@ -41,6 +41,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -1209,7 +1210,9 @@ public final class BriefingTab extends CampaignGuiTab {
         // later
         SwingUtilities.invokeLater(() -> scrollScenarioView.getVerticalScrollBar().setValue(0));
 
-        final boolean canStartGame = scenario.canStartScenario(getCampaign());
+        final boolean canStartGame = (
+            (!getCampaign().checkLinkedScenario(scenario.getId())) && (scenario.canStartScenario(getCampaign()))
+            );
 
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
@@ -1227,7 +1230,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario instanceof AtBScenario) {
             btnAutoResolveScenario.setEnabled(canStartGame);
         }
-        btnPrintRS.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canStartGame);   
     }
 
     public void refreshLanceAssignments() {
