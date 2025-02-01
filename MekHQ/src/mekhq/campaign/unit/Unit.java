@@ -1552,7 +1552,7 @@ public class Unit implements ITechnology {
             if (mounted.getType().hasFlag(F_CARGO)) {
                 // isOperable doesn't check if the mounted location still exists, so we check for
                 // that first.
-                if ((entity.getInternal(mounted.getLocation()) > 0) && (mounted.isOperable())) {
+                if ((entity.getInternal(mounted.getLocation()) != 0) && (mounted.isOperable())) {
                     capacity += mounted.getTonnage();
                 }
             }
