@@ -437,7 +437,7 @@
 			<ELDER>true</ELDER>
 			<TODDLER>false</TODDLER>
 			<PRETEEN>false</PRETEEN>
-			<TEENAGER>true</TEENAGER>
+			<TEENAGER>false</TEENAGER>
 		</enabledRandomDeathAgeGroups>
 		<useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
 		<randomDeathChance>0</randomDeathChance>

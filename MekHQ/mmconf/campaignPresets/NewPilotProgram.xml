@@ -434,7 +434,7 @@
 			<ELDER>true</ELDER>
 			<ADULT>true</ADULT>
 			<CHILD>false</CHILD>
-			<TEENAGER>true</TEENAGER>
+			<TEENAGER>false</TEENAGER>
 			<TODDLER>false</TODDLER>
 			<BABY>false</BABY>
 			<PRETEEN>false</PRETEEN>
