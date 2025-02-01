@@ -961,7 +961,7 @@ public class CampaignOptions {
         getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
         setUseRandomDeathSuicideCause(false);
-        setRandomDeathChance(6000);
+        setRandomDeathChance(0);
         // endregion Life Paths Tab
 
         // region Turnover and Retention
