@@ -20,19 +20,19 @@
  */
 package mekhq.campaign.unit;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
+import megamek.common.force.Force;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This class is used to store information about a particular unit that is
@@ -56,6 +56,7 @@ public class MothballInfo {
      * Parameterless constructor, used for deserialization.
      */
     private MothballInfo() {
+        forceID = Force.NO_FORCE;
         drivers = new ArrayList<>();
         gunners = new ArrayList<>();
         vesselCrew = new ArrayList<>();
@@ -138,9 +139,7 @@ public class MothballInfo {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
 
-        if (forceID > 0) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceID);
-        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceID", forceID);
 
         for (Person driver : drivers) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "driverId", driver.getId());

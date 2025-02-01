@@ -18,7 +18,9 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import megamek.client.ui.baseComponents.FileNameComboBoxModel;
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.CampaignOptions;
@@ -32,10 +34,12 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.io.File;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 /**
  * Represents a tab in the campaign options UI for managing ruleset configurations in campaigns.
@@ -117,7 +121,9 @@ public class RulesetsTab {
     private JPanel pnlAutoResolve;
     private JLabel lblAutoResolveMethod;
     private MMComboBox<AutoResolveMethod> comboAutoResolveMethod;
+    private MMComboBox<String> minimapThemeSelector;
     private JCheckBox chkAutoResolveVictoryChanceEnabled;
+    private JCheckBox chkAutoResolveExperimentalPacarGuiEnabled;
     private JLabel lblAutoResolveNumberOfScenarios;
     private JSpinner spnAutoResolveNumberOfScenarios;
     //end Universal Options
@@ -247,10 +253,12 @@ public class RulesetsTab {
         final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
                 AutoResolveMethod.values());
         comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
+        minimapThemeSelector = new MMComboBox<>("minimapThemeSelector",
+            new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
         chkAutoResolveVictoryChanceEnabled = new JCheckBox();
         lblAutoResolveNumberOfScenarios = new JLabel();
         spnAutoResolveNumberOfScenarios = new JSpinner();
-
+        chkAutoResolveExperimentalPacarGuiEnabled = new JCheckBox();
         // Here we set up the options, so they can be used across both the AtB and StratCon tabs
         substantializeUniversalOptions();
     }
@@ -384,6 +392,8 @@ public class RulesetsTab {
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
                 250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled");
+        var lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme");
+        chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox("AutoResolveExperimentalPacarGuiEnabled");
 
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoResolvePanel", true,
@@ -397,11 +407,20 @@ public class RulesetsTab {
         layout.gridx++;
         panel.add(comboAutoResolveMethod, layout);
         layout.gridx++;
-        layout.gridwidth = 2;
+        layout.gridwidth = 1;
         panel.add(chkAutoResolveVictoryChanceEnabled, layout);
+        layout.gridx++;
+        layout.gridwidth = 1;
+        panel.add(chkAutoResolveExperimentalPacarGuiEnabled, layout);
 
+        layout.gridx = 0;
         layout.gridwidth = 1;
         layout.gridy++;
+        panel.add(lblMinimapTheme, layout);
+        layout.gridx++;
+        panel.add(minimapThemeSelector, layout);
+        layout.gridx++;
+        layout.gridx++;
         panel.add(lblAutoResolveNumberOfScenarios, layout);
         layout.gridx++;
         panel.add(spnAutoResolveNumberOfScenarios, layout);
@@ -1054,8 +1073,10 @@ public class RulesetsTab {
         options.setBaseStrategyDeployment((int) spnBaseStrategyDeployment.getValue());
         options.setAdditionalStrategyDeployment((int) spnAdditionalStrategyDeployment.getValue());
         options.setAutoResolveMethod(comboAutoResolveMethod.getSelectedItem());
+        options.setStrategicViewTheme(minimapThemeSelector.getSelectedItem());
         options.setAutoResolveVictoryChanceEnabled(chkAutoResolveVictoryChanceEnabled.isSelected());
         options.setAutoResolveNumberOfScenarios((int) spnAutoResolveNumberOfScenarios.getValue());
+        options.setAutoResolveExperimentalPacarGuiEnabled(chkAutoResolveExperimentalPacarGuiEnabled.isSelected());
 
         // StratCon
         options.setUseStratCon(chkUseStratCon.isSelected());
@@ -1127,7 +1148,9 @@ public class RulesetsTab {
         spnBaseStrategyDeployment.setValue(options.getBaseStrategyDeployment());
         spnAdditionalStrategyDeployment.setValue(options.getAdditionalStrategyDeployment());
         comboAutoResolveMethod.setSelectedItem(options.getAutoResolveMethod());
+        minimapThemeSelector.setSelectedItem(options.getStrategicViewTheme().getName());
         chkAutoResolveVictoryChanceEnabled.setSelected(options.isAutoResolveVictoryChanceEnabled());
+        chkAutoResolveExperimentalPacarGuiEnabled.setSelected(options.isAutoResolveExperimentalPacarGuiEnabled());
         spnAutoResolveNumberOfScenarios.setValue(options.getAutoResolveNumberOfScenarios());
 
         // StratCon

@@ -30,7 +30,7 @@ import java.util.*;
  * Tracks what units this transport is transporting, and its current capacity for its different transporter types.
  */
 public abstract class AbstractTransportedUnitsSummary implements ITransportedUnitsSummary {
-    protected final MMLogger logger = MMLogger.create(this.getClass());
+    private static final MMLogger logger = MMLogger.create(AbstractTransportedUnitsSummary.class);
     protected Unit transport;
     private Set<Unit> transportedUnits = new HashSet<>();
     private Map<TransporterType, Double> transportCapacity = new HashMap<>();

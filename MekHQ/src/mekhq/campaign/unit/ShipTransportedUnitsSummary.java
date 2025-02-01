@@ -20,6 +20,7 @@
 package mekhq.campaign.unit;
 
 import megamek.common.*;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -35,7 +36,7 @@ import java.util.*;
  *
  */
 public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary {
-
+    private static final MMLogger logger = MMLogger.create(ShipTransportedUnitsSummary.class);
     /**
      * Initialize the transport details for a transport ship
      * @param transport unit this summary is about
