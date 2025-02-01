@@ -80,10 +80,10 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
@@ -1496,27 +1496,26 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * Computes the total cargo capacity of the entity, accounting for transport bays
-     * and mounted equipment designated for cargo, only if the entity is fully crewed.
+     * Calculates the total cargo capacity of the entity, considering the usable capacities of
+     * transport bays and mounted equipment designated for cargo. The calculation is performed only
+     * if the entity is fully crewed.
      *
-     * <p>The total cargo capacity is the sum of the following:</p>
+     * <p>The total cargo capacity is derived from the following:</p>
      * <ul>
-     *   <li>The usable capacities of transport bays that are instances of {@link CargoBay},
-     *       {@link RefrigeratedCargoBay}, or {@link InsulatedCargoBay}, adjusted for damage.</li>
-     *   <li>The tonnage of mounted equipment marked as cargo (via the {@code F_CARGO} flag),
-     *       provided the equipment is operable and located in valid entity sections.</li>
+     *   <li>The usable capacities of transport bays ({@link CargoBay}, {@link RefrigeratedCargoBay},
+     *       or {@link InsulatedCargoBay}), adjusted for existing damage.</li>
+     *   <li>The tonnage of mounted equipment tagged with the {@code F_CARGO} flag, provided
+     *       the equipment is operable and located in non-destroyed sections of the entity.</li>
      * </ul>
      *
-     * <p><strong>Important Considerations:</strong></p>
+     * <p><strong>Special Conditions:</strong></p>
      * <ul>
-     *   <li>The method returns a cargo capacity of zero if the entity is not fully crewed.</li>
-     *   <li>Capabilities of transport bays or mounted equipment that are damaged beyond operability
-     *       or located in destroyed sections are not included in the calculation.</li>
-     *   <li>The computation assumes no external conditions affect the equipment or bays beyond the
-     *       immediate considerations of damage and operability.</li>
+     *   <li>The method returns {@code 0.0} if the entity is not fully crewed.</li>
+     *   <li>Bays or mounted equipment damaged beyond usability are excluded from the total.</li>
+     *   <li>Only equipment in valid (non-destroyed) sections of the entity are considered.</li>
      * </ul>
      *
-     * @return The total cargo capacity of the entity if it is fully crewed; otherwise, {@code 0.0}.
+     * @return The total cargo capacity of the entity if fully crewed; otherwise, {@code 0.0}.
      */
     public double getCargoCapacity() {
         if (!isFullyCrewed()) {
@@ -1552,7 +1551,8 @@ public class Unit implements ITechnology {
             if (mounted.getType().hasFlag(F_CARGO)) {
                 // isOperable doesn't check if the mounted location still exists, so we check for
                 // that first.
-                if ((entity.getInternal(mounted.getLocation()) > 0) && (mounted.isOperable())) {
+                if (!mounted.getEntity().isLocationBad(mounted.getLocation())
+                    && (mounted.isOperable())) {
                     capacity += mounted.getTonnage();
                 }
             }
