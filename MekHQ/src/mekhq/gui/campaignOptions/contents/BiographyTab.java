@@ -29,7 +29,6 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -108,8 +107,6 @@ public class BiographyTab {
     //end Backgrounds Tab
 
     //start Death Tab
-    private JLabel lblRandomDeathMethod;
-    private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
     private JCheckBox chkUseRandomDeathSuicideCause;
     private JLabel lblRandomDeathChance;
     private JSpinner spnRandomDeathChance;
@@ -277,8 +274,6 @@ public class BiographyTab {
      * </ul>
      */
     private void initializeDeathTab() {
-        lblRandomDeathMethod = new JLabel();
-        comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
         chkUseRandomDeathSuicideCause = new JCheckBox();
         lblRandomDeathChance = new JLabel();
         spnRandomDeathChance = new JSpinner();
@@ -749,24 +744,11 @@ public class BiographyTab {
             getImageDirectory() + "logo_clan_fire_mandrills.png");
 
         // Contents
-        lblRandomDeathMethod = new CampaignOptionsLabel("RandomDeathMethod");
-        comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof RandomDeathMethod) {
-                    list.setToolTipText(((RandomDeathMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-        chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
-
         lblRandomDeathChance = new CampaignOptionsLabel("RandomDeathChance");
         spnRandomDeathChance = new CampaignOptionsSpinner("RandomDeathChance",
             6000, 1, 10000, 1);
+
+        chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
@@ -777,18 +759,15 @@ public class BiographyTab {
         layoutLeft.gridy = 0;
         layoutLeft.gridx = 0;
         layoutLeft.gridwidth = 1;
-        panelLeft.add(lblRandomDeathMethod, layoutLeft);
+        panelLeft.add(lblRandomDeathChance, layoutLeft);
         layoutLeft.gridx++;
-        panelLeft.add(comboRandomDeathMethod, layoutLeft);
+        panelLeft.add(spnRandomDeathChance, layoutLeft);
 
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
 
         layoutLeft.gridy++;
-        panelLeft.add(lblRandomDeathChance, layoutLeft);
-        layoutLeft.gridx++;
-        panelLeft.add(spnRandomDeathChance, layoutLeft);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -1317,7 +1296,6 @@ public class BiographyTab {
         chkExtraRandomOrigin.setSelected(originOptions.isExtraRandomOrigin());
 
         // Death
-        comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
         spnRandomDeathChance.setValue(options.getRandomDeathChance());
 
@@ -1407,7 +1385,6 @@ public class BiographyTab {
         options.setRandomOriginOptions(originOptions);
 
         // Death
-        options.setRandomDeathMethod(comboRandomDeathMethod.getSelectedItem());
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
         options.setRandomDeathChance((int) spnRandomDeathChance.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {

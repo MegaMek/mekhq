@@ -51,9 +51,6 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.Map.Entry;
 
-import static mekhq.campaign.personnel.enums.RandomDeathMethod.NONE;
-import static mekhq.campaign.personnel.enums.RandomDeathMethod.RANDOM;
-
 /**
  * @author natit
  */
@@ -368,7 +365,6 @@ public class CampaignOptions {
     private Integer militaryAcademyAccidents;
 
     // Death
-    private RandomDeathMethod randomDeathMethod;
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
     private boolean useRandomDeathSuicideCause;
     private int randomDeathChance;
@@ -956,7 +952,6 @@ public class CampaignOptions {
         setMilitaryAcademyAccidents(10000);
 
         // Death
-        setRandomDeathMethod(NONE);
         setEnabledRandomDeathAgeGroups(new HashMap<>());
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ELDER, true);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.ADULT, true);
@@ -2949,20 +2944,6 @@ public class CampaignOptions {
 
     public void setMilitaryAcademyAccidents(Integer militaryAcademyAccidents) {
         this.militaryAcademyAccidents = militaryAcademyAccidents;
-    }
-
-    /**
-     * @return the random death method to use
-     */
-    public RandomDeathMethod getRandomDeathMethod() {
-        return randomDeathMethod;
-    }
-
-    /**
-     * @param randomDeathMethod the random death method to use
-     */
-    public void setRandomDeathMethod(final RandomDeathMethod randomDeathMethod) {
-        this.randomDeathMethod = randomDeathMethod;
     }
 
     public Map<AgeGroup, Boolean> getEnabledRandomDeathAgeGroups() {
@@ -5025,7 +5006,6 @@ public class CampaignOptions {
         // endregion Education
 
         // region Death
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "enabledRandomDeathAgeGroups");
         for (final Entry<AgeGroup, Boolean> entry : getEnabledRandomDeathAgeGroups().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
@@ -5822,17 +5802,6 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("militaryAcademyAccidents")) {
                     retVal.setMilitaryAcademyAccidents(Integer.parseInt(wn2.getTextContent().trim()));
                     // endregion Education
-
-                    // region Death
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMethod")) {
-                    // <50.04 compatibility handler
-                    if (wn2.getTextContent().trim().equalsIgnoreCase(NONE.name())) {
-                        retVal.setRandomDeathMethod(NONE);
-                    } else {
-                        retVal.setRandomDeathMethod(RANDOM);
-                    }
-                    // Replace above with below when compatibility handler is removed.
-//                    retVal.setRandomDeathMethod(RandomDeathMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enabledRandomDeathAgeGroups")) {
                     if (!wn2.hasChildNodes()) {
                         continue;

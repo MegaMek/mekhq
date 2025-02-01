@@ -2769,9 +2769,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
-                && Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
-                && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
+        if (Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
+            && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
             cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
             cbMenuItem.setName("miImmortal");

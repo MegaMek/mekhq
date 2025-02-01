@@ -54,10 +54,11 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.death.AbstractDeath;
-import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
@@ -582,16 +583,6 @@ public class CampaignGUI extends JPanel {
         miRefreshRanks.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
         miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
         menuRefresh.add(miRefreshRanks);
-
-        JMenuItem miRefreshRandomDeathCauses = new JMenuItem(resourceMap.getString("miRefreshRandomDeathCauses.text"));
-        miRefreshRandomDeathCauses.setToolTipText(resourceMap.getString("miRefreshRandomDeathCauses.toolTipText"));
-        miRefreshRandomDeathCauses.setName("miRefreshRandomDeathCauses");
-        miRefreshRandomDeathCauses.setMnemonic(KeyEvent.VK_D);
-        miRefreshRandomDeathCauses.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
-        miRefreshRandomDeathCauses.addActionListener(evt -> getCampaign().setDeath(
-                getCampaign().getCampaignOptions().getRandomDeathMethod()
-                        .getMethod(getCampaign().getCampaignOptions())));
-        menuRefresh.add(miRefreshRandomDeathCauses);
 
         JMenuItem miRefreshFinancialInstitutions = new JMenuItem(
                 resourceMap.getString("miRefreshFinancialInstitutions.text"));
@@ -1456,7 +1447,6 @@ public class CampaignGUI extends JPanel {
         boolean rankIn = oldOptions.isUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
-        final RandomDeathMethod randomDeathMethod = oldOptions.getRandomDeathMethod();
         final boolean useRandomDeathSuicideCause = oldOptions.isUseRandomDeathSuicideCause();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
@@ -1485,14 +1475,6 @@ public class CampaignGUI extends JPanel {
                     person.setLastRankChangeDate(null);
                 }
             }
-        }
-
-        AbstractDeath death = getCampaign().getDeath();
-        if ((randomDeathMethod != newOptions.getRandomDeathMethod())
-                || (useRandomDeathSuicideCause != newOptions.isUseRandomDeathSuicideCause())) {
-            getCampaign().setDeath(newOptions.getRandomDeathMethod().getMethod(newOptions));
-        } else if (death instanceof RandomDeath) {
-            ((RandomDeath) death).setPercentage(newOptions.getRandomDeathChance());
         }
 
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {

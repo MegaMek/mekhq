@@ -85,8 +85,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.death.AbstractDeath;
-import mekhq.campaign.personnel.death.DisabledRandomDeath;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
@@ -276,7 +275,6 @@ public class Campaign implements ITechManager {
     private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
-    private transient AbstractDeath death;
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
@@ -378,7 +376,6 @@ public class Campaign implements ITechManager {
         setPersonnelMarket(new PersonnelMarket());
         setContractMarket(new AtbMonthlyContractMarket());
         setUnitMarket(new DisabledUnitMarket());
-        setDeath(new DisabledRandomDeath(getCampaignOptions(), false));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
@@ -627,14 +624,6 @@ public class Campaign implements ITechManager {
     // endregion Markets
 
     // region Personnel Modules
-    public AbstractDeath getDeath() {
-        return death;
-    }
-
-    public void setDeath(final AbstractDeath death) {
-        this.death = death;
-    }
-
     public AbstractDivorce getDivorce() {
         return divorce;
     }
@@ -4355,6 +4344,8 @@ public class Campaign implements ITechManager {
      * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
+        RandomDeath randomDeath = new RandomDeath(campaignOptions);
+
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
@@ -4389,7 +4380,7 @@ public class Campaign implements ITechManager {
 
             // Weekly events
             if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-                if (!getDeath().processNewWeek(this, getLocalDate(), person)) {
+                if (!randomDeath.processNewWeek(this, getLocalDate(), person)) {
                     // If the character has died, we don't need to process relationship events
                     processWeeklyRelationshipEvents(person);
                 }
