@@ -94,17 +94,17 @@ public class ObjectiveEffect {
         /*
          * In StratCon, relevant if scenario is about a facility, said facility remains in play.
          */
-        FacilityRemains("Facility Remains Intact", false),
+        FacilityRemains("Facility remains with current controller", false),
 
         /*
          * In StratCon, relevant if scenario is about a facility, said facility is removed from play.
          */
-        FacilityRemoved("Facility Destroyed", false),
+        FacilityRemoved("Facility destroyed and removed from area of operations", false),
 
         /*
          * In StratCon, relevant if scenario is about a facility, said facility changes ownership.
          */
-        FacilityCaptured("Facility Captured", false);
+        FacilityCaptured("Facility captured and changes controller", false);
 
         private final String descriptiveText;
         private boolean magnitudeIsRelevant;
