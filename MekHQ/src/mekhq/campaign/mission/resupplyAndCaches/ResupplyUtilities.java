@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
+import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
@@ -83,11 +84,11 @@ public class ResupplyUtilities {
         for (Force force : campaign.getAllForces()) {
             Force parentForce = force.getParentForce();
 
-            if (parentForce != null && (force.getParentForce().getForceType().isConvoy())) {
+            if (parentForce != null && (force.getParentForce().isForceType(CONVOY))) {
                 continue;
             }
 
-            if (force.getForceType().isConvoy() && force.getScenarioId() == scenarioId) {
+            if (force.isForceType(CONVOY) && force.getScenarioId() == scenarioId) {
                 new DialogAbandonedConvoy(campaign, contract, force);
 
                 for (UUID unitID : force.getAllUnits(false)) {

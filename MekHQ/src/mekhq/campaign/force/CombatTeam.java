@@ -56,6 +56,7 @@ import static megamek.common.Entity.ETYPE_TANK;
 import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
+import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.LANCE;
 
 /**
@@ -308,7 +309,7 @@ public class CombatTeam {
             return false;
         }
 
-        if (!force.getForceType().isStandard()) {
+        if (!force.isForceType(STANDARD)) {
             force.setCombatTeamStatus(false);
             return false;
         }
@@ -370,7 +371,7 @@ public class CombatTeam {
                 return false;
             }
 
-            if (!parentForce.getForceType().isStandard()) {
+            if (!parentForce.isForceType(STANDARD)) {
                 force.setCombatTeamStatus(false);
                 return false;
             }

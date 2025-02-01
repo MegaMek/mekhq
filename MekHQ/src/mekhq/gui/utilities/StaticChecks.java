@@ -28,6 +28,8 @@ import mekhq.campaign.unit.Unit;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static mekhq.campaign.force.ForceType.STANDARD;
+
 public class StaticChecks {
 
     public static boolean areAllForcesUndeployed(final Campaign campaign, final List<Force> forces) {
@@ -37,7 +39,7 @@ public class StaticChecks {
     }
 
     public static boolean areAllStandardForces(Vector<Force> forces) {
-        return forces.stream().allMatch(force -> force.getForceType().isStandard());
+        return forces.stream().allMatch(force -> force.isForceType(STANDARD));
     }
 
     public static boolean areAllUnitsAvailable(Vector<Unit> units) {

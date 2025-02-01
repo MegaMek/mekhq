@@ -46,6 +46,8 @@ import static java.lang.Math.round;
 import static megamek.common.MiscType.F_SPONSON_TURRET;
 import static megamek.common.enums.SkillLevel.NONE;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.market.procurement.Procurement.getFactionTechCode;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -390,7 +392,7 @@ public class Resupply {
                 continue;
             }
 
-            if (!force.getForceType().isStandard()) {
+            if (!force.isForceType(STANDARD)) {
                 continue;
             }
 
@@ -783,12 +785,12 @@ public class Resupply {
         totalPlayerCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.getForceType().isConvoy()) {
+            if (!force.isForceType(CONVOY)) {
                 continue;
             }
 
             // This ensures each convoy is only counted once
-            if (force.getParentForce() != null && force.getParentForce().getForceType().isConvoy()) {
+            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
                 continue;
             }
 

@@ -20,56 +20,118 @@ package mekhq.campaign.force;
 
 import megamek.logging.MMLogger;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 /**
  * Represents the various types of forces available.
- *
- * It is used to classify and manipulate forces within the game.
+ * <p>
+ *     It is used to classify and manipulate forces within the game.
+ * </p>
  */
 public enum ForceType {
     // region Enum Declarations
     /**
-     * Standard force type, typically used for combat and general operations.
+     * Standard force type, typically used for combat.
      */
-    STANDARD("Standard"),
+    STANDARD(true, false),
 
     /**
-     * Support force type, generally ignored by MekHQ.
+     * Support force type, used by forces that should be deployed in StratCon but not involved in
+     * combat.
      */
-    SUPPORT("Support"),
+    SUPPORT(false, false),
 
     /**
-     * Convoy force type, typically used for transport and supply operations.
+     * Convoy force type, typically used by the Resupply module.
      */
-    CONVOY("Convoy"),
+    CONVOY(true, true),
 
     /**
-     * Security force type, typically used for protection and guarding operations.
+     * Security force type, typically used by the Prisoner Events module.
      */
-    SECURITY("Security");
+    SECURITY(true, true);
 
+    // region Fields
+    private final boolean standardizeParents;
+    private final boolean childrenInherit;
 
-    // Fields
-    private final String name;
+    // region Constructor
 
-    // Constructor
     /**
-     * Constructs a {@code ForceType} with a specified name.
+     * Constructor for the {@code ForceType} enum.
      *
-     * @param name the name of the force type, used for displaying or referencing.
+     * @param standardizeParents  Whether changing to this ForceType changes the ForceType in all
+     *                           parent forces to STANDARD
+     * @param childrenInherit     Whether changing to this ForceType changes the ForceType in all
+     *                           child forces to this ForceType.
      */
-    ForceType(String name) {
-        this.name = name;
+    ForceType(boolean standardizeParents, boolean childrenInherit) {
+        this.standardizeParents = standardizeParents;
+        this.childrenInherit = childrenInherit;
     }
+    // endregion Constructor
 
 
     // region Getters
     /**
-     * Returns the name of this force type.
+     * Retrieves the display name for the ForceType by fetching a localized label from the relevant
+     * resource bundle.
      *
-     * @return a string representing the name of the force type.
+     * <p>The method uses the {@code name} of the current instance to construct a resource
+     * key in the format {@code [name].label}. This key is used to look up a localized string
+     * from the {@code ForceType} resource bundle located in the {@code mekhq.resources} package.
+     * The formatted text at the specified key is returned as the display name.</p>
+     *
+     * @return The localized display name for the current instance.
      */
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        final String RESOURCE_BUNDLE = "mekhq.resources.ForceType";
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the symbol associated with this ForceType.
+     *
+     * <p>The method determines the symbol to display for the current instance by looking up
+     * a localization resource key in the {@code ForceType} resource bundle, with keys formatted
+     * as {@code [enumName].symbol}.</p>
+     *
+     * <p>If the current instance is {@code STANDARD}, an empty string is returned as the symbol.</p>
+     *
+     * @return The localized symbol associated with the current instance, or an empty string
+     *         if the instance is {@code STANDARD}.
+     */
+    public String getSymbol() {
+        if (this == STANDARD) {
+            return "";
+        }
+
+        final String RESOURCE_BUNDLE = "mekhq.resources.ForceType";
+        final String RESOURCE_KEY = name() + ".symbol";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * This flag indicates whether, when changing to this ForceType, whether all parent forces
+     * should be changed to STANDARD.
+     *
+     * @return {@code true} if parent relationships should be standardized; {@code false} otherwise.
+     */
+    public boolean shouldStandardizeParents() {
+        return standardizeParents;
+    }
+
+    /**
+     * This flag indicates whether, when changing to this ForceType, whether all child forces
+     * should be changed to the same ForceType.
+     *
+     * @return {@code true} if children should inherit from parents; {@code false} otherwise.
+     */
+    public boolean shouldChildrenInherit() {
+        return childrenInherit;
     }
 
     /**
@@ -124,7 +186,7 @@ public enum ForceType {
         }
 
         MMLogger logger = MMLogger.create(ForceType.class);
-        logger.error(String.format("Unknown ForceType ordinal: %s - returning STANDARD.", ordinal));
+        logger.error("Unknown ForceType ordinal: {} - returning STANDARD.", ordinal);
 
         return STANDARD;
     }

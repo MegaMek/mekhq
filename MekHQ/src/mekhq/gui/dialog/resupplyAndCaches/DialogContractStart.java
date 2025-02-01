@@ -32,6 +32,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
@@ -195,11 +196,11 @@ public class DialogContractStart extends JDialog {
         double totalPlayerCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.getForceType().isConvoy()) {
+            if (!force.isForceType(CONVOY)) {
                 continue;
             }
 
-            if (force.getParentForce() != null && force.getParentForce().getForceType().isConvoy()) {
+            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
                 continue;
             }
 
