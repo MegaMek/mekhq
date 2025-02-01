@@ -18,36 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.Insets;
-import java.util.*;
-import java.util.Map.Entry;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-
-import static javax.swing.GroupLayout.Alignment;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.LayoutStyle;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -61,8 +31,18 @@ import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
@@ -100,16 +80,16 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void initComponents() {
-   
+
         this.setTitle(resourceMap.getString("Form.title"));
 
         Container container = this.getContentPane();
-        
+
         GroupLayout layout = new GroupLayout(container);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         container.setLayout(layout);
-        
+
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
@@ -340,7 +320,7 @@ public class PartsReportDialog extends JDialog {
             setVisible(false);
             onClose();
         });
-        
+
         layout.setHorizontalGroup(layout.createParallelGroup()
             .addComponent(tableScroll)
             .addGroup(layout.createSequentialGroup()
@@ -404,7 +384,7 @@ public class PartsReportDialog extends JDialog {
 
     private void updateOverviewPartsInUse() {
         overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
-                getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
+            false, getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
                 .getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
@@ -475,7 +455,7 @@ public class PartsReportDialog extends JDialog {
 
     private void onClose() {
         storePartInUseRequestedStockMap();
-    }  
+    }
 
     /**
      * Wipes the requested stock numbers back to their defaults

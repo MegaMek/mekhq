@@ -115,7 +115,8 @@ public class Fatigue {
         }
 
         if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
-                && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
+                && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())
+                && (person.getInjuries().isEmpty() || person.getInjuries().equals(person.getPermanentInjuries()))) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }
