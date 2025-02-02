@@ -20,21 +20,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemListener;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -53,6 +38,12 @@ import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -252,7 +243,7 @@ public class NewContractDialog extends JDialog {
         /*
          * suggestPlanet.addActionListener(new ActionListener() {
          * public void actionPerformed(ActionEvent evt) {
-         * contract.setPlanetName(suggestPlanet.getText());
+         * contract.setPlanetName(suggestPlanet.getLabel());
          * // reset the start date so this can be recalculated
          * contract.setStartDate(campaign.getDate());
          * contract.calculateContract(campaign);
@@ -687,7 +678,7 @@ public class NewContractDialog extends JDialog {
         }
 
         contract.setName(txtName.getText());
-        // contract.setPlanetName(suggestPlanet.getText());
+        // contract.setPlanetName(suggestPlanet.getLabel());
         contract.setEmployer(txtEmployer.getText());
         contract.setType(txtType.getText());
         contract.setDesc(txtDesc.getText());

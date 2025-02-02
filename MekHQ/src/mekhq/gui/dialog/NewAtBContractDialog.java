@@ -532,7 +532,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setName(txtName.getText());
         if (chkShowAllPlanets.isSelected()) {
-            // contract.setPlanetName(suggestPlanet.getText());
+            // contract.setPlanetName(suggestPlanet.getLabel());
         } else {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     campaign.getLocalDate())).getId());

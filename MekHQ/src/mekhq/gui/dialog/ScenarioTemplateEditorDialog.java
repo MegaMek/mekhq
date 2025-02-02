@@ -20,27 +20,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.baseComponents.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -63,9 +42,20 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Handles editing, saving and loading of scenario template definitions.
- * 
+ *
  * @author NickAragua
  */
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
@@ -155,7 +145,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Constructor. Creates a new instance of this dialog with the given parent
      * JFrame.
-     * 
+     *
      * @param parent
      */
     public ScenarioTemplateEditorDialog(JFrame parent) {
@@ -211,7 +201,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Sets up text entry boxes in the top - briefing, scenario name, labels.
-     * 
+     *
      * @param gbc
      */
     private void setupTopFluff(GridBagConstraints gbc) {
@@ -315,7 +305,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Worker function that sets up top-level headers for the force template editor
      * section.
-     * 
+     *
      * @param gbc
      */
     private void setupForceEditorHeaders(GridBagConstraints gbc) {
@@ -338,7 +328,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Worker function that sets up UI elements for the force template editor.
-     * 
+     *
      * @param externalGBC
      */
     private void setupForceEditor(GridBagConstraints externalGBC) {
@@ -655,7 +645,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Helper function that loads the given force template into the force editor
      * interface.
-     * 
+     *
      * @param forceTemplate The force template.
      */
     private void loadForce(ScenarioForceTemplate forceTemplate) {
@@ -695,7 +685,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Worker function called when initializing the dialog to place the force
      * template list on the content pane.
-     * 
+     *
      * @param gbc Grid bag constraints.
      */
     private void initializeForceList(GridBagConstraints gbc) {
@@ -717,7 +707,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Worker function called when initializing to place the map parameters.
-     * 
+     *
      * @param gbc
      */
     private void setupMapParameters(GridBagConstraints gbc) {
@@ -914,7 +904,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     /**
      * Worker function that sets up the buttons on the bottom of the dialog
-     * 
+     *
      * @param gbc
      */
     private void setupBottomButtons(GridBagConstraints gbc) {
@@ -1227,7 +1217,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Function that performs validation when the 'Add' button is clicked for a
      * force
      * and informs the user of any nonsense configuration they may have specified.
-     * 
+     *
      * @return Validation message for display.
      */
     private String validateAddForce() {
@@ -1273,11 +1263,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
 
         /*
-         * if (scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {
+         * if (scenarioTemplate.scenarioForces.containsKey(txtForceName.getLabel())) {
          * if (valBuilder.length() > 0) {
          * valBuilder.append("\n");
          * }
-         * 
+         *
          * valBuilder.append("Force with this key already exists!");
          * }
          */
@@ -1288,7 +1278,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Event handler for when the "Remove" button is pressed for a particular force
      * template.
-     * 
+     *
      * @param command The command string containing the index of the force to
      *                remove.
      */
@@ -1305,7 +1295,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     /**
      * Event handler for when the "Edit" button is pressed for a particular force
      * template.
-     * 
+     *
      * @param command The command string containing the index of the force to edit.
      */
     private void editForceButtonHandler(String command) {

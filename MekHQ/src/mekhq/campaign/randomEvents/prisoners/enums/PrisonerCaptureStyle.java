@@ -18,34 +18,26 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import mekhq.MekHQ;
-
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum PrisonerCaptureStyle {
     //region Enum Declarations
-    NONE("PrisonerCaptureStyle.NONE.text", "PrisonerCaptureStyle.NONE.toolTipText"),
-    ATB("PrisonerCaptureStyle.ATB.text", "PrisonerCaptureStyle.ATB.toolTipText"),
-    TAHARQA("PrisonerCaptureStyle.TAHARQA.text", "PrisonerCaptureStyle.TAHARQA.toolTipText");
+    NONE, CAMPAIGN_OPERATIONS, MEKHQ;
     //endregion Enum Declarations
 
-    //region Variable Declarations
-    private final String name;
-    private final String toolTipText;
-    //endregion Variable Declarations
-
-    //region Constructors
-    PrisonerCaptureStyle(final String name, final String toolTipText) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
-    }
-    //endregion Constructors
+    final private String RESOURCE_BUNDLE = "mekhq.resources.PrisonerCaptureStyle";
 
     //region Getters
-    public String getToolTipText() {
-        return toolTipText;
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    public String getTooltip() {
+        final String RESOURCE_KEY = name() + ".tooltip";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     //endregion Getters
 
@@ -54,17 +46,17 @@ public enum PrisonerCaptureStyle {
         return this == NONE;
     }
 
-    public boolean isAtB() {
-        return this == ATB;
+    public boolean isCampaignOperations() {
+        return this == CAMPAIGN_OPERATIONS;
     }
 
-    public boolean isTaharqa() {
-        return this == TAHARQA;
+    public boolean isMekHQ() {
+        return this == MEKHQ;
     }
     //endregion Boolean Comparison Methods
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 }

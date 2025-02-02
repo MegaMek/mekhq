@@ -18,6 +18,16 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,17 +35,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.RankSystem;
 
 public class ProfessionTest {
     // region Variable Declarations
@@ -161,32 +160,32 @@ public class ProfessionTest {
     public void testGetProfession() {
         /*
          * final Rank mockRankA = mock(Rank.class);
-         * when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
+         * when(mockRankA.getLabel(Profession.NAVAL)).thenReturn("Naval");
          * when(mockRankA.isEmpty(Profession.NAVAL)).thenReturn(false);
          * when(mockRankA.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
          * );
-         * when(mockRankA.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankA.getLabel(Profession.AEROSPACE)).thenReturn("--NAVAL");
          * when(mockRankA.isEmpty(Profession.AEROSPACE)).thenReturn(false);
          * when(mockRankA.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
          * true);
-         * 
+         *
          * final Rank mockRankB = mock(Rank.class);
-         * when(mockRankB.getName(Profession.NAVAL)).thenReturn("-");
+         * when(mockRankB.getLabel(Profession.NAVAL)).thenReturn("-");
          * when(mockRankB.isEmpty(Profession.NAVAL)).thenReturn(true);
          * when(mockRankB.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
          * );
-         * when(mockRankB.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankB.getLabel(Profession.AEROSPACE)).thenReturn("--NAVAL");
          * when(mockRankB.isEmpty(Profession.AEROSPACE)).thenReturn(false);
          * when(mockRankB.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
          * true);
-         * 
+         *
          * final List<Rank> ranks = new ArrayList<>();
          * ranks.add(mockRankA);
          * ranks.add(mockRankB);
-         * 
+         *
          * final RankSystem mockRankSystem = mock(RankSystem.class);
          * when(mockRankSystem.getRanks()).thenReturn(ranks);
-         * 
+         *
          * assertEquals(Profession.NAVAL, Profession.NAVAL.getProfession(mockRankSystem,
          * mockRankA));
          * assertEquals(Profession.NAVAL,
@@ -221,15 +220,15 @@ public class ProfessionTest {
     public void testIsEmptyProfessionInitialRank() {
         /*
          * final Rank mockRank = mock(Rank.class);
-         * when(mockRank.getName(Profession.NAVAL)).thenReturn("Naval");
-         * when(mockRank.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
-         * 
+         * when(mockRank.getLabel(Profession.NAVAL)).thenReturn("Naval");
+         * when(mockRank.getLabel(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         *
          * final List<Rank> ranks = new ArrayList<>();
          * ranks.add(mockRank);
-         * 
+         *
          * final RankSystem mockRankSystem = mock(RankSystem.class);
          * when(mockRankSystem.getRanks()).thenReturn(ranks);
-         * 
+         *
          * assertFalse(Profession.NAVAL.isEmptyProfession(mockRankSystem));
          * assertTrue(Profession.AEROSPACE.isEmptyProfession(mockRankSystem));
          */
@@ -240,32 +239,32 @@ public class ProfessionTest {
     public void testIsEmptyProfessionCheckAll() {
         /*
          * final Rank mockRankA = mock(Rank.class);
-         * when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
+         * when(mockRankA.getLabel(Profession.NAVAL)).thenReturn("Naval");
          * when(mockRankA.isEmpty(Profession.NAVAL)).thenReturn(false);
          * when(mockRankA.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
          * );
-         * when(mockRankA.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankA.getLabel(Profession.AEROSPACE)).thenReturn("--NAVAL");
          * when(mockRankA.isEmpty(Profession.AEROSPACE)).thenReturn(false);
          * when(mockRankA.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
          * true);
-         * 
+         *
          * final Rank mockRankB = mock(Rank.class);
-         * when(mockRankB.getName(Profession.NAVAL)).thenReturn("-");
+         * when(mockRankB.getLabel(Profession.NAVAL)).thenReturn("-");
          * when(mockRankB.isEmpty(Profession.NAVAL)).thenReturn(true);
          * when(mockRankB.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
          * );
-         * when(mockRankB.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankB.getLabel(Profession.AEROSPACE)).thenReturn("--NAVAL");
          * when(mockRankB.isEmpty(Profession.AEROSPACE)).thenReturn(false);
          * when(mockRankB.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
          * true);
-         * 
+         *
          * final List<Rank> ranks = new ArrayList<>();
          * ranks.add(mockRankA);
          * ranks.add(mockRankB);
-         * 
+         *
          * final RankSystem mockRankSystem = mock(RankSystem.class);
          * when(mockRankSystem.getRanks()).thenReturn(ranks);
-         * 
+         *
          * assertFalse(Profession.NAVAL.isEmptyProfession(mockRankSystem));
          * assertTrue(Profession.AEROSPACE.isEmptyProfession(mockRankSystem));
          */

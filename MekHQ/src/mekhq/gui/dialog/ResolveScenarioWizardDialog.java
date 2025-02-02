@@ -36,18 +36,15 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
-import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -410,7 +407,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-           
+
             pnlUnitStatus.add(nameLbl, gridBagConstraints);
             gridBagConstraints.gridx = 1;
             pnlUnitStatus.add(chkTotaled, gridBagConstraints);
@@ -427,7 +424,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
             unitIndex++;
         }
-        
+
         return pnlUnitStatus;
     }
 
@@ -778,10 +775,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
 
             // if the person is dead, set the checkbox and skip all this captured stuff
+            PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
             if ((status.getHits() > 5) || status.isDead()) {
                 kiaCheck.setSelected(true);
-            } else if (status.isCaptured()
-                    && tracker.getCampaign().getCampaignOptions().getPrisonerCaptureStyle().isAtB()) {
+            } else if (status.isCaptured() && !prisonerCaptureStyle.isNone()) {
                 boolean wasCaptured;
                 if (status.wasPickedUp()) {
                     wasCaptured = true;
@@ -1552,7 +1549,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             && tracker.getScenario().getLinkedScenario() != 0) {
             StratconRulesManager.linkedScenarioProcessing(tracker, forces);
         }
-        
+
 
         aborted = false;
         this.setVisible(false);
@@ -1942,7 +1939,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     /**
      * Event handler for "Continue as Reinforcements" Button that
-     * adjusts boolean used after scenario resolution to signal 
+     * adjusts boolean used after scenario resolution to signal
      * player wants to send units to linked scenario
      */
     private class ReinforcementListener implements ActionListener {

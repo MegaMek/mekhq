@@ -26,14 +26,18 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.gui.dialog.DefectionOffer;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Math.round;
 import static megamek.common.Board.T_SPACE;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
@@ -41,9 +45,10 @@ import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class CapturePrisoners {
     private final Campaign campaign;
@@ -52,7 +57,7 @@ public class CapturePrisoners {
 
     private final int ATTEMPT_COUNT = 3; // This will need tweaking till we're happy with the result
     private final int DEFECTION_CHANCE = 100;
-    private final int MERCENARY_DIVIDER = 3;
+    private final double MERCENARY_MULTIPLIER = 0.95;
     private final int CLAN_DEZGRA_MULTIPLIER = 5;
 
     // SAR Modifiers (based on CamOps pg 223)
@@ -129,23 +134,52 @@ public class CapturePrisoners {
     }
 
     public void processCaptureOfNPC(Person prisoner) {
+        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        Faction originFaction = prisoner.getOriginFaction();
+        LocalDate today = campaign.getLocalDate();
+
+        // if the campaign faction is Clan, we do things a little differently
         if (isClan) {
-            prisoner.setPrisonerStatus(campaign, BONDSMAN, true);
+            Faction campaignFaction = campaign.getFaction();
+            HonorRating campaignHonorRating = campaignFaction.getHonorRating(campaign);
+            int targetNumber = campaignHonorRating.getBondsmanTargetNumber();
+
+            if (d6() >= targetNumber) {
+                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+            } else {
+                prisoner.setPrisonerStatus(campaign, PRISONER, true);
+            }
+
             handlePostCapture(prisoner);
-            return;
         }
 
-        // Attempt defection
+        // Otherwise, we attempt defection
         int roll = attemptDefection(prisoner, true);
 
         if (roll == 0) {
+            boolean isDefector = false;
             if (prisoner.isClanPersonnel()) {
-                prisoner.setPrisonerStatus(campaign, BONDSMAN, true);
-            } else {
-                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
+                // Even if we roll a Defection, the honor of the character in question may cause
+                // them to choose not to Bond themselves to the player campaign.
+                HonorRating originFactionHonorRating = originFaction.getHonorRating(campaign);
+                int targetNumber = originFactionHonorRating.getBondsmanTargetNumber();
+
+                if (d6() >= targetNumber) {
+                    prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+                    isDefector = true;
+                }
             }
 
-            new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+            if (!prisoner.isClanPersonnel() && prisonerCaptureStyle.isMekHQ()) {
+                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
+                isDefector = true;
+            }
+
+            if (isDefector) {
+                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+            }
         } else {
             prisoner.setPrisonerStatus(campaign, PRISONER, true);
         }
@@ -157,7 +191,7 @@ public class CapturePrisoners {
     private int attemptDefection(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
         if (potentialDefector.getOriginFaction().isMercenary()) {
-            adjustedDefectionChance /= MERCENARY_DIVIDER;
+            adjustedDefectionChance *= (int) round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
         }
 
         if (potentialDefector.isClanPersonnel()) {
@@ -218,6 +252,8 @@ public class CapturePrisoners {
     }
 
     private void handlePostCapture(Person prisoner) {
+        final String RESOURCE_BUNDLE = "mekhq.resources.DefectionOffer";
+
         // non-clan prisoners should generate with lower than average loyalty, so drop the highest roll
         if (!prisoner.isClanPersonnel()) {
             List<Integer> rolls = new ArrayList<>();
@@ -236,12 +272,12 @@ public class CapturePrisoners {
         campaign.recruitPerson(prisoner, prisonerStatus);
 
         if (prisonerStatus.isPrisonerDefector()) {
-            campaign.addReport(String.format("You have convinced %s to defect.",
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "defection.report",
                 prisoner.getHyperlinkedName()));
         }
 
-        if (prisonerStatus.isBondsman()) {
-            campaign.addReport(String.format("You have taken %s as a Bondsman.",
+        if (prisonerStatus.isBecomingBondsman()) {
+            campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsman.report",
                 prisoner.getHyperlinkedName()));
         }
     }

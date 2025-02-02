@@ -168,6 +168,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -4452,6 +4453,18 @@ public class Campaign implements ITechManager {
 
             if (person.getStatus().isMIA()) {
                 recovery.attemptRescueOfPlayerCharacter(person);
+            }
+
+            if (person.getPrisonerStatus().isBecomingBondsman()) {
+                // We use 'isAfter' to avoid situations where we somehow manage to miss the date.
+                // This shouldn't be necessary, but a safety net never hurt
+                if (currentDay.isAfter(person.getBecomingBondsmanEndDate().minusDays(1))) {
+                    person.setPrisonerStatus(this, BONDSMAN, true);
+                    addReport(String.format(resources.getString("becomeBondsman.text"),
+                        person.getHyperlinkedName(),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        CLOSING_SPAN_TAG));
+                }
             }
 
             person.resetMinutesLeft();

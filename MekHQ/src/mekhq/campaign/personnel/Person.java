@@ -162,6 +162,7 @@ public class Person {
     private String bloodname;
     private Faction originFaction;
     private Planet originPlanet;
+    private LocalDate becomingBondsmanEndDate;
 
     // assignments
     private Unit unit;
@@ -334,6 +335,7 @@ public class Person {
 
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
+        becomingBondsmanEndDate = null;
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
@@ -452,6 +454,14 @@ public class Person {
         this.originPlanet = originPlanet;
     }
 
+    public LocalDate getBecomingBondsmanEndDate() {
+        return becomingBondsmanEndDate;
+    }
+
+    public void setBecomingBondsmanEndDate(final LocalDate becomingBondsmanEndDate) {
+        this.becomingBondsmanEndDate = becomingBondsmanEndDate;
+    }
+
     public PrisonerStatus getPrisonerStatus() {
         return prisonerStatus;
     }
@@ -479,7 +489,7 @@ public class Person {
         switch (prisonerStatus) {
             case PRISONER:
             case PRISONER_DEFECTOR:
-            case BONDSMAN:
+            case BECOMING_BONDSMAN:
                 setRecruitment(null);
                 setLastRankChangeDate(null);
                 if (log) {
@@ -491,6 +501,11 @@ public class Person {
                                 campaign.getName(), "");
                     }
                 }
+                break;
+            case BONDSMAN:
+                LocalDate today = campaign.getLocalDate();
+                setRecruitment(today);
+                setLastRankChangeDate(today);
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
@@ -1989,6 +2004,11 @@ public class Person {
                         originPlanet.getParentSystem().getId(), originPlanet.getId());
             }
 
+            if (becomingBondsmanEndDate != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "becomingBondsmanEndDate",
+                    becomingBondsmanEndDate);
+            }
+
             if (!getPhenotype().isNone()) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
@@ -2344,6 +2364,8 @@ public class Person {
                     } catch (NullPointerException e) {
                         logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("becomingBondsmanEndDate")) {
+                    retVal.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {

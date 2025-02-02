@@ -19,49 +19,31 @@
 package mekhq.campaign.randomEvents.prisoners.enums;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum PrisonerStatus {
     // region Enum Declarations
-    /**
-     * This is used for personnel who are not (currently) prisoners
-     */
-    FREE("PrisonerStatus.FREE.text", "PrisonerStatus.FREE.titleExtension"),
-    /**
-     * This is used to track standard personnel who are prisoners and not willing to
-     * defect
-     */
-    PRISONER("PrisonerStatus.PRISONER.text", "PrisonerStatus.PRISONER.titleExtension"),
-    /**
-     * This is used to track standard personnel who are prisoners and are willing to
-     * defect
-     */
-    PRISONER_DEFECTOR("PrisonerStatus.PRISONER_DEFECTOR.text", "PrisonerStatus.PRISONER_DEFECTOR.titleExtension"),
-    /**
-     * This is used to track clan personnel who become Bondsmen when captured
-     */
-    BONDSMAN("PrisonerStatus.BONDSMAN.text", "PrisonerStatus.BONDSMAN.titleExtension");
+    FREE,
+    PRISONER,
+    PRISONER_DEFECTOR,
+    BONDSMAN,
+    BECOMING_BONDSMAN;
     // endregion Enum Declarations
 
-    // region Variable Declarations
-    private final String name;
-    private final String titleExtension;
-    // endregion Variable Declarations
-
-    // region Constructors
-    PrisonerStatus(final String name, final String titleExtension) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.titleExtension = resources.getString(titleExtension);
-    }
-    // endregion Constructors
+    final private String RESOURCE_BUNDLE = "mekhq.resources.PrisonerCaptureStyle";
 
     // region Getters
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
     public String getTitleExtension() {
-        return titleExtension;
+        final String RESOURCE_KEY = name() + ".titleExtension";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
     // endregion Getters
 
@@ -80,6 +62,10 @@ public enum PrisonerStatus {
 
     public boolean isPrisonerDefector() {
         return this == PRISONER_DEFECTOR;
+    }
+
+    public boolean isBecomingBondsman() {
+        return this == BECOMING_BONDSMAN;
     }
 
     public boolean isBondsman() {
@@ -102,33 +88,15 @@ public enum PrisonerStatus {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
-
+            MMLogger.create(PrisonerStatus.class)
+                .error("Unable to parse {} into a PrisonerStatus. Returning {}.", text, FREE);
+            return FREE;
         }
-
-        // Magic Number Save Format
-        try {
-            switch (Integer.parseInt(text)) {
-                case 0:
-                    return FREE;
-                case 1:
-                    return PRISONER;
-                case 2:
-                    return BONDSMAN;
-                default:
-                    break;
-            }
-        } catch (Exception ignored) {
-
-        }
-
-        MMLogger.create(PrisonerStatus.class)
-                .error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
-        return FREE;
     }
     // endregion File I/O
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 }

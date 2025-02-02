@@ -18,28 +18,23 @@
  */
 package mekhq.campaign.mod.am;
 
+import megamek.common.Aero;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.Mek;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.GameEffect;
+import mekhq.campaign.log.MedicalLogger;
+import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.unit.Unit;
+
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
-
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mek;
-import mekhq.campaign.*;
-import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.personnel.BodyLocation;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.unit.Unit;
 
 /**
  * Static helper methods implementing the "advanced medical" sub-system
@@ -473,7 +468,7 @@ public final class InjuryUtil {
                             // TODO: Disabled, too much spam
                             /*
                             LogEntry entry = new LogEntry(c.getDate(),
-                                String.format("%s worsened its condition due to lack of proper medical attention", i.getName()), Person.LOGTYPE_MEDICAL);
+                                String.format("%s worsened its condition due to lack of proper medical attention", i.getLabel()), Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
                             */
                         }

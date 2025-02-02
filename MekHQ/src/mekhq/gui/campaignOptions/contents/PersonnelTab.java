@@ -1062,7 +1062,7 @@ public class PersonnelTab {
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PrisonerCaptureStyle) {
-                    list.setToolTipText(((PrisonerCaptureStyle) value).getToolTipText());
+                    list.setToolTipText(((PrisonerCaptureStyle) value).getTooltip());
                 }
                 return this;
             }

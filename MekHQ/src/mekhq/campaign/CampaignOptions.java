@@ -776,7 +776,7 @@ public class CampaignOptions {
         setMaximumPatients(25);
 
         // Prisoners
-        setPrisonerCaptureStyle(PrisonerCaptureStyle.TAHARQA);
+        setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
         setDefaultPrisonerStatus(PrisonerStatus.PRISONER);
         setPrisonerBabyStatus(true);
         setUseAtBPrisonerDefection(false);
@@ -6440,12 +6440,6 @@ public class CampaignOptions {
                     // Removed in 0.47.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
-                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
-                        retVal.setUseAtBPrisonerDefection(true);
-                        retVal.setUseAtBPrisonerRansom(true);
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
                     double intensity = Double.parseDouble(wn2.getTextContent().trim());
 
@@ -6455,9 +6449,6 @@ public class CampaignOptions {
                     retVal.atbBattleChance[CombatRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
-                    retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
-                            ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
                 } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
                     MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
