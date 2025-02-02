@@ -25,7 +25,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceType;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
@@ -54,6 +53,7 @@ import static java.lang.Math.min;
 import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
+import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -173,9 +173,7 @@ public class EventEffectsManager {
         List<Person> potentialTargets = new ArrayList<>();
         if (isGuard) {
             for (Force force : campaign.getAllForces()) {
-                ForceType forceType = force.getForceType();
-
-                if (forceType.isSecurity()) {
+                if (force.isForceType(SECURITY)) {
                     for (UUID unitId : force.getAllUnits(false)) {
                         Unit unit = campaign.getUnit(unitId);
 

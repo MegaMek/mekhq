@@ -45,6 +45,7 @@ import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -306,7 +307,7 @@ public class PrisonerEventManager {
         int prisonerCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.getForceType().isSecurity()) {
+            if (!force.isForceType(SECURITY)) {
                 continue;
             }
 
@@ -360,7 +361,7 @@ public class PrisonerEventManager {
         List<Force> securityForces = new ArrayList<>();
 
         for (Force force : campaign.getAllForces()) {
-            if (force.getForceType().isSecurity()) {
+            if (force.isForceType(SECURITY)) {
                 securityForces.add(force);
             }
         }
