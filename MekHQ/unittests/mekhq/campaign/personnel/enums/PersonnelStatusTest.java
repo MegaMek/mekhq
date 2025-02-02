@@ -330,6 +330,7 @@ class PersonnelStatusTest {
                 case PREGNANCY_COMPLICATIONS:
                 case UNDETERMINED:
                 case SUICIDE:
+                case BONDSREF:
                     assertTrue(personnelStatus.isDead());
                     break;
                 default:
@@ -355,6 +356,7 @@ class PersonnelStatusTest {
                 case PREGNANCY_COMPLICATIONS:
                 case UNDETERMINED:
                 case SUICIDE:
+                case BONDSREF:
                     assertTrue(personnelStatus.isDeadOrMIA());
                     break;
                 default:
