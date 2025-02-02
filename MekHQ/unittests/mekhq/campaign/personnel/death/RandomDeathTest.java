@@ -26,7 +26,7 @@ import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.eras.Era;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -72,8 +72,8 @@ public class RandomDeathTest {
 
     private static Map<AgeGroup, Boolean> ageGroups;
 
-    @BeforeAll
-    public static void beforeAll() {
+    @BeforeEach
+    public void beforeAll() {
         // Prep Age Groups
         ageGroups = Map.of(
             ELDER, true,
@@ -85,14 +85,12 @@ public class RandomDeathTest {
             BABY, true
         );
 
-        // Mock Campaign and CampaignOptions
         mockedCampaign = mock(Campaign.class);
         mockedCampaignOptions = mock(CampaignOptions.class);
-        mockedToday = LocalDate.of(3025,1,1);
+        mockedToday = LocalDate.of(3025, 1, 1);
         mockedPerson = mock(Person.class);
 
         when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
-
         when(mockedCampaignOptions.getEnabledRandomDeathAgeGroups()).thenReturn(ageGroups);
         when(mockedCampaignOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
         when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
