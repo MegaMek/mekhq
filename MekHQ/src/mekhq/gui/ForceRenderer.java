@@ -157,12 +157,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
 
             ForceType forceType = force.getForceType();
-            String typeKey = switch (forceType) {
-                case STANDARD -> "";
-                case SUPPORT -> " \u2205";
-                case CONVOY -> " \u039E";
-                case SECURITY -> " \u2727";
-            };
+            String typeKey = forceType.getSymbol();
 
             String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
                 force.isCombatTeam() ? "<b>" : "",

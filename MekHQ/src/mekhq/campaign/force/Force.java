@@ -158,10 +158,35 @@ public class Force {
         this.desc = d;
     }
 
+    /**
+     * @return The {@code ForceType} currently assigned to this instance.
+     */
     public ForceType getForceType() {
         return forceType;
     }
 
+    /**
+     * This method compares the provided {@code forceType} with the current instance's
+     * {@code ForceType} to determine if they match.
+     *
+     * @param forceType The {@code ForceType} to compare against.
+     * @return {@code true} if the current instance matches the specified {@code forceType};
+     *         otherwise, {@code false}.
+     */
+    public boolean isForceType(ForceType forceType) {
+        return this.forceType == forceType;
+    }
+
+    /**
+     * Updates the {@code ForceType} for this instance and optionally propagates the change
+     * to all sub-forces.
+     *
+     * <p>If the {@code setForSubForces} flag is {@code true}, the method recursively sets the
+     * provided {@code forceType} for all sub-forces of this instance.</p>
+     *
+     * @param forceType The new {@code ForceType} to assign to this instance.
+     * @param setForSubForces A flag indicating whether the change should also apply to sub-forces.
+     */
     public void setForceType(ForceType forceType, boolean setForSubForces) {
         this.forceType = forceType;
         if (setForSubForces) {

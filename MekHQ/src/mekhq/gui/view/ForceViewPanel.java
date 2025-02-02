@@ -196,11 +196,11 @@ public class ForceViewPanel extends JScrollablePanel {
 
             ForceType forceType = force.getForceType();
 
-            String forceLabel = "";
+            String forceLabel;
             if (forceType.isStandard()) {
                 forceLabel = force.getFormationLevel().toString();
             } else {
-                forceLabel = forceType.getName() + ' ' + force.getFormationLevel().toString();
+                forceLabel = forceType.getDisplayName() + ' ' + force.getFormationLevel().toString();
             }
 
             lblType.setText("<html><i>" + forceLabel + "</i></html>");

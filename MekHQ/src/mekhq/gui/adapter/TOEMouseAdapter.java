@@ -66,6 +66,10 @@ import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_TRUE;
+import static mekhq.campaign.force.ForceType.CONVOY;
+import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.force.ForceType.STANDARD;
+import static mekhq.campaign.force.ForceType.SUPPORT;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
@@ -429,20 +433,27 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
 
             ForceType forceType = ForceType.STANDARD;
-            if (command.contains("SUPPORT")) {
-                forceType = ForceType.SUPPORT;
+            if (command.contains(SUPPORT.name())) {
+                forceType = SUPPORT;
             }
 
-            if (command.contains("CONVOY")) {
-                forceType = ForceType.CONVOY;
+            if (command.contains(CONVOY.name())) {
+                forceType = CONVOY;
             }
 
-            if (command.contains("SECURITY")) {
-                forceType = ForceType.SECURITY;
+            if (command.contains(SECURITY.name())) {
+                forceType = SECURITY;
             }
 
             for (final Force force : forces) {
-                force.setForceType(forceType, true);
+                force.setForceType(forceType, forceType.shouldChildrenInherit());
+
+                if (forceType.shouldStandardizeParents()) {
+                    for (Force parentForce : force.getAllParents()) {
+                        parentForce.setForceType(STANDARD, false);
+                    }
+                }
+
                 MekHQ.triggerEvent(new OrganizationChangedEvent(force));
             }
 
