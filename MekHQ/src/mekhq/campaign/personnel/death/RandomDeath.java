@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.EraFlag;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.utilities.MHQXMLUtility;
@@ -47,10 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
 import static mekhq.campaign.universe.enums.EraFlag.*;
@@ -118,6 +116,7 @@ public class RandomDeath {
     private final double FACTION_MULTIPLIER_PERIPHERY_DEEP = 1.30;
     private final double FACTION_MULTIPLIER_PIRATE = 1.35;
     private final double FACTION_MULTIPLIER_MERCENARY = 1.00;
+    private final double FACTION_MULTIPLIER_CANOPUS = 0.85;
 
     private final double MEDICAL_MULTIPLIER_INJURY_TRANSIENT = 0.1; // per injury
     private final double MEDICAL_MULTIPLIER_INJURY_PERMANENT = 0.25; // once no matter how many
@@ -446,6 +445,13 @@ public class RandomDeath {
      * @return the death chance multiplier specific to the provided faction.
      */
     double getFactionMultiplier(Faction faction) {
+        // We have to use String Comparison here due to how
+        Faction canopus = Factions.getInstance().getFaction("MOC");
+
+        if (Objects.equals(faction, canopus)) {
+            return FACTION_MULTIPLIER_CANOPUS;
+        }
+
         if (faction.isClan()) {
             return FACTION_MULTIPLIER_CLANS;
         }
