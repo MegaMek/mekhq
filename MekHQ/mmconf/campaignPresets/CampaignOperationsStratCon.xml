@@ -440,7 +440,7 @@
 			<TODDLER>false</TODDLER>
 		</enabledRandomDeathAgeGroups>
 		<useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
-		<randomDeathChance>0</randomDeathChance>
+		<randomDeathMultiplier>0.0</randomDeathMultiplier>
 		<payForParts>true</payForParts>
 		<payForRepairs>true</payForRepairs>
 		<payForUnits>true</payForUnits>

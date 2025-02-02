@@ -440,7 +440,7 @@
 			<PRETEEN>false</PRETEEN>
 		</enabledRandomDeathAgeGroups>
 		<useRandomDeathSuicideCause>false</useRandomDeathSuicideCause>
-		<randomDeathChance>6000</randomDeathChance>
+		<randomDeathMultiplier>1.0</randomDeathMultiplier>
 		<payForParts>true</payForParts>
 		<payForRepairs>true</payForRepairs>
 		<payForUnits>true</payForUnits>

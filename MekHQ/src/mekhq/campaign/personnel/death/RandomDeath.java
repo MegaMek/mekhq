@@ -87,8 +87,8 @@ public class RandomDeath {
 
     // Base Chances
     private final List<RandomDeathChance> deathChances = List.of(
-        new RandomDeathChance(9, 15, 12),
-        new RandomDeathChance(19, 16, 14),
+        new RandomDeathChance(9, 4, 2),
+        new RandomDeathChance(19, 9, 4),
         new RandomDeathChance(29, 17, 8),
         new RandomDeathChance(39, 20, 10),
         new RandomDeathChance(49, 30, 18),
@@ -97,7 +97,7 @@ public class RandomDeath {
         new RandomDeathChance(79, 385, 233),
         new RandomDeathChance(89, 1000, 714),
         new RandomDeathChance(99, 2500, 2000),
-        new RandomDeathChance(Integer.MAX_VALUE, 50, 3333)
+        new RandomDeathChance(Integer.MAX_VALUE, 5000, 3333)
     );
 
     // Multipliers
@@ -123,6 +123,8 @@ public class RandomDeath {
     private final double MEDICAL_MULTIPLIER_INJURY_PERMANENT = 0.25; // once no matter how many
     private final double MEDICAL_MULTIPLIER_HPG_ACCESS = -0.05;
 
+    // Die Size
+    private final int DIE_SIZE = 1000000;
     /**
      * Constructs a {@code RandomDeath} object using campaign-specific options.
      *
@@ -141,10 +143,6 @@ public class RandomDeath {
         randomDeathMultiplier = campaignOptions.getRandomDeathMultiplier();
 
         initializeCauses();
-    }
-
-    List<RandomDeathChance> getDeathChances() {
-        return deathChances;
     }
 
     /**
@@ -356,7 +354,7 @@ public class RandomDeath {
             return false;
         }
 
-        return randomInt(10000) < actualDeathChance;
+        return randomInt(DIE_SIZE) < actualDeathChance;
     }
 
     /**
@@ -526,7 +524,7 @@ public class RandomDeath {
     private double getInjuryModifier(Person person) {
         if (!campaignOptions.isUseAdvancedMedical()) {
             // Simplified injury multiplier without advanced medical care
-            return MEDICAL_MULTIPLIER_INJURY_TRANSIENT * person.getHits();
+            return 1 + (MEDICAL_MULTIPLIER_INJURY_TRANSIENT * person.getHits());
         }
 
         // Advanced medical care: calculate based on individual injuries

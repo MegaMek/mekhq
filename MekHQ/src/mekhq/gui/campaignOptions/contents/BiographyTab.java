@@ -108,8 +108,8 @@ public class BiographyTab {
 
     //start Death Tab
     private JCheckBox chkUseRandomDeathSuicideCause;
-    private JLabel lblRandomDeathChance;
-    private JSpinner spnRandomDeathChance;
+    private JLabel lblRandomDeathMultiplier;
+    private JSpinner spnRandomDeathMultiplier;
 
     private JPanel pnlDeathAgeGroup;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
@@ -275,8 +275,8 @@ public class BiographyTab {
      */
     private void initializeDeathTab() {
         chkUseRandomDeathSuicideCause = new JCheckBox();
-        lblRandomDeathChance = new JLabel();
-        spnRandomDeathChance = new JSpinner();
+        lblRandomDeathMultiplier = new JLabel();
+        spnRandomDeathMultiplier = new JSpinner();
 
         pnlDeathAgeGroup = new JPanel();
         chkEnabledRandomDeathAgeGroups = new HashMap<>();
@@ -744,9 +744,9 @@ public class BiographyTab {
             getImageDirectory() + "logo_clan_fire_mandrills.png");
 
         // Contents
-        lblRandomDeathChance = new CampaignOptionsLabel("RandomDeathChance");
-        spnRandomDeathChance = new CampaignOptionsSpinner("RandomDeathChance",
-            6000, 1, 10000, 1);
+        lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier");
+        spnRandomDeathMultiplier = new CampaignOptionsSpinner("RandomDeathMultiplier",
+            1.0, 0, 100., 0.01);
 
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
@@ -759,9 +759,9 @@ public class BiographyTab {
         layoutLeft.gridy = 0;
         layoutLeft.gridx = 0;
         layoutLeft.gridwidth = 1;
-        panelLeft.add(lblRandomDeathChance, layoutLeft);
+        panelLeft.add(lblRandomDeathMultiplier, layoutLeft);
         layoutLeft.gridx++;
-        panelLeft.add(spnRandomDeathChance, layoutLeft);
+        panelLeft.add(spnRandomDeathMultiplier, layoutLeft);
 
         layoutLeft.gridx = 0;
         layoutLeft.gridy++;
@@ -1297,7 +1297,7 @@ public class BiographyTab {
 
         // Death
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
-        spnRandomDeathChance.setValue(options.getRandomDeathMultiplier());
+        spnRandomDeathMultiplier.setValue(options.getRandomDeathMultiplier());
 
         Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
@@ -1386,7 +1386,7 @@ public class BiographyTab {
 
         // Death
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setRandomDeathMultiplier((int) spnRandomDeathChance.getValue());
+        options.setRandomDeathMultiplier((int) spnRandomDeathMultiplier.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
