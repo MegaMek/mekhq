@@ -24,11 +24,17 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.eras.Era;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 
+import static mekhq.campaign.personnel.enums.AgeGroup.*;
+import static mekhq.campaign.universe.enums.EraFlag.STAR_LEAGUE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -58,212 +64,199 @@ import static org.mockito.Mockito.*;
 public class RandomDeathTest {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomDeath";
 
+    private static Campaign mockedCampaign;
+    private static CampaignOptions mockedCampaignOptions;
+    private static LocalDate mockedToday;
+    private static Person mockedPerson;
+    private static RandomDeath randomDeath;
+
+    private static Map<AgeGroup, Boolean> ageGroups;
+
+    @BeforeAll
+    public static void beforeAll() {
+        // Prep Age Groups
+        ageGroups = Map.of(
+            ELDER, true,
+            ADULT, false,
+            TEENAGER, true,
+            PRETEEN, true,
+            CHILD, true,
+            TODDLER, true,
+            BABY, true
+        );
+
+        // Mock Campaign and CampaignOptions
+        mockedCampaign = mock(Campaign.class);
+        mockedCampaignOptions = mock(CampaignOptions.class);
+        mockedToday = LocalDate.of(3025,1,1);
+        mockedPerson = mock(Person.class);
+
+        when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
+
+        when(mockedCampaignOptions.getEnabledRandomDeathAgeGroups()).thenReturn(ageGroups);
+        when(mockedCampaignOptions.isUseRandomDeathSuicideCause()).thenReturn(false);
+        when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
+        when(mockedCampaign.getLocalDate()).thenReturn(mockedToday);
+
+        randomDeath = new RandomDeath(mockedCampaign);
+    }
+
     @Test
     public void testCanDie_PersonAlreadyDead() {
-        Person mockedPerson = mock(Person.class);
+        when(mockedPerson.getAge(any(LocalDate.class))).thenReturn(1);
         when(mockedPerson.getStatus()).thenReturn(PersonnelStatus.KIA);
 
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
-
-        String result = randomDeath.canDie(mockedPerson, AgeGroup.ELDER, true);
+        String result = randomDeath.canDie(mockedPerson, true);
 
         assertEquals(getFormattedTextAt(RESOURCE_BUNDLE, "cannotDie.Dead.text"), result);
     }
 
     @Test
     public void testCanDie_PersonImmortal() {
-        Person mockedPerson = mock(Person.class);
         when(mockedPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockedPerson.isImmortal()).thenReturn(true);
 
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
-
-        String result = randomDeath.canDie(mockedPerson, AgeGroup.ADULT, true);
+        String result = randomDeath.canDie(mockedPerson, true);
 
         assertEquals(getFormattedTextAt(RESOURCE_BUNDLE, "cannotDie.Immortal.text"), result);
     }
 
     @Test
     public void testCanDie_AgeGroupDisabled() {
-        Person mockedPerson = mock(Person.class);
         when(mockedPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockedPerson.isImmortal()).thenReturn(false);
+        when(mockedPerson.getAge(mockedToday)).thenReturn(21);
 
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        Map<AgeGroup, Boolean> ageGroupMap = Map.of(AgeGroup.ADULT, false);
-        when(mockedOptions.getEnabledRandomDeathAgeGroups()).thenReturn(ageGroupMap);
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
-
-        String result = randomDeath.canDie(mockedPerson, AgeGroup.ADULT, true);
+        String result = randomDeath.canDie(mockedPerson, true);
 
         assertEquals(getFormattedTextAt(RESOURCE_BUNDLE, "cannotDie.AgeGroupDisabled.text"), result);
     }
 
     @Test
     public void testCanDie_RandomDeathFalse() {
-        Person mockedPerson = mock(Person.class);
         when(mockedPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
 
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
-
-        String result = randomDeath.canDie(mockedPerson, AgeGroup.ADULT, false);
+        String result = randomDeath.canDie(mockedPerson, false);
 
         assertNull(result);
     }
 
     @Test
-    public void testCanDie_CanDieNullMessage() {
-        Person mockedPerson = mock(Person.class);
+    public void testCanDie_RandomDeathTrue() {
         when(mockedPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockedPerson.isImmortal()).thenReturn(false);
+        when(mockedPerson.getAge(mockedToday)).thenReturn(106);
 
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        Map<AgeGroup, Boolean> ageGroupMap = Map.of(AgeGroup.ELDER, true);
-        when(mockedOptions.getEnabledRandomDeathAgeGroups()).thenReturn(ageGroupMap);
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions);
-
-        String result = randomDeath.canDie(mockedPerson, AgeGroup.ELDER, true);
+        String result = randomDeath.canDie(mockedPerson, true);
 
         assertNull(result);
     }
 
     @Test
-    public void testRandomlyDies_BaseChanceZero() {
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        when(mockedOptions.getRandomDeathChance()).thenReturn(0);
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
-            @Override
-            protected int randomInt(int bound) {
-                return 0; // Doesn't matter because chance is zero
-            }
-        };
-
-        assertFalse(randomDeath.randomlyDies(30, Gender.MALE));
-    }
-
-    @Test
-    public void testRandomlyDies_AgeThresholdAbove() {
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        when(mockedOptions.getRandomDeathChance()).thenReturn(10);
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
-            @Override
-            protected int randomInt(int bound) {
-                return 1; // Simulate NOT rolling a 0
-            }
-        };
-
-        assertFalse(randomDeath.randomlyDies(95, Gender.MALE));
-    }
-
-    @Test
-    public void testRandomlyDies_GenderFemaleMultiplier() {
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        when(mockedOptions.getRandomDeathChance()).thenReturn(10);
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
-            @Override
-            protected int randomInt(int bound) {
-                return 0; // Simulate rolling a 0 (death)
-            }
-        };
-
-        assertTrue(randomDeath.randomlyDies(30, Gender.FEMALE));
-    }
-
-    @Test
-    public void testRandomlyDies_AdjustedDieSizeAboveOne() {
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        when(mockedOptions.getRandomDeathChance()).thenReturn(20); // Base chance
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
-            @Override
-            protected int randomInt(int bound) {
-                return 5; // Simulate NOT rolling a 0
-            }
-        };
-
-        assertFalse(randomDeath.randomlyDies(80, Gender.MALE));
-    }
-
-    @Test
-    public void testRandomlyDies_AgeThresholdGuaranteesDeath() {
-        CampaignOptions mockedOptions = mock(CampaignOptions.class);
-        when(mockedOptions.getRandomDeathChance()).thenReturn(10);
-
-        RandomDeath randomDeath = new RandomDeath(mockedOptions) {
-            @Override
-            protected int randomInt(int bound) {
-                return 0; // Doesn't matter since death is guaranteed when adjustedDieSize <= 1
-            }
-        };
-
-        // If adjustedDieSize = 1, death is guaranteed without a random roll
-        assertTrue(randomDeath.randomlyDies(150, Gender.MALE));
-    }
-
-    @Test
-    public void testProcessNewWeek_PersonCannotDie() {
-        // Mock setup
-        Person mockedPerson = mock(Person.class);
-        Campaign mockedCampaign = mock(Campaign.class);
-        LocalDate today = LocalDate.now();
-        when(mockedPerson.getAge(today)).thenReturn(30);
+    void testRandomlyDies_DeathChanceZero() {
+        when(mockedPerson.getAge(any())).thenReturn(25);
         when(mockedPerson.getGender()).thenReturn(Gender.MALE);
-        RandomDeath mockedRandomDeath = spy(new RandomDeath(mock(CampaignOptions.class)));
-        doReturn("Cannot die message").when(mockedRandomDeath).canDie(eq(mockedPerson), any(AgeGroup.class), eq(true));
 
-        // Call processNewWeek
-        boolean result = mockedRandomDeath.processNewWeek(mockedCampaign, today, mockedPerson);
+        randomDeath = spy(randomDeath);
+        doReturn(0.0).when(randomDeath).getBaseDeathChance(mockedPerson);
+        doReturn(null).when(randomDeath).canDie(mockedPerson, true);
 
-        // Assertions
+        boolean result = randomDeath.randomlyDies(mockedPerson);
+
         assertFalse(result);
     }
 
     @Test
-    public void testProcessNewWeek_RandomlyDies() {
-        // Mock setup
-        Person mockedPerson = mock(Person.class);
-        Campaign mockedCampaign = mock(Campaign.class);
-        LocalDate today = LocalDate.now();
-        when(mockedPerson.getAge(today)).thenReturn(70);
+    void testRandomlyDies_NotDeath() {
+        // Mocking the Person object
+        when(mockedPerson.getAge(any())).thenReturn(30);
         when(mockedPerson.getGender()).thenReturn(Gender.MALE);
 
-        RandomDeath mockedRandomDeath = spy(new RandomDeath(mock(CampaignOptions.class)));
-        doReturn(null).when(mockedRandomDeath).canDie(eq(mockedPerson), any(AgeGroup.class), eq(true));
-        doReturn(true).when(mockedRandomDeath).randomlyDies(eq(70), eq(Gender.MALE));
-        doReturn(PersonnelStatus.NATURAL_CAUSES).when(mockedRandomDeath).getCause(eq(mockedPerson), any(AgeGroup.class), eq(70));
+        // Mocking the Era object
+        Era mockedEra = mock(Era.class);
+        when(mockedEra.getFlags()).thenReturn(Set.of(STAR_LEAGUE));
 
-        // Call processNewWeek
-        boolean result = mockedRandomDeath.processNewWeek(mockedCampaign, today, mockedPerson);
+        // Mocking the Faction object
+        Faction mockedFaction = mock(Faction.class);
+        when(mockedFaction.isClan()).thenReturn(false);
 
-        // Assertions
+        // Mocking the Campaign object
+        when(mockedCampaign.getEra()).thenReturn(mockedEra);
+        when(mockedCampaign.getFaction()).thenReturn(mockedFaction);
+        when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        // Create the RandomDeath object normally, then spy on it
+        RandomDeath realRandomDeath = new RandomDeath(mockedCampaign) {
+            @Override
+            protected int randomInt(int bound) {
+                return 1000; // Simulate rolling a 1000
+            }
+        };
+
+        RandomDeath randomDeath = spy(realRandomDeath);
+
+        // Ensure mocked methods return valid results
+        doReturn(1000.0).when(randomDeath).getBaseDeathChance(mockedPerson);
+        doReturn(1.0).when(randomDeath).getEraMultiplier(mockedEra);
+        doReturn(1.0).when(randomDeath).getFactionMultiplier(mockedFaction);
+        doReturn(1.0).when(randomDeath).getHealthModifier(mockedPerson);
+        doReturn(null).when(randomDeath).canDie(mockedPerson, true);
+
+        // Use mocked CampaignOptions
+        when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
+        when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
+
+        // Act
+        boolean result = randomDeath.randomlyDies(mockedPerson);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    void testRandomlyDies_Dies() {
+        // Mocking the Person object
+        when(mockedPerson.getAge(any())).thenReturn(30);
+        when(mockedPerson.getGender()).thenReturn(Gender.MALE);
+
+        // Mocking the Era object
+        Era mockedEra = mock(Era.class);
+        when(mockedEra.getFlags()).thenReturn(Set.of(STAR_LEAGUE));
+
+        // Mocking the Faction object
+        Faction mockedFaction = mock(Faction.class);
+        when(mockedFaction.isClan()).thenReturn(false);
+
+        // Mocking the Campaign object
+        when(mockedCampaign.getEra()).thenReturn(mockedEra);
+        when(mockedCampaign.getFaction()).thenReturn(mockedFaction);
+        when(mockedCampaign.getLocalDate()).thenReturn(LocalDate.now());
+
+        // Create the RandomDeath object normally, then spy on it
+        RandomDeath realRandomDeath = new RandomDeath(mockedCampaign) {
+            @Override
+            protected int randomInt(int bound) {
+                return 1; // Simulate rolling a 1
+            }
+        };
+
+        RandomDeath randomDeath = spy(realRandomDeath); // Spy on the real object
+
+        // Ensure mocked methods return valid results
+        doReturn(1000.0).when(randomDeath).getBaseDeathChance(mockedPerson);
+        doReturn(1.0).when(randomDeath).getEraMultiplier(mockedEra);
+        doReturn(1.0).when(randomDeath).getFactionMultiplier(mockedFaction);
+        doReturn(1.0).when(randomDeath).getHealthModifier(mockedPerson);
+        doReturn(null).when(randomDeath).canDie(mockedPerson, true);
+
+        // Use mocked CampaignOptions
+        when(mockedCampaignOptions.getRandomDeathMultiplier()).thenReturn(1.0);
+        when(mockedCampaign.getCampaignOptions()).thenReturn(mockedCampaignOptions);
+
+        // Act
+        boolean result = randomDeath.randomlyDies(mockedPerson);
+
+        // Assert
         assertTrue(result);
-    }
-
-    @Test
-    public void testProcessNewWeek_RandomlySurvives() {
-        // Mock setup
-        Person mockedPerson = mock(Person.class);
-        Campaign mockedCampaign = mock(Campaign.class);
-        LocalDate today = LocalDate.now();
-        when(mockedPerson.getAge(today)).thenReturn(50);
-        when(mockedPerson.getGender()).thenReturn(Gender.FEMALE);
-
-        RandomDeath mockedRandomDeath = spy(new RandomDeath(mock(CampaignOptions.class)));
-        doReturn(null).when(mockedRandomDeath).canDie(eq(mockedPerson), any(AgeGroup.class), eq(true));
-        doReturn(false).when(mockedRandomDeath).randomlyDies(eq(50), eq(Gender.FEMALE));
-
-        // Call processNewWeek
-        boolean result = mockedRandomDeath.processNewWeek(mockedCampaign, today, mockedPerson);
-
-        // Assertions
-        assertFalse(result);
     }
 }

@@ -1297,7 +1297,7 @@ public class BiographyTab {
 
         // Death
         chkUseRandomDeathSuicideCause.setSelected(options.isUseRandomDeathSuicideCause());
-        spnRandomDeathChance.setValue(options.getRandomDeathChance());
+        spnRandomDeathChance.setValue(options.getRandomDeathMultiplier());
 
         Map<AgeGroup, Boolean> deathAgeGroups = options.getEnabledRandomDeathAgeGroups();
         for (final AgeGroup ageGroup : AgeGroup.values()) {
@@ -1386,7 +1386,7 @@ public class BiographyTab {
 
         // Death
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setRandomDeathChance((int) spnRandomDeathChance.getValue());
+        options.setRandomDeathMultiplier((int) spnRandomDeathChance.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());

@@ -20,6 +20,7 @@ package mekhq.campaign.personnel.death;
 
 import megamek.Version;
 import megamek.common.Compute;
+import megamek.common.EquipmentType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
@@ -28,10 +29,14 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.enums.EraFlag;
+import mekhq.campaign.universe.eras.Era;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
@@ -43,10 +48,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static java.lang.Math.round;
 import static mekhq.campaign.personnel.enums.TenYearAgeRange.determineAgeRange;
+import static mekhq.campaign.universe.enums.EraFlag.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
@@ -71,10 +78,50 @@ public class RandomDeath {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomDeath";
     private static final MMLogger logger = MMLogger.create(RandomDeath.class);
 
+    private final Campaign campaign;
+    private final CampaignOptions campaignOptions;
     private final Map<AgeGroup, Boolean> enabledAgeGroups;
     private final boolean enableRandomDeathSuicideCause;
-    private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
-    private final int baseRandomDeathChance;
+    private Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
+    private final double randomDeathMultiplier;
+
+    // Base Chances
+    private final List<RandomDeathChance> deathChances = List.of(
+        new RandomDeathChance(9, 15, 12),
+        new RandomDeathChance(19, 16, 14),
+        new RandomDeathChance(29, 17, 8),
+        new RandomDeathChance(39, 20, 10),
+        new RandomDeathChance(49, 30, 18),
+        new RandomDeathChance(59, 70, 40),
+        new RandomDeathChance(69, 149, 90),
+        new RandomDeathChance(79, 385, 233),
+        new RandomDeathChance(89, 1000, 714),
+        new RandomDeathChance(99, 2500, 2000),
+        new RandomDeathChance(Integer.MAX_VALUE, 50, 3333)
+    );
+
+    // Multipliers
+    private final double ERA_MULTIPLIER_AGE_OF_WAR = 1.2;
+    private final double ERA_MULTIPLIER_STAR_LEAGUE = 0.9;
+    private final double ERA_MULTIPLIER_SUCCESSION_WARS = 1.05;
+    private final double ERA_MULTIPLIER_CLAN_INVASION = 0.95;
+    private final double ERA_MULTIPLIER_CIVIL_WAR = 0.93;
+    private final double ERA_MULTIPLIER_JIHAD = 1.0;
+    private final double ERA_MULTIPLIER_REPUBLIC = 0.92;
+    private final double ERA_MULTIPLIER_DARK_AGE = 0.95;
+    private final double ERA_MULTIPLIER_ILCLAN = 0.85;
+
+    private final double FACTION_MULTIPLIER_CLANS = 0.85;
+    private final double FACTION_MULTIPLIER_IS_MAJOR = 0.9;
+    private final double FACTION_MULTIPLIER_IS_MINOR = 0.95;
+    private final double FACTION_MULTIPLIER_PERIPHERY = 1.00;
+    private final double FACTION_MULTIPLIER_PERIPHERY_DEEP = 1.30;
+    private final double FACTION_MULTIPLIER_PIRATE = 1.35;
+    private final double FACTION_MULTIPLIER_MERCENARY = 1.00;
+
+    private final double MEDICAL_MULTIPLIER_INJURY_TRANSIENT = 0.1; // per injury
+    private final double MEDICAL_MULTIPLIER_INJURY_PERMANENT = 0.25; // once no matter how many
+    private final double MEDICAL_MULTIPLIER_HPG_ACCESS = -0.05;
 
     /**
      * Constructs a {@code RandomDeath} object using campaign-specific options.
@@ -83,15 +130,21 @@ public class RandomDeath {
      * enabling or disabling suicide causes, and retrieving the base random death chances.
      * The death causes map is also initialized by reading relevant files.</p>
      *
-     * @param campaignOptions The campaign options containing random death configurations.
+     * @param campaign The current campaign.
      */
-    public RandomDeath(final CampaignOptions campaignOptions) {
+    public RandomDeath(final Campaign campaign) {
+        this.campaign = campaign;
+        this.campaignOptions = campaign.getCampaignOptions();
+
         enabledAgeGroups = campaignOptions.getEnabledRandomDeathAgeGroups();
         enableRandomDeathSuicideCause = campaignOptions.isUseRandomDeathSuicideCause();
-        baseRandomDeathChance = campaignOptions.getRandomDeathChance();
-        causes = new HashMap<>();
+        randomDeathMultiplier = campaignOptions.getRandomDeathMultiplier();
 
         initializeCauses();
+    }
+
+    List<RandomDeathChance> getDeathChances() {
+        return deathChances;
     }
 
     /**
@@ -101,7 +154,7 @@ public class RandomDeath {
      * the {@code causes} map.</p>
      */
     public void initializeCauses() {
-        causes.clear();
+        causes = new HashMap<>();
         initializeCausesFromFile(new File(MHQConstants.RANDOM_DEATH_CAUSES_FILE_PATH));
         initializeCausesFromFile(new File(MHQConstants.USER_RANDOM_DEATH_CAUSES_FILE_PATH));
     }
@@ -259,48 +312,253 @@ public class RandomDeath {
     }
 
     /**
-     * Determines whether an individual dies randomly based on age, gender, and campaign configuration.
+     * Determines if a person randomly dies based on various multipliers and random chance.
      *
-     * <p>The chance of random death is influenced by:</p>
-     * <ul>
-     *     <li>Age: The risk increases exponentially after a certain threshold.</li>
-     *     <li>Gender: Gender-based multipliers affect the base death chance.</li>
-     *     <li>Campaign settings: The base random death chance is configured globally.</li>
-     * </ul>
+     * <p>This method calculates the probability of a person dying based on era, faction, health,
+     * and other modifiers, then performs a random roll to decide if the person dies.</p>
      *
-     * @param age    The age of the individual.
-     * @param gender The gender of the individual.
-     * @return {@code true} if the individual dies randomly; {@code false} otherwise.
+     * @param person the person to evaluate for random death.
+     * @return {@code true} if the person randomly dies, {@code false} otherwise.
      */
-    public boolean randomlyDies(final int age, final Gender gender) {
-        final int AGE_THRESHOLD = 90;
-        final double REDUCTION_MULTIPLIER = 0.90;
-        final double FEMALE_MULTIPLIER = 1.1;
-
-        int baseDieSize = baseRandomDeathChance;
-
-        // If Random Death disabled?
-        if (baseDieSize == 0) {
+    public boolean randomlyDies(Person person) {
+        if (canDie(person, true) != null) {
             return false;
         }
 
-        // Modifier for gender
-        if (gender == Gender.FEMALE) {
-            baseDieSize = (int) round(baseDieSize * FEMALE_MULTIPLIER);
+        Era era = campaign.getEra();
+        Faction faction = campaign.getFaction();
+
+        // Determine base chance
+        double randomDeathChance = getBaseDeathChance(person);
+
+        // If randomDeathChance is 0, we're never going to have a result other than zero, so just
+        // early exit.
+        if (randomDeathChance == 0) {
+            return false;
         }
 
-        // Calculate adjusted die size if the age exceeds the threshold
-        int adjustedDieSize = (age > AGE_THRESHOLD)
-            ? (int) round(baseDieSize * Math.pow(REDUCTION_MULTIPLIER, (age - AGE_THRESHOLD)))
-            : baseDieSize;
+        // Apply Era Multiplier
+        randomDeathChance = randomDeathChance * getEraMultiplier(era);
 
-        // At this point death is guaranteed, so no need to roll.
-        if (adjustedDieSize <= 1) {
-            return true;
+        // Apply Faction Multiplier
+        randomDeathChance = randomDeathChance * getFactionMultiplier(faction);
+
+        // Apply Health Multiplier
+        randomDeathChance = randomDeathChance * getHealthModifier(person);
+
+        // Apply Campaign Options Multiplier
+        randomDeathChance = randomDeathChance * randomDeathMultiplier;
+
+        // Round to the nearest int. We need an int for the final roll.
+        int actualDeathChance = (int) Math.round(randomDeathChance);
+
+        if (actualDeathChance == 0) {
+            return false;
         }
 
-        // Return random death outcome
-        return randomInt(adjustedDieSize) == 0;
+        return randomInt(10000) < actualDeathChance;
+    }
+
+    /**
+     * Retrieves the base death chance for a person based on their age and gender.
+     *
+     * <p>This method iterates over the list of predefined {@link RandomDeathChance} configurations
+     * and finds the matching rule based on the age of the person. Gender-based multipliers
+     * are applied accordingly.</p>
+     *
+     * @param person the person whose death chance is being calculated.
+     * @return the base death chance as a double, based on the matching {@link RandomDeathChance}.
+     */
+    double getBaseDeathChance(Person person) {
+        int age = person.getAge(campaign.getLocalDate());
+
+        for (RandomDeathChance deathChance : deathChances) {
+            // Check if the age falls within the range of this death chance
+            if (age <= deathChance.maximumAge) {
+                if (person.getGender().isFemale()) {
+                    return deathChance.female; // Use female death chance
+                } else {
+                    return deathChance.male; // Use male death chance
+                }
+            }
+        }
+
+        // If no matching entry is found for the provided age, default to 0
+        return 0.0;
+    }
+
+    /**
+     * Retrieves the era-based multiplier for determining the death chance.
+     *
+     * <p>The multiplier is obtained based on the characteristics of the current era (via
+     * {@link EraFlag}).</p>
+     *
+     * @param era the current era being analyzed.
+     * @return the death chance multiplier specific to the provided era.
+     */
+    double getEraMultiplier(Era era) {
+        Set<EraFlag> flags = era.getFlags();
+
+        if (flags.contains(PRE_SPACEFLIGHT) || flags.contains(EARLY_SPACEFLIGHT)
+            || flags.contains(AGE_OF_WAR)) {
+            return ERA_MULTIPLIER_AGE_OF_WAR;
+        }
+
+        if (flags.contains(STAR_LEAGUE)) {
+            return ERA_MULTIPLIER_STAR_LEAGUE;
+        }
+
+        if (flags.contains(EARLY_SUCCESSION_WARS) || flags.contains(LATE_SUCCESSION_WARS_LOSTECH)
+            || flags.contains(LATE_SUCCESSION_WARS_RENAISSANCE)) {
+            return ERA_MULTIPLIER_SUCCESSION_WARS;
+        }
+
+        if (flags.contains(CLAN_INVASION)) {
+            return ERA_MULTIPLIER_CLAN_INVASION;
+        }
+
+        if (flags.contains(CIVIL_WAR)) {
+            return ERA_MULTIPLIER_CIVIL_WAR;
+        }
+
+        if (flags.contains(JIHAD)) {
+            return ERA_MULTIPLIER_JIHAD;
+        }
+
+        if (flags.contains(EARLY_REPUBLIC) || flags.contains(LATE_REPUBLIC)) {
+            return ERA_MULTIPLIER_REPUBLIC;
+        }
+
+        if (flags.contains(DARK_AGES)) {
+            return ERA_MULTIPLIER_DARK_AGE;
+        }
+
+        // this is the current era, so if we've not hit any of the others, that means we're in ilClan
+        return ERA_MULTIPLIER_ILCLAN;
+    }
+
+    /**
+     * Retrieves the faction-based multiplier for determining the death chance.
+     *
+     * <p>The multiplier is determined based on the type of faction the campaign belongs to,
+     * such as Clan, Periphery, Major Power, or Mercenary. Each faction type has a predefined
+     * multiplier applied to the death chance.</p>
+     *
+     * @param faction the faction to calculate the multiplier for.
+     * @return the death chance multiplier specific to the provided faction.
+     */
+    double getFactionMultiplier(Faction faction) {
+        if (faction.isClan()) {
+            return FACTION_MULTIPLIER_CLANS;
+        }
+
+        if (faction.isDeepPeriphery()) {
+            return FACTION_MULTIPLIER_PERIPHERY_DEEP;
+        }
+
+        if (faction.isPeriphery()) {
+            return FACTION_MULTIPLIER_PERIPHERY;
+        }
+
+        if (faction.isMinorPower()) {
+            return FACTION_MULTIPLIER_IS_MINOR;
+        }
+
+        if (faction.isMajorPower()) {
+            return FACTION_MULTIPLIER_IS_MAJOR;
+        }
+
+        if (faction.isPirate()) {
+            return FACTION_MULTIPLIER_PIRATE;
+        }
+
+        // We also use the Mercenary modifier as a fallback
+        return FACTION_MULTIPLIER_MERCENARY;
+    }
+
+    /**
+     * Calculates the health-based multiplier for determining the death chance.
+     *
+     * <p>The health multiplier accounts for HPG access, injuries, and other health modifiers.
+     * When cumulative injuries (transient or permanent) are present, and depending on the use of
+     * advanced medical care, additional multipliers are applied to represent the overall health.</p>
+     *
+     * @param person the person to evaluate for health-related modifiers.
+     * @return the health multiplier as a double.
+     */
+    double getHealthModifier(Person person) {
+        double healthMultiplier = 1;
+
+        // Apply HPG access modifier if applicable
+        healthMultiplier += getHpgAccessMultiplier();
+
+        // Apply injury-related modifiers
+        if (person.needsFixing()) {
+            healthMultiplier += getInjuryModifier(person);
+        }
+
+        return healthMultiplier;
+    }
+
+    /**
+     * Calculates the multiplier based on HPG access if applicable.
+     *
+     * @return the HPG access multiplier, or 0 if no modifier is required.
+     */
+    private double getHpgAccessMultiplier() {
+        Integer hpgRating = campaign.getLocation().getPlanet().getHPG(campaign.getLocalDate());
+        if (hpgRating != null && hpgRating <= EquipmentType.RATING_B) {
+            return MEDICAL_MULTIPLIER_HPG_ACCESS;
+        }
+        return 0;
+    }
+
+    /**
+     * Calculates the modifier based on the injuries of the person.
+     *
+     * <p>If advanced medical care is enabled in the campaign options, individual injuries are
+     * evaluated for either transient or permanent injuries. Otherwise, a simpler calculation is
+     * applied based on the total number of injuries.</p>
+     *
+     * @param person the person whose injuries are evaluated.
+     * @return the injury-related health multiplier.
+     */
+    private double getInjuryModifier(Person person) {
+        if (!campaignOptions.isUseAdvancedMedical()) {
+            // Simplified injury multiplier without advanced medical care
+            return MEDICAL_MULTIPLIER_INJURY_TRANSIENT * person.getHits();
+        }
+
+        // Advanced medical care: calculate based on individual injuries
+        return calculateAdvancedInjuryModifier(person.getInjuries());
+    }
+
+    /**
+     * Calculates the injury modifier when advanced medical care is used.
+     *
+     * <p>Counts both transient and permanent injuries, and applies appropriate modifiers.</p>
+     *
+     * @param injuries the list of injuries to evaluate.
+     * @return the calculated health multiplier for advanced injuries.
+     */
+    private double calculateAdvancedInjuryModifier(List<Injury> injuries) {
+        boolean hasPermanentInjuries = false;
+        double injuryMultiplier = 0;
+
+        for (Injury injury : injuries) {
+            if (injury.isPermanent()) {
+                hasPermanentInjuries = true;
+            } else {
+                injuryMultiplier += MEDICAL_MULTIPLIER_INJURY_TRANSIENT;
+            }
+        }
+
+        // Apply permanent injury penalty if applicable
+        if (hasPermanentInjuries) {
+            injuryMultiplier += MEDICAL_MULTIPLIER_INJURY_PERMANENT;
+        }
+
+        return injuryMultiplier;
     }
 
     /**
@@ -315,11 +573,14 @@ public class RandomDeath {
      * </ul>
      *
      * @param person      The individual to evaluate.
-     * @param ageGroup    The person's age group.
      * @param randomDeath Whether random deaths are enabled in the campaign.
      * @return A string describing why the individual cannot die, or {@code null} if no restrictions apply.
      */
-    public @Nullable String canDie(final Person person, final AgeGroup ageGroup, final boolean randomDeath) {
+    public @Nullable String canDie(final Person person, final boolean randomDeath) {
+        LocalDate today = campaign.getLocalDate();
+        int age = person.getAge(today);
+        AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
+
         if (person.getStatus().isDead()) {
             return getCannotDieMessage("cannotDie.Dead.text");
         }
@@ -364,11 +625,11 @@ public class RandomDeath {
         final int age = person.getAge(today);
         final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
 
-        if (canDie(person, ageGroup, true) != null) {
+        if (canDie(person, true) != null) {
             return false;
         }
 
-        if (randomlyDies(age, person.getGender())) {
+        if (randomlyDies(person)) {
             // We double-report here, to make sure the user definitely notices that a random death has occurred.
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
@@ -471,4 +732,35 @@ public class RandomDeath {
         return Compute.randomInt(bound);
     }
 
+    /**
+     * A record representing the random death chance information based on gender and maximum age.
+     *
+     * <p>This record stores the following information:</p>
+     * <ul>
+     *     <li>{@code maximumAge}: The maximum age to which the death chance applies.</li>
+     *     <li>{@code male}: The death chance multiplier for male individuals.</li>
+     *     <li>{@code female}: The death chance multiplier for female individuals.</li>
+     * </ul>
+     */
+    public record RandomDeathChance(int maximumAge, double male, double female) {
+        /**
+         * Constructs a new {@code RandomDeathChance} record, which ensures the values are valid.
+         *
+         * @param maximumAge The maximum age limit for the death chance.
+         * @param male The death chance multiplier for males.
+         * @param female The death chance multiplier for females.
+         * @throws IllegalArgumentException if any values are invalid:
+         *                                  - {@code maximumAge} must be greater than 0.
+         *                                  - {@code male} and {@code female} must be non-negative.
+         */
+        public RandomDeathChance {
+            if (maximumAge < 0) {
+                throw new IllegalArgumentException("maximumAge must be 0 or greater: " + maximumAge);
+            }
+            if (male < 0 || female < 0) {
+                throw new IllegalArgumentException("male and female multipliers must be non-negative: male="
+                    + male + ", female=" + female);
+            }
+        }
+    }
 }

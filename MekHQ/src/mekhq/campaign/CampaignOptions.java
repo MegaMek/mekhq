@@ -367,7 +367,7 @@ public class CampaignOptions {
     // Death
     private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
     private boolean useRandomDeathSuicideCause;
-    private int randomDeathChance;
+    private double randomDeathMultiplier;
     // endregion Life Paths Tab
 
     //region Turnover and Retention
@@ -961,7 +961,7 @@ public class CampaignOptions {
         getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
         getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
         setUseRandomDeathSuicideCause(false);
-        setRandomDeathChance(0);
+        setRandomDeathMultiplier(0);
         // endregion Life Paths Tab
 
         // region Turnover and Retention
@@ -2962,12 +2962,12 @@ public class CampaignOptions {
         this.useRandomDeathSuicideCause = useRandomDeathSuicideCause;
     }
 
-    public int getRandomDeathChance() {
-        return randomDeathChance;
+    public double getRandomDeathMultiplier() {
+        return randomDeathMultiplier;
     }
 
-    public void setRandomDeathChance(final int randomDeathChance) {
-        this.randomDeathChance = randomDeathChance;
+    public void setRandomDeathMultiplier(final int randomDeathMultiplier) {
+        this.randomDeathMultiplier = randomDeathMultiplier;
     }
     // endregion Death
 
@@ -5012,7 +5012,7 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enabledRandomDeathAgeGroups");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathChance", getRandomDeathChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMultiplier", getRandomDeathMultiplier());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathMaleValues");
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathMaleValues");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathFemaleValues");
@@ -5819,8 +5819,8 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
                     retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathChance")) {
-                    retVal.setRandomDeathChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMultiplier")) {
+                    retVal.setRandomDeathMultiplier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
