@@ -26,6 +26,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
 import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
 import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
@@ -73,17 +74,34 @@ public class PrisonerEventManager {
         this.campaign = campaign;
         this.speaker = getSpeaker();
 
+        LocalDate today = campaign.getLocalDate();
+
+        // we have this here, as we still want Temporary Capacity to degrade even if the MeKHQ
+        // capture style isn't being used.
+        int temporaryCapacityModifier = campaign.getTemporaryPrisonerCapacity();
+
+        if (temporaryCapacityModifier != 100 && today.getDayOfMonth() == 1) {
+            int degreeOfChange = (int) round(temporaryCapacityModifier * 0.1);
+
+            if (temporaryCapacityModifier < 100) {
+                temporaryCapacityModifier += degreeOfChange;
+                campaign.setTemporaryPrisonerCapacity(min(100, temporaryCapacityModifier));
+            } else {
+                temporaryCapacityModifier -= degreeOfChange;
+                campaign.setTemporaryPrisonerCapacity(max(100, temporaryCapacityModifier));
+            }
+        }
+
         if (campaign.getCurrentPrisoners().isEmpty()) {
             return;
         }
 
-        LocalDate today = campaign.getLocalDate();
+        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isMekHQ()) {
+            return;
+        }
 
         // Monthly events
         if (today.getDayOfMonth() == 1) {
-            // reset temporary prisoner capacity
-            campaign.setTemporaryPrisonerCapacity(100);
-
             // Check for ransom events
             if (campaign.hasActiveContract()) {
                 Contract contract = campaign.getActiveContracts().get(0);
@@ -278,13 +296,16 @@ public class PrisonerEventManager {
     }
 
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {
+        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
+
         int prisonerCapacityUsage = 0;
 
         for (Person prisoner : campaign.getCurrentPrisoners()) {
-            // TODO this needs to be optional
-            if (prisoner.needsFixing()) {
+            if (prisoner.needsFixing() && isMekHQCaptureStyle) {
                 if (prisoner.getDoctorId() != null) {
-                    // Injured prisoners without doctors increase prisoner unhappiness, increasing capacity usage.
+                    // Injured prisoners without doctors increase prisoner unhappiness, increasing
+                    // capacity usage.
                     prisonerCapacityUsage++;
                 }
             }
@@ -296,6 +317,9 @@ public class PrisonerEventManager {
     }
 
     public static int calculatePrisonerCapacity(Campaign campaign) {
+        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
+
         // These values are based on CamOps. CamOps states a platoon of CI or one squad of BA can
         // handle 100 prisoners. As there are usually around 28 soldiers in a CI platoon and 5 BA
         // in a BA Squad, we extrapolated from there to more easily handle different platoon and
@@ -329,7 +353,6 @@ public class PrisonerEventManager {
                         }
                     }
 
-                    prisonerCapacity += crewSize * PRISONER_CAPACITY_BATTLE_ARMOR;
                     continue;
                 }
 
@@ -339,22 +362,22 @@ public class PrisonerEventManager {
                             prisonerCapacity += PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
                         }
                     }
+                    continue;
                 }
 
-                // TODO This needs to be an optional rule
-                if (!unit.isDamaged()) {
-                    for (Person crewMember : unit.getCrew()) {
-                        if (!crewMember.needsFixing()) {
-                            prisonerCapacity += PRISONER_CAPACITY_OTHER;
-                        }
-                    }
+                if (!unit.isDamaged() && isMekHQCaptureStyle) {
+                    prisonerCapacity += unit.getCrew().size() * PRISONER_CAPACITY_OTHER;
                 }
             }
         }
 
         double modifier = (double) campaign.getTemporaryPrisonerCapacity() / 100;
 
-        return max(0, (int) round(prisonerCapacity * modifier));
+        if (isMekHQCaptureStyle) {
+            return max(0, (int) round(prisonerCapacity * modifier));
+        } else {
+            return max(0, prisonerCapacity);
+        }
     }
 
     private @Nullable Person getSpeaker() {
