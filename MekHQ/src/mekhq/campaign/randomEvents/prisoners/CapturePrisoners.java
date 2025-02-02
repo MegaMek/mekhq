@@ -47,13 +47,12 @@ import static megamek.common.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class CapturePrisoners {
     private final Campaign campaign;
     private final Faction searchingFaction;
-    private final boolean isClan;
+    private final boolean searchingFactionIsClan;
 
     private final int ATTEMPT_COUNT = 3; // This will need tweaking till we're happy with the result
     private final int DEFECTION_CHANCE = 100;
@@ -82,9 +81,9 @@ public class CapturePrisoners {
         sarTargetNumber.addModifier(HAS_BATTLEFIELD_CONTROL, "Searcher Has Battlefield Control");
 
         int today = campaign.getLocalDate().getYear();
-        isClan = searchingFaction != null && searchingFaction.isClan();
+        searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
 
-        int techFaction = isClan ? ITechnology.getCodeFromMMAbbr("CLAN") : ITechnology.getCodeFromMMAbbr("IS");
+        int techFaction = searchingFactionIsClan ? ITechnology.getCodeFromMMAbbr("CLAN") : ITechnology.getCodeFromMMAbbr("IS");
         try {
             // searchingFaction being null is fine because we're just ignoring any exceptions
             techFaction = ITechnology.getCodeFromMMAbbr(searchingFaction.getShortName());
@@ -101,14 +100,14 @@ public class CapturePrisoners {
 
 
             final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
-                today, isClan, techFaction);
+                today, searchingFactionIsClan, techFaction);
             final int clanImprovedSensorsAvailability = createCLImprovedSensors().calcYearAvailability(
-                today, isClan, techFaction);
+                today, searchingFactionIsClan, techFaction);
 
-            final int improvedSensorsAvailability = isClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
+            final int improvedSensorsAvailability = searchingFactionIsClan ? clanImprovedSensorsAvailability : isImprovedSensorsAvailability;
 
             final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
-                today, isClan, techFaction);
+                today, searchingFactionIsClan, techFaction);
 
             if (sarQuality == null) {
                 sarQuality = QUALITY_D.ordinal();
@@ -135,61 +134,71 @@ public class CapturePrisoners {
 
     public void processCaptureOfNPC(Person prisoner) {
         PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
-        Faction originFaction = prisoner.getOriginFaction();
+        boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
+        Faction prisonerFaction = prisoner.getOriginFaction();
         LocalDate today = campaign.getLocalDate();
 
         // if the campaign faction is Clan, we do things a little differently
-        if (isClan) {
+        if (searchingFactionIsClan) {
             Faction campaignFaction = campaign.getFaction();
-            HonorRating campaignHonorRating = campaignFaction.getHonorRating(campaign);
-            int targetNumber = campaignHonorRating.getBondsmanTargetNumber();
+            processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle);
 
-            if (d6() >= targetNumber) {
-                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
-                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+            handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+            return;
+        }
+
+        // If MekHQ Capture Style is disabled, we can use a shortcut
+        if (!isMekHQCaptureStyle) {
+            if (prisonerFaction.isClan()) {
+                processPrisoner(prisoner, prisonerFaction, false);
             } else {
                 prisoner.setPrisonerStatus(campaign, PRISONER, true);
             }
 
-            handlePostCapture(prisoner);
+            handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+
+            return;
         }
 
         // Otherwise, we attempt defection
-        int roll = attemptDefection(prisoner, true);
+        int defectionRoll = attemptDefection(prisoner, true);
 
-        if (roll == 0) {
-            boolean isDefector = false;
-            if (prisoner.isClanPersonnel()) {
-                // Even if we roll a Defection, the honor of the character in question may cause
-                // them to choose not to Bond themselves to the player campaign.
-                HonorRating originFactionHonorRating = originFaction.getHonorRating(campaign);
-                int targetNumber = originFactionHonorRating.getBondsmanTargetNumber();
+        if (defectionRoll == 0) {
+            processPrisoner(prisoner, prisonerFaction, true);
 
-                if (d6() >= targetNumber) {
-                    prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
-                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
-                    isDefector = true;
-                }
-            }
-
-            if (!prisoner.isClanPersonnel() && prisonerCaptureStyle.isMekHQ()) {
-                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, true);
-                isDefector = true;
-            }
-
-            if (isDefector) {
+            PrisonerStatus newStatus = prisoner.getPrisonerStatus();
+            if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
                 new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
             }
         } else {
             prisoner.setPrisonerStatus(campaign, PRISONER, true);
         }
 
-        // If defection has failed, convert to normal prisoner
-        handlePostCapture(prisoner);
+        handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+    }
+
+    private void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle) {
+        LocalDate today = campaign.getLocalDate();
+        HonorRating honorRating = faction.getHonorRating(campaign);
+
+        int bondsmanRoll = d6();
+        if (faction.isClan()) {
+            if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
+                prisoner.changeStatus(campaign, today, PersonnelStatus.BONDSREF);
+                return;
+            } else if (d6() >= honorRating.getBondsmanTargetNumber()) {
+                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+                return;
+            }
+        }
+
+        prisoner.setPrisonerStatus(campaign, PRISONER, true);
     }
 
     private int attemptDefection(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
+
         if (potentialDefector.getOriginFaction().isMercenary()) {
             adjustedDefectionChance *= (int) round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
         }
@@ -224,7 +233,7 @@ public class CapturePrisoners {
             return;
         }
 
-        if (isClan) {
+        if (searchingFactionIsClan) {
             potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ENEMY_BONDSMAN);
             return;
         }
@@ -251,11 +260,11 @@ public class CapturePrisoners {
         return false;
     }
 
-    private void handlePostCapture(Person prisoner) {
+    private void handlePostCapture(Person prisoner, PrisonerStatus newStatus) {
         final String RESOURCE_BUNDLE = "mekhq.resources.DefectionOffer";
 
         // non-clan prisoners should generate with lower than average loyalty, so drop the highest roll
-        if (!prisoner.isClanPersonnel()) {
+        if (!newStatus.isBecomingBondsman()) {
             List<Integer> rolls = new ArrayList<>();
 
             for (int roll = 0; roll < 4; roll++) {

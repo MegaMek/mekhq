@@ -82,7 +82,9 @@ public enum PersonnelStatus {
     SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText",
         "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText"),
     ENEMY_BONDSMAN("PersonnelStatus.ENEMY_BONDSMAN.text", "PersonnelStatus.ENEMY_BONDSMAN.toolTipText",
-                     "PersonnelStatus.ENEMY_BONDSMAN.reportText", "PersonnelStatus.ENEMY_BONDSMAN.logText"),;
+                     "PersonnelStatus.ENEMY_BONDSMAN.reportText", "PersonnelStatus.ENEMY_BONDSMAN.logText"),
+    BONDSREF("PersonnelStatus.BONDSREF.text", "PersonnelStatus.BONDSREF.toolTipText",
+                     "PersonnelStatus.BONDSREF.reportText", "PersonnelStatus.BONDSREF.logText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -403,6 +405,16 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@code BONDSREF} personnel status.
+     *
+     * @return {@code true} if the character has the {@code BONDSREF} personnel status {@code false}
+     * otherwise.
+     */
+    public boolean isBondsref() {
+        return this == BONDSREF;
+    }
+
+    /**
      * @return {@code true} if a person is currently absent from the core force, otherwise
      *         {@code false}
      */
@@ -415,8 +427,8 @@ public enum PersonnelStatus {
      * @return {@code true} if a person has left the unit, otherwise {@code false}
      */
     public boolean isDepartedUnit() {
-        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected() || isMissing()
-                || isLeft() || isEnemyBondsman();
+        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected()
+            || isMissing() || isLeft() || isEnemyBondsman();
     }
 
     /**
@@ -425,7 +437,7 @@ public enum PersonnelStatus {
     public boolean isDead() {
         return isKIA() || isHomicide() || isWounds() || isDisease() || isAccidental()
                 || isNaturalCauses() || isOldAge() || isMedicalComplications()
-                || isPregnancyComplications() || isUndetermined() || isSuicide();
+                || isPregnancyComplications() || isUndetermined() || isSuicide() || isBondsref();
     }
 
     /**
