@@ -21,7 +21,6 @@ package mekhq.campaign.randomEvents.prisoners;
 import megamek.common.Compute;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -44,7 +43,10 @@ import static megamek.common.Compute.randomInt;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
-import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -72,8 +74,7 @@ public class CapturePrisoners {
 
     private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
-    public CapturePrisoners(Campaign campaign, @Nullable Faction searchingFaction, Scenario scenario,
-                            @Nullable Integer sarQuality) {
+    public CapturePrisoners(Campaign campaign, Faction searchingFaction, Scenario scenario, int sarQuality) {
         this.campaign = campaign;
         this.searchingFaction = searchingFaction;
 
@@ -109,10 +110,6 @@ public class CapturePrisoners {
             final int activeProbeAvailability = createBeagleActiveProbe().calcYearAvailability(
                 today, searchingFactionIsClan, techFaction);
 
-            if (sarQuality == null) {
-                sarQuality = QUALITY_D.ordinal();
-            }
-
             if (sarQuality >= improvedSensorsAvailability) {
                 sarTargetNumber.addModifier(SAR_HAS_IMPROVED_SENSORS, "SAR has Improved Sensors");
             } else if (sarQuality >= activeProbeAvailability) {
@@ -122,26 +119,22 @@ public class CapturePrisoners {
     }
 
     public boolean attemptCaptureOfNPC(boolean wasPickedUp) {
-        // Attempt capture
-        boolean captureSuccessful = wasPickedUp;
-
-        if (!captureSuccessful) {
-            captureSuccessful = rollForCapture();
+        if (wasPickedUp) {
+            return true;
         }
 
-        return captureSuccessful;
+        return rollForCapture();
     }
 
     public void processCaptureOfNPC(Person prisoner) {
         PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
         boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
         Faction prisonerFaction = prisoner.getOriginFaction();
-        LocalDate today = campaign.getLocalDate();
+        Faction campaignFaction = campaign.getFaction();
 
         // if the campaign faction is Clan, we do things a little differently
-        if (searchingFactionIsClan) {
-            Faction campaignFaction = campaign.getFaction();
-            processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle);
+        if (campaignFaction.isClan()) {
+            processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle, true);
 
             handlePostCapture(prisoner, prisoner.getPrisonerStatus());
             return;
@@ -150,7 +143,7 @@ public class CapturePrisoners {
         // If MekHQ Capture Style is disabled, we can use a shortcut
         if (!isMekHQCaptureStyle) {
             if (prisonerFaction.isClan()) {
-                processPrisoner(prisoner, prisonerFaction, false);
+                processPrisoner(prisoner, prisonerFaction, false, true);
             } else {
                 prisoner.setPrisonerStatus(campaign, PRISONER, true);
             }
@@ -164,7 +157,7 @@ public class CapturePrisoners {
         int defectionRoll = attemptDefection(prisoner, true);
 
         if (defectionRoll == 0) {
-            processPrisoner(prisoner, prisonerFaction, true);
+            processPrisoner(prisoner, prisonerFaction, true, true);
 
             PrisonerStatus newStatus = prisoner.getPrisonerStatus();
             if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
@@ -177,23 +170,31 @@ public class CapturePrisoners {
         handlePostCapture(prisoner, prisoner.getPrisonerStatus());
     }
 
-    private void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle) {
+    private void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle, boolean isNPC) {
         LocalDate today = campaign.getLocalDate();
         HonorRating honorRating = faction.getHonorRating(campaign);
 
         int bondsmanRoll = d6();
         if (faction.isClan()) {
             if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
-                prisoner.changeStatus(campaign, today, PersonnelStatus.BONDSREF);
+                prisoner.changeStatus(campaign, today, BONDSREF);
                 return;
             } else if (d6() >= honorRating.getBondsmanTargetNumber()) {
-                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
-                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+                if (isNPC) {
+                    prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
+                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+                } else {
+                    prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
+                }
                 return;
             }
         }
 
-        prisoner.setPrisonerStatus(campaign, PRISONER, true);
+        if (isNPC) {
+            prisoner.setPrisonerStatus(campaign, PRISONER, true);
+        } else {
+            prisoner.changeStatus(campaign, today, POW);
+        }
     }
 
     private int attemptDefection(Person potentialDefector, boolean isNPC) {
@@ -219,7 +220,7 @@ public class CapturePrisoners {
         return randomInt(adjustedDefectionChance);
     }
 
-    public void attemptCaptureOfPlayerCharacter(Person potentialPrisoner, boolean wasPickedUp) {
+    public void attemptCaptureOfPlayerCharacter(Person prisoner, boolean wasPickedUp) {
         // Attempt capture
         boolean captureSuccessful = wasPickedUp;
 
@@ -229,22 +230,42 @@ public class CapturePrisoners {
 
         // Early exit is capture was unsuccessful
         if (!captureSuccessful) {
-            potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MIA);
+            prisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MIA);
             return;
         }
+
+        PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
+        Faction prisonerFaction = prisoner.getOriginFaction();
 
         if (searchingFactionIsClan) {
-            potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ENEMY_BONDSMAN);
+            Faction campaignFaction = campaign.getFaction();
+            processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle, false);
             return;
         }
 
-        // Attempt defection
-        int roll = attemptDefection(potentialPrisoner, false);
+        if (!isMekHQCaptureStyle) {
+            if (prisonerFaction.isClan()) {
+                processPrisoner(prisoner, prisonerFaction, false, false);
+            } else {
+                prisoner.changeStatus(campaign, campaign.getLocalDate(), POW);
+            }
 
-        if (roll == 0) {
-            potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DEFECTED);
+            return;
+        }
+
+        // Otherwise, we attempt defection
+        int defectionRoll = attemptDefection(prisoner, false);
+
+        if (defectionRoll == 0) {
+            processPrisoner(prisoner, prisonerFaction, true, false);
+
+            PrisonerStatus newStatus = prisoner.getPrisonerStatus();
+            if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
+                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+            }
         } else {
-            potentialPrisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.POW);
+            prisoner.changeStatus(campaign, campaign.getLocalDate(), DEFECTED);
         }
     }
 

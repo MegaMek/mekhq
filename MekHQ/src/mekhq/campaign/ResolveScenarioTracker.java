@@ -147,8 +147,7 @@ public class ResolveScenarioTracker {
             AtBContract contract = ((AtBScenario) scenario).getContract(campaign);
 
             if (control) {
-                searchingFaction = contract.getEmployerFaction();
-                sarQuality = contract.getAllyQuality();
+                searchingFaction = campaign.getFaction();
             } else {
                 searchingFaction = contract.getEnemy();
                 sarQuality = contract.getEnemyQuality();
