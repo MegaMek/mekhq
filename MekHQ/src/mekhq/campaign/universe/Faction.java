@@ -21,20 +21,26 @@
  */
 package mekhq.campaign.universe;
 
-import java.awt.Color;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.Map.Entry;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.universe.enums.HonorRating.LIBERAL;
+import static mekhq.campaign.universe.enums.HonorRating.OPPORTUNISTIC;
+import static mekhq.campaign.universe.enums.HonorRating.STRICT;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -507,5 +513,45 @@ public class Faction {
         CONTROLLING,
         /** Faction is lenient with mercenary command rights (Camops p. 42) */
         LENIENT
+    }
+
+    /**
+     * Calculates the honor rating for a given Clan.
+     *
+     * @param campaign    the ongoing campaign
+     * @return the honor rating as an {@link HonorRating} enum
+     */
+    public HonorRating getHonorRating(Campaign campaign) {
+        // Our research showed the post-Invasion shift in Clan doctrine to occur between 3053 and 3055
+        boolean isPostInvasion = campaign.getLocalDate().getYear() >= 3053 + randomInt(2);
+
+        // This is based on the table found on page 274 of Total Warfare
+        // Any Clan not mentioned on that table is assumed to be Strict → Opportunistic
+        return switch (shortName) {
+            case "CCC", "CHH", "CIH", "CNC", "CSR" -> OPPORTUNISTIC;
+            case "CCO", "CGS", "CSV" -> STRICT;
+            case "CGB", "CWIE" -> {
+                if (isPostInvasion) {
+                    yield LIBERAL;
+                } else {
+                    yield STRICT;
+                }
+            }
+            case "CDS" -> LIBERAL;
+            case "CW" -> {
+                if (isPostInvasion) {
+                    yield LIBERAL;
+                } else {
+                    yield OPPORTUNISTIC;
+                }
+            }
+            default -> {
+                if (isPostInvasion) {
+                    yield OPPORTUNISTIC;
+                } else {
+                    yield STRICT;
+                }
+            }
+        };
     }
 }
