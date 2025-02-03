@@ -38,18 +38,14 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
-import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -66,7 +62,7 @@ import java.util.List;
 import java.util.*;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
-import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
 
 /**
  * @author Taharqa
@@ -414,7 +410,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-           
+
             pnlUnitStatus.add(nameLbl, gridBagConstraints);
             gridBagConstraints.gridx = 1;
             pnlUnitStatus.add(chkTotaled, gridBagConstraints);
@@ -431,7 +427,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
             unitIndex++;
         }
-        
+
         return pnlUnitStatus;
     }
 
@@ -1621,7 +1617,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             && tracker.getScenario().getLinkedScenario() != 0) {
             StratconRulesManager.linkedScenarioProcessing(tracker, forces);
         }
-        
+
 
         aborted = false;
         this.setVisible(false);
@@ -2021,7 +2017,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     /**
      * Event handler for "Continue as Reinforcements" Button that
-     * adjusts boolean used after scenario resolution to signal 
+     * adjusts boolean used after scenario resolution to signal
      * player wants to send units to linked scenario
      */
     private class ReinforcementListener implements ActionListener {
