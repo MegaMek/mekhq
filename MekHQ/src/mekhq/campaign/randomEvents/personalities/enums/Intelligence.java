@@ -83,7 +83,7 @@ public enum Intelligence {
      */
     public String getDescription(Person person) {
         int descriptionIndex = person.getIntelligenceDescriptionIndex();
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex + ".regexp";
+        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
 
         Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);

@@ -102,7 +102,7 @@ public enum Greed {
      */
     public String getDescription(Person person) {
         int descriptionIndex = person.getGreedDescriptionIndex();
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex + ".regexp";
+        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
 
         Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
