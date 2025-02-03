@@ -102,6 +102,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -9160,7 +9161,7 @@ public class Campaign implements ITechManager {
         }
     }
 
-    /** 
+    /**
      * Wipes the Parts in use map for the purpose of resetting all values to their default
      */
     public void wipePartsInUseMap() {
@@ -9186,13 +9187,13 @@ public class Campaign implements ITechManager {
         }
         return icon;
     }
-    
+
     /**
      * Checks if another active scenario has this scenarioID as it's linkedScenarioID and returns true if it finds one.
      */
     public boolean checkLinkedScenario(int scenarioID) {
         for (Scenario scenario : getScenarios()) {
-            if ((scenario.getLinkedScenario() == scenarioID)  
+            if ((scenario.getLinkedScenario() == scenarioID)
                 && (getScenario(scenario.getId()).getStatus().isCurrent())) {
                 return true;
             }

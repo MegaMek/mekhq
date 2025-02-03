@@ -20,15 +20,12 @@
 package mekhq.campaign;
 
 import megamek.Version;
-import megamek.client.ui.swing.GUIPreferences;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Configuration;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
-import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -43,6 +40,7 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;

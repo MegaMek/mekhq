@@ -23,7 +23,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -144,7 +147,7 @@ public class AbstractDeathTest {
         when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockPerson.isImmortal()).thenReturn(true);
         assertNotNull(mockDeath.canDie(mockPerson, AgeGroup.ADULT, true));
-        
+
         // Age Group must be enabled
         when(mockPerson.isImmortal()).thenReturn(false);
         assertNotNull(mockDeath.canDie(mockPerson, AgeGroup.CHILD, true));
