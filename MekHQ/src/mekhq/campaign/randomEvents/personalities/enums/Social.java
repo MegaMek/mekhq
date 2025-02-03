@@ -102,7 +102,7 @@ public enum Social {
      */
     public String getDescription(Person person) {
         int descriptionIndex = person.getSocialDescriptionIndex();
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
+        final String RESOURCE_KEY = name() + ".description." + descriptionIndex + ".regexp";
 
         Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
