@@ -18,8 +18,13 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
+import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.Person;
 
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
+import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum Greed {
@@ -89,18 +94,27 @@ public enum Greed {
     }
 
     /**
-     * Retrieves the description of the current enumeration value.
+     * Generates a description for a specified person based on their social description index,
+     * pronoun, and other properties specific to the person and resource bundle.
      *
-     * <p>The label is determined based on the resource bundle for the application,
-     * utilizing the enum name combined with a specific key suffix to fetch the
-     * relevant localized string.</p>
-     *
-     * @return the description associated with this enumeration value
+     * @param person the {@code Person} object for whom the description is being generated
+     * @return a formatted description string tailored to the specified person
      */
-    public String getDescription() {
-        final String RESOURCE_KEY = name() + ".description";
+    public String getDescription(Person person) {
+        int descriptionIndex = person.getGreedDescriptionIndex();
+        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+        Gender gender = person.getGender();
+        String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
+        String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
+        String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
+        String objectPronounLowerCase = HIM_HER_THEM.getDescriptor(gender);
+        String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
+        String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, person.getFirstName(),
+            subjectPronoun, subjectPronounLowerCase, objectPronoun, objectPronounLowerCase,
+            possessivePronoun, possessivePronounLowerCase);
     }
 
     /**

@@ -19,11 +19,9 @@
 
 package mekhq.campaign.randomEvents.personalities;
 
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.randomEvents.personalities.enums.*;
 
 import java.util.*;
@@ -116,25 +114,9 @@ public class PersonalityController {
 
         StringBuilder personalityDescription = new StringBuilder();
 
-        String firstName = person.getFirstName();
-
-        // The use of capitalized gender-neutral 'they'.
-        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(Gender.OTHER_FEMALE);
-
-        for (int index = 0; index < traitDescriptions.size(); index++) {
-
-            // Define "forward" and "plural" based on the index value.
-            // If the index is an even number, use first name; otherwise use pronoun.
-            // The alternation between first name and pronoun adds variety to the
-            // descriptions.
-            // The "plural" string is only used when the first name is used.
-            String forward = ((index % 2) == 0) ? firstName : pronoun;
-            String plural = ((index % 2) == 0) ? "s" : "";
-
-            // We only append a space between descriptions, not at the start.
+        for (String traitDescription : traitDescriptions) {
+            personalityDescription.append(traitDescription);
             personalityDescription.append(' ');
-
-            personalityDescription.append(String.format(traitDescriptions.get(index), forward, plural));
         }
 
         person.setPersonalityDescription(personalityDescription.toString());
@@ -150,27 +132,27 @@ public class PersonalityController {
         List<String> traitDescriptions = new ArrayList<>();
 
         if (!person.getAggression().isNone()) {
-            traitDescriptions.add(person.getAggression().getDescription());
+            traitDescriptions.add(person.getAggression().getDescription(person));
         }
 
         if (!person.getAmbition().isNone()) {
-            traitDescriptions.add(person.getAmbition().getDescription());
+            traitDescriptions.add(person.getAmbition().getDescription(person));
         }
 
         if (!person.getGreed().isNone()) {
-            traitDescriptions.add(person.getGreed().getDescription());
+            traitDescriptions.add(person.getGreed().getDescription(person));
         }
 
         if (!person.getSocial().isNone()) {
-            traitDescriptions.add(person.getSocial().getDescription());
+            traitDescriptions.add(person.getSocial().getDescription(person));
         }
 
         if (!person.getIntelligence().isAverage()) {
-            traitDescriptions.add(person.getIntelligence().getDescription());
+            traitDescriptions.add(person.getIntelligence().getDescription(person));
         }
 
         if (!person.getPersonalityQuirk().isNone()) {
-            traitDescriptions.add(person.getPersonalityQuirk().getDescription());
+            traitDescriptions.add(person.getPersonalityQuirk().getDescription(person));
         }
 
         return traitDescriptions;

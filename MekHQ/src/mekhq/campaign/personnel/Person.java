@@ -77,6 +77,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.lang.Math.abs;
+import static megamek.common.Compute.randomInt;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -221,11 +222,17 @@ public class Person {
 
     // region Personality
     private Aggression aggression;
+    private int aggressionDescriptionIndex;
     private Ambition ambition;
+    private int ambitionDescriptionIndex;
     private Greed greed;
+    private int greedDescriptionIndex;
     private Social social;
+    private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
+    private int personalityQuirkDescriptionIndex;
     private Intelligence intelligence;
+    private int intelligenceDescriptionIndex;
     private String personalityDescription;
     // endregion Personality
 
@@ -394,11 +401,17 @@ public class Person {
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
         aggression = Aggression.NONE;
+        aggressionDescriptionIndex = randomInt(3);
         ambition = Ambition.NONE;
+        ambitionDescriptionIndex = randomInt(3);
         greed = Greed.NONE;
+        greedDescriptionIndex = randomInt(3);
         social = Social.NONE;
+        socialDescriptionIndex = randomInt(3);
         personalityQuirk = PersonalityQuirk.NONE;
+        personalityQuirkDescriptionIndex = randomInt(3);
         intelligence = Intelligence.AVERAGE;
+        intelligenceDescriptionIndex = randomInt(3);
         personalityDescription = "";
 
         // region Flags
@@ -1826,8 +1839,16 @@ public class Person {
         this.aggression = aggression;
     }
 
+    public int getAggressionDescriptionIndex() {
+        return aggressionDescriptionIndex;
+    }
+
     public Ambition getAmbition() {
         return ambition;
+    }
+
+    public int getAmbitionDescriptionIndex() {
+        return ambitionDescriptionIndex;
     }
 
     public void setAmbition(final Ambition ambition) {
@@ -1838,12 +1859,20 @@ public class Person {
         return greed;
     }
 
+    public int getGreedDescriptionIndex() {
+        return greedDescriptionIndex;
+    }
+
     public void setGreed(final Greed greed) {
         this.greed = greed;
     }
 
     public Social getSocial() {
         return social;
+    }
+
+    public int getSocialDescriptionIndex() {
+        return socialDescriptionIndex;
     }
 
     public void setSocial(final Social social) {
@@ -1854,12 +1883,20 @@ public class Person {
         return personalityQuirk;
     }
 
+    public int getPersonalityQuirkDescriptionIndex() {
+        return personalityQuirkDescriptionIndex;
+    }
+
     public void setPersonalityQuirk(final PersonalityQuirk personalityQuirk) {
         this.personalityQuirk = personalityQuirk;
     }
 
     public Intelligence getIntelligence() {
         return intelligence;
+    }
+
+    public int getIntelligenceDescriptionIndex() {
+        return intelligenceDescriptionIndex;
     }
 
     public void setIntelligence(final Intelligence intelligence) {
@@ -2235,25 +2272,43 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggressionDescriptionIndex",
+                aggressionDescriptionIndex);
+
             if (ambition != Ambition.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.name());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambitionDescriptionIndex",
+                ambitionDescriptionIndex);
 
             if (greed != Greed.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.name());
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greedDescriptionIndex",
+                greedDescriptionIndex);
+
             if (social != Social.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.name());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "socialDescriptionIndex",
+                socialDescriptionIndex);
 
             if (personalityQuirk != PersonalityQuirk.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.ordinal());
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirkDescriptionIndex",
+                personalityQuirkDescriptionIndex);
+
             if (intelligence != Intelligence.AVERAGE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligence", intelligence.ordinal());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligenceDescriptionIndex",
+                intelligenceDescriptionIndex);
 
             if (!StringUtility.isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
@@ -2604,16 +2659,28 @@ public class Person {
                     retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
                     retVal.aggression = Aggression.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("aggressionDescriptionIndex")) {
+                    retVal.aggressionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
                     retVal.ambition = Ambition.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("ambitionDescriptionIndex")) {
+                    retVal.ambitionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
                     retVal.greed = Greed.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("greedDescriptionIndex")) {
+                    retVal.greedDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
                     retVal.social = Social.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("socialDescriptionIndex")) {
+                    retVal.socialDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
                     retVal.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
+                    retVal.personalityQuirkDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
                     retVal.intelligence = Intelligence.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("intelligenceDescriptionIndex")) {
+                    retVal.intelligenceDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
