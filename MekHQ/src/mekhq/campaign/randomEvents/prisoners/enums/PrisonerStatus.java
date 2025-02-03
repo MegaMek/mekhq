@@ -31,7 +31,7 @@ public enum PrisonerStatus {
     BECOMING_BONDSMAN;
     // endregion Enum Declarations
 
-    final private String RESOURCE_BUNDLE = "mekhq.resources.PrisonerCaptureStyle";
+    final private String RESOURCE_BUNDLE = "mekhq.resources.PrisonerStatus";
 
     // region Getters
     public String getLabel() {
