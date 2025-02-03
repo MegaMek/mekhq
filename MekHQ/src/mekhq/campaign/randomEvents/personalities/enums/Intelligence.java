@@ -19,59 +19,70 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum Intelligence {
     // region Enum Declarations
-    BRAIN_DEAD("Intelligence.BRAIN_DEAD.text", "Intelligence.BRAIN_DEAD.description"),
-    UNINTELLIGENT("Intelligence.UNINTELLIGENT.text", "Intelligence.UNINTELLIGENT.description"),
-    FOOLISH("Intelligence.FOOLISH.text", "Intelligence.FOOLISH.description"),
-    SIMPLE("Intelligence.SIMPLE.text", "Intelligence.SIMPLE.description"),
-    SLOW("Intelligence.SLOW.text", "Intelligence.SLOW.description"),
-    UNINSPIRED("Intelligence.UNINSPIRED.text", "Intelligence.UNINSPIRED.description"),
-    DULL("Intelligence.DULL.text", "Intelligence.DULL.description"),
-    DIMWITTED("Intelligence.DIMWITTED.text", "Intelligence.DIMWITTED.description"),
-    OBTUSE("Intelligence.OBTUSE.text", "Intelligence.OBTUSE.description"),
-    BELOW_AVERAGE("Intelligence.BELOW_AVERAGE.text", "Intelligence.BELOW_AVERAGE.description"),
-    UNDER_PERFORMING("Intelligence.UNDER_PERFORMING.text", "Intelligence.UNDER_PERFORMING.description"),
-    LIMITED_INSIGHT("Intelligence.LIMITED_INSIGHT.text", "Intelligence.LIMITED_INSIGHT.description"),
-    AVERAGE("Intelligence.AVERAGE.text", "Intelligence.AVERAGE.description"),
-    ABOVE_AVERAGE("Intelligence.ABOVE_AVERAGE.text", "Intelligence.ABOVE_AVERAGE.description"),
-    STUDIOUS("Intelligence.STUDIOUS.text", "Intelligence.STUDIOUS.description"),
-    DISCERNING("Intelligence.DISCERNING.text", "Intelligence.DISCERNING.description"),
-    SHARP("Intelligence.SHARP.text", "Intelligence.SHARP.description"),
-    QUICK_WITTED("Intelligence.QUICK_WITTED.text", "Intelligence.QUICK_WITTED.description"),
-    PERCEPTIVE("Intelligence.PERCEPTIVE.text", "Intelligence.PERCEPTIVE.description"),
-    BRIGHT("Intelligence.BRIGHT.text", "Intelligence.BRIGHT.description"),
-    CLEVER("Intelligence.CLEVER.text", "Intelligence.CLEVER.description"),
-    INTELLECTUAL("Intelligence.INTELLECTUAL.text", "Intelligence.INTELLECTUAL.description"),
-    BRILLIANT("Intelligence.BRILLIANT.text", "Intelligence.BRILLIANT.description"),
-    EXCEPTIONAL("Intelligence.EXCEPTIONAL.text", "Intelligence.EXCEPTIONAL.description"),
-    GENIUS("Intelligence.GENIUS.text", "Intelligence.GENIUS.description");
+    BRAIN_DEAD,
+    UNINTELLIGENT,
+    FOOLISH,
+    SIMPLE,
+    SLOW,
+    UNINSPIRED,
+    DULL,
+    DIMWITTED,
+    OBTUSE,
+    BELOW_AVERAGE,
+    UNDER_PERFORMING,
+    LIMITED_INSIGHT,
+    AVERAGE,
+    ABOVE_AVERAGE,
+    STUDIOUS,
+    DISCERNING,
+    SHARP,
+    QUICK_WITTED,
+    PERCEPTIVE,
+    BRIGHT,
+    CLEVER,
+    INTELLECTUAL,
+    BRILLIANT,
+    EXCEPTIONAL,
+    GENIUS;
     // endregion Enum Declarations
 
-    // region Variable Declarations
-    private final String name;
-    private final String description;
-    // endregion Variable Declarations
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
-    // region Constructors
-    Intelligence(final String name, final String description) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.description = resources.getString(description);
-    }
-    // endregion Constructors
-
+    /**
+     * Retrieves the label associated with the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the localized label string corresponding to the enumeration value.
+     */
     // region Getters
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
 
-    public String getDescription() {
-        return description;
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
-    // endregion Getters
+
+    /**
+     * Retrieves the description of the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the description associated with this enumeration value
+     */
+    public String getDescription() {
+        final String RESOURCE_KEY = name() + ".description";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
 
     // region Boolean Comparison Methods
     public boolean isAverage() {
@@ -79,28 +90,38 @@ public enum Intelligence {
     }
     // endregion Boolean Comparison Methods
 
-    // region File I/O
     /**
-     * Returns the {@link Intelligence} associated with the given ordinal.
+     * Converts a given string to its corresponding {@code Intelligence} enumeration value.
+     * The method first attempts to parse the string as the name of an {@code Intelligence} enum value.
+     * If that fails, it attempts to parse the string as an integer representing the ordinal of an
+     * {@code Intelligence} enum value. If neither succeeds, it logs an error and defaults to
+     * returning {@code AVERAGE}.
      *
-     * @param ordinal the ordinal value of the {@link Intelligence}
-     * @return the {@link Intelligence} associated with the given ordinal, or default value
-     * {@code AVERAGE} if not found
+     * @param text the input string to parse, which represents either the name or the ordinal
+     *             of an {@code Intelligence} enum value.
+     * @return the corresponding {@code Intelligence} enum instance for the given input string,
+     *         or {@code AVERAGE} if no valid match is found.
      */
-    public static Intelligence fromOrdinal(int ordinal) {
-        if ((ordinal >= 0) && (ordinal < values().length)) {
-            return values()[ordinal];
-        }
+    // region File I/O
+    public static Intelligence fromString(String text) {
+        try {
+            return Intelligence.valueOf(text);
+        } catch (Exception ignored) {}
 
-        MMLogger logger = MMLogger.create(Intelligence.class);
-        logger.error(String.format("Unknown Intelligence ordinal: %s - returning AVERAGE.", ordinal));
+        try {
+            return Intelligence.values()[Integer.parseInt(text)];
+        } catch (Exception ignored) {}
+
+
+        MMLogger logger = MMLogger.create(Greed.class);
+        logger.error("Unknown Intelligence ordinal: {} - returning {}.", text, AVERAGE);
 
         return AVERAGE;
     }
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 
     /**

@@ -19,74 +19,94 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum Social {
     // region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
-    ALTRUISTIC("Social.ALTRUISTIC.text", "Social.ALTRUISTIC.description", true, true),
-    APATHETIC("Social.APATHETIC.text", "Social.APATHETIC.description", false, false),
-    AUTHENTIC("Social.AUTHENTIC.text", "Social.AUTHENTIC.description", true, false),
-    BLUNT("Social.BLUNT.text", "Social.BLUNT.description", false, false),
-    CALLOUS("Social.CALLOUS.text", "Social.CALLOUS.description", false, false),
-    COMPASSIONATE("Social.COMPASSIONATE.text", "Social.COMPASSIONATE.description", true, true),
-    CONDESCENDING("Social.CONDESCENDING.text", "Social.CONDESCENDING.description", false, false),
-    CONSIDERATE("Social.CONSIDERATE.text", "Social.CONSIDERATE.description", true, false),
-    DISINGENUOUS("Social.DISINGENUOUS.text", "Social.DISINGENUOUS.description", false, false),
-    DISMISSIVE("Social.DISMISSIVE.text", "Social.DISMISSIVE.description", false, false),
-    ENCOURAGING("Social.ENCOURAGING.text", "Social.ENCOURAGING.description", true, false),
-    ERRATIC("Social.ERRATIC.text", "Social.ERRATIC.description", false, false),
-    EMPATHETIC("Social.EMPATHETIC.text", "Social.EMPATHETIC.description", true, false),
-    FRIENDLY("Social.FRIENDLY.text", "Social.FRIENDLY.description", true, false),
-    GREGARIOUS("Social.GREGARIOUS.text", "Social.GREGARIOUS.description", true, true),
-    INSPIRING("Social.INSPIRING.text", "Social.INSPIRING.description", true, false),
-    INDIFFERENT("Social.INDIFFERENT.text", "Social.INDIFFERENT.description", false, false),
-    INTROVERTED("Social.INTROVERTED.text", "Social.INTROVERTED.description", true, false),
-    IRRITABLE("Social.IRRITABLE.text", "Social.IRRITABLE.description", false, false),
-    NARCISSISTIC("Social.NARCISSISTIC.text", "Social.NARCISSISTIC.description", false, true),
-    NEGLECTFUL("Social.NEGLECTFUL.text", "Social.NEGLECTFUL.description", false, false),
-    POMPOUS("Social.POMPOUS.text", "Social.POMPOUS.description", false, true),
-    PETTY("Social.PETTY.text", "Social.PETTY.description", false, false),
-    PERSUASIVE("Social.PERSUASIVE.text", "Social.PERSUASIVE.description", true, false),
-    RECEPTIVE("Social.RECEPTIVE.text", "Social.RECEPTIVE.description", true, false),
-    SCHEMING("Social.SCHEMING.text", "Social.SCHEMING.description", false, true),
-    SINCERE("Social.SINCERE.text", "Social.SINCERE.description", true, false),
-    SUPPORTIVE("Social.SUPPORTIVE.text", "Social.SUPPORTIVE.description", true, false),
-    TACTFUL("Social.TACTFUL.text", "Social.TACTFUL.description", true, false),
-    UNTRUSTWORTHY("Social.UNTRUSTWORTHY.text", "Social.UNTRUSTWORTHY.description", false, false);
+    NONE(false, false),
+    APATHETIC(false, false),
+    AUTHENTIC(true, false),
+    BLUNT(false, false),
+    CALLOUS(false, false),
+    CONDESCENDING(false, false),
+    CONSIDERATE(true, false),
+    DISINGENUOUS(false, false),
+    DISMISSIVE(false, false),
+    ENCOURAGING(true, false),
+    ERRATIC(false, false),
+    EMPATHETIC(true, false),
+    FRIENDLY(true, false),
+    INSPIRING(true, false),
+    INDIFFERENT(false, false),
+    INTROVERTED(true, false),
+    IRRITABLE(false, false),
+    NEGLECTFUL(false, false),
+    PETTY(false, false),
+    PERSUASIVE(true, false),
+    RECEPTIVE(true, false),
+    SINCERE(true, false),
+    SUPPORTIVE(true, false),
+    TACTFUL(true, false),
+    UNTRUSTWORTHY(false, false),
+    // Major Traits should always be last
+    SCHEMING(false, true),
+    ALTRUISTIC(true, true),
+    COMPASSIONATE(true, true),
+    GREGARIOUS(true, true),
+    NARCISSISTIC(false, true),
+    POMPOUS(false, true);
     // endregion Enum Declarations
 
     // region Variable Declarations
-    private final String name;
-    private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
     // endregion Variable Declarations
 
     // region Constructors
-    Social(final String name, final String description, boolean isPositive, boolean isMajor) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.description = resources.getString(description);
+    Social(boolean isPositive, boolean isMajor) {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
     // endregion Constructors
 
-    // region Getters
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    /**
+     * Retrieves the label associated with the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the localized label string corresponding to the enumeration value.
+     */
+    // region Getters
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the description of the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the description associated with this enumeration value
+     */
     public String getDescription() {
-        return description;
+        final String RESOURCE_KEY = name() + ".description";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
      * @return {@code true} if the personality trait is considered positive,
      *         {@code false} otherwise.
      */
-
     public boolean isTraitPositive() {
         return isPositive;
     }
@@ -95,7 +115,6 @@ public enum Social {
      * @return {@code true} if the personality trait is considered a major trait,
      *         {@code false} otherwise.
      */
-
     public boolean isTraitMajor() {
         return isMajor;
     }
@@ -107,27 +126,36 @@ public enum Social {
     }
     // endregion Boolean Comparison Methods
 
-    // region File I/O
     /**
-     * Returns the {@link Social} associated with the given ordinal.
+     * Converts the given string into an instance of the {@code Social} enum.
+     * The method tries to interpret the string as both a name of an enumeration constant
+     * and as an ordinal index. If neither interpretation succeeds, it logs an error
+     * and returns {@code NONE}.
      *
-     * @param ordinal the ordinal value of the {@link Social}
-     * @return the {@link Social} associated with the given ordinal, or default value
-     * {@code NONE} if not found
+     * @param text the string representation of the social; can be either
+     *             the name of an enumeration constant or the ordinal string.
+     * @return the corresponding {@code Social} enum instance if the string is a valid
+     *         name or ordinal; otherwise, returns {@code NONE}.
      */
-    public static Social fromOrdinal(int ordinal) {
-        if ((ordinal >= 0) && (ordinal < values().length)) {
-            return values()[ordinal];
-        }
+    // region File I/O
+    public static Social fromString(String text) {
+        try {
+            return Social.valueOf(text);
+        } catch (Exception ignored) {}
+
+        try {
+            return Social.values()[Integer.parseInt(text)];
+        } catch (Exception ignored) {}
+
 
         MMLogger logger = MMLogger.create(Social.class);
-        logger.error(String.format("Unknown Social ordinal: %s - returning NONE.", ordinal));
+        logger.error("Unknown Social ordinal: {} - returning {}.", text, NONE);
 
         return NONE;
     }
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 }

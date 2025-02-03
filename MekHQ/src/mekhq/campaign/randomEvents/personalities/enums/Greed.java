@@ -19,74 +19,94 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum Greed {
     // region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
-    ASTUTE("Greed.ASTUTE.text", "Greed.ASTUTE.description", true, false),
-    ADEPT("Greed.ADEPT.text", "Greed.ADEPT.description", true, false),
-    AVARICIOUS("Greed.AVARICIOUS.text", "Greed.AVARICIOUS.description", false, false),
-    CORRUPT("Greed.CORRUPT.text", "Greed.CORRUPT.description", false, true),
-    DYNAMIC("Greed.DYNAMIC.text", "Greed.DYNAMIC.description", true, false),
-    EAGER("Greed.EAGER.text", "Greed.EAGER.description", true, false),
-    ENTERPRISING("Greed.ENTERPRISING.text", "Greed.ENTERPRISING.description", true, true),
-    EXPLOITATIVE("Greed.EXPLOITATIVE.text", "Greed.EXPLOITATIVE.description", false, false),
-    FRAUDULENT("Greed.FRAUDULENT.text", "Greed.FRAUDULENT.description", false, false),
-    GENEROUS("Greed.GENEROUS.text", "Greed.GENEROUS.description", true, false),
-    GREEDY("Greed.GREEDY.text", "Greed.GREEDY.description", false, false),
-    HOARDING("Greed.HOARDING.text", "Greed.HOARDING.description", false, false),
-    INSATIABLE("Greed.INSATIABLE.text", "Greed.INSATIABLE.description", false, false),
-    INSIGHTFUL("Greed.INSIGHTFUL.text", "Greed.INSIGHTFUL.description", true, false),
-    INTUITIVE("Greed.INTUITIVE.text", "Greed.INTUITIVE.description", true, true),
-    JUDICIOUS("Greed.JUDICIOUS.text", "Greed.JUDICIOUS.description", true, false),
-    LUSTFUL("Greed.LUSTFUL.text", "Greed.LUSTFUL.description", false, false),
-    MERCENARY("Greed.MERCENARY.text", "Greed.MERCENARY.description", false, false),
-    METICULOUS("Greed.METICULOUS.text", "Greed.METICULOUS.description", true, true),
-    NEFARIOUS("Greed.NEFARIOUS.text", "Greed.NEFARIOUS.description", false, true),
-    OVERREACHING("Greed.OVERREACHING.text", "Greed.OVERREACHING.description", false, false),
-    PROFITABLE("Greed.PROFITABLE.text", "Greed.PROFITABLE.description", true, false),
-    SAVVY("Greed.SAVVY.text", "Greed.SAVVY.description", true, false),
-    SELF_SERVING("Greed.SELF_SERVING.text", "Greed.SELF_SERVING.description", false, false),
-    SHAMELESS("Greed.SHAMELESS.text", "Greed.SHAMELESS.description", false, false),
-    SHREWD("Greed.SHREWD.text", "Greed.SHREWD.description", true, false),
-    TACTICAL("Greed.TACTICAL.text", "Greed.TACTICAL.description", true, false),
-    THIEF("Greed.THIEF.text", "Greed.THIEF.description", false, true),
-    UNPRINCIPLED("Greed.UNPRINCIPLED.text", "Greed.UNPRINCIPLED.description", false, false),
-    VORACIOUS("Greed.VORACIOUS.text", "Greed.VORACIOUS.description", true, false);
+    NONE(false, false),
+    ASTUTE(true, false),
+    ADEPT(true, false),
+    AVARICIOUS(false, false),
+    DYNAMIC(true, false),
+    EAGER(true, false),
+    EXPLOITATIVE(false, false),
+    FRAUDULENT(false, false),
+    GENEROUS(true, false),
+    GREEDY(false, false),
+    HOARDING(false, false),
+    INSATIABLE(false, false),
+    INSIGHTFUL(true, false),
+    JUDICIOUS(true, false),
+    LUSTFUL(false, false),
+    MERCENARY(false, false),
+    OVERREACHING(false, false),
+    PROFITABLE(true, false),
+    SAVVY(true, false),
+    SELF_SERVING(false, false),
+    SHAMELESS(false, false),
+    SHREWD(true, false),
+    TACTICAL(true, false),
+    UNPRINCIPLED(false, false),
+    VORACIOUS(true, false),
+    // Major Traits should always be last
+    INTUITIVE(true, true),
+    ENTERPRISING(true, true),
+    CORRUPT(false, true),
+    METICULOUS(true, true),
+    NEFARIOUS(false, true),
+    THIEF(false, true);
     // endregion Enum Declarations
 
     // region Variable Declarations
-    private final String name;
-    private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
     // endregion Variable Declarations
 
     // region Constructors
-    Greed(final String name, final String description, boolean isPositive, boolean isMajor) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.description = resources.getString(description);
+    Greed(boolean isPositive, boolean isMajor) {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
     // endregion Constructors
 
-    // region Getters
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    /**
+     * Retrieves the label associated with the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the localized label string corresponding to the enumeration value.
+     */
+    // region Getters
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the description of the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the description associated with this enumeration value
+     */
     public String getDescription() {
-        return description;
+        final String RESOURCE_KEY = name() + ".description";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
      * @return {@code true} if the personality trait is considered positive,
      *         {@code false} otherwise.
      */
-
     public boolean isTraitPositive() {
         return isPositive;
     }
@@ -95,7 +115,6 @@ public enum Greed {
      * @return {@code true} if the personality trait is considered a major trait,
      *         {@code false} otherwise.
      */
-
     public boolean isTraitMajor() {
         return isMajor;
     }
@@ -107,27 +126,36 @@ public enum Greed {
     }
     // endregion Boolean Comparison Methods
 
-    // region File I/O
     /**
-     * Returns the {@link Greed} associated with the given ordinal.
+     * Parses a string to return the corresponding {@code Greed} enum instance.
+     * It attempts to match the string either to a valid enum constant name or
+     * an integer representing the ordinal of the desired enum value. If neither
+     * interpretation is valid, it defaults to returning {@code NONE}.
      *
-     * @param ordinal the ordinal value of the {@link Greed}
-     * @return the {@link Greed} associated with the given ordinal, or default value
-     * {@code NONE} if not found
+     * @param text the input string to parse, representing either the name or
+     *             the ordinal of the {@code Greed} enum.
+     * @return the corresponding {@code Greed} enum instance for the given input
+     *         string, or {@code NONE} if no valid match is found.
      */
-    public static Greed fromOrdinal(int ordinal) {
-        if ((ordinal >= 0) && (ordinal < values().length)) {
-            return values()[ordinal];
-        }
+    // region File I/O
+    public static Greed fromString(String text) {
+        try {
+            return Greed.valueOf(text);
+        } catch (Exception ignored) {}
+
+        try {
+            return Greed.values()[Integer.parseInt(text)];
+        } catch (Exception ignored) {}
+
 
         MMLogger logger = MMLogger.create(Greed.class);
-        logger.error(String.format("Unknown Greed ordinal: %s - returning NONE.", ordinal));
+        logger.error("Unknown Greed ordinal: {} - returning {}.", text, NONE);
 
         return NONE;
     }
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 }

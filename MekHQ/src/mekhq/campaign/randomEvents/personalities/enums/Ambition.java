@@ -19,74 +19,94 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 
-import java.util.ResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum Ambition {
     // region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
-    AMBITIOUS("Ambition.AMBITIOUS.text", "Ambition.AMBITIOUS.description", true, false),
-    ARROGANT("Ambition.ARROGANT.text", "Ambition.ARROGANT.description", false, false),
-    ASPIRING("Ambition.ASPIRING.text", "Ambition.ASPIRING.description", true, false),
-    CALCULATING("Ambition.CALCULATING.text", "Ambition.CALCULATING.description", true, false),
-    CONNIVING("Ambition.CONNIVING.text", "Ambition.CONNIVING.description", false, false),
-    CONTROLLING("Ambition.CONTROLLING.text", "Ambition.CONTROLLING.description", false, false),
-    CUTTHROAT("Ambition.CUTTHROAT.text", "Ambition.CUTTHROAT.description", false, false),
-    DISHONEST("Ambition.DISHONEST.text", "Ambition.DISHONEST.description", false, true),
-    DILIGENT("Ambition.DILIGENT.text", "Ambition.DILIGENT.description", true, false),
-    DRIVEN("Ambition.DRIVEN.text", "Ambition.DRIVEN.description", true, false),
-    ENERGETIC("Ambition.ENERGETIC.text", "Ambition.ENERGETIC.description", true, false),
-    EXCESSIVE("Ambition.EXCESSIVE.text", "Ambition.EXCESSIVE.description", false, false),
-    FOCUSED("Ambition.FOCUSED.text", "Ambition.FOCUSED.description", true, false),
-    GOAL_ORIENTED("Ambition.GOAL_ORIENTED.text", "Ambition.GOAL_ORIENTED.description", true, false),
-    INNOVATIVE("Ambition.INNOVATIVE.text", "Ambition.INNOVATIVE.description", true, true),
-    MANIPULATIVE("Ambition.MANIPULATIVE.text", "Ambition.MANIPULATIVE.description", false, true),
-    MOTIVATED("Ambition.MOTIVATED.text", "Ambition.MOTIVATED.description", true, false),
-    OPPORTUNISTIC("Ambition.OPPORTUNISTIC.text", "Ambition.OPPORTUNISTIC.description", true, false),
-    OVERCONFIDENT("Ambition.OVERCONFIDENT.text", "Ambition.OVERCONFIDENT.description", false, false),
-    PERSISTENT("Ambition.PERSISTENT.text", "Ambition.PERSISTENT.description", true, false),
-    PROACTIVE("Ambition.PROACTIVE.text", "Ambition.PROACTIVE.description", true, false),
-    RESILIENT("Ambition.RESILIENT.text", "Ambition.RESILIENT.description", true, false),
-    RESOURCEFUL("Ambition.RESOURCEFUL.text", "Ambition.RESOURCEFUL.description", true, true),
-    RUTHLESS("Ambition.RUTHLESS.text", "Ambition.RUTHLESS.description", false, false),
-    SELFISH("Ambition.SELFISH.text", "Ambition.SELFISH.description", false, false),
-    STRATEGIC("Ambition.STRATEGIC.text", "Ambition.STRATEGIC.description", true, false),
-    TYRANNICAL("Ambition.TYRANNICAL.text", "Ambition.TYRANNICAL.description", false, true),
-    UNAMBITIOUS("Ambition.UNAMBITIOUS.text", "Ambition.UNAMBITIOUS.description", false, false),
-    UNSCRUPULOUS("Ambition.UNSCRUPULOUS.text", "Ambition.UNSCRUPULOUS.description", false, false),
-    VISIONARY("Ambition.VISIONARY.text", "Ambition.VISIONARY.description", true, true);
+    NONE(false, false),
+    AMBITIOUS(true, false),
+    ARROGANT(false, false),
+    ASPIRING(true, false),
+    CALCULATING(true, false),
+    CONNIVING(false, false),
+    CONTROLLING(false, false),
+    CUTTHROAT(false, false),
+    DILIGENT(true, false),
+    DRIVEN(true, false),
+    ENERGETIC(true, false),
+    EXCESSIVE(false, false),
+    FOCUSED(true, false),
+    GOAL_ORIENTED(true, false),
+    MOTIVATED(true, false),
+    OPPORTUNISTIC(true, false),
+    OVERCONFIDENT(false, false),
+    PERSISTENT(true, false),
+    PROACTIVE(true, false),
+    RESILIENT(true, false),
+    RUTHLESS(false, false),
+    SELFISH(false, false),
+    STRATEGIC(true, false),
+    UNAMBITIOUS(false, false),
+    UNSCRUPULOUS(false, false),
+    // Major Traits should always be last
+    DISHONEST(false, true),
+    INNOVATIVE(true, true),
+    MANIPULATIVE(false, true),
+    RESOURCEFUL(true, true),
+    TYRANNICAL(false, true),
+    VISIONARY(true, true);
     // endregion Enum Declarations
 
     // region Variable Declarations
-    private final String name;
-    private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
     // endregion Variable Declarations
 
     // region Constructors
-    Ambition(final String name, final String description, boolean isPositive, boolean isMajor) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
-                MekHQ.getMHQOptions().getLocale());
-        this.name = resources.getString(name);
-        this.description = resources.getString(description);
+    Ambition(boolean isPositive, boolean isMajor) {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
     // endregion Constructors
 
-    // region Getters
+    final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
+    // region Getters
+    /**
+     * Retrieves the label associated with the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the localized label string corresponding to the enumeration value.
+     */
+    public String getLabel() {
+        final String RESOURCE_KEY = name() + ".label";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
+    }
+
+    /**
+     * Retrieves the description of the current enumeration value.
+     *
+     * <p>The label is determined based on the resource bundle for the application,
+     * utilizing the enum name combined with a specific key suffix to fetch the
+     * relevant localized string.</p>
+     *
+     * @return the description associated with this enumeration value
+     */
     public String getDescription() {
-        return description;
+        final String RESOURCE_KEY = name() + ".description";
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
 
     /**
      * @return {@code true} if the personality trait is considered positive,
      *         {@code false} otherwise.
      */
-
     public boolean isTraitPositive() {
         return isPositive;
     }
@@ -95,7 +115,6 @@ public enum Ambition {
      * @return {@code true} if the personality trait is considered a major trait,
      *         {@code false} otherwise.
      */
-
     public boolean isTraitMajor() {
         return isMajor;
     }
@@ -107,27 +126,36 @@ public enum Ambition {
     }
     // endregion Boolean Comparison Methods
 
-    // region File I/O
     /**
-     * Returns the {@link Ambition} associated with the given ordinal.
+     * Converts the specified string into its corresponding Ambition enum value.
+     * The method attempts to interpret the string as either the name of an enum constant
+     * or an ordinal value of the enum. If the conversion fails, the method logs an error
+     * and returns the default value {@code NONE}.
      *
-     * @param ordinal the ordinal value of the {@link Ambition}
-     * @return the {@link Ambition} associated with the given ordinal, or default value
-     * {@code NONE} if not found
+     * @param text the string to be converted into an Ambition enum value. It can be the name
+     *             of the enum constant or its ordinal value as a string.
+     * @return the corresponding Ambition enum constant if the string matches a name or
+     *         ordinal value, otherwise {@code NONE}.
      */
-    public static Ambition fromOrdinal(int ordinal) {
-        if ((ordinal >= 0) && (ordinal < values().length)) {
-            return values()[ordinal];
-        }
+    // region File I/O
+    public static Ambition fromString(String text) {
+        try {
+            return Ambition.valueOf(text);
+        } catch (Exception ignored) {}
+
+        try {
+            return Ambition.values()[Integer.parseInt(text)];
+        } catch (Exception ignored) {}
+
 
         MMLogger logger = MMLogger.create(Ambition.class);
-        logger.error(String.format("Unknown Ambition ordinal: %s - returning NONE.", ordinal));
+        logger.error("Unknown Ambition ordinal: {} - returning {}.", text, NONE);
 
         return NONE;
     }
 
     @Override
     public String toString() {
-        return name;
+        return getLabel();
     }
 }

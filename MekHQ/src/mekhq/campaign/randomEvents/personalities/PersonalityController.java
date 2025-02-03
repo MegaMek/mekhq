@@ -19,7 +19,6 @@
 
 package mekhq.campaign.randomEvents.personalities;
 
-import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -29,6 +28,7 @@ import mekhq.campaign.randomEvents.personalities.enums.*;
 
 import java.util.*;
 
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
@@ -45,18 +45,18 @@ public class PersonalityController {
         for (int table = 0; table < 4; table++) {
             // we only want a 1 in 6 chance of getting a personality trait, per table
             // this prevents trait bloat and helps reduce repetitiveness
-            if (Compute.randomInt(6) == 0) {
-                setPersonalityTrait(person, table, Compute.randomInt(25) + 1);
+            if (randomInt(6) == 0) {
+                setPersonalityTrait(person, table, randomInt(26));
             }
         }
 
         // we only want 1 in 10 persons to have a quirk,
         // as these helps reduce repetitiveness and keeps them unique
-        if (Compute.randomInt(10) == 0) {
+        if (randomInt(10) == 0) {
             person.setPersonalityQuirk(generatePersonalityQuirk());
         }
 
-        person.setIntelligence(generateIntelligence(Compute.randomInt(8346)));
+        person.setIntelligence(generateIntelligence(randomInt(8346)));
 
         // finally, write the description
         writeDescription(person);
@@ -86,14 +86,16 @@ public class PersonalityController {
         // We want major traits to have a low chance of occurring.
         // This ensures each trait only has a 1 in 25 chance of spawning
         if (traitRoll == 25) {
-            traitRoll += Compute.d6(1) - 1;
+            traitRoll += randomInt(6);
         }
 
+        String rollString = String.valueOf(traitRoll);
+
         switch (tableRoll) {
-            case 0 -> person.setAggression(Aggression.fromOrdinal(traitRoll));
-            case 1 -> person.setAmbition(Ambition.fromOrdinal(traitRoll));
-            case 2 -> person.setGreed(Greed.fromOrdinal(traitRoll));
-            case 3 -> person.setSocial(Social.fromOrdinal(traitRoll));
+            case 0 -> person.setAggression(Aggression.fromString(rollString));
+            case 1 -> person.setAmbition(Ambition.fromString(rollString));
+            case 2 -> person.setGreed(Greed.fromString(rollString));
+            case 3 -> person.setSocial(Social.fromString(rollString));
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/setPersonalityTrait: "
                             + tableRoll);

@@ -2232,19 +2232,19 @@ public class Person {
             }
 
             if (aggression != Aggression.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
 
             if (ambition != Ambition.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.name());
             }
 
             if (greed != Greed.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.name());
             }
 
             if (social != Social.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.name());
             }
 
             if (personalityQuirk != PersonalityQuirk.NONE) {
@@ -2603,65 +2603,17 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
                     retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.aggression = Aggression.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.aggression = Aggression.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.aggression = Aggression.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.ambition = Ambition.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.ambition = Ambition.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.ambition = Ambition.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.greed = Greed.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.greed = Greed.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.greed = Greed.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.social = Social.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.social = Social.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.social = Social.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.personalityQuirk = PersonalityQuirk.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.personalityQuirk = PersonalityQuirk.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.intelligence = Intelligence.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.intelligence = Intelligence.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.intelligence = Intelligence.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
