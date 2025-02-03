@@ -41,7 +41,6 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
@@ -234,10 +233,6 @@ public class CampaignOptions {
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
-    private PrisonerStatus defaultPrisonerStatus;
-    private boolean prisonerBabyStatus;
-    private boolean useAtBPrisonerDefection;
-    private boolean useAtBPrisonerRansom;
 
     // Dependent
     private boolean useRandomDependentAddition;
@@ -777,10 +772,6 @@ public class CampaignOptions {
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.NONE);
-        setDefaultPrisonerStatus(PrisonerStatus.PRISONER);
-        setPrisonerBabyStatus(true);
-        setUseAtBPrisonerDefection(false);
-        setUseAtBPrisonerRansom(false);
 
         // Dependent
         setUseRandomDependentAddition(false);
@@ -1866,38 +1857,6 @@ public class CampaignOptions {
 
     public void setPrisonerCaptureStyle(final PrisonerCaptureStyle prisonerCaptureStyle) {
         this.prisonerCaptureStyle = prisonerCaptureStyle;
-    }
-
-    public PrisonerStatus getDefaultPrisonerStatus() {
-        return defaultPrisonerStatus;
-    }
-
-    public void setDefaultPrisonerStatus(final PrisonerStatus defaultPrisonerStatus) {
-        this.defaultPrisonerStatus = defaultPrisonerStatus;
-    }
-
-    public boolean isPrisonerBabyStatus() {
-        return prisonerBabyStatus;
-    }
-
-    public void setPrisonerBabyStatus(final boolean prisonerBabyStatus) {
-        this.prisonerBabyStatus = prisonerBabyStatus;
-    }
-
-    public boolean isUseAtBPrisonerDefection() {
-        return useAtBPrisonerDefection;
-    }
-
-    public void setUseAtBPrisonerDefection(final boolean useAtBPrisonerDefection) {
-        this.useAtBPrisonerDefection = useAtBPrisonerDefection;
-    }
-
-    public boolean isUseAtBPrisonerRansom() {
-        return useAtBPrisonerRansom;
-    }
-
-    public void setUseAtBPrisonerRansom(final boolean useAtBPrisonerRansom) {
-        this.useAtBPrisonerRansom = useAtBPrisonerRansom;
     }
     // endregion Prisoners
 
@@ -4915,10 +4874,6 @@ public class CampaignOptions {
 
         // region Prisoners
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerBabyStatus", isPrisonerBabyStatus());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerDefection", isUseAtBPrisonerDefection());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", isUseAtBPrisonerRansom());
         // endregion Prisoners
 
         //region Dependent
@@ -5634,23 +5589,6 @@ public class CampaignOptions {
                     // region Prisoners
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                     retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                    // Most of this is legacy handlers - 0.47.X Removal
-                    String prisonerStatus = wn2.getTextContent().trim();
-
-                    try {
-                        prisonerStatus = String.valueOf(Integer.parseInt(prisonerStatus) + 1);
-                    } catch (Exception ignored) {
-
-                    }
-
-                    retVal.setDefaultPrisonerStatus(PrisonerStatus.parseFromString(prisonerStatus));
-                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerBabyStatus")) {
-                    retVal.setPrisonerBabyStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerDefection")) {
-                    retVal.setUseAtBPrisonerDefection(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
-                    retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Prisoners
 
                     //region Dependent
