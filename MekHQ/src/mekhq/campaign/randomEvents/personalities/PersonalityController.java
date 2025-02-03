@@ -24,7 +24,10 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
@@ -109,14 +112,20 @@ public class PersonalityController {
     public static void writeDescription(Person person) {
         List<String> traitDescriptions = getTraitDescriptions(person);
 
-        // It is beneficial to shuffle descriptions for variety.
-        Collections.shuffle(traitDescriptions);
-
         StringBuilder personalityDescription = new StringBuilder();
 
-        for (String traitDescription : traitDescriptions) {
-            personalityDescription.append(traitDescription);
-            personalityDescription.append(' ');
+        for (int i = 0; i < traitDescriptions.size(); i++) {
+            if (i % 2 == 0) {
+                personalityDescription.append("<p>");
+            }
+
+            personalityDescription.append(traitDescriptions.get(i));
+
+            if (i % 2 == 1 || i == traitDescriptions.size() - 1) {
+                personalityDescription.append("</p>");
+            } else {
+                personalityDescription.append(' ');
+            }
         }
 
         person.setPersonalityDescription(personalityDescription.toString());
