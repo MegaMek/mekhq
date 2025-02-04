@@ -450,7 +450,7 @@ public class StratconScenarioWizard extends JDialog {
         availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize,
             true);
 
-        ItemListener dropdownChangeListener = evt -> campaignTransportTypeChangeHandler(evt, eligibleUnits, leadershipUnitJPanel);
+        ItemListener dropdownChangeListener = this::campaignTransportTypeChangeHandler;
         cboTransportType.addItemListener(dropdownChangeListener);
         contentPanel.add(leadershipUnitJPanel);
     }
@@ -538,7 +538,7 @@ public class StratconScenarioWizard extends JDialog {
         return availableUnits;
     }
 
-    private void campaignTransportTypeChangeHandler(ItemEvent event, List<Unit> allUnits, JPanel leadershipUnitJPanel) {
+    private void campaignTransportTypeChangeHandler(ItemEvent event) {
         if (!(event.getSource() instanceof JComboBox<?>) || (event.getStateChange() != ItemEvent.SELECTED )) {
             return;
         }
