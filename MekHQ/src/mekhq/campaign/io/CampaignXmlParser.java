@@ -469,6 +469,11 @@ public class CampaignXmlParser {
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
+        // This removes the risk of having forces with invalid leadership getting locked in
+        for (Force force : retVal.getAllForces()) {
+            force.updateCommander(retVal);
+        }
+
         // ok, once we are sure that campaign has been set for all units, we can
         // now go through and initializeParts and run diagnostics
         List<Unit> removeUnits = new ArrayList<>();
@@ -872,11 +877,6 @@ public class CampaignXmlParser {
             } else {
                 logger.error("More than one type-level force found");
             }
-        }
-
-        // This removes the risk of having forces with invalid leadership getting locked in
-        for (Force force : retVal.getAllForces()) {
-            force.updateCommander(retVal);
         }
 
         recalculateCombatTeams(retVal);
