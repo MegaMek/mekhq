@@ -617,25 +617,22 @@ public class Force {
                 overrideForceCommanderID = null;
             }
         }
-        //If our force commander is null or not eligible (not in the force/subforces), let's assign a random person
-        if ((forceCommanderID == null) || (!eligibleCommanders.contains(forceCommanderID))) {
 
-            Collections.shuffle(eligibleCommanders);
-            Person highestRankedPerson = campaign.getPerson(eligibleCommanders.get(0));
+        Collections.shuffle(eligibleCommanders);
+        Person highestRankedPerson = campaign.getPerson(eligibleCommanders.get(0));
 
-            for (UUID eligibleCommanderId : eligibleCommanders) {
-                Person eligibleCommander = campaign.getPerson(eligibleCommanderId);
-                if (eligibleCommander == null) {
-                    continue;
-                }
-
-                if (eligibleCommander.outRanksUsingSkillTiebreaker(campaign, highestRankedPerson)) {
-                    highestRankedPerson = eligibleCommander;
-                }
+        for (UUID eligibleCommanderId : eligibleCommanders) {
+            Person eligibleCommander = campaign.getPerson(eligibleCommanderId);
+            if (eligibleCommander == null) {
+                continue;
             }
 
-            forceCommanderID = highestRankedPerson.getId();
+            if (eligibleCommander.outRanksUsingSkillTiebreaker(campaign, highestRankedPerson)) {
+                highestRankedPerson = eligibleCommander;
+            }
         }
+
+        forceCommanderID = highestRankedPerson.getId();
         updateCombatTeamCommanderIfCombatTeam(campaign);
 
         if (getParentForce() != null) {
