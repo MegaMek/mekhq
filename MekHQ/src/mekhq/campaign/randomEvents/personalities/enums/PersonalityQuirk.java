@@ -241,7 +241,10 @@ public enum PersonalityQuirk {
     TRASH_TALKER,
     CORRECTS_PRONOUNS,
     BODY_DISCOMFORT,
-    MEK_COMFORT;
+    MEK_COMFORT,
+    FEAR_OF_FIRE,
+    TOUCH_SENSITIVE,
+    HOLOVID_FANATIC;
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
