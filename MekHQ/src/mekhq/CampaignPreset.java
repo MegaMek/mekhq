@@ -442,7 +442,7 @@ public class CampaignPreset {
             return null;
         }
 
-        if (LAST_COMPATIBLE_VERSION.isLowerThan(version)) {
+        if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
             String message = String.format(
                 "Cannot parse Campaign Preset from %s in newer version %s.",
                 version.toString(), MHQConstants.VERSION);
