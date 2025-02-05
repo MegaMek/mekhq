@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    static final private Version LAST_COMPATIBLE_VERSION = new Version("0.50.03-SNAPSHOT");
+    static final private Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
 
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
