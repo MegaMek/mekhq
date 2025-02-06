@@ -99,6 +99,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.GrayMonday;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -166,6 +167,9 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.TrainingCombatTeams.processTrainingCombatTeams;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
+import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -4857,6 +4861,12 @@ public class Campaign implements ITechManager {
             addReport(String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 
+        // Random Events
+        if (currentDay.equals(EVENT_DATE_CLARION_NOTE) ||
+            (currentDay.isBefore(EVENT_DATE_GRAY_MONDAY.plusDays(5)))) {
+            new GrayMonday(this, currentDay);
+        }
+
         // This must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -7090,6 +7100,11 @@ public class Campaign implements ITechManager {
             if (contractAvailability != 0) {
                 target.addModifier(contractAvailability, "Contract");
             }
+        }
+
+
+        if (isGrayMonday(this)) {
+            target.addModifier(4, "Gray Monday");
         }
 
         return target;
