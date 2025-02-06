@@ -459,6 +459,7 @@
 		<showPeacetimeCost>false</showPeacetimeCost>
 		<financialYearDuration>ANNUAL</financialYearDuration>
 		<newFinancialYearFinancesToCSVExport>false</newFinancialYearFinancesToCSVExport>
+        <simulateGrayMonday>false</simulateGrayMonday>
 		<commonPartPriceMultiplier>1.0</commonPartPriceMultiplier>
 		<innerSphereUnitPriceMultiplier>1.0</innerSphereUnitPriceMultiplier>
 		<innerSpherePartPriceMultiplier>1.0</innerSpherePartPriceMultiplier>

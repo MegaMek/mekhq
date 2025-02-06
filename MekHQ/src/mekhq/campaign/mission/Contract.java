@@ -2,7 +2,7 @@
  * Contract.java
  *
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2024 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -383,7 +383,7 @@ public class Contract extends Mission {
         return transitAmount;
     }
 
-    protected void setTransitAmount(Money amount) {
+    public void setTransitAmount(Money amount) {
         transitAmount = amount;
     }
 
