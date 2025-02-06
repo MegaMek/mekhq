@@ -621,6 +621,10 @@ public class AtBDynamicScenarioFactory {
         // Generate a tactical formation (lance/star/etc.) until the BV or unit count
         // limits are exceeded
         while (!stopGenerating) {
+            if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.None.ordinal()) {
+                break;
+            }
+
             List<Entity> generatedLance;
 
             // Generate a tactical formations for this force based on the desired weight class.
@@ -962,6 +966,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (generatedForce.getTeam() != 1
+            && forceTemplate.getGenerationMethod() != ForceGenerationMethod.None.ordinal()
             && campaign.getCampaignOptions().isUseGenericBattleValue()
             && BatchallFactions.usesBatchalls(factionCode)
             && contract.isBatchallAccepted()) {
