@@ -2,7 +2,6 @@
  * CurrencyManager.java
  *
  * Copyright (c) 2019 Vicente Cartas Espinel (vicente.cartas at outlook.com). All rights reserved.
- * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,6 +22,8 @@ package mekhq.campaign.finances;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -128,27 +129,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return this.uiAmountAndNamePrinter;
     }
 
-    /**
-     * Retrieves the default currency for the current campaign, based on the campaign's
-     * date, planetary system, and faction details.
-     * <p>
-     * This method ensures the default currency is updated if the campaign's date or
-     * planetary system has changed since the last check. It uses various conditions
-     * to determine the appropriate default currency, including:
-     * </p>
-     * <ul>
-     *   <li>The year range validity for each currency</li>
-     *   <li>Special cases for Clan factions (e.g., "KSK" or "SFC" currencies)</li>
-     *   <li>The "default" status of available currencies</li>
-     * </ul>
-     *
-     * If no campaign is active, the backup currency is returned. Certain decisions
-     * regarding currency selection (e.g., based on contracts or planetary factions)
-     * are currently disabled.
-     *
-     * @return the default {@link Currency} for the campaign.
-     */
-    public synchronized Currency getDefaultCurrency() {
+    synchronized Currency getDefaultCurrency() {
         if (this.campaign == null) {
             return this.backupCurrency;
         }
@@ -165,65 +146,46 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             this.lastSystem = currentSystem;
             this.defaultCurrency = this.backupCurrency;
 
-//            Map<String, Currency> possibleCurrencies = new HashMap<>();
+            Map<String, Currency> possibleCurrencies = new HashMap<>();
 
-            // Use the default currency in this time period if it exists
+            // Use the default currency in this time period, if it exists
             int year = date.getYear();
             for (Currency currency : this.currencies) {
-                boolean isWithinYearRange = (year >= currency.getStartYear()) && (year <= currency.getEndYear());
-                boolean isKSKorSFC = campaign.getFaction().isClan() &&
-                    ("KSK".equals(String.valueOf(currency)) || "SFC".equals(String.valueOf(currency)));
+                if ((year >= currency.getStartYear()) && (year <= currency.getEndYear())) {
 
-                if (isWithinYearRange) {
-                    // Special case for Clan factions
-                    if (isKSKorSFC) {
-                        return defaultCurrency = currency;
-                    }
-
-                    // Check if the current currency is default
                     if (currency.getIsDefault()) {
                         return defaultCurrency = currency;
                     }
 
-                    // Add currency to possible options
-                    // This is where we'd construct a list for the commented code to use.
-//                    possibleCurrencies.put(currency.getCode(), currency);
+                    possibleCurrencies.put(currency.getCode(), currency);
                 }
             }
 
-
-
-            // The next two options have been disabled until we have a way to easily communicate to
-            // the user why their funds are being changed. This is especially true for H-Bills, as
-            // they are undesirable compared to the C-Bill so players should be given a choice to
-            // change. The code is good, though, so shouldn't be deleted as it could prove useful
-            // later.
-
             // Use the currency of the Faction in any of our contracts, if it exists
-//            for (Contract contract : this.campaign.getActiveContracts()) {
-//                if (contract instanceof AtBContract) {
-//                    Currency currency = possibleCurrencies.getOrDefault(
-//                            Factions.getInstance().getFaction(((AtBContract) contract).getEmployerCode())
-//                                    .getCurrencyCode(),
-//                            null);
-//
-//                    if (currency != null) {
-//                        return defaultCurrency = currency;
-//                    }
-//                }
-//            }
+            for (Contract contract : this.campaign.getActiveContracts()) {
+                if (contract instanceof AtBContract) {
+                    Currency currency = possibleCurrencies.getOrDefault(
+                            Factions.getInstance().getFaction(((AtBContract) contract).getEmployerCode())
+                                    .getCurrencyCode(),
+                            null);
+
+                    if (currency != null) {
+                        return defaultCurrency = currency;
+                    }
+                }
+            }
 
             // Use the currency of one of the factions in the planet where the unit is
             // deployed, if it exists
-//            if (currentSystem != null) {
-//                Set<Faction> factions = currentSystem.getFactionSet(date);
-//                for (Faction faction : factions) {
-//                    Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
-//                    if (currency != null) {
-//                        return defaultCurrency = currency;
-//                    }
-//                }
-//            }
+            if (currentSystem != null) {
+                Set<Faction> factions = currentSystem.getFactionSet(date);
+                for (Faction faction : factions) {
+                    Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
+                    if (currency != null) {
+                        return defaultCurrency = currency;
+                    }
+                }
+            }
         }
 
         return defaultCurrency;
