@@ -2356,11 +2356,11 @@ public class CampaignGUI extends JPanel {
                 || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            StringBuilder report = new StringBuilder();
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
+            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
             // FIXME : Localize
             lblPartsAvailabilityRating
-                    .setText("<html><b>Campaign Parts Availability</b>: " + partsAvailability + "</html>");
+                    .setText(String.format("<html><b>Parts Availability Modifier</b>: %d</html>",
+                        partsAvailability));
         }
     }
 
