@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,17 +18,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import org.w3c.dom.Node;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
@@ -41,6 +30,10 @@ import megamek.common.Compute;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import org.w3c.dom.Node;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
     private static final MMLogger logger = MMLogger.create(ScenarioForceTemplate.class);
@@ -156,7 +149,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
          */
         BVScaled,
 
-        /*
+        /**
          * Scale on the unit count, based on number of already generated units flagged
          * as contributing towards unit count
          */
@@ -175,7 +168,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         /**
          * Using one or more fixed MULs
          */
-        FixedMUL
+        FixedMUL,
+
+        /**
+         * Don't generate units. For use when you want to add units separately
+         */
+        None
     }
 
     /**

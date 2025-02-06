@@ -5,7 +5,7 @@ plugins {
     id 'checkstyle'
     id 'com.palantir.git-version' version '3.1.0'
     id 'edu.sc.seis.launch4j' version '3.0.6'
-    id "io.sentry.jvm.gradle" version "4.11.0"
+    id "io.sentry.jvm.gradle" version "5.1.0"
     id 'jacoco'
     id 'java'
     id 'org.ec4j.editorconfig' version '0.1.0'
@@ -182,6 +182,15 @@ task stageFiles(type: Copy) {
     include 'SubmitBug.html'
     include "sentry.properties"
     include "*.ini"
+
+    // User Config Files
+    exclude "${mmconf}/clientsettings.xml"
+    exclude "${mmconf}/gameoptions.xml"
+    exclude "${mmconf}/megameklab.properties"
+    exclude "${mmconf}/megameklab.properties.bak"
+    exclude "${mmconf}/mhq.preferences"
+    exclude "${mmconf}/mm.preferences"
+    exclude "${mmconf}/mml.preferences"
 
     into fileStagingDir
 

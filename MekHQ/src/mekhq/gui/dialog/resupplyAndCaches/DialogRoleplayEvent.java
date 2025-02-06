@@ -25,12 +25,12 @@ import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code DialogRoleplayEvent} class handles the creation and display of roleplay event dialogs
@@ -42,7 +42,7 @@ public class DialogRoleplayEvent extends JDialog {
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a roleplay event dialog for a player convoy. The dialog is used to present messages related
@@ -81,7 +81,7 @@ public class DialogRoleplayEvent extends JDialog {
      *                      placeholders ({@code %s}) to dynamically incorporate campaign-specific details.
      */
     public DialogRoleplayEvent(Campaign campaign, Force playerConvoy, String eventText) {
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -137,11 +137,9 @@ public class DialogRoleplayEvent extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        String message = String.format(eventText, campaign.getCommanderAddress(false));
-
         JLabel rightDescription = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                RIGHT_WIDTH, message));
+                RIGHT_WIDTH, eventText));
         rightBox.add(rightDescription);
 
         // Add rightBox to mainPanel
@@ -157,7 +155,7 @@ public class DialogRoleplayEvent extends JDialog {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        JButton confirmButton = new JButton(resources.getString("convoyConfirm.text"));
+        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "convoyConfirm.text"));
         confirmButton.addActionListener(e -> dispose());
         buttonPanel.add(confirmButton);
 
@@ -169,7 +167,7 @@ public class DialogRoleplayEvent extends JDialog {
         JLabel lblInfo = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 RIGHT_WIDTH + LEFT_WIDTH,
-                String.format(resources.getString("documentation.prompt"))));
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

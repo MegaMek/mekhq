@@ -24,6 +24,7 @@ import megamek.common.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -155,13 +156,16 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
 
+            ForceType forceType = force.getForceType();
+            String typeKey = forceType.getSymbol();
+
             String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
                 force.isCombatTeam() ? "<b>" : "",
                 force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
                 force.getName(),
                 force.isCombatTeam() ? "</b>" : "",
                 force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
-                force.isConvoyForce() ? " &#926;" : force.isCombatForce() ? "" : " &#8709;");
+                typeKey);
 
             setText(formattedForceName);
         } else {

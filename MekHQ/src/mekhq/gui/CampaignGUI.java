@@ -56,11 +56,11 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
-import mekhq.campaign.personnel.death.ExponentialRandomDeath;
-import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.RandomDivorce;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
@@ -585,16 +585,6 @@ public class CampaignGUI extends JPanel {
         miRefreshRanks.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
         miRefreshRanks.addActionListener(evt -> Ranks.reinitializeRankSystems(getCampaign()));
         menuRefresh.add(miRefreshRanks);
-
-        JMenuItem miRefreshRandomDeathCauses = new JMenuItem(resourceMap.getString("miRefreshRandomDeathCauses.text"));
-        miRefreshRandomDeathCauses.setToolTipText(resourceMap.getString("miRefreshRandomDeathCauses.toolTipText"));
-        miRefreshRandomDeathCauses.setName("miRefreshRandomDeathCauses");
-        miRefreshRandomDeathCauses.setMnemonic(KeyEvent.VK_D);
-        miRefreshRandomDeathCauses.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
-        miRefreshRandomDeathCauses.addActionListener(evt -> getCampaign().setDeath(
-                getCampaign().getCampaignOptions().getRandomDeathMethod()
-                        .getMethod(getCampaign().getCampaignOptions())));
-        menuRefresh.add(miRefreshRandomDeathCauses);
 
         JMenuItem miRefreshFinancialInstitutions = new JMenuItem(
                 resourceMap.getString("miRefreshFinancialInstitutions.text"));
@@ -1471,7 +1461,6 @@ public class CampaignGUI extends JPanel {
         boolean rankIn = oldOptions.isUseTimeInRank();
         boolean staticRATs = oldOptions.isUseStaticRATs();
         boolean factionIntroDate = oldOptions.isFactionIntroDate();
-        final RandomDeathMethod randomDeathMethod = oldOptions.getRandomDeathMethod();
         final boolean useRandomDeathSuicideCause = oldOptions.isUseRandomDeathSuicideCause();
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
@@ -1499,31 +1488,6 @@ public class CampaignGUI extends JPanel {
                 for (Person person : getCampaign().getPersonnel()) {
                     person.setLastRankChangeDate(null);
                 }
-            }
-        }
-
-        if ((randomDeathMethod != newOptions.getRandomDeathMethod())
-                || (useRandomDeathSuicideCause != newOptions.isUseRandomDeathSuicideCause())) {
-            getCampaign().setDeath(newOptions.getRandomDeathMethod().getMethod(newOptions));
-        } else {
-            getCampaign().getDeath().setUseRandomClanPersonnelDeath(newOptions.isUseRandomClanPersonnelDeath());
-            getCampaign().getDeath().setUseRandomPrisonerDeath(newOptions.isUseRandomPrisonerDeath());
-            switch (getCampaign().getDeath().getMethod()) {
-                case PERCENTAGE:
-                    ((PercentageRandomDeath) getCampaign().getDeath()).setPercentage(
-                            newOptions.getPercentageRandomDeathChance());
-                    break;
-                case EXPONENTIAL:
-                    ((ExponentialRandomDeath) getCampaign().getDeath()).setMale(
-                            newOptions.getExponentialRandomDeathMaleValues());
-                    ((ExponentialRandomDeath) getCampaign().getDeath()).setFemale(
-                            newOptions.getExponentialRandomDeathFemaleValues());
-                    break;
-                case AGE_RANGE:
-                    ((AgeRangeRandomDeath) getCampaign().getDeath()).adjustRangeValues(newOptions);
-                    break;
-                default:
-                    break;
             }
         }
 
@@ -2370,11 +2334,11 @@ public class CampaignGUI extends JPanel {
                 || CampaignOptions.S_AUTO.equals(getCampaign().getCampaignOptions().getAcquisitionSkill())) {
             lblPartsAvailabilityRating.setText("");
         } else {
-            StringBuilder report = new StringBuilder();
-            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel(null, report);
+            int partsAvailability = getCampaign().findAtBPartsAvailabilityLevel();
             // FIXME : Localize
             lblPartsAvailabilityRating
-                    .setText("<html><b>Campaign Parts Availability</b>: " + partsAvailability + "</html>");
+                    .setText(String.format("<html><b>Parts Availability Modifier</b>: %d</html>",
+                        partsAvailability));
         }
     }
 

@@ -147,15 +147,14 @@
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
+                    <effectType>SupplyCache</effectType>
                     <effectScaling>Linear</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects />
             <additionalDetails />
-            <description>Capture intact units from the following force(s) for additional support
-                points:</description>
+            <description>Capture intact units from the following force(s) for additional support points:</description>
             <destinationEdge>NONE</destinationEdge>
             <fixedAmount>1</fixedAmount>
             <objectiveCriterion>Capture</objectiveCriterion>

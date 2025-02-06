@@ -27,13 +27,13 @@ import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static megamek.common.Compute.randomInt;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * This class provides a utility method to display a custom dialog related to abandoned convoys
@@ -44,10 +44,10 @@ public class DialogAbandonedConvoy extends JDialog {
     final int LEFT_WIDTH = UIUtil.scaleForGUI(200);
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     public DialogAbandonedConvoy(Campaign campaign, AtBContract contract, @Nullable Force targetConvoy) {
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
@@ -75,7 +75,7 @@ public class DialogAbandonedConvoy extends JDialog {
             speakerName = speaker.getFullTitle();
         } else {
             if (targetConvoy == null) {
-                speakerName = String.format(resources.getString("dialogBorderConvoySpeakerDefault.text"),
+                speakerName = getFormattedTextAt(RESOURCE_BUNDLE, "dialogBorderConvoySpeakerDefault.text",
                     contract.getEmployerName(campaign.getGameYear()));
             } else {
                 speakerName = campaign.getName();
@@ -113,8 +113,8 @@ public class DialogAbandonedConvoy extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        String message = String.format(
-            resources.getString("statusUpdateAbandoned" + randomInt(20) + ".text"),
+        String message = getFormattedTextAt(RESOURCE_BUNDLE,
+            "statusUpdateAbandoned" + randomInt(20) + ".text",
             campaign.getCommanderAddress(false));
 
         JLabel rightDescription = new JLabel(
@@ -135,7 +135,7 @@ public class DialogAbandonedConvoy extends JDialog {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        JButton confirmButton = new JButton(resources.getString("logisticsDestroyed.text"));
+        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "logisticsDestroyed.text"));
         confirmButton.addActionListener(e -> dispose());
         buttonPanel.add(confirmButton);
 
@@ -149,7 +149,8 @@ public class DialogAbandonedConvoy extends JDialog {
 
         JLabel newPanelLabel = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
-                LEFT_WIDTH + RIGHT_WIDTH, resources.getString("documentation.prompt")));
+                LEFT_WIDTH + RIGHT_WIDTH,
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         infoPanel.add(newPanelLabel, BorderLayout.CENTER);
 
         // Add the new panel to the container (below the button panel)
