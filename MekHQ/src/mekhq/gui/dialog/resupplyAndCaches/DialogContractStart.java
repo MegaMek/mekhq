@@ -32,6 +32,7 @@ import java.awt.*;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
+import static mekhq.campaign.force.ForceType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
@@ -195,42 +196,44 @@ public class DialogContractStart extends JDialog {
         double totalPlayerCargoCapacity = 0;
 
         for (Force force : campaign.getAllForces()) {
-            if (!force.isConvoyForce()) {
+            if (!force.isForceType(CONVOY)) {
+                continue;
+            }
+
+            if (force.getParentForce() != null && force.getParentForce().isForceType(CONVOY)) {
                 continue;
             }
 
             double cargoCapacitySubTotal = 0;
-            if (force.isConvoyForce()) {
-                boolean hasCargo = false;
-                for (UUID unitId : force.getAllUnits(false)) {
-                    try {
-                        Unit unit = campaign.getUnit(unitId);
-                        Entity entity = unit.getEntity();
+            boolean hasCargo = false;
+            for (UUID unitId : force.getAllUnits(false)) {
+                try {
+                    Unit unit = campaign.getUnit(unitId);
+                    Entity entity = unit.getEntity();
 
-                        if (unit.isDamaged()
-                            || !unit.isFullyCrewed()
-                            || isProhibitedUnitType(entity, true)) {
-                            continue;
-                        }
-
-                        double individualCargo = unit.getCargoCapacity();
-
-                        if (individualCargo > 0) {
-                            hasCargo = true;
-                        }
-
-                        cargoCapacitySubTotal += individualCargo;
-                    } catch (Exception ignored) {
-                        // If we run into an exception, it's because we failed to get Unit or Entity.
-                        // In either case, we just ignore that unit.
+                    if (unit.isDamaged()
+                        || !unit.isFullyCrewed()
+                        || isProhibitedUnitType(entity, true)) {
+                        continue;
                     }
+
+                    double individualCargo = unit.getCargoCapacity();
+
+                    if (individualCargo > 0) {
+                        hasCargo = true;
+                    }
+
+                    cargoCapacitySubTotal += individualCargo;
+                } catch (Exception ignored) {
+                    // If we run into an exception, it's because we failed to get Unit or Entity.
+                    // In either case, we just ignore that unit.
                 }
+            }
 
-                if (hasCargo) {
-                    if (cargoCapacitySubTotal > 0) {
-                        totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                        playerConvoys++;
-                    }
+            if (hasCargo) {
+                if (cargoCapacitySubTotal > 0) {
+                    totalPlayerCargoCapacity += cargoCapacitySubTotal;
+                    playerConvoys++;
                 }
             }
         }
