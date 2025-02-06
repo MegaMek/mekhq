@@ -170,8 +170,8 @@ public final class BatchXPDialog extends JDialog {
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
         personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null));
-        for (int i = SkillLevel.ULTRA_GREEN.ordinal(); i < SkillLevel.ELITE.ordinal(); i++) {
-            personExpModel.addElement(new PersonTypeItem(Skills.SKILL_LEVELS[i].toString(), i));
+        for (int i = SkillLevel.ULTRA_GREEN.ordinal(); i <= SkillLevel.ELITE.ordinal(); i++) {
+            personExpModel.addElement(new PersonTypeItem(SkillLevel.parseFromInteger(i).toString(), SkillLevel.parseFromInteger(i).getAdjustedValue()));
         }
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);
