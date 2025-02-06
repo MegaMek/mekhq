@@ -47,7 +47,6 @@ import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.*;
-import mekhq.campaign.finances.Currency;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
@@ -86,7 +85,10 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
@@ -98,8 +100,8 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.randomEvents.GrayMonday;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -4770,7 +4772,6 @@ public class Campaign implements ITechManager {
 
         // Advance the day by one
         final LocalDate yesterday = currentDay;
-        final Currency oldCurrency = CurrencyManager.getInstance().getDefaultCurrency();
         currentDay = currentDay.plusDays(1);
 
         // Determine if we have an active contract or not, as this can get used
@@ -4841,7 +4842,7 @@ public class Campaign implements ITechManager {
         setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
-        finances.newDay(this, yesterday, getLocalDate(), oldCurrency);
+        finances.newDay(this, yesterday, getLocalDate());
 
         // process removal of old personnel data on the first day of each month
         if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
@@ -9121,14 +9122,5 @@ public class Campaign implements ITechManager {
             }
         }
         return false;
-    }
-
-    /**
-     * Retrieves the symbol of the default currency from the {@link CurrencyManager}.
-     *
-     * @return the symbol of the default currency as a {@link String}.
-     */
-    public String getCurrencyString() {
-        return CurrencyManager.getInstance().getDefaultCurrency().getSymbol();
     }
 }

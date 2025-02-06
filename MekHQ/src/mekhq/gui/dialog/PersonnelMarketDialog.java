@@ -178,8 +178,7 @@ public class PersonnelMarketDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
 
-            radioPaidRecruitment.setText(String.format("Make paid recruitment roll next week (%s)",
-                campaign.getCurrencyString()));
+            radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 2;
