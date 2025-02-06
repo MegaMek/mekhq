@@ -1342,7 +1342,7 @@ public class Unit implements ITechnology {
     }
 
     public String getHeatSinkTypeString(int year) {
-        BigInteger heatSinkType = MiscType.F_HEAT_SINK;
+        EquipmentFlag heatSinkType = MiscType.F_HEAT_SINK;
         boolean heatSinkIsClanTechBase = false;
 
         for (Mounted<?> mounted : getEntity().getEquipment()) {
