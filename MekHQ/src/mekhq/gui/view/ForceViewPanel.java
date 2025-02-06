@@ -25,6 +25,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -193,19 +194,17 @@ public class ForceViewPanel extends JScrollablePanel {
         if (null != type) {
             lblType.setName("lblType");
 
-            String forceType;
-            if (force.isCombatForce()) {
-                forceType = type + ' ' + force.getFormationLevel().toString();
+            ForceType forceType = force.getForceType();
+
+            String forceLabel;
+            if (forceType.isStandard()) {
+                forceLabel = force.getFormationLevel().toString();
             } else {
-                if (force.isConvoyForce()) {
-                    forceType = "Resupply " + force.getFormationLevel().toString();
-                } else {
-                    forceType = "Support " + force.getFormationLevel().toString();
-                }
+                forceLabel = forceType.getDisplayName() + ' ' + force.getFormationLevel().toString();
             }
 
-            lblType.setText("<html><i>" + forceType + "</i></html>");
-            lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceType);
+            lblType.setText("<html><i>" + forceLabel + "</i></html>");
+            lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceLabel);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = nexty;

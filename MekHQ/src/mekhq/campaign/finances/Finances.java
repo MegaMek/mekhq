@@ -35,21 +35,20 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.joda.money.CurrencyMismatchException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -128,7 +127,21 @@ public class Finances {
 
     public Money getBalance() {
         Money balance = Money.zero();
-        return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+
+        Currency currency = CurrencyManager.getInstance().getDefaultCurrency();
+
+        for (Transaction transaction : transactions) {
+            try {
+                balance.plus(transaction.getAmount());
+            } catch (CurrencyMismatchException e) {
+                // This means the finances were logged in the wrong currency.
+                // This can be caused by data mismatch or by legacy campaigns.
+                // The fix is easy: convert the transaction to the right currency
+                convertFinances(transaction, currency);
+            }
+        }
+
+        return balance;
     }
 
     public Money getLoanBalance() {
@@ -258,7 +271,15 @@ public class Finances {
         loans.add(loan);
     }
 
-    public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
+    public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today, Currency oldCurrency) {
+        // check for currency change
+        Currency newCurrency = CurrencyManager.getInstance().getDefaultCurrency();
+        if (!Objects.equals(newCurrency, oldCurrency)) {
+            for (Transaction transaction : transactions) {
+                convertFinances(transaction, newCurrency);
+            }
+        }
+
         // check for a new fiscal year
         if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
             // calculate profits
@@ -444,6 +465,18 @@ public class Finances {
         }
 
         loans = newLoans;
+    }
+
+    private static void convertFinances(Transaction transaction, Currency newCurrency) {
+        Money currentMoney = transaction.getAmount();
+
+        // Perform the currency conversion (amount * conversionRate)
+        // TODO currency specific conversion rates. Replace hardcoded '1'
+        double newAmount = currentMoney.getAmount().multiply(BigDecimal.valueOf(1)).doubleValue();
+
+        Money convertedMoney = Money.of(newAmount, newCurrency);
+
+        transaction.setAmount(convertedMoney);
     }
 
     /**
