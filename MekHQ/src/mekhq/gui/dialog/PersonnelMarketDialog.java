@@ -18,42 +18,11 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JTablePreference;
-import megamek.client.ui.preferences.JToggleButtonPreference;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MekViewPanel;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mek;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -72,6 +41,19 @@ import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.gui.view.PersonViewPanel;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -196,7 +178,8 @@ public class PersonnelMarketDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
 
-            radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
+            radioPaidRecruitment.setText(String.format("Make paid recruitment roll next week (%s)",
+                campaign.getCurrencyString()));
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 2;

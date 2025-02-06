@@ -47,6 +47,7 @@ import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.event.*;
+import mekhq.campaign.finances.Currency;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
@@ -340,17 +341,17 @@ public class Campaign implements ITechManager {
         game.addPlayer(0, player);
         currentDay = LocalDate.ofYearDay(3067, 1);
         campaignStartDate = null;
+        campaignOptions = new CampaignOptions();
+        setFaction(Factions.getInstance().getDefaultFaction());
+        techFactionCode = ITechnology.F_MERC;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
-        campaignOptions = new CampaignOptions();
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
         name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
-        setFaction(Factions.getInstance().getDefaultFaction());
-        techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         retainerStartDate = null;
         reputation = null;
@@ -4775,6 +4776,7 @@ public class Campaign implements ITechManager {
 
         // Advance the day by one
         final LocalDate yesterday = currentDay;
+        final Currency oldCurrency = CurrencyManager.getInstance().getDefaultCurrency();
         currentDay = currentDay.plusDays(1);
 
         // Determine if we have an active contract or not, as this can get used
@@ -4845,7 +4847,7 @@ public class Campaign implements ITechManager {
         setShoppingList(goShopping(getShoppingList()));
 
         // check for anything in finances
-        finances.newDay(this, yesterday, getLocalDate());
+        finances.newDay(this, yesterday, getLocalDate(), oldCurrency);
 
         // process removal of old personnel data on the first day of each month
         if ((campaignOptions.isUsePersonnelRemoval()) && (currentDay.getDayOfMonth() == 1)) {
@@ -9118,5 +9120,14 @@ public class Campaign implements ITechManager {
             }
         }
         return false;
+    }
+
+    /**
+     * Retrieves the symbol of the default currency from the {@link CurrencyManager}.
+     *
+     * @return the symbol of the default currency as a {@link String}.
+     */
+    public String getCurrencyString() {
+        return CurrencyManager.getInstance().getDefaultCurrency().getSymbol();
     }
 }
