@@ -746,7 +746,7 @@ public class BiographyTab {
         // Contents
         lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier");
         spnRandomDeathMultiplier = new CampaignOptionsSpinner("RandomDeathMultiplier",
-            1.0, 0, 100., 0.01);
+            1.0, 0, 100.0, 0.01);
 
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
@@ -1386,7 +1386,7 @@ public class BiographyTab {
 
         // Death
         options.setUseRandomDeathSuicideCause(chkUseRandomDeathSuicideCause.isSelected());
-        options.setRandomDeathMultiplier((int) spnRandomDeathMultiplier.getValue());
+        options.setRandomDeathMultiplier((double) spnRandomDeathMultiplier.getValue());
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
                 chkEnabledRandomDeathAgeGroups.get(ageGroup).isSelected());
