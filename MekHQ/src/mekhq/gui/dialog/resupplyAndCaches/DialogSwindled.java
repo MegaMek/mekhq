@@ -26,11 +26,11 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.gui.dialog.resupplyAndCaches.ResupplyDialogUtilities.getEnemyFactionReference;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code DialogSwindled} class provides functionality to display a dialog related to swindling events
@@ -42,7 +42,7 @@ public class DialogSwindled extends JDialog {
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a dialog notifying the player that they have been swindled during a resupply.
@@ -85,7 +85,7 @@ public class DialogSwindled extends JDialog {
     public DialogSwindled(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
 
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -102,7 +102,7 @@ public class DialogSwindled extends JDialog {
         // Get speaker details
         final RandomCallsignGenerator callsignGenerator = RandomCallsignGenerator.getInstance();
         String smugglerCallSign = callsignGenerator.generate();
-        String smugglerTitle = resources.getString("guerrillaSpeaker.text");
+        String smugglerTitle = getFormattedTextAt(RESOURCE_BUNDLE, "guerrillaSpeaker.text");
         String speakerName = String.format("<b>'%s'</b><br>%s", smugglerCallSign, smugglerTitle);
 
         ImageIcon speakerIcon = getFactionLogo(campaign, "PIR", true);
@@ -133,8 +133,8 @@ public class DialogSwindled extends JDialog {
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
         String enemyFactionReference = getEnemyFactionReference(resupply);
-        String message = String.format(
-            resources.getString("guerrillaSwindled" + Compute.randomInt(25) + ".text"),
+        String message = getFormattedTextAt(RESOURCE_BUNDLE,
+            "guerrillaSwindled" + Compute.randomInt(25) + ".text",
                 campaign.getCommanderAddress(true),
             enemyFactionReference);
 
@@ -156,7 +156,7 @@ public class DialogSwindled extends JDialog {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        JButton confirmButton = new JButton(resources.getString("logisticsDestroyed.text"));
+        JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "logisticsDestroyed.text"));
         confirmButton.addActionListener(e -> dispose());
         buttonPanel.add(confirmButton);
 
@@ -168,7 +168,7 @@ public class DialogSwindled extends JDialog {
         JLabel lblInfo = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 RIGHT_WIDTH + LEFT_WIDTH,
-                String.format(resources.getString("documentation.prompt"))));
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

@@ -75,6 +75,10 @@ public class Currency {
         return this.isDefault;
     }
 
+    public String getSymbol() {
+        return this.symbol;
+    }
+
     @Override
     public String toString() {
         return this.wrapped.toString();

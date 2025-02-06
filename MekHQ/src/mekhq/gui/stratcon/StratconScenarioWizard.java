@@ -27,6 +27,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.personnel.Person;
@@ -36,13 +37,20 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
+import mekhq.utilities.MHQInternationalization;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.scaleObjectiveTimeLimits;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.translateTemplateObjectives;
@@ -52,6 +60,7 @@ import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratcon.StratconRulesManager.ReinforcementResultsType.FAILED;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.stratcon.StratconScenario.ScenarioState.REINFORCEMENTS_COMMITTED;
+import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
@@ -64,14 +73,20 @@ public class StratconScenarioWizard extends JDialog {
     private final Campaign campaign;
     private StratconTrackState currentTrackState;
     private StratconCampaignState currentCampaignState;
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
+    private final String resourcePath = "mekhq.resources.AtBStratCon";
+    private final transient ResourceBundle resources = ResourceBundle.getBundle(resourcePath,
             MekHQ.getMHQOptions().getLocale());
 
     private final Map<String, JList<Force>> availableForceLists = new HashMap<>();
     private final Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
 
+    private List<Unit> eligibleLeadershipUnits;
     private JList<Unit> availableInfantryUnits = new JList<>();
     private JList<Unit> availableLeadershipUnits = new JList<>();
+    private Map<CampaignTransportType, JList<Unit>> availableTransportedLeadershipUnits = new HashMap<>();
+    private CampaignTransportType selectedCampaignTransportType = null;
+
+    private JComboBox<String> cboTransportType = new JComboBox<>();
 
     private JPanel contentPanel;
     private JButton btnCommit;
@@ -81,6 +96,12 @@ public class StratconScenarioWizard extends JDialog {
     public StratconScenarioWizard(Campaign campaign) {
         this.campaign = campaign;
         this.setModalityType(ModalityType.APPLICATION_MODAL);
+
+        for (CampaignTransportType campaignTransportType : getLeadershipDropdownVectorPair().stream().map(Pair::getValue).collect(Collectors.toSet())) {
+            if (campaignTransportType != null) {
+                availableTransportedLeadershipUnits.put(campaignTransportType, new JList<>());
+            }
+        }
     }
 
     /**
@@ -153,7 +174,7 @@ public class StratconScenarioWizard extends JDialog {
         getContentPane().removeAll();
 
         // Create a new panel to hold all components
-        contentPanel = new JPanel();
+        contentPanel = new JPanel(new CardLayout());
         contentPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -174,7 +195,7 @@ public class StratconScenarioWizard extends JDialog {
         if (isPrimaryForce) {
             gbc.gridy++;
             int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(S_LEADER, campaign);
-            List<Unit> eligibleLeadershipUnits = getEligibleLeadershipUnits(
+            eligibleLeadershipUnits = getEligibleLeadershipUnits(
                 campaign, currentScenario.getPrimaryForceIDs(), leadershipSkill);
             eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
@@ -408,10 +429,30 @@ public class StratconScenarioWizard extends JDialog {
             String.format(resources.getString("lblLeadershipInstructions.Text"), maxSelectionSize));
         contentPanel.add(lblLeadershipInstructions, gbc);
 
+        // Transport Type
         gbc.gridy++;
+        JLabel lblTransportInstructions = new JLabel(MHQInternationalization.getTextAt(resourcePath, "lblLeadershipTransportInstructions.text"));
+        contentPanel.add(lblTransportInstructions, gbc);
+
+        gbc.gridy++;
+
+        cboTransportType = new JComboBox<>(new Vector<>
+            (getLeadershipDropdownVectorPair().stream().map(Pair::getKey).collect(Collectors.toSet())));
+        cboTransportType.setSelectedItem(getLeadershipDropdownVectorPair().firstElement().getKey());
+
+        contentPanel.add(cboTransportType, gbc);
+
+
+        gbc.gridy++;
+        CardLayout leadershipTransportCard = new CardLayout();
+        JPanel leadershipUnitJPanel = new JPanel(leadershipTransportCard);
 
         availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize,
             true);
+
+        ItemListener dropdownChangeListener = this::campaignTransportTypeChangeHandler;
+        cboTransportType.addItemListener(dropdownChangeListener);
+        contentPanel.add(leadershipUnitJPanel);
     }
 
     /**
@@ -495,6 +536,19 @@ public class StratconScenarioWizard extends JDialog {
         contentPanel.add(unitPanel, gridBagConstraints);
 
         return availableUnits;
+    }
+
+    private void campaignTransportTypeChangeHandler(ItemEvent event) {
+        if (!(event.getSource() instanceof JComboBox<?>) || (event.getStateChange() != ItemEvent.SELECTED )) {
+            return;
+        }
+
+        for (Pair<String, CampaignTransportType> pair : getLeadershipDropdownVectorPair()) {
+            if (pair.getKey().equals(cboTransportType.getSelectedItem())) {
+                selectedCampaignTransportType = pair.getValue();
+                break;
+            }
+        }
     }
 
     /**
@@ -985,6 +1039,8 @@ public class StratconScenarioWizard extends JDialog {
         }
 
         JList<Unit> changedList = (JList<Unit>) event.getSource();
+        ListSelectionListener[] listeners = (((JList<?>) event.getSource()).getListSelectionListeners());
+        ((JList<?>) event.getSource()).removeListSelectionListener(listeners[0]);
 
         int selectedItems;
         if (usesBV) {
@@ -993,6 +1049,8 @@ public class StratconScenarioWizard extends JDialog {
                 selectedItems += unit.getEntity().calculateBattleValue(true, true);
                 selectionCountLabel.setText(String.format("%d %s", selectedItems,
                     resources.getString("unitsSelectedLabel.bv")));
+                selectTransportedUnitsAndTransport(selectedCampaignTransportType, unit,changedList);
+
             }
         } else {
             selectedItems = changedList.getSelectedIndices().length;
@@ -1037,6 +1095,36 @@ public class StratconScenarioWizard extends JDialog {
 
         unitStatusLabel.setText(sb.toString());
         pack();
+
+        ((JList<?>) event.getSource()).addListSelectionListener(listeners[0]);
+    }
+
+    private void selectTransportedUnitsAndTransport(CampaignTransportType campaignTransportType, Unit unit, JList<Unit> changedList) {
+        if (campaignTransportType != null) {
+            if (unit.hasTransportedUnits(campaignTransportType)) {
+                Set<Unit> potentialTransportedUnits = unit.getTransportedUnits(campaignTransportType);
+                for (Unit transportedUnit : potentialTransportedUnits) {
+                    // if this unit isn't selected but is an eligible leadership unit
+                    if (!changedList.getSelectedValuesList().contains(transportedUnit)
+                            && (eligibleLeadershipUnits.contains(transportedUnit))) {
+
+                        int index = eligibleLeadershipUnits.indexOf(transportedUnit);
+                        changedList.setSelectedIndices(ArrayUtils.add(changedList.getSelectedIndices(), index));
+                    }
+                }
+            }
+
+            if (unit.hasTransportAssignment(campaignTransportType)) {
+                Unit transport = unit.getTransportAssignment(campaignTransportType).getTransport();
+                // if this unit isn't selected but is an eligible leadership unit
+                if (!changedList.getSelectedValuesList().contains(transport)
+                        && (eligibleLeadershipUnits.contains(transport))) {
+
+                    int index = eligibleLeadershipUnits.indexOf(transport);
+                    changedList.setSelectedIndices(ArrayUtils.add(changedList.getSelectedIndices(), index));
+                }
+            }
+        }
     }
 
     /**
