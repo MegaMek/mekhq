@@ -69,7 +69,7 @@ public class GrayMonday {
             }
         }
 
-        if (daysAfterGrayMonday == 1) {
+        if (daysAfterGrayMonday == 2) {
             Finances finances = campaign.getFinances();
             Money balance = finances.getBalance();
             Money adjustedBalance = balance.multipliedBy(0.01);
