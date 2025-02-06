@@ -58,6 +58,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.EraFlag;
+import mekhq.campaign.universe.enums.HonorRating;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
 
 import java.io.File;
@@ -96,10 +97,6 @@ public class AtBDynamicScenarioFactory {
     // target number for 2d6 roll of infantry being upgraded to battle armor,
     // indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
-
-    private static final double STRICT = 0.75;
-    private static final double OPPORTUNISTIC = 1.0;
-    private static final double LIBERAL = 1.25;
 
     private static final int REINFORCEMENT_ARRIVAL_SCALE = 15;
 
@@ -985,7 +982,7 @@ public class AtBDynamicScenarioFactory {
                 logger.info(String.format("Base bidding budget is %s BV2. This is seed force" +
                     " multiplied by scenario force multiplier", forceBVBudget));
 
-                forceBVBudget = (int) round(forceBVBudget * getHonorRating(campaign, factionCode));
+                forceBVBudget = (int) round(forceBVBudget * faction.getHonorRating(campaign).getBvMultiplier());
 
                 logger.info(String.format("Honor Rating changed it to %s BV2", forceBVBudget));
 
@@ -1106,7 +1103,7 @@ public class AtBDynamicScenarioFactory {
                 && BatchallFactions.usesBatchalls(factionCode)
                 && contract.isBatchallAccepted()) {
                 reportResultsOfBidding(campaign, bidAwayForces, generatedForce, supplementedForces,
-                    factionCode);
+                    faction);
             }
         }
 
@@ -1206,47 +1203,6 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Calculates the honor rating for a given Clan.
-     *
-     * @param campaign    the ongoing campaign
-     * @param factionCode the faction code for which to calculate honor rating
-     * @return the honor rating as a double value
-     */
-    private static double getHonorRating(Campaign campaign, String factionCode) {
-        // Our research showed the post-Invasion shift in Clan doctrine to occur between 3053 and 3055
-        boolean isPostInvasion = campaign.getLocalDate().getYear() >= 3053 + randomInt(2);
-
-        // This is based on the table found on page 274 of Total Warfare
-        // Any Clan not mentioned on that table is assumed to be Strict → Opportunistic
-        return switch (factionCode) {
-            case "CCC", "CHH", "CIH", "CNC", "CSR" -> OPPORTUNISTIC;
-            case "CCO", "CGS", "CSV" -> STRICT;
-            case "CGB", "CWIE" -> {
-                if (isPostInvasion) {
-                    yield LIBERAL;
-                } else {
-                    yield STRICT;
-                }
-            }
-            case "CDS" -> LIBERAL;
-            case "CW" -> {
-                if (isPostInvasion) {
-                    yield LIBERAL;
-                } else {
-                    yield OPPORTUNISTIC;
-                }
-            }
-            default -> {
-                if (isPostInvasion) {
-                    yield OPPORTUNISTIC;
-                } else {
-                    yield STRICT;
-                }
-            }
-        };
-    }
-
-    /**
      * Reports the results of Clan bidding for a scenario.
      *
      * @param campaign           the campaign in which the bidding took place
@@ -1256,21 +1212,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static void reportResultsOfBidding(Campaign campaign, List<Entity> bidAwayForces,
                                                BotForce generatedForce, int supplementedForces,
-                                               String factionCode) {
-        double honor = getHonorRating(campaign, factionCode);
-        String honorLevel;
+                                               Faction faction) {
+        HonorRating honorRating = faction.getHonorRating(campaign);
 
-        if (honor == STRICT) {
-            honorLevel = "STRICT";
-        } else if (honor == OPPORTUNISTIC) {
-            honorLevel = "OPPORTUNISTIC";
-        } else {
-            honorLevel = "LIBERAL";
-        }
-
-        logger.info(String.format("The honor of %s is rated as %s",
-            Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()),
-            honorLevel));
+        logger.info("The honor of {} is rated as {}", faction.getFullName(campaign.getGameYear()),
+            honorRating);
 
         boolean useVerboseBidding = campaign.getCampaignOptions().isUseVerboseBidding();
         StringBuilder report = new StringBuilder();
