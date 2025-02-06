@@ -25,47 +25,20 @@ defaultEnd - Indicates which year the currency ended being the default currency 
 
 <currencies>
     <currency>
-        <name>Kerensky</name>
-        <code>KSK</code>
-        <decimalPlaces>0</decimalPlaces>
-        <symbol>K</symbol>
-        <startYear>2807</startYear>
-        <endYear>3152</endYear>
-    </currency>
-    <currency>
-        <name>Fox Credit</name>
-        <code>SFC</code>
-        <decimalPlaces>0</decimalPlaces>
-        <symbol>Fox</symbol>
-        <startYear>3133</startYear>
-        <endYear>999999</endYear>
-        <isDefault>true</isDefault>
-    </currency>
-    <currency>
-        <name>Hegemony Dollar</name>
-        <code>HGD</code>
-        <decimalPlaces>0</decimalPlaces>
-        <symbol>HG$</symbol>
-        <startYear>1</startYear>
-        <endYear>2570</endYear>
-        <isDefault>true</isDefault>
-    </currency>
-    <currency>
-        <name>Star Dollar</name>
+        <name>Star League Dollar</name>
         <code>SLD</code>
-        <decimalPlaces>0</decimalPlaces>
-        <symbol>S$</symbol>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>SL$</symbol>
         <startYear>2571</startYear>
         <endYear>2785</endYear>
-        <isDefault>true</isDefault>
     </currency>
     <currency>
-        <name>ComStar Bill</name>
+        <name>ComStar bill</name>
         <code>CSB</code>
         <decimalPlaces>0</decimalPlaces>
         <symbol>C-Bill</symbol>
-        <startYear>2572</startYear>
-        <endYear>3132</endYear>
+        <startYear>1</startYear>
+        <endYear>999999</endYear>
         <isDefault>true</isDefault>
         <isBackup>true</isBackup>
     </currency>
