@@ -2957,7 +2957,7 @@ public class CampaignOptions {
         return randomDeathMultiplier;
     }
 
-    public void setRandomDeathMultiplier(final int randomDeathMultiplier) {
+    public void setRandomDeathMultiplier(final double randomDeathMultiplier) {
         this.randomDeathMultiplier = randomDeathMultiplier;
     }
     // endregion Death
@@ -5754,7 +5754,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
                     retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMultiplier")) {
-                    retVal.setRandomDeathMultiplier(Integer.parseInt(wn2.getTextContent().trim()));
+                    retVal.setRandomDeathMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
