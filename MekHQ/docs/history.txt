@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.03-SNAPSHOT
+0.50.04-SNAPSHOT
+
+0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
 + PR #5559: Refactored Combat Team Handling in Scenarios for Better null Safety
 + Fix #5572: don't attempt to sum NaN tonnage equipment
@@ -162,8 +164,7 @@ MEKHQ VERSION HISTORY:
 + PR #5931: Refactored Part Handling in Resupply Module
 + Fix #5932: Added check for injuries that are not permanent before going on leave
 + PR #5946: Implemented Linked Scenarios for Interceptions
-
-
++ Fix #5951: Fixed Cargo Capacity Calculation in For Cargo Items in Body
 
 0.50.02 (2024-12-30 2130 UTC)
 + Fix #846, #5185: Fix BattleArmor customization/refit overweight check.

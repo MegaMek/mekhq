@@ -2,7 +2,7 @@
  * Force.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -76,8 +76,7 @@ public class Force {
     private StandardForceIcon forceIcon;
     private Camouflage camouflage;
     private String desc;
-    private boolean combatForce;
-    private boolean convoyForce;
+    private ForceType forceType;
     private boolean isCombatTeam;
     private int overrideCombatTeam;
     private FormationLevel formationLevel;
@@ -100,8 +99,7 @@ public class Force {
         setForceIcon(new LayeredForceIcon());
         setCamouflage(new Camouflage());
         setDescription("");
-        this.combatForce = true;
-        this.convoyForce = false;
+        this.forceType = ForceType.STANDARD;
         this.isCombatTeam = false;
         this.overrideCombatTeam = COMBAT_TEAM_OVERRIDE_NONE;
         this.formationLevel = FormationLevel.NONE;
@@ -160,39 +158,46 @@ public class Force {
         this.desc = d;
     }
 
-    public boolean isCombatForce() {
-        return combatForce && !convoyForce;
+    /**
+     * @return The {@code ForceType} currently assigned to this instance.
+     */
+    public ForceType getForceType() {
+        return forceType;
     }
 
-    public void setCombatForce(boolean combatForce, boolean setForSubForces) {
-        this.combatForce = combatForce;
+    /**
+     * This method compares the provided {@code forceType} with the current instance's
+     * {@code ForceType} to determine if they match.
+     *
+     * @param forceType The {@code ForceType} to compare against.
+     * @return {@code true} if the current instance matches the specified {@code forceType};
+     *         otherwise, {@code false}.
+     */
+    public boolean isForceType(ForceType forceType) {
+        return this.forceType == forceType;
+    }
+
+    /**
+     * Updates the {@code ForceType} for this instance and optionally propagates the change
+     * to all sub-forces.
+     *
+     * <p>If the {@code setForSubForces} flag is {@code true}, the method recursively sets the
+     * provided {@code forceType} for all sub-forces of this instance.</p>
+     *
+     * @param forceType The new {@code ForceType} to assign to this instance.
+     * @param setForSubForces A flag indicating whether the change should also apply to sub-forces.
+     */
+    public void setForceType(ForceType forceType, boolean setForSubForces) {
+        this.forceType = forceType;
         if (setForSubForces) {
             for (Force force : subForces) {
-                force.setCombatForce(combatForce, true);
+                force.setForceType(forceType, true);
             }
         }
     }
 
     public boolean isCombatTeam() {
         return isCombatTeam;
-    }
-
-    /**
-     * @return {@code true} if this is a convoy force, {@code false} otherwise.
-     */
-    public boolean isConvoyForce() {
-        return convoyForce;
-    }
-
-    /**
-     * Sets the status of the force as a convoy force. If requested, propagate this status to all
-     * sub-forces recursively.
-     *
-     * @param convoyForce {@code true} to mark force as a convoy force, {@code false} to mark force
-     *                     as non-convoy.
-     */
-    public void setConvoyForce(boolean convoyForce) {
-        this.convoyForce = convoyForce;
     }
 
     public void setCombatTeamStatus(final boolean isCombatTeam) {
@@ -403,21 +408,21 @@ public class Force {
     }
 
     /**
-     * @param combatForcesOnly to only include combat forces or to also include
+     * @param standardForcesOnly to only include combat forces or to also include
      *                         support forces
      * @return all the unit ids in this force and all of its subforces
      */
-    public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
+    public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
         Vector<UUID> allUnits;
 
-        if (combatForcesOnly && !isCombatForce() && !isConvoyForce()) {
+        if (standardForcesOnly && forceType.isStandard()) {
             allUnits = new Vector<>();
         } else {
             allUnits = new Vector<>(units);
         }
 
         for (Force force : subForces) {
-            allUnits.addAll(force.getAllUnits(combatForcesOnly));
+            allUnits.addAll(force.getAllUnits(standardForcesOnly));
         }
 
         return allUnits;
@@ -725,8 +730,7 @@ public class Force {
         if (!getDescription().isBlank()) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "convoyForce", convoyForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceType", forceType.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideCombatTeam", overrideCombatTeam);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
@@ -774,10 +778,9 @@ public class Force {
                     force.setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     force.setDescription(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
-                    force.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("convoyForce")) {
-                    force.setConvoyForce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceType")) {
+                    force.setForceType(ForceType.fromOrdinal(
+                        Integer.parseInt(wn2.getTextContent().trim())), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("overrideCombatTeam")) {
                     force.setOverrideCombatTeam(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
