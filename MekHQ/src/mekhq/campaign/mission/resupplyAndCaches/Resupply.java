@@ -19,6 +19,7 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Entity;
+import megamek.common.EquipmentFlag;
 import megamek.common.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -568,13 +569,8 @@ public class Resupply {
      * @return {@code true} if the part is in the exclusion list, {@code false} otherwise.
      */
     private boolean checkExclusionList(Part part) {
-        if (part instanceof EquipmentPart) {
-            List<BigInteger> excludedTypes = List.of(F_SPONSON_TURRET);
-            for (BigInteger excludedType : excludedTypes) {
-                if (((EquipmentPart) part).getType().hasFlag(excludedType)) {
-                    return true;
-                }
-            }
+        if (part instanceof EquipmentPart equipmentPart) {
+            return equipmentPart.getType().hasFlag(F_SPONSON_TURRET);
         }
         return false;
     }
