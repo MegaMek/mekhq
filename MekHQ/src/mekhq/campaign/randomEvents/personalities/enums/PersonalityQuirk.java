@@ -224,7 +224,6 @@ public enum PersonalityQuirk {
     BATTLE_HARDENED,
     BREAKS_RADIO_SILENCE,
     CONVOY_LOVER,
-    DEBRIS_SLINGER,
     CAMOUFLAGE,
     DISTANT_LEADER,
     DRAMATIC_FINISH,
@@ -244,7 +243,22 @@ public enum PersonalityQuirk {
     MEK_COMFORT,
     FEAR_OF_FIRE,
     TOUCH_SENSITIVE,
-    HOLOVID_FANATIC;
+    HOLOVID_FANATIC,
+    INVINCIBLE,
+    STUTTERS,
+    ACROPHOBIA,
+    CLAUSTROPHOBIA,
+    AGORAPHOBIA,
+    NYCTOPHOBIA,
+    MONOPHOBIA,
+    HEMOPHOBIA,
+    ZERO_G_PARALYSIS,
+    HEDONIST,
+    BROADCASTS_MUSIC,
+    NEMESIS,
+    FEAR_MECHS,
+    LOCAL_CONNECTOR,
+    HATRED;
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
