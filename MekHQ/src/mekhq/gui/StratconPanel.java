@@ -37,8 +37,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -118,6 +120,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
+    private List<Force> pendingDeployments = new ArrayList<Force>();
+
     /**
      * Constructs a StratconPanel instance, given a parent campaign GUI and a
      * pointer to an info area.
@@ -125,7 +129,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     public StratconPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
 
-        scenarioWizard = new StratconScenarioWizard(campaign);
+        scenarioWizard = new StratconScenarioWizard(campaign, this);
         this.infoArea = infoArea;
 
         assignmentUI = new TrackForceAssignmentUI(this);
@@ -1049,6 +1053,15 @@ public class StratconPanel extends JPanel implements ActionListener {
                         isPrimaryForce = true;
                     }
                 }
+                if (selectedScenario != null) {
+                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
+                        currentTrack, campaignState, isPrimaryForce);
+
+                    scenarioWizard.toFront();
+                    scenarioWizard.setVisible(true);
+                }
+                setPendingDeployments(new ArrayList<>());
+                break;
             // Deliberate fall-through
             case RCLICK_COMMAND_MANAGE_SCENARIO:
                 // It's possible a scenario may have been placed when deploying the force, so we
@@ -1121,5 +1134,23 @@ public class StratconPanel extends JPanel implements ActionListener {
         } else {
             return super.getPreferredSize();
         }
+    }
+
+    public List<Force> getPendingDeployments() {
+        return pendingDeployments;
+    }
+
+    public void setPendingDeployments(List<Force> pendingDeployments) {
+        this.pendingDeployments = pendingDeployments;
+    }
+
+    public void processPendingDeployments() {
+
+        for (Force force : getPendingDeployments()) {
+            StratconRulesManager.deployForceToCoords(getSelectedCoords(),
+                force.getId(), campaign, campaignState.getContract(), getCurrentTrack(), false);
+        }
+
+        setPendingDeployments(new ArrayList<>());
     }
 }

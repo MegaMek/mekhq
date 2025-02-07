@@ -36,6 +36,7 @@ import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.lang3.ArrayUtils;
@@ -93,8 +94,11 @@ public class StratconScenarioWizard extends JDialog {
 
     private static final MMLogger logger = MMLogger.create(StratconScenarioWizard.class);
 
-    public StratconScenarioWizard(Campaign campaign) {
+    private final StratconPanel parent;
+
+    public StratconScenarioWizard(Campaign campaign, StratconPanel parent) {
         this.campaign = campaign;
+        this.parent = parent;
         this.setModalityType(ModalityType.APPLICATION_MODAL);
 
         for (CampaignTransportType campaignTransportType : getLeadershipDropdownVectorPair().stream().map(Pair::getValue).collect(Collectors.toSet())) {
@@ -900,6 +904,11 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber,
                                   boolean isGMReinforcement) {
+        //StratconPanel parent = (StratconPanel) getParent();
+        if (parent != null && !(parent.getPendingDeployments().isEmpty())) {
+            parent.processPendingDeployments();
+        }
+
         // go through all the force lists and add the selected forces to the scenario
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
@@ -956,7 +965,7 @@ public class StratconScenarioWizard extends JDialog {
 
         currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
 
-        if (currentScenario.getCurrentState().ordinal() < REINFORCEMENTS_COMMITTED.ordinal()) {
+        if (currentScenario.getCurrentState().ordinal() <= REINFORCEMENTS_COMMITTED.ordinal()) {
             translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
             scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
         }
