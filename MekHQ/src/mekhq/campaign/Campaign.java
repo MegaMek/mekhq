@@ -4439,11 +4439,6 @@ public class Campaign implements ITechManager {
             }
 
             // Daily events
-            if (getDeath().processNewDay(this, getLocalDate(), person)) {
-                // The person has died, so don't continue to process the dead
-                continue;
-            }
-
             if (person.getStatus().isMIA()) {
                 recovery.attemptRescueOfPlayerCharacter(person);
             }
