@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
+import static mekhq.campaign.utilities.glossary.GlossaryLibrary.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
@@ -42,6 +43,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * personnel records via hyperlinks.</p>
  */
 public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
+    private static final String PERSON_COMMAND_STRING = "PERSON";
+
     private static final String RESOURCE_BUNDLE = "mekhq.resources.VocationalExperienceAwardDialog";
 
     /**
@@ -67,15 +70,24 @@ public class VocationalExperienceAwardDialog extends MHQDialogImmersive {
      * <p>This method parses the hyperlink reference to focus on the personnel record identified by
      * the provided UUID in the campaign's graphical user interface.</p>
      *
-     * @param campaign the {@link Campaign} containing relevant personnel data
-     * @param hyperlinkReference     the hyperlink reference containing the UUID of the selected character
+     * @param campaign      the {@link Campaign} containing relevant personnel data
+     * @param reference     the hyperlink reference containing the UUID of the selected character
      */
     @Override
-    protected void handleHyperlinkClick(Campaign campaign, String hyperlinkReference) {
-        CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
+    protected void handleHyperlinkClick(Campaign campaign, String reference) {
+        String[] splitReference = reference.split(":");
 
-        final UUID id = UUID.fromString(hyperlinkReference.split(":")[1]);
-        campaignGUI.focusOnPerson(id);
+        String commandKey = splitReference[0];
+        String entryKey = splitReference[1];
+
+        if (commandKey.equals(GLOSSARY_COMMAND_STRING)) {
+            new GlossaryDialog(this, campaign, entryKey);
+        } else if (commandKey.equals(PERSON_COMMAND_STRING)) {
+            CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
+
+            final UUID id = UUID.fromString(reference.split(":")[1]);
+            campaignGUI.focusOnPerson(id);
+        }
     }
 
     /**

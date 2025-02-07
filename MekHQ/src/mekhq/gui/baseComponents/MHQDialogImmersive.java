@@ -26,6 +26,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.GlossaryDialog;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
@@ -36,6 +37,7 @@ import static java.lang.Math.max;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.campaign.utilities.glossary.GlossaryLibrary.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -57,7 +59,7 @@ public class MHQDialogImmersive extends JDialog {
 
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
 
-    private final int INSERT_SIZE = UIUtil.scaleForGUI(5);
+    private final int PADDING = UIUtil.scaleForGUI(5);
     protected final int IMAGE_WIDTH = 125; // This is scaled to GUI by 'scaleImageIconToWidth'
 
     private JPanel northPanel;
@@ -115,7 +117,7 @@ public class MHQDialogImmersive extends JDialog {
         // Main Panel to hold all boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        constraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
 
@@ -233,7 +235,7 @@ public class MHQDialogImmersive extends JDialog {
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
-        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, 0, INSERT_SIZE, 0));
+        scrollPaneContainer.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
         scrollPaneContainer.add(scrollPane, BorderLayout.CENTER);
 
         // Add the scrollPane with padding to the northPanel
@@ -249,17 +251,19 @@ public class MHQDialogImmersive extends JDialog {
 
     /**
      * Handles hyperlink clicks from HTML content.
-     * <p>
-     *     <b>Usage</b><br>
-     *     This method provides a default implementation that does nothing. Subclasses should
-     *     override this to provide specific behavior when hyperlinks are clicked.
-     * </p>
      *
      * @param campaign The {@link Campaign} instance that contains relevant data.
-     * @param href The hyperlink reference (e.g., a URL or a specific identifier).
+     * @param reference The hyperlink reference (e.g., a specific identifier).
      */
-    protected void handleHyperlinkClick(Campaign campaign, String href) {
-        logger.error("handleHyperlinkClick() was not overridden in the subclass.");
+    protected void handleHyperlinkClick(Campaign campaign, String reference) {
+        String[] splitReference = reference.split(":");
+
+        String commandKey = splitReference[0];
+        String entryKey = splitReference[1];
+
+        if (commandKey.equals(GLOSSARY_COMMAND_STRING)) {
+            new GlossaryDialog(this, campaign, entryKey);
+        }
     }
 
     /**
@@ -272,16 +276,37 @@ public class MHQDialogImmersive extends JDialog {
      */
     private void populateOutOfCharacterPanel(String outOfCharacterMessage) {
         JPanel pnlOutOfCharacter = new JPanel(new GridBagLayout());
-        pnlOutOfCharacter.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel lblOutOfCharacter = new JLabel(
-            String.format("<html><div style='width: %dpx'>%s</div></html>",
-                CENTER_WIDTH, outOfCharacterMessage));
-        lblOutOfCharacter.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE,
-            INSERT_SIZE, INSERT_SIZE));
+        // Create a compound border with an etched border and padding (empty border)
+        pnlOutOfCharacter.setBorder(
+            BorderFactory.createEtchedBorder()
+        );
 
-        pnlOutOfCharacter.add(lblOutOfCharacter);
+        // Create a JEditorPane for the message
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setFocusable(false);
 
+        int width = CENTER_WIDTH;
+        width += leftSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
+        width += rightSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
+
+        // Use inline CSS to set font family, size, and other style properties
+        editorPane.setText(String.format("<div style='width: %s'>%s</div>", width, outOfCharacterMessage));
+        setFontScaling(editorPane, false, 1);
+
+        // Add a HyperlinkListener to capture hyperlink clicks
+        editorPane.addHyperlinkListener(evt -> {
+            if (evt.getEventType() == EventType.ACTIVATED) {
+                handleHyperlinkClick(campaign, evt.getDescription());
+            }
+        });
+
+        // Add the editor pane to the panel
+        pnlOutOfCharacter.add(editorPane);
+
+        // Add the panel to the southPanel
         southPanel.add(pnlOutOfCharacter, BorderLayout.SOUTH);
     }
 
@@ -299,7 +324,7 @@ public class MHQDialogImmersive extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE);
+        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
