@@ -136,14 +136,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         // set starting education
         setInitialEducationLevel(campaign, person);
 
-        // generate personality
-        PersonalityController.generatePersonality(person);
-
         // generate background
         BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(person);
+        PersonalityController.generatePersonality(campaign, person);
 
         return person;
     }

@@ -1131,7 +1131,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(person);
+                    PersonalityController.generatePersonality(gui.getCampaign(), person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1152,7 +1152,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
-                    PersonalityController.writeDescription(person);
+                    PersonalityController.writeDescription(gui.getCampaign(), person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;

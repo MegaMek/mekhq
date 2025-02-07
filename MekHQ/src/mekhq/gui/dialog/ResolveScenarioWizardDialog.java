@@ -821,7 +821,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             // presented to the user.
             // We therefore need to re-generate the personality description at this point,
             // as this is the earliest point in which that description is visible to the user
-            writeDescription(status.getPerson());
+            writeDescription(campaign, status.getPerson());
             prisonerIndex++;
         }
 

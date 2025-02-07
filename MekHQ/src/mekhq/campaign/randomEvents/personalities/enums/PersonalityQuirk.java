@@ -20,11 +20,16 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
+import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum PersonalityQuirk {
@@ -256,7 +261,7 @@ public enum PersonalityQuirk {
     HEDONIST,
     BROADCASTS_MUSIC,
     NEMESIS,
-    FEAR_MECHS,
+    FEAR_MEKS,
     LOCAL_CONNECTOR,
     HATRED;
     // endregion Enum Declarations
@@ -286,9 +291,23 @@ public enum PersonalityQuirk {
      * @param person the {@code Person} object for whom the description is being generated
      * @return a formatted description string tailored to the specified person
      */
-    public String getDescription(Person person) {
+    public String getDescription(Campaign campaign, Person person) {
+        PersonnelRole primaryRole = person.getPrimaryRole();
+
+        if (primaryRole.isDependent() || primaryRole.isNone()) {
+            return "";
+        }
+
         int descriptionIndex = person.getPersonalityQuirkDescriptionIndex();
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
+
+        String professionKey;
+        if (primaryRole.isCombat()) {
+            professionKey = "COMBATANT";
+        } else {
+            professionKey = "SUPPORT";
+        }
+
+        final String RESOURCE_KEY = name() + ".description." + descriptionIndex + '.' + professionKey;
 
         Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
@@ -298,9 +317,31 @@ public enum PersonalityQuirk {
         String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
         String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, person.getFirstName(),
+        String formationKey;
+        if (primaryRole == SOLDIER || primaryRole == BATTLE_ARMOUR) {
+            formationKey = "squad";
+        } else {
+            formationKey = "lance";
+        }
+
+        Faction faction = campaign.getFaction();
+
+        String factionKey;
+        if (faction.isClan()) {
+            factionKey = "clan";
+        } else if (faction.isComStarOrWoB()) {
+            factionKey = "comStar";
+        } else {
+            factionKey = "innerSphere";
+        }
+        String lanceLabelLowercase = getFormattedTextAt(RESOURCE_BUNDLE,
+            formationKey + '.' + factionKey + ".lowercase");
+        String lanceLabelUppercase  = getFormattedTextAt(RESOURCE_BUNDLE,
+            formationKey + '.' + factionKey + ".uppercase");
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, person.getGivenName(),
             subjectPronoun, subjectPronounLowerCase, objectPronoun, objectPronounLowerCase,
-            possessivePronoun, possessivePronounLowerCase);
+            possessivePronoun, possessivePronounLowerCase, lanceLabelUppercase, lanceLabelLowercase);
     }
     // endregion Getters
 

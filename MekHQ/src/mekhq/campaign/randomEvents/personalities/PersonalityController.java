@@ -33,7 +33,7 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
-    public static void generatePersonality(Person person) {
+    public static void generatePersonality(Campaign campaign, Person person) {
         // first, we wipe any pre-existing personality traits
         person.setAggression(Aggression.NONE);
         person.setAmbition(Ambition.NONE);
@@ -60,7 +60,7 @@ public class PersonalityController {
         person.setIntelligence(generateIntelligence(randomInt(8346)));
 
         // finally, write the description
-        writeDescription(person);
+        writeDescription(campaign, person);
 
         // check at least one characteristic has been generated, if not, then repeat the
         // process
@@ -68,7 +68,7 @@ public class PersonalityController {
         // probability says we can only expect 1 additional loop, 2 in exceptional
         // circumstances
         if (Objects.equals(person.getPersonalityDescription(), "")) {
-            generatePersonality(person);
+            generatePersonality(campaign, person);
         }
     }
 
@@ -109,8 +109,8 @@ public class PersonalityController {
      *
      * @param person the person whose personality description will be set
      */
-    public static void writeDescription(Person person) {
-        List<String> traitDescriptions = getTraitDescriptions(person);
+    public static void writeDescription(Campaign campaign, Person person) {
+        List<String> traitDescriptions = getTraitDescriptions(campaign, person);
 
         StringBuilder personalityDescription = new StringBuilder();
 
@@ -137,7 +137,7 @@ public class PersonalityController {
      * @param person the person for whom to retrieve the trait descriptions
      * @return a list of trait descriptions for the person
      */
-    private static List<String> getTraitDescriptions(Person person) {
+    private static List<String> getTraitDescriptions(Campaign campaign, Person person) {
         List<String> traitDescriptions = new ArrayList<>();
 
         if (!person.getAggression().isNone()) {
@@ -161,7 +161,7 @@ public class PersonalityController {
         }
 
         if (!person.getPersonalityQuirk().isNone()) {
-            traitDescriptions.add(person.getPersonalityQuirk().getDescription(person));
+            traitDescriptions.add(person.getPersonalityQuirk().getDescription(campaign, person));
         }
 
         return traitDescriptions;
