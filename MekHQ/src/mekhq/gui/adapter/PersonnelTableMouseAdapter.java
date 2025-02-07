@@ -85,6 +85,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
@@ -322,6 +323,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
                     person.setPrimaryRole(gui.getCampaign(), role);
+                    writeDescription(gui.getCampaign(), person);
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().isUsePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().isAssignPortraitOnRoleChange()
@@ -1153,7 +1155,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
-                    PersonalityController.writeDescription(gui.getCampaign(), person);
+                    writeDescription(gui.getCampaign(), person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
