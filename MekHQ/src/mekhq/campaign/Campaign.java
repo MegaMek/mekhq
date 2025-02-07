@@ -323,7 +323,7 @@ public class Campaign implements ITechManager {
     // We deliberately don't write this data to the save file as we want it rebuilt every time the
     // campaign loads. This ensures updates can be applied and there is no risk of bugs being
     // permanently locked into the campaign file.
-    Map<String, GlossaryEntry> glossaryLibrary = new GlossaryLibrary().getGlossaryEntries();
+    Map<String, GlossaryEntry> glossaryLibrary;
 
     /**
      * Represents the different types of administrative specializations.
@@ -411,6 +411,7 @@ public class Campaign implements ITechManager {
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
+        glossaryLibrary = new GlossaryLibrary().getGlossaryEntries();
 
     }
 
