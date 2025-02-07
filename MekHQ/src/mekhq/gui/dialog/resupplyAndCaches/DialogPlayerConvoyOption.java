@@ -32,6 +32,7 @@ import java.util.ResourceBundle;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code DialogPlayerConvoyOption} class provides functionality to display a dialog
@@ -44,7 +45,7 @@ public class DialogPlayerConvoyOption extends JDialog {
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a dialog that allows the player to decide if they want to use their own convoy for resupply.
@@ -87,7 +88,7 @@ public class DialogPlayerConvoyOption extends JDialog {
     public DialogPlayerConvoyOption(Resupply resupply, boolean forcedUseOfPlayerConvoy) {
         final Campaign campaign = resupply.getCampaign();
 
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -148,17 +149,18 @@ public class DialogPlayerConvoyOption extends JDialog {
 
         String message;
         if (forcedUseOfPlayerConvoy) {
-            messageResource = resources.getString("usePlayerConvoyForced.text");
+            messageResource = "usePlayerConvoyForced.text";
 
-            message = String.format(messageResource, campaign.getCommanderAddress(false),
-                resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTotalPlayerCargoCapacity(),
-                playerConvoyCount, pluralizer, pluralizer);
+            message = getFormattedTextAt(RESOURCE_BUNDLE, messageResource,
+                campaign.getCommanderAddress(false), resupply.getTargetCargoTonnagePlayerConvoy(),
+                resupply.getTotalPlayerCargoCapacity(), playerConvoyCount, pluralizer);
         } else {
-            messageResource = resources.getString("usePlayerConvoyOptional.text");
+            messageResource = "usePlayerConvoyOptional.text";
 
-            message = String.format(messageResource, campaign.getCommanderAddress(false),
-                resupply.getTargetCargoTonnagePlayerConvoy(), resupply.getTotalPlayerCargoCapacity(),
-                playerConvoyCount, pluralizer, resupply.getTargetCargoTonnage(), pluralizer);
+            message = getFormattedTextAt(RESOURCE_BUNDLE, messageResource,
+                campaign.getCommanderAddress(false), resupply.getTargetCargoTonnagePlayerConvoy(),
+                resupply.getTotalPlayerCargoCapacity(), playerConvoyCount, pluralizer,
+                resupply.getTargetCargoTonnage());
         }
 
         JLabel rightDescription = new JLabel(
@@ -181,7 +183,7 @@ public class DialogPlayerConvoyOption extends JDialog {
         JPanel buttonPanel = new JPanel();
 
         // Create the buttons and add their action listener.
-        JButton acceptButton = new JButton(resources.getString("confirmAccept.text"));
+        JButton acceptButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE,"confirmAccept.text"));
         acceptButton.addActionListener(e -> {
             dispose();
             resupply.setUsePlayerConvoy(true);
@@ -189,7 +191,7 @@ public class DialogPlayerConvoyOption extends JDialog {
         acceptButton.setEnabled(playerConvoyCount > 0);
         buttonPanel.add(acceptButton);
 
-        JButton refuseButton = new JButton(resources.getString("confirmRefuse.text"));
+        JButton refuseButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE,"confirmRefuse.text"));
         refuseButton.addActionListener(e -> {
             dispose();
             resupply.setUsePlayerConvoy(false);
@@ -204,7 +206,7 @@ public class DialogPlayerConvoyOption extends JDialog {
         JLabel lblInfo = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 RIGHT_WIDTH + LEFT_WIDTH,
-                String.format(resources.getString("documentation.prompt"))));
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

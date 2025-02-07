@@ -136,6 +136,9 @@ class GameThread extends Thread implements CloseClientListener {
     }
 
     protected Map<String, AbstractClient> getLocalBots() {
+        if (localBots == null) {
+            return Collections.emptyMap();
+        }
         return localBots.getLocalBots();
     }
 
@@ -153,6 +156,7 @@ class GameThread extends Thread implements CloseClientListener {
         createController();
         swingGui = new ClientGUI(client, controller);
         controller.clientgui = swingGui;
+        localBots = (ClientGUI) swingGui;
         swingGui.initialize();
 
         try {

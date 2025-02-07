@@ -2,6 +2,7 @@
  * ContractMarket.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +45,9 @@ import java.util.Set;
 import static java.lang.Math.floor;
 import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 
+import static megamek.common.Compute.d6;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+
 /**
  * Contract offers that are generated monthly under AtB rules.
  *
@@ -69,6 +73,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
+        boolean isGrayMonday = isGrayMonday(campaign);
+
         if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
@@ -79,7 +85,19 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
             }
 
-            int numContracts = Compute.d6() - 4 + unitRatingMod;
+            int numContracts = d6() - 4 + unitRatingMod;
+
+            if (isGrayMonday) {
+                for (int i = 0; i < numContracts; i++) {
+                    if (d6() <= 2) {
+                        numContracts--;
+                    }
+                }
+            }
+
+            if (numContracts == 0) {
+                return;
+            }
 
             Set<Faction> currentFactions = campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate());
             final boolean inMinorFaction = currentFactions.stream()
@@ -183,7 +201,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 }
             }
             for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
-                int roll = Compute.d6(2);
+                int roll = d6(2);
                 if (roll >= 10) {
                     AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
                     if (sub.getEndingDate().isBefore(contract.getEndingDate())) {
@@ -518,6 +536,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= (1.0 - unofficialMultiplier);
         }
 
+        // This should always be last
+        if (isGrayMonday(campaign)) {
+            multiplier *= 0.25;
+        }
+
         return multiplier;
     }
 
@@ -555,7 +578,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         AtBContractType type = contract.getContractType();
         if (type.isDiversionaryRaid() || type.isReconRaid()
             || type.isRiotDuty()) {
-            int roll = Compute.d6();
+            int roll = d6();
             if (roll == 6) {
                 addFollowup(campaign, contract);
                 campaign.addReport(
