@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,6 +55,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -2769,9 +2770,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(cbMenuItem);
         }
 
-        if (!gui.getCampaign().getCampaignOptions().getRandomDeathMethod().isNone()
-                && Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
-                && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
+        if (Stream.of(selected).noneMatch(p -> p.getStatus().isDead())
+            && Stream.of(selected).allMatch(p -> p.isImmortal() == person.isImmortal())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miImmortal.text"));
             cbMenuItem.setToolTipText(resources.getString("miImmortal.toolTipText"));
             cbMenuItem.setName("miImmortal");

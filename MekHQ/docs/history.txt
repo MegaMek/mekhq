@@ -1,6 +1,29 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.04-SNAPSHOT
++ PR #5852: RAW CamOps Delivery Times
++ PR #5853: Remove Legacy AtB's Campaign Parts Availability System
++ PR #5868: Updated Several Scenario Effects to use SupplyCache over SupportPointUpdate
++ Fix #5695: Refactored Personnel Cleanup and Random Dependent Removal
++ PR #5873: Added Force Type Enumeration
++ PR #5892: Refactored Resupply Messaging to use Internalization
++ PR #5905: Refactored Currency to No Longer Always Display as C-Bills
++ PR #5907: Implemented Clarion Note & Gray Monday
++ PR #5920: MegaMekLab Issue 1703: Allow bays to be added to aerospace fighters
++ PR #5955: Implemented Death Rework
++ PR #5959: Updated rankSystems version to 0.50.04-SNAPSHOT
++ PR #5962: Converted Honor Rating into an Enum
++ PR #5963: Refactored PrisonerStatus Enum and Reorganized Related Code
++ PR #5964: Use ModifiedConstantSkillGenerator for Skill Generation
++ PR #5965: Added "Intercept the Escapees" Scenario Template
++ PR #5966: Added 'None' Generation Method to ScenarioForceTemplate
++ Fix #5845: In Stratcon scenario wizard, leadership units consider transport assignments
++ PR #5982: Cap splashscreen button width
++ Fix #5980: Improved commander updating logic
++ PR #5985: Fixed backwards "last compatible version" check
++ PR #5988: Feat: refactor flags to use EquipmentFlag instead
++ Fix #5987: local bots property empty on non-atb games #5989
+
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment

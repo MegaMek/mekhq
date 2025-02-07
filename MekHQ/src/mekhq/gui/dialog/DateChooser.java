@@ -810,7 +810,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             }
             case 10 -> {
                 turningPoints = List.of("GreyMonday");
-                turningPointDates = List.of(LocalDate.of(3132, 8, 7));
+                turningPointDates = List.of(LocalDate.of(3132, 8, 3));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 11 -> {

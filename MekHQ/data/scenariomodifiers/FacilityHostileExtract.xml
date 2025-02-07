@@ -17,7 +17,7 @@
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
+                    <effectType>SupplyCache</effectType>
                     <effectScaling>Linear</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
