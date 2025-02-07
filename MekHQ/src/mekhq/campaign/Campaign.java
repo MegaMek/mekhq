@@ -426,12 +426,7 @@ public class Campaign implements ITechManager {
             glossaryLibrary = new HashMap<>();
         }
 
-        try {
-            randomEventLibraries = new RandomEventLibraries();
-        } catch (Exception e) {
-            randomEventLibraries = new HashMap<>();
-        }
-
+        randomEventLibraries = new RandomEventLibraries();
     }
 
     /**

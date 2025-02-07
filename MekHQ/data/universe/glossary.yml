@@ -6,3 +6,16 @@ entries:
     title: "An Example Title"
     # This is the specific description of the term that will be presented to the player
     description: "This is an example entry. This text will be displayed to the user."
+  PRISONER_CAPACITY:
+    title: "Prisoner Capacity"
+    description: "Prisoner Capacity is a measure of how many prisoners your Security personnel can
+     manage without potential crisis. Generally speaking, each prisoner takes up 1 capacity,
+      however some events may change this.
+      <p>For additional information on Prisoner Capacity and how to manage it, please see the
+       documentation in...
+       <br>MekHQ/docs/Stratcon and Against the Bot/Prisoners.pdf</p>"
+  REPUTATION:
+    title: "Reputation"
+    description: "Reputation is a measure of how well known your unit is and whether people
+      generally believe they can get the job done. The rules for Reputation can be found in
+       Campaign Operations."
