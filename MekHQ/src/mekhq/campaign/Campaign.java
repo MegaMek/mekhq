@@ -129,7 +129,6 @@ import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
-import mekhq.campaign.utilities.glossary.GlossaryLibrary;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -411,7 +410,7 @@ public class Campaign implements ITechManager {
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
-        glossaryLibrary = new GlossaryLibrary().getGlossaryEntries();
+        glossaryLibrary = new HashMap<>();
 
     }
 
