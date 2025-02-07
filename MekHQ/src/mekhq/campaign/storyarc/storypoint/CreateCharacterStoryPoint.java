@@ -1,7 +1,7 @@
 /*
  * CreateCharacterStoryPoint.java
  *
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *

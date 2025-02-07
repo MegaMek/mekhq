@@ -33,6 +33,13 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
+    /**
+     * Generates a personality for the given person. The method assigns various personality traits,
+     * intelligence, and potential quirks to the person.
+     *
+     * @param campaign the current campaign context in which the person's personality is being generated
+     * @param person   the person for whom the personality will be generated and updated
+     */
     public static void generatePersonality(Campaign campaign, Person person) {
         // first, we wipe any pre-existing personality traits
         person.setAggression(Aggression.NONE);
@@ -132,10 +139,13 @@ public class PersonalityController {
     }
 
     /**
-     * Returns a list of trait descriptions for a given person.
+     * Retrieves descriptions for various personality traits of the given person. Each non-default
+     * personality trait is processed to generate a corresponding description, which is then added
+     * to the resulting list.
      *
-     * @param person the person for whom to retrieve the trait descriptions
-     * @return a list of trait descriptions for the person
+     * @param campaign the current campaign
+     * @param person   the person whose personality trait descriptions are to be retrieved
+     * @return a list of strings containing descriptions of the person's personality traits
      */
     private static List<String> getTraitDescriptions(Campaign campaign, Person person) {
         List<String> traitDescriptions = new ArrayList<>();
