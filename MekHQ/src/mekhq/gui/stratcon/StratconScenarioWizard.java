@@ -710,8 +710,6 @@ public class StratconScenarioWizard extends JDialog {
 
         // Add the commit button to the content panel
         contentPanel.add(btnCommit, constraints);
-
-
     }
 
     /**
