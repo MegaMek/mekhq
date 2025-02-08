@@ -46,12 +46,38 @@ import java.util.stream.Stream;
 public class PostScenarioDialogHandler {
 
     /**
-     * Post game resolution checks, dialogs and actions.
-     * @param tracker The tracker that contains all the information about the scenario resolution.
-     * @param control Whether the player controlled the battlefield at the end of the scenario.
+     * Handles post-game resolution checks, dialogs, and actions after a scenario is completed.
+     *
+     * <p>
+     * This method is responsible for performing several post-combat processes, including retirement checks,
+     * automatic application of awards, restarting campaign operations, and cleaning up temporary files.
+     * Additionally, it triggers a {@link ScenarioResolvedEvent} to indicate the resolution of the current scenario.
+     * </p>
+     *
+     * <b>Steps Performed:</b>
+     * <ul>
+     *   <li>Performs post-combat retirement checks on units and personnel within the campaign.</li>
+     *   <li>Automatically applies any awards or bonuses based on the scenario results using the tracker.</li>
+     *   <li>Restarts "rats" (any required campaign activities or background processes).</li>
+     *   <li>Cleans up temporary image files generated during the scenario.</li>
+     *   <li>Triggers a {@link ScenarioResolvedEvent} to notify the system about the scenario resolution.</li>
+     * </ul>
+     *
+     * <p>
+     * It is important to note that the {@code ScenarioResolvedEvent} is triggered before stopping any
+     * background threads to ensure that the {@code currentScenario} is still accessible at the time of the event.
+     * </p>
+     *
+     * @param campaignGUI The {@link CampaignGUI} instance used to manage UI interactions and
+     *                   display any necessary dialogs.
+     * @param campaign The {@link Campaign} instance containing the current state of the campaign
+     *                and its personnel.
+     * @param currentScenario The {@link Scenario} that has just been resolved.
+     * @param tracker The {@link ResolveScenarioTracker} containing the results and details of the
+     *               scenario resolution.
      */
     public static void handle(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario,
-                              ResolveScenarioTracker tracker, boolean control) {
+                              ResolveScenarioTracker tracker) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
         restartRats(campaign);

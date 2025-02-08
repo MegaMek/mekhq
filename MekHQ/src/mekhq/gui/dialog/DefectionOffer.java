@@ -29,7 +29,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public class DefectionOffer extends MHQDialogImmersive {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.DefectionOffer";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     public DefectionOffer(Campaign campaign, Person defector, boolean isBondsman) {
         super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign,
