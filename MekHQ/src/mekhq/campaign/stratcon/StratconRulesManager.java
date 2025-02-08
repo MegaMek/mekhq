@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1368,7 +1368,7 @@ public class StratconRulesManager {
     private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
@@ -2652,7 +2652,7 @@ public class StratconRulesManager {
     /**
      * Processes completion of a Stratcon scenario that is linked to another scenario
      * pulls forces off completed scenario and moves them to linked one.
-     * 
+     *
      * Should only be used after a scenario is resolved
      */
     public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
