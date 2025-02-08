@@ -80,15 +80,15 @@ public class GlossaryDialog extends JDialog {
     }
 
     /**
-     * Builds the Glossary Dialog by setting its title and description based on the key provided.
+     * Builds the Glossary Dialog by setting its title and definition based on the key provided.
      *
      * <p>
-     * This method fetches the title and description strings for the glossary term from the
+     * This method fetches the title and definition strings for the glossary term from the
      * resource bundle. If the title is invalid (i.e., the resource key is not found),
      * it logs an error and terminates the dialog building process.
      * </p>
      *
-     * @param key The resource key used to retrieve the glossary term's title and description.
+     * @param key The resource key used to retrieve the glossary term's title and definition.
      */
     private void buildDialog(String key) {
         String title = getFormattedTextAt(GLOSSARY_BUNDLE, key + ".title");
@@ -97,9 +97,9 @@ public class GlossaryDialog extends JDialog {
             return;
         }
 
-        String description = getFormattedTextAt(GLOSSARY_BUNDLE, key + ".description");
+        String description = getFormattedTextAt(GLOSSARY_BUNDLE, key + ".definition");
         if (!isResourceKeyValid(description)) {
-            logger.error("No valid description for {}", key);
+            logger.error("No valid definition for {}", key);
             return;
         }
 

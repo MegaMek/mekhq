@@ -403,6 +403,7 @@ public class Campaign implements ITechManager {
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
+
     }
 
     /**
