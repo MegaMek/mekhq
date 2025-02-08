@@ -30,6 +30,7 @@ MEKHQ VERSION HISTORY:
 + PR #6001: Added Glossary Functionality to MHQDialogImmersive with Clickable Hyperlink Support
 + PR #6004: Refactored Support Point Modification Method Name
 + PR #6005: Refactored Fatigue Modification Method Name
++ PR #6006: Added Shortcut Method to Check if a Unit is Battle Armor
 
 
 0.50.03 (2025-02-02 2030 UTC)
