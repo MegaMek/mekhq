@@ -52,9 +52,9 @@ public class GrayMonday {
 
         int daysAfterGrayMonday = (int) DAYS.between(EVENT_DATE_GRAY_MONDAY, today);
         if (daysAfterGrayMonday > 0 && daysAfterGrayMonday <= 4) {
-            boolean shouldShowDialog = daysAfterGrayMonday != 2;
+            boolean shouldShowDialog = daysAfterGrayMonday != 3;
 
-            if (daysAfterGrayMonday == 2) {
+            if (daysAfterGrayMonday == 3) {
                 for (AtBContract contract : campaign.getAtBContracts()) {
                     LocalDate startDate = contract.getStartDate();
                     if (!startDate.isBefore(today)) {
@@ -69,7 +69,7 @@ public class GrayMonday {
             }
         }
 
-        if (daysAfterGrayMonday == 1) {
+        if (daysAfterGrayMonday == 2) {
             Finances finances = campaign.getFinances();
             Money balance = finances.getBalance();
             Money adjustedBalance = balance.multipliedBy(0.01);
