@@ -23,6 +23,11 @@ MEKHQ VERSION HISTORY:
 + PR #5985: Fixed backwards "last compatible version" check
 + PR #5988: Feat: refactor flags to use EquipmentFlag instead
 + Fix #5987: local bots property empty on non-atb games #5989
++ Fix #5922: Fixed Off-by-One Error in Mass Training Dialog
++ PR #5993: Adjusted Gray Monday Employer Dialog to Trigger on the Correct Day
++ PR #5999: Fixed Clan Ghost Bear Greeting Keys
++ Fix #5979: Force players to use commit when deploying forces
++ PR #6001: Added Glossary Functionality to MHQDialogImmersive with Clickable Hyperlink Support
 
 
 0.50.03 (2025-02-02 2030 UTC)
