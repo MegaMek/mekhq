@@ -21,7 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.campaign.enums.Glossary;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
@@ -30,7 +30,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.campaign.utilities.glossary.GlossaryLibrary.GLOSSARY_COMMAND_STRING;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.GLOSSARY_COMMAND_STRING;
 
 /**
  * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries.
@@ -42,18 +42,13 @@ import static mekhq.campaign.utilities.glossary.GlossaryLibrary.GLOSSARY_COMMAND
  * interactions for related glossary entries. If a related term is clicked, a new {@code GlossaryDialog}
  * is opened to show its details.
  * </p>
- *
- * <p>
- * The dialog fetches glossary entries via the {@link Campaign} class and uses
- * {@link GlossaryEntry} objects to retrieve data for display.
- * </p>
  */
 public class GlossaryDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(GlossaryDialog.class);
 
     private final JDialog parent;
     private final Campaign campaign;
-    private final GlossaryEntry entry;
+    private Glossary entry;
 
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
     private int CENTER_HEIGHT = UIUtil.scaleForGUI(300);
@@ -74,12 +69,12 @@ public class GlossaryDialog extends JDialog {
     public GlossaryDialog(JDialog parent, Campaign campaign, String key) {
         this.parent = parent;
         this.campaign = campaign;
-        this.entry = campaign.getGlossaryEntry(key);
 
-        if (entry != null) {
+        try {
+            this.entry = Glossary.valueOf(key);
             parent.setVisible(false);
-            displayDialog(entry.title(), entry.description());
-        } else {
+            displayDialog(entry.getTitle(), entry.getDescription());
+        } catch (IllegalArgumentException e) {
             logger.error("No entry available for key {}", key);
         }
     }

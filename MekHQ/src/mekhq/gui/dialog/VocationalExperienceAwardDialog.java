@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
-import static mekhq.campaign.utilities.glossary.GlossaryLibrary.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**

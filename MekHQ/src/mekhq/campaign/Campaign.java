@@ -128,8 +128,6 @@ import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
-import mekhq.campaign.utilities.glossary.GlossaryLibrary;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -319,12 +317,6 @@ public class Campaign implements ITechManager {
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
 
-    // Libraries
-    // We deliberately don't write this data to the save file as we want it rebuilt every time the
-    // campaign loads. This ensures updates can be applied and there is no risk of bugs being
-    // permanently locked into the campaign file.
-    Map<String, GlossaryEntry> glossaryLibrary;
-
     /**
      * Represents the different types of administrative specializations.
      * Each specialization corresponds to a distinct administrative role
@@ -411,16 +403,6 @@ public class Campaign implements ITechManager {
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
-
-        // Library initialization
-        try {
-            glossaryLibrary = new GlossaryLibrary().getGlossaryEntries();
-        } catch (Exception e) {
-            // This ensures that if we fail to parse the glossary, for whatever reason,
-            // the campaign will still successfully initialize.
-            glossaryLibrary = new HashMap<>();
-        }
-
     }
 
     /**
@@ -5956,17 +5938,6 @@ public class Campaign implements ITechManager {
      */
     public void setAutomatedMothballUnits(List<Unit> automatedMothballUnits) {
         this.automatedMothballUnits = automatedMothballUnits;
-    }
-
-    /**
-     * Retrieves a glossary entry based on the provided key.
-     *
-     * @param key the unique identifier for the glossary entry to retrieve
-     * @return the {@code GlossaryEntry} object corresponding to the given key,
-     *         or {@code null} if no entry is found for the specified key
-     */
-    public @Nullable GlossaryEntry getGlossaryEntry(String key) {
-        return glossaryLibrary.get(key);
     }
 
     public void writeToXML(final PrintWriter pw) {

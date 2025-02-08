@@ -1,8 +1,0 @@
-entries:
-  # The map key used to retrieve the entry. This is the value included in the HTML hyperlink to
-  # fetch this particular glossary entry so must be unique.
-  EXAMPLE:
-    # This is the title of the entry, this will be displayed in the glossary dialog
-    title: "An Example Title"
-    # This is the specific description of the term that will be presented to the player
-    description: "This is an example entry. This text will be displayed to the user."
