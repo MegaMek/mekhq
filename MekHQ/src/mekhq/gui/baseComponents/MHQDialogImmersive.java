@@ -375,7 +375,7 @@ public class MHQDialogImmersive extends JDialog {
             buttonPanel.add(button, gbc);
 
             gbc.gridx++;
-            if (gbc.gridx % 4 == 0) { // Move to a new row after every forth button
+            if (gbc.gridx % 3 == 0) { // Move to a new row after every third button
                 gbc.gridx = 0;
                 gbc.gridy++;
             }

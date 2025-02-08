@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.randomEvents.personalities.enums.*;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.sorter.*;
@@ -530,16 +530,16 @@ public enum PersonnelTableModelColumn {
                         Unit refitUnit = person.getTechUnits().stream()
                             .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
                             .findFirst().orElse(null);
-                        String refitString = null != refitUnit ?
+                        String refitString = null != refitUnit ? 
                                 "<b>Refitting</b> " + refitUnit.getName() : "";
                         if (person.getTechUnits().size() == 1) {
                             unit = person.getTechUnits().get(0);
                             if (unit != null) {
-                                return "<html>" + ReportingUtilities.separateIf(refitString, ", ",
+                                return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
                                         unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") + "</html>";
                             }
                         } else {
-                            return "<html>" + ReportingUtilities.separateIf(refitString, ", ",
+                            return "<html>" + ReportingUtilities.separateIf(refitString, ", ", 
                                     person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)")
                                     + "</html>";
                         }
