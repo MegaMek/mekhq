@@ -683,7 +683,6 @@ public class StratconRulesManager {
      * @param scenario The {@link StratconScenario} being evaluated to determine if it is a Turning Point.
      */
     private static void determineIfTurningPointScenario(AtBContract contract, StratconScenario scenario) {
-        ScenarioTemplate template = scenario.getScenarioTemplate();
         ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
         boolean isResupply = scenarioType.isResupply();
         boolean isJailBreak = scenarioType.isJailBreak();
