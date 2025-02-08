@@ -37,6 +37,7 @@ import static java.lang.Math.max;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
+import static mekhq.gui.dialog.GlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -53,7 +54,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  */
 public class MHQDialogImmersive extends JDialog {
     private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     private Campaign campaign;
 

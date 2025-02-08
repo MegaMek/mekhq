@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.enums.Glossary;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
@@ -30,8 +29,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import static java.lang.Math.round;
+import static javax.swing.BorderFactory.createEmptyBorder;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.baseComponents.MHQDialogImmersive.GLOSSARY_COMMAND_STRING;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 /**
  * The {@code GlossaryDialog} class represents a dialog window for displaying glossary entries.
@@ -49,49 +50,59 @@ public class GlossaryDialog extends JDialog {
 
     private final JDialog parent;
     private final Campaign campaign;
-    private Glossary entry;
 
     private int CENTER_WIDTH = UIUtil.scaleForGUI(400);
     private int CENTER_HEIGHT = UIUtil.scaleForGUI(300);
     private int PADDING = UIUtil.scaleForGUI(10);
 
+    private final String GLOSSARY_BUNDLE = "mekhq.resources.Glossary";
+    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
+
     /**
-     * Constructs a new {@code GlossaryDialog} to display a glossary entry.
+     * Creates a new {@code GlossaryDialog} instance to display information about a glossary term.
      *
      * <p>
-     * If the glossary key does not correspond to an existing entry, an error is logged,
-     * and the dialog is not displayed.
+     * The dialog retrieves the glossary term's title and description using the provided key
+     * and displays the content in a styled format. During its construction, the parent dialog
+     * is hidden to ensure that only this dialog is visible to the user.
      * </p>
      *
-     * @param parent The parent {@code JDialog} to temporarily hide while this dialog is open.
-     * @param campaign The {@code Campaign} instance containing the glossary data.
-     * @param key The key for the glossary entry to display.
+     * @param parent The parent {@link JDialog} that is temporarily hidden while this dialog is displayed.
+     * @param campaign The {@link Campaign} object containing resources and glossary entries.
+     * @param key The unique identifier for the glossary term to be displayed.
      */
     public GlossaryDialog(JDialog parent, Campaign campaign, String key) {
         this.parent = parent;
         this.campaign = campaign;
 
-        try {
-            this.entry = Glossary.valueOf(key);
-            parent.setVisible(false);
-            displayDialog(entry.getTitle(), entry.getDescription());
-        } catch (IllegalArgumentException e) {
-            logger.error("No entry available for key {}", key);
-        }
+        parent.setVisible(false);
+        buildDialog(key);
     }
 
     /**
-     * Displays the glossary dialog with the given title and description.
+     * Builds the Glossary Dialog by setting its title and description based on the key provided.
      *
      * <p>
-     * The content is rendered using HTML in a {@link JEditorPane}, allowing for styled text
-     * and clickable hyperlinks. The dialog also provides a scrollable view for long content.
+     * This method fetches the title and description strings for the glossary term from the
+     * resource bundle. If the title is invalid (i.e., the resource key is not found),
+     * it logs an error and terminates the dialog building process.
      * </p>
      *
-     * @param title The title of the glossary entry.
-     * @param description The detailed description of the glossary entry.
+     * @param key The resource key used to retrieve the glossary term's title and description.
      */
-    private void displayDialog(String title, String description) {
+    private void buildDialog(String key) {
+        String title = getFormattedTextAt(GLOSSARY_BUNDLE, key + ".title");
+        if (!isResourceKeyValid(title)) {
+            logger.error("No valid title for {}", key);
+            return;
+        }
+
+        String description = getFormattedTextAt(GLOSSARY_BUNDLE, key + ".description");
+        if (!isResourceKeyValid(description)) {
+            logger.error("No valid description for {}", key);
+            return;
+        }
+
         setTitle(title);
 
         // Create a JEditorPane for the message
@@ -105,8 +116,7 @@ public class GlossaryDialog extends JDialog {
         editorPane.setText(String.format(
             "<div style='width: %s; %s'>"
                 + "<h1 style='text-align: center;'>%s</h1>"
-                + "<p>%s</p>"
-                + "</div>",
+                + "%s</div>",
             CENTER_WIDTH, fontStyle, title, description
         ));
         setFontScaling(editorPane, false, 1.1);
@@ -124,7 +134,7 @@ public class GlossaryDialog extends JDialog {
 
         // Create a JPanel with padding
         JPanel paddedPanel = new JPanel(new BorderLayout());
-        paddedPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        paddedPanel.setBorder(createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         paddedPanel.add(scrollPane, BorderLayout.CENTER);
         add(paddedPanel);
 

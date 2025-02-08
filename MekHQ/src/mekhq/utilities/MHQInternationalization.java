@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * It makes use of some short names to make it easier to use since it is used in many places
  */
 public class MHQInternationalization {
+    private static String MISSING_RESOURCE_TAG = "!";
 
     private final String defaultBundle;
     private final ConcurrentHashMap<String, ResourceBundle> resourceBundles = new ConcurrentHashMap<>();
@@ -82,7 +83,7 @@ public class MHQInternationalization {
         if (getInstance().getResourceBundle(bundleName).containsKey(key)) {
             return getInstance().getResourceBundle(bundleName).getString(key);
         }
-        return "!" + key + "!";
+        return MISSING_RESOURCE_TAG + key + MISSING_RESOURCE_TAG;
     }
 
     /**
@@ -115,4 +116,22 @@ public class MHQInternationalization {
         return MessageFormat.format(getTextAt(bundleName, key), args);
     }
 
+
+
+    /**
+     * Checks if the given text is valid. A valid string does not start or end with an exclamation
+     * mark ('!').
+     *
+     * <p>If {@link MHQInternationalization} fails to fetch a valid return it returns the key
+     * between two {@code !}. So by checking the returned string doesn't begin and end with that
+     * punctuation, we can easily verify that all statuses have been provided results for the key
+     * s we're using.</p>
+     *
+     * @param text The text to validate.
+     * @return {@code true} if the text is valid (does not start or end with an '!'); {@code false}
+     * otherwise.
+     */
+    public static boolean isResourceKeyValid(String text) {
+        return !text.startsWith(MISSING_RESOURCE_TAG) && !text.endsWith(MISSING_RESOURCE_TAG);
+    }
 }
