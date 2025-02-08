@@ -26,18 +26,19 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.GlossaryDialog;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent.EventType;
 import java.awt.*;
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.Math.max;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.campaign.force.Force.FORCE_NONE;
-import static mekhq.gui.dialog.GlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -54,6 +55,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  */
 public class MHQDialogImmersive extends JDialog {
     private final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
+    public final static String PERSON_COMMAND_STRING = "PERSON";
 
     private Campaign campaign;
 
@@ -224,7 +227,7 @@ public class MHQDialogImmersive extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
-                handleHyperlinkClick(campaign, evt.getDescription());
+                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
             }
         });
 
@@ -250,19 +253,45 @@ public class MHQDialogImmersive extends JDialog {
     }
 
     /**
-     * Handles hyperlink clicks from HTML content.
+     * Handles hyperlink clicks from HTML content dialog.
      *
-     * @param campaign The {@link Campaign} instance that contains relevant data.
-     * @param reference The hyperlink reference (e.g., a specific identifier).
+     * <p>
+     * This method processes the provided hyperlink reference to determine the type of command
+     * and executes the appropriate action. It supports commands for displaying a glossary
+     * entry or focusing on a specific person in the campaign.
+     * </p>
+     *
+     * <b>Supported Commands:</b>
+     * <ul>
+     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link GlossaryDialog} to display the
+     *   referenced glossary entry.</li>
+     *   <li>{@code PERSON_COMMAND_STRING}: Focuses on a specific person in the campaign using
+     *   their unique identifier (UUID). If using this, you will need to ensure your dialog has
+     *   modal set to {@code false}</li>
+     * </ul>
+     *
+     * <p>
+     * If the command is not recognized, no action is performed.
+     * </p>
+     *
+     * @param parent The parent {@link JDialog} instance to associate with the new dialog, if created.
+     * @param campaign The {@link Campaign} instance that contains application and campaign data.
+     * @param reference The hyperlink reference used to determine the command and additional
+     *                 information (e.g., a specific glossary term key or a person's UUID).
      */
-    protected void handleHyperlinkClick(Campaign campaign, String reference) {
+    public static void handleImmersiveHyperlinkClick(JDialog parent, Campaign campaign, String reference) {
         String[] splitReference = reference.split(":");
 
         String commandKey = splitReference[0];
         String entryKey = splitReference[1];
 
         if (commandKey.equals(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, campaign, entryKey);
+            new GlossaryDialog(parent, campaign, entryKey);
+        } else if (commandKey.equals(PERSON_COMMAND_STRING)) {
+            CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
+
+            final UUID id = UUID.fromString(reference.split(":")[1]);
+            campaignGUI.focusOnPerson(id);
         }
     }
 
@@ -299,7 +328,7 @@ public class MHQDialogImmersive extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
-                handleHyperlinkClick(campaign, evt.getDescription());
+                handleImmersiveHyperlinkClick(this, campaign, evt.getDescription());
             }
         });
 

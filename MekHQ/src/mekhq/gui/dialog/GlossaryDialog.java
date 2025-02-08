@@ -31,6 +31,7 @@ import java.awt.event.WindowEvent;
 import static java.lang.Math.round;
 import static javax.swing.BorderFactory.createEmptyBorder;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
+import static mekhq.gui.baseComponents.MHQDialogImmersive.handleImmersiveHyperlinkClick;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
@@ -56,7 +57,6 @@ public class GlossaryDialog extends JDialog {
     private int PADDING = UIUtil.scaleForGUI(10);
 
     private final String GLOSSARY_BUNDLE = "mekhq.resources.Glossary";
-    public final static String GLOSSARY_COMMAND_STRING = "GLOSSARY";
 
     /**
      * Creates a new {@code GlossaryDialog} instance to display information about a glossary term.
@@ -124,7 +124,7 @@ public class GlossaryDialog extends JDialog {
         // Add a HyperlinkListener to capture hyperlink clicks
         editorPane.addHyperlinkListener(evt -> {
             if (evt.getEventType() == EventType.ACTIVATED) {
-                handleHyperlinkClick(campaign, evt.getDescription());
+                handleImmersiveHyperlinkClick(parent, campaign, evt.getDescription());
             }
         });
 
@@ -165,28 +165,5 @@ public class GlossaryDialog extends JDialog {
     private void onCloseAction() {
         dispose();
         parent.setVisible(true);
-    }
-
-    /**
-     * Handles hyperlink clicks from the HTML content displayed in the glossary dialog.
-     *
-     * <p>
-     * If the hyperlink points to another glossary term (via the {@code GLOSSARY} command),
-     * a new {@code GlossaryDialog} is opened for the referenced term.
-     * </p>
-     *
-     * @param campaign The {@link Campaign} instance containing glossary data.
-     * @param reference The hyperlink reference string. Expected to be in the format
-     *                  {@code GL_COMMAND:termKey}.
-     */
-    private void handleHyperlinkClick(Campaign campaign, String reference) {
-        String[] splitReference = reference.split(":");
-
-        String commandKey = splitReference[0];
-        String entryKey = splitReference[1];
-
-        if (commandKey.equals(GLOSSARY_COMMAND_STRING)) {
-            new GlossaryDialog(this, campaign, entryKey);
-        }
     }
 }
