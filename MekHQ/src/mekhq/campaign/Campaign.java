@@ -129,8 +129,6 @@ import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
-import mekhq.campaign.utilities.glossary.GlossaryEntry;
-import mekhq.campaign.utilities.glossary.GlossaryLibrary;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.sorter.PersonTitleSorter;
@@ -322,11 +320,10 @@ public class Campaign implements ITechManager {
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
 
-    // Random Events
+    // Libraries
     // We deliberately don't write this data to the save file as we want it rebuilt every time the
     // campaign loads. This ensures updates can be applied and there is no risk of bugs being
     // permanently locked into the campaign file.
-    Map<String, GlossaryEntry> glossaryLibrary;
     RandomEventLibraries randomEventLibraries;
 
     /**
@@ -418,15 +415,8 @@ public class Campaign implements ITechManager {
         ignoreSparesUnderQuality = QUALITY_A;
 
         // Library initialization
-        // These try-catches ensures that if we fail to parse the library, for whatever reason,
-        // the campaign will still successfully initialize.
-        try {
-            glossaryLibrary = new GlossaryLibrary().getGlossaryEntries();
-        } catch (Exception e) {
-            glossaryLibrary = new HashMap<>();
-        }
-
         randomEventLibraries = new RandomEventLibraries();
+
     }
 
     /**
@@ -6050,17 +6040,6 @@ public class Campaign implements ITechManager {
 
     public RandomEventLibraries getRandomEventLibraries() {
         return randomEventLibraries;
-    }
-
-    /**
-     * Retrieves a glossary entry based on the provided key.
-     *
-     * @param key the unique identifier for the glossary entry to retrieve
-     * @return the {@code GlossaryEntry} object corresponding to the given key,
-     *         or {@code null} if no entry is found for the specified key
-     */
-    public @Nullable GlossaryEntry getGlossaryEntry(String key) {
-        return glossaryLibrary.get(key);
     }
 
     public void writeToXML(final PrintWriter pw) {
