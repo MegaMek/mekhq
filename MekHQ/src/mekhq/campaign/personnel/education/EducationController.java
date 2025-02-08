@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.randomEvents.personalities.enums.Intelligence;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 import mekhq.utilities.ReportingUtilities;
 
 import java.time.DayOfWeek;

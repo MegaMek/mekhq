@@ -468,7 +468,7 @@ public final class InjuryUtil {
                             // TODO: Disabled, too much spam
                             /*
                             LogEntry entry = new LogEntry(c.getDate(),
-                                String.format("%s worsened its condition due to lack of proper medical attention", i.getLabel()), Person.LOGTYPE_MEDICAL);
+                                String.format("%s worsened its condition due to lack of proper medical attention", i.getName()), Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
                             */
                         }
