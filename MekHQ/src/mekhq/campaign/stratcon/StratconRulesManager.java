@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1224,7 +1224,7 @@ public class StratconRulesManager {
             StratconCampaignState campaignState, boolean isStartOfMonth) {
         for (StratconFacility facility : track.getFacilities().values()) {
             if (isStartOfMonth) {
-                campaignState.addSupportPoints(facility.getMonthlySPModifier());
+                campaignState.changeSupportPoints(facility.getMonthlySPModifier());
             }
         }
     }
@@ -2652,7 +2652,7 @@ public class StratconRulesManager {
     /**
      * Processes completion of a Stratcon scenario that is linked to another scenario
      * pulls forces off completed scenario and moves them to linked one.
-     * 
+     *
      * Should only be used after a scenario is resolved
      */
     public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -131,8 +131,20 @@ public class StratconCampaignState {
         return supportPoints;
     }
 
-    public void addSupportPoints(int number) {
-        supportPoints += number;
+    /**
+     * Modifies the current support points by the specified amount.
+     *
+     * <p>
+     * This method increases or decreases the support points by the given number.
+     * It adds the value of {@code change} to the existing support points total.
+     * This can be used to reflect changes due to various gameplay events or actions.
+     * </p>
+     *
+     * @param change The amount to adjust the support points by. Positive values will
+     *               increase the support points, while negative values will decrease them.
+     */
+    public void changeSupportPoints(int change) {
+        supportPoints += change;
     }
 
     public void setSupportPoints(int supportPoints) {
