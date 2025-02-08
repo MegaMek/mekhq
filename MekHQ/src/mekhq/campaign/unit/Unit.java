@@ -6044,6 +6044,22 @@ public class Unit implements ITechnology {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
     }
 
+    /**
+     * Checks if the associated entity is classified as battle armor.
+     *
+     * <p>
+     * This method determines whether the entity linked to this object is
+     * considered battle armor. It first verifies that the entity is not null,
+     * and then checks if the entity meets the criteria for battle armor.
+     * </p>
+     *
+     * @return {@code true} if the entity is classified as battle armor and is not null,
+     *         otherwise {@code false}.
+     */
+    public boolean isBattleArmor() {
+        return (getEntity() != null) && getEntity().isBattleArmor();
+    }
+
     public boolean isIntroducedBy(int year) {
         return null != entity && entity.getYear() <= year;
     }
