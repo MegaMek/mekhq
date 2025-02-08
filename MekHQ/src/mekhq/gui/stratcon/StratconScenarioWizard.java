@@ -117,17 +117,17 @@ public class StratconScenarioWizard extends JDialog {
      * @param trackState     the {@link StratconTrackState} representing the state of the scenario's track.
      * @param campaignState  the {@link StratconCampaignState} representing the state of the overall campaign.
      * @param isPrimaryForce a boolean flag indicating whether the primary force is being assigned for this scenario.
-     *                                             <ul>
-     *                                               <li>{@code true}: Indicates that the primary force is being deployed.</li>
-     *                                               <li>{@code false}: Indicates that the scenario is being configured without primary force assignment.</li>
-     *                                             </ul>
-     *
-     *                       <p>Functionality and Process:</p>
      *                       <ul>
-     *                         <li>Sets the provided scenario as the {@code currentScenario}.</li>
-     *                         <li>Updates the {@link StratconCampaignState}, {@link StratconTrackState}, and clears previous force/unit lists.</li>
-     *                         <li>Initializes the user interface by calling {@link #setUI(boolean)}, passing the {@code isPrimaryForce} parameter.</li>
+     *                         <li>{@code true}: Indicates that the primary force is being deployed.</li>
+     *                         <li>{@code false}: Indicates that the scenario is being configured without primary force assignment.</li>
      *                       </ul>
+     *
+     * <p>Functionality and Process:</p>
+     * <ul>
+     *   <li>Sets the provided scenario as the {@code currentScenario}.</li>
+     *   <li>Updates the {@link StratconCampaignState}, {@link StratconTrackState}, and clears previous force/unit lists.</li>
+     *   <li>Initializes the user interface by calling {@link #setUI(boolean)}, passing the {@code isPrimaryForce} parameter.</li>
+     * </ul>
      */
     public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState,
             StratconCampaignState campaignState, boolean isPrimaryForce) {
@@ -684,7 +684,6 @@ public class StratconScenarioWizard extends JDialog {
         btnCancel.addActionListener(evt -> closeWizard());
         btnCancel.setEnabled(true);
 
-
         // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
         constraints.anchor = GridBagConstraints.CENTER;
@@ -701,7 +700,6 @@ public class StratconScenarioWizard extends JDialog {
 
             contentPanel.add(new JLabel(instructions), constraints);
         }
-
 
         // Allign and add cancel button to the content panel
         constraints.gridy++;
@@ -993,7 +991,7 @@ public class StratconScenarioWizard extends JDialog {
 
         currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
 
-        if (currentScenario.getCurrentState().ordinal() <= REINFORCEMENTS_COMMITTED.ordinal()) {
+        if (currentScenario.getCurrentState().ordinal() < REINFORCEMENTS_COMMITTED.ordinal()) {
             translateTemplateObjectives(currentScenario.getBackingScenario(), campaign);
             scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
         }
