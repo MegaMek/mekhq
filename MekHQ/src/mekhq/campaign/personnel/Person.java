@@ -1593,8 +1593,20 @@ public class Person {
         this.fatigue = fatigue;
     }
 
-    public void changeFatigue(final int fatigue) {
-        this.fatigue = this.fatigue + fatigue;
+    /**
+     * Adjusts the current fatigue level by the specified amount.
+     *
+     * <p>
+     * This method modifies the fatigue level by adding the value of {@code change}
+     * to the current fatigue. Positive values will increase the fatigue, while
+     * negative values will decrease it.
+     * </p>
+     *
+     * @param change The amount to adjust the fatigue by. Positive values increase fatigue,
+     *               and negative values decrease it.
+     */
+    public void changeFatigue(final int change) {
+        this.fatigue = this.fatigue + change;
     }
 
     public boolean getIsRecoveringFromFatigue() {
