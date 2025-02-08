@@ -120,7 +120,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
-    private List<Force> pendingDeployments = new ArrayList<Force>();
+    private boolean commitForces = false;
 
     /**
      * Constructs a StratconPanel instance, given a parent campaign GUI and a
@@ -1053,16 +1053,17 @@ public class StratconPanel extends JPanel implements ActionListener {
                         isPrimaryForce = true;
                     }
                 }
-                if (selectedScenario != null) {
+                if (selectedScenario != null &&  selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
                     scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
                         currentTrack, campaignState, isPrimaryForce);
 
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
                 }
-                setPendingDeployments(new ArrayList<>());
+                if (selectedScenario != null && !isCommitForces()) {
+                    selectedScenario.resetScenario(campaign);
+                }
                 break;
-            // Deliberate fall-through
             case RCLICK_COMMAND_MANAGE_SCENARIO:
                 // It's possible a scenario may have been placed when deploying the force, so we
                 // need to recheck
@@ -1118,6 +1119,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (scenarioToReset != null) {
                     scenarioToReset.resetScenario(campaign);
                 }
+
+                setCommitForces(false);
                 break;
         }
 
@@ -1136,21 +1139,11 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
     }
 
-    public List<Force> getPendingDeployments() {
-        return pendingDeployments;
+    public boolean isCommitForces() {
+        return commitForces;
     }
 
-    public void setPendingDeployments(List<Force> pendingDeployments) {
-        this.pendingDeployments = pendingDeployments;
-    }
-
-    public void processPendingDeployments() {
-
-        for (Force force : getPendingDeployments()) {
-            StratconRulesManager.deployForceToCoords(getSelectedCoords(),
-                force.getId(), campaign, campaignState.getContract(), getCurrentTrack(), false);
-        }
-
-        setPendingDeployments(new ArrayList<>());
+    public void setCommitForces(boolean commitForces) {
+        this.commitForces = commitForces;
     }
 }

@@ -114,8 +114,10 @@ public class TrackForceAssignmentUI extends JDialog implements ActionListener {
             // sometimes the scenario templates take a little while to load, we don't want the user
             // clicking the button fifty times and getting a bunch of scenarios.
             btnConfirm.setEnabled(false);
-
-            ownerPanel.setPendingDeployments(availableForceList.getSelectedValuesList());
+            for (Force force : availableForceList.getSelectedValuesList()) {
+                StratconRulesManager.deployForceToCoords(ownerPanel.getSelectedCoords(),
+                    force.getId(), campaign, currentCampaignState.getContract(), ownerPanel.getCurrentTrack(), false);
+            }
             setVisible(false);
             ownerPanel.repaint();
             btnConfirm.setEnabled(true);

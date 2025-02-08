@@ -413,12 +413,10 @@ public class Force {
      * @return all the unit ids in this force and all of its subforces
      */
     public Vector<UUID> getAllUnits(boolean standardForcesOnly) {
-        Vector<UUID> allUnits;
+        Vector<UUID> allUnits = new Vector<>();
 
-        if (standardForcesOnly && forceType.isStandard()) {
-            allUnits = new Vector<>();
-        } else {
-            allUnits = new Vector<>(units);
+        if (!standardForcesOnly || forceType.isStandard()) {
+            allUnits.addAll(units);
         }
 
         for (Force force : subForces) {
