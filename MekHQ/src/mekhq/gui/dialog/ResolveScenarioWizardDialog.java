@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.*;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
+import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
 
 /**
  * @author Taharqa

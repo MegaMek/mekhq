@@ -48,7 +48,7 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
+import static mekhq.campaign.rating.CamOpsReputation.CommandRating.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;

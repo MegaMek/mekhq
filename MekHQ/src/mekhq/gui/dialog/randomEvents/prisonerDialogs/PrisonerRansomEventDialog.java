@@ -43,23 +43,6 @@ public class PrisonerRansomEventDialog extends MHQDialogImmersive {
         setAlwaysOnTop(true);
     }
 
-    /**
-     * Handles the hyperlink click event in the dialog.
-     *
-     * <p>This method parses the hyperlink reference to focus on the personnel record identified by
-     * the provided UUID in the campaign's graphical user interface.</p>
-     *
-     * @param campaign the {@link Campaign} containing relevant personnel data
-     * @param hyperlinkReference     the hyperlink reference containing the UUID of the selected character
-     */
-    @Override
-    protected void handleHyperlinkClick(Campaign campaign, String hyperlinkReference) {
-        CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
-
-        final UUID id = UUID.fromString(hyperlinkReference.split(":")[1]);
-        campaignGUI.focusOnPerson(id);
-    }
-
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnDecline = new ButtonLabelTooltipPair(
             getFormattedTextAt(RESOURCE_BUNDLE, "decline.button"), null);
