@@ -1368,7 +1368,7 @@ public class StratconRulesManager {
     private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
