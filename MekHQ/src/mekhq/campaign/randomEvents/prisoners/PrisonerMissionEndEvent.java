@@ -30,6 +30,7 @@ import mekhq.gui.dialog.MissionEndPrisonerDialog;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.finances.enums.TransactionType.RANSOM;
@@ -57,7 +58,7 @@ public class PrisonerMissionEndEvent {
     private boolean isSuccess;
     private boolean isAllied;
 
-    private final int GOOD_EVENT_CHANCE = 20;
+    final static int GOOD_EVENT_CHANCE = 20;
 
     private final int CHOICE_ACCEPTED = 0;
     private final int CHOICE_RELEASE_THEM = 1;
@@ -105,7 +106,9 @@ public class PrisonerMissionEndEvent {
 
         List<Person> prisoners = isAllied ? campaign.getFriendlyPrisoners() : campaign.getCurrentPrisoners();
         Money ransom = getRansom(prisoners);
-        boolean isGoodEvent = determineGoodEvent(isAllied);
+
+        int goodEventChance = determineGoodEventChance(isAllied);
+        boolean isGoodEvent = randomInt(goodEventChance) > 0;
 
         MissionEndPrisonerDialog dialog = new MissionEndPrisonerDialog(campaign, ransom, isAllied,
             isSuccess, isGoodEvent);
@@ -120,18 +123,16 @@ public class PrisonerMissionEndEvent {
      * @param isAllied {@code true} if the prisoners are allied POWs, {@code false} otherwise.
      * @return {@code true} if the event is classified as a "good event," {@code false} otherwise.
      */
-    private boolean determineGoodEvent(boolean isAllied) {
+    int determineGoodEventChance(boolean isAllied) {
         if (isAllied) {
             LocalDate lastCrime = campaign.getDateOfLastCrime();
             if (lastCrime != null && lastCrime.isAfter(contract.getStartDate().minusDays(1))) {
                 // Adjust the chance of a good event based on crime rating
-                int adjustedChance = GOOD_EVENT_CHANCE - campaign.getAdjustedCrimeRating();
-
-                return adjustedChance >= 1 && randomInt(adjustedChance) != 0;
+                return max(1, GOOD_EVENT_CHANCE - campaign.getAdjustedCrimeRating());
             }
         }
         // Default chance for goodEvent (used for both non-allied and no recent crimes in allied)
-        return randomInt(GOOD_EVENT_CHANCE) != 0;
+        return GOOD_EVENT_CHANCE;
     }
 
     /**
@@ -140,12 +141,14 @@ public class PrisonerMissionEndEvent {
      * @param alliedPoWs The list of prisoners for whom the ransom is calculated.
      * @return The total ransom as {@link Money}.
      */
-    private Money getRansom(List<Person> alliedPoWs) {
+    Money getRansom(List<Person> alliedPoWs) {
         Money alliedRansom = Money.zero();
+
         for (Person person : alliedPoWs) {
             Money ransomValue = person.getRansomValue(campaign);
             alliedRansom = alliedRansom.plus(ransomValue);
         }
+
         return alliedRansom;
     }
 

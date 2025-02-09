@@ -85,8 +85,8 @@ import static java.lang.Math.abs;
  */
 public class Person {
     // region Variable Declarations
-    private static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
-    private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
+    public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
+    public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
     private PersonAwardController awardController;
 
