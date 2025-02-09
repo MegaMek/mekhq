@@ -173,6 +173,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
@@ -409,7 +410,7 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
-        temporaryPrisonerCapacity = 100;
+        temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;

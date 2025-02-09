@@ -19,6 +19,7 @@
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -43,8 +44,7 @@ import java.util.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
+import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.force.ForceType.SECURITY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -77,6 +77,9 @@ public class PrisonerEventManager {
     private final int MINIMUM_PRISONER_COUNT = 25;
     private final int RESPONSE_TARGET_NUMBER = 7;
 
+    public static final int DEFAULT_TEMPORARY_CAPACITY = 100;
+    public static final double TEMPORARY_CAPACITY_DEGRADE_RATE = 0.1;
+
     // Fixed Dialog Options
     private final int CHOICE_FREE = 1;
     private final int CHOICE_EXECUTE = 2;
@@ -100,21 +103,14 @@ public class PrisonerEventManager {
         this.speaker = getSpeaker();
 
         LocalDate today = campaign.getLocalDate();
+        boolean isFirstOfMonth = today.getDayOfMonth() == 1;
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        boolean isFortnight = isMonday && (today.get(WEEK_OF_WEEK_BASED_YEAR) % 2 == 0);
 
         // we have this here, as we still want Temporary Capacity to degrade even if the MeKHQ
         // capture style isn't being used.
-        int temporaryCapacityModifier = campaign.getTemporaryPrisonerCapacity();
-
-        if (temporaryCapacityModifier != 100 && today.getDayOfMonth() == 1) {
-            int degreeOfChange = (int) round(temporaryCapacityModifier * 0.1);
-
-            if (temporaryCapacityModifier < 100) {
-                temporaryCapacityModifier += degreeOfChange;
-                campaign.setTemporaryPrisonerCapacity(min(100, temporaryCapacityModifier));
-            } else {
-                temporaryCapacityModifier -= degreeOfChange;
-                campaign.setTemporaryPrisonerCapacity(max(100, temporaryCapacityModifier));
-            }
+        if (isFirstOfMonth) {
+            degradeTemporaryCapacity();
         }
 
         if (campaign.getCurrentPrisoners().isEmpty()) {
@@ -126,58 +122,129 @@ public class PrisonerEventManager {
         }
 
         // Monthly events
-        if (today.getDayOfMonth() == 1) {
-            // Check for ransom events
-            if (campaign.hasActiveContract()) {
-                Contract contract = campaign.getActiveContracts().get(0);
+        if (isFirstOfMonth) {
+            checkForRansomEvents();
+        }
 
-                int ransomEventChance = DEFAULT_EVENT_CHANCE;
-                if (contract instanceof AtBContract) {
-                    ransomEventChance = ((AtBContract) contract).getMoraleLevel().ordinal();
-                }
+        // Fortnightly events
+        if (isMonday && isFortnight) {
+            checkForPrisonerEvents(false);
+        }
+    }
 
-                int roll = d6(2);
-                if (roll <= ransomEventChance) {
-                    boolean isFriendlyPOWs = false;
+    /**
+     * Adjusts the temporary prisoner capacity for the given campaign by degrading it.
+     *
+     * <p>This method modifies the campaign's temporary prisoner capacity based on a percentage of
+     * the current value. It ensures that the capacity moves closer to a default value, either
+     * increasing or decreasing depending on the current capacity modifier's position relative to
+     * the default.</p>
+     *
+     * @return The updated temporary capacity modifier after the adjustment has been applied.
+     */
+    int degradeTemporaryCapacity() {
+        int temporaryCapacityModifier = campaign.getTemporaryPrisonerCapacity();
+        int newCapacity = 0;
 
-                    if (!campaign.getFriendlyPrisoners().isEmpty()) {
-                        isFriendlyPOWs = d6(1) <= 2;
-                    }
+        if (temporaryCapacityModifier != DEFAULT_TEMPORARY_CAPACITY) {
+            int degreeOfChange = (int) round(temporaryCapacityModifier * TEMPORARY_CAPACITY_DEGRADE_RATE);
 
-                    new PrisonerRansomEvent(campaign, isFriendlyPOWs);
-                }
+            if (temporaryCapacityModifier < DEFAULT_TEMPORARY_CAPACITY) {
+                temporaryCapacityModifier += degreeOfChange;
+                newCapacity = min(DEFAULT_TEMPORARY_CAPACITY, temporaryCapacityModifier);
+
+                campaign.setTemporaryPrisonerCapacity(newCapacity);
+            } else {
+                temporaryCapacityModifier -= degreeOfChange;
+                newCapacity = max(DEFAULT_TEMPORARY_CAPACITY, temporaryCapacityModifier);
+
+                campaign.setTemporaryPrisonerCapacity(newCapacity);
             }
         }
 
-        // Weekly events
-        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-            int totalPrisoners = campaign.getCurrentPrisoners().size();
-            int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
-            int prisonerCapacity = calculatePrisonerCapacity(campaign);
+        return newCapacity;
+    }
 
-            int overflow = prisonerCapacityUsage - prisonerCapacity;
+    /**
+     * Checks for ransom-related events in the given campaign. This method determines if a ransom
+     * event is triggered and whether friendly prisoners of war (POWs) are involved.
+     *
+     * @return A list of two boolean values where the first element indicates if an event
+     *         was triggered, and the second element specifies if the event involves friendly POWs.
+     */
+    List<Boolean> checkForRansomEvents() {
+        boolean eventTriggered = false;
+        boolean isFriendlyPOWs = false;
 
-            if (overflow <= 0) {
-                // No risk of event
-                return;
+        // Check for ransom events
+        if (campaign.hasActiveContract()) {
+            Contract contract = campaign.getActiveContracts().get(0);
+
+            int ransomEventChance = DEFAULT_EVENT_CHANCE;
+            if (contract instanceof AtBContract) {
+                ransomEventChance = ((AtBContract) contract).getMoraleLevel().ordinal();
             }
 
-            boolean minorEvent = randomInt(100) < overflow;
-            // Does the minor event escalate into a major event?
-            boolean majorEvent = minorEvent
-                && (totalPrisoners > MINIMUM_PRISONER_COUNT)
-                && (randomInt(100) < overflow);
+            int roll = d6(2);
+            if (roll <= ransomEventChance) {
+                if (!campaign.getFriendlyPrisoners().isEmpty()) {
+                    // We use randomInt here as it allows us better control over the return values
+                    // when testing.
+                    isFriendlyPOWs = randomInt(6) <= 1;
+                }
 
-            // If there is no event, throw up a warning and give the player an opportunity to do
-            // something about the situation.
-            if (!minorEvent) {
+                eventTriggered = true;
+                new PrisonerRansomEvent(campaign, isFriendlyPOWs);
+            }
+        }
+
+        return List.of(eventTriggered, isFriendlyPOWs);
+    }
+
+    /**
+     * Checks for events related to prisoner overflow in the campaign.
+     *
+     * <p>This method determines whether a minor or major prisoner-related event occurs based on
+     * the current prisoner capacity, usage, and overflow. If there is no event, a warning may be
+     * processed.
+     *
+     * @param isHeadless A boolean value indicating whether the process is running without a user
+     *                  interface. Allows Unit Tests to bypass the GUI prompts created by this method.
+     * @return A list of two boolean values: The first element indicates whether a minor event
+     * occurred. The second element indicates whether a major event occurred.
+     */
+    List<Boolean> checkForPrisonerEvents(boolean isHeadless) {
+        int totalPrisoners = campaign.getCurrentPrisoners().size();
+        int prisonerCapacityUsage = calculatePrisonerCapacityUsage(campaign);
+        int prisonerCapacity = calculatePrisonerCapacity(campaign);
+
+        int overflow = prisonerCapacityUsage - prisonerCapacity;
+
+        if (overflow <= 0) {
+            // No risk of event
+            return List.of(false, false);
+        }
+
+        boolean minorEvent = randomInt(100) < overflow;
+        // Does the minor event escalate into a major event?
+        boolean majorEvent = minorEvent
+            && (totalPrisoners > MINIMUM_PRISONER_COUNT)
+            && (randomInt(100) < overflow);
+
+        // If there is no event, throw up a warning and give the player an opportunity to do
+        // something about the situation.
+        if (!minorEvent) {
+            if (!isHeadless) {
                 processWarning(overflow);
-                return;
             }
+            return List.of(false, false);
+        }
 
-            // Random Event
+        // Random Event
+        if (!isHeadless) {
             processRandomEvent(majorEvent);
         }
+        return List.of(minorEvent, majorEvent);
     }
 
     /**
@@ -333,7 +400,7 @@ public class PrisonerEventManager {
      */
     public static void processAdHocExecution(Campaign campaign, int victims) {
         // Did the execution backfire?
-        int backfireRoll = d6(1);
+        int backfireRoll = Compute.d6(1);
         boolean hasBackfired = backfireRoll == 1;
 
         if (hasBackfired) {
@@ -343,7 +410,7 @@ public class PrisonerEventManager {
         }
 
         // Was the crime noticed?
-        int crimeNoticeRoll = randomInt(100);
+        int crimeNoticeRoll = Compute.randomInt(100);
         boolean crimeNoticed = crimeNoticeRoll < victims;
 
         int penalty = min(MAX_CRIME_PENALTY, victims * 2);
@@ -512,5 +579,31 @@ public class PrisonerEventManager {
         } else {
             return speaker;
         }
+    }
+
+    /**
+     * Generates a random integer between 0 (inclusive) and the specified maximum value (exclusive).
+     *
+     * <p>This method exists to assist testing. As it allows us to easily override the return
+     * value.</p>
+     *
+     * @param maxValue The upper bound (exclusive) for the random integer. Must be greater than 0.
+     * @return A randomly generated integer in the range [0, (maxValue - 1)].
+     */
+    protected int randomInt(int maxValue) {
+        return Compute.randomInt(maxValue);
+    }
+
+    /**
+     * Rolls a specified number of six-sided dice and computes the total.
+     *
+     * <p>This method exists to assist testing. As it allows us to easily override the return
+     * value.</p>
+     *
+     * @param dice The number of six-sided dice to roll. Must be a non-negative integer.
+     * @return The total result of the rolled dice.
+     */
+    protected int d6(int dice) {
+        return Compute.d6(dice);
     }
 }
