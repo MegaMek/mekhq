@@ -1053,6 +1053,10 @@ public class StratconPanel extends JPanel implements ActionListener {
                         isPrimaryForce = true;
                     }
                 }
+
+                // Let's reload the scenario in case it updated
+                selectedScenario = currentTrack.getScenario(selectedCoords);
+
                 if (selectedScenario != null &&  selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
                     scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
                         currentTrack, campaignState, isPrimaryForce);
@@ -1063,6 +1067,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (selectedScenario != null && !isCommitForces()) {
                     selectedScenario.resetScenario(campaign);
                 }
+
+                setCommitForces(false);
                 break;
             case RCLICK_COMMAND_MANAGE_SCENARIO:
                 // It's possible a scenario may have been placed when deploying the force, so we
@@ -1119,8 +1125,6 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (scenarioToReset != null) {
                     scenarioToReset.resetScenario(campaign);
                 }
-
-                setCommitForces(false);
                 break;
         }
 
