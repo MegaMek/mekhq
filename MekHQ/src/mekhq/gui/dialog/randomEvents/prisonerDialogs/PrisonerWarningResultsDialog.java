@@ -28,14 +28,42 @@ import java.util.List;
 import static megamek.common.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Represents a dialog triggered as a result of the player responding to a warning about exceeding
+ * Prisoner Capacity.
+ *
+ * <p>This dialog is shown after the player has chosen to resolve the high Prisoner Capacity
+ * situation by either releasing or executing prisoners. It provides an immersive, narrative-driven
+ * in-character message that reflects the consequences of the player's decision and an optional
+ * out-of-character (OOC) message for additional context.</p>
+ */
 public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
+    /**
+     * Creates a dialog to display the results of resolving high Prisoner Capacity.
+     *
+     * @param campaign   The current campaign instance, providing context for the dialog.
+     * @param speaker    The person acting as the in-universe speaker for the event, or {@code null}
+     *                  if no speaker is present.
+     * @param isExecute  {@code true} if the player chose to execute prisoners, {@code false} if
+     *                              the player opted to release them.
+     */
     public PrisonerWarningResultsDialog(Campaign campaign, @Nullable Person speaker, boolean isExecute) {
         super(campaign, speaker, null, createInCharacterMessage(campaign, isExecute),
             createButtons(), createOutOfCharacterMessage(), null);
     }
 
+    /**
+     * Generates a list of buttons to display in the dialog.
+     *
+     * <p>
+     * The dialog includes a single "Understood" button, allowing the player to acknowledge the
+     * given information.
+     * </p>
+     *
+     * @return A list containing a single button with the appropriate label and tooltip.
+     */
     private static List<ButtonLabelTooltipPair> createButtons() {
         ButtonLabelTooltipPair btnUnderstood = new ButtonLabelTooltipPair(
                 getFormattedTextAt(RESOURCE_BUNDLE, "btnUnderstood.button"), null);
@@ -43,6 +71,19 @@ public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
         return List.of(btnUnderstood);
     }
 
+    /**
+     * Generates the immersive in-character message for the dialog.
+     *
+     * <p>The generated message reflects the player's decision to either release or execute
+     * prisoners, incorporating contextual elements such as the player's in-game title and random
+     * narrative variation for replay value.</p>
+     *
+     * @param campaign   The current campaign instance, used for context-specific data such as the
+     *                  commander's address.
+     * @param isExecute  {@code true} if the player chose to execute prisoners, {@code false} if
+     *                              the player chose to release them.
+     * @return A formatted string containing the narrative in-character message for the dialog.
+     */
     private static String createInCharacterMessage(Campaign campaign, boolean isExecute) {
         String executeKey = isExecute ? "execute" : "free";
         int eventRoll = randomInt(50);
@@ -53,7 +94,14 @@ public class PrisonerWarningResultsDialog extends MHQDialogImmersive {
         return getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
     }
 
-    private static @Nullable String createOutOfCharacterMessage() {
+    /**
+     * Generates an out-of-character (OOC) message for the dialog.
+     *
+     * <p>This optional message provides additional gameplay or narrative context.</p>
+     *
+     * @return A formatted string containing the out-of-character message.
+     */
+    private static String createOutOfCharacterMessage() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
     }
 }

@@ -18,6 +18,36 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
+/**
+ * Represents the quality of a response in prisoner-related random events.
+ *
+ * <p>This enumeration defines three levels of response quality, which influence how various
+ * prisoner events and interactions are processed in the campaign. It is used to categorize
+ * reactions or results in situations involving prisoners.</p>
+ */
 public enum ResponseQuality {
-    RESPONSE_NEUTRAL, RESPONSE_POSITIVE, RESPONSE_NEGATIVE
+    /**
+     * Represents a neutral response quality.
+     *
+     * <p>Indicates that the response neither has a positive nor a negative influence, but
+     * reflects a balanced or indifferent outcome from the associated prisoner interaction.</p>
+     */
+    RESPONSE_NEUTRAL,
+
+    /**
+     * Represents a positive response quality.
+     *
+     * <p>Indicates a favorable interaction or result, often leading to improved outcomes
+     * during prisoner-related events, such as successful negotiations or rescues.</p>
+     */
+    RESPONSE_POSITIVE,
+
+    /**
+     * Represents a negative response quality.
+     *
+     * <p>Indicates an unfavorable interaction or result, often leading to deteriorated
+     * outcomes during prisoner-related events, such as failed negotiations or missed
+     * rescues.</p>
+     */
+    RESPONSE_NEGATIVE
 }

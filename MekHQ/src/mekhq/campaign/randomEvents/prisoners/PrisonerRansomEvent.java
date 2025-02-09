@@ -32,6 +32,14 @@ import static java.lang.Math.max;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Handles ransom events for prisoners of war (POWs) within the campaign.
+ *
+ * <p>This class manages both scenarios where the opposing force requests ransom for captured
+ * friendly personnel and where the player can accept ransom offers for enemy prisoners.
+ * It calculates the total ransom, determines the list of prisoners involved, and manages the
+ * corresponding financial and personnel updates based on the player's decision.</p>
+ */
 public class PrisonerRansomEvent {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -40,6 +48,22 @@ public class PrisonerRansomEvent {
     private static final int ACCEPTED = 1; // Choice for accepting ransom
     private static final double RANSOM_PERCENTAGE = 0.1; // Allow 10% of prisoners to be ransomed in any given event
 
+    /**
+     * Creates a new ransom event for prisoners of war (POWs).
+     *
+     * <p>Depending on the event type (friendly or enemy POWs), this constructor:</p>
+     * <ul>
+     *     <li>Determines the list of prisoners involved in the ransom event.</li>
+     *     <li>Calculates the ransom amount for the selected prisoners.</li>
+     *     <li>Prompts the player to accept or decline the ransom via a dialog.</li>
+     *     <li>Handles the financial transaction and updates the prisoners' status based on the
+     *     player's choice.</li>
+     * </ul>
+     *
+     * @param campaign       The current campaign instance, which provides game state and relevant data.
+     * @param isFriendlyPOWs {@code true} if the ransom event is for friendly POWs (player's personnel),
+     *                       {@code false} if it's for enemy prisoners.
+     */
     public PrisonerRansomEvent(Campaign campaign, boolean isFriendlyPOWs) {
         List<Person> prisoners = isFriendlyPOWs
             ? campaign.getFriendlyPrisoners()
@@ -80,10 +104,36 @@ public class PrisonerRansomEvent {
         }
     }
 
+    /**
+     * Calculates the number of prisoners involved in the ransom event.
+     *
+     * <p>The number is determined as a percentage of the total prisoners available, ensuring
+     * that at least one prisoner is always included in the event.</p>
+     *
+     * @param prisonerCount The total number of prisoners available for the ransom.
+     * @return The number of prisoners to be involved in the ransom event.
+     */
     private int calculateRansomCount(int prisonerCount) {
         return max(1, (int) Math.ceil(prisonerCount * RANSOM_PERCENTAGE));
     }
 
+    /**
+     * Calculates the total ransom amount for the list of prisoners.
+     *
+     * <p>The ransom value for each prisoner is fetched and aggregated. The total ransom is adjusted
+     * based on whether the prisoners are friendly or enemy personnel:</p>
+     * <ul>
+     *     <li>For friendly POWs, the ransom is multiplied by a predefined multiplier.</li>
+     *     <li>For enemy prisoners, the ransom is divided by a predefined divider.</li>
+     * </ul>
+     *
+     * @param ransomList     A list of {@link Person} objects representing the prisoners involved
+     *                      in the event.
+     * @param campaign       The current campaign context for calculating ransom values.
+     * @param isFriendlyPOWs {@code true} if the ransom is for friendly POWs, {@code false} for
+     *                                  enemy prisoners.
+     * @return The total ransom amount as {@link Money}.
+     */
     private Money calculateTotalRansom(List<Person> ransomList, Campaign campaign, boolean isFriendlyPOWs) {
         Money ransom = Money.zero();
         for (Person person : ransomList) {
@@ -96,11 +146,35 @@ public class PrisonerRansomEvent {
             : ransom.dividedBy(RANSOM_COST_DIVIDER);
     }
 
+    /**
+     * Determines if the player can afford the ransom amount for friendly POWs.
+     *
+     * @param campaign The current campaign context containing financial information.
+     * @param ransom   The calculated ransom amount.
+     * @return {@code true} if the player has sufficient funds to cover the ransom, {@code false}
+     * otherwise.
+     */
     private boolean canAffordRansom(Campaign campaign, Money ransom) {
         Money currentFunds = campaign.getFinances().getBalance();
         return !currentFunds.isLessThan(ransom);
     }
 
+    /**
+     * Handles the outcome of the ransom event, based on the player's decision.
+     *
+     * <p>If the ransom is accepted:</p>
+     * <ul>
+     *     <li>For friendly POWs: Funds are debited, and the prisoners' status changes to active
+     *     duty.</li>
+     *     <li>For enemy prisoners: Funds are credited, and the prisoners are removed from the
+     *     campaign.</li>
+     * </ul>
+     *
+     * @param campaign       The current campaign instance for managing updates.
+     * @param ransomList     A list of {@link Person} objects representing the prisoners involved in the event.
+     * @param ransom         The total ransom amount.
+     * @param isFriendlyPOWs {@code true} if the event is for friendly POWs, {@code false} for enemy prisoners.
+     */
     private void handleRansomOutcome(Campaign campaign, List<Person> ransomList, Money ransom,
                                   boolean isFriendlyPOWs) {
         if (isFriendlyPOWs) {

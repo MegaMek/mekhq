@@ -22,7 +22,6 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 
 import static megamek.common.Compute.d6;
@@ -30,7 +29,18 @@ import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 
+/**
+ * Handles the recovery of missing personnel (MIA) through abstracted search-and-rescue (SAR)
+ * operations.
+ *
+ * <p>This class defines the process of conducting a SAR operation to attempt the rescue of a
+ * missing character. The success of the operation is determined by various factors, including the
+ * quality of the SAR team, the presence of specialized technology, and a dice roll.</p>
+ *
+ * <p>The recovery process is based on rules adapted from the Campaign Operations manual.</p>
+ */
 public class RecoverMIAPersonnel {
     private final Campaign campaign;
 
@@ -40,6 +50,20 @@ public class RecoverMIAPersonnel {
     final int SAR_HAS_ACTIVE_PROBE = 1; // largest only
     private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
+    /**
+     * Constructs a new instance to handle the SAR search for MIA personnel.
+     *
+     * <p>This constructor sets up the base target number for the operation and adjusts it using
+     * modifiers based on the SAR team's quality, equipment availability, and other relevant factors.
+     * The availability of certain technologies and their effects on the SAR operation depends on
+     * the current year in the game's campaign and the faction's tech level.</p>
+     *
+     * @param campaign       The current campaign instance containing the operation context.
+     * @param searchingFaction The faction conducting the SAR operation. Can be {@code null}, in
+     *                        which case a default technology setting is applied.
+     * @param sarQuality     The quality of the SAR team's equipment (null defaults to average
+     *                      quality).
+     */
     public RecoverMIAPersonnel(Campaign campaign, Faction searchingFaction, Integer sarQuality) {
         this.campaign = campaign;
 
@@ -77,6 +101,18 @@ public class RecoverMIAPersonnel {
         }
     }
 
+    /**
+     * Attempts to rescue a player-character who is listed as missing in action (MIA).
+     *
+     * <p>The success of the SAR operation is determined by a die roll against a target number (TN).
+     * The TN is influenced by factors such as the SAR team's available equipment and the
+     * technology level of the faction conducting the operation.</p>
+     *
+     * <p>If the rescue attempt is successful, the missing person's status is updated to indicate
+     * they have been found.</p>
+     *
+     * @param missingPerson The {@link Person} representing the character who is MIA.
+     */
     public void attemptRescueOfPlayerCharacter(Person missingPerson) {
         int targetNumber = sarTargetNumber.getValue();
         int roll = d6(2);
@@ -84,7 +120,7 @@ public class RecoverMIAPersonnel {
         boolean wasRescued = roll >= targetNumber;
 
         if (wasRescued) {
-            missingPerson.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.POW);
+            missingPerson.changeStatus(campaign, campaign.getLocalDate(), ACTIVE);
         }
     }
 }

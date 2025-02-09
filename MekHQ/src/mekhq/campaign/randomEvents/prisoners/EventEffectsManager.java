@@ -59,12 +59,18 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
- * Manages the resolution and effects of prisoner events.
+ * Manages the resolution and effects of prisoner events during a campaign.
  *
- * <p>This class is responsible for applying effects based on prisoner events. It processes the
- * event details, applies changes like injuries, loyalty modifications, and other event-related
- * effects, and generates a report summarizing the results.</p>
+ * <p>This class applies the effects of prisoner-related events, such as injuries, capacity
+ * changes, escapes, and loyalty adjustments. It processes event details and effects, manages
+ * affected campaign state or personnel, and generates a comprehensive report summarizing the
+ * outcomes.</p>
+ *
+ * <p>The effects manager handles a wide variety of event consequences, including unique cases for
+ * specific prisoner events. It also tracks and exposes information like escapees for further
+ * processing in the campaign.</p>
  */
+
 public class EventEffectsManager {
     private final Campaign campaign;
 
@@ -74,12 +80,16 @@ public class EventEffectsManager {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
-     * Constructs an {@code EventEffectsManager} object and processes the given event effects.
+     * Constructs an {@link EventEffectsManager} object and processes the given event effects.
      *
-     * @param campaign the campaign in which the event occurs
-     * @param eventData the data related to the prisoner event being processed
-     * @param choiceIndex the index of the user-selected choice for the event
-     * @param wasSuccessful whether the event's selected choice was successful
+     * <p>Based on the event data and the player's chosen response, this constructor processes the
+     * potential effects of the event, applying their impact to the campaign. These effects are
+     * compiled into an event report for further use.</p>
+     *
+     * @param campaign      The campaign in which the event occurs.
+     * @param eventData     The data related to the prisoner event being processed.
+     * @param choiceIndex   The index of the user-selected choice for the event.
+     * @param wasSuccessful Indicates whether the selected choice was successful.
      */
     public EventEffectsManager(Campaign campaign, PrisonerEventData eventData, int choiceIndex,
                                boolean wasSuccessful) {
@@ -122,9 +132,12 @@ public class EventEffectsManager {
     }
 
     /**
-     * Gets the event report summarizing the effects of the processed event.
+     * Retrieves the generated event report summarizing the processed event's effects.
      *
-     * @return the event report as a {@link String}
+     * <p>The report contains a textual summary of all effects that were applied during the event,
+     * structured for easy display to the user or for logs.</p>
+     *
+     * @return The event report as a {@link String}.
      */
     public String getEventReport() {
         return eventReport;
@@ -133,25 +146,25 @@ public class EventEffectsManager {
     /**
      * Retrieves the set of prisoners who escaped as a result of the processed event.
      *
-     * <p>The {@code getEscapees} method returns the prisoners that have escaped during the
-     * event handled by this {@link EventEffectsManager}. This allows other parts of the system
-     * to track and process the consequences of these escapes, such as adjusting campaign
-     * statistics or generating appropriate reports.</p>
+     * <p>The returned set can be used to track and handle additional consequences of the escapes,
+     * such as updating campaign statistics or creating follow-up events.</p>
      *
-     * @return a {@link Set} of {@link Person} objects representing the individuals who have escaped,
+     * @return A {@link Set} of {@link Person} objects representing the prisoners who escaped,
      * or an empty set if no escapes occurred.
      */
-
     public Set<Person> getEscapees() {
         return escapees;
     }
 
     /**
-     * Selects a random target from the campaign's personnel based on whether the
-     * target is a guard or prisoner.
+     * Selects a random target for an event effect based on whether the target is a guard or a
+     * prisoner.
      *
-     * @param isGuard whether to target a guard ({@code true}) or prisoner ({@code false})
-     * @return the randomly selected {@link Person}, or {@code null} if no valid target exists
+     * <p>Guards are selected from security forces, while prisoners are selected from the current
+     * prisoner list. The selection excludes any invalid targets.</p>
+     *
+     * @param isGuard {@code true} to select a guard, {@code false} to select a prisoner.
+     * @return The randomly selected {@link Person}, or {@code null} if no valid target exists.
      */
     private @Nullable Person getRandomTarget(final boolean isGuard) {
         List<Person> potentialTargets = getAllPotentialTargets(isGuard);
@@ -164,10 +177,10 @@ public class EventEffectsManager {
     }
 
     /**
-     * Retrieves all potential targets for an event effect based on their role (guards or prisoners).
+     * Retrieves all potential targets for an event effect, either guards or prisoners.
      *
-     * @param isGuard whether to retrieve guards ({@code true}) or prisoners ({@code false})
-     * @return a {@link List} of {@link Person} objects representing potential targets
+     * @param isGuard {@code true} to retrieve guards, {@code false} to retrieve prisoners.
+     * @return A {@link List} of {@link Person} objects representing the potential targets.
      */
     private List<Person> getAllPotentialTargets(final boolean isGuard) {
         List<Person> potentialTargets = new ArrayList<>();
@@ -196,11 +209,14 @@ public class EventEffectsManager {
     }
 
     /**
-     * Applies an event effect to adjust the temporary prisoner capacity in the campaign and
-     * generates a report.
+     * Applies an effect to adjust the temporary prisoner capacity and generates a report.
      *
-     * @param result the {@link EventResult} detailing the effect
-     * @return a {@link String} summarizing the effect of the operation
+     * <p>This effect changes the available capacity based on the magnitude, with positive values
+     * increasing capacity and negative values decreasing it. The outcome is logged as part of the
+     * event report.</p>
+     *
+     * @param result The {@link EventResult} detailing the effect and its magnitude.
+     * @return A {@link String} summarizing the effect of the operation.
      */
     private String eventEffectPrisonerCapacity(EventResult result) {
         final int magnitude = result.magnitude();
@@ -220,11 +236,14 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the effects of an "injury" event, applying injuries to a random target and
-     * generating a report.
+     * Handles the effects of an "injury" event, causing injuries to a random target.
      *
-     * @param result the {@link EventResult} detailing the injury effect
-     * @return a {@link String} summarizing the injury effect
+     * <p>The injury amount is determined by the magnitude of the event effect. Injuries are
+     * applied up to the maximum allowable level per target. The outcome is added to the event
+     * report.</p>
+     *
+     * @param result The {@link EventResult} detailing the injury effect.
+     * @return A {@link String} summarizing the injury effect.
      */
     private String eventEffectInjury(EventResult result) {
         final boolean isGuard = result.isGuard();
@@ -236,7 +255,9 @@ public class EventEffectsManager {
             return "";
         }
 
-        int wounds = clamp(magnitude, 1, 5);
+        // We don't want to accidentally kill anyone. So while someone can get really mauled by
+        // this event, they will never actually die.
+        int wounds = max(magnitude, 1);
 
         int priorHits = max(target.getHits(), target.getInjuries().size());
 
@@ -264,11 +285,15 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the effects of an "injury percent" event, which applies injuries to a percentage of
-     * selected personnel and generates a report.
+     * Handles the effects of a "death" event, removing personnel from the campaign due to
+     * fatalities.
      *
-     * @param result the {@link EventResult} detailing the injury percentage effect
-     * @return a {@link String} summarizing the injury percentage effect
+     * <p>The affected individuals are determined based on the event's magnitude, with guards being
+     * marked as KIA and prisoners being removed completely. The outcome is added to the event
+     * report.</p>
+     *
+     * @param result The {@link EventResult} detailing the death effect.
+     * @return A {@link String} summarizing the death effect.
      */
     private String eventEffectInjuryPercent(EventResult result) {
         final boolean isUseAdvancedMedical = campaign.getCampaignOptions().isUseAdvancedMedical();
@@ -328,11 +353,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the effects of a "death" event, removing personnel from the campaign, or changing
-     * their status based on the event magnitude and generating a report.
+     * Handles the escape effect, reducing the number of prisoners and tracking escapees.
      *
-     * @param result the {@link EventResult} detailing the death effect
-     * @return a {@link String} summarizing the death effect
+     * <p>The magnitude of the event determines how many prisoners escape, and these prisoners
+     * are logged for further actions. An escape report is generated as part of the event handling.</p>
+     *
+     * @param result The {@link EventResult} detailing the escape effect and its magnitude.
+     * @return A {@link String} summarizing the escape effect.
      */
     private String eventEffectDeath(EventResult result) {
         final boolean isGuard = result.isGuard();
@@ -388,11 +415,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the effects of a "death percent" event, applying death to a percentage of selected
-     * personnel and generating a report.
+     * Handles unique effects for specific prisoner events and generates a report.
      *
-     * @param result the {@link EventResult} detailing the death percentage effect
-     * @return a {@link String} summarizing the death percentage effect
+     * <p>This method processes special cases that require custom logic, such as skill removal,
+     * faction changes, or morale adjustments. The exact behavior depends on the event type.</p>
+     *
+     * @param result    The {@link EventResult} describing the unique effect.
+     * @return A {@link String} summarizing the unique effect.
      */
     private String eventEffectDeathPercent(EventResult result) {
         final boolean isGuard = result.isGuard();
@@ -449,11 +478,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "loyalty one" effect, altering the loyalty of a single target
-     * and generating a report.
+     * Handles the "fatigue all" effect, applying fatigue to all targeted personnel.
      *
-     * @param result the {@link EventResult} detailing the loyalty effect
-     * @return a {@link String} summarizing the loyalty change for one target
+     * <p>The magnitude of the event determines the level of fatigue applied. The outcome is
+     * added to the event report.</p>
+     *
+     * @param result The {@link EventResult} specifying the fatigue effect and its magnitude.
+     * @return A {@link String} summarizing the fatigue effect.
      */
     private String eventEffectSkill(EventResult result) {
         final boolean isGuard = result.isGuard();
@@ -508,11 +539,14 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "loyalty all" effect, altering the loyalty of all potential targets
-     * and generating a report.
+     * Adjusts the loyalty level of a single person based on the event effect.
      *
-     * @param result the {@link EventResult} detailing the loyalty effect
-     * @return a {@link String} summarizing the loyalty change for all targeted personnel
+     * <p>If loyalty modifiers are enabled, the loyalty of a random target is either increased or
+     * decreased by the effect's magnitude.</p>
+     *
+     * @param result The {@link EventResult} detailing the loyalty effect and its magnitude.
+     * @return A {@link String} summarizing the loyalty adjustment or an empty string if loyalty
+     * modifiers are disabled.
      */
     private String eventEffectLoyaltyOne(EventResult result) {
         boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
@@ -547,7 +581,16 @@ public class EventEffectsManager {
             context, colorOpen, direction, CLOSING_SPAN_TAG, magnitude);
     }
 
-
+    /**
+     * Adjusts the loyalty level of all eligible targets in the campaign.
+     *
+     * <p>If loyalty modifiers are enabled, this effect changes the loyalty of all guards or
+     * prisoners, as determined by the event effect's configuration.</p>
+     *
+     * @param result The {@link EventResult} detailing the loyalty effect and its magnitude.
+     * @return A {@link String} summarizing the collective loyalty adjustment or an empty string
+     * if loyalty modifiers are disabled.
+     */
     private String eventEffectLoyaltyAll(EventResult result) {
         boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
 
@@ -591,11 +634,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the effects of a prisoner escape event, reducing the number of prisoners
-     * and generating a report.
+     * Handles the escape effect, reducing the number of prisoners and tracking escapees.
      *
-     * @param result the {@link EventResult} detailing the escape effect
-     * @return a {@link String} summarizing the prisoner escape
+     * <p>The magnitude of the event determines how many prisoners escape. These prisoners
+     * are logged for follow-up actions or reporting purposes.</p>
+     *
+     * @param result The {@link EventResult} detailing the escape effect and its magnitude.
+     * @return A {@link String} summarizing the escape effect.
      */
     private String eventEffectEscape(EventResult result) {
         int magnitude = result.magnitude();
@@ -635,11 +680,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "escape percent" effect, determining the percentage of escaping prisoners
-     * based on magnitude and generating a report.
+     * Applies a percentage-based escape effect, determining how many prisoners escape.
      *
-     * @param result the {@link EventResult} detailing the percentage of prisoners escaping
-     * @return a {@link String} summarizing the escape percentage effect
+     * <p>The number of escapees is calculated as a percentage of the total prisoner count.
+     * Escapees are logged for tracking, and a summary report is generated.</p>
+     *
+     * @param result The {@link EventResult} detailing the escape effect as a percentage.
+     * @return A {@link String} summarizing the escape effect.
      */
     private String eventEffectEscapePercent(EventResult result) {
         final double magnitude = (double) result.magnitude() / 100;
@@ -679,13 +726,15 @@ public class EventEffectsManager {
             targetCount, context, haveOrHas, colorOpen, CLOSING_SPAN_TAG);
     }
 
-
     /**
-     * Handles the "fatigue one" effect, which modifies the fatigue level of one target and
-     * generates a report.
+     * Applies a fatigue effect to a single target as part of the event effect.
      *
-     * @param result the {@link EventResult} detailing the fatigue effect
-     * @return a {@link String} summarizing the fatigue effect for one target
+     * <p>If fatigue effects are enabled, the fatigue of a random target is adjusted based on the
+     * event's magnitude. The outcome is logged in the event report.</p>
+     *
+     * @param result The {@link EventResult} specifying the fatigue effect and its magnitude.
+     * @return A {@link String} summarizing the fatigue effect or an empty string if fatigue
+     * is disabled.
      */
     private String eventEffectFatigueOne(EventResult result) {
         boolean isUseFatigue = campaign.getCampaignOptions().isUseFatigue();
@@ -721,11 +770,14 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "fatigue all" effect, which applies fatigue to all relevant personnel
-     * and generates a report.
+     * Applies a fatigue effect to all eligible targets in the campaign.
      *
-     * @param result the {@link EventResult} detailing the fatigue effect
-     * @return a {@link String} summarizing the fatigue effect for all targets
+     * <p>If fatigue effects are enabled, this effect adjusts the fatigue level of all guards or
+     * prisoners, based on the event effect's magnitude.</p>
+     *
+     * @param result The {@link EventResult} specifying the fatigue effect and its magnitude.
+     * @return A {@link String} summarizing the collective fatigue effect or an empty string
+     * if fatigue is disabled.
      */
     private String eventEffectFatigueAll(EventResult result) {
         boolean isUseFatigue = campaign.getCampaignOptions().isUseFatigue();
@@ -770,11 +822,14 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "support point" effect, which adjusts support points within StratCon
-     * campaign states and generates a report.
+     * Adjusts support points for a strategic campaign operation.
      *
-     * @param result the {@link EventResult} detailing the support point effect
-     * @return a {@link String} summarizing the support point adjustment
+     * <p>If StratCon operations are enabled, this effect changes the support points of a random
+     * active contract. The change is logged for reporting purposes.</p>
+     *
+     * @param result The {@link EventResult} specifying the support point effect and its magnitude.
+     * @return A {@link String} summarizing the support point adjustment or an empty string if
+     * StratCon is disabled.
      */
     private String eventEffectSupportPoint(EventResult result) {
         if (!campaign.getCampaignOptions().isUseStratCon()) {
@@ -818,12 +873,15 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles unique effects for specific events and generates a report based on the
-     * implemented unique event behavior.
+     * Applies unique effects for specific prisoner events.
      *
-     * @param eventData the {@link PrisonerEventData} containing event details
-     * @param result the {@link EventResult} detailing the unique effect
-     * @return a {@link String} summarizing the unique event effect
+     * <p>Unique event effects may perform complex operations depending on the event type, such as
+     * changing factions, applying fatigue to personnel, or generating new prisoners.</p>
+     *
+     * @param eventData The {@link PrisonerEventData} providing context for the unique operation.
+     * @param result    The {@link EventResult} detailing the specific unique effect.
+     * @return A {@link String} summarizing the unique effect or an empty string for unsupported
+     * events.
      */
     private String eventEffectUnique(PrisonerEventData eventData, EventResult result) {
         final PrisonerEvent event = eventData.prisonerEvent();
@@ -844,9 +902,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "bartering" effect where the OpFor gains morale and generates a report.
+     * Applies a morale boost to a random active contract's operation in the campaign.
      *
-     * @return a {@link String} summarizing the morale increase effect for the OpFor
+     * <p>If the morale level of an active contract is below the overwhelming threshold, it is
+     * increased by one level. The effect is logged as part of the event report.</p>
+     *
+     * @return A {@link String} summarizing the outcome of the morale adjustment, or an empty string
+     * if no contract qualifies for the effect.
      */
     private String eventEffectUniqueBartering() {
         List<AtBContract> potentialTargets = new ArrayList<>();
@@ -875,10 +937,12 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "mistake" effect, removing all combat skills from a random prisoner and
-     * generating a report.
+     * Removes all combat skills from a randomly selected prisoner as part of the event effect.
      *
-     * @return a {@link String} summarizing the skills removal effect
+     * <p>The selected prisoner has all their skills removed, and their role is changed to
+     * {@code DEPENDENT}. The outcome is logged as part of the event report.</p>
+     *
+     * @return A {@link String} summarizing the changes to the prisoner's skills and roles.
      */
     private String eventEffectUniqueMistake() {
         Person target = getRandomTarget(false);
@@ -896,10 +960,13 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "undercover" effect, assigning one prisoner to the employer faction and
-     * generating a report.
+     * Changes the origin faction of a random prisoner to match the employer's faction.
      *
-     * @return a {@link String} summarizing the undercover effect
+     * <p>The prisoner is updated to match the employer's faction, and their "Clan Personnel" status
+     * is adjusted accordingly. This event can represent undercover operations or defections.</p>
+     *
+     * @return A {@link String} summarizing the faction change for the affected prisoner, or an
+     * empty string if no prisoner qualifies.
      */
     private String eventEffectUniqueUndercover() {
         Person targetCharacter = getRandomTarget(false);
@@ -921,10 +988,14 @@ public class EventEffectsManager {
     }
 
     /**
-     * Handles the "poison" effect, applying fatigue to 10% of personnel and generating a report.
+     * Applies a fatigue effect to 10% of campaign personnel, simulating a poisoning event.
      *
-     * @param result the {@link EventResult} detailing the poison's fatigue effect
-     * @return a {@link String} summarizing the poison effect
+     * <p>The magnitude determines the level of fatigue applied to each affected person. If fatigue
+     * modifiers are disabled, this effect is skipped.</p>
+     *
+     * @param result The {@link EventResult} describing the magnitude of the fatigue effect.
+     * @return A {@link String} summarizing the outcome of the poisoning effect, or an empty string
+     * if the modifier is disabled.
      */
     private String eventEffectUniquePoison(EventResult result) {
         if (!campaign.getCampaignOptions().isUseFatigue()) {
@@ -957,13 +1028,18 @@ public class EventEffectsManager {
         return getFormattedTextAt(RESOURCE_BUNDLE, "POISON.report",
             colorOpen, CLOSING_SPAN_TAG);
     }
-
     /**
-     * Handles the "abandoned to die" effect, recruiting new prisoners, altering crime levels,
-     * and generating a report.
+     * Handles an event where abandoned personnel generate new prisoners while increasing the
+     * crime rating.
      *
-     * @param result the {@link EventResult} detailing the abandoned-to-die effect
-     * @return a {@link String} summarizing the effect
+     * <p>The magnitude determines the severity of the crime level increase and the number of new
+     * prisoners generated. These prisoners are added to the campaign with random details and
+     * assigned the "prisoner" status.</p>
+     *
+     * @param result The {@link EventResult} specifying the magnitude of the crime and prisoner
+     *              generation.
+     * @return A {@link String} summarizing the increase in crime and the generation of new
+     * prisoners.
      */
     private String eventEffectUniqueAbandonedToDie(EventResult result) {
         int magnitude = result.magnitude();

@@ -51,6 +51,20 @@ import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMIN
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Handles events and processes related to capturing prisoners.
+ *
+ * <p>This class manages the capture mechanics for both NPCs and player characters, based on
+ * SAR (Search and Rescue) quality, faction alignment, and campaign rules. It applies various
+ * modifiers to determine the likelihood of successfully capturing prisoners and processes
+ * their capture outcome (e.g., statuses such as prisoner, bondsman, or defector).</p>
+ *
+ * <p>The class supports different capture styles (e.g., MekHQ Capture Mode) and adjusts outcomes
+ * based on honor ratings, faction-specific rules (e.g., Clan or IS), and campaign configurations.</p>
+ *
+ * <p>It also accounts for faction-specific behaviors, such as Clan dezgra multipliers and bondsman
+ * mechanics, and provides support for defection offers.</p>
+ */
 public class CapturePrisoners {
     private final Campaign campaign;
     private final Faction searchingFaction;
@@ -74,6 +88,20 @@ public class CapturePrisoners {
 
     private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
+    /**
+     * Constructs a {@link CapturePrisoners} object and initializes modifiers
+     * based on the faction, scenario, and SAR (Search and Rescue) qualities.
+     *
+     * <p>This constructor applies SAR-related modifiers, including checking for active probes,
+     * improved sensors, VTOL/DropShips, and orbit-related penalties. It also ensures proper
+     * faction-related checks, such as whether the searching faction is Clan, and sets the
+     * appropriate base target rolls for capturing prisoners.</p>
+     *
+     * @param campaign          The active {@link Campaign} being played.
+     * @param searchingFaction  The {@link Faction} conducting the prisoner search.
+     * @param scenario          The {@link Scenario} representing the current mission or battle.
+     * @param sarQuality        Search and Rescue quality level, affecting capture difficulty.
+     */
     public CapturePrisoners(Campaign campaign, Faction searchingFaction, Scenario scenario, int sarQuality) {
         this.campaign = campaign;
         this.searchingFaction = searchingFaction;
@@ -118,6 +146,12 @@ public class CapturePrisoners {
         }
     }
 
+    /**
+     * Attempts to determine the capture of an NPC prisoner.
+     *
+     * @param wasPickedUp Whether the target prisoner was already picked up.
+     * @return {@code true} if the prisoner capture was successful, otherwise {@code false}.
+     */
     public boolean attemptCaptureOfNPC(boolean wasPickedUp) {
         if (wasPickedUp) {
             return true;
@@ -126,6 +160,15 @@ public class CapturePrisoners {
         return rollForCapture();
     }
 
+    /**
+     * Processes the capture of an NPC prisoner.
+     *
+     * <p>This method evaluates the capture style and adjusts the handling of the prisoner
+     * accordingly. It accounts for different capture styles, such as MekHQ's mode, and processes
+     * unique rules for Clan-related factions.</p>
+     *
+     * @param prisoner The {@link Person} object representing the captured NPC.
+     */
     public void processCaptureOfNPC(Person prisoner) {
         PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
         boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
@@ -170,6 +213,18 @@ public class CapturePrisoners {
         handlePostCapture(prisoner, prisoner.getPrisonerStatus());
     }
 
+    /**
+     * Processes the outcome for a captured prisoner based on faction-related logic.
+     *
+     * <p>The method determines if the prisoner should be made a bondsman, added as a prisoner of
+     * war, or handled according to ruler rules defined for the faction. It differentiates between
+     * NPCs and player characters.</p>
+     *
+     * @param prisoner               The {@link Person} being processed.
+     * @param faction                The {@link Faction} processing the prisoner.
+     * @param isMekHQCaptureStyle    Indicates whether MekHQ's custom capture style is active.
+     * @param isNPC                  {@code true} if the prisoner is an NPC, otherwise {@code false}.
+     */
     private void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle, boolean isNPC) {
         LocalDate today = campaign.getLocalDate();
         HonorRating honorRating = faction.getHonorRating(campaign);
@@ -197,6 +252,17 @@ public class CapturePrisoners {
         }
     }
 
+    /**
+     * Handles the defection mechanics for a captured prisoner.
+     *
+     * <p>This method calculates the base likelihood of defection and adjusts the probabilities
+     * based on faction traits, such as whether the faction is mercenary or subject to Clan-specific
+     * dezgra rules. It also accounts for NPCs or player-specific conditions in the defection process.</p>
+     *
+     * @param potentialDefector The {@link Person} object representing the potential defector.
+     * @param isNPC             {@code true} if the defection attempt is for an NPC, otherwise {@code false}.
+     * @return The defection roll value, where {@code 0} indicates a successful defection.
+     */
     private int attemptDefection(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
 
@@ -220,6 +286,16 @@ public class CapturePrisoners {
         return randomInt(adjustedDefectionChance);
     }
 
+    /**
+     * Attempts to capture or determine the fate of a player character prisoner.
+     *
+     * <p>If the capture attempt fails, the player character is marked as missing in action (MIA).
+     * Otherwise, the prisoner is processed further, using either standard or MekHQ-specific capture
+     * rules. Defection rolls are applied if applicable, and post-capture events are handled.</p>
+     *
+     * @param prisoner     The {@link Person} representing the player-character prisoner.
+     * @param wasPickedUp  Whether the prisoner was picked up as part of the scenario outcome.
+     */
     public void attemptCaptureOfPlayerCharacter(Person prisoner, boolean wasPickedUp) {
         // Attempt capture
         boolean captureSuccessful = wasPickedUp;
@@ -269,6 +345,14 @@ public class CapturePrisoners {
         }
     }
 
+    /**
+     * Rolls dice to determine if a prisoner is successfully captured based on current modifiers.
+     *
+     * <p>This method makes multiple attempts (based on {@code ATTEMPT_COUNT}) to roll dice against
+     * a target number calculated from SAR modifiers and campaign settings.</p>
+     *
+     * @return {@code true} if any roll meets or exceeds the target number, otherwise {@code false}.
+     */
     private boolean rollForCapture() {
         int targetNumber = sarTargetNumber.getValue();
         for (int attempt = 0; attempt < ATTEMPT_COUNT; attempt++) {
@@ -281,6 +365,15 @@ public class CapturePrisoners {
         return false;
     }
 
+    /**
+     * Handles post-capture adjustments and records for a newly captured prisoner.
+     *
+     * <p>This includes loyalty adjustments, prisoner recruitment, and campaign interaction logging
+     * (e.g., offers of defection or bondsman status).</p>
+     *
+     * @param prisoner   The {@link Person} being processed as a captured prisoner.
+     * @param newStatus  The resulting {@link PrisonerStatus} of the prisoner post-capture.
+     */
     private void handlePostCapture(Person prisoner, PrisonerStatus newStatus) {
         final String RESOURCE_BUNDLE = "mekhq.resources.DefectionOffer";
 

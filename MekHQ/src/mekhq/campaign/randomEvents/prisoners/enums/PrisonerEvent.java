@@ -18,6 +18,15 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
+/**
+ * Represents the collection of possible events related to prisoners in MekHQ.
+ *
+ * <p>The {@code PrisonerEvent} enumeration is used to define various prisoner-related random
+ * events that can occur during a campaign. These events include interactions and behaviors
+ * among prisoners, as well as outcomes that can affect morale, resources, and the overall
+ * state of the campaign. Each event describes a unique scenario or theme triggered under certain
+ * circumstances.</p>
+ */
 public enum PrisonerEvent {
     ARGUMENT, WILD_STORIES, TAMPERING, CONVERSATIONS, RATIONS, TRADE, DRAINED, RESCUE, REPAIRS,
     SICKNESS, VETERAN, GRAFFITI, PRAYER, BARTERING, OFFICER, DICE, LOVERS, SOBBING, PROPAGANDA,

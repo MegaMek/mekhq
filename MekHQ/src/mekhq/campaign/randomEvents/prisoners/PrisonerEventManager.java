@@ -53,6 +53,17 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+/**
+ * Manages prisoner-related events and warnings during a campaign.
+ *
+ * <p>Handles both weekly and monthly events associated with prisoners in the campaign, including
+ * ransom opportunities, warnings for prisoner overflow, and random events that affect the campaign
+ * state. It also calculates prisoner capacity, processes executions, and dynamically generates
+ * prisoner-related scenarios based on campaign conditions.</p>
+ *
+ * <p>The manager adjusts campaign parameters such as temporary prisoner capacity and handles
+ * interactions with the player via dialogs, providing options to resolve prisoner-related issues.</p>
+ */
 public class PrisonerEventManager {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -70,6 +81,20 @@ public class PrisonerEventManager {
     private final int CHOICE_FREE = 1;
     private final int CHOICE_EXECUTE = 2;
 
+    /**
+     * Constructs a new {@link PrisonerEventManager} and handles the initialization of
+     * prisoner-related events.
+     *
+     * <p>Performs the following during initialization:</p>
+     * <ul>
+     *     <li>Adjusts temporary prisoner capacity for the campaign.</li>
+     *     <li>Triggers monthly events such as ransom opportunities if applicable.</li>
+     *     <li>Handles weekly events related to prisoner overflow or random events.</li>
+     * </ul>
+     *
+     * @param campaign The current campaign instance, providing context and state for prisoner
+     *                management.
+     */
     public PrisonerEventManager(Campaign campaign) {
         this.campaign = campaign;
         this.speaker = getSpeaker();
@@ -155,6 +180,16 @@ public class PrisonerEventManager {
         }
     }
 
+    /**
+     * Processes a random event involving prisoners.
+     *
+     * <p>Handles both minor and major prisoner events. A dialog is presented to the player,
+     * allowing them to decide how to respond. Based on the outcome, the event's effects are
+     * applied, which may include generating escapee scenarios or other consequences.</p>
+     *
+     * @param majorEvent {@code true} if the event is classified as a major event, {@code false}
+     *                              for a minor event.
+     */
     private void processRandomEvent(boolean majorEvent) {
         PrisonerEventData eventData;
         if (majorEvent) {
@@ -188,6 +223,15 @@ public class PrisonerEventManager {
         }
     }
 
+    /**
+     * Processes a warning event when the prisoner overflow exceeds acceptable limits.
+     *
+     * <p>Presents a dialog to the player, allowing them to take corrective actions by choosing to
+     * either release or execute prisoners to address the overflow. Results in the removal or
+     * execution of prisoners based on the player's choice.</p>
+     *
+     * @param overflow The calculated overflow value indicating prisoners exceeding capacity.
+     */
     private void processWarning(int overflow) {
         List<Person> prisoners = campaign.getCurrentPrisoners();
         Collections.shuffle(prisoners);
@@ -217,12 +261,28 @@ public class PrisonerEventManager {
         }
     }
 
+    /**
+     * Selects a random event from the available prisoner events.
+     *
+     * @param isMajor {@code true} to select a major event, {@code false} to select a minor event.
+     * @return A randomly selected {@link PrisonerEventData} object representing the event.
+     */
     private PrisonerEventData pickEvent(boolean isMajor) {
         List<PrisonerEventData> allMajorEvents = campaign.getRandomEventLibraries().getPrisonerEvents(isMajor);
         Collections.shuffle(allMajorEvents);
         return ObjectUtility.getRandomItem(allMajorEvents);
     }
 
+    /**
+     * Performs a check to determine if the player's response to an event is successful.
+     *
+     * <p>The success of the check depends on the attributes of the event, the chosen response
+     * option, and modifiers such as the speaker's personality.</p>
+     *
+     * @param eventData   The data for the prisoner event being processed.
+     * @param choiceIndex The index of the choice made by the player in the event dialog.
+     * @return {@code true} if the player's response is deemed successful, {@code false} otherwise.
+     */
     private boolean makeEventCheck(PrisonerEventData eventData, int choiceIndex) {
         int responseModifier = 0;
         if (speaker != null) {
@@ -241,6 +301,16 @@ public class PrisonerEventManager {
         return responseCheck >= RESPONSE_TARGET_NUMBER;
     }
 
+    /**
+     * Processes the execution of a given number of prisoners.
+     *
+     * <p>Removes prisoners from the campaign while generating appropriate reports of their
+     * execution. Triggers additional logic to handle campaign state updates, such as potential
+     * backfires or penalties from the executions.</p>
+     *
+     * @param executions The number of prisoners to be executed.
+     * @param prisoners  The list of prisoners involved in the execution.
+     */
     private void processExecutions(int executions, List<Person> prisoners) {
         for (int i = 0; i < executions; i++) {
             Person prisoner = prisoners.get(i);
@@ -252,6 +322,15 @@ public class PrisonerEventManager {
         processAdHocExecution(campaign, executions);
     }
 
+    /**
+     * Handles ad-hoc executions and applies their effects on the campaign state.
+     *
+     * <p>This method can affect the campaign's temporary prisoner capacity and crime rating, and
+     * it generates reports based on whether the executions were noticed or backfired.</p>
+     *
+     * @param campaign The current campaign instance.
+     * @param victims  The number of victims executed.
+     */
     public static void processAdHocExecution(Campaign campaign, int victims) {
         // Did the execution backfire?
         int backfireRoll = d6(1);
@@ -295,6 +374,15 @@ public class PrisonerEventManager {
                 crimeMessage);
     }
 
+    /**
+     * Calculates the total capacity usage for holding prisoners in the campaign.
+     *
+     * <p>Includes adjustments for capture styles and considers the needs of injured prisoners.
+     * This value represents the total number of prisoners consuming capacity resources.</p>
+     *
+     * @param campaign The current campaign instance.
+     * @return The total prisoner capacity usage.
+     */
     public static int calculatePrisonerCapacityUsage(Campaign campaign) {
         PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
@@ -316,6 +404,16 @@ public class PrisonerEventManager {
         return prisonerCapacityUsage;
     }
 
+    /**
+     * Calculates the total available capacity for holding prisoners in the campaign.
+     *
+     * <p>This calculation accounts for forces capable of handling prisoners, such as security
+     * units, and factors in adjustments based on the MekHQ capture style and temporary capacity
+     * modifiers.</p>
+     *
+     * @param campaign The current campaign instance.
+     * @return The total prisoner capacity.
+     */
     public static int calculatePrisonerCapacity(Campaign campaign) {
         PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
@@ -380,6 +478,15 @@ public class PrisonerEventManager {
         }
     }
 
+    /**
+     * Retrieves the speaker for a prisoner-related dialog or event.
+     *
+     * <p>The speaker is typically selected from security forces within the campaign. If no suitable
+     * speaker is found, a senior administrator with the transport specialization is returned as a
+     * fallback.</p>
+     *
+     * @return The selected {@link Person} who acts as the speaker, or {@code null} if none is found.
+     */
     private @Nullable Person getSpeaker() {
         List<Force> securityForces = new ArrayList<>();
 

@@ -19,7 +19,6 @@
 package mekhq.gui.dialog;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.MHQDialogImmersive;
 
 import java.util.ArrayList;
@@ -28,14 +27,41 @@ import java.util.List;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Represents a dialog triggered at the end of a mission when the player has Prisoner Defectors
+ * they can recruit.
+ *
+ * <p>
+ * This dialog allows the player to handle the scenario of prisoners defecting to their forces. The
+ * player is presented with an immersive, narrative-driven in-character message as well as optional
+ * out-of-character context. Action buttons, such as canceling or continuing the mission conclusion
+ * process, are also provided.
+ * </p>
+ */
 public class MissionEndPrisonerDefectorDialog extends MHQDialogImmersive {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
+    /**
+     * Creates a dialog to remind the player of outstanding prisoner defectors.
+     *
+     * @param campaign The current campaign instance, which provides context for the dialog.
+     */
     public MissionEndPrisonerDefectorDialog(Campaign campaign) {
-        super(campaign, getSpeaker(campaign), null, createInCharacterMessage(campaign),
-            createButtons(), createOutOfCharacterMessage(), null);
+        super(campaign, campaign.getSeniorAdminPerson(COMMAND), null,
+            createInCharacterMessage(campaign), createButtons(), createOutOfCharacterMessage(),
+            null);
     }
 
+    /**
+     * Builds the list of buttons displayed in the dialog.
+     *
+     * <p>
+     * This method creates buttons allowing the player to either cancel the mission conclusion
+     * or continue.
+     * </p>
+     *
+     * @return A list of button-label and tooltip pairs for this dialog.
+     */
     private static List<ButtonLabelTooltipPair> createButtons() {
         List<ButtonLabelTooltipPair> buttons = new ArrayList<>();
 
@@ -50,16 +76,33 @@ public class MissionEndPrisonerDefectorDialog extends MHQDialogImmersive {
         return buttons;
     }
 
+    /**
+     * Generates the in-character message for the dialog.
+     *
+     * <p>
+     * This message is displayed narratively in the dialog. It addresses the player using their
+     * in-game commander address while providing context about the prisoner defectors.
+     * </p>
+     *
+     * @param campaign The current campaign instance, which provides data for the message.
+     * @return A formatted string containing the in-character message for the player.
+     */
     private static String createInCharacterMessage(Campaign campaign) {
         String commanderAddress = campaign.getCommanderAddress(false);
         return getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.message",
             commanderAddress);
     }
 
-    private static Person getSpeaker(Campaign campaign) {
-        return campaign.getSeniorAdminPerson(COMMAND);
-    }
-
+    /**
+     * Creates an out-of-character (OOC) message for the dialog.
+     *
+     * <p>
+     * The OOC message provides additional context or instructions to the player about the recruiting
+     * defectors process. It is shown for narrative or instructional purposes.
+     * </p>
+     *
+     * @return A formatted string containing the OOC message.
+     */
     private static String createOutOfCharacterMessage() {
         return getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.ooc");
     }
