@@ -42,7 +42,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -54,6 +53,7 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.mission.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 
 /**
@@ -397,7 +397,7 @@ public class ResolveScenarioTracker {
                     continue;
                 }
 
-                if (wreck.isDropShip() && scenario.getBoardType() != Scenario.T_SPACE) {
+                if (wreck.isDropShip() && scenario.getBoardType() != T_SPACE) {
                     double dropShipBonusPercentage =
                         (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
 
@@ -1527,7 +1527,8 @@ public class ResolveScenarioTracker {
                 if (control) {
                     person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
                 } else {
-                    prisonerController.attemptCaptureOfPlayerCharacter(person, status.pickedUp);
+                    boolean isSpace = scenario.getBoardType() == T_SPACE;
+                    prisonerController.attemptCaptureOfPlayerCharacter(person, status.pickedUp, isSpace);
                 }
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);

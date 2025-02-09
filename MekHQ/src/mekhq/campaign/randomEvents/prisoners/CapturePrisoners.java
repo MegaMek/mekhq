@@ -25,7 +25,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
@@ -42,10 +41,7 @@ import static megamek.common.Board.T_SPACE;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.BONDSREF;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.DEFECTED;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
-import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.*;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
@@ -338,7 +334,7 @@ public class CapturePrisoners {
      * @param prisoner     The {@link Person} representing the player-character prisoner.
      * @param wasPickedUp  Whether the prisoner was picked up as part of the scenario outcome.
      */
-    public void attemptCaptureOfPlayerCharacter(Person prisoner, boolean wasPickedUp) {
+    public void attemptCaptureOfPlayerCharacter(Person prisoner, boolean wasPickedUp, boolean isSpace) {
         // Attempt capture
         boolean captureSuccessful = wasPickedUp;
 
@@ -348,9 +344,16 @@ public class CapturePrisoners {
 
         // Early exit is capture was unsuccessful
         if (!captureSuccessful) {
-            prisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MIA);
+            if (isSpace) {
+                // If you're not found in space, you're not going to be found.
+                // At least, not until we have a more robust SAR system.
+                prisoner.changeStatus(campaign, campaign.getLocalDate(), KIA);
+            } else {
+                prisoner.changeStatus(campaign, campaign.getLocalDate(), MIA);
+            }
             return;
         }
+
 
         PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
         boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
