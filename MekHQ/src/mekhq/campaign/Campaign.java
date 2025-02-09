@@ -2229,14 +2229,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Provides a filtered list of personnel including only active Persons.
+     * Retrieves a list of all active personnel, including prisoners.
      *
-     * @return a {@link Person} <code>List</code> containing all active personnel
+     * <p>This method is deprecated and defaults to including prisoners in the result. Use
+     * {@link #getActivePersonnel(boolean)} instead for more explicit behavior control.</p>
+     *
+     * <p>This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't
+     * explicit in it's inclusion of prisoners in the return. I've opted to Deprecate this method
+     * as it is far better to be explicit in whether you want to include prisoners or not. This
+     * avoids a lot of potentially weird bugs.</p>
+     *
+     * @return A {@link List} of {@link Person} objects representing all active personnel,
+     * including prisoners.
+     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners.
      */
+    @Deprecated
     public List<Person> getActivePersonnel() {
-        return getPersonnel().stream()
-                .filter(p -> p.getStatus().isActive())
-                .collect(Collectors.toList());
+        return getActivePersonnel(true);
+    }
+
+    /**
+     * Retrieves a list of active personnel in the campaign, optionally including prisoners.
+     *
+     * <p>This method iterates through all personnel and filters out inactive members. It then
+     * further filters prisoners based on the provided parameter:</p>
+     * <ul>
+     *   <li>If {@code includePrisoners} is {@code true}, all active personnel, including prisoners,
+     *   are included in the result.</li>
+     *   <li>If {@code includePrisoners} is {@code false}, only active personnel who are either
+     *   free or classified as bondsmen are included.</li>
+     * </ul>
+     *
+     * @param includePrisoners {@code true} to include all active prisoners in the result,
+     *                         {@code false} to exclude them unless they are free or bondsmen.
+     * @return A {@link List} of {@link Person} objects representing the filtered active personnel.
+     */
+    public List<Person> getActivePersonnel(boolean includePrisoners) {
+        List<Person> activePersonnel = new ArrayList<>();
+
+        for (Person person : getPersonnel()) {
+            if (!person.getStatus().isActive()) {
+                continue;
+            }
+
+            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
+            if (includePrisoners || prisonerStatus.isFreeOrBondsman()) {
+                activePersonnel.add(person);
+            }
+        }
+
+        return activePersonnel;
     }
 
     /**
