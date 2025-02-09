@@ -2625,7 +2625,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (entity != null) {
-                    if (isProhibitedUnitType(entity, false)) {
+                    if (isProhibitedUnitType(entity, false, false)) {
                         return;
                     }
                 }
