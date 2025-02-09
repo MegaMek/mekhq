@@ -3483,11 +3483,27 @@ public class Person {
                 getId(), getFullTitle());
     }
 
+    /**
+     * Constructs and returns the full title by combining the rank and full name. If the rank is
+     * not available or an exception occurs while retrieving it, the method will only return the
+     * full name.
+     *
+     * @return the full title as a combination of rank and full name, or just the full name if the
+     * rank is unavailable
+     */
     public String getFullTitle() {
-        String rank = getRankName();
+        String rank = "";
 
-        if (!rank.isBlank()) {
-            rank = rank + ' ';
+        try {
+            rank = getRankName();
+
+            if (!rank.isBlank()) {
+                rank = rank + ' ';
+            }
+        } catch (Exception ignored) {
+            // This try-catch exists to allow us to more easily test Person objects. Previously, if
+            // a method included 'getFullTitle' it would break if the Person object hadn't been
+            // assigned a Rank System.
         }
 
         return rank + getFullName();

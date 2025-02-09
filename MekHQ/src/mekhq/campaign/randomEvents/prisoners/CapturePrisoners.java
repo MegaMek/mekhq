@@ -21,6 +21,7 @@ package mekhq.campaign.randomEvents.prisoners;
 import megamek.common.Compute;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
@@ -38,8 +39,6 @@ import java.util.List;
 
 import static java.lang.Math.round;
 import static megamek.common.Board.T_SPACE;
-import static megamek.common.Compute.d6;
-import static megamek.common.Compute.randomInt;
 import static megamek.common.MiscType.createBeagleActiveProbe;
 import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
@@ -49,7 +48,10 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ENEMY_BONDSMAN;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.POW;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BECOMING_BONDSMAN;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER_DEFECTOR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 /**
  * Handles events and processes related to capturing prisoners.
@@ -66,27 +68,32 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
  * mechanics, and provides support for defection offers.</p>
  */
 public class CapturePrisoners {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
+
     private final Campaign campaign;
     private final Faction searchingFaction;
     private final boolean searchingFactionIsClan;
 
     private final int ATTEMPT_COUNT = 3; // This will need tweaking till we're happy with the result
-    private final int DEFECTION_CHANCE = 100;
-    private final double MERCENARY_MULTIPLIER = 0.95;
-    private final int CLAN_DEZGRA_MULTIPLIER = 5;
+    final static int DEFECTION_CHANCE = 100;
+    final static double MERCENARY_MULTIPLIER = 0.95;
+    final static int CLAN_DEZGRA_MULTIPLIER = 5;
 
     // SAR Modifiers (based on CamOps pg 223)
-    final int HAS_BATTLEFIELD_CONTROL = 1;
-    final int GOING_TO_GROUND = -4;
+    final static int HAS_BATTLEFIELD_CONTROL = -1;
+    final static int GOING_TO_GROUND = 4;
 
-    final int SAR_CONTAINS_VTOL_OR_WIGE = 1;
-    final int SAR_HAS_IMPROVED_SENSORS = 2; // largest only
-    final int SAR_HAS_ACTIVE_PROBE = 1; // largest only
+    // Ground
+    final static int SAR_CONTAINS_VTOL_OR_WIGE = -1;
+    final static int SAR_HAS_IMPROVED_SENSORS = -2; // largest only
+    final static int SAR_HAS_ACTIVE_PROBE = -1; // largest only
 
-    final int NOT_IN_PLANET_ORBIT = -2;
-    final int SAR_INCLUDES_DROPSHIP = 2; // largest only
+    // Space
+    final static int NOT_IN_PLANET_ORBIT = 2;
+    final static int SAR_INCLUDES_DROPSHIP = -2;
 
-    private TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
+    final static int BASE_TARGET_NUMBER = 8; // Base Target Number (CamOps pg 223)
+    private TargetRoll sarTargetNumber = new TargetRoll(BASE_TARGET_NUMBER, "Base TN");
 
     /**
      * Constructs a {@link CapturePrisoners} object and initializes modifiers
@@ -106,7 +113,6 @@ public class CapturePrisoners {
         this.campaign = campaign;
         this.searchingFaction = searchingFaction;
 
-        sarTargetNumber.addModifier(GOING_TO_GROUND, "Potential Prisoner Going to Ground");
         sarTargetNumber.addModifier(HAS_BATTLEFIELD_CONTROL, "Searcher Has Battlefield Control");
 
         int today = campaign.getLocalDate().getYear();
@@ -121,12 +127,13 @@ public class CapturePrisoners {
         }
 
         if (scenario.getBoardType() == T_SPACE) {
+            // It doesn't make sense for a character to 'go to ground' in space. Where are they
+            // going to go when their air runs out?
             sarTargetNumber.addModifier(NOT_IN_PLANET_ORBIT, "Not in Planet Orbit");
             sarTargetNumber.addModifier(SAR_INCLUDES_DROPSHIP, "SAR Includes DropShip");
         } else {
+            sarTargetNumber.addModifier(GOING_TO_GROUND, "Potential Prisoner Going to Ground");
             sarTargetNumber.addModifier(SAR_CONTAINS_VTOL_OR_WIGE, "SAR Contains VTOL or WIGE");
-            sarTargetNumber.addModifier(SAR_INCLUDES_DROPSHIP, "SAR Includes DropShip");
-
 
             final int isImprovedSensorsAvailability = createISImprovedSensors().calcYearAvailability(
                 today, searchingFactionIsClan, techFaction);
@@ -144,6 +151,16 @@ public class CapturePrisoners {
                 sarTargetNumber.addModifier(SAR_HAS_ACTIVE_PROBE, "SAR has Active Probe");
             }
         }
+    }
+
+    /**
+     * Retrieves the target roll number used for Search and Rescue (SAR) operations
+     * to determine the success of capturing prisoners.
+     *
+     * @return The {@link TargetRoll} object representing the SAR target number.
+     */
+    TargetRoll getSarTargetNumber() {
+        return sarTargetNumber;
     }
 
     /**
@@ -179,7 +196,10 @@ public class CapturePrisoners {
         if (campaignFaction.isClan()) {
             processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle, true);
 
-            handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+            // It's possible the character may have performed Bondsref and been removed
+            if (campaign.getPersonnel().contains(prisoner)) {
+                handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+            }
             return;
         }
 
@@ -197,20 +217,31 @@ public class CapturePrisoners {
         }
 
         // Otherwise, we attempt defection
-        int defectionRoll = attemptDefection(prisoner, true);
+        int defectionChance = attemptDefection(prisoner, true);
 
-        if (defectionRoll == 0) {
+        if (randomInt(defectionChance) == 0) {
             processPrisoner(prisoner, prisonerFaction, true, true);
 
-            PrisonerStatus newStatus = prisoner.getPrisonerStatus();
-            if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
-                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+            // We include this check in case the character committed Bondsref and was removed
+            if (campaign.getPersonnel().contains(prisoner)) {
+                PrisonerStatus newStatus = prisoner.getPrisonerStatus();
+
+                if (newStatus.isPrisoner()) {
+                    prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
+                }
+
+                if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
+                    new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+                }
             }
         } else {
             prisoner.setPrisonerStatus(campaign, PRISONER, true);
         }
 
-        handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+        // It's possible the character may have performed Bondsref and been removed
+        if (campaign.getPersonnel().contains(prisoner)) {
+            handlePostCapture(prisoner, prisoner.getPrisonerStatus());
+        }
     }
 
     /**
@@ -225,19 +256,29 @@ public class CapturePrisoners {
      * @param isMekHQCaptureStyle    Indicates whether MekHQ's custom capture style is active.
      * @param isNPC                  {@code true} if the prisoner is an NPC, otherwise {@code false}.
      */
-    private void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle, boolean isNPC) {
+    void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle, boolean isNPC) {
         LocalDate today = campaign.getLocalDate();
         HonorRating honorRating = faction.getHonorRating(campaign);
 
-        int bondsmanRoll = d6();
+        int bondsmanRoll = d6(1);
         if (faction.isClan()) {
+
             if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
-                prisoner.changeStatus(campaign, today, BONDSREF);
+                if (isNPC) {
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "free.report",
+                            prisoner.getFullName(),
+                            spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            CLOSING_SPAN_TAG));
+
+                    campaign.removePerson(prisoner);
+                } else {
+                    prisoner.changeStatus(campaign, today, BONDSREF);
+                }
                 return;
-            } else if (d6() >= honorRating.getBondsmanTargetNumber()) {
+            } else if (d6(1) >= honorRating.getBondsmanTargetNumber()) {
                 if (isNPC) {
                     prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
-                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6()));
+                    prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
                 } else {
                     prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
                 }
@@ -253,21 +294,22 @@ public class CapturePrisoners {
     }
 
     /**
-     * Handles the defection mechanics for a captured prisoner.
+     * Attempts to calculate the likelihood of a defection by evaluating various factors
+     * including the origin faction of the potential defector, their status as clan personnel,
+     * and whether the defector is controlled by the AI or the player.
      *
-     * <p>This method calculates the base likelihood of defection and adjusts the probabilities
-     * based on faction traits, such as whether the faction is mercenary or subject to Clan-specific
-     * dezgra rules. It also accounts for NPCs or player-specific conditions in the defection process.</p>
-     *
-     * @param potentialDefector The {@link Person} object representing the potential defector.
-     * @param isNPC             {@code true} if the defection attempt is for an NPC, otherwise {@code false}.
-     * @return The defection roll value, where {@code 0} indicates a successful defection.
+     * @param potentialDefector The {@link Person} being evaluated for a potential defection.
+     *                          This person may originate from a faction that affects defection probability.
+     * @param isNPC             {@code true} if the defection attempt involves a non-player character (NPC),
+     *                          otherwise {@code false}.
+     * @return The adjusted defection probability as an integer value based on the base defection
+     *         chance and applicable multipliers.
      */
-    private int attemptDefection(Person potentialDefector, boolean isNPC) {
+    int attemptDefection(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
 
         if (potentialDefector.getOriginFaction().isMercenary()) {
-            adjustedDefectionChance *= (int) round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
+            adjustedDefectionChance = (int) round(adjustedDefectionChance * MERCENARY_MULTIPLIER);
         }
 
         if (potentialDefector.isClanPersonnel()) {
@@ -283,7 +325,7 @@ public class CapturePrisoners {
             }
         }
 
-        return randomInt(adjustedDefectionChance);
+        return adjustedDefectionChance;
     }
 
     /**
@@ -331,9 +373,9 @@ public class CapturePrisoners {
         }
 
         // Otherwise, we attempt defection
-        int defectionRoll = attemptDefection(prisoner, false);
+        int defectionChance = attemptDefection(prisoner, false);
 
-        if (defectionRoll == 0) {
+        if (randomInt(defectionChance) == 0) {
             processPrisoner(prisoner, prisonerFaction, true, false);
 
             PrisonerStatus newStatus = prisoner.getPrisonerStatus();
@@ -353,7 +395,7 @@ public class CapturePrisoners {
      *
      * @return {@code true} if any roll meets or exceeds the target number, otherwise {@code false}.
      */
-    private boolean rollForCapture() {
+    boolean rollForCapture() {
         int targetNumber = sarTargetNumber.getValue();
         for (int attempt = 0; attempt < ATTEMPT_COUNT; attempt++) {
             int roll = d6(2);
@@ -379,15 +421,7 @@ public class CapturePrisoners {
 
         // non-clan prisoners should generate with lower than average loyalty, so drop the highest roll
         if (!newStatus.isBecomingBondsman()) {
-            List<Integer> rolls = new ArrayList<>();
-
-            for (int roll = 0; roll < 4; roll++) {
-                rolls.add(Compute.d6(1));
-            }
-
-            Collections.sort(rolls);
-
-            prisoner.setLoyalty(rolls.get(0) + rolls.get(1) + rolls.get(2));
+            setLoyalty(prisoner);
         }
 
         // 'Recruit' prisoner
@@ -403,5 +437,48 @@ public class CapturePrisoners {
             campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsman.report",
                 prisoner.getHyperlinkedName()));
         }
+    }
+
+    /**
+     * Sets the loyalty level for a captured prisoner.
+     *
+     * <p>This method calculates the loyalty value by performing four dice rolls,
+     * taking the highest three rolls, and summing their results. The calculated
+     * value is then assigned as the prisoner's loyalty attribute.</p>
+     *
+     * @param prisoner The captured prisoner whose loyalty is being calculated and set.
+     */
+    private void setLoyalty(Person prisoner) {
+        List<Integer> rolls = new ArrayList<>();
+
+        for (int roll = 0; roll < 4; roll++) {
+            rolls.add(d6(1));
+        }
+
+        Collections.sort(rolls);
+
+        prisoner.setLoyalty(rolls.get(0) + rolls.get(1) + rolls.get(2));
+    }
+
+    /**
+     * Performs a dice roll using a specified number of dice and returns the total.
+     *
+     * <p>This method allows us to pass in explicit values in during Unit Testing.</p>
+     *
+     * @param dice The number of six-sided dice to roll.
+     * @return The total result of rolling the specified number of six-sided dice.
+     */
+    protected int d6(int dice) {
+        return Compute.d6(dice);
+    }
+
+    /**
+     * Generates a random integer value between 0 (inclusive) and the specified maximum value (exclusive).
+     *
+     * @param maxValue The upper bound (exclusive) for the random integer generation. Must be a positive integer.
+     * @return A randomly generated integer value between 0 (inclusive) and maxValue (exclusive).
+     */
+    protected int randomInt(int maxValue) {
+        return Compute.randomInt(maxValue);
     }
 }
