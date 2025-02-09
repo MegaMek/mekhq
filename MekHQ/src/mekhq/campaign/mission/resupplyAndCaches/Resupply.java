@@ -19,7 +19,6 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import megamek.common.Entity;
-import megamek.common.EquipmentFlag;
 import megamek.common.Mek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -37,7 +36,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -404,7 +402,7 @@ public class Resupply {
                     continue;
                 }
 
-                if (isProhibitedUnitType(entity, false)) {
+                if (isProhibitedUnitType(entity, false, false)) {
                     continue;
                 }
 
@@ -428,26 +426,29 @@ public class Resupply {
     }
 
     /**
-     * Checks whether a unit type is prohibited from resupply based on its characteristics.
-     * Some units, such as large craft, super-heavy units, and conventional infantry, may
-     * be excluded.
-     * <p>
-     * If {@code excludeDropShipsFromCheck} is {@code true} DropShips will not be considered a
-     * prohibited unit
+     * Determines if the given entity is a prohibited unit type based on specific criteria.
      *
-     * @param entity                     The entity being checked.
-     * @param excludeDropShipsFromCheck  {@code true} to exclude DropShips from prohibited checks,
-     *                                   {@code false} otherwise.
-     * @return {@code true} if the unit type is prohibited, {@code false} otherwise.
+     * @param entity the entity to check for prohibited unit type
+     * @param excludeDropShipsFromCheck if true, DropShip entities are excluded from being
+     *                                 considered prohibited
+     * @param excludeSuperHeaviesFromCheck if true, Super Heavy entities are excluded from being
+     *                                    considered prohibited
+     * @return {@code true} if the entity is a prohibited unit type such as Small Craft, Large
+     * Craft, or Conventional Infantry, and not excluded by the specified parameters; {@code false}
+     * otherwise
      */
-    public static boolean isProhibitedUnitType(Entity entity, boolean excludeDropShipsFromCheck) {
+    public static boolean isProhibitedUnitType(Entity entity, boolean excludeDropShipsFromCheck,
+                                               boolean excludeSuperHeaviesFromCheck) {
         if (entity.isDropShip() && excludeDropShipsFromCheck) {
+            return false;
+        }
+
+        if (entity.isSuperHeavy() && excludeSuperHeaviesFromCheck) {
             return false;
         }
 
         return entity.isSmallCraft()
             || entity.isLargeCraft()
-            || entity.isSuperHeavy()
             || entity.isConventionalInfantry();
     }
 
@@ -516,32 +517,26 @@ public class Resupply {
         Set<PartInUse> partsInUse = campaign.getPartsInUse(true, true,
             PartQuality.QUALITY_A);
 
-        return applyWarehouseWeightModifiers(partsInUse);
-    }
+        Faction campaignFaction = campaign.getFaction();
+        LocalDate today = campaign.getLocalDate();
+        boolean removeClan = !campaignFaction.isClan() && today.isBefore(BATTLE_OF_TUKAYYID);
 
-    /**
-     * Generates a key for the given part based on its name and tonnage.
-     *
-     * <p>The key is a combination of the part's name and its tonnage, separated by a colon.
-     * For specific part types such as {@link AmmoBin} and {@link Armor}, the tonnage is
-     * always set to a set value, regardless of the actual tonnage.</p>
-     *
-     * @param part The {@link Part} for which the key is generated. Must not be {@code null}.
-     * @return A unique key in the format {@code "partName:partTonnage"}, where
-     *         {@code partName} is the name of the part and {@code partTonnage} is the
-     *         tonnage of the part or a fixed value for {@link AmmoBin} and {@link Armor}.
-     */
-    private static String getPartKey(Part part) {
-        String partName = part.getName();
-        double partTonnage = part.getTonnage();
+        Set<PartInUse> partsToRemove = new HashSet<>();
+        for (PartInUse partInUse : partsInUse) {
+            Part part = partInUse.getPartToBuy().getAcquisitionPart();
+            if (removeClan && (part.isClan() || part.isMixedTech())) {
+                partsToRemove.add(partInUse);
+                continue;
+            }
 
-        if (part instanceof AmmoBin) {
-            partTonnage = RESUPPLY_AMMO_TONNAGE;
-        } else if (part instanceof Armor) {
-            partTonnage = RESUPPLY_ARMOR_TONNAGE;
+            if (isIneligiblePart(part)) {
+                partsToRemove.add(partInUse);
+            }
         }
 
-        return partName + ':' + partTonnage;
+        partsInUse.removeAll(partsToRemove);
+
+        return applyWarehouseWeightModifiers(partsInUse);
     }
 
     /**
@@ -549,12 +544,11 @@ public class Resupply {
      * determined based on exclusion lists, unit structure compatibility, and transporter checks.
      *
      * @param part   The part being checked.
-     * @param unit   The unit to which the part belongs.
      * @return {@code true} if the part is ineligible, {@code false} otherwise.
      */
-    private boolean isIneligiblePart(Part part, Unit unit) {
+    private boolean isIneligiblePart(Part part) {
         return checkExclusionList(part)
-            || checkMekLocation(part, unit)
+            || checkMekLocation(part)
             || checkTankLocation(part)
             || checkMotiveSystem(part)
             || checkTransporter(part);
@@ -586,19 +580,17 @@ public class Resupply {
     }
 
     /**
-     * Checks if a part belonging to a 'Mek' unit is eligible for resupply, based on its location
-     * or whether the unit is considered extinct. For example, parts located in the center torso
-     * or parts from extinct units are deemed ineligible.
+     * Checks if a part belonging to a 'Mek' unit is eligible for resupply, based on its location.
+     * For example, parts located in the center torso or parts from extinct units are deemed
+     * ineligible.
      *
      * @param part   The part to check.
-     * @param mek    The unit to which the part belongs.
      * @return {@code true} if the part is ineligible due to its location or extinction,
      * {@code false} otherwise.
      */
-    private boolean checkMekLocation(Part part, Unit mek) {
+    private boolean checkMekLocation(Part part) {
         return part instanceof MekLocation &&
-            (((MekLocation) part).getLoc() == Mek.LOC_CT
-                || mek.isExtinct(currentYear, employerIsClan, employerTechCode));
+            (((MekLocation) part).getLoc() == Mek.LOC_CT);
     }
 
     /**
@@ -799,7 +791,7 @@ public class Resupply {
 
                     if (unit.isDamaged()
                         || !unit.isFullyCrewed()
-                        || isProhibitedUnitType(entity, true)) {
+                        || isProhibitedUnitType(entity, true, true)) {
                         continue;
                     }
 
