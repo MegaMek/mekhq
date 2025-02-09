@@ -54,6 +54,8 @@ import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.force.ForceType.SECURITY;
+import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
+import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -70,8 +72,9 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
  * specific prisoner events. It also tracks and exposes information like escapees for further
  * processing in the campaign.</p>
  */
-
 public class EventEffectsManager {
+    private static final MMLogger logger = MMLogger.create(EventEffectsManager.class);
+
     private final Campaign campaign;
 
     private String eventReport = "";
@@ -186,13 +189,15 @@ public class EventEffectsManager {
         List<Person> potentialTargets = new ArrayList<>();
         if (isGuard) {
             for (Force force : campaign.getAllForces()) {
-                if (force.isForceType(SECURITY)) {
-                    for (UUID unitId : force.getAllUnits(false)) {
-                        Unit unit = campaign.getUnit(unitId);
+                if (!force.isForceType(SECURITY)) {
+                    continue;
+                }
 
-                        if (unit != null) {
-                            potentialTargets.addAll(unit.getActiveCrew());
-                        }
+                for (UUID unitId : force.getAllUnits(false)) {
+                    Unit unit = campaign.getUnit(unitId);
+
+                    if (unit != null) {
+                        potentialTargets.addAll(unit.getActiveCrew());
                     }
                 }
             }
@@ -218,7 +223,7 @@ public class EventEffectsManager {
      * @param result The {@link EventResult} detailing the effect and its magnitude.
      * @return A {@link String} summarizing the effect of the operation.
      */
-    private String eventEffectPrisonerCapacity(EventResult result) {
+    String eventEffectPrisonerCapacity(EventResult result) {
         final int magnitude = result.magnitude();
         int currentTemporarilyPrisonerCapacity = campaign.getTemporaryPrisonerCapacity();
 
@@ -245,7 +250,7 @@ public class EventEffectsManager {
      * @param result The {@link EventResult} detailing the injury effect.
      * @return A {@link String} summarizing the injury effect.
      */
-    private String eventEffectInjury(EventResult result) {
+    String eventEffectInjury(EventResult result) {
         final boolean isGuard = result.isGuard();
         final int magnitude = result.magnitude();
 
@@ -295,7 +300,7 @@ public class EventEffectsManager {
      * @param result The {@link EventResult} detailing the death effect.
      * @return A {@link String} summarizing the death effect.
      */
-    private String eventEffectInjuryPercent(EventResult result) {
+    String eventEffectInjuryPercent(EventResult result) {
         final boolean isUseAdvancedMedical = campaign.getCampaignOptions().isUseAdvancedMedical();
         final boolean isGuard = result.isGuard();
         final double magnitude = (double) result.magnitude() / 100;
@@ -306,7 +311,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        int targetCount = (int) max(1, ceil(potentialTargets.size() * magnitude));
+        int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
@@ -361,7 +366,7 @@ public class EventEffectsManager {
      * @param result The {@link EventResult} detailing the escape effect and its magnitude.
      * @return A {@link String} summarizing the escape effect.
      */
-    private String eventEffectDeath(EventResult result) {
+    String eventEffectDeath(EventResult result) {
         final boolean isGuard = result.isGuard();
         int magnitude = result.magnitude();
 
@@ -435,7 +440,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        int targetCount = (int) max(1, ceil(potentialTargets.size() * magnitude));
+        int targetCount = (int) max(1, potentialTargets.size() * magnitude);
 
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
@@ -548,7 +553,7 @@ public class EventEffectsManager {
      * @return A {@link String} summarizing the loyalty adjustment or an empty string if loyalty
      * modifiers are disabled.
      */
-    private String eventEffectLoyaltyOne(EventResult result) {
+    String eventEffectLoyaltyOne(EventResult result) {
         boolean isUseLoyalty = campaign.getCampaignOptions().isUseLoyaltyModifiers();
 
         if (!isUseLoyalty) {
@@ -663,7 +668,6 @@ public class EventEffectsManager {
             allPotentialTargets.remove(target);
         }
 
-        MMLogger logger = MMLogger.create(EventEffectsManager.class);
         logger.info(escapees.toString());
 
         String colorOpen = spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor());
@@ -952,8 +956,8 @@ public class EventEffectsManager {
         }
 
         target.removeAllSkills();
-        target.setPrimaryRole(campaign, PersonnelRole.DEPENDENT);
-        target.setSecondaryRole(PersonnelRole.DEPENDENT);
+        target.setPrimaryRole(campaign, DEPENDENT);
+        target.setSecondaryRole(NONE);
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "MISTAKE.report",
             target.getFullTitle());
@@ -988,14 +992,16 @@ public class EventEffectsManager {
     }
 
     /**
-     * Applies a fatigue effect to 10% of campaign personnel, simulating a poisoning event.
+     * Applies a unique poison effect to a subset of the active personnel in the campaign,
+     * adjusting their fatigue levels based on the magnitude of the event result.
+     * The effect targets a percentage of personnel determined by a skill value provided in the
+     * event result.
      *
-     * <p>The magnitude determines the level of fatigue applied to each affected person. If fatigue
-     * modifiers are disabled, this effect is skipped.</p>
-     *
-     * @param result The {@link EventResult} describing the magnitude of the fatigue effect.
-     * @return A {@link String} summarizing the outcome of the poisoning effect, or an empty string
-     * if the modifier is disabled.
+     * @param result The event result containing data about the poison effect, including its
+     *               magnitude and a factor influencing the percentage of targets affected.
+     * @return A formatted string summarizing the poison's effect, including a color-coded
+     *         representation of severity, or an empty string if fatigue effects are disabled
+     *         or there are no valid personnel to target.
      */
     private String eventEffectUniquePoison(EventResult result) {
         if (!campaign.getCampaignOptions().isUseFatigue()) {
@@ -1010,7 +1016,9 @@ public class EventEffectsManager {
             return "";
         }
 
-        int targetCount = (int) max(1, ceil(potentialTargets.size() * 0.1));
+        double percentage = 0.1;
+
+        int targetCount = (int) max(1, potentialTargets.size() * percentage);
 
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
@@ -1028,6 +1036,7 @@ public class EventEffectsManager {
         return getFormattedTextAt(RESOURCE_BUNDLE, "POISON.report",
             colorOpen, CLOSING_SPAN_TAG);
     }
+
     /**
      * Handles an event where abandoned personnel generate new prisoners while increasing the
      * crime rating.
@@ -1068,7 +1077,7 @@ public class EventEffectsManager {
 
         for (int i = 0; i < prisonerCount; i++) {
             Person newPerson = campaign.newPerson(PersonnelRole.MEKWARRIOR,
-                PersonnelRole.NONE,
+                NONE,
                 new DefaultFactionSelector(originOptions, targetFaction),
                 new DefaultPlanetSelector(originOptions, targetContract.getSystem().getPrimaryPlanet()),
                 Gender.RANDOMIZE);

@@ -23,6 +23,13 @@ import org.junit.jupiter.api.Test;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * A test class for validating the functionality of the {@code PrisonerCaptureStyle} enumeration.
+ *
+ * <p>This class contains unit tests to ensure that each {@code PrisonerCaptureStyle} has valid
+ * resource keys for its labels and tooltips. The tests verify that no invalid labels or tooltips
+ * are present, as determined by the {@code isResourceKeyValid} method.</p>
+ */
 public class PrisonerCaptureStyleTest {
     @Test
     public void testGetLabel_notInvalid() {

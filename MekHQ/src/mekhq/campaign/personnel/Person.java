@@ -1564,7 +1564,7 @@ public class Person {
     }
 
     /**
-     * @return the name corresponding to a individual's loyalty modifier.
+     * @return the name corresponding to an individual's loyalty modifier.
      *
      * @param loyaltyModifier the loyalty modifier
      * @throws IllegalStateException if an unexpected value is passed for

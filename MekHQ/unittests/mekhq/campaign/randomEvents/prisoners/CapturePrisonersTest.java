@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.common.ITechnology;
@@ -28,6 +46,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+/**
+ * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the
+ * prisoner capture and processing mechanisms. This class contains a variety of unit test cases to
+ * ensure all intended scenarios for capturing and handling prisoners are resolved correctly.
+ *
+ * <p>The test cases examine different settings such as ground and space environments, the use of
+ * sensors and probes, the capture of NPCs, and the processing of prisoners under specific factions
+ * or capture methods such as Campaign Operations and MekHQ. Additionally, scenarios regarding
+ * prisoner defection are also tested for various factions and conditions.</p>
+ */
 class CapturePrisonersTest {
     @Test
     void testCapturePrisoners_Ground() {
