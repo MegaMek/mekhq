@@ -39,6 +39,8 @@ import java.awt.event.ActionListener;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
+
 /**
  * Displays interstellar map and contains transit controls.
  */
@@ -189,6 +191,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.repaint();
 
         getCampaign().getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
+
+        abandonMissingPersonnel(getCampaign());
     }
 
     private void refreshSystemView() {

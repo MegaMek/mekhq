@@ -95,7 +95,7 @@ public class ResupplyUtilities {
                     Unit unit = campaign.getUnit(unitID);
 
                     for (Person crewMember : unit.getCrew()) {
-                        decideCrewMemberFate(campaign, crewMember);
+                        decideCrewMemberFate(campaign, contract, crewMember);
                     }
 
                     campaign.removeUnit(unitID);
@@ -119,11 +119,15 @@ public class ResupplyUtilities {
      * @param campaign the {@link Campaign} instance for date tracking and updating crew member status.
      * @param person   the {@link Person} representing the crew member whose fate is being decided.
      */
-    private static void decideCrewMemberFate(Campaign campaign, Person person) {
+    private static void decideCrewMemberFate(Campaign campaign, AtBContract contract, Person person) {
         PersonnelStatus status = KIA;
 
         if (Compute.d6(2) > 7) {
-            status = PersonnelStatus.POW;
+            if (contract.getEnemy().isClan()) {
+                status = PersonnelStatus.ENEMY_BONDSMAN;
+            } else {
+                status = PersonnelStatus.POW;
+            }
         }
 
         person.changeStatus(campaign, campaign.getLocalDate(), status);

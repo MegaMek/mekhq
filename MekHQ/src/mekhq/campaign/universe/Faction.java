@@ -176,6 +176,19 @@ public class Faction {
         return tags.contains(tag);
     }
 
+    /**
+     * Updates the set of tags associated with the faction. Tags represent various
+     * attributes or characteristics that describe the faction, such as its size,
+     * alignment, behavior, or role within the campaign universe.
+     *
+     * @param tags the set of tags to be assigned to the faction. Each tag represents
+     *             a specific characteristic or quality of the faction, such as
+     *             {@code PIRATE}, {@code SUPER}, {@code REBEL}, among others.
+     */
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
+    }
+
     public boolean validIn(final LocalDate today) {
         return validIn(today.getYear());
     }
