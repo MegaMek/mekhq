@@ -43,7 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 public class PrisonerRansomEvent {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
-    private static final int RANSOM_COST_DIVIDER = 10;
+    private static final int RANSOM_COST_DIVIDER = 5;
     private static final int RANSOM_COST_MULTIPLIER = 10;
     private static final int ACCEPTED = 1; // Choice for accepting ransom
     private static final double RANSOM_PERCENTAGE = 0.1; // Allow 10% of prisoners to be ransomed in any given event

@@ -30,6 +30,7 @@ import static megamek.common.MiscType.createCLImprovedSensors;
 import static megamek.common.MiscType.createISImprovedSensors;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
 
 /**
  * Handles the recovery of missing personnel (MIA) through abstracted search-and-rescue (SAR)
@@ -121,6 +122,22 @@ public class RecoverMIAPersonnel {
 
         if (wasRescued) {
             missingPerson.changeStatus(campaign, campaign.getLocalDate(), ACTIVE);
+        }
+    }
+
+    /**
+     * Updates the status of all personnel marked as Missing In Action (MIA) in the given campaign
+     * to indicate they have left the campaign.
+     *
+     * @param campaign The campaign instance containing the personnel to be checked and updated.
+     */
+    public static void abandonMissingPersonnel(Campaign campaign) {
+        for (Person person : campaign.getPersonnel()) {
+            if (!person.getStatus().isMIA()) {
+                continue;
+            }
+
+            person.changeStatus(campaign, campaign.getLocalDate(), LEFT);
         }
     }
 }

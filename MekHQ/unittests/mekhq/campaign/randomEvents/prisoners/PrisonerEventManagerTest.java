@@ -190,6 +190,7 @@ public class PrisonerEventManagerTest {
     void testCheckForRansomEvents_EnemyEvent() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        when(mockCampaign.hasActiveContract()).thenReturn(true);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
@@ -197,10 +198,6 @@ public class PrisonerEventManagerTest {
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        AtBContract contract = new AtBContract("TEST");
-        contract.setMoraleLevel(STALEMATE);
-        when(mockCampaign.hasActiveContract()).thenReturn(true);
-        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         Person friendlyPrisonerOfWar = new Person(mockCampaign);
         when(mockCampaign.getFriendlyPrisoners()).thenReturn(List.of(friendlyPrisonerOfWar));
@@ -208,7 +205,7 @@ public class PrisonerEventManagerTest {
         PrisonerEventManager realEventManager = new PrisonerEventManager(mockCampaign) {
             @Override
             protected int d6(int dice) {
-                return STALEMATE.ordinal();
+                return RANSOM_EVENT_CHANCE;
             }
 
             @Override
@@ -235,17 +232,13 @@ public class PrisonerEventManagerTest {
     void testCheckForRansomEvents_FriendlyEvent() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
+        when(mockCampaign.hasActiveContract()).thenReturn(true);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         LocalDate today = LocalDate.of(3151, 1, 3);
         when(mockCampaign.getLocalDate()).thenReturn(today);
-
-        AtBContract contract = new AtBContract("TEST");
-        contract.setMoraleLevel(STALEMATE);
-        when(mockCampaign.hasActiveContract()).thenReturn(true);
-        when(mockCampaign.getActiveContracts()).thenReturn(List.of(contract));
 
         Person friendlyPrisonerOfWar = new Person(mockCampaign);
         when(mockCampaign.getFriendlyPrisoners()).thenReturn(List.of(friendlyPrisonerOfWar));
@@ -256,7 +249,7 @@ public class PrisonerEventManagerTest {
         PrisonerEventManager realEventManager = new PrisonerEventManager(mockCampaign) {
             @Override
             protected int d6(int dice) {
-                return STALEMATE.ordinal();
+                return RANSOM_EVENT_CHANCE;
             }
 
             @Override

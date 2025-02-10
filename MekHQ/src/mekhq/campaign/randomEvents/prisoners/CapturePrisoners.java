@@ -72,7 +72,7 @@ public class CapturePrisoners {
 
     private final int ATTEMPT_COUNT = 3; // This will need tweaking till we're happy with the result
     final static int DEFECTION_CHANCE = 100;
-    final static double MERCENARY_MULTIPLIER = 0.95;
+    final static double MERCENARY_MULTIPLIER = 0.80;
     final static int CLAN_DEZGRA_MULTIPLIER = 5;
 
     // SAR Modifiers (based on CamOps pg 223)
@@ -184,60 +184,42 @@ public class CapturePrisoners {
      */
     public void processCaptureOfNPC(Person prisoner) {
         PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
-        boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
-        Faction prisonerFaction = prisoner.getOriginFaction();
+
+        if (prisonerCaptureStyle.isNone()) {
+            return;
+        }
+
         Faction campaignFaction = campaign.getFaction();
+        processPrisoner(prisoner, campaignFaction, prisonerCaptureStyle.isMekHQ(), true);
 
-        // if the campaign faction is Clan, we do things a little differently
-        if (campaignFaction.isClan()) {
-            processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle, true);
-
-            // It's possible the character may have performed Bondsref and been removed
-            if (campaign.getPersonnel().contains(prisoner)) {
-                handlePostCapture(prisoner, prisoner.getPrisonerStatus());
-            }
+        // Have they been removed via Bondsref?
+        if (!campaign.getPersonnel().contains(prisoner)) {
             return;
         }
 
         // If MekHQ Capture Style is disabled, we can use a shortcut
-        if (!isMekHQCaptureStyle) {
-            if (prisonerFaction.isClan()) {
-                processPrisoner(prisoner, prisonerFaction, false, true);
-            } else {
-                prisoner.setPrisonerStatus(campaign, PRISONER, true);
-            }
-
+        if (!prisonerCaptureStyle.isMekHQ() || prisoner.getPrisonerStatus().isBecomingBondsman()) {
             handlePostCapture(prisoner, prisoner.getPrisonerStatus());
-
             return;
         }
 
-        // Otherwise, we attempt defection
-        int defectionChance = attemptDefection(prisoner, true);
+        // Attempt defection
+        int defectionChance = determineDefectionChance(prisoner, true);
 
         if (randomInt(defectionChance) == 0) {
-            processPrisoner(prisoner, prisonerFaction, true, true);
+            if (prisoner.isClanPersonnel()) {
+                prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
 
-            // We include this check in case the character committed Bondsref and was removed
-            if (campaign.getPersonnel().contains(prisoner)) {
-                PrisonerStatus newStatus = prisoner.getPrisonerStatus();
-
-                if (newStatus.isPrisoner()) {
-                    prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
-                }
-
-                if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
-                    new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
-                }
+                LocalDate today = campaign.getLocalDate();
+                prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
+            } else {
+                prisoner.setPrisonerStatus(campaign, PRISONER_DEFECTOR, false);
             }
-        } else {
-            prisoner.setPrisonerStatus(campaign, PRISONER, true);
+
+            new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
         }
 
-        // It's possible the character may have performed Bondsref and been removed
-        if (campaign.getPersonnel().contains(prisoner)) {
-            handlePostCapture(prisoner, prisoner.getPrisonerStatus());
-        }
+        handlePostCapture(prisoner, prisoner.getPrisonerStatus());
     }
 
     /**
@@ -248,20 +230,19 @@ public class CapturePrisoners {
      * NPCs and player characters.</p>
      *
      * @param prisoner               The {@link Person} being processed.
-     * @param faction                The {@link Faction} processing the prisoner.
+     * @param capturingFaction                The {@link Faction} processing the prisoner.
      * @param isMekHQCaptureStyle    Indicates whether MekHQ's custom capture style is active.
      * @param isNPC                  {@code true} if the prisoner is an NPC, otherwise {@code false}.
      */
-    void processPrisoner(Person prisoner, Faction faction, boolean isMekHQCaptureStyle, boolean isNPC) {
+    void processPrisoner(Person prisoner, Faction capturingFaction, boolean isMekHQCaptureStyle, boolean isNPC) {
         LocalDate today = campaign.getLocalDate();
-        HonorRating honorRating = faction.getHonorRating(campaign);
+        HonorRating prisonerHonorRating = prisoner.getOriginFaction().getHonorRating(campaign);
 
         int bondsmanRoll = d6(1);
-        if (faction.isClan()) {
-
+        if (capturingFaction.isClan()) {
             if (isMekHQCaptureStyle && prisoner.isClanPersonnel() && (bondsmanRoll == 1)) {
                 if (isNPC) {
-                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "free.report",
+                    campaign.addReport(getFormattedTextAt(RESOURCE_BUNDLE, "bondsref.report",
                             prisoner.getFullName(),
                             spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
                             CLOSING_SPAN_TAG));
@@ -271,7 +252,7 @@ public class CapturePrisoners {
                     prisoner.changeStatus(campaign, today, BONDSREF);
                 }
                 return;
-            } else if (d6(1) >= honorRating.getBondsmanTargetNumber()) {
+            } else if (d6(1) >= prisonerHonorRating.getBondsmanTargetNumber()) {
                 if (isNPC) {
                     prisoner.setPrisonerStatus(campaign, BECOMING_BONDSMAN, true);
                     prisoner.setBecomingBondsmanEndDate(today.plusWeeks(d6(1)));
@@ -301,7 +282,7 @@ public class CapturePrisoners {
      * @return The adjusted defection probability as an integer value based on the base defection
      *         chance and applicable multipliers.
      */
-    int attemptDefection(Person potentialDefector, boolean isNPC) {
+    int determineDefectionChance(Person potentialDefector, boolean isNPC) {
         int adjustedDefectionChance = DEFECTION_CHANCE;
 
         if (potentialDefector.getOriginFaction().isMercenary()) {
@@ -335,6 +316,8 @@ public class CapturePrisoners {
      * @param wasPickedUp  Whether the prisoner was picked up as part of the scenario outcome.
      */
     public void attemptCaptureOfPlayerCharacter(Person prisoner, boolean wasPickedUp, boolean isSpace) {
+        LocalDate today = campaign.getLocalDate();
+
         // Attempt capture
         boolean captureSuccessful = wasPickedUp;
 
@@ -354,39 +337,34 @@ public class CapturePrisoners {
             return;
         }
 
-
         PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
-        boolean isMekHQCaptureStyle = prisonerCaptureStyle.isMekHQ();
-        Faction prisonerFaction = prisoner.getOriginFaction();
 
-        if (searchingFactionIsClan) {
-            Faction campaignFaction = campaign.getFaction();
-            processPrisoner(prisoner, campaignFaction, isMekHQCaptureStyle, false);
+        if (prisonerCaptureStyle.isNone()) {
+            prisoner.changeStatus(campaign, campaign.getLocalDate(), MIA);
             return;
         }
 
-        if (!isMekHQCaptureStyle) {
-            if (prisonerFaction.isClan()) {
-                processPrisoner(prisoner, prisonerFaction, false, false);
-            } else {
-                prisoner.changeStatus(campaign, campaign.getLocalDate(), POW);
-            }
+        processPrisoner(prisoner, searchingFaction, prisonerCaptureStyle.isMekHQ(), true);
 
+        // Have they dead? Usually from performing Bondsref
+        if (prisoner.getStatus().isDead()) {
+            return;
+        }
+
+        // If MekHQ Capture Style is disabled, we can use a shortcut
+        if (!prisonerCaptureStyle.isMekHQ() || prisoner.getStatus().isEnemyBondsman()) {
             return;
         }
 
         // Otherwise, we attempt defection
-        int defectionChance = attemptDefection(prisoner, false);
+        int defectionChance = determineDefectionChance(prisoner, false);
 
         if (randomInt(defectionChance) == 0) {
-            processPrisoner(prisoner, prisonerFaction, true, false);
-
-            PrisonerStatus newStatus = prisoner.getPrisonerStatus();
-            if (newStatus.isBecomingBondsman() || newStatus.isPrisonerDefector()) {
-                new DefectionOffer(campaign, prisoner, prisoner.isClanPersonnel());
+            if (prisoner.isClanPersonnel()) {
+                prisoner.changeStatus(campaign, today, ENEMY_BONDSMAN);
+            } else {
+                prisoner.changeStatus(campaign, today, DEFECTED);
             }
-        } else {
-            prisoner.changeStatus(campaign, campaign.getLocalDate(), DEFECTED);
         }
     }
 

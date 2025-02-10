@@ -41,7 +41,6 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -415,12 +414,14 @@ public final class BriefingTab extends CampaignGuiTab {
         if (mission instanceof AtBContract) {
             boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
-            if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
-                prisoners.handlePrisoners(wasOverallSuccess, true);
-            }
+            if (prisoners != null) { // IDEA says we don't need the null check; I left it for insurance
+                if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(wasOverallSuccess, true);
+                }
 
-            if (!getCampaign().getCurrentPrisoners().isEmpty()) {
-                prisoners.handlePrisoners(wasOverallSuccess, false);
+                if (!getCampaign().getCurrentPrisoners().isEmpty()) {
+                    prisoners.handlePrisoners(wasOverallSuccess, false);
+                }
             }
         }
 
@@ -1230,7 +1231,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario instanceof AtBScenario) {
             btnAutoResolveScenario.setEnabled(canStartGame);
         }
-        btnPrintRS.setEnabled(canStartGame);   
+        btnPrintRS.setEnabled(canStartGame);
     }
 
     public void refreshLanceAssignments() {

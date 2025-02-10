@@ -20,12 +20,12 @@ package mekhq.campaign.randomEvents.prisoners;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
@@ -47,7 +47,6 @@ import static java.lang.Math.round;
 import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.rating.CamOpsReputation.CommandRating.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -73,7 +72,7 @@ public class PrisonerEventManager {
     // CamOps states that executing prisoners incurs a -50 reputation penalty.
     // However, that lacks nuance, so we've changed it to -1 per prisoner to a maximum of -50.
     public static final int MAX_CRIME_PENALTY = 50;
-    private final int DEFAULT_EVENT_CHANCE = STALEMATE.ordinal();
+    static final int RANSOM_EVENT_CHANCE = 10;
     private final int MINIMUM_PRISONER_COUNT = 25;
     private final int RESPONSE_TARGET_NUMBER = 7;
 
@@ -178,19 +177,12 @@ public class PrisonerEventManager {
 
         // Check for ransom events
         if (campaign.hasActiveContract()) {
-            Contract contract = campaign.getActiveContracts().get(0);
-
-            int ransomEventChance = DEFAULT_EVENT_CHANCE;
-            if (contract instanceof AtBContract) {
-                ransomEventChance = ((AtBContract) contract).getMoraleLevel().ordinal();
-            }
-
             int roll = d6(2);
-            if (roll <= ransomEventChance) {
+            if (roll >= RANSOM_EVENT_CHANCE) {
                 if (!campaign.getFriendlyPrisoners().isEmpty()) {
                     // We use randomInt here as it allows us better control over the return values
                     // when testing.
-                    isFriendlyPOWs = randomInt(6) <= 1;
+                    isFriendlyPOWs = randomInt(6) == 1;
                 }
 
                 eventTriggered = true;
@@ -356,6 +348,10 @@ public class PrisonerEventManager {
             responseModifier = getPersonalityValue(campaign, speaker);
         }
 
+        if (speaker == null) {
+            responseModifier = -12; // this deliberately renders the check impossible
+        }
+
         ResponseQuality responseQuality = eventData.responseEntries().get(choiceIndex).quality();
         switch (responseQuality) {
             case RESPONSE_NEUTRAL -> {} // No modifier
@@ -510,6 +506,10 @@ public class PrisonerEventManager {
                     continue;
                 }
 
+                if (isProhibitedUnitType(unit)) {
+                    continue;
+                }
+
                 if (unit.isBattleArmor()) {
                     int crewSize = unit.getCrew().size();
                     for (int trooper = 0; trooper < crewSize; trooper++) {
@@ -543,6 +543,23 @@ public class PrisonerEventManager {
         } else {
             return max(0, prisonerCapacity);
         }
+    }
+
+    /**
+     * Determines whether the specified unit is of a prohibited type. A unit is considered
+     * prohibited if its associated entity is an aerospace entity.
+     *
+     * @param unit The unit to be checked for prohibition. Must not be null.
+     * @return true if the unit's entity is an aerospace entity, false otherwise.
+     */
+    private static boolean isProhibitedUnitType(Unit unit) {
+        Entity entity = unit.getEntity();
+
+        if (entity == null) {
+            return false;
+        }
+
+        return entity.isAerospace();
     }
 
     /**

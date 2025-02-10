@@ -783,7 +783,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 if (status.wasPickedUp()) {
                     wasCaptured = true;
                 } else {
-                    wasCaptured = tracker.getPrisonerController().attemptCaptureOfNPC(false);
+                    wasCaptured = tracker.getCapturePrisoners().attemptCaptureOfNPC(false);
                 }
                 prisonerCapturedCheck.setSelected(wasCaptured);
             }

@@ -440,7 +440,7 @@ class CapturePrisonersTest {
     }
 
     @Test
-    void testAttemptDefection() {
+    void testDetermineDefectionChance() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
@@ -456,8 +456,8 @@ class CapturePrisonersTest {
 
         // Act
         CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
-        capturePrisoners.attemptDefection(prisoner, true);
-        int defectionChance = capturePrisoners.attemptDefection(prisoner, true);
+        capturePrisoners.determineDefectionChance(prisoner, true);
+        int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
         int expectedTargetNumber = DEFECTION_CHANCE;
@@ -467,7 +467,7 @@ class CapturePrisonersTest {
     }
 
     @Test
-    void testAttemptDefection_MercenaryPrisoner() {
+    void testDetermineDefection_Chance_MercenaryPrisoner() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
@@ -486,8 +486,8 @@ class CapturePrisonersTest {
 
         // Act
         CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
-        capturePrisoners.attemptDefection(prisoner, true);
-        int defectionChance = capturePrisoners.attemptDefection(prisoner, true);
+        capturePrisoners.determineDefectionChance(prisoner, true);
+        int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
         int expectedTargetNumber = (int) round(DEFECTION_CHANCE * MERCENARY_MULTIPLIER);
@@ -497,7 +497,7 @@ class CapturePrisonersTest {
     }
 
     @Test
-    void testAttemptDefection_ClanPrisoner_NotDezgraFaction() {
+    void testDetermineDefection_Chance_ClanPrisoner_NotDezgraFaction() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
@@ -515,8 +515,8 @@ class CapturePrisonersTest {
 
         // Act
         CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
-        capturePrisoners.attemptDefection(prisoner, true);
-        int defectionChance = capturePrisoners.attemptDefection(prisoner, true);
+        capturePrisoners.determineDefectionChance(prisoner, true);
+        int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
         int expectedTargetNumber = DEFECTION_CHANCE;
@@ -526,7 +526,7 @@ class CapturePrisonersTest {
     }
 
     @Test
-    void testAttemptDefection_ClanPrisoner_DezgraFaction() {
+    void testDetermineDefection_Chance_ClanPrisoner_DezgraFaction() {
         // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
@@ -544,7 +544,7 @@ class CapturePrisonersTest {
 
         // Act
         CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign, campaignFaction, scenario, DRAGOON_C);
-        int defectionChance = capturePrisoners.attemptDefection(prisoner, true);
+        int defectionChance = capturePrisoners.determineDefectionChance(prisoner, true);
 
         // Assert
         int expectedTargetNumber = DEFECTION_CHANCE * CLAN_DEZGRA_MULTIPLIER;

@@ -97,7 +97,7 @@ public class ResolveScenarioTracker {
     IClient client;
     Boolean control;
     private PostGameResolution victoryEvent;
-    private final CapturePrisoners prisonerController;
+    private final CapturePrisoners capturePrisoners;
 
     private static final MMLogger logger = MMLogger.create(ResolveScenarioTracker.class);
 
@@ -154,11 +154,11 @@ public class ResolveScenarioTracker {
                 sarQuality = contract.getEnemyQuality();
             }
         }
-        prisonerController = new CapturePrisoners(campaign, searchingFaction, scenario, sarQuality);
+        capturePrisoners = new CapturePrisoners(campaign, searchingFaction, scenario, sarQuality);
     }
 
-    public CapturePrisoners getPrisonerController() {
-        return prisonerController;
+    public CapturePrisoners getCapturePrisoners() {
+        return capturePrisoners;
     }
 
     public boolean isAutoResolve() {
@@ -1137,7 +1137,7 @@ public class ResolveScenarioTracker {
                 status.setPickedUp(pickedUp);
 
                 if (control) {
-                    status.setCaptured(prisonerController.attemptCaptureOfNPC(pickedUp));
+                    status.setCaptured(capturePrisoners.attemptCaptureOfNPC(pickedUp));
                 } else {
                     status.setCaptured(pickedUp);
                 }
@@ -1528,7 +1528,7 @@ public class ResolveScenarioTracker {
                     person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
                 } else {
                     boolean isSpace = scenario.getBoardType() == T_SPACE;
-                    prisonerController.attemptCaptureOfPlayerCharacter(person, status.pickedUp, isSpace);
+                    capturePrisoners.attemptCaptureOfPlayerCharacter(person, status.pickedUp, isSpace);
                 }
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
@@ -1562,7 +1562,7 @@ public class ResolveScenarioTracker {
             }
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.isCaptured()) {
-                prisonerController.processCaptureOfNPC(person);
+                capturePrisoners.processCaptureOfNPC(person);
 
                 if (status.getHits() > person.getHits()) {
                     person.setHits(status.getHits());
