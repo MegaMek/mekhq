@@ -738,29 +738,29 @@ public class Planet {
      * @return The hiring hall level on the given date
      */
     public HiringHallLevel getHiringHallLevel(LocalDate when) {
-        return getEventData(when, hiringHall, e -> e.hiringHall);
-        /*if (staticHall != null && staticHall.isActive(date)) {
-            return staticHall.getLevel();
+        HiringHallLevel staticHall = getEventData(when, hiringHall, e -> e.hiringHall);
+        if (!staticHall.isNone()) {
+            return staticHall;
         }
-        if (getPopulation(date) == 0) {
+        if (getPopulation(when) == null || getPopulation(when) == 0) {
             return HiringHallLevel.NONE;
         }
-        for (Faction faction : getFactionSet(date)) {
+        for (Faction faction : getFactionSet(when)) {
             if (faction.isPirate() || faction.isChaos()) {
                 return HiringHallLevel.QUESTIONABLE;
             }
-            if (faction.isClan()) {
+            if (faction.isClan() || faction.isInactive()) {
                 return HiringHallLevel.NONE;
             }
         }
-        int score = calculateHiringHallScore(date);
-        return resolveHiringHallLevel(score);*/
+        int score = calculateHiringHallScore(when);
+        return resolveHiringHallLevel(score);
     }
 
-    private int calculateHiringHallScore(LocalDate date) {
+    private int calculateHiringHallScore(LocalDate when) {
         int score = 0;
-        score += getHiringHallHpgBonus(date);
-        score += getHiringHallTechBonus(date);
+        score += getHiringHallHpgBonus(when);
+        score += getHiringHallTechBonus(when);
         return score;
     }
 
@@ -775,8 +775,11 @@ public class Planet {
         return HiringHallLevel.NONE;
     }
 
-    private int getHiringHallHpgBonus(LocalDate date) {
-        return switch (getHPG(date)) {
+    private int getHiringHallHpgBonus(LocalDate when) {
+        if(null == getHPG(when)) {
+            return 0;
+        }
+        return switch (getHPG(when)) {
             case EquipmentType.RATING_A -> 5;
             case EquipmentType.RATING_B -> 3;
             case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
@@ -784,8 +787,11 @@ public class Planet {
         };
     }
 
-    private int getHiringHallTechBonus(LocalDate date) {
-        return switch (getSocioIndustrial(date).tech) {
+    private int getHiringHallTechBonus(LocalDate when) {
+        if(null == getSocioIndustrial(when)) {
+            return 0;
+        }
+        return switch (getSocioIndustrial(when).tech) {
             case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
             case EquipmentType.RATING_A, EquipmentType.RATING_B -> 3;
             case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
