@@ -27,5 +27,17 @@ public enum HiringHallLevel {
     QUESTIONABLE,
     MINOR,
     STANDARD,
-    GREAT
+    GREAT;
+
+    public static HiringHallLevel parseHiringHallLevel(String val) {
+        return switch (val.toLowerCase()) {
+            case "questionable" -> QUESTIONABLE;
+            case "minor" -> MINOR;
+            case "standard" -> STANDARD;
+            case "great" -> GREAT;
+            default -> NONE;
+        };
+    }
 }
+
+

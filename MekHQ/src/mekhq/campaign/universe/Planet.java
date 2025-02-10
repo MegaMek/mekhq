@@ -36,17 +36,10 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
-import mekhq.adapter.AtmosphereAdapter;
-import mekhq.adapter.BooleanValueAdapter;
-import mekhq.adapter.ClimateAdapter;
-import mekhq.adapter.DateAdapter;
-import mekhq.adapter.HPGRatingAdapter;
-import mekhq.adapter.LifeFormAdapter;
-import mekhq.adapter.PressureAdapter;
-import mekhq.adapter.SocioIndustrialDataAdapter;
-import mekhq.adapter.StringListAdapter;
+import mekhq.adapter.*;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
  * This is the start of a planet object that will keep lots of information about
@@ -133,6 +126,7 @@ public class Planet {
     @XmlElement(name = "faction")
     @XmlJavaTypeAdapter(StringListAdapter.class)
     private List<String> factions;
+    private HiringHallLevel hiringHall = HiringHallLevel.NONE;
 
     // private List<String> garrisonUnits;
 
@@ -726,6 +720,80 @@ public class Planet {
     }
 
     /**
+     * Checks whether a hiring hall exists on the planet on the specified date
+     *
+     * @param  when Date to check for existence of hiring hall
+     * @return True if a hiring hall exists on the given date; otherwise false.
+     */
+    public boolean isHiringHall(LocalDate when) {
+        return getHiringHallLevel(when) != HiringHallLevel.NONE;
+    }
+
+    /**
+     * Retrieves the level of the Hiring Hall on the planet on the specified
+     * date. The level is dynamically determined on various planetary characteristics,
+     * including Technological Sophistication, HPG level, and planetary governments.
+     *
+     * @param  when Date to check for the level of the hiring hall
+     * @return The hiring hall level on the given date
+     */
+    public HiringHallLevel getHiringHallLevel(LocalDate when) {
+        return getEventData(when, hiringHall, e -> e.hiringHall);
+        /*if (staticHall != null && staticHall.isActive(date)) {
+            return staticHall.getLevel();
+        }
+        if (getPopulation(date) == 0) {
+            return HiringHallLevel.NONE;
+        }
+        for (Faction faction : getFactionSet(date)) {
+            if (faction.isPirate() || faction.isChaos()) {
+                return HiringHallLevel.QUESTIONABLE;
+            }
+            if (faction.isClan()) {
+                return HiringHallLevel.NONE;
+            }
+        }
+        int score = calculateHiringHallScore(date);
+        return resolveHiringHallLevel(score);*/
+    }
+
+    private int calculateHiringHallScore(LocalDate date) {
+        int score = 0;
+        score += getHiringHallHpgBonus(date);
+        score += getHiringHallTechBonus(date);
+        return score;
+    }
+
+    private HiringHallLevel resolveHiringHallLevel(int score) {
+        if (score > 9) {
+            return HiringHallLevel.GREAT;
+        } else if (score > 6) {
+            return HiringHallLevel.STANDARD;
+        } else if (score > 4) {
+            return HiringHallLevel.MINOR;
+        }
+        return HiringHallLevel.NONE;
+    }
+
+    private int getHiringHallHpgBonus(LocalDate date) {
+        return switch (getHPG(date)) {
+            case EquipmentType.RATING_A -> 5;
+            case EquipmentType.RATING_B -> 3;
+            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            default -> 0;
+        };
+    }
+
+    private int getHiringHallTechBonus(LocalDate date) {
+        return switch (getSocioIndustrial(date).tech) {
+            case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
+            case EquipmentType.RATING_A, EquipmentType.RATING_B -> 3;
+            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            default -> 0;
+        };
+    }
+
+    /**
      * @return the distance to another planet in light years (0 if both are in the
      *         same system)
      */
@@ -1124,6 +1192,9 @@ public class Planet {
         public SocioIndustrialData socioIndustrial;
         @XmlJavaTypeAdapter(HPGRatingAdapter.class)
         public Integer hpg;
+        @XmlElement(name = "hiringHall")
+        @XmlJavaTypeAdapter(HiringHallAdapter.class)
+        private HiringHallLevel hiringHall;
         @XmlJavaTypeAdapter(PressureAdapter.class)
         private Integer pressure;
         @XmlJavaTypeAdapter(AtmosphereAdapter.class)
@@ -1145,6 +1216,7 @@ public class Planet {
             percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
             shortName = ObjectUtility.nonNull(other.shortName, shortName);
             socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
+            hiringHall = ObjectUtility.nonNull(other.hiringHall, hiringHall);
             temperature = ObjectUtility.nonNull(other.temperature, temperature);
             pressure = ObjectUtility.nonNull(other.pressure, pressure);
             atmosphere = ObjectUtility.nonNull(other.atmosphere, atmosphere);
@@ -1175,6 +1247,7 @@ public class Planet {
             percentWater = other.percentWater;
             shortName = other.shortName;
             socioIndustrial = other.socioIndustrial;
+            hiringHall = other.hiringHall;
             temperature = other.temperature;
             pressure = other.pressure;
             atmosphere = other.atmosphere;
@@ -1189,7 +1262,8 @@ public class Planet {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
                     && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
                     && (null == temperature) && (null == pressure) && (null == atmosphere)
-                    && (null == composition) && (null == population) && (null == dayLength);
+                    && (null == composition) && (null == population) && (null == dayLength)
+                    && (null == hiringHall);
         }
     }
 
