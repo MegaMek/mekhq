@@ -275,7 +275,7 @@ public class PlanetarySystem {
 
     /** @return true if a hiring hall is present in the system **/
     public boolean isHiringHall(LocalDate when) {
-        return getHiringHallLevel(when) != HiringHallLevel.NONE;
+        return !getHiringHallLevel(when).isNone();
     }
 
     /**

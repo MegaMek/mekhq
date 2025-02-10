@@ -726,7 +726,7 @@ public class Planet {
      * @return True if a hiring hall exists on the given date; otherwise false.
      */
     public boolean isHiringHall(LocalDate when) {
-        return getHiringHallLevel(when) != HiringHallLevel.NONE;
+        return !getHiringHallLevel(when).isNone();
     }
 
     /**

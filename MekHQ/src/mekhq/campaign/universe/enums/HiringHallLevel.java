@@ -38,6 +38,11 @@ public enum HiringHallLevel {
             default -> NONE;
         };
     }
+
+    public boolean isNone() {
+        return this == NONE;
+    }
+
 }
 
 
