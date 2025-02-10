@@ -192,11 +192,12 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (scenario.getCurrentState().equals(UNRESOLVED)) {
                     menuItemManageScenario.setText("Manage Deployment");
+                    menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 } else {
                     menuItemManageScenario.setText("Manage Reinforcements");
+                    menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
                 }
 
-                menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 menuItemManageScenario.addActionListener(this);
                 rightClickMenu.add(menuItemManageScenario);
             }
@@ -1077,7 +1078,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (selectedScenario != null
                     && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
                     scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                        currentTrack, campaignState, isPrimaryForce);
+                        currentTrack, campaignState, false);
 
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
