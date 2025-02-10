@@ -336,8 +336,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         gbcLabel.gridy = infoRow;
         panel.add(lblHiringHall, gbcLabel);
         JLabel textHiringHall = new JLabel(StringUtils.capitalize(
-            planet.getParentSystem()
-            .getHiringHallLevel(currentDate)
+            planet.getHiringHallLevel(currentDate)
             .name()
             .toLowerCase()));
         gbcText.gridy = infoRow;
