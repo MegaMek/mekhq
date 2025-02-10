@@ -112,7 +112,7 @@ public class CapturePrisoners {
         sarTargetNumber.addModifier(HAS_BATTLEFIELD_CONTROL, "Searcher Has Battlefield Control");
 
         int today = campaign.getLocalDate().getYear();
-        searchingFactionIsClan = searchingFaction != null && searchingFaction.isClan();
+        searchingFactionIsClan = searchingFaction.isClan();
 
         int techFaction = searchingFactionIsClan ? ITechnology.getCodeFromMMAbbr("CLAN") : ITechnology.getCodeFromMMAbbr("IS");
         try {
