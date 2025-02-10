@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -17,20 +17,30 @@
  * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.personnel.randomEvents;
+package mekhq.campaign.randomEvents.personalities;
 
-import megamek.common.Compute;
-import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
+import mekhq.campaign.randomEvents.personalities.enums.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
-import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
+import static megamek.common.Compute.randomInt;
+import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
-    public static void generatePersonality(Person person) {
+    /**
+     * Generates a personality for the given person. The method assigns various personality traits,
+     * intelligence, and potential quirks to the person.
+     *
+     * @param campaign the current campaign context in which the person's personality is being generated
+     * @param person   the person for whom the personality will be generated and updated
+     */
+    public static void generatePersonality(Campaign campaign, Person person) {
         // first, we wipe any pre-existing personality traits
         person.setAggression(Aggression.NONE);
         person.setAmbition(Ambition.NONE);
@@ -43,21 +53,21 @@ public class PersonalityController {
         for (int table = 0; table < 4; table++) {
             // we only want a 1 in 6 chance of getting a personality trait, per table
             // this prevents trait bloat and helps reduce repetitiveness
-            if (Compute.randomInt(6) == 0) {
-                setPersonalityTrait(person, table, Compute.randomInt(25) + 1);
+            if (randomInt(6) == 0) {
+                setPersonalityTrait(person, table, randomInt(26));
             }
         }
 
         // we only want 1 in 10 persons to have a quirk,
         // as these helps reduce repetitiveness and keeps them unique
-        if (Compute.randomInt(10) == 0) {
+        if (randomInt(10) == 0) {
             person.setPersonalityQuirk(generatePersonalityQuirk());
         }
 
-        person.setIntelligence(generateIntelligence(Compute.randomInt(8346)));
+        person.setIntelligence(generateIntelligence(randomInt(8346)));
 
         // finally, write the description
-        writeDescription(person);
+        writeDescription(campaign, person);
 
         // check at least one characteristic has been generated, if not, then repeat the
         // process
@@ -65,7 +75,7 @@ public class PersonalityController {
         // probability says we can only expect 1 additional loop, 2 in exceptional
         // circumstances
         if (Objects.equals(person.getPersonalityDescription(), "")) {
-            generatePersonality(person);
+            generatePersonality(campaign, person);
         }
     }
 
@@ -84,14 +94,16 @@ public class PersonalityController {
         // We want major traits to have a low chance of occurring.
         // This ensures each trait only has a 1 in 25 chance of spawning
         if (traitRoll == 25) {
-            traitRoll += Compute.d6(1) - 1;
+            traitRoll += randomInt(6);
         }
 
+        String rollString = String.valueOf(traitRoll);
+
         switch (tableRoll) {
-            case 0 -> person.setAggression(Aggression.fromOrdinal(traitRoll));
-            case 1 -> person.setAmbition(Ambition.fromOrdinal(traitRoll));
-            case 2 -> person.setGreed(Greed.fromOrdinal(traitRoll));
-            case 3 -> person.setSocial(Social.fromOrdinal(traitRoll));
+            case 0 -> person.setAggression(Aggression.fromString(rollString));
+            case 1 -> person.setAmbition(Ambition.fromString(rollString));
+            case 2 -> person.setGreed(Greed.fromString(rollString));
+            case 3 -> person.setSocial(Social.fromString(rollString));
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/setPersonalityTrait: "
                             + tableRoll);
@@ -104,69 +116,62 @@ public class PersonalityController {
      *
      * @param person the person whose personality description will be set
      */
-    public static void writeDescription(Person person) {
-        List<String> traitDescriptions = getTraitDescriptions(person);
-
-        // It is beneficial to shuffle descriptions for variety.
-        Collections.shuffle(traitDescriptions);
+    public static void writeDescription(Campaign campaign, Person person) {
+        List<String> traitDescriptions = getTraitDescriptions(campaign, person);
 
         StringBuilder personalityDescription = new StringBuilder();
 
-        String firstName = person.getFirstName();
+        for (int i = 0; i < traitDescriptions.size(); i++) {
+            if (i % 2 == 0) {
+                personalityDescription.append("<p>");
+            }
 
-        // The use of capitalized gender-neutral 'they'.
-        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(Gender.OTHER_FEMALE);
+            personalityDescription.append(traitDescriptions.get(i));
 
-        for (int index = 0; index < traitDescriptions.size(); index++) {
-
-            // Define "forward" and "plural" based on the index value.
-            // If the index is an even number, use first name; otherwise use pronoun.
-            // The alternation between first name and pronoun adds variety to the
-            // descriptions.
-            // The "plural" string is only used when the first name is used.
-            String forward = ((index % 2) == 0) ? firstName : pronoun;
-            String plural = ((index % 2) == 0) ? "s" : "";
-
-            // We only append a space between descriptions, not at the start.
-            personalityDescription.append(' ');
-
-            personalityDescription.append(String.format(traitDescriptions.get(index), forward, plural));
+            if (i % 2 == 1 || i == traitDescriptions.size() - 1) {
+                personalityDescription.append("</p>");
+            } else {
+                personalityDescription.append(' ');
+            }
         }
 
         person.setPersonalityDescription(personalityDescription.toString());
     }
 
     /**
-     * Returns a list of trait descriptions for a given person.
+     * Retrieves descriptions for various personality traits of the given person. Each non-default
+     * personality trait is processed to generate a corresponding description, which is then added
+     * to the resulting list.
      *
-     * @param person the person for whom to retrieve the trait descriptions
-     * @return a list of trait descriptions for the person
+     * @param campaign the current campaign
+     * @param person   the person whose personality trait descriptions are to be retrieved
+     * @return a list of strings containing descriptions of the person's personality traits
      */
-    private static List<String> getTraitDescriptions(Person person) {
+    private static List<String> getTraitDescriptions(Campaign campaign, Person person) {
         List<String> traitDescriptions = new ArrayList<>();
 
         if (!person.getAggression().isNone()) {
-            traitDescriptions.add(person.getAggression().getDescription());
+            traitDescriptions.add(person.getAggression().getDescription(person));
         }
 
         if (!person.getAmbition().isNone()) {
-            traitDescriptions.add(person.getAmbition().getDescription());
+            traitDescriptions.add(person.getAmbition().getDescription(person));
         }
 
         if (!person.getGreed().isNone()) {
-            traitDescriptions.add(person.getGreed().getDescription());
+            traitDescriptions.add(person.getGreed().getDescription(person));
         }
 
         if (!person.getSocial().isNone()) {
-            traitDescriptions.add(person.getSocial().getDescription());
+            traitDescriptions.add(person.getSocial().getDescription(person));
         }
 
         if (!person.getIntelligence().isAverage()) {
-            traitDescriptions.add(person.getIntelligence().getDescription());
+            traitDescriptions.add(person.getIntelligence().getDescription(person));
         }
 
         if (!person.getPersonalityQuirk().isNone()) {
-            traitDescriptions.add(person.getPersonalityQuirk().getDescription());
+            traitDescriptions.add(person.getPersonalityQuirk().getDescription(campaign, person));
         }
 
         return traitDescriptions;
@@ -251,6 +256,54 @@ public class PersonalityController {
             throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateIntelligence: "
                             + roll);
+        }
+    }
+
+    /**
+     * Calculates the total value of a person's personality characteristics.
+     *
+     * @param campaign the current campaign
+     * @param person   the person to calculate the personality value for
+     * @return the total personality value of the person in the campaign
+     */
+    public static int getPersonalityValue(Campaign campaign, Person person) {
+        if (person == null) {
+            return 0;
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseRandomPersonalityReputation()) {
+            int personalityValue = 0;
+            int modifier;
+
+            Aggression aggression = person.getAggression();
+            if (!person.getAggression().isNone()) {
+                modifier = aggression.isTraitPositive() ? 1 : -1;
+                personalityValue += aggression.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            Ambition ambition = person.getAmbition();
+            if (!person.getAmbition().isNone()) {
+                modifier = ambition.isTraitPositive() ? 1 : -1;
+                personalityValue += ambition.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            Greed greed = person.getGreed();
+            if (!person.getGreed().isNone()) {
+                modifier = greed.isTraitPositive() ? 1 : -1;
+                personalityValue += greed.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            Social social = person.getSocial();
+            if (!person.getSocial().isNone()) {
+                modifier = social.isTraitPositive() ? 1 : -1;
+                personalityValue += social.isTraitMajor() ? modifier * 2 : modifier;
+            }
+
+            return personalityValue;
+        } else {
+            return 0;
         }
     }
 }
