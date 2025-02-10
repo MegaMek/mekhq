@@ -1342,7 +1342,7 @@ public class Unit implements ITechnology {
     }
 
     public String getHeatSinkTypeString(int year) {
-        BigInteger heatSinkType = MiscType.F_HEAT_SINK;
+        EquipmentFlag heatSinkType = MiscType.F_HEAT_SINK;
         boolean heatSinkIsClanTechBase = false;
 
         for (Mounted<?> mounted : getEntity().getEquipment()) {
@@ -6042,6 +6042,22 @@ public class Unit implements ITechnology {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    /**
+     * Checks if the associated entity is classified as battle armor.
+     *
+     * <p>
+     * This method determines whether the entity linked to this object is
+     * considered battle armor. It first verifies that the entity is not null,
+     * and then checks if the entity meets the criteria for battle armor.
+     * </p>
+     *
+     * @return {@code true} if the entity is classified as battle armor and is not null,
+     *         otherwise {@code false}.
+     */
+    public boolean isBattleArmor() {
+        return (getEntity() != null) && getEntity().isBattleArmor();
     }
 
     public boolean isIntroducedBy(int year) {

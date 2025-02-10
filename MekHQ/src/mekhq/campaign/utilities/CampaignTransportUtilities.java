@@ -22,6 +22,8 @@ package mekhq.campaign.utilities;
 import megamek.common.*;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
+import mekhq.utilities.MHQInternationalization;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
 
@@ -253,6 +255,19 @@ public class CampaignTransportUtilities {
 
     private static Optional<Visitor> getTransportTypeClassifier(Entity entity) {
         return visitors.stream().filter(v -> v.isInterestedIn(entity)).findFirst();
+    }
+
+    /**
+     * Return "None" in the first position
+     * @return vector of transport options, with none first
+     */
+    public static Vector<Pair<String, CampaignTransportType>> getLeadershipDropdownVectorPair() {
+        Vector<Pair<String, CampaignTransportType>> retVal = new Vector<>();
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.null.text"), null));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.TACTICAL_TRANSPORT.text"), CampaignTransportType.TACTICAL_TRANSPORT));
+        retVal.add(new Pair<>(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "CampaignTransportUtilities.selectTransport.SHIP_TRANSPORT.text"), CampaignTransportType.SHIP_TRANSPORT));
+
+        return retVal;
     }
     // endregion Static Helpers
 }
