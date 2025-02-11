@@ -533,8 +533,7 @@ public class PlanetarySystem {
         luminosity = scDef.luminosity;
     }
 
-    @SuppressWarnings(value = "unused")
-    public void afterLoading() {
+    public void postLoading() {
         if (null == id) {
             id = name;
         }
@@ -552,6 +551,7 @@ public class PlanetarySystem {
         if (null != planetList) {
             for (Planet p : planetList) {
                 p.setParentSystem(this);
+                p.postLoading();
                 if (!planets.containsKey(p.getSystemPosition())) {
                     planets.put(p.getSystemPosition(), p);
                 }
@@ -571,15 +571,6 @@ public class PlanetarySystem {
         }
         eventList = null;
     }
-
-    @SuppressWarnings(value = "unused")
-    /*private boolean beforeMarshal(Marshaller marshaller) {
-        // Fill up our event list from the internal data type
-        eventList = new ArrayList<>(events.values());
-        // same for planet list
-        planetList = new ArrayList<>(planets.values());
-        return true;
-    }*/
 
     public void copyDataFrom(PlanetarySystem other) {
         if (null != other) {

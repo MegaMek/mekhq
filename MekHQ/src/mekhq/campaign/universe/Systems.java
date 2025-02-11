@@ -291,7 +291,7 @@ public class Systems {
         mapper.registerModule(new JavaTimeModule());
 
         PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
-            system.afterLoading();
+            system.postLoading();
 
             // Run through the list again, this time creating and updating systems as we go
             PlanetarySystem oldSystem = systemList.get(system.getId());

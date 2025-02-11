@@ -610,7 +610,7 @@ public class Planet {
     }
 
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
-        return getEventData(when, socioIndustrial, e -> e.socioIndustrial);
+        return getEventData(when, null, e -> e.socioIndustrial);
     }
 
     public String getSocioIndustrialText(LocalDate when) {
@@ -619,7 +619,7 @@ public class Planet {
     }
 
     public Integer getHPG(LocalDate when) {
-        return getEventData(when, hpg, e -> e.hpg);
+        return getEventData(when, EquipmentType.RATING_X, e -> e.hpg);
     }
 
     public String getHPGClass(LocalDate when) {
@@ -627,7 +627,7 @@ public class Planet {
     }
 
     public Long getPopulation(LocalDate when) {
-        return getEventData(when, population, e -> e.population);
+        return getEventData(when, null, e -> e.population);
     }
 
     public LifeForm getLifeForm(LocalDate when) {
@@ -669,7 +669,7 @@ public class Planet {
     }
 
     public List<String> getFactions(LocalDate when) {
-        List<String> retVal = getEventData(when, factions, e -> e.faction);
+        List<String> retVal = getEventData(when, new ArrayList<String>(), e -> e.faction);
         if (retVal != null) {
             return retVal;
         }
@@ -867,10 +867,7 @@ public class Planet {
 
     }
 
-    // JAXB marshalling support
-
-    @SuppressWarnings({ "unused" })
-    /*private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    public void postLoading() {
         if (null == id) {
             id = name;
         }
@@ -886,26 +883,7 @@ public class Planet {
             eventList.clear();
         }
         eventList = null;
-        // Merge faction change events into the event data
-        if (null != factionChanges) {
-            for (FactionChange change : factionChanges) {
-                if ((null != change) && (null != change.date)) {
-                    PlanetaryEvent event = getOrCreateEvent(change.date);
-                    event.faction = change.faction;
-                }
-            }
-            factionChanges.clear();
-        }
-        factionChanges = null;
-    }*/
-
-    /*
-    @SuppressWarnings("unused")
-    private boolean beforeMarshal(Marshaller marshaller) {
-        // Fill up our event list from the internal data type
-        eventList = new ArrayList<>(events.values());
-        return true;
-    }*/
+    }
 
     /**
      * Updates the current planet's coordinates and faction ownership from the given
@@ -1017,21 +995,17 @@ public class Planet {
             x = ObjectUtility.nonNull(other.x, x);
             y = ObjectUtility.nonNull(other.y, y);
             desc = ObjectUtility.nonNull(other.desc, desc);
-            factions = ObjectUtility.nonNull(other.factions, factions);
             gravity = ObjectUtility.nonNull(other.gravity, gravity);
-            hpg = ObjectUtility.nonNull(other.hpg, hpg);
             //landMasses = ObjectUtility.nonNull(other.landMasses, landMasses);
             life = ObjectUtility.nonNull(other.life, life);
             percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
             pressure = ObjectUtility.nonNull(other.pressure, pressure);
             atmosphere = ObjectUtility.nonNull(other.atmosphere, atmosphere);
-            population = ObjectUtility.nonNull(other.population, population);
             dayLength = ObjectUtility.nonNull(other.dayLength, dayLength);
             smallMoons = ObjectUtility.nonNull(other.smallMoons, smallMoons);
             satellites = ObjectUtility.nonNull(other.satellites, satellites);
             sysPos = ObjectUtility.nonNull(other.sysPos, sysPos);
             temperature = ObjectUtility.nonNull(other.temperature, temperature);
-            socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
             icon = ObjectUtility.nonNull(other.icon, icon);
             // Merge (not replace!) events
             if (null != other.events) {
