@@ -28,7 +28,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
-import mekhq.io.LocalDateKeyDeserializer;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -568,6 +567,14 @@ public class Systems {
             }
         }
         return true;
+    }
+
+    public class LocalDateKeyDeserializer extends KeyDeserializer {
+
+        @Override
+        public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+            return LocalDate.parse(key);
+        }
     }
 
     private class AtmosphereDeserializer extends StdDeserializer<Atmosphere> {
