@@ -33,7 +33,12 @@ MEKHQ VERSION HISTORY:
 + PR #6006: Added Shortcut Method to Check if a Unit is Battle Armor
 + Fix #6009: Improve Stratcon deployment logic to ensure units aren't deployed twice
 + PR #6012: Fixed Multiple Resupply Bugs
-+ PR #6020: Manage Scenario will now use manage scenario and not manage forces 
++ PR #6020: Manage Scenario will now use manage scenario and not manage forces
++ PR #6019: Change xml recording of hiring halls
++ Fix #5996: Typo in cargo, fixes bolding, addresses issue #5996
++ Fix #5784: Better handling for missing parts when replacing parts via "Pod Space"
++ PR #6014: Refactored Active Personnel Retrieval Logic
++ PR #6013: Refactored Random Dependents Removal-Addition into a Seperate Class
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
