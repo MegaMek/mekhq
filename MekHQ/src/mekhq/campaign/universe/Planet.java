@@ -1091,30 +1091,42 @@ public class Planet {
 
     /** A class representing some event, possibly changing planetary information */
     public static final class PlanetaryEvent {
+
+        @JsonProperty("date")
         public LocalDate date;
+        @JsonProperty("message")
         public String message;
+        @JsonProperty("name")
         public String name;
+        @JsonProperty("shortName")
         public String shortName;
-        @JsonProperty("faction")
+
         public List<String> faction;
         public Set<Faction> factions;
+        @JsonProperty("lifeForm")
         public LifeForm lifeForm;
-        public Climate climate;
         @JsonProperty("water")
         public Integer percentWater;
+        @JsonProperty("temperature")
         public Integer temperature;
         public SocioIndustrialData socioIndustrial;
         public Integer hpg;
+        @JsonProperty("pressure")
+        @JsonDeserialize(using=PressureDeserializer.class)
         private Integer pressure;
+        @JsonProperty("atmosphere")
         private Atmosphere atmosphere;
+        @JsonProperty("composition")
         public String composition;
+        @JsonProperty("population")
         public Long population;
+        @JsonProperty("dayLength")
         public Double dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
+        @JsonProperty("custom")
         public boolean custom = false;
 
         public void copyDataFrom(PlanetaryEvent other) {
-            climate = ObjectUtility.nonNull(other.climate, climate);
             faction = ObjectUtility.nonNull(other.faction, faction);
             factions = updateFactions(factions, faction, other.faction);
             hpg = ObjectUtility.nonNull(other.hpg, hpg);
@@ -1145,7 +1157,6 @@ public class Planet {
         }
 
         public void replaceDataFrom(PlanetaryEvent other) {
-            climate = other.climate;
             faction = other.faction;
             hpg = other.hpg;
             lifeForm = other.lifeForm;
@@ -1165,7 +1176,7 @@ public class Planet {
 
         /** @return <code>true</code> if the event doesn't contain any change */
         public boolean isEmpty() {
-            return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
+            return (null == faction) && (null == hpg) && (null == lifeForm)
                     && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
                     && (null == temperature) && (null == pressure) && (null == atmosphere)
                     && (null == composition) && (null == population) && (null == dayLength);

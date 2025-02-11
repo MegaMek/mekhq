@@ -634,8 +634,12 @@ public class PlanetarySystem {
 
     /** A class representing some event, possibly changing planetary information */
     public static final class PlanetarySystemEvent {
+
+        @JsonProperty("date")
         public LocalDate date;
+        @JsonProperty("nadirCharge")
         public Boolean nadirCharge;
+        @JsonProperty("zenithCharge")
         public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
