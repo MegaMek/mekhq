@@ -134,7 +134,7 @@ planet:
         faction:
           - IND
         population: 52222.0
-        #socioIndustrial: D-D-C-C-D
+        socioIndustrial: D-D-C-C-D
       - date: '2250-01-01'
         population: 143804.0
       - date: '2260-01-01'
@@ -197,7 +197,7 @@ planet:
       - date: '2520-01-01'
         population: 487333253.0
       - date: '2522-01-01'
-        #socioIndustrial: D-D-C-C-C
+        socioIndustrial: D-D-C-C-C
       - date: '2530-01-01'
         population: 501505086.0
       - date: '2540-01-01'
@@ -225,7 +225,7 @@ planet:
       - date: '2640-01-01'
         population: 593003448.0
       - date: '2649-01-01'
-        #socioIndustrial: C-C-B-C-B
+        socioIndustrial: C-C-B-C-B
       - date: '2650-01-01'
         population: 594885097.0
       - date: '2660-01-01'
@@ -275,7 +275,7 @@ planet:
       - date: '2840-01-01'
         population: 545177703.0
       - date: '2844-01-01'
-        #socioIndustrial: C-D-C-C-C
+        socioIndustrial: C-D-C-C-C
       - date: '2850-01-01'
         population: 546136450.0
       - date: '2860-01-01'
@@ -287,7 +287,7 @@ planet:
       - date: '2890-01-01'
         population: 549988325.0
       - date: '2897-01-01'
-        #socioIndustrial: D-D-C-D-D
+        socioIndustrial: D-D-C-D-D
       - date: '2900-01-01'
         population: 551849847.0
       - date: '2910-01-01'
@@ -322,7 +322,7 @@ planet:
         faction:
           - FC
       - date: '3049-01-01'
-        #socioIndustrial: C-C-C-C-C
+        socioIndustrial: C-C-C-C-C
       - date: '3050-01-01'
         population: 547149542.0
       - date: '3057-09-18'
@@ -360,7 +360,7 @@ planet:
       - date: '3090-01-01'
         population: 557887220.0
       - date: '3094-01-01'
-        #socioIndustrial: B-C-B-B-C
+        socioIndustrial: B-C-B-B-C
       - date: '3100-01-01'
         population: 568133728.0
       - date: '3110-01-01'
