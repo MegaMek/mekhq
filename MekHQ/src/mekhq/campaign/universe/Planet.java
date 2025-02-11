@@ -125,15 +125,6 @@ public class Planet {
     @JsonProperty("lifeForm")
     private LifeForm life;
 
-    // Human influence
-    @JsonProperty("population")
-    private Long population;
-    //@JsonProperty("socioIndustrial")
-    private SocioIndustrialData socioIndustrial;
-    //@JsonProperty("hpg")
-    private Integer hpg;
-    private List<String> factions;
-
     // private List<String> garrisonUnits;
 
     // the system that this planet belongs to
