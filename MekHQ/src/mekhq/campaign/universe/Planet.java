@@ -22,14 +22,12 @@ package mekhq.campaign.universe;
 import java.time.LocalDate;
 import java.util.*;
 
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -54,84 +52,86 @@ import mekhq.campaign.universe.Faction.Tag;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-@XmlRootElement(name = "planet")
-@XmlAccessorType(value = XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Planet {
     private static final MMLogger logger = MMLogger.create(Planet.class);
 
-    @XmlElement(name = "xcood")
     private Double x;
-    @XmlElement(name = "ycood")
     private Double y;
 
     // Base data
     @SuppressWarnings("unused")
     private UUID uniqueIdentifier;
     private String id;
+    @JsonProperty("name")
     private String name;
     private String shortName;
+    @JsonProperty("sysPos")
     private Integer sysPos;
 
     // Orbital information
     /** orbital radius (average distance to parent star), in AU */
-    @XmlElement(name = "orbitalDist")
+    @JsonProperty("orbitalDist")
     private Double orbitRadius;
 
     // Stellar neighbourhood
     // for reading in because lists are easier
-    @XmlElement(name = "satellite")
+    @JsonProperty("satellite")
     private List<Satellite> satellites;
-    @XmlElement(name = "smallMoons")
+    @JsonProperty("smallMoons")
     private int smallMoons;
-    @XmlElement(name = "ring")
+    @JsonProperty("ring")
     private boolean ring;
 
     // Global physical characteristics
-    @XmlElement(name = "type")
+    @JsonProperty("type")
     private String planetType;
     /** diameter in km */
+    @JsonProperty("diameter")
     private double diameter;
     /** Density in g/m^3 */
+    @JsonProperty("density")
     private Double density;
+    @JsonProperty("gravity")
     private Double gravity;
+    @JsonProperty("dayLength")
     private Double dayLength;
+    @JsonProperty("yearLength")
     private Double yearLength;
 
-    @XmlElement(name = "class")
-    private String className;
+    //@XmlElement(name = "class")
+    //private String className;
 
     // Surface description
-    @XmlElement(name = "water")
+    @JsonProperty("water")
     private Integer percentWater;
-    @XmlElement(name = "volcanism")
-    private Integer volcanicActivity;
-    @XmlElement(name = "tectonics")
-    private Integer tectonicActivity;
-    @XmlElement(name = "landMass")
-    private List<String> landMasses;
+
+    //@XmlElement(name = "landMass")
+    //private List<String> landMasses;
 
     // Atmospheric description
     /** Pressure classification */
-    @XmlJavaTypeAdapter(PressureAdapter.class)
+    @JsonProperty("pressure")
+    @JsonDeserialize(using=PressureDeserializer.class)
     private Integer pressure;
-    @XmlJavaTypeAdapter(AtmosphereAdapter.class)
+    @JsonProperty("atmosphere")
     private Atmosphere atmosphere;
+    @JsonProperty("composition")
     private String composition;
+    @JsonProperty("temperature")
     private Integer temperature;
 
     // Ecosphere
-    @XmlElement(name = "lifeForm")
-    @XmlJavaTypeAdapter(LifeFormAdapter.class)
+    @JsonProperty("lifeForm")
     private LifeForm life;
 
     // Human influence
+    @JsonProperty("population")
     private Long population;
-    @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
+    //@JsonProperty("socioIndustrial")
     private SocioIndustrialData socioIndustrial;
-    @XmlJavaTypeAdapter(HPGRatingAdapter.class)
+    //@JsonProperty("hpg")
     private Integer hpg;
-    @XmlElement(name = "faction")
-    @XmlJavaTypeAdapter(StringListAdapter.class)
     private List<String> factions;
 
     // private List<String> garrisonUnits;
@@ -140,7 +140,9 @@ public class Planet {
     private PlanetarySystem parentSystem;
 
     // Fluff
+    @JsonProperty("desc")
     private String desc;
+    @JsonProperty("icon")
     private String icon;
 
     /**
@@ -149,7 +151,6 @@ public class Planet {
      * sorted map of [date of change: change information]
      * <p>
      */
-    @XmlTransient
     private TreeMap<LocalDate, PlanetaryEvent> events;
 
     /**
@@ -158,7 +159,6 @@ public class Planet {
      * should be called if event data has been modified
      * or the current date moved backwards.
      */
-    @XmlTransient
     CurrentEvents currentEvents;
 
     // a hash to keep track of dynamic garrison changes
@@ -169,14 +169,13 @@ public class Planet {
      *             planetary data
      */
     @Deprecated
-    @XmlElement(name = "factionChange")
-    private List<FactionChange> factionChanges;
+    //@XmlElement(name = "factionChange")
+    //private List<FactionChange> factionChanges;
     // For export and import only (lists are easier than maps) */
-    @XmlElement(name = "event")
+    @JsonProperty("event")
     private List<Planet.PlanetaryEvent> eventList;
 
     /** Marker for "please delete this planet" */
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
     public Boolean delete;
 
     public Planet() {
@@ -315,10 +314,6 @@ public class Planet {
         return id;
     }
 
-    public String getClassName() {
-        return className;
-    }
-
     public Double getGravity() {
         return gravity;
     }
@@ -379,19 +374,13 @@ public class Planet {
     }
 
     public List<String> getLandMasses() {
-        return null != landMasses ? new ArrayList<>(landMasses) : null;
+        return new ArrayList<>();
+        //return null != landMasses ? new ArrayList<>(landMasses) : null;
     }
 
     public String getLandMassDescription() {
-        return null != landMasses ? Utilities.combineString(landMasses, ", ") : "";
-    }
-
-    public Integer getVolcanicActivity() {
-        return volcanicActivity;
-    }
-
-    public Integer getTectonicActivity() {
-        return tectonicActivity;
+        return "";
+        //return null != landMasses ? Utilities.combineString(landMasses, ", ") : "";
     }
 
     public Double getDayLength(LocalDate when) {
@@ -890,7 +879,7 @@ public class Planet {
     // JAXB marshalling support
 
     @SuppressWarnings({ "unused" })
-    private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    /*private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         if (null == id) {
             id = name;
         }
@@ -917,14 +906,15 @@ public class Planet {
             factionChanges.clear();
         }
         factionChanges = null;
-    }
+    }*/
 
+    /*
     @SuppressWarnings("unused")
     private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
         eventList = new ArrayList<>(events.values());
         return true;
-    }
+    }*/
 
     /**
      * Updates the current planet's coordinates and faction ownership from the given
@@ -1039,13 +1029,11 @@ public class Planet {
             factions = ObjectUtility.nonNull(other.factions, factions);
             gravity = ObjectUtility.nonNull(other.gravity, gravity);
             hpg = ObjectUtility.nonNull(other.hpg, hpg);
-            landMasses = ObjectUtility.nonNull(other.landMasses, landMasses);
+            //landMasses = ObjectUtility.nonNull(other.landMasses, landMasses);
             life = ObjectUtility.nonNull(other.life, life);
             percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
             pressure = ObjectUtility.nonNull(other.pressure, pressure);
             atmosphere = ObjectUtility.nonNull(other.atmosphere, atmosphere);
-            volcanicActivity = ObjectUtility.nonNull(other.volcanicActivity, volcanicActivity);
-            tectonicActivity = ObjectUtility.nonNull(other.tectonicActivity, tectonicActivity);
             population = ObjectUtility.nonNull(other.population, population);
             dayLength = ObjectUtility.nonNull(other.dayLength, dayLength);
             smallMoons = ObjectUtility.nonNull(other.smallMoons, smallMoons);
@@ -1102,31 +1090,22 @@ public class Planet {
     }
 
     /** A class representing some event, possibly changing planetary information */
-    @XmlRootElement(name = "event")
     public static final class PlanetaryEvent {
-        @XmlJavaTypeAdapter(DateAdapter.class)
         public LocalDate date;
         public String message;
         public String name;
         public String shortName;
-        @XmlJavaTypeAdapter(StringListAdapter.class)
+        @JsonProperty("faction")
         public List<String> faction;
-        @XmlTransient
         public Set<Faction> factions;
-        @XmlJavaTypeAdapter(LifeFormAdapter.class)
         public LifeForm lifeForm;
-        @XmlJavaTypeAdapter(ClimateAdapter.class)
         public Climate climate;
-        @XmlElement(name = "water")
+        @JsonProperty("water")
         public Integer percentWater;
         public Integer temperature;
-        @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
         public SocioIndustrialData socioIndustrial;
-        @XmlJavaTypeAdapter(HPGRatingAdapter.class)
         public Integer hpg;
-        @XmlJavaTypeAdapter(PressureAdapter.class)
         private Integer pressure;
-        @XmlJavaTypeAdapter(AtmosphereAdapter.class)
         private Atmosphere atmosphere;
         public String composition;
         public Long population;
@@ -1194,9 +1173,7 @@ public class Planet {
     }
 
     public static final class FactionChange {
-        @XmlJavaTypeAdapter(DateAdapter.class)
         public LocalDate date;
-        @XmlJavaTypeAdapter(StringListAdapter.class)
         public List<String> faction;
 
         @Override
@@ -1214,4 +1191,36 @@ public class Planet {
     public enum PlanetaryType {
         SMALL_ASTEROID, MEDIUM_ASTEROID, DWARF_TERRESTRIAL, TERRESTRIAL, GIANT_TERRESTRIAL, GAS_GIANT, ICE_GIANT
     }
+
+    public static class PressureDeserializer extends StdDeserializer<Integer> {
+
+        public PressureDeserializer() {
+            this(null);
+        }
+
+        public PressureDeserializer(final Class<?> vc) {
+            super(vc);
+        }
+
+        @Override
+        public Integer deserialize(final JsonParser jsonParser, final DeserializationContext context) {
+            try {
+                switch (jsonParser.getText()) {
+                    case "Vacuum": return megamek.common.planetaryconditions.Atmosphere.VACUUM.ordinal();
+                    case "Trace": return megamek.common.planetaryconditions.Atmosphere.TRACE.ordinal();
+                    case "Thin":
+                    case "Low": return megamek.common.planetaryconditions.Atmosphere.THIN.ordinal();
+                    case "Standard":
+                    case "Normal": return megamek.common.planetaryconditions.Atmosphere.STANDARD.ordinal();
+                    case "High": return megamek.common.planetaryconditions.Atmosphere.HIGH.ordinal();
+                    case "Very High": return megamek.common.planetaryconditions.Atmosphere.VERY_HIGH.ordinal();
+                    default: return null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
 }

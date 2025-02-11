@@ -20,20 +20,21 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * This is an object for satellites (i.e. moons around a planet)
  *
  * @author Aaron Gullickson (aarongullickson at gmail.com)
  */
-@XmlRootElement(name = "satellite")
-@XmlAccessorType(value = XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Satellite {
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("size")
     private String size;
+    @JsonProperty("icon")
     private String icon;
 
     public String getDescription() {

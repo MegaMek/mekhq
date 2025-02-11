@@ -31,14 +31,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import mekhq.adapter.BooleanValueAdapter;
@@ -57,8 +51,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
  *
  * @author Taharqa
  */
-@XmlRootElement(name = "system")
-@XmlAccessorType(value = XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class PlanetarySystem {
     // Star classification data and methods
     public static final int SPECTRAL_O = 0;
@@ -99,45 +92,42 @@ public class PlanetarySystem {
     // always used as class designation "D", never as a suffix
     public static final String LUM_VII = "VII";
 
-    @XmlElement(name = "xcood")
+    @JsonProperty("xcood")
     private Double x;
-    @XmlElement(name = "ycood")
+    @JsonProperty("ycood")
     private Double y;
 
     // Base data
     @SuppressWarnings(value = "unused")
     private UUID uniqueIdentifier;
+    @JsonProperty("id")
     private String id;
     private String name;
 
     // Star data (to be factored out)
+    @JsonProperty("spectralType")
     private String spectralType;
-    @XmlJavaTypeAdapter(value = SpectralClassAdapter.class)
     private Integer spectralClass;
     private Double subtype;
     private String luminosity;
 
-    @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
-    private Boolean nadirCharge;
-    @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
-    private Boolean zenithCharge;
+    @JsonProperty("nadirCharge")
+    private Boolean nadirCharge = false;
+    @JsonProperty("zenithCharge")
+    private Boolean zenithCharge = false;
 
     // tree map of planets sorted by system position
-    @XmlTransient
     private TreeMap<Integer, Planet> planets;
 
     // for reading in because lists are easier
-    @XmlElement(name = "planet")
+    @JsonProperty("planet")
     private List<Planet> planetList;
 
     // the location of the primary planet for this system
+    @JsonProperty("primarySlot")
     private int primarySlot;
 
-    @XmlElement(name = "hiringHall")
-    private HiringHallOverride staticHall = null;
-
     /** Marker for "please delete this system" */
-    @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
     public Boolean delete;
 
     /**
@@ -147,11 +137,10 @@ public class PlanetarySystem {
      * <p>
      * Package-private so that Planets can access it
      */
-    @XmlTransient
     TreeMap<LocalDate, PlanetarySystemEvent> events;
 
     // For export and import only (lists are easier than maps) */
-    @XmlElement(name = "event")
+    @JsonProperty("event")
     private List<PlanetarySystemEvent> eventList;
 
     public PlanetarySystem() {
@@ -544,9 +533,8 @@ public class PlanetarySystem {
         luminosity = scDef.luminosity;
     }
 
-    // JAXB marshaling support
     @SuppressWarnings(value = "unused")
-    private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    public void afterLoading() {
         if (null == id) {
             id = name;
         }
@@ -585,13 +573,13 @@ public class PlanetarySystem {
     }
 
     @SuppressWarnings(value = "unused")
-    private boolean beforeMarshal(Marshaller marshaller) {
+    /*private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
         eventList = new ArrayList<>(events.values());
         // same for planet list
         planetList = new ArrayList<>(planets.values());
         return true;
-    }
+    }*/
 
     public void copyDataFrom(PlanetarySystem other) {
         if (null != other) {
@@ -645,9 +633,7 @@ public class PlanetarySystem {
     }
 
     /** A class representing some event, possibly changing planetary information */
-    @XmlRootElement(name = "event")
     public static final class PlanetarySystemEvent {
-        @XmlJavaTypeAdapter(value = DateAdapter.class)
         public LocalDate date;
         public Boolean nadirCharge;
         public Boolean zenithCharge;
@@ -753,9 +739,9 @@ public class PlanetarySystem {
      * @return The hiring hall level on the given date
      */
     public HiringHallLevel getHiringHallLevel(LocalDate date) {
-        if (staticHall != null && staticHall.isActive(date)) {
+        /*if (staticHall != null && staticHall.isActive(date)) {
             return staticHall.getLevel();
-        }
+        }*/
         if (getPopulation(date) == 0) {
             return HiringHallLevel.NONE;
         }

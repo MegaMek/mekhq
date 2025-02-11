@@ -18,22 +18,24 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
+import mekhq.io.LocalDateKeyDeserializer;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -54,36 +56,6 @@ public class Systems {
 
     private final int HPG_RADIUS_A_STATION = 50;
     private final int HPG_RADIUS_B_STATION = 30;
-
-    // Marshaller / unmarshaller instances
-    private static Marshaller marshaller;
-    private static Unmarshaller unmarshaller;
-    static {
-        try {
-            JAXBContext context = JAXBContext.newInstance(LocalSystemList.class, Planet.class);
-            marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            unmarshaller = context.createUnmarshaller();
-        } catch (JAXBException e) {
-            logger.error("", e);
-        }
-    }
-
-    private static Marshaller planetMarshaller;
-    private static Unmarshaller planetUnmarshaller;
-    static {
-        try {
-            // creating the JAXB context
-            JAXBContext jContext = JAXBContext.newInstance(Planet.class);
-            planetMarshaller = jContext.createMarshaller();
-            planetMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            planetUnmarshaller = jContext.createUnmarshaller();
-        } catch (Exception e) {
-            logger.error("", e);
-        }
-    }
 
     public static Systems getInstance() {
         if (systems == null) {
@@ -271,7 +243,7 @@ public class Systems {
         logger.info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
-        Systems systems = load("data/universe/planetary_systems", "data/universe/systems.xml");
+        Systems systems = load("data/universe/planetary_systems/Galatea.yml");
 
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
@@ -285,21 +257,20 @@ public class Systems {
      * Loads Systems data from files.
      *
      * @param planetsPath     The path to the folder containing planetary XML files.
-     * @param defaultFilePath The path to the file with default systems data.
      *
      * @throws DOMException
      * @throws IOException
      */
-    public static Systems load(String planetsPath, String defaultFilePath) throws DOMException, IOException {
+    public static Systems load(String planetsPath) throws DOMException, IOException {
         Systems systems = new Systems();
 
         // Step 1: Read the default file
-        try (FileInputStream fis = new FileInputStream(defaultFilePath)) {
+        try (FileInputStream fis = new FileInputStream(planetsPath)) {
             systems.updateSystems(fis);
         }
 
         // Step 2: Load all the xml files within the planets subdirectory, if it exists
-        Utilities.parseXMLFiles(planetsPath, systems::updateSystems);
+        //Utilities.parseXMLFiles(planetsPath, systems::updateSystems);
 
         // Step 3: Cleanup any systems that have issues
         systems.cleanupSystems();
@@ -307,40 +278,36 @@ public class Systems {
         return systems;
     }
 
-    private void updateSystems(FileInputStream source) {
-        // JAXB unmarshaller closes the stream it doesn't own. Bad JAXB. BAD.
-        try (InputStream is = new FilterInputStream(source) {
-            @Override
-            public void close() {
-            }
-        }) {
-            // Reset the file stream
-            source.getChannel().position(0);
+    private void updateSystems(FileInputStream source) throws IOException {
+        // Reset the file stream
+        //source.getChannel().position(0);
 
-            LocalSystemList localSystems = unmarshaller.unmarshal(
-                    MHQXMLUtility.createSafeXmlSource(is), LocalSystemList.class).getValue();
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        SimpleModule module = new SimpleModule();
+        module.addKeyDeserializer(LocalDate.class, new LocalDateKeyDeserializer());
+        module.addDeserializer(Atmosphere.class, new AtmosphereDeserializer());
+        module.addDeserializer(LifeForm.class, new LifeFormDeserializer());
+        mapper.registerModule(module);
+        //mapper.registerModule(new Jdk8Module());
+
+        PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
+            system.afterLoading();
 
             // Run through the list again, this time creating and updating systems as we go
-            for (PlanetarySystem system : localSystems.list) {
-                PlanetarySystem oldSystem = systemList.get(system.getId());
-                if (null == oldSystem) {
-                    systemList.put(system.getId(), system);
-                } else {
-                    // Update with new data
-                    oldSystem.copyDataFrom(system);
-                    system = oldSystem;
-                }
+            PlanetarySystem oldSystem = systemList.get(system.getId());
+            if (null == oldSystem) {
+                systemList.put(system.getId(), system);
+            } else {
+                // Update with new data
+                oldSystem.copyDataFrom(system);
+                system = oldSystem;
             }
 
             // Process system deletions
-            for (String systemId : localSystems.toDelete) {
-                if (null != systemId) {
-                    systemList.remove(systemId);
-                }
-            }
-        } catch (JAXBException | IOException e) {
-            logger.error("", e);
-        }
+            //for (String systemId : localSystems.toDelete) {
+            //    if (null != systemId) {
+            //        systemList.remove(systemId);
+            //    }
     }
 
     private void cleanupSystems() {
@@ -385,15 +352,12 @@ public class Systems {
         }
     }
 
-    @XmlRootElement(name = "systems")
     private static final class LocalSystemList {
-        @XmlElement(name = "system")
         public List<PlanetarySystem> list;
 
-        @XmlTransient
         public List<String> toDelete;
 
-        @SuppressWarnings("unused")
+        /*@SuppressWarnings("unused")
         private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
             toDelete = new ArrayList<>();
             if (null == list) {
@@ -410,7 +374,7 @@ public class Systems {
                 }
                 list = filteredList;
             }
-        }
+        }*/
     }
 
     /** A data class representing a HPG link between two planets */
@@ -482,7 +446,7 @@ public class Systems {
      */
     public void writePlanetaryEvent(Writer out, Planet.PlanetaryEvent event) {
         try {
-            planetMarshaller.marshal(event, out);
+            //planetMarshaller.marshal(event, out);
         } catch (Exception e) {
             logger.error("", e);
         }
@@ -496,26 +460,10 @@ public class Systems {
      */
     public void writePlanetarySystemEvent(Writer out, PlanetarySystem.PlanetarySystemEvent event) {
         try {
-            marshaller.marshal(event, out);
+            //marshaller.marshal(event, out);
         } catch (Exception e) {
             logger.error("", e);
         }
-    }
-
-    /**
-     * This is a legacy function to read custom planetary events from before the
-     * switch to PlanetarySystems
-     *
-     * @param node - xml node
-     * @return PlanetaryEvent class from Planet
-     */
-    public Planet.PlanetaryEvent readPlanetaryEvent(Node node) {
-        try {
-            return (Planet.PlanetaryEvent) planetUnmarshaller.unmarshal(node);
-        } catch (JAXBException e) {
-            logger.error("", e);
-        }
-        return null;
     }
 
     /**
@@ -526,11 +474,15 @@ public class Systems {
      * @return PlanetaryEvent class from Planet
      */
     public PlanetarySystem.PlanetarySystemEvent readPlanetarySystemEvent(Node node) {
-        try {
+        /*try {
             return (PlanetarySystem.PlanetarySystemEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
             logger.error("", e);
-        }
+        }*/
+        return null;
+    }
+
+    public Planet.PlanetaryEvent readPlanetaryEvent(Node node) {
         return null;
     }
 
@@ -617,4 +569,48 @@ public class Systems {
         }
         return true;
     }
+
+    private class AtmosphereDeserializer extends StdDeserializer<Atmosphere> {
+
+        public AtmosphereDeserializer() {
+            this(null);
+        }
+
+        public AtmosphereDeserializer(final Class<?> vc) {
+            super(vc);
+        }
+
+        @Override
+        public Atmosphere deserialize(final JsonParser jsonParser, final DeserializationContext context) {
+            try {
+                return Atmosphere.parseAtmosphere(jsonParser.getText());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    private class LifeFormDeserializer extends StdDeserializer<LifeForm> {
+
+        public LifeFormDeserializer() {
+            this(null);
+        }
+
+        public LifeFormDeserializer(final Class<?> vc) {
+            super(vc);
+        }
+
+        @Override
+        public LifeForm deserialize(final JsonParser jsonParser, final DeserializationContext context) {
+            try {
+                return LifeForm.parseLifeForm(jsonParser.getText());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+
 }
