@@ -4,9 +4,9 @@ xcood: -53.775
 ycood: 34.077
 spectralType: F8II
 primarySlot: 6
-#event:
-#  - date: '2376-02-25'
-#    zenithCharge: yes
+event:
+  - date: '2376-02-25'
+    zenithCharge: yes
 planet:
   - name: Skouzas's Frontier
     type: Terrestrial

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
@@ -283,11 +284,11 @@ public class Systems {
 
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         SimpleModule module = new SimpleModule();
-        module.addKeyDeserializer(LocalDate.class, new LocalDateKeyDeserializer());
         module.addDeserializer(Atmosphere.class, new AtmosphereDeserializer());
         module.addDeserializer(LifeForm.class, new LifeFormDeserializer());
         mapper.registerModule(module);
-        //mapper.registerModule(new Jdk8Module());
+        // this will allow it to deserialize LocalDate objects
+        mapper.registerModule(new JavaTimeModule());
 
         PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
             system.afterLoading();
