@@ -18,6 +18,9 @@
  */
 package mekhq.campaign.universe.enums;
 
+import io.sentry.Sentry;
+import megamek.logging.MMLogger;
+
 /**
  * The level of a Hiring Hall as defined in CamOps (4th printing). Used to determine various modifiers
  * related to contract generation.
@@ -29,14 +32,16 @@ public enum HiringHallLevel {
     STANDARD,
     GREAT;
 
+    private static final MMLogger logger = MMLogger.create(HiringHallLevel.class);
+
     public static HiringHallLevel parseHiringHallLevel(String val) {
-        return switch (val.toLowerCase()) {
-            case "questionable" -> QUESTIONABLE;
-            case "minor" -> MINOR;
-            case "standard" -> STANDARD;
-            case "great" -> GREAT;
-            default -> NONE;
-        };
+        try {
+            return HiringHallLevel.valueOf(val.toUpperCase());
+        } catch (Exception ex) {
+            Sentry.captureException(ex);
+            logger.error("Couldn't find a hiring hall level matching " + val.toUpperCase(), ex);
+            return NONE;
+        }
     }
 
     public boolean isNone() {
