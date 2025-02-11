@@ -18,6 +18,10 @@
  */
 package mekhq.campaign.universe;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
 public enum Atmosphere {
     NONE("None"),
     TAINTEDPOISON("Tainted (Poisonous)"),
@@ -86,5 +90,27 @@ public enum Atmosphere {
 
     public boolean isToxic() {
         return isToxicPoison() || isToxicCaustic() || isToxicFlame();
+    }
+
+
+    public static class AtmosphereDeserializer extends StdDeserializer<Atmosphere> {
+
+        public AtmosphereDeserializer() {
+            this(null);
+        }
+
+        public AtmosphereDeserializer(final Class<?> vc) {
+            super(vc);
+        }
+
+        @Override
+        public Atmosphere deserialize(final JsonParser jsonParser, final DeserializationContext context) {
+            try {
+                return Atmosphere.parseAtmosphere(jsonParser.getText());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
     }
 }

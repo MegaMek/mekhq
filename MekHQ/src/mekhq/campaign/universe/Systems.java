@@ -282,12 +282,13 @@ public class Systems {
         // Reset the file stream
         //source.getChannel().position(0);
 
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        // add custom deserializer for complex classes and enums
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(Atmosphere.class, new AtmosphereDeserializer());
-        module.addDeserializer(LifeForm.class, new LifeFormDeserializer());
+        module.addDeserializer(Atmosphere.class, new Atmosphere.AtmosphereDeserializer());
+        module.addDeserializer(LifeForm.class, new LifeForm.LifeFormDeserializer());
         mapper.registerModule(module);
-        // this will allow it to deserialize LocalDate objects
+        // this will allow the mapper to deserialize LocalDate objects
         mapper.registerModule(new JavaTimeModule());
 
         PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
@@ -568,48 +569,5 @@ public class Systems {
         }
         return true;
     }
-
-    private class AtmosphereDeserializer extends StdDeserializer<Atmosphere> {
-
-        public AtmosphereDeserializer() {
-            this(null);
-        }
-
-        public AtmosphereDeserializer(final Class<?> vc) {
-            super(vc);
-        }
-
-        @Override
-        public Atmosphere deserialize(final JsonParser jsonParser, final DeserializationContext context) {
-            try {
-                return Atmosphere.parseAtmosphere(jsonParser.getText());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-    }
-
-    private class LifeFormDeserializer extends StdDeserializer<LifeForm> {
-
-        public LifeFormDeserializer() {
-            this(null);
-        }
-
-        public LifeFormDeserializer(final Class<?> vc) {
-            super(vc);
-        }
-
-        @Override
-        public LifeForm deserialize(final JsonParser jsonParser, final DeserializationContext context) {
-            try {
-                return LifeForm.parseLifeForm(jsonParser.getText());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-    }
-
 
 }
