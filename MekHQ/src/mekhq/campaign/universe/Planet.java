@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -53,6 +54,7 @@ import mekhq.campaign.universe.Faction.Tag;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
+@JsonDeserialize(converter= Planet.PlanetPostLoader.class)
 public class Planet {
     private static final MMLogger logger = MMLogger.create(Planet.class);
 
@@ -867,24 +869,6 @@ public class Planet {
 
     }
 
-    public void postLoading() {
-        if (null == id) {
-            id = name;
-        }
-
-        // Fill up events
-        events = new TreeMap<>();
-        if (null != eventList) {
-            for (PlanetaryEvent event : eventList) {
-                if ((null != event) && (null != event.date)) {
-                    events.put(event.date, event);
-                }
-            }
-            eventList.clear();
-        }
-        eventList = null;
-    }
-
     /**
      * Updates the current planet's coordinates and faction ownership from the given
      * other planet.
@@ -1196,6 +1180,31 @@ public class Planet {
                 e.printStackTrace();
                 return null;
             }
+        }
+    }
+
+    public static class PlanetPostLoader extends StdConverter<Planet, Planet> {
+
+
+        @Override
+        public Planet convert(Planet planet) {
+            if (null == planet.id) {
+                planet.id = planet.name;
+            }
+
+            // Fill up events
+            planet.events = new TreeMap<>();
+            if (null != planet.eventList) {
+                for (PlanetaryEvent event : planet.eventList) {
+                    if ((null != event) && (null != event.date)) {
+                        planet.events.put(event.date, event);
+                    }
+                }
+                planet.eventList.clear();
+            }
+            planet.eventList = null;
+
+            return planet;
         }
     }
 

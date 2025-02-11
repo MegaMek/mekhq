@@ -33,6 +33,8 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import mekhq.adapter.BooleanValueAdapter;
@@ -52,6 +54,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
  * @author Taharqa
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
+@JsonDeserialize(converter= PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
     // Star classification data and methods
     public static final int SPECTRAL_O = 0;
@@ -533,45 +536,6 @@ public class PlanetarySystem {
         luminosity = scDef.luminosity;
     }
 
-    public void postLoading() {
-        if (null == id) {
-            id = name;
-        }
-
-        // Spectral classification: use spectralType if available, else the separate
-        // values
-        if (null != spectralType) {
-            setSpectralType(spectralType);
-        }
-        nadirCharge = ObjectUtility.nonNull(nadirCharge, Boolean.FALSE);
-        zenithCharge = ObjectUtility.nonNull(zenithCharge, Boolean.FALSE);
-
-        // fill up planets
-        planets = new TreeMap<>();
-        if (null != planetList) {
-            for (Planet p : planetList) {
-                p.setParentSystem(this);
-                p.postLoading();
-                if (!planets.containsKey(p.getSystemPosition())) {
-                    planets.put(p.getSystemPosition(), p);
-                }
-            }
-            planetList.clear();
-        }
-        planetList = null;
-        // Fill up events
-        events = new TreeMap<>();
-        if (null != eventList) {
-            for (PlanetarySystemEvent event : eventList) {
-                if ((null != event) && (null != event.date)) {
-                    events.put(event.date, event);
-                }
-            }
-            eventList.clear();
-        }
-        eventList = null;
-    }
-
     public void copyDataFrom(PlanetarySystem other) {
         if (null != other) {
             // We don't change the ID
@@ -786,5 +750,49 @@ public class PlanetarySystem {
             case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
             default -> 0;
         };
+    }
+
+    public static class PlanetarySystemPostLoader extends StdConverter<PlanetarySystem, PlanetarySystem> {
+
+        @Override
+        public PlanetarySystem convert(PlanetarySystem ps) {
+            if (null == ps.id) {
+                ps.id = ps.name;
+            }
+
+            // Spectral classification: use spectralType if available, else the separate
+            // values
+            if (null != ps.spectralType) {
+                ps.setSpectralType(ps.spectralType);
+            }
+            ps.nadirCharge = ObjectUtility.nonNull(ps.nadirCharge, Boolean.FALSE);
+            ps.zenithCharge = ObjectUtility.nonNull(ps.zenithCharge, Boolean.FALSE);
+
+            // fill up planets
+            ps.planets = new TreeMap<>();
+            if (null != ps.planetList) {
+                for (Planet p : ps.planetList) {
+                    p.setParentSystem(ps);
+                    if (!ps.planets.containsKey(p.getSystemPosition())) {
+                        ps.planets.put(p.getSystemPosition(), p);
+                    }
+                }
+                ps.planetList.clear();
+            }
+            ps.planetList = null;
+            // Fill up events
+            ps.events = new TreeMap<>();
+            if (null != ps.eventList) {
+                for (PlanetarySystemEvent event : ps.eventList) {
+                    if ((null != event) && (null != event.date)) {
+                        ps.events.put(event.date, event);
+                    }
+                }
+                ps.eventList.clear();
+            }
+            ps.eventList = null;
+
+            return ps;
+        }
     }
 }
