@@ -570,14 +570,6 @@ public class Systems {
         return true;
     }
 
-    public class LocalDateKeyDeserializer extends KeyDeserializer {
-
-        @Override
-        public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-            return LocalDate.parse(key);
-        }
-    }
-
     private class AtmosphereDeserializer extends StdDeserializer<Atmosphere> {
 
         public AtmosphereDeserializer() {
