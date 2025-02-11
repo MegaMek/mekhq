@@ -1483,7 +1483,8 @@ public class StratconRulesManager {
         }
 
         // Reinforcement roll failed, make interception check
-        int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
+        int interceptionOdds = 100;
+        //calculateScenarioOdds(track, campaignState.getContract(), true);
         int interceptionRoll = randomInt(100);
 
         // Check passed
@@ -2655,29 +2656,29 @@ public class StratconRulesManager {
      * 
      * Should only be used after a scenario is resolved
      */
-    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
+    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<UUID> reinforcementForce) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
-
+        Campaign campaign = tracker.getCampaign();
+    
         if (nextScenario instanceof AtBScenario nextAtBScenario) {
-            StratconCampaignState campaignState = nextAtBScenario.getContract(tracker.getCampaign())
-                    .getStratconCampaignState();
+
+            StratconCampaignState campaignState = nextAtBScenario.getContract(tracker.getCampaign()).getStratconCampaignState();
             if (campaignState == null) {
                 return;
-            }
+                }
             for (StratconTrackState track : campaignState.getTracks()) {
                 if (track.getBackingScenariosMap().containsKey(nextScenario.getId())) {
                     StratconScenario scenario = track.getBackingScenariosMap().get(nextScenario.getId());
-                    for (int forceID : forces) {
-                        track.unassignForce(forceID);
-                        nextScenario.addForces(forceID);
+
+                    for (UUID forceId : reinforcementForce) {
+                        track.unassignUnit(campaign.getUnit(forceId).getForceId());
+                        nextScenario.addUnit(forceId);
                     }
-
                 }
-
             }
-
         }
     }
+
 
     /**
      * Worker function that updates strategic objectives relevant to the passed in

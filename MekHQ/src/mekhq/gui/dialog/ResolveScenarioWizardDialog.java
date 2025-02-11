@@ -115,8 +115,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JButton> btnsEditUnit;
     private List<UnitStatus> ustatuses;
     private List<JLabel> lblsUnitName;
-    private JButton btnSendReinforcements;
+    // private JButton btnSendReinforcements;
     private boolean reinforcementsSent = false;
+    private List<JCheckBox> chkReinforcements;
 
     // maps objectives to list of associated entity checkboxes
     private Map<ScenarioObjective, List<JCheckBox>> objectiveCheckboxes;
@@ -367,20 +368,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
         ustatuses = new ArrayList<>();
         btnsEditUnit = new ArrayList<>();
         lblsUnitName = new ArrayList<>();
+        chkReinforcements = new ArrayList<>();
 
         JLabel nameLbl;
         JCheckBox chkTotaled;
         JButton btnViewUnit;
         JButton btnEditUnit;
+        JCheckBox chkReinforced;
 
         int gridy = 2;
         int unitIndex = 0;
 
-        btnSendReinforcements = new JButton("Continue as Reinforcements");
-        btnSendReinforcements.setEnabled(tracker.getScenario().getLinkedScenario() != 0);
-        btnSendReinforcements.setName("Confirm Reinforcement");
-        btnSendReinforcements.addActionListener(new ReinforcementListener());
-
+        boolean possibleReinforcment = (tracker.getScenario().getLinkedScenario() != 0);
+        // btnSendReinforcements = new JButton("Continue as Reinforcements");
+        // btnSendReinforcements.setEnabled(tracker.getScenario().getLinkedScenario() != 0);
+        // btnSendReinforcements.setName("Confirm Reinforcement");
+        // btnSendReinforcements.addActionListener(new ReinforcementListener());
+        
 
         for (Unit unit : tracker.getUnits()) {
             UnitStatus status = tracker.getUnitsStatus().get(unit.getId());
@@ -408,13 +412,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnEditUnit.addActionListener(new EditUnitListener());
             btnsEditUnit.add(btnEditUnit);
 
+          
+            chkReinforced = new JCheckBox("Send Reinforcement");
+            chkReinforced.setEnabled(!status.isTotalLoss());
+            chkReinforced.setVisible(possibleReinforcment);
+            chkReinforced.setName(Integer.toString(unitIndex));
+            chkReinforced.setActionCommand(unit.getId().toString());
+            chkReinforcements.add(chkReinforced);
+          
+            
+
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-           
+            if (unitIndex == tracker.getUnits().size() - 1) {
+                gridBagConstraints.weighty = 1.0;
+            }
+
             pnlUnitStatus.add(nameLbl, gridBagConstraints);
             gridBagConstraints.gridx = 1;
             pnlUnitStatus.add(chkTotaled, gridBagConstraints);
@@ -422,13 +439,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlUnitStatus.add(btnViewUnit, gridBagConstraints);
             gridBagConstraints.gridx = 3;
             pnlUnitStatus.add(btnEditUnit, gridBagConstraints);
+            gridBagConstraints.gridx = 4;
+            pnlUnitStatus.add(chkReinforced, gridBagConstraints);
             gridy++;
-            if (unitIndex == tracker.getUnits().size() - 1) {
-                gridBagConstraints.weighty = 1.0;
-                gridBagConstraints.gridy= gridy;
-                gridBagConstraints.gridx = 1;
-                pnlUnitStatus.add(btnSendReinforcements, gridBagConstraints);
-            }
             unitIndex++;
         }
         
@@ -1588,8 +1601,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
             }
         }
-        List<Integer> forces = tracker.getScenario().getForceIDs();
 
+        //Collect units selected as reinforcements
+        List<UUID> backupFOrce = new ArrayList<>();
+            for(JCheckBox box : chkReinforcements){
+                if(box.isSelected()){
+                UUID id = UUID.fromString(box.getActionCommand());
+                backupFOrce.add(id);
+                }
+            }
+       
+            if(!backupFOrce.isEmpty()){
+             reinforcementsSent = true;
+            }
+    
         //now process
         tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText());
 
@@ -1617,9 +1642,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         StratconRulesManager.processScenarioCompletion(tracker);
 
+      
+
         if (reinforcementsSent  && tracker.getScenario().getStatus().isOverallVictory()
             && tracker.getScenario().getLinkedScenario() != 0) {
-            StratconRulesManager.linkedScenarioProcessing(tracker, forces);
+                
+            StratconRulesManager.linkedScenarioProcessing(tracker, backupFOrce);
         }
         
 
@@ -1954,6 +1982,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
     }
+
+    // private class CheckReinforcmentListener implements ItemListener {
+    //     @Override
+    //     public void itemStateChanged(ItemEvent evt) {
+    //         int idx = Integer.parseInt(((JCheckBox) evt.getItem()).getName());
+    //        if(chkReinforcements.contains(idx)){
+    //         chkReinforcements.remove(idx);
+    //        }else{
+    //         chkReinforcements.
+    //        }
+    //     }
+    // }
 
     /**
      * Event handler for a KIA checkbox
