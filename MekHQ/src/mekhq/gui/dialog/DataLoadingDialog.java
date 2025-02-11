@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.bot.queen.ai.utility.tw.TWUtilityAIRepository;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
@@ -262,6 +263,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             // region Progress 1
             setProgress(1);
             Factions.setInstance(Factions.loadDefault());
+            TWUtilityAIRepository.getInstance().reloadRepository();
             // endregion Progress 1
 
             // region Progress 2
