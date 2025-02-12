@@ -6,7 +6,8 @@ spectralType: F8II
 primarySlot: 6
 event:
   - date: '2376-02-25'
-    zenithCharge: yes
+    zenithCharge:
+      value: yes
 planet:
   - name:
       value: Skouzas's Frontier

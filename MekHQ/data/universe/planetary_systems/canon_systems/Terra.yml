@@ -6,9 +6,11 @@ spectralType: G2V
 primarySlot: 3
 event:
   - date: '2367-11-21'
-    zenithCharge: yes
+    zenithCharge:
+      value: yes
   - date: '2426-08-27'
-    nadirCharge: yes
+    nadirCharge:
+      value: yes
 planet:
   - name:
       source: canon

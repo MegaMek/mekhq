@@ -285,11 +285,19 @@ public class PlanetarySystem {
     }
 
     public Boolean isNadirCharge(LocalDate when) {
-        return getEventData(when, false, e -> e.nadirCharge);
+        return (null == getSourcedNadirCharge(when) ? false : getSourcedNadirCharge(when).getValue());
+    }
+
+    public SourceableValue<Boolean> getSourcedNadirCharge(LocalDate when) {
+        return getEventData(when, null, e -> e.nadirCharge);
     }
 
     public boolean isZenithCharge(LocalDate when) {
-        return getEventData(when, false, e -> e.zenithCharge);
+        return (null == getSourcedZenithCharge(when) ? false : getSourcedZenithCharge(when).getValue());
+    }
+
+    public SourceableValue<Boolean> getSourcedZenithCharge(LocalDate when) {
+        return getEventData(when, null, e -> e.zenithCharge);
     }
 
     public int getNumberRechargeStations(LocalDate when) {
@@ -541,9 +549,9 @@ public class PlanetarySystem {
         @JsonProperty("date")
         public LocalDate date;
         @JsonProperty("nadirCharge")
-        public Boolean nadirCharge;
+        public SourceableValue<Boolean> nadirCharge;
         @JsonProperty("zenithCharge")
-        public Boolean zenithCharge;
+        public SourceableValue<Boolean> zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
 
