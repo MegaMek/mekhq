@@ -86,7 +86,7 @@ public class Planet {
     @JsonProperty("gravity")
     private Double gravity;
     @JsonProperty("dayLength")
-    private Double dayLength;
+    private SourceableValue<Double> dayLength;
     @JsonProperty("yearLength")
     private Double yearLength;
 
@@ -231,6 +231,10 @@ public class Planet {
     }
 
     public Double getDayLength(LocalDate when) {
+        return (null == getSourcedDayLength(when)) ? null : getSourcedDayLength(when).getValue();
+    }
+
+    public SourceableValue<Double> getSourcedDayLength(LocalDate when) {
         // yes day length can change because Venus
         return getEventData(when, dayLength, e -> e.dayLength);
     }
@@ -405,10 +409,10 @@ public class Planet {
     }
 
     public String getName(LocalDate when) {
-        return getSourceableName(when).getValue();
+        return getSourcedName(when).getValue();
     }
 
-    public SourceableValue<String> getSourceableName(LocalDate when) {
+    public SourceableValue<String> getSourcedName(LocalDate when) {
         return getEventData(when, name, e -> e.name);
     }
 
@@ -799,7 +803,7 @@ public class Planet {
         @JsonProperty("population")
         public Long population;
         @JsonProperty("dayLength")
-        public Double dayLength;
+        public SourceableValue<Double> dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
         @JsonProperty("custom")
         public boolean custom = false;

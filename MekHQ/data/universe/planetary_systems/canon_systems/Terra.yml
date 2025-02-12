@@ -23,7 +23,8 @@ planet:
     gravity: 0.38
     diameter: 4880
     density: 5.427
-    dayLength: 1407
+    dayLength:
+      value: 1407
     yearLength: 0.24
     temperature: 427
     water: 0
@@ -39,7 +40,8 @@ planet:
     gravity: 0.904
     diameter: 12100
     density: 5.243
-    dayLength: 5832
+    dayLength:
+      value: 5832
     yearLength: 0.24
     temperature: 460
     water: 0
@@ -55,7 +57,9 @@ planet:
     event:
       - date: '2205-04-16'
         atmosphere: BREATHABLE
-        dayLength: 48
+        dayLength:
+          source: canon
+          value: 48
         faction:
           - TA
         population: 10072.0
@@ -261,7 +265,9 @@ planet:
     gravity: 1.0
     diameter: 12742
     density: 5.514
-    dayLength: 24
+    dayLength:
+      source: canon
+      value: 24
     yearLength: 1.0
     temperature: 31
     water: 71
@@ -575,7 +581,8 @@ planet:
     gravity: 0.38
     diameter: 6779
     density: 3.9335
-    dayLength: 24
+    dayLength:
+      value: 24
     yearLength: 1.88
     temperature: 12
     water: 14
@@ -835,7 +842,8 @@ planet:
     gravity: 2.53
     diameter: 139820
     density: 1.33
-    dayLength: 9
+    dayLength:
+      value: 9
     yearLength: 12.0
     ring: yes
     smallMoons: 73
@@ -888,7 +896,8 @@ planet:
     gravity: 1.07
     diameter: 116460
     density: 0.687
-    dayLength: 10
+    dayLength:
+      value: 10
     yearLength: 29.0
     ring: yes
     smallMoons: 51
@@ -961,7 +970,8 @@ planet:
     gravity: 0.89
     diameter: 50724
     density: 1.27
-    dayLength: 17
+    dayLength:
+      value: 17
     yearLength: 84.0
     smallMoons: 22
     satellite:
@@ -1003,7 +1013,8 @@ planet:
     gravity: 1.14
     diameter: 49244
     density: 1.64
-    dayLength: 16
+    dayLength:
+      value: 16
     yearLength: 164.8
     smallMoons: 8
     satellite:
