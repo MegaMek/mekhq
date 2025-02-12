@@ -462,7 +462,8 @@ planet:
             - TA
         population:
           value: 8906920784.0
-        socioIndustrial: D-C-A-D-B
+        socioIndustrial:
+          value: D-C-A-D-B
       - date: '2090-01-01'
         population:
           value: 8968654762.0
@@ -515,7 +516,8 @@ planet:
         population:
           value: 10691669283.0
       - date: '2259-01-01'
-        socioIndustrial: C-C-A-D-B
+        socioIndustrial:
+          value: C-C-A-D-B
       - date: '2260-01-01'
         population:
           value: 10759021585.0
@@ -579,7 +581,8 @@ planet:
         population:
           value: 11382502766.0
       - date: '2446-01-01'
-        socioIndustrial: B-B-A-C-B
+        socioIndustrial:
+          value: B-B-A-C-B
       - date: '2450-01-01'
         population:
           value: 11397701413.0
@@ -650,7 +653,8 @@ planet:
         population:
           value: 11602696060.0
       - date: '2666-01-01'
-        socioIndustrial: A-A-A-B-A
+        socioIndustrial:
+          value: A-A-A-B-A
       - date: '2670-01-01'
         population:
           value: 11606959295.0
@@ -732,7 +736,8 @@ planet:
         population:
           value: 8821455331.0
       - date: '2877-01-01'
-        socioIndustrial: B-B-B-B-B
+        socioIndustrial:
+          value: B-B-B-B-B
       - date: '2880-01-01'
         population:
           value: 8660834506.0
@@ -740,7 +745,8 @@ planet:
         population:
           value: 8434707101.0
       - date: '2897-01-01'
-        socioIndustrial: C-C-C-C-C
+        socioIndustrial:
+          value: C-C-C-C-C
       - date: '2900-01-01'
         population:
           value: 8307156978.0
@@ -783,7 +789,8 @@ planet:
       - date: '3025-11-18'
         population:
           value: 6000000000.0
-        socioIndustrial: B-B-B-B-B
+        socioIndustrial:
+          value: B-B-B-B-B
       - date: '3030-01-01'
         population:
           value: 6043719422.0
@@ -791,7 +798,9 @@ planet:
         population:
           value: 6096452432.0
       - date: '3041-01-01'
-        socioIndustrial: A-A-A-A-A
+        socioIndustrial:
+          source: canon
+          value: A-A-A-A-A
       - date: '3050-01-01'
         population:
           value: 6154278514.0
@@ -833,7 +842,8 @@ planet:
         population:
           value: 6396715320.0
       - date: '3095-01-01'
-        socioIndustrial: A-A-A-A-A
+        socioIndustrial:
+          value: A-A-A-A-A
       - date: '3100-01-01'
         population:
           value: 6437807968.0

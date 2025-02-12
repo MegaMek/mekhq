@@ -468,6 +468,10 @@ public class Planet {
     }
 
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
+        return (null == getSourcedSocioIndustrial(when)) ? null : getSourcedSocioIndustrial(when).getValue();
+    }
+
+    public SourceableValue<SocioIndustrialData> getSourcedSocioIndustrial(LocalDate when) {
         return getEventData(when, null, e -> e.socioIndustrial);
     }
 
@@ -864,7 +868,7 @@ public class Planet {
         public SourceableValue<Integer> percentWater;
         @JsonProperty("temperature")
         public SourceableValue<Integer> temperature;
-        public SocioIndustrialData socioIndustrial;
+        public SourceableValue<SocioIndustrialData> socioIndustrial;
         @JsonProperty("hpg")
         public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
