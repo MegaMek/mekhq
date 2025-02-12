@@ -477,7 +477,11 @@ public class Planet {
     }
 
     public HPGRating getHPG(LocalDate when) {
-        return getEventData(when, HPGRating.X, e -> e.hpg);
+        return (null == getSourcedHPG(when)) ? HPGRating.X : getSourcedHPG(when).getValue();
+    }
+
+    public SourceableValue<HPGRating> getSourcedHPG(LocalDate when) {
+        return getEventData(when, null, e -> e.hpg);
     }
 
     public String getHPGClass(LocalDate when) {
@@ -604,10 +608,14 @@ public class Planet {
      * @return The hiring hall level on the given date
      */
     public HiringHallLevel getHiringHallLevel(LocalDate when) {
-        HiringHallLevel staticHall = getEventData(when, HiringHallLevel.NONE, e -> e.hiringHall);
+        HiringHallLevel staticHall = (null == getSourcedHiringHallLevel(when)) ?
+            HiringHallLevel.NONE : getSourcedHiringHallLevel(when).getValue();
         if (!staticHall.isNone()) {
             return staticHall;
         }
+
+        //this is stupid - the hiring hall should still be none, but just add other
+        //mods to the contract roll for these things
         if (getPopulation(when) == null || getPopulation(when) == 0) {
             return HiringHallLevel.NONE;
         }
@@ -621,6 +629,10 @@ public class Planet {
         }
         int score = calculateHiringHallScore(when);
         return resolveHiringHallLevel(score);
+    }
+
+    public SourceableValue<HiringHallLevel> getSourcedHiringHallLevel(LocalDate when) {
+        return getEventData(when, null, e -> e.hiringHall);
     }
 
     private int calculateHiringHallScore(LocalDate when) {
@@ -854,11 +866,11 @@ public class Planet {
         public SourceableValue<Integer> temperature;
         public SocioIndustrialData socioIndustrial;
         @JsonProperty("hpg")
-        public HPGRating hpg;
+        public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
         private megamek.common.planetaryconditions.Atmosphere pressure;
         @JsonProperty("hiringHall")
-        private HiringHallLevel hiringHall;
+        private SourceableValue<HiringHallLevel> hiringHall;
         @JsonProperty("atmosphere")
         private SourceableValue<Atmosphere> atmosphere;
         @JsonProperty("composition")

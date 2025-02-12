@@ -635,7 +635,9 @@ planet:
         population:
           value: 11577679423.0
       - date: '2630-08-08'
-        hpg: A
+        hpg:
+          source: canon
+          value: A
         population:
           value: 11584300423.0
       - date: '2640-01-01'
@@ -845,7 +847,9 @@ planet:
         population:
           value: 6477708559.0
       - date: '3132-08-07'
-        hpg: X
+        hpg:
+          source: canon
+          value: X
       - date: '3140-01-01'
         population:
           value: 6517938233.0

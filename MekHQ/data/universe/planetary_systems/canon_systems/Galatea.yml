@@ -357,7 +357,9 @@ planet:
         population:
           value: 594065739.0
       - date: '2632-04-18'
-        hpg: A
+        hpg:
+          source: canon
+          value: A
       - date: '2640-01-01'
         population:
           value: 593003448.0
@@ -366,7 +368,9 @@ planet:
       - date: '2650-01-01'
         population:
           value: 594885097.0
-        hiringHall: GREAT
+        hiringHall:
+          source: Merc Supplemental 1
+          value: GREAT
       - date: '2660-01-01'
         population:
           value: 598352411.0
@@ -581,7 +585,9 @@ planet:
         population:
           value: 593333614.0
       - date: '3132-08-07'
-        hpg: X
+        hpg:
+          source: canon
+          value: X
       - date: '3135-10-01'
         faction:
           source: canon
