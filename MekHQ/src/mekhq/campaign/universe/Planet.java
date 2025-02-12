@@ -533,11 +533,11 @@ public class Planet {
     }
 
     public List<String> getFactions(LocalDate when) {
-        List<String> retVal = getEventData(when, new ArrayList<String>(), e -> e.faction);
-        if (retVal != null) {
-            return retVal;
-        }
-        return Collections.emptyList();
+        return (null == getSourcedFactions(when)) ? Collections.emptyList() : getSourcedFactions(when).getValue();
+    }
+
+    public SourceableValue<List<String>> getSourcedFactions(LocalDate when) {
+        return getEventData(when, null, e -> e.faction);
     }
 
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
@@ -827,7 +827,8 @@ public class Planet {
         @JsonProperty("shortName")
         public String shortName;
 
-        public List<String> faction;
+        @JsonProperty("faction")
+        public SourceableValue<List<String>> faction;
         public Set<Faction> factions;
         @JsonProperty("lifeForm")
         public LifeForm lifeForm;
@@ -856,7 +857,9 @@ public class Planet {
 
         public void copyDataFrom(PlanetaryEvent other) {
             faction = ObjectUtility.nonNull(other.faction, faction);
-            factions = updateFactions(factions, faction, other.faction);
+            if(null != other.faction) {
+                factions = updateFactions(factions, faction.getValue(), other.faction.getValue());
+            }
             hpg = ObjectUtility.nonNull(other.hpg, hpg);
             lifeForm = ObjectUtility.nonNull(other.lifeForm, lifeForm);
             message = ObjectUtility.nonNull(other.message, message);

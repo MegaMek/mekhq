@@ -79,7 +79,8 @@ planet:
           source: canon
           value: 48
         faction:
-          - TA
+          value:
+            - TA
         population:
           value: 10072.0
         pressure: STANDARD
@@ -124,7 +125,9 @@ planet:
           value: 19396232.0
       - date: '2316-12-08'
         faction:
-          - TH
+          source: canon
+          value:
+            - TH
       - date: '2320-01-01'
         population:
           value: 26443017.0
@@ -262,19 +265,25 @@ planet:
           value: 205661804.0
       - date: '2767-02-12'
         faction:
-          - RWR
+          source: canon
+          value:
+            - RWR
       - date: '2770-01-01'
         population:
           value: 169352736.0
       - date: '2779-10-09'
         faction:
-          - TH
+          source: canon
+          value:
+            - TH
       - date: '2780-01-01'
         population:
           value: 113713557.0
       - date: '2788-06-25'
         faction:
-          - CS
+          source: canon
+          value:
+            - CS
       - date: '2790-01-01'
         population:
           value: 74089762.0
@@ -354,12 +363,15 @@ planet:
           value: 11103.0
       - date: '3030-12-23'
         faction:
-          - ABN
+          value:
+            - ABN
         population:
           value: 0.0
       - date: '3151-01-01'
         faction:
-          - ROS
+          source: sucs
+          value:
+            - ROS
   - name:
       source: canon
       value: Terra
@@ -428,7 +440,9 @@ planet:
     event:
       - date: '2086-10-31'
         faction:
-          - TA
+          source: canon
+          value:
+            - TA
         population:
           value: 8906920784.0
         socioIndustrial: D-C-A-D-B
@@ -505,7 +519,9 @@ planet:
           value: 11032488944.0
       - date: '2316-10-21'
         faction:
-          - TH
+          source: canon
+          value:
+            - TH
       - date: '2320-01-01'
         population:
           value: 11074680174.0
@@ -648,7 +664,9 @@ planet:
           value: 11598493372.0
       - date: '2767-06-11'
         faction:
-          - RWR
+          source: canon
+          value:
+            - RWR
         population:
           value: 12000000000.0
       - date: '2770-01-01'
@@ -656,13 +674,17 @@ planet:
           value: 11529401369.0
       - date: '2779-02-05'
         faction:
-          - TH
+          source: canon
+          value:
+            - TH
       - date: '2780-01-01'
         population:
           value: 11373148719.0
       - date: '2788-06-25'
         faction:
-          - CS
+          source: canon
+          value:
+            - CS
       - date: '2790-01-01'
         population:
           value: 11150031133.0
@@ -756,7 +778,9 @@ planet:
           value: 6154278514.0
       - date: '3057-02-28'
         faction:
-          - WOB
+          source: canon
+          value:
+            - WOB
       - date: '3060-01-01'
         population:
           value: 6207265299.0
@@ -768,18 +792,24 @@ planet:
           value: 6350000000.0
       - date: '3079-01-12'
         faction:
-          - Stone
-          - LA
-          - WOB
+          source: canon
+          value:
+            - Stone
+            - LA
+            - WOB
       - date: '3079-06-20'
         faction:
-          - Stone
+          source: canon
+          value:
+            - Stone
       - date: '3080-01-01'
         population:
           value: 6350820116.0
       - date: '3081-01-24'
         faction:
-          - ROS
+          source: canon
+          value:
+            - ROS
       - date: '3090-01-01'
         population:
           value: 6396715320.0
@@ -846,7 +876,8 @@ planet:
       - date: '2201-10-11'
         atmosphere: BREATHABLE
         faction:
-          - TA
+          value:
+            - TA
         population:
           value: 10282.0
         pressure: THIN
@@ -888,7 +919,9 @@ planet:
           value: 755443.0
       - date: '2316-04-29'
         faction:
-          - TH
+          source: canon
+          value:
+            - TH
       - date: '2320-01-01'
         population:
           value: 845127.0
@@ -1026,19 +1059,25 @@ planet:
           value: 68841607.0
       - date: '2767-03-06'
         faction:
-          - RWR
+          source: canon
+          value:
+            - RWR
       - date: '2770-01-01'
         population:
           value: 72481756.0
       - date: '2779-10-13'
         faction:
-          - TH
+          source: canon
+          value:
+            - TH
       - date: '2780-01-01'
         population:
           value: 66145803.0
       - date: '2788-06-25'
         faction:
-          - CS
+          source: canon
+          value:
+            - CS
       - date: '2790-01-01'
         population:
           value: 60274531.0
@@ -1122,7 +1161,9 @@ planet:
           value: 5324766.0
       - date: '3057-02-28'
         faction:
-          - WOB
+          source: canon
+          value:
+            - WOB
       - date: '3060-01-01'
         population:
           value: 4895356.0
@@ -1135,18 +1176,24 @@ planet:
           value: 4233539.021739199758
       - date: '3079-01-12'
         faction:
-          - Stone
-          - LA
-          - WOB
+          source: canon
+          value:
+            - Stone
+            - LA
+            - WOB
       - date: '3079-06-20'
         faction:
-          - Stone
+          source: canon
+          value:
+            - Stone
       - date: '3080-01-01'
         population:
           value: 4261917.0
       - date: '3081-09-06'
         faction:
-          - ROS
+          source: canon
+          value:
+            - ROS
       - date: '3090-01-01'
         population:
           value: 4288423.0
