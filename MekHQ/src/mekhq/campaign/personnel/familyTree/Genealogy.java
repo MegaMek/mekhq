@@ -433,6 +433,29 @@ public class Genealogy {
         }
     }
 
+    /**
+     * Checks if there is at least one person in the family who is not marked as "departed".
+     *
+     * <p>The method iterates through all relationship groups in the {@code family} map and checks
+     * the status of each person. If any person is found whose status is not marked as "departed",
+     * the method returns {@code true}. Otherwise, it returns {@code false} once all groups have
+     * been checked.
+     *
+     * @return {@code true} if at least one person in the family is active (not "departed"),
+     *         {@code false} otherwise.
+     */
+    public boolean isActive() {
+        for (List<Person> relationshipGroup : family.values()) {
+            for (Person relation : relationshipGroup) {
+                if (!relation.getStatus().isDepartedUnit()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     // region File I/O
     /**
      * @param pw     the PrintWriter to write to

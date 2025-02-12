@@ -90,6 +90,7 @@ import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
+import static mekhq.campaign.force.ForceType.STANDARD;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
@@ -1024,7 +1025,7 @@ public class AtBContract extends Contract {
 
                                 if (campaignState != null) {
                                     text += ": -1 Support Point";
-                                    campaignState.addSupportPoints(-1);
+                                    campaignState.changeSupportPoints(-1);
                                 }
                             }
                             break;
@@ -2069,7 +2070,7 @@ public class AtBContract extends Contract {
         int playerGBV = 0;
         int playerUnitCount = 0;
         for (Force force : campaign.getAllForces()) {
-            if (!force.isCombatForce()) {
+            if (!force.isForceType(STANDARD)) {
                 continue;
             }
 

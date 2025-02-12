@@ -26,11 +26,11 @@ import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerDescription;
 import static mekhq.gui.baseComponents.MHQDialogImmersive.getSpeakerIcon;
 import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**
  * The {@code DialogResupplyFocus} class is responsible for displaying a dialog that allows
@@ -43,7 +43,7 @@ public class DialogResupplyFocus extends JDialog {
     final int RIGHT_WIDTH = UIUtil.scaleForGUI(400);
     final int INSERT_SIZE = UIUtil.scaleForGUI(10);
 
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Resupply");
+    private static final String  RESOURCE_BUNDLE = "mekhq.resources.Resupply";
 
     /**
      * Displays a dialog to let the player select a resupply focus. The available options include:
@@ -80,7 +80,7 @@ public class DialogResupplyFocus extends JDialog {
     public DialogResupplyFocus(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
 
-        setTitle(resources.getString("incomingTransmission.title"));
+        setTitle(getFormattedTextAt(RESOURCE_BUNDLE, "incomingTransmission.title"));
 
         // Main Panel to hold both boxes
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -135,7 +135,7 @@ public class DialogResupplyFocus extends JDialog {
         JPanel rightBox = new JPanel(new BorderLayout());
         rightBox.setBorder(BorderFactory.createEtchedBorder());
 
-        String message = String.format(resources.getString("focusDescription.text"),
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "focusDescription.text",
             campaign.getCommanderAddress(false));
 
         JLabel rightDescription = new JLabel(
@@ -156,8 +156,8 @@ public class DialogResupplyFocus extends JDialog {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        JButton optionBalanced = new JButton(resources.getString("optionBalanced.text"));
-        optionBalanced.setToolTipText(resources.getString("optionBalanced.tooltip"));
+        JButton optionBalanced = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "optionBalanced.text"));
+        optionBalanced.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "optionBalanced.tooltip"));
         optionBalanced.addActionListener(e -> {
             dispose();
             // The Resupply class initialization assumes a balanced approach
@@ -167,8 +167,8 @@ public class DialogResupplyFocus extends JDialog {
         // The player should not be able to focus on parts for game balance reasons.
         // If the player could pick parts, the optimum choice would be to always pick parts.
 
-        JButton optionArmor = new JButton(resources.getString("optionArmor.text"));
-        optionArmor.setToolTipText(resources.getString("optionArmor.tooltip"));
+        JButton optionArmor = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "optionArmor.text"));
+        optionArmor.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "optionArmor.tooltip"));
         optionArmor.addActionListener(e -> {
             dispose();
             resupply.setFocusAmmo(0);
@@ -177,8 +177,8 @@ public class DialogResupplyFocus extends JDialog {
         });
         buttonPanel.add(optionArmor);
 
-        JButton optionAmmo = new JButton(resources.getString("optionAmmo.text"));
-        optionAmmo.setToolTipText(resources.getString("optionAmmo.tooltip"));
+        JButton optionAmmo = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "optionAmmo.text"));
+        optionAmmo.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "optionAmmo.tooltip"));
         optionAmmo.addActionListener(e -> {
             dispose();
             resupply.setFocusAmmo(0.75);
@@ -195,7 +195,7 @@ public class DialogResupplyFocus extends JDialog {
         JLabel lblInfo = new JLabel(
             String.format("<html><div style='width: %s; text-align:center;'>%s</div></html>",
                 RIGHT_WIDTH + LEFT_WIDTH,
-                String.format(resources.getString("documentation.prompt"))));
+                getFormattedTextAt(RESOURCE_BUNDLE, "documentation.prompt")));
         lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
         infoPanel.add(lblInfo, BorderLayout.CENTER);
         infoPanel.setBorder(BorderFactory.createEtchedBorder());

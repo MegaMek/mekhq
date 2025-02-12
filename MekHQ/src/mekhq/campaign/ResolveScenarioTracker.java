@@ -2,7 +2,7 @@
  * ResolveScenarioTracker.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,13 +24,13 @@ package mekhq.campaign;
 import megamek.client.IClient;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.autoresolve.acar.SimulatedClient;
 import megamek.common.event.PostGameResolution;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import megamek.common.autoresolve.acar.SimulatedClient;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -41,8 +41,8 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
@@ -1479,7 +1479,7 @@ public class ResolveScenarioTracker {
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
                 if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    person.increaseFatigue(
+                    person.changeFatigue(
                             campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
                 }
 
@@ -1506,7 +1506,7 @@ public class ResolveScenarioTracker {
             }
 
             if (!status.isDead()) {
-                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);

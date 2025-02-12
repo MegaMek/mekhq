@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,13 +28,13 @@ import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 
 /**
  * Handles processing for objectives for a scenario that has them
@@ -399,8 +399,22 @@ public class ScenarioObjectiveProcessor {
                         if (dryRun) {
                             return String.format("%d support points will be added", numSupportPoints);
                         } else {
-                            contract.getStratconCampaignState().addSupportPoints(numSupportPoints);
+                            contract.getStratconCampaignState().changeSupportPoints(numSupportPoints);
                         }
+                    }
+                }
+                break;
+            case SupplyCache:
+                if (tracker.getMission() instanceof AtBContract contract) {
+                    Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
+
+                    int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
+                    int size = effect.howMuch * effectMultiplier;
+
+                    if (dryRun) {
+                        return String.format("A size %d supply cache will be added", size);
+                    } else {
+                        performResupply(resupply, contract, size);
                     }
                 }
                 break;
@@ -440,7 +454,7 @@ public class ScenarioObjectiveProcessor {
                         if (dropSize > 0) {
                             LogManager.getLogger().info("ScenarioObjectiveProcessor.java");
                             campaign.addReport("Bonus: Captured Supplies");
-                            Resupply resupply = new Resupply(campaign, contract, ResupplyType.RESUPPLY_LOOT);
+                            Resupply resupply = new Resupply(campaign, contract, RESUPPLY_LOOT);
                             performResupply(resupply, contract, dropSize);
                         }
                     }

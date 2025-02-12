@@ -220,6 +220,7 @@ planet:
         population: 592907650.0
       - date: '2630-01-01'
         population: 594065739.0
+        hiringHall: Great
       - date: '2632-04-18'
         #hpg: A
       - date: '2640-01-01'

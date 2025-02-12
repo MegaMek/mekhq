@@ -4841,6 +4841,7 @@
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
+        <destructionYear>3067</destructionYear>
         <tuition>10500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
@@ -4859,6 +4860,7 @@
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
+        <destructionYear>3067</destructionYear>
         <tuition>10500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
@@ -4877,6 +4879,7 @@
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
+        <destructionYear>3067</destructionYear>
         <tuition>11667</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
@@ -4946,6 +4949,7 @@
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
+        <destructionYear>3067</destructionYear>
         <tuition>22458</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>

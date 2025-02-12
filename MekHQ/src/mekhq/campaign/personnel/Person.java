@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -1577,8 +1578,20 @@ public class Person {
         this.fatigue = fatigue;
     }
 
-    public void increaseFatigue(final int fatigue) {
-        this.fatigue = this.fatigue + fatigue;
+    /**
+     * Adjusts the current fatigue level by the specified amount.
+     *
+     * <p>
+     * This method modifies the fatigue level by adding the value of {@code change}
+     * to the current fatigue. Positive values will increase the fatigue, while
+     * negative values will decrease it.
+     * </p>
+     *
+     * @param change The amount to adjust the fatigue by. Positive values increase fatigue,
+     *               and negative values decrease it.
+     */
+    public void changeFatigue(final int change) {
+        this.fatigue = this.fatigue + change;
     }
 
     public boolean getIsRecoveringFromFatigue() {

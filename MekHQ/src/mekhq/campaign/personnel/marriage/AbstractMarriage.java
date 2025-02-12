@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,8 +29,8 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

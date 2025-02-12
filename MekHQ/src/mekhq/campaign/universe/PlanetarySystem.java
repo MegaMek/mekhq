@@ -2,7 +2,7 @@
  * PlanetarySystem.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2011-2024 - The MegaMek team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -255,6 +255,22 @@ public class PlanetarySystem {
             }
         }
         return rating;
+    }
+
+    /** @return the highest Hiring Hall rating among planets **/
+    public HiringHallLevel getHiringHallLevel(LocalDate when) {
+        HiringHallLevel level = HiringHallLevel.NONE;
+        for (Planet planet : planets.values()) {
+            if ((null != planet.getHiringHallLevel(when)) && (planet.getHiringHallLevel(when).compareTo(level) > 0)) {
+                level = planet.getHiringHallLevel(when);
+            }
+        }
+        return level;
+    }
+
+    /** @return true if a hiring hall is present in the system **/
+    public boolean isHiringHall(LocalDate when) {
+        return !getHiringHallLevel(when).isNone();
     }
 
     /**
@@ -673,83 +689,10 @@ public class PlanetarySystem {
 
         for (Academy academy : filteredAcademies) { // there are not enough entries to justify a Stream
             academyString.append("<b>").append(academy.getName()).append("</b><br>")
-                    .append(academy.getDescription()).append("<br><br>");
+                .append(academy.getDescription()).append("<br><br>");
         }
 
         return academyString.toString();
-    }
-
-    /**
-     * Checks whether a hiring hall exists in the planetary system on the specified date
-     *
-     * @param  date Date to check for existence of hiring hall
-     * @return True if a hiring hall exists on the given date; otherwise false.
-     */
-    public boolean isHiringHall(LocalDate date) {
-        return getHiringHallLevel(date) != HiringHallLevel.NONE;
-    }
-
-    /**
-     * Retrieves the level of the Hiring Hall in the planetary system on the specified
-     * date. The level is dynamically determined on various planetary characteristics,
-     * including Technological Sophistication, HPG level, and planetary governments.
-     *
-     * @param  date Date to check for the level of the hiring hall
-     * @return The hiring hall level on the given date
-     */
-    public HiringHallLevel getHiringHallLevel(LocalDate date) {
-        /*if (staticHall != null && staticHall.isActive(date)) {
-            return staticHall.getLevel();
-        }*/
-        if (getPopulation(date) == 0) {
-            return HiringHallLevel.NONE;
-        }
-        for (Faction faction : getFactionSet(date)) {
-            if (faction.isPirate() || faction.isChaos()) {
-                return HiringHallLevel.QUESTIONABLE;
-            }
-            if (faction.isClan()) {
-                return HiringHallLevel.NONE;
-            }
-        }
-        int score = calculateHiringHallScore(date);
-        return resolveHiringHallLevel(score);
-    }
-
-    private int calculateHiringHallScore(LocalDate date) {
-        int score = 0;
-        score += getHiringHallHpgBonus(date);
-        score += getHiringHallTechBonus(date);
-        return score;
-    }
-
-    private HiringHallLevel resolveHiringHallLevel(int score) {
-        if (score > 9) {
-            return HiringHallLevel.GREAT;
-        } else if (score > 6) {
-            return HiringHallLevel.STANDARD;
-        } else if (score > 4) {
-            return HiringHallLevel.MINOR;
-        }
-        return HiringHallLevel.NONE;
-    }
-
-    private int getHiringHallHpgBonus(LocalDate date) {
-        return switch (getHPG(date)) {
-            case EquipmentType.RATING_A -> 5;
-            case EquipmentType.RATING_B -> 3;
-            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
-            default -> 0;
-        };
-    }
-
-    private int getHiringHallTechBonus(LocalDate date) {
-        return switch (getSocioIndustrial(date).tech) {
-            case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
-            case EquipmentType.RATING_A, EquipmentType.RATING_B -> 3;
-            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
-            default -> 0;
-        };
     }
 
     public static class PlanetarySystemPostLoader extends StdConverter<PlanetarySystem, PlanetarySystem> {

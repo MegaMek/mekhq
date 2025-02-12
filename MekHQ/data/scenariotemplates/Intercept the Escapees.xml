@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ScenarioTemplate>
+    <name>Intercept the Escapees</name>
+    <stratConScenarioType>SPECIAL_JAIL_BREAK</stratConScenarioType>
+    <shortBriefing>Prevent the escapees from linking up with enemy forces.</shortBriefing>
+    <detailedBriefing>Allied Command has located the escapees. Ensure they do not fall into enemy hands by wiping out the escapees, or by destroying 50% of enemy forces. Failure will grant the enemy valuable intel and cost us 1 CVP.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
+    <mapParameters>
+        <allowedTerrainTypes />
+        <allowRotation>false</allowRotation>
+        <baseHeight>25</baseHeight>
+        <baseWidth>25</baseWidth>
+        <heightScalingIncrement>5</heightScalingIncrement>
+        <mapLocation>AllGroundTerrain</mapLocation>
+        <useStandardAtBSizing>true</useStandardAtBSizing>
+        <widthScalingIncrement>5</widthScalingIncrement>
+    </mapParameters>
+    <scenarioForces>
+        <entry>
+            <key>Player</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>-3</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>3</deploymentZone>
+                </deploymentZones>
+                <destinationZone>4</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Player</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>0</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>OpFor</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>-3</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones />
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>OpFor</forceName>
+                <generationMethod>1</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>RECON</forceRole>
+                    <forceRole>RAIDER</forceRole>
+                    <forceRole>CAVALRY</forceRole>
+                </roleChoices>
+            </value>
+        </entry>
+        <entry>
+            <key>Escapees</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
+                <destinationZone>7</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Escapees</forceName>
+                <generationMethod>6</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>0</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+    </scenarioForces>
+    <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>OpFor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>95</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Escapees</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy 100% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Destroy</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+    </scenarioObjectives>
+</ScenarioTemplate>

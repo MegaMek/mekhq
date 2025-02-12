@@ -37,8 +37,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
@@ -118,6 +120,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
+    private boolean commitForces = false;
+
     /**
      * Constructs a StratconPanel instance, given a parent campaign GUI and a
      * pointer to an info area.
@@ -125,7 +129,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     public StratconPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
 
-        scenarioWizard = new StratconScenarioWizard(campaign);
+        scenarioWizard = new StratconScenarioWizard(campaign, this);
         this.infoArea = infoArea;
 
         assignmentUI = new TrackForceAssignmentUI(this);
@@ -188,11 +192,12 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (scenario.getCurrentState().equals(UNRESOLVED)) {
                     menuItemManageScenario.setText("Manage Deployment");
+                    menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 } else {
                     menuItemManageScenario.setText("Manage Reinforcements");
+                    menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_SCENARIO);
                 }
 
-                menuItemManageScenario.setActionCommand(RCLICK_COMMAND_MANAGE_FORCES);
                 menuItemManageScenario.addActionListener(this);
                 rightClickMenu.add(menuItemManageScenario);
             }
@@ -1049,7 +1054,23 @@ public class StratconPanel extends JPanel implements ActionListener {
                         isPrimaryForce = true;
                     }
                 }
-            // Deliberate fall-through
+
+                // Let's reload the scenario in case it updated
+                selectedScenario = currentTrack.getScenario(selectedCoords);
+
+                if (selectedScenario != null &&  selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
+                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
+                        currentTrack, campaignState, isPrimaryForce);
+
+                    scenarioWizard.toFront();
+                    scenarioWizard.setVisible(true);
+                }
+                if (selectedScenario != null && !isCommitForces()) {
+                    selectedScenario.resetScenario(campaign);
+                }
+
+                setCommitForces(false);
+                break;
             case RCLICK_COMMAND_MANAGE_SCENARIO:
                 // It's possible a scenario may have been placed when deploying the force, so we
                 // need to recheck
@@ -1057,7 +1078,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (selectedScenario != null
                     && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
                     scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                        currentTrack, campaignState, isPrimaryForce);
+                        currentTrack, campaignState, false);
 
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
@@ -1121,5 +1142,13 @@ public class StratconPanel extends JPanel implements ActionListener {
         } else {
             return super.getPreferredSize();
         }
+    }
+
+    public boolean isCommitForces() {
+        return commitForces;
+    }
+
+    public void setCommitForces(boolean commitForces) {
+        this.commitForces = commitForces;
     }
 }

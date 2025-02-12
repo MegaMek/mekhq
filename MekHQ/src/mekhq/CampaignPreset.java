@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    static final private Version LAST_COMPATIBLE_VERSION = new Version("0.50.03-SNAPSHOT");
+    static final private Version LAST_COMPATIBLE_VERSION = new Version("0.50.02");
 
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
@@ -442,7 +442,7 @@ public class CampaignPreset {
             return null;
         }
 
-        if (LAST_COMPATIBLE_VERSION.isLowerThan(version)) {
+        if (version.isLowerThan(LAST_COMPATIBLE_VERSION)) {
             String message = String.format(
                 "Cannot parse Campaign Preset from %s in newer version %s.",
                 version.toString(), MHQConstants.VERSION);

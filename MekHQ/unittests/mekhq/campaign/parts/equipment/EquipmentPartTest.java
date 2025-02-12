@@ -41,7 +41,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -221,23 +220,23 @@ public class EquipmentPartTest {
 
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_MEK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_TANK_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Aero Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return MiscType.F_FIGHTER_EQUIPMENT.equals(flag);
-        }).when(miscType).hasFlag(any());
+        }).when(miscType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // WeaponType
@@ -250,30 +249,30 @@ public class EquipmentPartTest {
 
         // ... we need to be Mek Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_MEK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Tank Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_TANK_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... or Fighter Equipment ...
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         assertTrue(equipmentPart.isOmniPoddable());
 
         // ... but not Capital scale.
         doAnswer(inv -> {
-            BigInteger flag = inv.getArgument(0);
+            EquipmentFlag flag = inv.getArgument(0);
             return WeaponType.F_AERO_WEAPON.equals(flag);
-        }).when(weaponType).hasFlag(any());
+        }).when(weaponType).hasFlag(any(EquipmentFlag.class));
         when(weaponType.isCapital()).thenReturn(true);
         assertFalse(equipmentPart.isOmniPoddable());
     }
