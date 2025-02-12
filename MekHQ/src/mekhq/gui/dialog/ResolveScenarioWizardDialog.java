@@ -410,7 +410,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
           
             chkReinforced = new JCheckBox("Send Reinforcement");
             chkReinforced.setVisible(possibleReinforcment);
-            chkReinforced.setEnabled(!status.isTotalLoss());
+            chkReinforced.setEnabled(!status.isTotalLoss() && unit.isFunctional());
             chkReinforced.setName(Integer.toString(unitIndex));
             chkReinforced.setActionCommand(unit.getId().toString());
             chkReinforcements.add(chkReinforced);
@@ -1894,6 +1894,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             checkSalvageRights();
         } else {
             lblsUnitName.get(unitIndex).setText(ustatus.getDesc());
+            chkReinforcements.get(unitIndex).setEnabled(ustatus.getUnit().isFunctional());
         }
     }
 
