@@ -8,7 +8,8 @@ event:
   - date: '2376-02-25'
     zenithCharge: yes
 planet:
-  - name: Skouzas's Frontier
+  - name:
+      value: Skouzas's Frontier
     type: Terrestrial
     orbitalDist: 0.48
     sysPos: 1
@@ -24,7 +25,8 @@ planet:
     temperature: 469
     water: 0
     smallMoons: 2
-  - name: Namtar
+  - name:
+      value: Namtar
     type: Ice Giant
     orbitalDist: 0.84
     sysPos: 2
@@ -45,7 +47,8 @@ planet:
       - name: X-2
         size: large
         icon: rock3
-  - name: Damu
+  - name:
+      value: Damu
     type: Terrestrial
     orbitalDist: 1.2
     sysPos: 3
@@ -60,7 +63,8 @@ planet:
     yearLength: 1.7
     temperature: 172
     water: 0
-  - name: Hashemi
+  - name:
+      value: Hashemi
     type: Ice Giant
     orbitalDist: 1.92
     sysPos: 4
@@ -84,7 +88,8 @@ planet:
       - name: ZP3
         size: large
         icon: rock13
-  - name: Alohi's Hold
+  - name:
+      value: Alohi's Hold
     type: Giant Terrestrial
     orbitalDist: 6.24
     sysPos: 5
@@ -99,7 +104,9 @@ planet:
     yearLength: 15.6
     ring: yes
     smallMoons: 7
-  - name: Galatea
+  - name:
+      source: canon
+      value: Galatea
     type: Terrestrial
     orbitalDist: 3.36
     sysPos: 6
@@ -382,7 +389,8 @@ planet:
           - GL
       - date: '3145-01-01'
         population: 607502826.0
-  - name: Zhui
+  - name:
+      value: Zhui
     type: Terrestrial
     orbitalDist: 12.0
     sysPos: 7
@@ -407,7 +415,8 @@ planet:
       - name: Sorsa
       - name: White
       - name: Boehm's Stand
-  - name: Biddick
+  - name:
+      value: Biddick
     type: Gas Giant
     orbitalDist: 46.56
     sysPos: 8

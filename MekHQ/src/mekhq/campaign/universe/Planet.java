@@ -55,7 +55,7 @@ public class Planet {
     // Base data
     private String id;
     @JsonProperty("name")
-    private String name;
+    private SourceableValue<String> name;
     private String shortName;
     @JsonProperty("sysPos")
     private Integer sysPos;
@@ -406,21 +406,15 @@ public class Planet {
     }
 
     public String getName(LocalDate when) {
+        return getSourceableName(when).getValue();
+    }
+
+    public SourceableValue<String> getSourceableName(LocalDate when) {
         return getEventData(when, name, e -> e.name);
     }
 
     public String getShortName(LocalDate when) {
         return getEventData(when, shortName, e -> e.shortName);
-    }
-
-    public List<String> getNames() {
-        List<String> names = new ArrayList<>();
-
-        for (PlanetaryEvent p : events.values()) {
-            names.add(p.name);
-        }
-
-        return names;
     }
 
     /** @return short name if set, else full name, else "unnamed" */
@@ -782,7 +776,7 @@ public class Planet {
         @JsonProperty("message")
         public String message;
         @JsonProperty("name")
-        public String name;
+        public SourceableValue<String> name;
         @JsonProperty("shortName")
         public String shortName;
 
@@ -921,7 +915,7 @@ public class Planet {
         @Override
         public Planet convert(Planet planet) {
             if (null == planet.id) {
-                planet.id = planet.name;
+                planet.id = planet.name.getValue();
             }
 
             // Fill up events

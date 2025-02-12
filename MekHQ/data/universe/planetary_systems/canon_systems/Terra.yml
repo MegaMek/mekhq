@@ -10,7 +10,9 @@ event:
   - date: '2426-08-27'
     nadirCharge: yes
 planet:
-  - name: Mercury
+  - name:
+     source: canon
+     value: Mercury
     type: Terrestrial
     orbitalDist: 0.39
     sysPos: 1
@@ -25,7 +27,9 @@ planet:
     yearLength: 0.24
     temperature: 427
     water: 0
-  - name: Venus
+  - name:
+      source: canon
+      value: Venus
     type: Terrestrial
     orbitalDist: 0.723
     sysPos: 2
@@ -245,7 +249,9 @@ planet:
       - date: '3151-01-01'
         faction:
           - ROS
-  - name: Terra
+  - name:
+      source: canon
+      value: Terra
     type: Terrestrial
     orbitalDist: 1.0
     sysPos: 3
@@ -555,7 +561,9 @@ planet:
         population: 6517938233.0
       - date: '3145-01-01'
         population: 6555834723.0
-  - name: Mars
+  - name:
+      source: canon
+      value: Mars
     type: Terrestrial
     orbitalDist: 1.524
     sysPos: 4
@@ -804,14 +812,18 @@ planet:
         population: 4542688.0
       - date: '3145-01-01'
         population: 4586508.0
-  - name: Main Asteroid Belt
+  - name:
+      source: canon
+      value: Main Asteroid Belt
     type: Asteroid Belt
     orbitalDist: 2.7
     sysPos: 5
     icon: asteroid1
     yearLength: 4.44
     temperature: -91
-  - name: Jupiter
+  - name:
+      source: canon
+      value: Jupiter
     type: Gas Giant
     orbitalDist: 5.2
     sysPos: 6
@@ -848,7 +860,9 @@ planet:
       - name: Thebe
         size: medium
         icon: oddmoon2
-  - name: Saturn
+  - name:
+      source: canon
+      value: Saturn
     type: Gas Giant
     orbitalDist: 9.6
     sysPos: 7
@@ -897,7 +911,9 @@ planet:
       - name: Epimetheus
         size: medium
         icon: rock8
-  - name: Uranus
+  - name:
+      source: canon
+      value: Uranus
     type: Ice Giant
     orbitalDist: 19.2
     sysPos: 8
@@ -927,7 +943,9 @@ planet:
       - name: Miranda
         size: medium
         icon: rock3
-  - name: Neptune
+  - name:
+      source: canon
+      value: Neptune
     type: Ice Giant
     orbitalDist: 30.1
     sysPos: 9
