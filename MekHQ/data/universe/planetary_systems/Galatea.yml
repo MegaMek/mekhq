@@ -222,7 +222,7 @@ planet:
         population: 594065739.0
         hiringHall: Great
       - date: '2632-04-18'
-        #hpg: A
+        hpg: A
       - date: '2640-01-01'
         population: 593003448.0
       - date: '2649-01-01'
@@ -371,7 +371,7 @@ planet:
       - date: '3130-01-01'
         population: 593333614.0
       - date: '3132-08-07'
-        #hpg: X
+        hpg: X
       - date: '3135-10-01'
         faction:
           - IND
