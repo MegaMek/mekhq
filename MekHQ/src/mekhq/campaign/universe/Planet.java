@@ -102,7 +102,7 @@ public class Planet {
     // Atmospheric description
     /** Pressure classification - we use the megamek enum here directly */
     @JsonProperty("pressure")
-    private megamek.common.planetaryconditions.Atmosphere pressure;
+    private SourceableValue<megamek.common.planetaryconditions.Atmosphere> pressure;
     @JsonProperty("atmosphere")
     private SourceableValue<Atmosphere> atmosphere;
     @JsonProperty("composition")
@@ -529,6 +529,10 @@ public class Planet {
     }
 
     public megamek.common.planetaryconditions.Atmosphere getPressure(LocalDate when) {
+        return (null == getSourcedPressure(when)) ? null : getSourcedPressure(when).getValue();
+    }
+
+    public SourceableValue<megamek.common.planetaryconditions.Atmosphere> getSourcedPressure(LocalDate when) {
         return getEventData(when, pressure, e -> e.pressure);
     }
 
@@ -872,7 +876,7 @@ public class Planet {
         @JsonProperty("hpg")
         public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
-        private megamek.common.planetaryconditions.Atmosphere pressure;
+        private SourceableValue<megamek.common.planetaryconditions.Atmosphere> pressure;
         @JsonProperty("hiringHall")
         private SourceableValue<HiringHallLevel> hiringHall;
         @JsonProperty("atmosphere")

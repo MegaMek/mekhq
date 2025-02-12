@@ -23,7 +23,8 @@ planet:
       source: canon
       value: 1
     icon: mercury
-    pressure: TRACE
+    pressure:
+      value: TRACE
     atmosphere:
       value: TOXICPOISON
     composition:
@@ -51,7 +52,8 @@ planet:
       source: canon
       value: 2
     icon: venus
-    pressure: VERY_HIGH
+    pressure:
+      value: VERY_HIGH
     atmosphere:
       value: TOXICPOISON
     composition:
@@ -92,7 +94,9 @@ planet:
             - TA
         population:
           value: 10072.0
-        pressure: STANDARD
+        pressure:
+          source: canon
+          value: STANDARD
         temperature:
           source: canon
           value: 40
@@ -347,7 +351,9 @@ planet:
           value: TOXICPOISON
         population:
           value: 148298.0
-        pressure: VERY_HIGH
+        pressure:
+          source: canon
+          value: VERY_HIGH
         temperature:
           source: canon
           value: 250
@@ -394,7 +400,9 @@ planet:
       source: canon
       value: 3
     icon: earth
-    pressure: STANDARD
+    pressure:
+      source: canon
+      value: STANDARD
     atmosphere:
       source: canon
       value: BREATHABLE
@@ -877,7 +885,8 @@ planet:
       source: canon
       value: 4
     icon: mars
-    pressure: TRACE
+    pressure:
+      value: TRACE
     atmosphere:
       value: TOXICPOISON
     composition:
@@ -916,7 +925,8 @@ planet:
             - TA
         population:
           value: 10282.0
-        pressure: THIN
+        pressure:
+          value: THIN
         water:
           source: canon
           value: 39
@@ -1277,7 +1287,8 @@ planet:
       source: canon
       value: 6
     icon: jupiter
-    pressure: VERY_HIGH
+    pressure:
+      value: VERY_HIGH
     atmosphere:
       value: TOXICPOISON
     composition:
@@ -1350,7 +1361,8 @@ planet:
       source: canon
       value: 7
     icon: saturn
-    pressure: VERY_HIGH
+    pressure:
+      value: VERY_HIGH
     atmosphere:
       value: TOXICPOISON
     composition:
@@ -1447,7 +1459,8 @@ planet:
       source: canon
       value: 8
     icon: uranus
-    pressure: VERY_HIGH
+    pressure:
+      value: VERY_HIGH
     atmosphere:
       value: TOXICPOISON
     composition:
@@ -1507,7 +1520,8 @@ planet:
       source: canon
       value: 9
     icon: neptune
-    pressure: VERY_HIGH
+    pressure:
+      value: VERY_HIGH
     atmosphere:
       value: TOXICPOISON
     composition:
