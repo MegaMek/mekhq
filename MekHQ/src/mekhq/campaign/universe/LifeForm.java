@@ -26,36 +26,6 @@ public enum LifeForm {
     NONE("None"), MICROBE("Microbes"), PLANT("Plants"), INSECT("Insects"), FISH("Fish"),
     AMPHIBIAN("Amphibians"), REPTILE("Reptiles"), BIRD("Birds"), MAMMAL("Mammals");
 
-    // For old life form data
-    public static LifeForm parseLifeForm(String val) {
-        switch (val.toLowerCase()) {
-            case "microbe":
-            case "microbes":
-                return MICROBE;
-            case "plant":
-            case "plants":
-                return PLANT;
-            case "fish":
-                return FISH;
-            case "amphibian":
-            case "amphibians":
-                return AMPHIBIAN;
-            case "reptile":
-            case "reptiles":
-                return REPTILE;
-            case "bird":
-            case "birds":
-                return BIRD;
-            case "mammal":
-            case "mammals":
-                return MAMMAL;
-            case "insect":
-            case "insects":
-                return INSECT;
-            default: return NONE;
-        }
-    }
-
     public final String name;
 
     private LifeForm(String name) {
