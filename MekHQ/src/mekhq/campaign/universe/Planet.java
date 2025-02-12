@@ -477,6 +477,10 @@ public class Planet {
     }
 
     public Long getPopulation(LocalDate when) {
+        return (null == getSourcedPopulation(when)) ? null : getSourcedPopulation(when).getValue();
+    }
+
+    public SourceableValue<Long> getSourcedPopulation(LocalDate when) {
         return getEventData(when, null, e -> e.population);
     }
 
@@ -843,7 +847,7 @@ public class Planet {
         @JsonProperty("composition")
         public SourceableValue<String> composition;
         @JsonProperty("population")
-        public Long population;
+        public SourceableValue<Long> population;
         @JsonProperty("dayLength")
         public SourceableValue<Double> dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
