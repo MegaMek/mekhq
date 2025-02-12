@@ -312,6 +312,7 @@ public class CampaignXmlParser {
                             BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR)
                         );
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
+                    //TODO: deal with this
                     updatePlanetaryEventsFromXML(wn);
                 } else if (xn.equalsIgnoreCase("partsInUse")) {
                     processPartsInUse(retVal, wn);
@@ -1581,6 +1582,11 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
+        //TODO: we are no longer tracking planetary events from XML. We weren't allowing this
+        // except by hand-editing the original code anyway since the planetary system XML reboot
+        // so I think its time to retire this code. A future feature will allow players to add
+        // planetary events that can be saved to the campaign file.
+        /*
         List<PlanetaryEvent> events;
         Map<Integer, List<PlanetaryEvent>> eventsMap = new HashMap<>();
 
@@ -1606,11 +1612,12 @@ public class CampaignXmlParser {
                     if (systemNode.getNodeName().equalsIgnoreCase("id")) {
                         systemId = systemNode.getTextContent();
                     } else if (systemNode.getNodeName().equalsIgnoreCase("event")) {
-                        PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
-                        if (null != event) {
-                            event.custom = true;
-                            sysEvents.add(event);
-                        }
+                        //TODO: fix this because we are no longer using XML for system events
+                        //PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
+                        //if (null != event) {
+                        //    event.custom = true;
+                        //    sysEvents.add(event);
+                        //}
                     } else if (systemNode.getNodeName().equalsIgnoreCase("planet")) {
                         NodeList planetNodes = systemNode.getChildNodes();
                         int sysPos = 0;
@@ -1623,11 +1630,12 @@ public class CampaignXmlParser {
                             if (planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
                                 sysPos = Integer.parseInt(planetNode.getTextContent());
                             } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
-                                PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                                if (null != event) {
-                                    event.custom = true;
-                                    events.add(event);
-                                }
+                                //TODO: fix this because we are no longer using XML for planetary system events
+                                //PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
+                                //if (null != event) {
+                                //    event.custom = true;
+                                //    events.add(event);
+                                //}
                             }
                         }
                         if (sysPos > 0 && !events.isEmpty()) {
@@ -1674,7 +1682,7 @@ public class CampaignXmlParser {
                     Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }
-        }
+        }*/
     }
 
     private static void processPartsInUse(Campaign retVal, Node wn) {

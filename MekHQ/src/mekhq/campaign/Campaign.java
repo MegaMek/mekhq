@@ -6031,8 +6031,9 @@ public class Campaign implements ITechManager {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
                 for (PlanetarySystemEvent event : customSysEvents) {
-                    Systems.getInstance().writePlanetarySystemEvent(pw, event);
-                    pw.println();
+                    //TODO: fix this because we are no longer doing planetary systems with xml
+                    //Systems.getInstance().writePlanetarySystemEvent(pw, event);
+                    //pw.println();
                 }
                 startedSystem = true;
             }
@@ -6048,8 +6049,9 @@ public class Campaign implements ITechManager {
                     MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planet");
                     MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
                     for (PlanetaryEvent event : customEvents) {
-                        Systems.getInstance().writePlanetaryEvent(pw, event);
-                        pw.println();
+                        //TODO: fix this because we are no longer doing planetary events with XML
+                        //Systems.getInstance().writePlanetaryEvent(pw, event);
+                        //pw.println();
                     }
                     MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planet");
                     startedSystem = true;

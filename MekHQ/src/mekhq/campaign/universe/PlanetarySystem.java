@@ -99,8 +99,6 @@ public class PlanetarySystem {
     private Double y;
 
     // Base data
-    @SuppressWarnings(value = "unused")
-    private UUID uniqueIdentifier;
     @JsonProperty("id")
     private String id;
     private String name;
@@ -112,11 +110,6 @@ public class PlanetarySystem {
     private Double subtype;
     private String luminosity;
 
-    @JsonProperty("nadirCharge")
-    private Boolean nadirCharge = false;
-    @JsonProperty("zenithCharge")
-    private Boolean zenithCharge = false;
-
     // tree map of planets sorted by system position
     private TreeMap<Integer, Planet> planets;
 
@@ -127,9 +120,6 @@ public class PlanetarySystem {
     // the location of the primary planet for this system
     @JsonProperty("primarySlot")
     private int primarySlot;
-
-    /** Marker for "please delete this system" */
-    public Boolean delete;
 
     /**
      * a hash to keep track of dynamic planet changes
@@ -295,11 +285,11 @@ public class PlanetarySystem {
     }
 
     public Boolean isNadirCharge(LocalDate when) {
-        return getEventData(when, nadirCharge, e -> e.nadirCharge);
+        return getEventData(when, false, e -> e.nadirCharge);
     }
 
     public boolean isZenithCharge(LocalDate when) {
-        return getEventData(when, zenithCharge, e -> e.zenithCharge);
+        return getEventData(when, false, e -> e.zenithCharge);
     }
 
     public int getNumberRechargeStations(LocalDate when) {
@@ -484,30 +474,6 @@ public class PlanetarySystem {
         return Objects.hash(id);
     }
 
-    public PlanetarySystemEvent getOrCreateEvent(LocalDate when) {
-        if (null == when) {
-            return null;
-        }
-        if (null == events) {
-            events = new TreeMap<>();
-        }
-        PlanetarySystemEvent event = events.get(when);
-        if (null == event) {
-            event = new PlanetarySystemEvent();
-            event.date = when;
-            events.put(when, event);
-        }
-        return event;
-    }
-
-    public PlanetaryEvent getOrCreateEvent(LocalDate when, int position) {
-        Planet p = getPlanet(position);
-        if (null == p) {
-            return null;
-        }
-        return p.getOrCreateEvent(when);
-    }
-
     public PlanetarySystemEvent getEvent(LocalDate when) {
         if ((null == when) || (null == events)) {
             return null;
@@ -550,38 +516,6 @@ public class PlanetarySystem {
         luminosity = scDef.luminosity;
     }
 
-    public void copyDataFrom(PlanetarySystem other) {
-        if (null != other) {
-            // We don't change the ID
-            name = ObjectUtility.nonNull(other.name, name);
-            x = ObjectUtility.nonNull(other.x, x);
-            y = ObjectUtility.nonNull(other.y, y);
-            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
-            // TODO : some other changes should be possible
-            // TODO : Merge (not replace!) events
-            if (null != other.events) {
-                for (PlanetarySystemEvent event : other.getEvents()) {
-                    if ((null != event) && (null != event.date)) {
-                        PlanetarySystemEvent myEvent = getOrCreateEvent(event.date);
-                        myEvent.copyDataFrom(event);
-                    }
-                }
-            }
-            // check for planet level changes
-            if (null != other.planets) {
-                for (Planet p : other.planets.values()) {
-                    int pos = p.getSystemPosition();
-                    if (planets.containsKey(pos)) {
-                        planets.get(pos).copyDataFrom(p);
-                    } else {
-                        planets.put(pos, p);
-                    }
-                }
-            }
-        }
-    }
-
     /** Data class to hold parsed spectral definitions */
     public static final class SpectralDefinition {
         public String spectralType;
@@ -612,18 +546,6 @@ public class PlanetarySystem {
         public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
-
-        public void copyDataFrom(PlanetarySystemEvent other) {
-            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
-            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
-            custom = (other.custom || custom);
-        }
-
-        public void replaceDataFrom(PlanetarySystemEvent other) {
-            nadirCharge = other.nadirCharge;
-            zenithCharge = other.zenithCharge;
-            custom = (other.custom || custom);
-        }
 
         /**
          * @return <code>true</code> if the event doesn't contain any change
@@ -706,8 +628,6 @@ public class PlanetarySystem {
             if (null != ps.spectralType) {
                 ps.setSpectralType(ps.spectralType);
             }
-            ps.nadirCharge = ObjectUtility.nonNull(ps.nadirCharge, Boolean.FALSE);
-            ps.zenithCharge = ObjectUtility.nonNull(ps.zenithCharge, Boolean.FALSE);
 
             // fill up planets
             ps.planets = new TreeMap<>();

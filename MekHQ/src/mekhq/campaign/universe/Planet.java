@@ -36,7 +36,6 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
-import mekhq.adapter.*;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -53,12 +52,7 @@ import mekhq.campaign.universe.enums.HPGRating;
 public class Planet {
     private static final MMLogger logger = MMLogger.create(Planet.class);
 
-    private Double x;
-    private Double y;
-
     // Base data
-    @SuppressWarnings("unused")
-    private UUID uniqueIdentifier;
     private String id;
     @JsonProperty("name")
     private String name;
@@ -95,9 +89,6 @@ public class Planet {
     private Double dayLength;
     @JsonProperty("yearLength")
     private Double yearLength;
-
-    //@XmlElement(name = "class")
-    //private String className;
 
     // Surface description
     @JsonProperty("water")
@@ -149,151 +140,15 @@ public class Planet {
      */
     CurrentEvents currentEvents;
 
-    // a hash to keep track of dynamic garrison changes
-    // TreeMap<LocalDate, List<String>> garrisonHistory;
-
-    /**
-     * @deprecated Use "event", which can have any number of changes to the
-     *             planetary data
-     */
-    @Deprecated
-    //@XmlElement(name = "factionChange")
-    //private List<FactionChange> factionChanges;
     // For export and import only (lists are easier than maps) */
     @JsonProperty("event")
     private List<Planet.PlanetaryEvent> eventList;
-
-    /** Marker for "please delete this planet" */
-    public Boolean delete;
 
     public Planet() {
     }
 
     public Planet(String id) {
         this.id = id;
-    }
-
-    /**
-     * Overloaded constructor that parses out a single line of tsv data for a planet
-     * with the help of a list of event years
-     *
-     * @param tsvData tab-separated data line
-     * @param years   The list of years acquired from the tsv file
-     * @throws Exception
-     */
-    public Planet(String tsvData, List<LocalDate> years) throws Exception {
-        eventList = new ArrayList<>();
-        events = new TreeMap<>();
-
-        // map of faction names that are different in the SUCS data, but have a
-        // correspondence to our factions
-        Map<String, String> factionReplacements = new HashMap<>();
-        factionReplacements.put("LC", "LA");
-        factionReplacements.put("U", "UND");
-        factionReplacements.put("A", "ABN");
-        factionReplacements.put("I", "IND");
-        factionReplacements.put("", "UND"); // no data. defaulting to "undiscovered"
-
-        try {
-            // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
-            // "Ownership info" breaks down to "FactionCode, irrelevant stuff"
-            String[] infoElements = tsvData.split("\t");
-
-            // sometimes, names are formatted like this:
-            // Primary Name (Alternate Name)
-            // Primary Name (Alternate Name YEAR+)
-
-            String nameString = infoElements[0].replace("\"", ""); // get rid of surrounding quotation marks
-            int plusIndex = nameString.indexOf('+');
-            int nameChangeYear = 2000;
-
-            // this indicates that there's an (Alternate Name YEAR+) here
-            if (plusIndex > 0) {
-                String yearString = nameString.substring(plusIndex - 4, plusIndex);
-                nameChangeYear = Integer.parseInt(yearString);
-            }
-
-            LocalDate nameChangeYearDate = LocalDate.ofYearDay(nameChangeYear, 1);
-
-            String altName;
-            String primaryName = nameString;
-            int parenIndex = nameString.indexOf('(');
-            int closingParenIndex = nameString.indexOf(')');
-            // this indicates that there's an (Alternate Name) sequence of some kind
-            if (parenIndex > 0) {
-                // we chop off the year if there is one
-                if (plusIndex > 0) {
-                    altName = nameString.substring(parenIndex + 1, plusIndex - 5);
-                }
-                // otherwise, we just chop off the closing paren
-                else {
-                    altName = nameString.substring(parenIndex + 1, closingParenIndex);
-                }
-
-                // there are a few situations where all this stuff with parens is for naught,
-                // which is PlanetName (FactionCode) or if the PlanetName (AltName) is already
-                // in our planets "database"
-
-                if ((null == Factions.getInstance().getFaction(altName))
-                        && (null == Systems.getInstance().getSystemById(primaryName))) {
-                    primaryName = nameString.substring(0, parenIndex - 1);
-
-                    PlanetaryEvent nameChangeEvent = getOrCreateEvent(nameChangeYearDate);
-                    nameChangeEvent.name = altName;
-
-                    eventList.add(nameChangeEvent);
-                }
-            }
-
-            // now we have a primary name
-            this.name = primaryName;
-
-            this.id = this.name;
-            this.x = Double.parseDouble(infoElements[1]);
-            this.y = Double.parseDouble(infoElements[2]);
-
-            for (int x = 3; x < infoElements.length; x++) {
-                String infoElement = infoElements[x].replace("\"", "");
-                String newFaction;
-
-                int commaIndex = infoElement.indexOf(',');
-                if (commaIndex < 0) { // sometimes there are no commas
-                    newFaction = infoElement;
-                } else {
-                    // anything after the first comma is fluff
-                    // we also want to forego the opening quote
-                    newFaction = infoElement.substring(0, commaIndex);
-                }
-
-                // dirty hack, replace faction name with one we can use
-                if (factionReplacements.containsKey(newFaction)) {
-                    newFaction = factionReplacements.get(newFaction);
-                }
-
-                // for brevity, only add the new event if the faction hasn't changed since the
-                // previous event
-                // or if it's the first event
-
-                // dirty hack here assumes that there's only one faction per event, which is
-                // true in the case
-                // of this spreadsheet
-                if ((x == 3) || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
-                    LocalDate eventDate = years.get(x - 3);
-
-                    PlanetaryEvent pe = events.getOrDefault(eventDate, new PlanetaryEvent());
-                    pe.faction = new ArrayList<>();
-                    pe.faction.add(newFaction);
-
-                    if (!eventList.contains(pe)) {
-                        eventList.add(pe);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Exception ne = new Exception("Error running Planet constructor with following line:\n" + tsvData);
-            ne.addSuppressed(e);
-            throw (ne);
-        }
     }
 
     // Constant base data
@@ -427,11 +282,11 @@ public class Planet {
     // Constant stellar data (to be moved out later)
 
     public Double getX() {
-        return x;
+        return null == getParentSystem() ? 0.0 : getParentSystem().getX();
     }
 
     public Double getY() {
-        return y;
+        return null == getParentSystem() ? 0.0 : getParentSystem().getY();
     }
 
     public PlanetarySystem getParentSystem() {
@@ -439,23 +294,6 @@ public class Planet {
     }
 
     // Date-dependant data
-
-    public synchronized PlanetaryEvent getOrCreateEvent(LocalDate when) {
-        if (null == when) {
-            return null;
-        }
-        if (null == events) {
-            events = new TreeMap<>();
-        }
-        PlanetaryEvent event = events.get(when);
-        if (null == event) {
-            event = new PlanetaryEvent();
-            event.date = when;
-            events.put(when, event);
-        }
-        currentEvents = null;
-        return event;
-    }
 
     public PlanetaryEvent getEvent(LocalDate when) {
         if ((null == when) || (null == events)) {
@@ -565,23 +403,6 @@ public class Planet {
 
             return planetaryEvent;
         }
-    }
-
-    /** @return events for this year. Never returns <i>null</i>. */
-    public List<PlanetaryEvent> getEvents(int year) {
-        if (null == events) {
-            return Collections.emptyList();
-        }
-        List<PlanetaryEvent> result = new ArrayList<>();
-        for (LocalDate date : events.navigableKeySet()) {
-            if (date.getYear() > year) {
-                break;
-            }
-            if (date.getYear() == year) {
-                result.add(events.get(date));
-            }
-        }
-        return result;
     }
 
     public String getName(LocalDate when) {
@@ -767,14 +588,12 @@ public class Planet {
         if(null == getHPG(when)) {
             return 0;
         }
-        // TODO: fix this
-        /*return switch (getHPG(when)) {
-            case HPGRating.A -> 5;
-            case EquipmentType.RATING_B -> 3;
-            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+        return switch (getHPG(when)) {
+            case A -> 5;
+            case B -> 3;
+            case C, D -> 1;
             default -> 0;
-        };*/
-        return 0;
+        };
     }
 
     private int getHiringHallTechBonus(LocalDate when) {
@@ -787,19 +606,6 @@ public class Planet {
             case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
             default -> 0;
         };
-    }
-
-    /**
-     * @return the distance to another planet in light years (0 if both are in the
-     *         same system)
-     */
-    public double getDistanceTo(Planet anotherPlanet) {
-        return Math.sqrt(Math.pow(x - anotherPlanet.x, 2) + Math.pow(y - anotherPlanet.y, 2));
-    }
-
-    /** @return the distance to a point in space in light years */
-    public double getDistanceTo(double x, double y) {
-        return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
     }
 
     // Astronavigation
@@ -951,140 +757,6 @@ public class Planet {
 
     }
 
-    /**
-     * Updates the current planet's coordinates and faction ownership from the given
-     * other planet.
-     * Makes several assumptions about the way the other planet's ownership events
-     * are structured.
-     *
-     * @param tsvPlanet The planet from which to update.
-     * @param dryRun    Whether to actually perform the updates.
-     * @return Human readable form of what was/would have been updated.
-     */
-    public String updateFromTSVPlanet(final Planet tsvPlanet, boolean dryRun) {
-        StringBuilder sb = new StringBuilder();
-
-        if (!tsvPlanet.x.equals(this.x) || !tsvPlanet.y.equals(this.y)) {
-            sb.append("Coordinate update from ").append(x).append(", ").append(y).append(" to ")
-                    .append(tsvPlanet.x).append(", ").append(tsvPlanet.y).append("\r\n");
-
-            if (!dryRun) {
-                this.x = tsvPlanet.x;
-                this.y = tsvPlanet.y;
-            }
-        }
-
-        // loop using index
-        // look ahead by one event (if possible) and check that getFaction(next event
-        // year) isn't already
-        // the same as the faction from the current event : sometimes, our data is more
-        // exact than the incoming data
-        List<PlanetaryEvent> tsvEvents = tsvPlanet.getEvents();
-        for (int eventIndex = 0; eventIndex < tsvEvents.size(); eventIndex++) {
-            PlanetaryEvent event = tsvEvents.get(eventIndex);
-            // check other planet events (currently only updating faction change events)
-            // if the other planet has an 'ownership change' event with a non-"U" faction
-            // check that this planet does not have an existing non-"U" faction already
-            // owning it at the event date
-            // and does not acquire such a faction between this and the next event
-            // Then we will add the ownership change event
-            if ((event.faction != null) && !event.faction.isEmpty()) {
-                // the purpose of this code is to evaluate whether the current "other planet"
-                // event
-                // is a faction change to an active, valid faction.
-                Faction eventFaction = Factions.getInstance().getFaction(event.faction.get(0));
-                boolean eventHasActualFaction = eventFaction != null
-                        && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
-
-                if (eventHasActualFaction) {
-                    List<String> currentFactions = this.getFactions(event.date);
-
-                    // if this planet has an "inactive and abandoned" current faction...
-                    // we also want to catch the situation where the next faction change isn't to
-                    // the same exact faction
-                    if ((currentFactions.size() == 1)
-                            && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
-                            && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-                        // now we travel into the future, to the next "other" event, and if this planet
-                        // has acquired a faction
-                        // before the next "other" event, then we
-                        int nextEventIndex = eventIndex + 1;
-                        PlanetaryEvent nextEvent = nextEventIndex < tsvEvents.size() ? tsvEvents.get(nextEventIndex)
-                                : null;
-                        LocalDate nextEventDate;
-
-                        // if we're at the last event, then just check that the planet doesn't have a
-                        // faction in the year 3600
-                        if (nextEvent == null) {
-                            nextEventDate = LocalDate.ofYearDay(3600, 1);
-                        } else {
-                            nextEventDate = nextEvent.date;
-                        }
-
-                        List<String> nextFactions = this.getFactions(nextEventDate);
-                        boolean factionBeforeNextEvent = !(nextFactions.size() == 1 &&
-                                Factions.getInstance().getFaction(nextFactions.get(0)).is(Tag.INACTIVE) &&
-                                Factions.getInstance().getFaction(nextFactions.get(0)).is(Tag.ABANDONED));
-
-                        if (!factionBeforeNextEvent) {
-                            sb.append("Adding faction change in ").append(event.date.getYear())
-                                    .append(" from ").append(currentFactions.get(0)).append(" to ")
-                                    .append(event.faction).append("\r\n");
-
-                            if (!dryRun) {
-                                this.events.put(event.date, event);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (sb.length() > 0) {
-            sb.insert(0, "Updating planet " + this.getId() + "\r\n");
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Copy all but id from the other planet. Update event list. Events with the
-     * same date as others already in the list get overwritten, others added.
-     * To effectively delete an event, simply create a new one with <i>just</i> the
-     * date.
-     */
-    public void copyDataFrom(Planet other) {
-        if (null != other) {
-            // We don't change the ID
-            name = ObjectUtility.nonNull(other.name, name);
-            shortName = ObjectUtility.nonNull(other.shortName, shortName);
-            x = ObjectUtility.nonNull(other.x, x);
-            y = ObjectUtility.nonNull(other.y, y);
-            desc = ObjectUtility.nonNull(other.desc, desc);
-            gravity = ObjectUtility.nonNull(other.gravity, gravity);
-            //landMasses = ObjectUtility.nonNull(other.landMasses, landMasses);
-            life = ObjectUtility.nonNull(other.life, life);
-            percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
-            pressure = ObjectUtility.nonNull(other.pressure, pressure);
-            atmosphere = ObjectUtility.nonNull(other.atmosphere, atmosphere);
-            dayLength = ObjectUtility.nonNull(other.dayLength, dayLength);
-            smallMoons = ObjectUtility.nonNull(other.smallMoons, smallMoons);
-            satellites = ObjectUtility.nonNull(other.satellites, satellites);
-            sysPos = ObjectUtility.nonNull(other.sysPos, sysPos);
-            temperature = ObjectUtility.nonNull(other.temperature, temperature);
-            icon = ObjectUtility.nonNull(other.icon, icon);
-            // Merge (not replace!) events
-            if (null != other.events) {
-                for (PlanetaryEvent event : other.getEvents()) {
-                    if ((null != event) && (null != event.date)) {
-                        PlanetaryEvent myEvent = getOrCreateEvent(event.date);
-                        myEvent.copyDataFrom(event);
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
@@ -1100,24 +772,6 @@ public class Planet {
         }
         final Planet other = (Planet) object;
         return Objects.equals(id, other.id);
-    }
-
-    public static int convertRatingToCode(String rating) {
-        if (rating.equalsIgnoreCase("A")) {
-            return EquipmentType.RATING_A;
-        } else if (rating.equalsIgnoreCase("B")) {
-            return EquipmentType.RATING_B;
-        } else if (rating.equalsIgnoreCase("C")) {
-            return EquipmentType.RATING_C;
-        } else if (rating.equalsIgnoreCase("D")) {
-            return EquipmentType.RATING_D;
-        } else if (rating.equalsIgnoreCase("E")) {
-            return EquipmentType.RATING_E;
-        } else if (rating.equalsIgnoreCase("F")) {
-            return EquipmentType.RATING_F;
-        } else {
-            return EquipmentType.RATING_C;
-        }
     }
 
     /** A class representing some event, possibly changing planetary information */
@@ -1217,16 +871,6 @@ public class Planet {
                     && (null == temperature) && (null == pressure) && (null == atmosphere)
                     && (null == composition) && (null == population) && (null == dayLength)
                     && (null == hiringHall);
-        }
-    }
-
-    public static final class FactionChange {
-        public LocalDate date;
-        public List<String> faction;
-
-        @Override
-        public String toString() {
-            return "{" + "date=" + date + "," + "faction=" + faction + "}";
         }
     }
 
