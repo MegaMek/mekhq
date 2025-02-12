@@ -18,8 +18,12 @@
  */
 package mekhq.campaign.universe.enums;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import io.sentry.Sentry;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Atmosphere;
 
 /**
  * The level of a Hiring Hall as defined in CamOps (4th printing). Used to determine various modifiers
@@ -48,6 +52,26 @@ public enum HiringHallLevel {
         return this == NONE;
     }
 
+    public static class HiringHallLevelDeserializer extends StdDeserializer<HiringHallLevel> {
+
+        public HiringHallLevelDeserializer() {
+            this(null);
+        }
+
+        public HiringHallLevelDeserializer(final Class<?> vc) {
+            super(vc);
+        }
+
+        @Override
+        public HiringHallLevel deserialize(final JsonParser jsonParser, final DeserializationContext context) {
+            try {
+                return HiringHallLevel.parseHiringHallLevel(jsonParser.getText());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
 }
 
 

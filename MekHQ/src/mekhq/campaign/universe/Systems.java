@@ -29,6 +29,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -287,6 +288,7 @@ public class Systems {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Atmosphere.class, new Atmosphere.AtmosphereDeserializer());
         module.addDeserializer(LifeForm.class, new LifeForm.LifeFormDeserializer());
+        module.addDeserializer(HiringHallLevel.class, new HiringHallLevel.HiringHallLevelDeserializer());
         module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
         mapper.registerModule(module);
         // this will allow the mapper to deserialize LocalDate objects
