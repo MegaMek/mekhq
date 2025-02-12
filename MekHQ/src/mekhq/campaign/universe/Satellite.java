@@ -31,14 +31,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Satellite {
     @JsonProperty("name")
-    private String name;
+    private SourceableValue<String> name;
     @JsonProperty("size")
     private String size;
     @JsonProperty("icon")
     private String icon;
 
     public String getDescription() {
-        return name + " (" + size + ")";
+        return name.getValue() + " (" + size + ")";
     }
 
     public String getIcon() {
