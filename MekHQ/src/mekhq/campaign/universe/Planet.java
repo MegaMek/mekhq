@@ -98,10 +98,9 @@ public class Planet {
     private List<LandMass> landMasses;
 
     // Atmospheric description
-    /** Pressure classification */
+    /** Pressure classification - we use the megamek enum here directly */
     @JsonProperty("pressure")
-    @JsonDeserialize(using=PressureDeserializer.class)
-    private Integer pressure;
+    private megamek.common.planetaryconditions.Atmosphere pressure;
     @JsonProperty("atmosphere")
     private Atmosphere atmosphere;
     @JsonProperty("composition")
@@ -463,14 +462,12 @@ public class Planet {
         return getEventData(when, temperature, e -> e.temperature);
     }
 
-    public Integer getPressure(LocalDate when) {
+    public megamek.common.planetaryconditions.Atmosphere getPressure(LocalDate when) {
         return getEventData(when, pressure, e -> e.pressure);
     }
 
     public String getPressureName(LocalDate when) {
-        megamek.common.planetaryconditions.Atmosphere currentPressure = megamek.common.planetaryconditions.Atmosphere
-                .getAtmosphere(getPressure(when));
-        return null != currentPressure ? currentPressure.toString() : "unknown";
+        return getPressure(when).toString();
     }
 
     public Atmosphere getAtmosphere(LocalDate when) {
@@ -792,8 +789,7 @@ public class Planet {
         @JsonProperty("hpg")
         public HPGRating hpg;
         @JsonProperty("pressure")
-        @JsonDeserialize(using=PressureDeserializer.class)
-        private Integer pressure;
+        private megamek.common.planetaryconditions.Atmosphere pressure;
         @JsonProperty("hiringHall")
         private HiringHallLevel hiringHall;
         @JsonProperty("atmosphere")
@@ -871,37 +867,6 @@ public class Planet {
     // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
     private interface EventGetter<T> {
         T get(PlanetaryEvent e);
-    }
-
-    public static class PressureDeserializer extends StdDeserializer<Integer> {
-
-        public PressureDeserializer() {
-            this(null);
-        }
-
-        public PressureDeserializer(final Class<?> vc) {
-            super(vc);
-        }
-
-        @Override
-        public Integer deserialize(final JsonParser jsonParser, final DeserializationContext context) {
-            try {
-                switch (jsonParser.getText()) {
-                    case "Vacuum": return megamek.common.planetaryconditions.Atmosphere.VACUUM.ordinal();
-                    case "Trace": return megamek.common.planetaryconditions.Atmosphere.TRACE.ordinal();
-                    case "Thin":
-                    case "Low": return megamek.common.planetaryconditions.Atmosphere.THIN.ordinal();
-                    case "Standard":
-                    case "Normal": return megamek.common.planetaryconditions.Atmosphere.STANDARD.ordinal();
-                    case "High": return megamek.common.planetaryconditions.Atmosphere.HIGH.ordinal();
-                    case "Very High": return megamek.common.planetaryconditions.Atmosphere.VERY_HIGH.ordinal();
-                    default: return null;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
     }
 
     public static class PlanetPostLoader extends StdConverter<Planet, Planet> {

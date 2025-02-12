@@ -17,7 +17,7 @@ planet:
     orbitalDist: 0.39
     sysPos: 1
     icon: mercury
-    pressure: Trace
+    pressure: TRACE
     atmosphere: TOXICPOISON
     composition: Oxygen and Sodium, plus trace gases
     gravity: 0.38
@@ -33,7 +33,7 @@ planet:
     orbitalDist: 0.723
     sysPos: 2
     icon: venus
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Carbon Dioxide and Nitrogen, plus trace gases
     gravity: 0.904
@@ -59,7 +59,7 @@ planet:
         faction:
           - TA
         population: 10072.0
-        pressure: Standard
+        pressure: STANDARD
         temperature: 40
         water: 30
       - date: '2210-01-01'
@@ -225,7 +225,7 @@ planet:
       - date: '2950-10-28'
         atmosphere: TOXICPOISON
         population: 148298.0
-        pressure: Very High
+        pressure: VERY_HIGH
         temperature: 250
       - date: '2960-01-01'
         population: 101204.0
@@ -255,7 +255,7 @@ planet:
     orbitalDist: 1.0
     sysPos: 3
     icon: earth
-    pressure: Standard
+    pressure: STANDARD
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity: 1.0
@@ -569,7 +569,7 @@ planet:
     orbitalDist: 1.524
     sysPos: 4
     icon: mars
-    pressure: Trace
+    pressure: TRACE
     atmosphere: TOXICPOISON
     composition: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
     gravity: 0.38
@@ -593,7 +593,7 @@ planet:
         faction:
           - TA
         population: 10282.0
-        pressure: Thin
+        pressure: THIN
         water: 39
       - date: '2210-01-01'
         population: 21775.0
@@ -829,7 +829,7 @@ planet:
     orbitalDist: 5.2
     sysPos: 6
     icon: jupiter
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 2.53
@@ -882,7 +882,7 @@ planet:
     orbitalDist: 9.6
     sysPos: 7
     icon: saturn
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 1.07
@@ -955,7 +955,7 @@ planet:
     orbitalDist: 19.2
     sysPos: 8
     icon: uranus
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 0.89
@@ -997,7 +997,7 @@ planet:
     orbitalDist: 30.1
     sysPos: 9
     icon: neptune
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 1.14

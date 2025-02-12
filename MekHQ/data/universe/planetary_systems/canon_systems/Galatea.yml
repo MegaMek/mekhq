@@ -14,7 +14,7 @@ planet:
     orbitalDist: 0.48
     sysPos: 1
     icon: barren2
-    pressure: Normal
+    pressure: STANDARD
     atmosphere: TOXICPOISON
     composition: Carbon Dioxide, plus trace amounts of Water Vapor
     gravity: 0.52
@@ -31,7 +31,7 @@ planet:
     orbitalDist: 0.84
     sysPos: 2
     icon: iceg10
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 0.68
@@ -55,7 +55,7 @@ planet:
     orbitalDist: 1.2
     sysPos: 3
     icon: rock16
-    pressure: Trace
+    pressure: TRACE
     atmosphere: TOXICPOISON
     composition: Ammonia, plus trace amounts of Methane
     gravity: 1.1
@@ -71,7 +71,7 @@ planet:
     orbitalDist: 1.92
     sysPos: 4
     icon: iceg14
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 0.96
@@ -99,7 +99,7 @@ planet:
     orbitalDist: 6.24
     sysPos: 5
     icon: gasg15
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 2.11
@@ -116,7 +116,7 @@ planet:
     orbitalDist: 3.36
     sysPos: 6
     icon: green35
-    pressure: Normal
+    pressure: STANDARD
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity: 1.0
@@ -401,7 +401,7 @@ planet:
     orbitalDist: 12.0
     sysPos: 7
     icon: frozen48
-    pressure: Normal
+    pressure: STANDARD
     atmosphere: TOXICCAUSTIC
     composition: Methane and Carbon Dioxide, plus trace amounts of Sulfur Dioxide
     gravity: 0.87
@@ -427,7 +427,7 @@ planet:
     orbitalDist: 46.56
     sysPos: 8
     icon: gasg24
-    pressure: Very High
+    pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 2.05
