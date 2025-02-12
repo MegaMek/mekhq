@@ -13,7 +13,7 @@ planet:
   - name:
       source: canon
       value: Mercury
-    type: Terrestrial
+    type: TERRESTRIAL
     orbitalDist: 0.39
     sysPos: 1
     icon: mercury
@@ -29,7 +29,7 @@ planet:
     water: 0
   - name:
       value: Venus
-    type: Terrestrial
+    type: TERRESTRIAL
     orbitalDist: 0.723
     sysPos: 2
     icon: venus
@@ -251,7 +251,7 @@ planet:
   - name:
       source: canon
       value: Terra
-    type: Terrestrial
+    type: TERRESTRIAL
     orbitalDist: 1.0
     sysPos: 3
     icon: earth
@@ -565,7 +565,7 @@ planet:
   - name:
       source: canon
       value: Mars
-    type: Terrestrial
+    type: TERRESTRIAL
     orbitalDist: 1.524
     sysPos: 4
     icon: mars
@@ -816,7 +816,7 @@ planet:
   - name:
       source: canon
       value: Main Asteroid Belt
-    type: Asteroid Belt
+    type: ASTEROID_BELT
     orbitalDist: 2.7
     sysPos: 5
     icon: asteroid1
@@ -825,7 +825,7 @@ planet:
   - name:
       source: canon
       value: Jupiter
-    type: Gas Giant
+    type: GAS_GIANT
     orbitalDist: 5.2
     sysPos: 6
     icon: jupiter
@@ -878,7 +878,7 @@ planet:
   - name:
       source: canon
       value: Saturn
-    type: Gas Giant
+    type: GAS_GIANT
     orbitalDist: 9.6
     sysPos: 7
     icon: saturn
@@ -951,7 +951,7 @@ planet:
   - name:
       source: canon
       value: Uranus
-    type: Ice Giant
+    type: ICE_GIANT
     orbitalDist: 19.2
     sysPos: 8
     icon: uranus
@@ -993,7 +993,7 @@ planet:
   - name:
       source: canon
       value: Neptune
-    type: Ice Giant
+    type: ICE_GIANT
     orbitalDist: 30.1
     sysPos: 9
     icon: neptune

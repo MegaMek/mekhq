@@ -76,7 +76,7 @@ public class Planet {
 
     // Global physical characteristics
     @JsonProperty("type")
-    private String planetType;
+    private PlanetaryType planetType;
     /** diameter in km */
     @JsonProperty("diameter")
     private double diameter;
@@ -240,7 +240,7 @@ public class Planet {
         return yearLength;
     }
 
-    public String getPlanetType() {
+    public PlanetaryType getPlanetType() {
         return planetType;
     }
 
@@ -263,7 +263,7 @@ public class Planet {
         }
         int pos = 0;
         for (int i = 1; i <= sysPos; i++) {
-            if (getParentSystem().getPlanet(i).getPlanetType().equals("Asteroid Belt")) {
+            if (getParentSystem().getPlanet(i).getPlanetType() == PlanetaryType.ASTEROID_BELT) {
                 continue;
             }
             pos++;
@@ -871,11 +871,6 @@ public class Planet {
     // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
     private interface EventGetter<T> {
         T get(PlanetaryEvent e);
-    }
-
-    /** BT planet types */
-    public enum PlanetaryType {
-        SMALL_ASTEROID, MEDIUM_ASTEROID, DWARF_TERRESTRIAL, TERRESTRIAL, GIANT_TERRESTRIAL, GAS_GIANT, ICE_GIANT
     }
 
     public static class PressureDeserializer extends StdDeserializer<Integer> {

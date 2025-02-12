@@ -23,6 +23,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.PlanetaryType;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -137,13 +138,13 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblPlanetType = new JLabel(resourceMap.getString("lblPlanetaryType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblPlanetType, gbcLabel);
-        JLabel txtPlanetType = new JLabel(planet.getPlanetType());
+        JLabel txtPlanetType = new JLabel(planet.getPlanetType().toString());
         gbcText.gridy = infoRow;
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
 
         //System Position
-        if (!"Asteroid Belt".equals(planet.getPlanetType())) {
+        if (planet.getPlanetType() != PlanetaryType.ASTEROID_BELT) {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDiameter, gbcLabel);
@@ -395,7 +396,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private static JLabel getTxtPosition(Planet planet) {
         String text;
         if (null != planet.getOrbitRadius()) {
-            if (planet.getPlanetType().equals("Asteroid Belt")) {
+            if (planet.getPlanetType() == PlanetaryType.ASTEROID_BELT) {
                 text = String.format("%.3f AU",
                         planet.getOrbitRadius());
             } else {
