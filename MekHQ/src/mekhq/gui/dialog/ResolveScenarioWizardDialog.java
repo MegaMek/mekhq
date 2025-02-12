@@ -115,9 +115,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JButton> btnsEditUnit;
     private List<UnitStatus> ustatuses;
     private List<JLabel> lblsUnitName;
-    // private JButton btnSendReinforcements;
-    private boolean reinforcementsSent = false;
     private List<JCheckBox> chkReinforcements;
+    private boolean reinforcementsSent = false;
 
     // maps objectives to list of associated entity checkboxes
     private Map<ScenarioObjective, List<JCheckBox>> objectiveCheckboxes;
