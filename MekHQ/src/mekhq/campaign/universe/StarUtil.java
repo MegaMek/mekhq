@@ -727,26 +727,6 @@ public final class StarUtil {
         }
     }
 
-    public static String getHPGClass(Integer hpg) {
-        if (null == hpg) {
-            return null;
-        }
-        switch (hpg) {
-            case EquipmentType.RATING_A:
-                return "A-rated HPG";
-            case EquipmentType.RATING_B:
-                return "B-rated HPG";
-            case EquipmentType.RATING_C:
-                return "C-rated Service (pony express)";
-            case EquipmentType.RATING_D:
-                return "D-rated Service (pony express)";
-            case EquipmentType.RATING_X:
-                return "none";
-            default:
-                return "unknown";
-        }
-    }
-
     public static String getIconImage(Planet planet) {
         if (!planetIconDataLoaded) {
             try (FileReader fr = new FileReader(new File("data", PLANET_ICON_DATA_FILE));

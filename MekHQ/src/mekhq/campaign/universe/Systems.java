@@ -30,6 +30,7 @@ import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -203,14 +204,14 @@ public class Systems {
 
         Set<HPGLink> result = new HashSet<>();
         for (PlanetarySystem system : systemList.values()) {
-            Integer hpg = system.getHPG(when);
+            HPGRating hpg = system.getHPG(when);
             if (hpg != null) {
                 int distance = 0;
-                if (hpg == EquipmentType.RATING_A) {
+                if (hpg == HPGRating.A) {
                     distance = HPG_RADIUS_A_STATION;
                 }
 
-                if (hpg == EquipmentType.RATING_B) {
+                if (hpg == HPGRating.B) {
                     distance = HPG_RADIUS_B_STATION;
                 }
 
@@ -388,9 +389,9 @@ public class Systems {
          */
         public final PlanetarySystem primary;
         public final PlanetarySystem secondary;
-        public final int rating;
+        public final HPGRating rating;
 
-        public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, int rating) {
+        public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, HPGRating rating) {
             this.primary = primary;
             this.secondary = secondary;
             this.rating = rating;

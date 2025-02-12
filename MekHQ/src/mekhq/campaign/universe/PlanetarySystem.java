@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
@@ -247,10 +248,10 @@ public class PlanetarySystem {
     }
 
     /** @return the highest HPG rating among planets **/
-    public Integer getHPG(LocalDate when) {
-        int rating = EquipmentType.RATING_X;
+    public HPGRating getHPG(LocalDate when) {
+        HPGRating rating = HPGRating.X;
         for (Planet planet : planets.values()) {
-            if ((null != planet.getHPG(when)) && (planet.getHPG(when) < rating)) {
+            if ((null != planet.getHPG(when)) && (planet.getHPG(when).compareTo(rating) > 0)) {
                 rating = planet.getHPG(when);
             }
         }

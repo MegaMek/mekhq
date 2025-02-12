@@ -39,6 +39,7 @@ import mekhq.adapter.*;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.campaign.universe.enums.HPGRating;
 
 /**
  * This is the start of a planet object that will keep lots of information about
@@ -613,12 +614,12 @@ public class Planet {
         return null != sid ? sid.toString() : "";
     }
 
-    public Integer getHPG(LocalDate when) {
-        return getEventData(when, EquipmentType.RATING_X, e -> e.hpg);
+    public HPGRating getHPG(LocalDate when) {
+        return getEventData(when, HPGRating.X, e -> e.hpg);
     }
 
     public String getHPGClass(LocalDate when) {
-        return StarUtil.getHPGClass(getHPG(when));
+        return getHPG(when).toString();
     }
 
     public Long getPopulation(LocalDate when) {
@@ -760,12 +761,14 @@ public class Planet {
         if(null == getHPG(when)) {
             return 0;
         }
-        return switch (getHPG(when)) {
-            case EquipmentType.RATING_A -> 5;
+        // TODO: fix this
+        /*return switch (getHPG(when)) {
+            case HPGRating.A -> 5;
             case EquipmentType.RATING_B -> 3;
             case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
             default -> 0;
-        };
+        };*/
+        return 0;
     }
 
     private int getHiringHallTechBonus(LocalDate when) {
@@ -1132,7 +1135,8 @@ public class Planet {
         @JsonProperty("temperature")
         public Integer temperature;
         public SocioIndustrialData socioIndustrial;
-        public Integer hpg;
+        @JsonProperty("hpg")
+        public HPGRating hpg;
         @JsonProperty("pressure")
         @JsonDeserialize(using=PressureDeserializer.class)
         private Integer pressure;
