@@ -21,6 +21,7 @@ package mekhq.campaign.universe;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -102,8 +103,8 @@ public class Planet {
     @JsonProperty("water")
     private Integer percentWater;
 
-    //@XmlElement(name = "landMass")
-    //private List<String> landMasses;
+    @JsonProperty("landmass")
+    private List<LandMass> landMasses;
 
     // Atmospheric description
     /** Pressure classification */
@@ -366,8 +367,13 @@ public class Planet {
     }
 
     public String getLandMassDescription() {
-        return "";
-        //return null != landMasses ? Utilities.combineString(landMasses, ", ") : "";
+        if(null == landMasses || landMasses.size() == 0) {
+            return "";
+        }
+        List<String> descLandMass = landMasses.stream()
+            .map(LandMass::getDescription)
+            .collect(Collectors.toList());
+        return Utilities.combineString(descLandMass, ", ");
     }
 
     public Double getDayLength(LocalDate when) {

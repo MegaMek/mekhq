@@ -123,12 +123,8 @@ planet:
       destruction of the facilities on Outreach. The primary spaceport, Galaport,
       is located just northwest of the planet's capital Galatean City.
     landmass:
-      - name:
-          source: canon
-          value: Lubbucks
-        capital:
-          source: canon
-          value: Galatean City
+      - name: Lubbucks
+        capital: Galatean City
     satellite:
       - name: Galatea Minor
         size: large
