@@ -18,7 +18,8 @@ planet:
       value: 1
     icon: barren2
     pressure: STANDARD
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Carbon Dioxide, plus trace amounts of Water Vapor
     gravity:
@@ -46,7 +47,8 @@ planet:
       value: 2
     icon: iceg10
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:
@@ -81,7 +83,8 @@ planet:
       value: 3
     icon: rock16
     pressure: TRACE
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Ammonia, plus trace amounts of Methane
     gravity:
@@ -107,7 +110,8 @@ planet:
       value: 4
     icon: iceg14
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:
@@ -147,7 +151,8 @@ planet:
       value: 5
     icon: gasg15
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:
@@ -174,7 +179,8 @@ planet:
       value: 6
     icon: green35
     pressure: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      value: BREATHABLE
     composition:
       value: Nitrogen and Oxygen, plus trace gases
     gravity:
@@ -194,7 +200,9 @@ planet:
     water:
       source: canon
       value: 35
-    lifeForm: MAMMAL
+    lifeForm:
+      source: canon
+      value: MAMMAL
     desc: Galatea is an arid planet located just three jumps from Terra. It served
       as a major training location for the Star League Defense force and transitioned
       into the Mercenary Star after the League collapsed after the Amaris Coup. The
@@ -599,7 +607,8 @@ planet:
       value: 7
     icon: frozen48
     pressure: STANDARD
-    atmosphere: TOXICCAUSTIC
+    atmosphere:
+      value: TOXICCAUSTIC
     composition:
       value: Methane and Carbon Dioxide, plus trace amounts of Sulfur Dioxide
     gravity:
@@ -635,7 +644,8 @@ planet:
       value: 8
     icon: gasg24
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:

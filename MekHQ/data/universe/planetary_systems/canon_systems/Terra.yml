@@ -24,7 +24,8 @@ planet:
       value: 1
     icon: mercury
     pressure: TRACE
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Oxygen and Sodium, plus trace gases
     gravity:
@@ -51,7 +52,8 @@ planet:
       value: 2
     icon: venus
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Carbon Dioxide and Nitrogen, plus trace gases
     gravity:
@@ -79,7 +81,9 @@ planet:
         capital: Aphros
     event:
       - date: '2205-04-16'
-        atmosphere: BREATHABLE
+        atmosphere:
+          source: canon
+          value: BREATHABLE
         dayLength:
           source: canon
           value: 48
@@ -338,7 +342,9 @@ planet:
         population:
           value: 220179.0
       - date: '2950-10-28'
-        atmosphere: TOXICPOISON
+        atmosphere:
+          source: canon
+          value: TOXICPOISON
         population:
           value: 148298.0
         pressure: VERY_HIGH
@@ -389,7 +395,9 @@ planet:
       value: 3
     icon: earth
     pressure: STANDARD
-    atmosphere: BREATHABLE
+    atmosphere:
+      source: canon
+      value: BREATHABLE
     composition:
       source: canon
       value: Nitrogen and Oxygen, plus trace gases
@@ -414,7 +422,9 @@ planet:
     water:
       source: canon
       value: 71
-    lifeForm: MAMMAL
+    lifeForm:
+      source: canon
+      value: MAMMAL
     desc: |-
       The birthplace of humanity, Terra (or Earth), remains a leader in industry and technology over the rest of the Inner Sphere. Terra was the seat of power for the Terran Alliance and then later the Terran Hegemony and by extension the Star League.
 
@@ -854,7 +864,8 @@ planet:
       value: 4
     icon: mars
     pressure: TRACE
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
     gravity:
@@ -883,7 +894,9 @@ planet:
         capital: Koryo
     event:
       - date: '2201-10-11'
-        atmosphere: BREATHABLE
+        atmosphere:
+          source: canon
+          value: BREATHABLE
         faction:
           value:
             - TA
@@ -1251,7 +1264,8 @@ planet:
       value: 6
     icon: jupiter
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:
@@ -1323,7 +1337,8 @@ planet:
       value: 7
     icon: saturn
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:
@@ -1419,7 +1434,8 @@ planet:
       value: 8
     icon: uranus
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:
@@ -1478,7 +1494,8 @@ planet:
       value: 9
     icon: neptune
     pressure: VERY_HIGH
-    atmosphere: TOXICPOISON
+    atmosphere:
+      value: TOXICPOISON
     composition:
       value: Hydrogen and Helium, plus trace gases
     gravity:

@@ -104,7 +104,7 @@ public class Planet {
     @JsonProperty("pressure")
     private megamek.common.planetaryconditions.Atmosphere pressure;
     @JsonProperty("atmosphere")
-    private Atmosphere atmosphere;
+    private SourceableValue<Atmosphere> atmosphere;
     @JsonProperty("composition")
     private SourceableValue<String> composition;
     @JsonProperty("temperature")
@@ -112,7 +112,7 @@ public class Planet {
 
     // Ecosphere
     @JsonProperty("lifeForm")
-    private LifeForm lifeForm;
+    private SourceableValue<LifeForm> lifeForm;
 
     // private List<String> garrisonUnits;
 
@@ -493,7 +493,11 @@ public class Planet {
     }
 
     public LifeForm getLifeForm(LocalDate when) {
-        return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, e -> e.lifeForm);
+        return (null == getSourcedLifeForm(when)) ? LifeForm.NONE : getSourcedLifeForm(when).getValue();
+    }
+
+    public SourceableValue<LifeForm> getSourcedLifeForm(LocalDate when) {
+        return getEventData(when, lifeForm, e -> e.lifeForm);
     }
 
     public String getLifeFormName(LocalDate when) {
@@ -525,7 +529,11 @@ public class Planet {
     }
 
     public Atmosphere getAtmosphere(LocalDate when) {
-        return getEventData(when, null != atmosphere ? atmosphere : Atmosphere.NONE, e -> e.atmosphere);
+        return (null == getSourcedAtmosphere(when)) ? Atmosphere.NONE : getSourcedAtmosphere(when).getValue();
+    }
+
+    public SourceableValue<Atmosphere> getSourcedAtmosphere(LocalDate when) {
+        return getEventData(when, atmosphere, e -> e.atmosphere);
     }
 
     public String getAtmosphereName(LocalDate when) {
@@ -839,7 +847,7 @@ public class Planet {
         public SourceableValue<List<String>> faction;
         public Set<Faction> factions;
         @JsonProperty("lifeForm")
-        public LifeForm lifeForm;
+        public SourceableValue<LifeForm> lifeForm;
         @JsonProperty("water")
         public SourceableValue<Integer> percentWater;
         @JsonProperty("temperature")
@@ -852,7 +860,7 @@ public class Planet {
         @JsonProperty("hiringHall")
         private HiringHallLevel hiringHall;
         @JsonProperty("atmosphere")
-        private Atmosphere atmosphere;
+        private SourceableValue<Atmosphere> atmosphere;
         @JsonProperty("composition")
         public SourceableValue<String> composition;
         @JsonProperty("population")
