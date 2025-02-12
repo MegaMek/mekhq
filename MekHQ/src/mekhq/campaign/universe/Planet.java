@@ -78,7 +78,7 @@ public class Planet {
 
     // Global physical characteristics
     @JsonProperty("type")
-    private PlanetaryType planetType;
+    private SourceableValue<PlanetaryType> planetType;
     /** diameter in km */
     @JsonProperty("diameter")
     private SourceableValue<Double> diameter;
@@ -270,6 +270,14 @@ public class Planet {
     }
 
     public PlanetaryType getPlanetType() {
+        if(null == getSourcedPlanetType()) {
+            logger.error("No planetary type for " + id + ". Using Terrestrial");
+            return PlanetaryType.TERRESTRIAL;
+        }
+        return getSourcedPlanetType().getValue();
+    }
+
+    public SourceableValue<PlanetaryType> getSourcedPlanetType() {
         return planetType;
     }
 

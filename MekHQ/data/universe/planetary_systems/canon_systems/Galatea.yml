@@ -11,7 +11,8 @@ event:
 planet:
   - name:
       value: Skouzas's Frontier
-    type: TERRESTRIAL
+    type:
+      value: TERRESTRIAL
     orbitalDist: 0.48
     sysPos:
       value: 1
@@ -38,7 +39,8 @@ planet:
       value: 2
   - name:
       value: Namtar
-    type: ICE_GIANT
+    type:
+      value: ICE_GIANT
     orbitalDist: 0.84
     sysPos:
       value: 2
@@ -72,7 +74,8 @@ planet:
         icon: rock3
   - name:
       value: Damu
-    type: TERRESTRIAL
+    type:
+      value: TERRESTRIAL
     orbitalDist: 1.2
     sysPos:
       value: 3
@@ -97,7 +100,8 @@ planet:
       value: 0
   - name:
       value: Hashemi
-    type: ICE_GIANT
+    type:
+      value: ICE_GIANT
     orbitalDist: 1.92
     sysPos:
       value: 4
@@ -136,7 +140,8 @@ planet:
         icon: rock13
   - name:
       value: Alohi's Hold
-    type: GIANT_TERRESTRIAL
+    type:
+      value: GIANT_TERRESTRIAL
     orbitalDist: 6.24
     sysPos:
       value: 5
@@ -162,7 +167,8 @@ planet:
   - name:
       source: canon
       value: Galatea
-    type: TERRESTRIAL
+    type:
+      value: TERRESTRIAL
     orbitalDist: 3.36
     sysPos:
       value: 6
@@ -586,7 +592,8 @@ planet:
           value: 607502826.0
   - name:
       value: Zhui
-    type: TERRESTRIAL
+    type:
+      value: TERRESTRIAL
     orbitalDist: 12.0
     sysPos:
       value: 7
@@ -621,7 +628,8 @@ planet:
       - name: Boehm's Stand
   - name:
       value: Biddick
-    type: GAS_GIANT
+    type:
+      value: GAS_GIANT
     orbitalDist: 46.56
     sysPos:
       value: 8
