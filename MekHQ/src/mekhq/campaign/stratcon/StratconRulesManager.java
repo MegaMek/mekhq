@@ -1483,8 +1483,7 @@ public class StratconRulesManager {
         }
 
         // Reinforcement roll failed, make interception check
-        int interceptionOdds = 100;
-        //calculateScenarioOdds(track, campaignState.getContract(), true);
+        int interceptionOdds = calculateScenarioOdds(track, campaignState.getContract(), true);
         int interceptionRoll = randomInt(100);
 
         // Check passed
@@ -2652,11 +2651,11 @@ public class StratconRulesManager {
 
     /**
      * Processes completion of a Stratcon scenario that is linked to another scenario
-     * pulls forces off completed scenario and moves them to linked one.
+     * pulls force off completed scenario adds units in backupUnits to next linked scenario
      * 
      * Should only be used after a scenario is resolved
      */
-    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<UUID> reinforcementForce) {
+    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<UUID> reinforcementUnits) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
         Campaign campaign = tracker.getCampaign();
     
@@ -2670,9 +2669,9 @@ public class StratconRulesManager {
                 if (track.getBackingScenariosMap().containsKey(nextScenario.getId())) {
                     StratconScenario scenario = track.getBackingScenariosMap().get(nextScenario.getId());
 
-                    for (UUID forceId : reinforcementForce) {
-                        track.unassignUnit(campaign.getUnit(forceId).getForceId());
-                        nextScenario.addUnit(forceId);
+                    for (UUID unitID : reinforcementUnits) {
+                        track.unassignUnit(campaign.getUnit(unitID).getForceId());
+                        scenario.addUnit(campaign.getUnit(unitID), ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID, false);
                     }
                 }
             }

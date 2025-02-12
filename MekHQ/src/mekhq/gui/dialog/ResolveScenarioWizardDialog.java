@@ -380,11 +380,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         int unitIndex = 0;
 
         boolean possibleReinforcment = (tracker.getScenario().getLinkedScenario() != 0);
-        // btnSendReinforcements = new JButton("Continue as Reinforcements");
-        // btnSendReinforcements.setEnabled(tracker.getScenario().getLinkedScenario() != 0);
-        // btnSendReinforcements.setName("Confirm Reinforcement");
-        // btnSendReinforcements.addActionListener(new ReinforcementListener());
-        
+  
 
         for (Unit unit : tracker.getUnits()) {
             UnitStatus status = tracker.getUnitsStatus().get(unit.getId());
@@ -414,14 +410,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
           
             chkReinforced = new JCheckBox("Send Reinforcement");
-            chkReinforced.setEnabled(!status.isTotalLoss());
             chkReinforced.setVisible(possibleReinforcment);
+            chkReinforced.setEnabled(!status.isTotalLoss());
             chkReinforced.setName(Integer.toString(unitIndex));
             chkReinforced.setActionCommand(unit.getId().toString());
             chkReinforcements.add(chkReinforced);
           
             
-
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -1603,15 +1598,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         //Collect units selected as reinforcements
-        List<UUID> backupFOrce = new ArrayList<>();
+        List<UUID> backupUnits = new ArrayList<>();
             for(JCheckBox box : chkReinforcements){
                 if(box.isSelected()){
                 UUID id = UUID.fromString(box.getActionCommand());
-                backupFOrce.add(id);
+                backupUnits.add(id);
                 }
             }
        
-            if(!backupFOrce.isEmpty()){
+            if(!backupUnits.isEmpty()){
              reinforcementsSent = true;
             }
     
@@ -1646,8 +1641,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         if (reinforcementsSent  && tracker.getScenario().getStatus().isOverallVictory()
             && tracker.getScenario().getLinkedScenario() != 0) {
-                
-            StratconRulesManager.linkedScenarioProcessing(tracker, backupFOrce);
+
+            StratconRulesManager.linkedScenarioProcessing(tracker, backupUnits);
         }
         
 
@@ -1980,20 +1975,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         public void itemStateChanged(ItemEvent evt) {
             int idx = Integer.parseInt(((JCheckBox) evt.getItem()).getName());
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
+            chkReinforcements.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
     }
 
-    // private class CheckReinforcmentListener implements ItemListener {
-    //     @Override
-    //     public void itemStateChanged(ItemEvent evt) {
-    //         int idx = Integer.parseInt(((JCheckBox) evt.getItem()).getName());
-    //        if(chkReinforcements.contains(idx)){
-    //         chkReinforcements.remove(idx);
-    //        }else{
-    //         chkReinforcements.
-    //        }
-    //     }
-    // }
 
     /**
      * Event handler for a KIA checkbox
@@ -2057,27 +2042,4 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
-
-
-    /**
-     * Event handler for "Continue as Reinforcements" Button that
-     * adjusts boolean used after scenario resolution to signal 
-     * player wants to send units to linked scenario
-     */
-    private class ReinforcementListener implements ActionListener {
-
-        public ReinforcementListener() {
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            reinforcementsSent = (!reinforcementsSent);
-
-            if(reinforcementsSent){
-            ((JButton)evt.getSource()).setBackground(new Color(6, 64, 43));
-            }else{
-            ((JButton) evt.getSource()).setBackground(UIManager.getColor("Button.background"));
-            }
-        }
-    }
 }
