@@ -41,6 +41,8 @@ import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.HPGRating;
 
+import javax.xml.transform.Source;
+
 /**
  * This is the start of a planet object that will keep lots of information about
  * planets that can be displayed on the interstellar map.
@@ -58,7 +60,7 @@ public class Planet {
     private SourceableValue<String> name;
     private String shortName;
     @JsonProperty("sysPos")
-    private Integer sysPos;
+    private SourceableValue<Integer> sysPos;
 
     // Orbital information
     /** orbital radius (average distance to parent star), in AU */
@@ -79,7 +81,7 @@ public class Planet {
     private PlanetaryType planetType;
     /** diameter in km */
     @JsonProperty("diameter")
-    private double diameter;
+    private SourceableValue<Double> diameter;
     /** Density in g/m^3 */
     @JsonProperty("density")
     private Double density;
@@ -88,7 +90,7 @@ public class Planet {
     @JsonProperty("dayLength")
     private SourceableValue<Double> dayLength;
     @JsonProperty("yearLength")
-    private Double yearLength;
+    private SourceableValue<Double> yearLength;
 
     // Surface description
     @JsonProperty("water")
@@ -165,6 +167,10 @@ public class Planet {
     }
 
     public double getDiameter() {
+        return (null == getSourcedDiameter() ? null : getSourcedDiameter().getValue());
+    }
+
+    public SourceableValue<Double> getSourcedDiameter() {
         return diameter;
     }
 
@@ -240,6 +246,10 @@ public class Planet {
     }
 
     public Double getYearLength() {
+        return (null == getSourcedYearLength()) ? null : getSourcedYearLength().getValue();
+    }
+
+    public SourceableValue<Double> getSourcedYearLength() {
         return yearLength;
     }
 
@@ -248,6 +258,10 @@ public class Planet {
     }
 
     public Integer getSystemPosition() {
+        return (null == sysPos) ? null : getSourcedSystemPosition().getValue();
+    }
+
+    public SourceableValue<Integer> getSourcedSystemPosition() {
         return sysPos;
     }
 
@@ -261,11 +275,11 @@ public class Planet {
     public String getDisplayableSystemPosition() {
         // We won't give the actual system position here, because we don't want asteroid
         // belts to count for system position
-        if ((null == getParentSystem()) || (null == sysPos)) {
+        if ((null == getParentSystem()) || (null == getSystemPosition())) {
             return "?";
         }
         int pos = 0;
-        for (int i = 1; i <= sysPos; i++) {
+        for (int i = 1; i <= getSystemPosition(); i++) {
             if (getParentSystem().getPlanet(i).getPlanetType() == PlanetaryType.ASTEROID_BELT) {
                 continue;
             }
