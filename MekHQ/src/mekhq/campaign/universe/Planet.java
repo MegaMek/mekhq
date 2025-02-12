@@ -72,9 +72,9 @@ public class Planet {
     @JsonProperty("satellite")
     private List<Satellite> satellites;
     @JsonProperty("smallMoons")
-    private int smallMoons;
+    private SourceableValue<Integer> smallMoons;
     @JsonProperty("ring")
-    private boolean ring;
+    private SourceableValue<Boolean> ring;
 
     // Global physical characteristics
     @JsonProperty("type")
@@ -84,9 +84,9 @@ public class Planet {
     private SourceableValue<Double> diameter;
     /** Density in g/m^3 */
     @JsonProperty("density")
-    private Double density;
+    private SourceableValue<Double> density;
     @JsonProperty("gravity")
-    private Double gravity;
+    private SourceableValue<Double> gravity;
     @JsonProperty("dayLength")
     private SourceableValue<Double> dayLength;
     @JsonProperty("yearLength")
@@ -159,15 +159,23 @@ public class Planet {
     }
 
     public Double getGravity() {
+        return (null == getSourcedGravity()) ? null : getSourcedGravity().getValue();
+    }
+
+    public SourceableValue<Double> getSourcedGravity() {
         return gravity;
     }
 
     public Double getDensity() {
+        return (null == getSourcedDensity()) ? 0.0 : getSourcedDensity().getValue();
+    }
+
+    public SourceableValue<Double> getSourcedDensity() {
         return density;
     }
 
     public double getDiameter() {
-        return (null == getSourcedDiameter() ? null : getSourcedDiameter().getValue());
+        return (null == getSourcedDiameter() ? 0.0 : getSourcedDiameter().getValue());
     }
 
     public SourceableValue<Double> getSourcedDiameter() {
@@ -175,7 +183,7 @@ public class Planet {
     }
 
     public String getGravityText() {
-        return null != gravity ? gravity + "g" : "unknown";
+        return null != getGravity() ? getGravity() + "g" : "unknown";
     }
 
     public Double getOrbitRadius() {
@@ -190,7 +198,11 @@ public class Planet {
         return null != satellites ? new ArrayList<>(satellites) : null;
     }
 
-    public int getSmallMoons() {
+    public Integer getSmallMoons() {
+        return (null == getSourcedSmallMoons()) ? 0 : getSourcedSmallMoons().getValue();
+    }
+
+    public SourceableValue<Integer> getSourcedSmallMoons() {
         return smallMoons;
     }
 
@@ -203,8 +215,8 @@ public class Planet {
             }
             desc = Utilities.combineString(satNames, ", ");
         }
-        if (smallMoons > 0) {
-            String smallDesc = smallMoons + " small moons";
+        if (getSmallMoons() > 0) {
+            String smallDesc = getSmallMoons() + " small moons";
             if (desc.isBlank()) {
                 desc = smallDesc;
             } else {
@@ -217,7 +229,11 @@ public class Planet {
         return desc;
     }
 
-    public boolean hasRing() {
+    public Boolean hasRing() {
+        return (null == getSourcedRing()) ? false : getSourcedRing().getValue();
+    }
+
+    public SourceableValue<Boolean> getSourcedRing() {
         return ring;
     }
 

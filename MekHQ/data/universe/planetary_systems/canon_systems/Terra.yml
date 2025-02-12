@@ -22,10 +22,12 @@ planet:
     pressure: TRACE
     atmosphere: TOXICPOISON
     composition: Oxygen and Sodium, plus trace gases
-    gravity: 0.38
+    gravity:
+      value: 0.38
     diameter:
       value: 4880
-    density: 5.427
+    density:
+      value: 5.427
     dayLength:
       value: 1407
     yearLength:
@@ -43,10 +45,12 @@ planet:
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Carbon Dioxide and Nitrogen, plus trace gases
-    gravity: 0.904
+    gravity:
+      value: 0.904
     diameter:
       value: 12100
-    density: 5.243
+    density:
+      value: 5.243
     dayLength:
       value: 5832
     yearLength:
@@ -272,11 +276,15 @@ planet:
     pressure: STANDARD
     atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
-    gravity: 1.0
+    gravity:
+      source: canon
+      value: 1.0
     diameter:
       source: canon
       value: 12742
-    density: 5.514
+    density:
+      source: canon
+      value: 5.514
     dayLength:
       source: canon
       value: 24
@@ -594,10 +602,12 @@ planet:
     pressure: TRACE
     atmosphere: TOXICPOISON
     composition: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
-    gravity: 0.38
+    gravity:
+      value: 0.38
     diameter:
       value: 6779
-    density: 3.9335
+    density:
+      value: 3.9335
     dayLength:
       value: 24
     yearLength:
@@ -608,7 +618,9 @@ planet:
       3028 - In 2017, Mars was the first planet explored by humankind and was colonised soon after. In 2110, humanity's first attempt at terraforming began on Mars with the seeding of the two polar icecaps with a genetically enhanced plant that eventually caused the ice to melt and evaporate into the atmosphere. Other areas of Mars were planted with other hardy plants to convert carbon dioxide to oxygen and capture the sun's radiant heat. Ice asteroids were crashed into Mars to provide additional water and the resultant deep impact craters became the sites of domed cities. By 2201, rebreathers were no longer required and the temperature was above freezing. Mining companies began to actively exploit the metal depoists and industry soon followed. By the creation of the Star League, Mars had a population of over one million people in 20 domed cities. In 2601, the War Academy of Mars was completed. The Academy consisted of a vast complex of buildings, spaceports, battlefields and barracks located ind a hugh canyon approximately 100 kilometres southeast of Olympus Mons.
 
             During the Aramis coup, the officers and cadets of the Academy fought off the 23rd Republican Dragoons for six weeks before a nuclear weapon was used by frustrated Rim Worlds commander. Republican forces destroyed 11 cities.
-    smallMoons: 2
+    smallMoons:
+      source: canon
+      value: 2
     landmass:
       - name: .na.character
         capital: Koryo
@@ -862,16 +874,20 @@ planet:
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
-    gravity: 2.53
+    gravity:
+      value: 2.53
     diameter:
       value: 139820
-    density: 1.33
+    density:
+      value: 1.33
     dayLength:
       value: 9
     yearLength:
       value: 12.0
-    ring: yes
-    smallMoons: 73
+    ring:
+      value: yes
+    smallMoons:
+      value: 73
     satellite:
       - name:
           source: canon
@@ -920,16 +936,20 @@ planet:
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
-    gravity: 1.07
+    gravity:
+      value: 1.07
     diameter:
       value: 116460
-    density: 0.687
+    density:
+      value: 0.687
     dayLength:
       value: 10
     yearLength:
       value: 29.0
-    ring: yes
-    smallMoons: 51
+    ring:
+      value: yes
+    smallMoons:
+      value: 51
     satellite:
       - name:
           source: canon
@@ -998,15 +1018,19 @@ planet:
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
-    gravity: 0.89
+    gravity:
+      value: 0.89
     diameter:
       value: 50724
-    density: 1.27
+    density:
+      value: 1.27
     dayLength:
       value: 17
     yearLength:
       value: 84.0
-    smallMoons: 22
+    smallMoons:
+      source: canon
+      value: 22
     satellite:
       - name:
           source: canon
@@ -1045,15 +1069,19 @@ planet:
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
-    gravity: 1.14
+    gravity:
+      value: 1.14
     diameter:
       value: 49244
-    density: 1.64
+    density:
+      value: 1.64
     dayLength:
       value: 16
     yearLength:
       value: 164.8
-    smallMoons: 8
+    smallMoons:
+      source: canon
+      value: 8
     satellite:
       - name:
           source: canon
