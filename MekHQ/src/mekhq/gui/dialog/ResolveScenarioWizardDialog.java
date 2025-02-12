@@ -1597,18 +1597,22 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        //Collect units selected as reinforcements
-        List<UUID> backupUnits = new ArrayList<>();
-            for(JCheckBox box : chkReinforcements){
-                if(box.isSelected()){
-                UUID id = UUID.fromString(box.getActionCommand());
-                backupUnits.add(id);
-                }
-            }
+        //Collect forces and units selected as reinforcements
+        HashMap<Integer, List<UUID>> linkedForces = new HashMap<>();
        
-            if(!backupUnits.isEmpty()){
-             reinforcementsSent = true;
+        for(JCheckBox box : chkReinforcements){
+            if(box.isSelected()){
+                UUID id = UUID.fromString(box.getActionCommand());
+
+                if(!linkedForces.containsKey(campaign.getUnit(id).getForceId())){
+                   List<UUID> unitList = new ArrayList<UUID>(); 
+                    linkedForces.put(campaign.getUnit(id).getForceId(), unitList);
+                    reinforcementsSent = true;
+                }
+                linkedForces.get(campaign.getUnit(id).getForceId()).add(id);
             }
+        }
+       
     
         //now process
         tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText());
@@ -1642,7 +1646,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         if (reinforcementsSent  && tracker.getScenario().getStatus().isOverallVictory()
             && tracker.getScenario().getLinkedScenario() != 0) {
 
-            StratconRulesManager.linkedScenarioProcessing(tracker, backupUnits);
+            StratconRulesManager.linkedScenarioProcessing(tracker, linkedForces);
         }
         
 
