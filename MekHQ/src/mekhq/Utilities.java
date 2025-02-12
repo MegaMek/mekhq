@@ -1143,20 +1143,20 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      * Don't recurse.
      */
-    public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser) {
-        parseXMLFiles(dirName, parser, false);
+    public static void parseYMLFiles(String dirName, Consumer<FileInputStream> parser) {
+        parseYMLFiles(dirName, parser, false);
     }
 
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
-    public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
+    public static void parseYMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
         if (dir.isDirectory()) {
-            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".xml"));
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
             if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
                 Arrays.sort(files, Comparator.comparing(File::getPath));
@@ -1186,7 +1186,7 @@ public class Utilities {
                 Arrays.sort(dirs, Comparator.comparing(File::getPath));
                 for (File subDirectory : dirs) {
                     if (subDirectory.isDirectory()) {
-                        parseXMLFiles(subDirectory.getPath(), parser, true);
+                        parseYMLFiles(subDirectory.getPath(), parser, true);
                     }
                 }
             }

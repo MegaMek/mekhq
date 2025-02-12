@@ -99,7 +99,7 @@ planet:
     yearLength: 15.6
     ring: yes
     smallMoons: 7
-  - name: 'Galatea'
+  - name: Galatea
     type: Terrestrial
     orbitalDist: 3.36
     sysPos: 6
@@ -123,8 +123,12 @@ planet:
       destruction of the facilities on Outreach. The primary spaceport, Galaport,
       is located just northwest of the planet's capital Galatean City.
     landmass:
-      - name: Lubbucks
-        capital: Galatean City
+      - name:
+          source: canon
+          value: Lubbucks
+        capital:
+          source: canon
+          value: Galatean City
     satellite:
       - name: Galatea Minor
         size: large
@@ -220,7 +224,6 @@ planet:
         population: 592907650.0
       - date: '2630-01-01'
         population: 594065739.0
-        hiringHall: Great
       - date: '2632-04-18'
         hpg: A
       - date: '2640-01-01'
@@ -229,6 +232,7 @@ planet:
         socioIndustrial: C-C-B-C-B
       - date: '2650-01-01'
         population: 594885097.0
+        hiringHall: GREAT
       - date: '2660-01-01'
         population: 598352411.0
       - date: '2670-01-01'

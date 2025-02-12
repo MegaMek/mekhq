@@ -245,7 +245,7 @@ public class Systems {
         logger.info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
-        Systems systems = load("data/universe/planetary_systems/Galatea.yml");
+        Systems systems = load("data/universe/planetary_systems");
 
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
@@ -266,24 +266,7 @@ public class Systems {
     public static Systems load(String planetsPath) throws DOMException, IOException {
         Systems systems = new Systems();
 
-        // Step 1: Read the default file
-        try (FileInputStream fis = new FileInputStream(planetsPath)) {
-            systems.updateSystems(fis);
-        }
-
-        // Step 2: Load all the xml files within the planets subdirectory, if it exists
-        //Utilities.parseXMLFiles(planetsPath, systems::updateSystems);
-
-        // Step 3: Cleanup any systems that have issues
-        systems.cleanupSystems();
-
-        return systems;
-    }
-
-    private void updateSystems(FileInputStream source) throws IOException {
-        // Reset the file stream
-        //source.getChannel().position(0);
-
+        //Step 1: set up mapper
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         // add custom deserializer for complex classes and enums
         SimpleModule module = new SimpleModule();
@@ -295,23 +278,59 @@ public class Systems {
         // this will allow the mapper to deserialize LocalDate objects
         mapper.registerModule(new JavaTimeModule());
 
-        PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
+        // Step 2: Load all the yml files in the planetsPath and subdirectories
+        systems.parsePlanetarySystemFiles(planetsPath, mapper);
 
-            // Run through the list again, this time creating and updating systems as we go
-            PlanetarySystem oldSystem = systemList.get(system.getId());
-            if (null == oldSystem) {
-                systemList.put(system.getId(), system);
-            } else {
-                // Update with new data
-                oldSystem.copyDataFrom(system);
-                system = oldSystem;
+        // Step 3: Cleanup any systems that have issues
+        systems.cleanupSystems();
+
+        return systems;
+    }
+
+    private void parsePlanetarySystemFiles(String dirName, ObjectMapper mapper) {
+        if ((null == dirName)) {
+            throw new NullPointerException();
+        }
+
+        File dir = new File(dirName);
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
+            if ((null != files) && (files.length > 0)) {
+                // Case-insensitive sorting. Yes, even on Windows. Deal with it.
+                Arrays.sort(files, Comparator.comparing(File::getPath));
+                // Try parsing and updating the main list, one by one
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try (FileInputStream fis = new FileInputStream(file)) {
+                            loadPlanetarySystem(fis, mapper);
+                        } catch (Exception ex) {
+                            // Ignore this file then
+                            logger.error(
+                                String.format("Exception trying to parse %s - ignoring.", file.getPath()),
+                                ex);
+                        }
+                    }
+                }
             }
 
-            // Process system deletions
-            //for (String systemId : localSystems.toDelete) {
-            //    if (null != systemId) {
-            //        systemList.remove(systemId);
-            //    }
+            // Get subdirectories too
+            File[] dirs = dir.listFiles();
+            if (null != dirs && dirs.length > 0) {
+                Arrays.sort(dirs, Comparator.comparing(File::getPath));
+                for (File subDirectory : dirs) {
+                    if (subDirectory.isDirectory()) {
+                        parsePlanetarySystemFiles(subDirectory.getPath(), mapper);
+                    }
+                }
+            }
+        }
+    }
+
+    private void loadPlanetarySystem(FileInputStream source, ObjectMapper mapper) throws IOException {
+
+        PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
+        systemList.put(system.getId(), system);
+
     }
 
     private void cleanupSystems() {
@@ -354,31 +373,6 @@ public class Systems {
                 }
             }
         }
-    }
-
-    private static final class LocalSystemList {
-        public List<PlanetarySystem> list;
-
-        public List<String> toDelete;
-
-        /*@SuppressWarnings("unused")
-        private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-            toDelete = new ArrayList<>();
-            if (null == list) {
-                list = new ArrayList<>();
-            } else {
-                // Fill in the "toDelete" list
-                List<PlanetarySystem> filteredList = new ArrayList<>(list.size());
-                for (PlanetarySystem system : list) {
-                    if ((null != system.delete) && system.delete && (null != system.getId())) {
-                        toDelete.add(system.getId());
-                    } else {
-                        filteredList.add(system);
-                    }
-                }
-                list = filteredList;
-            }
-        }*/
     }
 
     /** A data class representing a HPG link between two planets */
