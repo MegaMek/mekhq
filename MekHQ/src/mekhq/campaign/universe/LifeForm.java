@@ -61,26 +61,4 @@ public enum LifeForm {
     private LifeForm(String name) {
         this.name = name;
     }
-
-    /** Deserializer for Jackson loading of this enum **/
-    public static class LifeFormDeserializer extends StdDeserializer<LifeForm> {
-
-        public LifeFormDeserializer() {
-            this(null);
-        }
-
-        public LifeFormDeserializer(final Class<?> vc) {
-            super(vc);
-        }
-
-        @Override
-        public LifeForm deserialize(final JsonParser jsonParser, final DeserializationContext context) {
-            try {
-                return LifeForm.parseLifeForm(jsonParser.getText());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-    }
 }

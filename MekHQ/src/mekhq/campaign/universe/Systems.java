@@ -264,11 +264,8 @@ public class Systems {
 
         //Step 1: set up mapper
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        // add custom deserializer for complex classes and enums
+        // add custom deserializer for socioIndustrialData
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(Atmosphere.class, new Atmosphere.AtmosphereDeserializer());
-        module.addDeserializer(LifeForm.class, new LifeForm.LifeFormDeserializer());
-        module.addDeserializer(HiringHallLevel.class, new HiringHallLevel.HiringHallLevelDeserializer());
         module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
         mapper.registerModule(module);
         // this will allow the mapper to deserialize LocalDate objects

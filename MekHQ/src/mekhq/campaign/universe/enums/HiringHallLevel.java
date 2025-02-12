@@ -38,39 +38,8 @@ public enum HiringHallLevel {
 
     private static final MMLogger logger = MMLogger.create(HiringHallLevel.class);
 
-    public static HiringHallLevel parseHiringHallLevel(String val) {
-        try {
-            return HiringHallLevel.valueOf(val.toUpperCase());
-        } catch (Exception ex) {
-            Sentry.captureException(ex);
-            logger.error("Couldn't find a hiring hall level matching " + val.toUpperCase(), ex);
-            return NONE;
-        }
-    }
-
     public boolean isNone() {
         return this == NONE;
-    }
-
-    public static class HiringHallLevelDeserializer extends StdDeserializer<HiringHallLevel> {
-
-        public HiringHallLevelDeserializer() {
-            this(null);
-        }
-
-        public HiringHallLevelDeserializer(final Class<?> vc) {
-            super(vc);
-        }
-
-        @Override
-        public HiringHallLevel deserialize(final JsonParser jsonParser, final DeserializationContext context) {
-            try {
-                return HiringHallLevel.parseHiringHallLevel(jsonParser.getText());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
     }
 }
 

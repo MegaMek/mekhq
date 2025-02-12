@@ -11,14 +11,14 @@ event:
     nadirCharge: yes
 planet:
   - name:
-     source: canon
-     value: Mercury
+      source: canon
+      value: Mercury
     type: Terrestrial
     orbitalDist: 0.39
     sysPos: 1
     icon: mercury
     pressure: Trace
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Oxygen and Sodium, plus trace gases
     gravity: 0.38
     diameter: 4880
@@ -28,14 +28,13 @@ planet:
     temperature: 427
     water: 0
   - name:
-      source: canon
       value: Venus
     type: Terrestrial
     orbitalDist: 0.723
     sysPos: 2
     icon: venus
     pressure: Very High
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Carbon Dioxide and Nitrogen, plus trace gases
     gravity: 0.904
     diameter: 12100
@@ -55,7 +54,7 @@ planet:
         capital: Aphros
     event:
       - date: '2205-04-16'
-        atmosphere: Breathable
+        atmosphere: BREATHABLE
         dayLength: 48
         faction:
           - TA
@@ -224,7 +223,7 @@ planet:
       - date: '2940-01-01'
         population: 220179.0
       - date: '2950-10-28'
-        atmosphere: Toxic (Poisonous)
+        atmosphere: TOXICPOISON
         population: 148298.0
         pressure: Very High
         temperature: 250
@@ -257,7 +256,7 @@ planet:
     sysPos: 3
     icon: earth
     pressure: Standard
-    atmosphere: Breathable
+    atmosphere: BREATHABLE
     composition: Nitrogen and Oxygen, plus trace gases
     gravity: 1.0
     diameter: 12742
@@ -266,7 +265,7 @@ planet:
     yearLength: 1.0
     temperature: 31
     water: 71
-    lifeForm: Mammals
+    lifeForm: MAMMAL
     desc: |-
       The birthplace of humanity, Terra (or Earth), remains a leader in industry and technology over the rest of the Inner Sphere. Terra was the seat of power for the Terran Alliance and then later the Terran Hegemony and by extension the Star League.
 
@@ -289,7 +288,9 @@ planet:
       - name: North America
       - name: South America
     satellite:
-      - name: Luna (Luna City)
+      - name:
+          source: canon
+          value: Luna (Luna City)
         size: large
         icon: rock16
     event:
@@ -569,7 +570,7 @@ planet:
     sysPos: 4
     icon: mars
     pressure: Trace
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
     gravity: 0.38
     diameter: 6779
@@ -588,7 +589,7 @@ planet:
         capital: Koryo
     event:
       - date: '2201-10-11'
-        atmosphere: Breathable
+        atmosphere: BREATHABLE
         faction:
           - TA
         population: 10282.0
@@ -829,7 +830,7 @@ planet:
     sysPos: 6
     icon: jupiter
     pressure: Very High
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 2.53
     diameter: 139820
@@ -839,25 +840,39 @@ planet:
     ring: yes
     smallMoons: 73
     satellite:
-      - name: Ganymede
+      - name:
+          source: canon
+          value: Ganymede
         size: large
         icon: rock16
-      - name: Callisto
+      - name:
+          source: canon
+          value: Callisto
         size: large
         icon: rock7
-      - name: Io
+      - name:
+          source: canon
+          value: Io
         size: large
         icon: rock17
-      - name: Europa
+      - name:
+          source: canon
+          value: Europa
         size: large
         icon: rock2
-      - name: Amalthea
+      - name:
+          source: canon
+          value: Amalthea
         size: medium
         icon: rock13
-      - name: Himalia
+      - name:
+          source: canon
+          value: Himalia
         size: medium
         icon: rock5
-      - name: Thebe
+      - name:
+          source: canon
+          value: Thebe
         size: medium
         icon: oddmoon2
   - name:
@@ -868,7 +883,7 @@ planet:
     sysPos: 7
     icon: saturn
     pressure: Very High
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 1.07
     diameter: 116460
@@ -878,37 +893,59 @@ planet:
     ring: yes
     smallMoons: 51
     satellite:
-      - name: Titan
+      - name:
+          source: canon
+          value: Titan
         size: giant
         icon: rock17
-      - name: Rhea
+      - name:
+          source: canon
+          value: Rhea
         size: large
         icon: rock15
-      - name: Iapetus
+      - name:
+          source: canon
+          value: Iapetus
         size: large
         icon: rock2
-      - name: Dione
+      - name:
+          source: canon
+          value: Dione
         size: large
         icon: rock1
-      - name: Tethys
+      - name:
+          source: canon
+          value: Tethys
         size: large
         icon: rock11
-      - name: Enceladus
+      - name:
+          source: canon
+          value: Enceladus
         size: large
         icon: rock6
-      - name: Mimas
+      - name:
+          source: canon
+          value: Mimas
         size: medium
         icon: oddmoon2
-      - name: Hyperion
+      - name:
+          source: canon
+          value: Hyperion
         size: medium
         icon: oddmoon3
-      - name: Phoebe
+      - name:
+          source: canon
+          value: Phoebe
         size: medium
         icon: oddmoon1
-      - name: Janus
+      - name:
+          source: canon
+          value: Janus
         size: medium
         icon: rock9
-      - name: Epimetheus
+      - name:
+          source: canon
+          value: Epimetheus
         size: medium
         icon: rock8
   - name:
@@ -919,7 +956,7 @@ planet:
     sysPos: 8
     icon: uranus
     pressure: Very High
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 0.89
     diameter: 50724
@@ -928,19 +965,29 @@ planet:
     yearLength: 84.0
     smallMoons: 22
     satellite:
-      - name: Titania
+      - name:
+          source: canon
+          value: Titania
         size: large
         icon: rock12
-      - name: Oberon
+      - name:
+          source: canon
+          value: Oberon
         size: large
         icon: rock4
-      - name: Umbriel
+      - name:
+          source: canon
+          value: Umbriel
         size: large
         icon: rock17
-      - name: Ariel
+      - name:
+          source: canon
+          value: Ariel
         size: large
         icon: rock11
-      - name: Miranda
+      - name:
+          source: canon
+          value: Miranda
         size: medium
         icon: rock3
   - name:
@@ -951,7 +998,7 @@ planet:
     sysPos: 9
     icon: neptune
     pressure: Very High
-    atmosphere: Toxic (Poisonous)
+    atmosphere: TOXICPOISON
     composition: Hydrogen and Helium, plus trace gases
     gravity: 1.14
     diameter: 49244
@@ -960,21 +1007,33 @@ planet:
     yearLength: 164.8
     smallMoons: 8
     satellite:
-      - name: Triton
+      - name:
+          source: canon
+          value: Triton
         size: large
         icon: rock3
-      - name: Proteus
+      - name:
+          source: canon
+          value: Proteus
         size: medium
         icon: rock6
-      - name: Nereid
+      - name:
+          source: canon
+          value: Nereid
         size: medium
         icon: rock1
-      - name: Larissa
+      - name:
+          source: canon
+          value: Larissa
         size: medium
         icon: rock2
-      - name: Galatea
+      - name:
+          source: canon
+          value: Galatea
         size: medium
         icon: rock5
-      - name: Despina
+      - name:
+          source: canon
+          value: Despina
         size: medium
         icon: rock7

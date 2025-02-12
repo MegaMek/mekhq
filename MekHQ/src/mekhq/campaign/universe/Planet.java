@@ -111,7 +111,7 @@ public class Planet {
 
     // Ecosphere
     @JsonProperty("lifeForm")
-    private LifeForm life;
+    private LifeForm lifeForm;
 
     // private List<String> garrisonUnits;
 
@@ -448,7 +448,7 @@ public class Planet {
     }
 
     public LifeForm getLifeForm(LocalDate when) {
-        return getEventData(when, null != life ? life : LifeForm.NONE, e -> e.lifeForm);
+        return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, e -> e.lifeForm);
     }
 
     public String getLifeFormName(LocalDate when) {

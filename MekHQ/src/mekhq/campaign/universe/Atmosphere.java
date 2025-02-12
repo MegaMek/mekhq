@@ -32,20 +32,6 @@ public enum Atmosphere {
     TOXICFLAME("Toxic (Flammable)"),
     BREATHABLE("Breathable");
 
-    // For old life form data
-    public static Atmosphere parseAtmosphere(String val) {
-        return switch (val.toLowerCase()) {
-            case "tainted (poisonous)" -> TAINTEDPOISON;
-            case "tainted (caustic)" -> TAINTEDCAUSTIC;
-            case "tainted (flammable)" -> TAINTEDFLAME;
-            case "toxic (poisonous)" -> TOXICPOISON;
-            case "toxic (caustic)" -> TOXICCAUSTIC;
-            case "toxic (flammable)" -> TOXICFLAME;
-            case "breathable" -> BREATHABLE;
-            default -> NONE;
-        };
-    }
-
     public final String name;
 
     Atmosphere(String name) {
@@ -90,27 +76,5 @@ public enum Atmosphere {
 
     public boolean isToxic() {
         return isToxicPoison() || isToxicCaustic() || isToxicFlame();
-    }
-
-
-    public static class AtmosphereDeserializer extends StdDeserializer<Atmosphere> {
-
-        public AtmosphereDeserializer() {
-            this(null);
-        }
-
-        public AtmosphereDeserializer(final Class<?> vc) {
-            super(vc);
-        }
-
-        @Override
-        public Atmosphere deserialize(final JsonParser jsonParser, final DeserializationContext context) {
-            try {
-                return Atmosphere.parseAtmosphere(jsonParser.getText());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
     }
 }
