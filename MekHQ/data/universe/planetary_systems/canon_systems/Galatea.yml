@@ -17,7 +17,8 @@ planet:
     icon: barren2
     pressure: STANDARD
     atmosphere: TOXICPOISON
-    composition: Carbon Dioxide, plus trace amounts of Water Vapor
+    composition:
+      value: Carbon Dioxide, plus trace amounts of Water Vapor
     gravity:
       value: 0.52
     diameter:
@@ -28,8 +29,10 @@ planet:
       value: 23
     yearLength:
       value: 1.1
-    temperature: 469
-    water: 0
+    temperature:
+      value: 469
+    water:
+      value: 0
     smallMoons:
       value: 2
   - name:
@@ -41,7 +44,8 @@ planet:
     icon: iceg10
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 0.68
     diameter:
@@ -74,7 +78,8 @@ planet:
     icon: rock16
     pressure: TRACE
     atmosphere: TOXICPOISON
-    composition: Ammonia, plus trace amounts of Methane
+    composition:
+      value: Ammonia, plus trace amounts of Methane
     gravity:
       value: 1.1
     diameter:
@@ -85,8 +90,10 @@ planet:
       value: 20
     yearLength:
       value: 1.7
-    temperature: 172
-    water: 0
+    temperature:
+      value: 172
+    water:
+      value: 0
   - name:
       value: Hashemi
     type: ICE_GIANT
@@ -96,7 +103,8 @@ planet:
     icon: iceg14
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 0.96
     diameter:
@@ -134,7 +142,8 @@ planet:
     icon: gasg15
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 2.11
     diameter:
@@ -159,7 +168,8 @@ planet:
     icon: green35
     pressure: STANDARD
     atmosphere: BREATHABLE
-    composition: Nitrogen and Oxygen, plus trace gases
+    composition:
+      value: Nitrogen and Oxygen, plus trace gases
     gravity:
       source: canon
       value: 1.0
@@ -171,8 +181,12 @@ planet:
       value: 23
     yearLength:
       value: 6.3
-    temperature: 55
-    water: 35
+    temperature:
+      source: canon
+      value: 55
+    water:
+      source: canon
+      value: 35
     lifeForm: MAMMAL
     desc: Galatea is an arid planet located just three jumps from Terra. It served
       as a major training location for the Star League Defense force and transitioned
@@ -452,7 +466,8 @@ planet:
     icon: frozen48
     pressure: STANDARD
     atmosphere: TOXICCAUSTIC
-    composition: Methane and Carbon Dioxide, plus trace amounts of Sulfur Dioxide
+    composition:
+      value: Methane and Carbon Dioxide, plus trace amounts of Sulfur Dioxide
     gravity:
       value: 0.87
     diameter:
@@ -463,8 +478,10 @@ planet:
       value: 19
     yearLength:
       value: 41.6
-    temperature: -125
-    water: 69
+    temperature:
+      value: -125
+    water:
+      value: 69
     landmass:
       - name: Taylor
       - name: Higashi
@@ -484,7 +501,8 @@ planet:
     icon: gasg24
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 2.05
     diameter:

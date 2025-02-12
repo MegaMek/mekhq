@@ -94,7 +94,7 @@ public class Planet {
 
     // Surface description
     @JsonProperty("water")
-    private Integer percentWater;
+    private SourceableValue<Integer> percentWater;
 
     @JsonProperty("landmass")
     private List<LandMass> landMasses;
@@ -106,9 +106,9 @@ public class Planet {
     @JsonProperty("atmosphere")
     private Atmosphere atmosphere;
     @JsonProperty("composition")
-    private String composition;
+    private SourceableValue<String> composition;
     @JsonProperty("temperature")
-    private Integer temperature;
+    private SourceableValue<Integer> temperature;
 
     // Ecosphere
     @JsonProperty("lifeForm")
@@ -489,10 +489,18 @@ public class Planet {
     }
 
     public Integer getPercentWater(LocalDate when) {
+        return (null == getSourcedPercentWater(when)) ? null : getSourcedPercentWater(when).getValue();
+    }
+
+    public SourceableValue<Integer> getSourcedPercentWater(LocalDate when) {
         return getEventData(when, percentWater, e -> e.percentWater);
     }
 
     public Integer getTemperature(LocalDate when) {
+        return (null == getSourcedTemperature(when)) ? null : getSourcedTemperature(when).getValue();
+    }
+
+    public SourceableValue<Integer> getSourcedTemperature(LocalDate when) {
         return getEventData(when, temperature, e -> e.temperature);
     }
 
@@ -513,6 +521,10 @@ public class Planet {
     }
 
     public String getComposition(LocalDate when) {
+        return (null == getSourcedComposition(when)) ? null : getSourcedComposition(when).getValue();
+    }
+
+    public SourceableValue<String> getSourcedComposition(LocalDate when) {
         return getEventData(when, composition, e -> e.composition);
     }
 
@@ -816,9 +828,9 @@ public class Planet {
         @JsonProperty("lifeForm")
         public LifeForm lifeForm;
         @JsonProperty("water")
-        public Integer percentWater;
+        public SourceableValue<Integer> percentWater;
         @JsonProperty("temperature")
-        public Integer temperature;
+        public SourceableValue<Integer> temperature;
         public SocioIndustrialData socioIndustrial;
         @JsonProperty("hpg")
         public HPGRating hpg;
@@ -829,7 +841,7 @@ public class Planet {
         @JsonProperty("atmosphere")
         private Atmosphere atmosphere;
         @JsonProperty("composition")
-        public String composition;
+        public SourceableValue<String> composition;
         @JsonProperty("population")
         public Long population;
         @JsonProperty("dayLength")

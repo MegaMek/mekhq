@@ -21,7 +21,8 @@ planet:
     icon: mercury
     pressure: TRACE
     atmosphere: TOXICPOISON
-    composition: Oxygen and Sodium, plus trace gases
+    composition:
+      value: Oxygen and Sodium, plus trace gases
     gravity:
       value: 0.38
     diameter:
@@ -32,8 +33,10 @@ planet:
       value: 1407
     yearLength:
       value: 0.24
-    temperature: 427
-    water: 0
+    temperature:
+      value: 427
+    water:
+      value: 0
   - name:
       value: Venus
     type: TERRESTRIAL
@@ -44,7 +47,8 @@ planet:
     icon: venus
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Carbon Dioxide and Nitrogen, plus trace gases
+    composition:
+      value: Carbon Dioxide and Nitrogen, plus trace gases
     gravity:
       value: 0.904
     diameter:
@@ -55,8 +59,10 @@ planet:
       value: 5832
     yearLength:
       value: 0.24
-    temperature: 460
-    water: 0
+    temperature:
+      value: 460
+    water:
+      value: 0
     desc: |-
       3028 - The terraforming of Venus began in the 2100s. In 2245, it was discovered that the chemicals that covered the planet's surface made excellent fertilizer. Agribusinesses set up farms using artificial soil and began producing enough food to feed Terra, Mars and Venus and a surplus for other struggling colonies.
 
@@ -76,8 +82,12 @@ planet:
           - TA
         population: 10072.0
         pressure: STANDARD
-        temperature: 40
-        water: 30
+        temperature:
+          source: canon
+          value: 40
+        water:
+          source: canon
+          value: 30
       - date: '2210-01-01'
         population: 19256.0
       - date: '2220-01-01'
@@ -242,7 +252,9 @@ planet:
         atmosphere: TOXICPOISON
         population: 148298.0
         pressure: VERY_HIGH
-        temperature: 250
+        temperature:
+          source: canon
+          value: 250
       - date: '2960-01-01'
         population: 101204.0
       - date: '2970-01-01'
@@ -275,7 +287,9 @@ planet:
     icon: earth
     pressure: STANDARD
     atmosphere: BREATHABLE
-    composition: Nitrogen and Oxygen, plus trace gases
+    composition:
+      source: canon
+      value: Nitrogen and Oxygen, plus trace gases
     gravity:
       source: canon
       value: 1.0
@@ -291,8 +305,12 @@ planet:
     yearLength:
       source: canon
       value: 1.0
-    temperature: 31
-    water: 71
+    temperature:
+      source: canon
+      value: 31
+    water:
+      source: canon
+      value: 71
     lifeForm: MAMMAL
     desc: |-
       The birthplace of humanity, Terra (or Earth), remains a leader in industry and technology over the rest of the Inner Sphere. Terra was the seat of power for the Terran Alliance and then later the Terran Hegemony and by extension the Star League.
@@ -603,7 +621,8 @@ planet:
     icon: mars
     pressure: TRACE
     atmosphere: TOXICPOISON
-    composition: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
+    composition:
+      value: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
     gravity:
       value: 0.38
     diameter:
@@ -614,8 +633,10 @@ planet:
       value: 24
     yearLength:
       value: 1.88
-    temperature: 12
-    water: 14
+    temperature:
+      value: 12
+    water:
+      value: 14
     desc: |-
       3028 - In 2017, Mars was the first planet explored by humankind and was colonised soon after. In 2110, humanity's first attempt at terraforming began on Mars with the seeding of the two polar icecaps with a genetically enhanced plant that eventually caused the ice to melt and evaporate into the atmosphere. Other areas of Mars were planted with other hardy plants to convert carbon dioxide to oxygen and capture the sun's radiant heat. Ice asteroids were crashed into Mars to provide additional water and the resultant deep impact craters became the sites of domed cities. By 2201, rebreathers were no longer required and the temperature was above freezing. Mining companies began to actively exploit the metal depoists and industry soon followed. By the creation of the Star League, Mars had a population of over one million people in 20 domed cities. In 2601, the War Academy of Mars was completed. The Academy consisted of a vast complex of buildings, spaceports, battlefields and barracks located ind a hugh canyon approximately 100 kilometres southeast of Olympus Mons.
 
@@ -633,7 +654,9 @@ planet:
           - TA
         population: 10282.0
         pressure: THIN
-        water: 39
+        water:
+          source: canon
+          value: 39
       - date: '2210-01-01'
         population: 21775.0
       - date: '2220-01-01'
@@ -863,7 +886,8 @@ planet:
     icon: asteroid1
     yearLength:
       value: 4.44
-    temperature: -91
+    temperature:
+      value: -91
   - name:
       source: canon
       value: Jupiter
@@ -875,7 +899,8 @@ planet:
     icon: jupiter
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 2.53
     diameter:
@@ -944,7 +969,8 @@ planet:
     icon: saturn
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 1.07
     diameter:
@@ -1037,7 +1063,8 @@ planet:
     icon: uranus
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 0.89
     diameter:
@@ -1093,7 +1120,8 @@ planet:
     icon: neptune
     pressure: VERY_HIGH
     atmosphere: TOXICPOISON
-    composition: Hydrogen and Helium, plus trace gases
+    composition:
+      value: Hydrogen and Helium, plus trace gases
     gravity:
       value: 1.14
     diameter:
