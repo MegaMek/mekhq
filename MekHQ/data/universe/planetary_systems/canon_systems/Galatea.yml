@@ -57,11 +57,13 @@ planet:
     satellite:
       - name:
           value: X-1
-        size: large
+        size:
+          value: large
         icon: rock6
       - name:
           value: X-2
-        size: large
+        size:
+          value: large
         icon: rock3
   - name:
       value: Damu
@@ -110,15 +112,18 @@ planet:
     satellite:
       - name:
           value: ZP1
-        size: large
+        size:
+          value: large
         icon: rock5
       - name:
           value: ZP2
-        size: large
+        size:
+          value: large
         icon: rock2
       - name:
           value: ZP3
-        size: large
+        size:
+          value: large
         icon: rock13
   - name:
       value: Alohi's Hold
@@ -182,7 +187,8 @@ planet:
     satellite:
       - name:
           value: Galatea Minor
-        size: large
+        size:
+          value: large
         icon: rock8
     event:
       - date: '2242-02-03'
@@ -496,17 +502,21 @@ planet:
     satellite:
       - name:
           value: Seirenes
-        size: medium
+        size:
+          value: medium
         icon: oddmoon2
       - name:
           value: Zeus
-        size: medium
+        size:
+          value: medium
         icon: rock11
       - name:
           value: Rhadamanthus
-        size: medium
+        size:
+          value: medium
         icon: rock16
       - name:
           value: Paieon
-        size: medium
+        size:
+          value: medium
         icon: oddmoon1

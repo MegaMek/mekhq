@@ -319,7 +319,9 @@ planet:
       - name:
           source: canon
           value: Luna (Luna City)
-        size: large
+        size:
+          source: canon
+          value: large
         icon: rock16
     event:
       - date: '2086-10-31'
@@ -892,37 +894,44 @@ planet:
       - name:
           source: canon
           value: Ganymede
-        size: large
+        size:
+          value: large
         icon: rock16
       - name:
           source: canon
           value: Callisto
-        size: large
+        size:
+          value: large
         icon: rock7
       - name:
           source: canon
           value: Io
-        size: large
+        size:
+          value: large
         icon: rock17
       - name:
           source: canon
           value: Europa
-        size: large
+        size:
+          value: large
         icon: rock2
       - name:
           source: canon
           value: Amalthea
-        size: medium
+        size:
+          value: medium
         icon: rock13
       - name:
           source: canon
           value: Himalia
-        size: medium
+        size:
+          value: medium
         icon: rock5
       - name:
           source: canon
           value: Thebe
-        size: medium
+        size:
+          value: medium
         icon: oddmoon2
   - name:
       source: canon
@@ -954,57 +963,68 @@ planet:
       - name:
           source: canon
           value: Titan
-        size: giant
+        size:
+          value: giant
         icon: rock17
       - name:
           source: canon
           value: Rhea
-        size: large
+        size:
+          value: large
         icon: rock15
       - name:
           source: canon
           value: Iapetus
-        size: large
+        size:
+          value: large
         icon: rock2
       - name:
           source: canon
           value: Dione
-        size: large
+        size:
+          value: large
         icon: rock1
       - name:
           source: canon
           value: Tethys
-        size: large
+        size:
+          value: large
         icon: rock11
       - name:
           source: canon
           value: Enceladus
-        size: large
+        size:
+          value: large
         icon: rock6
       - name:
           source: canon
           value: Mimas
-        size: medium
+        size:
+          value: medium
         icon: oddmoon2
       - name:
           source: canon
           value: Hyperion
-        size: medium
+        size:
+          value: medium
         icon: oddmoon3
       - name:
           source: canon
           value: Phoebe
-        size: medium
+        size:
+          value: medium
         icon: oddmoon1
       - name:
           source: canon
           value: Janus
-        size: medium
+        size:
+          value: medium
         icon: rock9
       - name:
           source: canon
           value: Epimetheus
-        size: medium
+        size:
+          value: medium
         icon: rock8
   - name:
       source: canon
@@ -1035,27 +1055,32 @@ planet:
       - name:
           source: canon
           value: Titania
-        size: large
+        size:
+          value: large
         icon: rock12
       - name:
           source: canon
           value: Oberon
-        size: large
+        size:
+          value: large
         icon: rock4
       - name:
           source: canon
           value: Umbriel
-        size: large
+        size:
+          value: large
         icon: rock17
       - name:
           source: canon
           value: Ariel
-        size: large
+        size:
+          value: large
         icon: rock11
       - name:
           source: canon
           value: Miranda
-        size: medium
+        size:
+          value: medium
         icon: rock3
   - name:
       source: canon
@@ -1086,30 +1111,36 @@ planet:
       - name:
           source: canon
           value: Triton
-        size: large
+        size:
+          value: large
         icon: rock3
       - name:
           source: canon
           value: Proteus
-        size: medium
+        size:
+          value: medium
         icon: rock6
       - name:
           source: canon
           value: Nereid
-        size: medium
+        size:
+          value: medium
         icon: rock1
       - name:
           source: canon
           value: Larissa
-        size: medium
+        size:
+          value: medium
         icon: rock2
       - name:
           source: canon
           value: Galatea
-        size: medium
+        size:
+          value: medium
         icon: rock5
       - name:
           source: canon
           value: Despina
-        size: medium
+        size:
+          value: medium
         icon: rock7

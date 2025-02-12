@@ -33,12 +33,12 @@ public class Satellite {
     @JsonProperty("name")
     private SourceableValue<String> name;
     @JsonProperty("size")
-    private String size;
+    private SourceableValue<String> size;
     @JsonProperty("icon")
     private String icon;
 
     public String getDescription() {
-        return name.getValue() + " (" + size + ")";
+        return name.getValue() + " (" + size.getValue() + ")";
     }
 
     public String getIcon() {
