@@ -179,10 +179,10 @@ public class SocioIndustrialData {
                 sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
                 break;
             case EquipmentType.RATING_D:
-                sb.append("D: Negligable industrial output<br>");
+                sb.append("D: Negligible industrial output<br>");
                 break;
             case EquipmentType.RATING_E:
-                sb.append("E: Negligable industrial output<br>");
+                sb.append("E: Negligible industrial output<br>");
                 break;
             case EquipmentType.RATING_F:
                 sb.append("F: None<br>"); // Good for Ferengi
