@@ -42,6 +42,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This will eventually replace the Planets object as our source of
@@ -313,6 +315,31 @@ public class Systems {
                 }
             }
 
+            File[] zipFiles = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".zip"));
+            for (File zipFile : zipFiles) {
+                try (ZipFile zip = new ZipFile(zipFile.getPath())) {
+                    Enumeration<? extends ZipEntry> entries = zip.entries();
+                    while (entries.hasMoreElements()) {
+                        ZipEntry entry = entries.nextElement();
+                        // Check if entry is a directory
+                        if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
+                            try (InputStream inputStream = zip.getInputStream(entry)) {
+                                loadPlanetarySystem(inputStream, mapper);
+                            } catch (Exception ex) {
+                                // Ignore this file then
+                                logger.error(
+                                    String.format("Exception trying to parse zip  entry %s - ignoring.", entry.getName()),
+                                    ex);
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    logger.error(
+                        String.format("Exception trying to read the zip file %s -ignoring.", zipFile.getName()),
+                        ex);
+                }
+            }
+
             // Get subdirectories too
             File[] dirs = dir.listFiles();
             if (null != dirs && dirs.length > 0) {
@@ -326,7 +353,7 @@ public class Systems {
         }
     }
 
-    private void loadPlanetarySystem(FileInputStream source, ObjectMapper mapper) throws IOException {
+    private void loadPlanetarySystem(InputStream source, ObjectMapper mapper) throws IOException {
 
         PlanetarySystem system = mapper.readValue(source, PlanetarySystem.class);
         systemList.put(system.getId(), system);
