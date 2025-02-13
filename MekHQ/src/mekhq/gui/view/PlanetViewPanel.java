@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -336,8 +336,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         gbcLabel.gridy = infoRow;
         panel.add(lblHiringHall, gbcLabel);
         JLabel textHiringHall = new JLabel(StringUtils.capitalize(
-            planet.getParentSystem()
-            .getHiringHallLevel(currentDate)
+            planet.getHiringHallLevel(currentDate)
             .name()
             .toLowerCase()));
         gbcText.gridy = infoRow;

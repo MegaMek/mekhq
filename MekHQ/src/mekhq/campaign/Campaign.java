@@ -151,7 +151,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
-import static java.lang.Math.round;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
@@ -312,7 +311,7 @@ public class Campaign implements ITechManager {
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
 
-     //options relating to parts in use and restock
+    //options relating to parts in use and restock
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
@@ -2229,14 +2228,56 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Provides a filtered list of personnel including only active Persons.
+     * Retrieves a list of all active personnel, including prisoners.
      *
-     * @return a {@link Person} <code>List</code> containing all active personnel
+     * <p>This method is deprecated and defaults to including prisoners in the result. Use
+     * {@link #getActivePersonnel(boolean)} instead for more explicit behavior control.</p>
+     *
+     * <p>This method was Deprecated during 50.04's dev cycle. In prior versions this method wasn't
+     * explicit in it's inclusion of prisoners in the return. I've opted to Deprecate this method
+     * as it is far better to be explicit in whether you want to include prisoners or not. This
+     * avoids a lot of potentially weird bugs.</p>
+     *
+     * @return A {@link List} of {@link Person} objects representing all active personnel,
+     * including prisoners.
+     * @deprecated Use {@link #getActivePersonnel(boolean)} to specify whether to include prisoners.
      */
+    @Deprecated
     public List<Person> getActivePersonnel() {
-        return getPersonnel().stream()
-                .filter(p -> p.getStatus().isActive())
-                .collect(Collectors.toList());
+        return getActivePersonnel(true);
+    }
+
+    /**
+     * Retrieves a list of active personnel in the campaign, optionally including prisoners.
+     *
+     * <p>This method iterates through all personnel and filters out inactive members. It then
+     * further filters prisoners based on the provided parameter:</p>
+     * <ul>
+     *   <li>If {@code includePrisoners} is {@code true}, all active personnel, including prisoners,
+     *   are included in the result.</li>
+     *   <li>If {@code includePrisoners} is {@code false}, only active personnel who are either
+     *   free or classified as bondsmen are included.</li>
+     * </ul>
+     *
+     * @param includePrisoners {@code true} to include all active prisoners in the result,
+     *                         {@code false} to exclude them unless they are free or bondsmen.
+     * @return A {@link List} of {@link Person} objects representing the filtered active personnel.
+     */
+    public List<Person> getActivePersonnel(boolean includePrisoners) {
+        List<Person> activePersonnel = new ArrayList<>();
+
+        for (Person person : getPersonnel()) {
+            if (!person.getStatus().isActive()) {
+                continue;
+            }
+
+            PrisonerStatus prisonerStatus = person.getPrisonerStatus();
+            if (includePrisoners || prisonerStatus.isFreeOrBondsman()) {
+                activePersonnel.add(person);
+            }
+        }
+
+        return activePersonnel;
     }
 
     /**
@@ -2625,7 +2666,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (entity != null) {
-                    if (isProhibitedUnitType(entity, false)) {
+                    if (isProhibitedUnitType(entity, false, false)) {
                         return;
                     }
                 }
@@ -4830,7 +4871,8 @@ public class Campaign implements ITechManager {
         }
 
         if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
-            processRandomDependents();
+            RandomDependents randomDependents = new RandomDependents(this);
+            randomDependents.processMonthlyRemovalAndAddition();
         }
 
         resetAstechMinutes();
@@ -4942,174 +4984,6 @@ public class Campaign implements ITechManager {
 
     public void setInitiativeMaxBonus(int bonus) {
         initiativeMaxBonus = bonus;
-    }
-
-    /**
-     * Processes the random addition and removal of dependents, adjusting the active dependents
-     * list based on campaign options, active personnel, and unit rating modifiers.
-     *
-     * <p>This method operates in the following steps:
-     * <ol>
-     *     <li>Filters active personnel into dependents and non-dependents. Dependents without a family
-     *     (i.e., an empty genealogy) are added to the list of active dependents, while eligible non-dependents
-     *     are counted to determine the dependent capacity.</li>
-     *     <li>Calculates the dependent capacity as 5% of active non-dependents, with a minimum
-     *     value of 1.</li>
-     *     <li>Randomly removes dependents from the active list based on campaign options and a roll
-     *     compared to the unit rating modifier.</li>
-     *     <li>Randomly adds new dependents, if allowed, ensuring the total number of dependents does not exceed
-     *     the dependent capacity. The addition is based on a roll relative to the unit rating modifier.</li>
-     * </ol>
-     *
-     * <p>The method ensures that the number of dependents is managed dynamically and reflects the
-     * current status of the campaign, its personnel, and relevant modifiers.
-     */
-    private void processRandomDependents() {
-        int activeNonDependents = 0;
-        List<Person> activeDependents = new ArrayList<>();
-
-        for (Person person : getActivePersonnel()) {
-            if (!person.getPrisonerStatus().isFreeOrBondsman()) {
-                continue;
-            }
-            if (person.isChild(currentDay)) {
-                continue;
-            }
-            if (person.isDependent()) {
-                if (person.getGenealogy().familyIsEmpty()) {
-                    activeDependents.add(person);
-                }
-                continue;
-            }
-
-            activeNonDependents++;
-        }
-
-        // Prepare the data
-        int dependentCapacity = max(1, (int) round(activeNonDependents * 0.05));
-        Collections.shuffle(activeDependents);
-
-        // roll for random removal
-        int dependentCount = dependentsRollForRemoval(activeDependents, dependentCapacity);
-
-        // then roll for random addition
-        dependentsAddNew(dependentCount, dependentCapacity);
-    }
-
-    /**
-     * Randomly removes dependents from the given list if the campaign options allow random
-     * dependent removal.
-     *
-     * @param dependents The list of dependents.
-     * @param dependentCapacity The maximum number of dependents allowed.
-     * @return The updated number of dependents.
-     */
-    int dependentsRollForRemoval(List<Person> dependents, int dependentCapacity) {
-        List<Person> dependentsToRemove = new ArrayList<>();
-
-        if (getCampaignOptions().isUseRandomDependentRemoval()) {
-            for (Person dependent : dependents) {
-                if (!isRemovalEligible(dependent, currentDay)) {
-                    continue;
-                }
-
-                int roll = Compute.randomInt(100);
-
-                if (dependents.size() > dependentCapacity) {
-                    roll = getLowerRandomInt(roll);
-                }
-
-                int targetNumber = 5 - getAtBUnitRatingMod();
-
-                if (roll <= targetNumber) {
-                    dependentsToRemove.add(dependent);
-
-                    Genealogy genealogy = dependent.getGenealogy();
-                    for (Person child : genealogy.getChildren()) {
-                        if (child.isChild(currentDay)) {
-                            dependentsToRemove.add(child);
-                        }
-                    }
-
-                    Person spouse = genealogy.getSpouse();
-                    if (spouse.isDependent()) {
-                        dependentsToRemove.add(spouse);
-                    }
-                }
-            }
-
-            if (!dependentsToRemove.isEmpty()) {
-                String pluralizer = dependentsToRemove.size() == 1
-                    ? resources.getString("dependentLeavesForce.dependent.singular")
-                    : resources.getString("dependentLeavesForce.dependent.plural");
-
-                addReport(String.format(resources.getString("dependentLeavesForce.text"),
-                    dependentsToRemove.size(), pluralizer));
-            }
-
-            for (Person dependent : dependentsToRemove) {
-                dependent.changeStatus(this, currentDay, PersonnelStatus.LEFT);
-            }
-        }
-
-        return dependents.size();
-    }
-
-    /**
-     * @return The lower integer value between the given input and the randomly generated integer.
-     *
-     * @param firstRoll The input integer to compare with the randomly generated integer.
-     */
-    private int getLowerRandomInt(int firstRoll) {
-        int secondRoll = Compute.randomInt(100);
-        return Math.min(firstRoll, secondRoll);
-    }
-
-    /**
-     * Checks if a dependent is eligible for removal.
-     *
-     * @param dependent the person to check
-     * @param currentDate the current date
-     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
-     */
-    boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
-        boolean hasNonAdultChildren = dependent.getGenealogy().hasNonAdultChildren(currentDate);
-        boolean hasSpouse = dependent.getGenealogy().hasSpouse();
-        boolean isChild = dependent.isChild(currentDate);
-
-        return !hasNonAdultChildren && !hasSpouse && !isChild;
-    }
-
-    /**
-     * Randomly adds new dependents to the campaign.
-     *
-     * @param dependentCount the current number of dependents
-     * @param dependentCapacity the maximum capacity for dependents
-     */
-    void dependentsAddNew(int dependentCount, int dependentCapacity) {
-        if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
-            int availableCapacity = dependentCapacity - dependentCount;
-            int rollCount = (int) max(1, availableCapacity * 0.2);
-
-            for (int i = 0; i < rollCount; i++) {
-                int roll = Compute.randomInt(100);
-
-                if (dependentCount < (dependentCapacity / 2)) {
-                    roll = getLowerRandomInt(roll);
-                }
-
-                if (roll <= (getAtBUnitRatingMod() * 2)) {
-                    final Person dependent = newDependent(Gender.RANDOMIZE);
-
-                    recruitPerson(dependent, PrisonerStatus.FREE, true, false);
-
-                    addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                            dependent.getHyperlinkedFullTitle()));
-
-                    dependentCount++;
-                }
-            }
-        }
     }
 
     /**

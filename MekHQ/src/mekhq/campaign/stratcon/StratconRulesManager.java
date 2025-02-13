@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1224,7 +1224,7 @@ public class StratconRulesManager {
             StratconCampaignState campaignState, boolean isStartOfMonth) {
         for (StratconFacility facility : track.getFacilities().values()) {
             if (isStartOfMonth) {
-                campaignState.addSupportPoints(facility.getMonthlySPModifier());
+                campaignState.changeSupportPoints(facility.getMonthlySPModifier());
             }
         }
     }
@@ -1368,7 +1368,7 @@ public class StratconRulesManager {
     private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);

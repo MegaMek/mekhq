@@ -213,7 +213,7 @@ public class DialogContractStart extends JDialog {
 
                     if (unit.isDamaged()
                         || !unit.isFullyCrewed()
-                        || isProhibitedUnitType(entity, true)) {
+                        || isProhibitedUnitType(entity, true, true)) {
                         continue;
                     }
 

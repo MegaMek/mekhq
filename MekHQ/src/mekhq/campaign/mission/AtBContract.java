@@ -1025,7 +1025,7 @@ public class AtBContract extends Contract {
 
                                 if (campaignState != null) {
                                     text += ": -1 Support Point";
-                                    campaignState.addSupportPoints(-1);
+                                    campaignState.changeSupportPoints(-1);
                                 }
                             }
                             break;

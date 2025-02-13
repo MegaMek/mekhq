@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -734,8 +734,7 @@ public class InterstellarMapPanel extends JPanel {
                                             360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                         g2.fill(arc);
                                     } else {
-                                        if (campaign.getCampaignOptions().isUseAtB()
-                                            && (system.getHiringHallLevel(campaign.getLocalDate()) == HiringHallLevel.GREAT)) {
+                                        if (system.getHiringHallLevel(campaign.getLocalDate()) == HiringHallLevel.GREAT) {
                                             g2.setPaint(new Color(176, 196, 222));
                                             arc.setArcByCenter(x, y, size + 5, 0,
                                                 360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
