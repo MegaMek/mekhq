@@ -1149,6 +1149,9 @@ public class Utilities {
 
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found.
+     * This was originally used to read in the planetary system data, but we are now doing that
+     * with YML code in Systems.java#loadDefault. Leaving this here, in case it is useful for
+     * something in the future.
      */
     public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         if ((null == dirName) || (null == parser)) {

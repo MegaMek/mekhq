@@ -18,8 +18,12 @@
  */
 package mekhq.campaign.universe.enums;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import io.sentry.Sentry;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Atmosphere;
 
 /**
  * The level of a Hiring Hall as defined in CamOps (4th printing). Used to determine various modifiers
@@ -34,20 +38,9 @@ public enum HiringHallLevel {
 
     private static final MMLogger logger = MMLogger.create(HiringHallLevel.class);
 
-    public static HiringHallLevel parseHiringHallLevel(String val) {
-        try {
-            return HiringHallLevel.valueOf(val.toUpperCase());
-        } catch (Exception ex) {
-            Sentry.captureException(ex);
-            logger.error("Couldn't find a hiring hall level matching " + val.toUpperCase(), ex);
-            return NONE;
-        }
-    }
-
     public boolean isNone() {
         return this == NONE;
     }
-
 }
 
 
