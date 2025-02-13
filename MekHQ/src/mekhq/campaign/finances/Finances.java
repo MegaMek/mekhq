@@ -69,6 +69,9 @@ public class Finances {
     private int failedCollateral;
     private LocalDate wentIntoDebt;
 
+    private Money balance;
+    private int transactionSize = -2;
+
     public Finances() {
         transactions = new ArrayList<>();
         loans = new ArrayList<>();
@@ -127,8 +130,15 @@ public class Finances {
     }
 
     public Money getBalance() {
-        Money balance = Money.zero();
-        return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+        if (transactions.size() == transactionSize && balance != null) {
+            return balance;
+        }
+
+        Money newBalance = Money.zero();
+        balance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+        transactionSize = transactions.size();
+
+        return newBalance;
     }
 
     public Money getLoanBalance() {
