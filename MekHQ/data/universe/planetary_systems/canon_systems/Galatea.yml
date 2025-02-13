@@ -220,8 +220,12 @@ planet:
       destruction of the facilities on Outreach. The primary spaceport, Galaport,
       is located just northwest of the planet's capital Galatean City.
     landmass:
-      - name: Lubbucks
-        capital: Galatean City
+      - name:
+          source: canon
+          value: Lubbucks
+        capital:
+          source: canon
+          value: Galatean City
     satellite:
       - name:
           value: Galatea Minor
@@ -650,15 +654,24 @@ planet:
     water:
       value: 69
     landmass:
-      - name: Taylor
-      - name: Higashi
-      - name: Chow's Frontier
-      - name: Barke
-      - name: Nethersole
-      - name: Nikkola
-      - name: Sorsa
-      - name: White
-      - name: Boehm's Stand
+      - name:
+          value: Taylor
+      - name:
+          value: Higashi
+      - name:
+          value: Chow's Frontier
+      - name:
+          value: Barke
+      - name:
+          value: Nethersole
+      - name:
+          value: Nikkola
+      - name:
+          value: Sorsa
+      - name:
+          value: White
+      - name:
+          value: Boehm's Stand
   - name:
       value: Biddick
     type:

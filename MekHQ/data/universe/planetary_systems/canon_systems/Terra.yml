@@ -81,8 +81,9 @@ planet:
 
             Since the fall of the Star League, Venus has slowly reverted to its normal environmental conditions. Only three inhabited cities, Aphros, Kilic and Genny remained in XXX and the entire planet was uninhabitable by the close of the 31st century.
     landmass:
-      - name: .na.character
-        capital: Aphros
+      - capital:
+          source: canon
+          value: Aphros
     event:
       - date: '2205-04-16'
         atmosphere:
@@ -448,14 +449,30 @@ planet:
 
       In addition to Terra herself, colonies exist on the Terran lunar surface, and the fourth planet in the system, Mars. At the peak of the Star League, settlements also existed on Venus, the second world, and a major shipyard was placed orbiting Titan, a moon of the gas giant Saturn, but both of these worlds are once more void of human habitation. Venus gradually reverted to its hellish environment after the fall of the League, becoming totally uninhabitable once again by the close of the thirty-first century, and the Titan shipyards were destroyed during the Jihad. The capital cities of Luna and Mars are Luna City and Koryo, respectively, though Koryo was heavily damaged in the final days of the Word of Blake‘s reign.
     landmass:
-      - name: Asia
-      - name: Africa
-      - name: Antarctica
-      - name: Australia
-      - name: Europe
-        capital: Geneva
-      - name: North America
-      - name: South America
+      - name:
+          source: canon
+          value: Asia
+      - name:
+          source: canon
+          value: Africa
+      - name:
+          source: canon
+          value: Antarctica
+      - name:
+          source: canon
+          value: Australia
+      - name:
+          source: canon
+          value: Europe
+        capital:
+          source: canon
+          value: Geneva
+      - name:
+          source: canon
+          value: North America
+      - name:
+          source: canon
+          value: South America
     satellite:
       - name:
           source: canon
@@ -915,8 +932,9 @@ planet:
       source: canon
       value: 2
     landmass:
-      - name: .na.character
-        capital: Koryo
+      - capital:
+          source: canon
+          value: Koryo
     event:
       - date: '2201-10-11'
         atmosphere:

@@ -31,11 +31,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LandMass {
 
     @JsonProperty("name")
-    private String name;
+    private SourceableValue<String> name;
     @JsonProperty("capital")
-    private String capital;
+    private SourceableValue<String> capital;
 
     public String getDescription() {
-        return (null == capital) ? name : name + " (" + capital + ")";
+        if(null != capital && null != name) {
+            return name.getValue() + " (" + capital.getValue() + ")";
+        } else if (null == name && null != capital) {
+            return "(" + capital.getValue() + ")";
+        } else if (null != name && null == capital) {
+            return name.getValue();
+        } else {
+            return "Unknown";
+        }
     }
 }
