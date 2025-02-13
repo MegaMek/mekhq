@@ -144,9 +144,9 @@ public class Finances {
 
         // This is the expensive calculation
         newBalance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
-        balance = Money.zero();
 
         // Update our cached balance & note the transactions size.
+        balance = Money.zero();
         balance = balance.plus(newBalance);
         transactionSize = transactions.size();
 
