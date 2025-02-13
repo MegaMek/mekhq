@@ -326,67 +326,6 @@ public final class StarUtil {
         return 0.0;
     }
 
-
-    public static String getPopulationRatingString(int pops) {
-        if (pops < 0) {
-            return "None";
-        }
-        switch (pops) {
-            case 0:
-                return "Few";
-            case 1:
-                return "Tens";
-            case 2:
-                return "Hundreds";
-            case 3:
-                return "Thousands";
-            case 4:
-                return "Tens of thousands";
-            case 5:
-                return "Hundreds of thousands";
-            case 6:
-                return "Millions";
-            case 7:
-                return "Tens of millions";
-            case 8:
-                return "Hundreds of millions";
-            case 9:
-                return "Billions";
-            case 10:
-                return "Tens of billions";
-            case 11:
-                return "Hundreds of billions";
-            case 12:
-                return "Trillions";
-            default:
-                return "Uncountable";
-        }
-    }
-
-    public static String getControlRatingString(int cr) {
-        if (cr < 0) {
-            return "in total anarchy";
-        }
-        switch (cr) {
-            case 0:
-                return "in anarchy";
-            case 1:
-                return "very free society";
-            case 2:
-                return "free society";
-            case 3:
-                return "moderately free society";
-            case 4:
-                return "controlled society";
-            case 5:
-                return "repressive";
-            case 6:
-                return "under total control";
-            default:
-                return "enslaved population";
-        }
-    }
-
     public static String getIconImage(Planet planet) {
         if (!planetIconDataLoaded) {
             try (FileReader fr = new FileReader(new File("data", PLANET_ICON_DATA_FILE));
