@@ -236,7 +236,8 @@ public class Systems {
 
     /**
      * Loads the default planetary system data. This includes all *.yml files in
-     * data/universe/planetary_systems and subfolders.
+     * data/universe/planetary_systems and subfolders. It also loads a player's
+     * custom planets in their custom user directory, if it exists.
      *
      * @throws DOMException
      * @throws IOException
@@ -291,8 +292,8 @@ public class Systems {
     /**
      * loop through all files in the directory and subdirectories and load any
      * *.yml files found.
-     * @param dirName
-     * @param mapper
+     * @param dirName the name of the directory from which to load files
+     * @param mapper the Jackson mapper used to load the data from yaml
      */
     private void parsePlanetarySystemFiles(String dirName, ObjectMapper mapper) {
         if ((null == dirName)) {

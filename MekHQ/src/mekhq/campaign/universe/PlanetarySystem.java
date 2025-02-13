@@ -506,6 +506,7 @@ public class PlanetarySystem {
         return academyString.toString();
     }
 
+    /** This class allows for some additional code on a planetary system after it is loaded by Jackson **/
     public static class PlanetarySystemPostLoader extends StdConverter<PlanetarySystem, PlanetarySystem> {
 
         @Override

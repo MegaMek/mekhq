@@ -954,6 +954,7 @@ public class Planet {
         T get(PlanetaryEvent e);
     }
 
+    /** This class is used to do some additional work after a planet file is loaded with Jackson **/
     public static class PlanetPostLoader extends StdConverter<Planet, Planet> {
 
 

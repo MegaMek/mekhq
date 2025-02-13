@@ -219,6 +219,10 @@ public class SocioIndustrialData {
         return sb.append("</html>").toString();
     }
 
+    /**
+     * This class is used to deserialize the SICs codes (e.g. "D-C-B-A-D") from a String into
+     * a SocioIndustrialData object.
+     */
     public static class SocioIndustrialDataDeserializer extends StdDeserializer<SocioIndustrialData> {
 
         public SocioIndustrialDataDeserializer() {
