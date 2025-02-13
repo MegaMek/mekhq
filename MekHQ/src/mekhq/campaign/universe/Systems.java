@@ -267,6 +267,7 @@ public class Systems {
         // add custom deserializer for socioIndustrialData
         SimpleModule module = new SimpleModule();
         module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
+        module.addDeserializer(StarType.class, new StarType.StarTypeDeserializer());
         mapper.registerModule(module);
         // this will allow the mapper to deserialize LocalDate objects
         mapper.registerModule(new JavaTimeModule());

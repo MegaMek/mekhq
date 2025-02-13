@@ -54,45 +54,6 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonDeserialize(converter= PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
-    // Star classification data and methods
-    public static final int SPECTRAL_O = 0;
-    public static final int SPECTRAL_B = 1;
-    public static final int SPECTRAL_A = 2;
-    public static final int SPECTRAL_F = 3;
-    public static final int SPECTRAL_G = 4;
-    public static final int SPECTRAL_K = 5;
-    public static final int SPECTRAL_M = 6;
-    public static final int SPECTRAL_L = 7;
-    public static final int SPECTRAL_T = 8;
-    public static final int SPECTRAL_Y = 9;
-    // Spectral class "D" (white dwarfs) are determined by their luminosity "VII" -
-    // the number is here for sorting
-    public static final int SPECTRAL_D = 99;
-    // "Q" - not a proper star (neutron stars QN, pulsars QP, black holes QB, ...)
-    public static final int SPECTRAL_Q = 100;
-    // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"),
-
-    public static final String LUM_0 = "0";
-    public static final String LUM_IA = "Ia";
-    public static final String LUM_IAB = "Iab";
-    public static final String LUM_IB = "Ib";
-    // Generic class, consisting of Ia, Iab and Ib
-    public static final String LUM_I = "I";
-    public static final String LUM_II_EVOLVED = "I/II";
-    public static final String LUM_II = "II";
-    public static final String LUM_III_EVOLVED = "II/III";
-    public static final String LUM_III = "III";
-    public static final String LUM_IV_EVOLVED = "III/IV";
-    public static final String LUM_IV = "IV";
-    public static final String LUM_V_EVOLVED = "IV/V";
-    public static final String LUM_V = "V";
-    // typically used as a prefix "sd", not as a suffix
-    public static final String LUM_VI = "VI";
-    // typically used as a prefix "esd", not as a suffix
-    public static final String LUM_VI_PLUS = "VI+";
-    // always used as class designation "D", never as a suffix
-    public static final String LUM_VII = "VII";
-
     @JsonProperty("xcood")
     private Double x;
     @JsonProperty("ycood")
@@ -105,10 +66,7 @@ public class PlanetarySystem {
 
     // Star data (to be factored out)
     @JsonProperty("spectralType")
-    private String spectralType;
-    private Integer spectralClass;
-    private Double subtype;
-    private String luminosity;
+    private StarType spectralType;
 
     // tree map of planets sorted by system position
     private TreeMap<Integer, Planet> planets;
@@ -336,11 +294,11 @@ public class PlanetarySystem {
      * efficiency)
      */
     public double getSolarRechargeTime() {
-        if ((null == spectralClass) || (null == subtype)) {
+        if (null == spectralType) {
             // 176 is the average recharge time across all spectral classes and subtypes
             return 176;
         }
-        return StarUtil.getSolarRechargeTime(spectralClass, subtype);
+        return spectralType.getSolarRechargeTime();
     }
 
     public String getRechargeTimeText(LocalDate when) {
@@ -353,11 +311,11 @@ public class PlanetarySystem {
     }
 
     public double getStarDistanceToJumpPoint() {
-        if ((null == spectralClass) || (null == subtype)) {
+        if (null == spectralType) {
             // 40 is close to the midpoint value across all star types
             return StarUtil.getDistanceToJumpPoint(40);
         }
-        return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
+        return spectralType.getDistanceToJumpPoint();
     }
 
     /**
@@ -376,46 +334,8 @@ public class PlanetarySystem {
         return planets.get(sysPos).getTimeToJumpPoint(acceleration);
     }
 
-    public String getSpectralType() {
+    public StarType getSpectralType() {
         return spectralType;
-    }
-
-    /**
-     * @return normalized spectral type, for display
-     */
-    public String getSpectralTypeNormalized() {
-        return null != spectralType ? StarUtil.getSpectralType(spectralClass, subtype, luminosity) : "?";
-    }
-
-    public String getSpectralTypeText() {
-        if ((null == spectralType) || spectralType.isEmpty()) {
-            return "unknown";
-        }
-        if (spectralType.startsWith("Q")) {
-            return switch (spectralType) {
-                case "QB" -> "black hole";
-                case "QN" -> "neutron star";
-                case "QP" -> "pulsar";
-                default -> "unknown";
-            };
-        }
-        return spectralType;
-    }
-
-    public Integer getSpectralClass() {
-        return spectralClass;
-    }
-
-    public void setSpectralClass(Integer spectralClass) {
-        this.spectralClass = spectralClass;
-    }
-
-    public Double getSubtype() {
-        return subtype;
-    }
-
-    public void setSubtype(double subtype) {
-        this.subtype = subtype;
     }
 
     /**
@@ -454,15 +374,7 @@ public class PlanetarySystem {
     }
 
     public String getIcon() {
-        return switch (getSpectralClass()) {
-            case SPECTRAL_B -> "B_" + luminosity;
-            case SPECTRAL_A -> "A_" + luminosity;
-            case SPECTRAL_F -> "F_" + luminosity;
-            case SPECTRAL_G -> "G_" + luminosity;
-            case SPECTRAL_K -> "K_" + luminosity;
-            case SPECTRAL_M -> "M_" + luminosity;
-            default -> "default";
-        };
+        return spectralType.getIcon();
     }
 
     @Override
@@ -508,35 +420,6 @@ public class PlanetarySystem {
             return null;
         }
         return new ArrayList<>(events.values());
-    }
-
-    /** Includes a parser for spectral type strings */
-    protected void setSpectralType(String type) {
-        SpectralDefinition scDef = StarUtil.parseSpectralType(type);
-
-        if (null == scDef) {
-            return;
-        }
-
-        spectralType = scDef.spectralType;
-        spectralClass = scDef.spectralClass;
-        subtype = scDef.subtype;
-        luminosity = scDef.luminosity;
-    }
-
-    /** Data class to hold parsed spectral definitions */
-    public static final class SpectralDefinition {
-        public String spectralType;
-        public int spectralClass;
-        public double subtype;
-        public String luminosity;
-
-        public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
-            this.spectralType = Objects.requireNonNull(spectralType);
-            this.spectralClass = spectralClass;
-            this.subtype = subtype;
-            this.luminosity = Objects.requireNonNull(luminosity);
-        }
     }
 
     private interface EventGetter<T> {
@@ -629,12 +512,6 @@ public class PlanetarySystem {
         public PlanetarySystem convert(PlanetarySystem ps) {
             if (null == ps.id) {
                 ps.id = ps.name;
-            }
-
-            // Spectral classification: use spectralType if available, else the separate
-            // values
-            if (null != ps.spectralType) {
-                ps.setSpectralType(ps.spectralType);
             }
 
             // fill up planets
