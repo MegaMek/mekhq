@@ -341,6 +341,13 @@ public class Systems {
                 toRemove.add(system);
                 continue;
             }
+
+            if(null == system.getStar()) {
+                logger.error(String.format("System \"%s\" is missing a star", system.getId()));
+                toRemove.add(system);
+                continue;
+            }
+
             // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
                 logger.error(String

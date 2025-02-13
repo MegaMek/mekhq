@@ -66,7 +66,7 @@ public class PlanetarySystem {
 
     // Star data (to be factored out)
     @JsonProperty("spectralType")
-    private StarType spectralType;
+    private SourceableValue<StarType> star;
 
     // tree map of planets sorted by system position
     private TreeMap<Integer, Planet> planets;
@@ -294,11 +294,7 @@ public class PlanetarySystem {
      * efficiency)
      */
     public double getSolarRechargeTime() {
-        if (null == spectralType) {
-            // 176 is the average recharge time across all spectral classes and subtypes
-            return 176;
-        }
-        return spectralType.getSolarRechargeTime();
+        return getStar().getSolarRechargeTime();
     }
 
     public String getRechargeTimeText(LocalDate when) {
@@ -311,11 +307,11 @@ public class PlanetarySystem {
     }
 
     public double getStarDistanceToJumpPoint() {
-        if (null == spectralType) {
+        if (null == star) {
             // 40 is close to the midpoint value across all star types
             return StarUtil.getDistanceToJumpPoint(40);
         }
-        return spectralType.getDistanceToJumpPoint();
+        return getStar().getDistanceToJumpPoint();
     }
 
     /**
@@ -334,8 +330,12 @@ public class PlanetarySystem {
         return planets.get(sysPos).getTimeToJumpPoint(acceleration);
     }
 
-    public StarType getSpectralType() {
-        return spectralType;
+    public StarType getStar() {
+        return getSourcedStar().getValue();
+    }
+
+    public SourceableValue<StarType> getSourcedStar() {
+        return star;
     }
 
     /**
@@ -374,7 +374,7 @@ public class PlanetarySystem {
     }
 
     public String getIcon() {
-        return spectralType.getIcon();
+        return getStar().getIcon();
     }
 
     @Override

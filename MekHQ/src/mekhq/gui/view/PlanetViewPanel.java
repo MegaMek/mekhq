@@ -432,7 +432,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblStarType, gbcLabel);
-        JLabel txtStarType = new JLabel(system.getSpectralType().toString() + " (" + system.getRechargeTimeText(currentDate) + ')');
+        JLabel txtStarType = new JLabel(system.getStar().toString() + " (" + system.getRechargeTimeText(currentDate) + ')');
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);
         ++ infoRow;

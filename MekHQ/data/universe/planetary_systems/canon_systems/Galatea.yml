@@ -2,7 +2,9 @@ id: Galatea
 sucsId: 917
 xcood: -53.775
 ycood: 34.077
-spectralType: F8II
+spectralType:
+  source: canon
+  value: F8II
 primarySlot: 6
 event:
   - date: '2376-02-25'

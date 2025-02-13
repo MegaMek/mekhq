@@ -2,7 +2,9 @@ id: Terra
 sucsId: 2370
 xcood: 0.0
 ycood: 0.0
-spectralType: G2V
+spectralType:
+  source: canon
+  value: G2V
 primarySlot: 3
 event:
   - date: '2367-11-21'
