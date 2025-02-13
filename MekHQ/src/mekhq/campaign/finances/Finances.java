@@ -129,13 +129,25 @@ public class Finances {
         this.wentIntoDebt = wentIntoDebt;
     }
 
+    /**
+     * Current campaign balance. Cached using the current transaction count.
+     * @see #clearBalanceCache()
+     * @return current balance (Money)
+     */
     public Money getBalance() {
+        Money newBalance = Money.zero();
+
+        // If our # of transactions matches what we expect, and the balance isn't null, we should return the cached balance:
         if (transactions.size() == transactionSize && balance != null) {
-            return balance;
+            return newBalance.plus(balance);
         }
 
-        Money newBalance = Money.zero();
-        balance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+        // This is the expensive calculation
+        newBalance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+        balance = Money.zero();
+
+        // Update our cached balance & note the transactions size.
+        balance = balance.plus(newBalance);
         transactionSize = transactions.size();
 
         return newBalance;
