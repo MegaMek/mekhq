@@ -28,6 +28,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.HPGRating;
@@ -243,7 +244,7 @@ public class Systems {
         logger.info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
-        Systems systems = load("data/universe/planetary_systems");
+        Systems systems = load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
 
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
