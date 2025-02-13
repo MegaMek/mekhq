@@ -363,6 +363,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlUnitStatus.add(new JLabel(resourceMap.getString("totaled")), gridBagConstraints);
 
+        boolean possibleReinforcment = (tracker.getScenario().getLinkedScenario() != 0);
+        if(possibleReinforcment){
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        String linkedScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario()).getName();
+        pnlUnitStatus.add(new JLabel( "<html><center>Continue to</center></br><b>"+ linkedScenario+"</b></html>"), gridBagConstraints);
+        }
+
+
+
         chksTotaled = new ArrayList<>();
         ustatuses = new ArrayList<>();
         btnsEditUnit = new ArrayList<>();
@@ -377,9 +390,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         int gridy = 2;
         int unitIndex = 0;
-
-        boolean possibleReinforcment = (tracker.getScenario().getLinkedScenario() != 0);
-  
 
         for (Unit unit : tracker.getUnits()) {
             UnitStatus status = tracker.getUnitsStatus().get(unit.getId());
@@ -408,7 +418,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnsEditUnit.add(btnEditUnit);
 
           
-            chkReinforced = new JCheckBox("Send Reinforcement");
+            chkReinforced = new JCheckBox("");
             chkReinforced.setVisible(possibleReinforcment);
             chkReinforced.setEnabled(!status.isTotalLoss() && unit.isFunctional());
             chkReinforced.setName(Integer.toString(unitIndex));
@@ -433,7 +443,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlUnitStatus.add(btnViewUnit, gridBagConstraints);
             gridBagConstraints.gridx = 3;
             pnlUnitStatus.add(btnEditUnit, gridBagConstraints);
-            gridBagConstraints.gridx = 4;
+            gridBagConstraints.gridx  = 4;
+            gridBagConstraints.anchor = GridBagConstraints.NORTH;
             pnlUnitStatus.add(chkReinforced, gridBagConstraints);
             gridy++;
             unitIndex++;
