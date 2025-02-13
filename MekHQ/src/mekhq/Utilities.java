@@ -1143,20 +1143,23 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      * Don't recurse.
      */
-    public static void parseYMLFiles(String dirName, Consumer<FileInputStream> parser) {
-        parseYMLFiles(dirName, parser, false);
+    public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser) {
+        parseXMLFiles(dirName, parser, false);
     }
 
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found.
+     * This was originally used to read in the planetary system data, but we are now doing that
+     * with YML code in Systems.java#loadDefault. Leaving this here, in case it is useful for
+     * something in the future.
      */
-    public static void parseYMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
+    public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         if ((null == dirName) || (null == parser)) {
             throw new NullPointerException();
         }
         File dir = new File(dirName);
         if (dir.isDirectory()) {
-            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
+            File[] files = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".xml"));
             if ((null != files) && (files.length > 0)) {
                 // Case-insensitive sorting. Yes, even on Windows. Deal with it.
                 Arrays.sort(files, Comparator.comparing(File::getPath));
@@ -1186,7 +1189,7 @@ public class Utilities {
                 Arrays.sort(dirs, Comparator.comparing(File::getPath));
                 for (File subDirectory : dirs) {
                     if (subDirectory.isDirectory()) {
-                        parseYMLFiles(subDirectory.getPath(), parser, true);
+                        parseXMLFiles(subDirectory.getPath(), parser, true);
                     }
                 }
             }
