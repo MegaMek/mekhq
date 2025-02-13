@@ -149,7 +149,6 @@ public class StarType {
 
         // We make sure to not rewrite the subtype, in case we need whatever special
         // part is behind it
-        String parsedSpectralType = type;
         Integer parsedSpectralClass = null;
         Double parsedSubtype = null;
         String parsedLuminosity = null;
