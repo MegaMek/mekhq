@@ -130,8 +130,9 @@ public class Finances {
     }
 
     /**
-     * Current campaign balance. Cached using the current transaction count.
-     * @see #clearBalanceCache()
+     * Current campaign balance. Will calculate the current campaign balance
+     * based on the campaign's transactions. Cached using the current transaction count.
+     * @see #clearCachedBalance()
      * @return current balance (Money)
      */
     public Money getBalance() {
@@ -142,7 +143,7 @@ public class Finances {
             return newBalance.plus(balance);
         }
 
-        // This is the expensive calculation
+        // Recalculate the current balance
         newBalance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
 
         // Update our cached balance & note the transactions size.
@@ -153,7 +154,13 @@ public class Finances {
         return newBalance;
     }
 
-    public void clearBalanceCache() {
+    /**
+     * Next time getBalance() is called force it to recalculate the current balance
+     * Should be called if transactions are modified or deleted. Should not be needed
+     * when adding new transactions - the balance should automatically recalculate.
+     * @see #getBalance()
+     */
+    public void clearCachedBalance() {
         transactionSize = -1;
     }
 
@@ -272,7 +279,7 @@ public class Finances {
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
-        clearBalanceCache();
+        clearCachedBalance();
 
         credit(
                 TransactionType.FINANCIAL_TERM_END_CARRYOVER,
