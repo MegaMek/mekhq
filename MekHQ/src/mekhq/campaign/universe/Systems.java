@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import megamek.common.EquipmentType;
+import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.Utilities;
@@ -244,11 +245,21 @@ public class Systems {
         logger.info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
-        Systems systems = load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
+        Systems systems = new Systems();
 
+        // load default systems
+        systems.load(MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH);
+
+        // load user directory systems
+        String userDir = PreferenceManager.getClientPreferences().getUserDir();
+        systems.load(new File(userDir, MHQConstants.PLANETARY_SYSTEM_DIRECTORY_PATH).toString());
+
+        // a bit of post loading clean up
+        systems.cleanupSystems();
+
+        // logging
         logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
-
         systems.logVeryCloseSystems();
 
         return systems;
@@ -262,12 +273,10 @@ public class Systems {
      * @throws DOMException
      * @throws IOException
      */
-    public static Systems load(String planetsPath) throws DOMException, IOException {
-        Systems systems = new Systems();
-
-        //Step 1: set up mapper
+    public void load(String planetsPath) throws DOMException, IOException {
+        // set up mapper
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        // add custom deserializer for socioIndustrialData
+        // add custom deserializer for any complex objects that need to be read from Strings, etc.
         SimpleModule module = new SimpleModule();
         module.addDeserializer(SocioIndustrialData.class, new SocioIndustrialData.SocioIndustrialDataDeserializer());
         module.addDeserializer(StarType.class, new StarType.StarTypeDeserializer());
@@ -275,13 +284,8 @@ public class Systems {
         // this will allow the mapper to deserialize LocalDate objects
         mapper.registerModule(new JavaTimeModule());
 
-        // Step 2: Load all the yml files in the planetsPath and subdirectories
-        systems.parsePlanetarySystemFiles(planetsPath, mapper);
-
-        // Step 3: Cleanup any systems that have issues
-        systems.cleanupSystems();
-
-        return systems;
+        // Now we can Load all the yml files in the planetsPath and subdirectories
+        parsePlanetarySystemFiles(planetsPath, mapper);
     }
 
     /**
