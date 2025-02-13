@@ -70,7 +70,7 @@ public class Finances {
     private LocalDate wentIntoDebt;
 
     private Money balance;
-    private int transactionSize = -2;
+    private int transactionSize = -1;
 
     public Finances() {
         transactions = new ArrayList<>();
@@ -139,6 +139,10 @@ public class Finances {
         transactionSize = transactions.size();
 
         return newBalance;
+    }
+
+    public void clearBalanceCache() {
+        transactionSize = -1;
     }
 
     public Money getLoanBalance() {
@@ -256,6 +260,7 @@ public class Finances {
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
+        clearBalanceCache();
 
         credit(
                 TransactionType.FINANCIAL_TERM_END_CARRYOVER,
