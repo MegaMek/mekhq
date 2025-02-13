@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2016-2025 MegaMek team
+ * PlanetaryType.java
+ *
+ * Copyright (C) 2025 MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -16,19 +18,24 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.universe;
+package mekhq.campaign.universe.enums;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
-public enum LifeForm {
-    NONE("None"), MICROBE("Microbes"), PLANT("Plants"), INSECT("Insects"), FISH("Fish"),
-    AMPHIBIAN("Amphibians"), REPTILE("Reptiles"), BIRD("Birds"), MAMMAL("Mammals");
+public enum PlanetaryType {
+    ASTEROID_BELT("Asteroid Belt"),
+    DWARF_TERRESTRIAL("Dwarf Terrestrial"),
+    TERRESTRIAL ("Terrestrial"),
+    GIANT_TERRESTRIAL("Giant Terrestrial"),
+    ICE_GIANT("Ice Giant"),
+    GAS_GIANT("Gas Giant");
 
     public final String name;
 
-    private LifeForm(String name) {
+    private PlanetaryType(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

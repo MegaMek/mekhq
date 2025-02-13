@@ -25,10 +25,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
@@ -40,8 +37,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.HPGRating;
-
-import javax.xml.transform.Source;
+import mekhq.campaign.universe.enums.PlanetaryType;
 
 /**
  * This is the start of a planet object that will keep lots of information about

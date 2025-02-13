@@ -1,7 +1,7 @@
 /*
  * SourceableValue.java
  *
- * Copyright (c) 2011-2025 - The MegaMek team. All Rights Reserved.
+ * Copyright (c) 2025 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *

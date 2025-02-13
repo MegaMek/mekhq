@@ -23,7 +23,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.PlanetaryType;
+import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;

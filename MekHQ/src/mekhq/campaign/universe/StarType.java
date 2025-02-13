@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2019 MegaMek team
+ * StarType.java
+ *
+ * Copyright (C) 2025 MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -26,7 +28,7 @@ import megamek.common.EquipmentType;
 
 import java.util.Locale;
 
-/** A class to carry information about a star **/
+/** A class to carry information about a star. Used in planetary system **/
 public class StarType {
 
     // Star classification data and methods
