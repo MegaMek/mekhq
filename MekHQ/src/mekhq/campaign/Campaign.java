@@ -350,7 +350,7 @@ public class Campaign implements ITechManager {
         setFaction(Factions.getInstance().getDefaultFaction());
         techFactionCode = ITechnology.F_MERC;
         CurrencyManager.getInstance().setCampaign(this);
-        location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
+        location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
