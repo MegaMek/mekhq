@@ -69,6 +69,9 @@ public class Finances {
     private int failedCollateral;
     private LocalDate wentIntoDebt;
 
+    private Money balance;
+    private int transactionSize = -1;
+
     public Finances() {
         transactions = new ArrayList<>();
         loans = new ArrayList<>();
@@ -126,9 +129,39 @@ public class Finances {
         this.wentIntoDebt = wentIntoDebt;
     }
 
+    /**
+     * Current campaign balance. Will calculate the current campaign balance
+     * based on the campaign's transactions. Cached using the current transaction count.
+     * @see #clearCachedBalance()
+     * @return current balance (Money)
+     */
     public Money getBalance() {
-        Money balance = Money.zero();
-        return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+        Money newBalance = Money.zero();
+
+        // If our # of transactions matches what we expect, and the balance isn't null, we should return the cached balance:
+        if (transactions.size() == transactionSize && balance != null) {
+            return newBalance.plus(balance);
+        }
+
+        // Recalculate the current balance
+        newBalance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+
+        // Update our cached balance & note the transactions size.
+        balance = Money.zero();
+        balance = balance.plus(newBalance);
+        transactionSize = transactions.size();
+
+        return newBalance;
+    }
+
+    /**
+     * Next time getBalance() is called force it to recalculate the current balance
+     * Should be called if transactions are modified or deleted. Should not be needed
+     * when adding new transactions - the balance should automatically recalculate.
+     * @see #getBalance()
+     */
+    public void clearCachedBalance() {
+        transactionSize = -1;
     }
 
     public Money getLoanBalance() {
@@ -246,6 +279,7 @@ public class Finances {
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
+        clearCachedBalance();
 
         credit(
                 TransactionType.FINANCIAL_TERM_END_CARRYOVER,
