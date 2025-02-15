@@ -554,7 +554,6 @@ public class MekLabTab extends CampaignGuiTab {
         private ASStructureTab structureTab;
         private ASEquipmentTab equipmentTab;
         private ASBuildTab buildTab;
-        private TransportTab transportTab;
         private PreviewTab previewTab;
 
         public AeroPanel(Aero a) {
@@ -576,17 +575,14 @@ public class MekLabTab extends CampaignGuiTab {
             equipmentTab = new ASEquipmentTab(this);
             buildTab = new ASBuildTab(this);
             FluffTab fluffTab = new FluffTab(this);
-            transportTab = new TransportTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
-            transportTab.addRefreshedListener(this);
             fluffTab.setRefreshedListener(this);
 
             addTab("Structure/Armor", new JScrollPaneWithSpeed(structureTab));
             addTab("Equipment", new JScrollPaneWithSpeed(equipmentTab));
             addTab("Assign Criticals", new JScrollPaneWithSpeed(buildTab));
-            addTab("Transport Bays", new JScrollPaneWithSpeed(transportTab));
             addTab("Fluff", new JScrollPaneWithSpeed(fluffTab));
             addTab("Preview", new JScrollPaneWithSpeed(previewTab));
             this.repaint();
@@ -597,7 +593,6 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.refresh();
             equipmentTab.refresh();
             buildTab.refresh();
-            transportTab.refresh();
             previewTab.refresh();
             refreshSummary();
         }
@@ -621,7 +616,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshTransport() {
-            transportTab.refresh();
+            // not used for fighters
         }
 
         @Override
