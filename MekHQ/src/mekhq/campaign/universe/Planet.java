@@ -442,6 +442,24 @@ public class Planet {
         }
     }
 
+    @Deprecated
+    /** @return events for this year. Never returns <i>null</i>. */
+    public List<PlanetaryEvent> getEvents(int year) {
+        if (null == events) {
+            return Collections.emptyList();
+        }
+        List<PlanetaryEvent> result = new ArrayList<>();
+        for (LocalDate date : events.navigableKeySet()) {
+            if (date.getYear() > year) {
+                break;
+            }
+            if (date.getYear() == year) {
+                result.add(events.get(date));
+            }
+        }
+        return result;
+    }
+
     public String getName(LocalDate when) {
         return getSourcedName(when).getValue();
     }
