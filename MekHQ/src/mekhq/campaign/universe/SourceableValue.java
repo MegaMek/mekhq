@@ -22,6 +22,11 @@ package mekhq.campaign.universe;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+
+import java.io.IOException;
 
 /**
  * This generic class is designed to hold an absract value and a string
@@ -49,5 +54,66 @@ public class SourceableValue<T> {
     public boolean isCanon() {
         return (null != source);
     }
+
+    public static class SourceableValueDeserializer extends JsonDeserializer<SourceableValue<Object>> implements ContextualDeserializer {
+
+        private JavaType valueType;
+
+        public SourceableValueDeserializer() {} // Default constructor for Jackson
+
+        private SourceableValueDeserializer(JavaType valueType) {
+            this.valueType = valueType;
+        }
+
+        /**
+         * The purpose of this rather complex custom deserializer is that we want to allow for direct entry of
+         * values in the yaml when it is not sourced, but we want it split into a source, value pair when it has
+         * been sourced. That requires a custom deserializer of a generic class which is rather involved.
+         */
+        @Override
+        public SourceableValue<Object> deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
+            ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
+            JsonNode root = mapper.readTree(jsonParser);
+
+            // set up initial values we need
+            String source = null;
+            Object value = null; // Use Object since we don’t know T
+
+            // If the type is known, use it; otherwise, use Object
+            JavaType actualType = (valueType != null) ? valueType : context.constructType(Object.class);
+
+            if (root.isObject()) {
+                // then we have children nodes, and we can get source and value from the children
+                JsonNode sourceNode = root.get("source");
+                if (sourceNode != null) {
+                    source = sourceNode.asText();
+                }
+
+                JsonNode valueNode = root.get("value");
+                if (valueNode != null) {
+                    // this code will continue to process the node using our annotation structure
+                    value = mapper.readValue(mapper.treeAsTokens(valueNode), actualType);
+                }
+            } else {
+                // this code will continue to process the node using our annotation structure
+                value = mapper.readValue(mapper.treeAsTokens(root), actualType);
+            }
+
+            // create final object for output
+            SourceableValue<Object> sourceableValue = new SourceableValue<>();
+            sourceableValue.source = source;
+            sourceableValue.value = value;
+
+            return sourceableValue;
+        }
+
+        @Override
+        public JsonDeserializer<?> createContextual(DeserializationContext context, BeanProperty property) throws JsonMappingException {
+            JavaType type = context.getContextualType();
+            JavaType containedType = (type != null && type.containedTypeCount() > 0) ? type.containedType(0) : context.constructType(Object.class);
+            return new SourceableValueDeserializer(containedType);
+        }
+    }
+
 
 }

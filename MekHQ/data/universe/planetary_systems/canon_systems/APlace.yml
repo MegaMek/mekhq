@@ -3,6 +3,7 @@ sucsId: 1
 xcood: -123.764
 ycood: 272.182
 spectralType:
+  source: test
   value: G5V
 primarySlot: 2
 event:
