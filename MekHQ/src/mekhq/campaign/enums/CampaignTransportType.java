@@ -54,7 +54,13 @@ public enum CampaignTransportType
      * @see InfantryCompartment
      * @see BattleArmorHandles
      */
-    TACTICAL_TRANSPORT(TransportAssignment.class, TacticalTransportedUnitsSummary.class);
+    TACTICAL_TRANSPORT(TransportAssignment.class, TacticalTransportedUnitsSummary.class),
+
+    /**
+     * Units assigned a tow transports will, if both deployed to battle, automatically
+     * set the unit as being towed.
+     */
+    TOW_TRANSPORT(TransportAssignment.class, TowTransportedUnitsSummary.class);
     // endregion Enum declarations
 
 
@@ -84,6 +90,12 @@ public enum CampaignTransportType
      * @return true if this is a TACTICAL_TRANSPORT
      */
     public boolean isTacticalTransport() { return this == TACTICAL_TRANSPORT; }
+
+    /**
+     * Is this a Tow Transport?
+     * @return true if this is a TOW_TRANSPORT
+     */
+    public boolean isTowTransport() { return this == TOW_TRANSPORT; }
     // endregion Boolean Comparison Methods
 
     // region Getters

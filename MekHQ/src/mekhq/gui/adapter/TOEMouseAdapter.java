@@ -50,6 +50,7 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.AssignForceToShipTransportMenu;
 import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
+import mekhq.gui.menus.AssignForceToTowTransportMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -1172,6 +1173,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
                 unassignTacticalTransportMenuClass(unitsInForces, popup);
                 unassignFromTacticalTransportMenuClass(unitsInForces, popup);
+
+                if (unitsInForces.size() == 1) {
+                    JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTowTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
+                    unassignTacticalTransportMenuClass(units, popup);
+                    unassignFromTacticalTransportMenuClass(units, popup);
+                }
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);
@@ -1403,6 +1410,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             unassignFromShipTransportMenuClass(units, popup);
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(units)));
+            unassignTacticalTransportMenuClass(units, popup);
+            unassignFromTacticalTransportMenuClass(units, popup);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTowTransportMenu(gui.getCampaign(), new HashSet<>(units)));
             unassignTacticalTransportMenuClass(units, popup);
             unassignFromTacticalTransportMenuClass(units, popup);
 

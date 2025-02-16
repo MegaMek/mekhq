@@ -1374,6 +1374,17 @@ public class Utilities {
         }
     }
 
+    public static void sendTowEntity(Client client, int trailerId, int tractorId) {
+        client.sendTowEntity(trailerId, tractorId);
+        // Add a wait to make sure that we don't start processing client.sendTowEntity
+        // out of order
+        try {
+            Thread.sleep(500);
+        } catch (Exception ex) {
+            logger.error("", ex);
+        }
+    }
+
     /**
      * Method that loops through a Transport ship's bays and finds one with enough
      * available space to load the Cargo unit

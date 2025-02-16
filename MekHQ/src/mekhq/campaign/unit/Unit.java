@@ -82,8 +82,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.*;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
@@ -119,6 +118,8 @@ public class Unit implements ITechnology {
     private TransportShipAssignment transportShipAssignment;
     // This is the transport assigned for scenario deployments
     private ITransportAssignment tacticalTransportAssignment;
+    // This is the unit that will tow this unit
+    private ITransportAssignment towTransportAssignment;
     //Contains what kind of transport it is, what units it's carrying, and the remaining capacity
     Set<AbstractTransportedUnitsSummary> transportedUnitsSummaries = new HashSet<>();
 
@@ -517,6 +518,8 @@ public class Unit implements ITechnology {
             return transportShipAssignment;
         } else if (campaignTransportType.isTacticalTransport()) {
             return tacticalTransportAssignment;
+        } else if (campaignTransportType.isTowTransport()) {
+            return towTransportAssignment;
         }
         return null;
     }
@@ -2349,6 +2352,10 @@ public class Unit implements ITechnology {
      */
     public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation, transporterType, transportedUnit);
+    }
+
+    public Unit towTrailer(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+        return ((TowTransportedUnitsSummary) getTransportedUnitsSummary(TOW_TRANSPORT)).towTrailer(transportedUnit, transportedLocation, transporterType);
     }
 
 

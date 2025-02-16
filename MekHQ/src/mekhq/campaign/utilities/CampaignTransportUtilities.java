@@ -52,6 +52,14 @@ public class CampaignTransportUtilities {
      * @return Transporter types that could potentially transport this entity
      */
     public static EnumSet<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType, Entity unit) {
+        if (campaignTransportType.isTowTransport()) {
+            if (unit.isTrailer()) {
+                return EnumSet.of(TANK_TRAILER_HITCH);
+            }
+            else {
+                return EnumSet.noneOf(TransporterType.class);
+            }
+        }
         return getTransportTypeClassifier(unit).map(v -> v.getTransporterTypes(unit, campaignTransportType)).orElse(EnumSet.noneOf(TransporterType.class));
     }
 
