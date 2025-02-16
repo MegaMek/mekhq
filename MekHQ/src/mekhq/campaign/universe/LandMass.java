@@ -37,12 +37,12 @@ public class LandMass {
     public String getDescription() {
         if(null != capital && null != name) {
             return name.getValue() + " (" + capital.getValue() + ")";
-        } else if (null == name && null != capital) {
+        } else if (null != capital) {
             return "(" + capital.getValue() + ")";
-        } else if (null != name && null == capital) {
+        } else if (null != name) {
             return name.getValue();
-        } else {
-            return "Unknown";
         }
+
+        return "Unknown";
     }
 }

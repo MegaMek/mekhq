@@ -32,15 +32,16 @@ import java.util.Locale;
 import java.util.Map;
 
 public class SocioIndustrialData {
-    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
-    static {
-        stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A);
-        stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B);
-        stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C);
-        stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D);
-        stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F);
-        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X);
-    }
+
+    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>() {{
+        put("A", EquipmentType.RATING_A);
+        put("B", EquipmentType.RATING_B);
+        put("C", EquipmentType.RATING_C);
+        put("D", EquipmentType.RATING_D);
+        put("F", EquipmentType.RATING_F);
+        put("X", EquipmentType.RATING_X);
+    }};
+
     private final static String SEPARATOR = "-";
 
     public static final SocioIndustrialData NONE = new SocioIndustrialData();
@@ -235,7 +236,7 @@ public class SocioIndustrialData {
 
         private int convertRatingToCode(String rating) {
             Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
-            return null != result ? result : EquipmentType.RATING_C;
+            return (null != result) ? result : EquipmentType.RATING_C;
         }
         @Override
         public SocioIndustrialData deserialize(final JsonParser jsonParser, final DeserializationContext context) {

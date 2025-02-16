@@ -124,20 +124,28 @@ public class StarType {
             subtypeFormat = "%.1f";
         }
 
-        if (null != luminosity && luminosity.equals(StarType.LUM_VI)) {
-            // subdwarfs
-            return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
-        } else if (null != luminosity && luminosity.equals(StarType.LUM_VI_PLUS)) {
-            // extreme subdwarfs
-            return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
-        } else if (null != luminosity && luminosity.equals(StarType.LUM_VII)) {
-            // white dwarfs
-            return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0);
-        } else {
-            // main class
+        if(null == luminosity) {
+            // assume mid-range luminosity
             return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
                 getSpectralClassName(spectralClass),
-                subtypeValue / 100.0, (null != luminosity ? luminosity : StarType.LUM_V));
+                subtypeValue / 100.0, StarType.LUM_V);
+        }
+
+        switch(luminosity) {
+            case StarType.LUM_VI:
+                // subdwarfs
+                return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
+            case StarType.LUM_VI_PLUS:
+                // extreme subdwarfs
+                return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
+            case StarType.LUM_VII:
+                // white dwarfs
+                return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0);
+            default:
+                return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
+                    getSpectralClassName(spectralClass),
+                    subtypeValue / 100.0,  luminosity);
+
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  * PlanetaryType.java
  *
- * Copyright (C) 2025 MegaMek team
+ * Copyright (c) 2019-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *

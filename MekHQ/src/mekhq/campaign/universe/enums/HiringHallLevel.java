@@ -18,9 +18,6 @@
  */
 package mekhq.campaign.universe.enums;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import io.sentry.Sentry;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Atmosphere;

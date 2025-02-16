@@ -510,36 +510,36 @@ public class PlanetarySystem {
     public static class PlanetarySystemPostLoader extends StdConverter<PlanetarySystem, PlanetarySystem> {
 
         @Override
-        public PlanetarySystem convert(PlanetarySystem ps) {
-            if (null == ps.id) {
-                ps.id = ps.name;
+        public PlanetarySystem convert(PlanetarySystem planetarySystem) {
+            if (null == planetarySystem.id) {
+                planetarySystem.id = planetarySystem.name;
             }
 
             // fill up planets
-            ps.planets = new TreeMap<>();
-            if (null != ps.planetList) {
-                for (Planet p : ps.planetList) {
-                    p.setParentSystem(ps);
-                    if (!ps.planets.containsKey(p.getSystemPosition())) {
-                        ps.planets.put(p.getSystemPosition(), p);
+            planetarySystem.planets = new TreeMap<>();
+            if (null != planetarySystem.planetList) {
+                for (Planet planet : planetarySystem.planetList) {
+                    planet.setParentSystem(planetarySystem);
+                    if (!planetarySystem.planets.containsKey(planet.getSystemPosition())) {
+                        planetarySystem.planets.put(planet.getSystemPosition(), planet);
                     }
                 }
-                ps.planetList.clear();
+                planetarySystem.planetList.clear();
             }
-            ps.planetList = null;
+            planetarySystem.planetList = null;
             // Fill up events
-            ps.events = new TreeMap<>();
-            if (null != ps.eventList) {
-                for (PlanetarySystemEvent event : ps.eventList) {
-                    if ((null != event) && (null != event.date)) {
-                        ps.events.put(event.date, event);
+            planetarySystem.events = new TreeMap<>();
+            if (null != planetarySystem.eventList) {
+                for (PlanetarySystemEvent systemEvent : planetarySystem.eventList) {
+                    if ((null != systemEvent) && (null != systemEvent.date)) {
+                        planetarySystem.events.put(systemEvent.date, systemEvent);
                     }
                 }
-                ps.eventList.clear();
+                planetarySystem.eventList.clear();
             }
-            ps.eventList = null;
+            planetarySystem.eventList = null;
 
-            return ps;
+            return planetarySystem;
         }
     }
 }
