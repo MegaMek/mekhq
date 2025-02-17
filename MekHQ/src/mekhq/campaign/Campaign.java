@@ -350,7 +350,7 @@ public class Campaign implements ITechManager {
         setFaction(Factions.getInstance().getDefaultFaction());
         techFactionCode = ITechnology.F_MERC;
         CurrencyManager.getInstance().setCampaign(this);
-        location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
+        location = new CurrentLocation(Systems.getInstance().getSystems().get("Galatea"), 0);
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
@@ -6016,53 +6016,6 @@ public class Campaign implements ITechManager {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
 
-        // Customised planetary events
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
-        for (PlanetarySystem psystem : Systems.getInstance().getSystems().values()) {
-            // first check for system-wide events
-            List<PlanetarySystemEvent> customSysEvents = new ArrayList<>();
-            for (PlanetarySystemEvent event : psystem.getEvents()) {
-                if (event.custom) {
-                    customSysEvents.add(event);
-                }
-            }
-            boolean startedSystem = false;
-            if (!customSysEvents.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
-                for (PlanetarySystemEvent event : customSysEvents) {
-                    Systems.getInstance().writePlanetarySystemEvent(pw, event);
-                    pw.println();
-                }
-                startedSystem = true;
-            }
-            // now check for planetary events
-            for (Planet p : psystem.getPlanets()) {
-                List<PlanetaryEvent> customEvents = p.getCustomEvents();
-                if (!customEvents.isEmpty()) {
-                    if (!startedSystem) {
-                        // only write this if we haven't already started the system
-                        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "system");
-                        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", psystem.getId());
-                    }
-                    MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "planet");
-                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sysPos", p.getSystemPosition());
-                    for (PlanetaryEvent event : customEvents) {
-                        Systems.getInstance().writePlanetaryEvent(pw, event);
-                        pw.println();
-                    }
-                    MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "planet");
-                    startedSystem = true;
-                }
-            }
-
-            if (startedSystem) {
-                // close the system
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "system");
-            }
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "customPlanetaryEvents");
-
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partsInUse");
@@ -6820,8 +6773,7 @@ public class Campaign implements ITechManager {
             if (getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
                 Planet planet = getLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
-                megamek.common.planetaryconditions.Atmosphere planetaryConditions = megamek.common.planetaryconditions.Atmosphere
-                        .getAtmosphere(planet.getPressure(getLocalDate()));
+                megamek.common.planetaryconditions.Atmosphere planetaryConditions = planet.getPressure(getLocalDate());
                 int temperature = planet.getTemperature(getLocalDate());
 
                 if (planet.getGravity() < 0.8) {
