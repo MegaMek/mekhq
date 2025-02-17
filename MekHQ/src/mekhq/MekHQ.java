@@ -47,6 +47,7 @@ import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
+import megamek.utilities.StartupUtil;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -278,36 +279,15 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
-        Config.setSerialFilter(sanityInputFilter);
+        StartupUtil.setupEnvironment(logger);
 
-        // Configure Sentry with defaults. Although the client defaults to enabled, the
-        // properties file is used to disable
-        // it and additional configuration can be done inside of the sentry.properties
-        // file. The defaults for everything else is set here.
-        Sentry.init(options -> {
-            options.setEnableExternalConfiguration(true);
-            options.setDsn("https://a05b2064798e2b8d46ac620b4497a072@sentry.tapenvy.us/10");
-            options.setEnvironment("production");
-            options.setTracesSampleRate(0.2);
-            options.setDebug(true);
-            options.setServerName("MegaMekClient");
-            options.setRelease(SuiteConstants.VERSION.toString());
-        });
 
-        // First, create a global default exception handler
-        Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
-            final String name = t.getClass().getName();
-            final String message = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION, name);
-            final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
-            logger.error(t, message, title);
-        });
-
-        // Second, let's handle logging
+        // First, let's handle logging
         MegaMek.initializeLogging(MHQConstants.PROJECT_NAME);
         MegaMekLab.initializeLogging(MHQConstants.PROJECT_NAME);
         MekHQ.initializeLogging(MHQConstants.PROJECT_NAME);
 
-        // Third, let's handle suite graphical setup initialization
+        // Second, let's handle suite graphical setup initialization
         MegaMek.initializeSuiteGraphicalSetups(MHQConstants.PROJECT_NAME);
 
         // Finally, let's handle startup
