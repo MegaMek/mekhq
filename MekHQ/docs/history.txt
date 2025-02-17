@@ -41,6 +41,7 @@ MEKHQ VERSION HISTORY:
 + PR #6013: Refactored Random Dependents Removal-Addition into a Seperate Class
 + PR #6028: Cache finances balance
 + PR #6029: Linked scenario unit selection
++ PR #6031: Convert planetary system data to yaml + general planetary system overhaul
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
