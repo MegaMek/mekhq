@@ -68,3 +68,5 @@ mhq-revision.txt
 
 /MekHQ/docs/OfficialUnitList.txt
 *.iml
+
+sentry.properties
