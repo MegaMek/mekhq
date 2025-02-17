@@ -24,8 +24,7 @@ import mekhq.campaign.unit.Unit;
 
 import java.util.*;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.*;
 
 /**
  * We need to determine what units in game are transports, and what units they're transporting.
@@ -109,11 +108,19 @@ public class PotentialTransportsMap {
                 return;
             }
         }
-        if ( unit.hasTacticalTransportAssignment()) {
+        if (unit.hasTacticalTransportAssignment()) {
             Unit transport = unit.getTacticalTransportAssignment().getTransport();
 
             if (containsTransportKey(TACTICAL_TRANSPORT, transport.getId())) {
                 addTransportedUnit(TACTICAL_TRANSPORT, transport.getId(), unit.getId());
+                return;
+            }
+        }
+        if (unit.hasTransportAssignment(TOW_TRANSPORT)) {
+            Unit transport = unit.getTransportAssignment(TOW_TRANSPORT).getTransport();
+
+            if (containsTransportKey(TOW_TRANSPORT, transport.getId())) {
+                addTransportedUnit(TOW_TRANSPORT, transport.getId(), unit.getId());
                 return;
             }
         }

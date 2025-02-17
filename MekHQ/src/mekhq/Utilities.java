@@ -1374,6 +1374,59 @@ public class Utilities {
         }
     }
 
+    /**
+     * Handles loading a player's transported units onto their transports once a
+     * megamek scenario has actually started.
+     *
+     *
+     * @param tractorId          - The MM id of the transport entity we want to load
+     * @param trailerId         - Map of entity ids and transport assignments for the units we want to load
+     * @param client         - the player's Client instance
+     * @param loadTactical  - Should "tactical"-ly transported units be loaded?
+     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
+     * @see mekhq.campaign.enums.CampaignTransportType#TACTICAL_TRANSPORT
+     * @see ITransportAssignment
+     */
+    public static void towPlayerTrailers(int tractorId, int trailerId, Client client,
+                                            boolean towTrailers, boolean isAlreadyReset) {
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
+        if (!towTrailers) {
+            // Nothing to do. Get outta here!
+            return;
+        }
+        Entity tractor = client.getEntity(tractorId);
+        Entity trailer = client.getEntity(trailerId);
+
+        if (tractor == null || trailer == null) {
+            return;
+        }
+
+        // Reset transporter status, as currentSpace might still retain updates from
+        // when the Unit
+        // was assigned to the Transport on the TO&E tab
+        if (!isAlreadyReset) {
+            tractor.resetTransporter();
+        }
+
+        // If we reset the transporters for the Ship transport, we'll need to save those units
+        // before we remove the fake capacity that was removed by selectBestBayFor
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(tractor.getLoadedUnits());
+        }
+
+        // Reset transporter status again
+        tractor.resetTransporter();
+
+        //Restore the normal transported entities
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            tractor.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
+        //Transported units should deploy on their transport's turn
+        if (tractor.canTow(trailerId)) {
+            sendTowEntity(client, trailerId, tractorId);
+        }
+    }
+
     public static void sendTowEntity(Client client, int trailerId, int tractorId) {
         client.sendTowEntity(trailerId, tractorId);
         // Add a wait to make sure that we don't start processing client.sendTowEntity

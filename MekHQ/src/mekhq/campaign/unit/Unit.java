@@ -504,6 +504,8 @@ public class Unit implements ITechnology {
             return hasTransportShipAssignment();
         } else if (campaignTransportType.isTacticalTransport()) {
             return hasTacticalTransportAssignment();
+        } else if (campaignTransportType.isTowTransport()) {
+            return getTransportAssignment(campaignTransportType) != null;
         }
         return false;
     }
@@ -537,6 +539,8 @@ public class Unit implements ITechnology {
             }
         } else if (campaignTransportType.isTacticalTransport()) {
             setTacticalTransportAssignment(assignment);
+        } else if (campaignTransportType.isTowTransport()) {
+            towTransportAssignment = assignment;
         }
     }
 

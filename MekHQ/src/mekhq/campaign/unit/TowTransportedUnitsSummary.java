@@ -95,10 +95,10 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
             }
         }
         if (transportedLocation != null) {
-            towedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transportedLocation));
+            towedUnit.setTransportAssignment(TOW_TRANSPORT, new TransportAssignment(transport, transportedLocation));
         }
         else if (transporterType != null){
-            towedUnit.setTacticalTransportAssignment(new TransportAssignment(transport, transporterType));
+            towedUnit.setTransportAssignment(TOW_TRANSPORT,new TransportAssignment(transport, transporterType));
         } else {
             logger.error(String.format("Cannot load transport (%s) with unit (%s) without a transported location or transporter!", transport.getId(), towedUnit.getId()));
             return oldTractor;
