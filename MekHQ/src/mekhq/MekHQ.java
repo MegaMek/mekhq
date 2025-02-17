@@ -279,7 +279,7 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
-        StartupUtil.setupEnvironment(logger);
+        StartupUtil.setupEnvironment(logger, MHQConstants.SENTRY_ATTRIBUTES);
 
 
         // First, let's handle logging

@@ -311,4 +311,16 @@ public final class MHQConstants extends SuiteConstants {
     // endregion Backgrounds
 
     // endregion File Paths
+
+    public static final SentryAttributes SENTRY_ATTRIBUTES = new SentryAttributes() {
+        @Override
+        public String serverName() {
+            return "MekHQClient";
+        }
+
+        @Override
+        public String dsn() {
+            return "https://a05b2064798e2b8d46ac620b4497a072@sentry.tapenvy.us/10";
+        }
+    };
 }
