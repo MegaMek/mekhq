@@ -24,6 +24,8 @@ import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.Princess;
 import megamek.client.bot.princess.PrincessException;
+import megamek.client.bot.queen.Queen;
+import megamek.client.bot.queen.ai.utility.tw.TWUtilityAIRepository;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.CommanderGUI;
@@ -544,7 +546,7 @@ public class AtBGameThread extends GameThread {
         var botName = player.getName() + "@AI";
 
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-        var botClient = new Princess(botName, client.getHost(), client.getPort());
+        var botClient = new Queen(botName, client.getHost(), client.getPort(), TWUtilityAIRepository.getInstance().reloadRepository().getProfiles().get(0));
         botClient.setBehaviorSettings(autoResolveBehaviorSettings.getCopy());
         try {
             botClient.connect();
