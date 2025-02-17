@@ -380,7 +380,7 @@ public final class StarUtil {
      * Estimates the radius of a star using its luminosity and temperature, based on the
      * Stefan-Boltzmann law:
      * <pre>
-     * R = √(L / (4πσT⁴))
+     * R = √(L / (4πσT^4))
      * </pre>
      *
      * Where:
@@ -388,7 +388,7 @@ public final class StarUtil {
      *     <li><b>R</b> is the radius of the star (in meters).</li>
      *     <li><b>L</b> is the luminosity of the star (in watts).</li>
      *     <li><b>T</b> is the effective temperature of the star (in Kelvin).</li>
-     *     <li><b>σ</b> is the Stefan-Boltzmann constant (5.67 × 10⁻⁸ W·m⁻²·K⁻⁴).</li>
+     *     <li><b>σ</b> is the Stefan-Boltzmann constant (5.67 × 10^-8 W·m^-2 · K^-4).</li>
      * </ul>
      *
      * @param luminosity The luminosity of the star in watts. Must be greater than 0.

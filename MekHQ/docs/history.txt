@@ -39,6 +39,8 @@ MEKHQ VERSION HISTORY:
 + Fix #5784: Better handling for missing parts when replacing parts via "Pod Space"
 + PR #6014: Refactored Active Personnel Retrieval Logic
 + PR #6013: Refactored Random Dependents Removal-Addition into a Seperate Class
++ PR #6028: Cache finances balance
++ PR #6029: Linked scenario unit selection
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
