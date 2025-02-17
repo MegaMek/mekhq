@@ -8,11 +8,9 @@ spectralType:
 primarySlot: 3
 event:
   - date: '2367-11-21'
-    zenithCharge:
-      value: yes
+    zenithCharge: yes
   - date: '2426-08-27'
-    nadirCharge:
-      value: yes
+    nadirCharge: yes
 planet:
   - name:
       source: canon
@@ -25,55 +23,33 @@ planet:
       source: canon
       value: 1
     icon: mercury
-    pressure:
-      value: TRACE
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Oxygen and Sodium, plus trace gases
-    gravity:
-      value: 0.38
-    diameter:
-      value: 4880
-    density:
-      value: 5.427
-    dayLength:
-      value: 1407
-    yearLength:
-      value: 0.24
-    temperature:
-      value: 427
-    water:
-      value: 0
-  - name:
-      value: Venus
-    type:
-      value: TERRESTRIAL
+    pressure: TRACE
+    atmosphere: TOXICPOISON
+    composition: Oxygen and Sodium, plus trace gases
+    gravity: 0.38
+    diameter: 4880
+    density: 5.427
+    dayLength: 1407
+    yearLength: 0.24
+    temperature: 427
+    water: 0
+  - name: Venus
+    type: TERRESTRIAL
     orbitalDist: 0.723
     sysPos:
       source: canon
       value: 2
     icon: venus
-    pressure:
-      value: VERY_HIGH
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Carbon Dioxide and Nitrogen, plus trace gases
-    gravity:
-      value: 0.904
-    diameter:
-      value: 12100
-    density:
-      value: 5.243
-    dayLength:
-      value: 5832
-    yearLength:
-      value: 0.24
-    temperature:
-      value: 460
-    water:
-      value: 0
+    pressure: VERY_HIGH
+    atmosphere: TOXICPOISON
+    composition: Carbon Dioxide and Nitrogen, plus trace gases
+    gravity: 0.904
+    diameter: 12100
+    density: 5.243
+    dayLength: 5832
+    yearLength: 0.24
+    temperature: 460
+    water: 0
     desc: |-
       3028 - The terraforming of Venus began in the 2100s. In 2245, it was discovered that the chemicals that covered the planet's surface made excellent fertilizer. Agribusinesses set up farms using artificial soil and began producing enough food to feed Terra, Mars and Venus and a surplus for other struggling colonies.
 
@@ -93,10 +69,8 @@ planet:
           source: canon
           value: 48
         faction:
-          value:
-            - TA
-        population:
-          value: 10072.0
+          - TA
+        population: 10072.0
         pressure:
           source: canon
           value: STANDARD
@@ -107,253 +81,178 @@ planet:
           source: canon
           value: 30
       - date: '2210-01-01'
-        population:
-          value: 19256.0
+        population: 19256.0
       - date: '2220-01-01'
-        population:
-          value: 62264.0
+        population: 62264.0
       - date: '2230-01-01'
-        population:
-          value: 173286.0
+        population: 173286.0
       - date: '2240-01-01'
-        population:
-          value: 423801.0
+        population: 423801.0
       - date: '2250-01-01'
-        population:
-          value: 927725.0
+        population: 927725.0
       - date: '2260-01-01'
-        population:
-          value: 1843499.0
+        population: 1843499.0
       - date: '2270-01-01'
-        population:
-          value: 3373344.0
+        population: 3373344.0
       - date: '2280-01-01'
-        population:
-          value: 5721035.0
+        population: 5721035.0
       - date: '2290-01-01'
-        population:
-          value: 9084478.0
+        population: 9084478.0
       - date: '2300-01-01'
-        population:
-          value: 13597166.0
+        population: 13597166.0
       - date: '2310-01-01'
-        population:
-          value: 19396232.0
+        population: 19396232.0
       - date: '2316-12-08'
         faction:
           source: canon
           value:
             - TH
       - date: '2320-01-01'
-        population:
-          value: 26443017.0
+        population: 26443017.0
       - date: '2330-01-01'
-        population:
-          value: 34557240.0
+        population: 34557240.0
       - date: '2340-01-01'
-        population:
-          value: 43489288.0
+        population: 43489288.0
       - date: '2350-01-01'
-        population:
-          value: 52888202.0
+        population: 52888202.0
       - date: '2360-01-01'
-        population:
-          value: 62600410.0
+        population: 62600410.0
       - date: '2370-01-01'
-        population:
-          value: 72611813.0
+        population: 72611813.0
       - date: '2380-01-01'
-        population:
-          value: 82374502.0
+        population: 82374502.0
       - date: '2390-01-01'
-        population:
-          value: 92133348.0
+        population: 92133348.0
       - date: '2400-01-01'
-        population:
-          value: 101495862.0
+        population: 101495862.0
       - date: '2410-01-01'
-        population:
-          value: 110697731.0
+        population: 110697731.0
       - date: '2420-01-01'
-        population:
-          value: 119568389.0
+        population: 119568389.0
       - date: '2430-01-01'
-        population:
-          value: 128279403.0
+        population: 128279403.0
       - date: '2440-01-01'
-        population:
-          value: 136828080.0
+        population: 136828080.0
       - date: '2450-01-01'
-        population:
-          value: 145238666.0
+        population: 145238666.0
       - date: '2460-01-01'
-        population:
-          value: 152990761.0
+        population: 152990761.0
       - date: '2470-01-01'
-        population:
-          value: 160470320.0
+        population: 160470320.0
       - date: '2480-01-01'
-        population:
-          value: 167394467.0
+        population: 167394467.0
       - date: '2490-01-01'
-        population:
-          value: 173824766.0
+        population: 173824766.0
       - date: '2500-01-01'
-        population:
-          value: 179163694.0
+        population: 179163694.0
       - date: '2510-01-01'
-        population:
-          value: 183441570.0
+        population: 183441570.0
       - date: '2520-01-01'
-        population:
-          value: 186907079.0
+        population: 186907079.0
       - date: '2530-01-01'
-        population:
-          value: 190207806.0
+        population: 190207806.0
       - date: '2540-01-01'
-        population:
-          value: 193598637.0
+        population: 193598637.0
       - date: '2550-01-01'
-        population:
-          value: 196872145.0
+        population: 196872145.0
       - date: '2560-01-01'
-        population:
-          value: 200370182.0
+        population: 200370182.0
       - date: '2570-01-01'
-        population:
-          value: 203810215.0
+        population: 203810215.0
       - date: '2580-01-01'
-        population:
-          value: 206419629.0
+        population: 206419629.0
       - date: '2590-01-01'
-        population:
-          value: 207949850.0
+        population: 207949850.0
       - date: '2600-01-01'
-        population:
-          value: 208437772.0
+        population: 208437772.0
       - date: '2610-01-01'
-        population:
-          value: 209121947.0
+        population: 209121947.0
       - date: '2620-01-01'
-        population:
-          value: 210595185.0
+        population: 210595185.0
       - date: '2630-01-01'
-        population:
-          value: 211335496.0
+        population: 211335496.0
       - date: '2640-01-01'
-        population:
-          value: 211257708.0
+        population: 211257708.0
       - date: '2650-01-01'
-        population:
-          value: 211168502.0
+        population: 211168502.0
       - date: '2660-01-01'
-        population:
-          value: 210986404.0
+        population: 210986404.0
       - date: '2670-01-01'
-        population:
-          value: 211324820.0
+        population: 211324820.0
       - date: '2680-01-01'
-        population:
-          value: 211085480.0
+        population: 211085480.0
       - date: '2690-01-01'
-        population:
-          value: 210310834.0
+        population: 210310834.0
       - date: '2700-01-01'
-        population:
-          value: 209485349.0
+        population: 209485349.0
       - date: '2710-01-01'
-        population:
-          value: 208804255.0
+        population: 208804255.0
       - date: '2720-01-01'
-        population:
-          value: 208553422.0
+        population: 208553422.0
       - date: '2730-01-01'
-        population:
-          value: 207581188.0
+        population: 207581188.0
       - date: '2740-01-01'
-        population:
-          value: 206334937.0
+        population: 206334937.0
       - date: '2750-01-01'
-        population:
-          value: 205623902.0
+        population: 205623902.0
       - date: '2760-01-01'
-        population:
-          value: 205661804.0
+        population: 205661804.0
       - date: '2767-02-12'
         faction:
           source: canon
           value:
             - RWR
       - date: '2770-01-01'
-        population:
-          value: 169352736.0
+        population: 169352736.0
       - date: '2779-10-09'
         faction:
           source: canon
           value:
             - TH
       - date: '2780-01-01'
-        population:
-          value: 113713557.0
+        population: 113713557.0
       - date: '2788-06-25'
         faction:
           source: canon
           value:
             - CS
       - date: '2790-01-01'
-        population:
-          value: 74089762.0
+        population: 74089762.0
       - date: '2800-01-01'
-        population:
-          value: 48422264.0
+        population: 48422264.0
       - date: '2810-01-01'
-        population:
-          value: 31793868.0
+        population: 31793868.0
       - date: '2820-01-01'
-        population:
-          value: 21216881.0
+        population: 21216881.0
       - date: '2830-01-01'
-        population:
-          value: 14071417.0
+        population: 14071417.0
       - date: '2840-01-01'
-        population:
-          value: 9267809.0
+        population: 9267809.0
       - date: '2850-01-01'
-        population:
-          value: 6132360.0
+        population: 6132360.0
       - date: '2860-01-01'
-        population:
-          value: 4149541.0
+        population: 4149541.0
       - date: '2870-01-01'
-        population:
-          value: 2829598.0
+        population: 2829598.0
       - date: '2880-01-01'
-        population:
-          value: 1965599.0
+        population: 1965599.0
       - date: '2890-01-01'
-        population:
-          value: 1380252.0
+        population: 1380252.0
       - date: '2900-01-01'
-        population:
-          value: 977484.0
+        population: 977484.0
       - date: '2910-01-01'
-        population:
-          value: 688516.0
+        population: 688516.0
       - date: '2920-01-01'
-        population:
-          value: 477913.0
+        population: 477913.0
       - date: '2930-01-01'
-        population:
-          value: 327152.0
+        population: 327152.0
       - date: '2940-01-01'
-        population:
-          value: 220179.0
+        population: 220179.0
       - date: '2950-10-28'
         atmosphere:
           source: canon
           value: TOXICPOISON
-        population:
-          value: 148298.0
+        population: 148298.0
         pressure:
           source: canon
           value: VERY_HIGH
@@ -361,32 +260,23 @@ planet:
           source: canon
           value: 250
       - date: '2960-01-01'
-        population:
-          value: 101204.0
+        population: 101204.0
       - date: '2970-01-01'
-        population:
-          value: 67797.0
+        population: 67797.0
       - date: '2980-01-01'
-        population:
-          value: 45982.0
+        population: 45982.0
       - date: '2990-01-01'
-        population:
-          value: 31794.0
+        population: 31794.0
       - date: '3000-01-01'
-        population:
-          value: 22223.0
+        population: 22223.0
       - date: '3010-01-01'
-        population:
-          value: 15702.0
+        population: 15702.0
       - date: '3020-01-01'
-        population:
-          value: 11103.0
+        population: 11103.0
       - date: '3030-12-23'
         faction:
-          value:
-            - ABN
-        population:
-          value: 0.0
+          - ABN
+        population: 0.0
       - date: '3151-01-01'
         faction:
           source: sucs
@@ -487,363 +377,257 @@ planet:
           source: canon
           value:
             - TA
-        population:
-          value: 8906920784.0
-        socioIndustrial:
-          value: D-C-A-D-B
+        population: 8906920784.0
+        socioIndustrial: D-C-A-D-B
       - date: '2090-01-01'
-        population:
-          value: 8968654762.0
+        population: 8968654762.0
       - date: '2100-01-01'
-        population:
-          value: 9118439429.0
+        population: 9118439429.0
       - date: '2110-01-01'
-        population:
-          value: 9261829999.0
+        population: 9261829999.0
       - date: '2120-01-01'
-        population:
-          value: 9398971549.0
+        population: 9398971549.0
       - date: '2130-01-01'
-        population:
-          value: 9530021296.0
+        population: 9530021296.0
       - date: '2140-01-01'
-        population:
-          value: 9655146301.0
+        population: 9655146301.0
       - date: '2150-01-01'
-        population:
-          value: 9774521365.0
+        population: 9774521365.0
       - date: '2160-01-01'
-        population:
-          value: 9888327151.0
+        population: 9888327151.0
       - date: '2170-01-01'
-        population:
-          value: 9996748485.0
+        population: 9996748485.0
       - date: '2180-01-01'
-        population:
-          value: 10099972854.0
+        population: 10099972854.0
       - date: '2190-01-01'
-        population:
-          value: 10198189075.0
+        population: 10198189075.0
       - date: '2200-01-01'
-        population:
-          value: 10291586117.0
+        population: 10291586117.0
       - date: '2210-01-01'
-        population:
-          value: 10380311058.0
+        population: 10380311058.0
       - date: '2220-01-01'
-        population:
-          value: 10464567092.0
+        population: 10464567092.0
       - date: '2230-01-01'
-        population:
-          value: 10544481370.0
+        population: 10544481370.0
       - date: '2240-01-01'
-        population:
-          value: 10620161124.0
+        population: 10620161124.0
       - date: '2250-01-01'
-        population:
-          value: 10691669283.0
+        population: 10691669283.0
       - date: '2259-01-01'
-        socioIndustrial:
-          value: C-C-A-D-B
+        socioIndustrial: C-C-A-D-B
       - date: '2260-01-01'
-        population:
-          value: 10759021585.0
+        population: 10759021585.0
       - date: '2270-01-01'
-        population:
-          value: 10822187035.0
+        population: 10822187035.0
       - date: '2280-01-01'
-        population:
-          value: 10881129253.0
+        population: 10881129253.0
       - date: '2290-01-01'
-        population:
-          value: 10935812224.0
+        population: 10935812224.0
       - date: '2300-01-01'
-        population:
-          value: 10986260952.0
+        population: 10986260952.0
       - date: '2310-01-01'
-        population:
-          value: 11032488944.0
+        population: 11032488944.0
       - date: '2316-10-21'
         faction:
           source: canon
           value:
             - TH
       - date: '2320-01-01'
-        population:
-          value: 11074680174.0
+        population: 11074680174.0
       - date: '2330-01-01'
-        population:
-          value: 11113156965.0
+        population: 11113156965.0
       - date: '2340-01-01'
-        population:
-          value: 11148304923.0
+        population: 11148304923.0
       - date: '2350-01-01'
-        population:
-          value: 11180598205.0
+        population: 11180598205.0
       - date: '2360-01-01'
-        population:
-          value: 11210304786.0
+        population: 11210304786.0
       - date: '2370-01-01'
-        population:
-          value: 11237557505.0
+        population: 11237557505.0
       - date: '2380-01-01'
-        population:
-          value: 11263011592.0
+        population: 11263011592.0
       - date: '2390-01-01'
-        population:
-          value: 11286526315.0
+        population: 11286526315.0
       - date: '2400-01-01'
-        population:
-          value: 11308597358.0
+        population: 11308597358.0
       - date: '2410-01-01'
-        population:
-          value: 11329091070.0
+        population: 11329091070.0
       - date: '2420-01-01'
-        population:
-          value: 11348260683.0
+        population: 11348260683.0
       - date: '2430-01-01'
-        population:
-          value: 11366038702.0
+        population: 11366038702.0
       - date: '2440-01-01'
-        population:
-          value: 11382502766.0
+        population: 11382502766.0
       - date: '2446-01-01'
-        socioIndustrial:
-          value: B-B-A-C-B
+        socioIndustrial: B-B-A-C-B
       - date: '2450-01-01'
-        population:
-          value: 11397701413.0
+        population: 11397701413.0
       - date: '2460-01-01'
-        population:
-          value: 11412236923.0
+        population: 11412236923.0
       - date: '2470-01-01'
-        population:
-          value: 11425794354.0
+        population: 11425794354.0
       - date: '2480-01-01'
-        population:
-          value: 11438724399.0
+        population: 11438724399.0
       - date: '2490-01-01'
-        population:
-          value: 11451032035.0
+        population: 11451032035.0
       - date: '2500-01-01'
-        population:
-          value: 11463381534.0
+        population: 11463381534.0
       - date: '2510-01-01'
-        population:
-          value: 11475799370.0
+        population: 11475799370.0
       - date: '2520-01-01'
-        population:
-          value: 11488075950.0
+        population: 11488075950.0
       - date: '2530-01-01'
-        population:
-          value: 11499620894.0
+        population: 11499620894.0
       - date: '2540-01-01'
-        population:
-          value: 11510235272.0
+        population: 11510235272.0
       - date: '2550-01-01'
-        population:
-          value: 11520180478.0
+        population: 11520180478.0
       - date: '2560-01-01'
-        population:
-          value: 11529148849.0
+        population: 11529148849.0
       - date: '2570-01-01'
-        population:
-          value: 11537460678.0
+        population: 11537460678.0
       - date: '2580-01-01'
-        population:
-          value: 11545647414.0
+        population: 11545647414.0
       - date: '2590-01-01'
-        population:
-          value: 11554192809.0
+        population: 11554192809.0
       - date: '2600-01-01'
-        population:
-          value: 11563095844.0
+        population: 11563095844.0
       - date: '2610-01-01'
-        population:
-          value: 11571124802.0
+        population: 11571124802.0
       - date: '2620-01-01'
-        population:
-          value: 11577679423.0
+        population: 11577679423.0
       - date: '2630-08-08'
         hpg:
           source: canon
           value: A
-        population:
-          value: 11584300423.0
+        population: 11584300423.0
       - date: '2640-01-01'
-        population:
-          value: 11591056703.0
+        population: 11591056703.0
       - date: '2650-01-01'
-        population:
-          value: 11597168694.0
+        population: 11597168694.0
       - date: '2660-01-01'
-        population:
-          value: 11602696060.0
+        population: 11602696060.0
       - date: '2666-01-01'
-        socioIndustrial:
-          value: A-A-A-B-A
+        socioIndustrial: A-A-A-B-A
       - date: '2670-01-01'
-        population:
-          value: 11606959295.0
+        population: 11606959295.0
       - date: '2680-01-01'
-        population:
-          value: 11610900215.0
+        population: 11610900215.0
       - date: '2690-01-01'
-        population:
-          value: 11614433275.0
+        population: 11614433275.0
       - date: '2700-01-01'
-        population:
-          value: 11616944789.0
+        population: 11616944789.0
       - date: '2710-01-01'
-        population:
-          value: 11618128948.0
+        population: 11618128948.0
       - date: '2720-01-01'
-        population:
-          value: 11617472291.0
+        population: 11617472291.0
       - date: '2730-01-01'
-        population:
-          value: 11615995995.0
+        population: 11615995995.0
       - date: '2740-01-01'
-        population:
-          value: 11612838319.0
+        population: 11612838319.0
       - date: '2750-01-01'
-        population:
-          value: 11607123411.0
+        population: 11607123411.0
       - date: '2760-01-01'
-        population:
-          value: 11598493372.0
+        population: 11598493372.0
       - date: '2767-06-11'
         faction:
           source: canon
           value:
             - RWR
-        population:
-          value: 12000000000.0
+        population: 12000000000.0
       - date: '2770-01-01'
-        population:
-          value: 11529401369.0
+        population: 11529401369.0
       - date: '2779-02-05'
         faction:
           source: canon
           value:
             - TH
       - date: '2780-01-01'
-        population:
-          value: 11373148719.0
+        population: 11373148719.0
       - date: '2788-06-25'
         faction:
           source: canon
           value:
             - CS
       - date: '2790-01-01'
-        population:
-          value: 11150031133.0
+        population: 11150031133.0
       - date: '2800-01-01'
-        population:
-          value: 11323603980.0
+        population: 11323603980.0
       - date: '2810-01-01'
-        population:
-          value: 11517418207.0
+        population: 11517418207.0
       - date: '2820-01-01'
-        population:
-          value: 11335600182.0
+        population: 11335600182.0
       - date: '2830-01-01'
-        population:
-          value: 10904617891.0
+        population: 10904617891.0
       - date: '2840-01-01'
-        population:
-          value: 10395626427.0
+        population: 10395626427.0
       - date: '2850-01-01'
-        population:
-          value: 9885162790.0
+        population: 9885162790.0
       - date: '2860-01-01'
-        population:
-          value: 9330968426.0
+        population: 9330968426.0
       - date: '2870-01-01'
-        population:
-          value: 8821455331.0
+        population: 8821455331.0
       - date: '2877-01-01'
-        socioIndustrial:
-          value: B-B-B-B-B
+        socioIndustrial: B-B-B-B-B
       - date: '2880-01-01'
-        population:
-          value: 8660834506.0
+        population: 8660834506.0
       - date: '2890-01-01'
-        population:
-          value: 8434707101.0
+        population: 8434707101.0
       - date: '2897-01-01'
-        socioIndustrial:
-          value: C-C-C-C-C
+        socioIndustrial: C-C-C-C-C
       - date: '2900-01-01'
-        population:
-          value: 8307156978.0
+        population: 8307156978.0
       - date: '2910-01-01'
-        population:
-          value: 8128695860.0
+        population: 8128695860.0
       - date: '2920-01-01'
-        population:
-          value: 7826966059.0
+        population: 7826966059.0
       - date: '2930-01-01'
-        population:
-          value: 7560688424.0
+        population: 7560688424.0
       - date: '2940-01-01'
-        population:
-          value: 7403848037.0
+        population: 7403848037.0
       - date: '2950-01-01'
-        population:
-          value: 7279331898.0
+        population: 7279331898.0
       - date: '2960-01-01'
-        population:
-          value: 7156787536.0
+        population: 7156787536.0
       - date: '2970-01-01'
-        population:
-          value: 6968774511.0
+        population: 6968774511.0
       - date: '2980-01-01'
-        population:
-          value: 6731398886.0
+        population: 6731398886.0
       - date: '2990-01-01'
-        population:
-          value: 6481212504.0
+        population: 6481212504.0
       - date: '3000-01-01'
-        population:
-          value: 6290589519.0
+        population: 6290589519.0
       - date: '3010-01-01'
-        population:
-          value: 6149815594.0
+        population: 6149815594.0
       - date: '3020-01-01'
-        population:
-          value: 6026622334.0
+        population: 6026622334.0
       - date: '3025-11-18'
         population:
+          source: canon
           value: 6000000000.0
-        socioIndustrial:
-          value: B-B-B-B-B
+        socioIndustrial: B-B-B-B-B
       - date: '3030-01-01'
-        population:
-          value: 6043719422.0
+        population: 6043719422.0
       - date: '3040-01-01'
-        population:
-          value: 6096452432.0
+        population: 6096452432.0
       - date: '3041-01-01'
         socioIndustrial:
           source: canon
           value: A-A-A-A-A
       - date: '3050-01-01'
-        population:
-          value: 6154278514.0
+        population: 6154278514.0
       - date: '3057-02-28'
         faction:
           source: canon
           value:
             - WOB
       - date: '3060-01-01'
-        population:
-          value: 6207265299.0
+        population: 6207265299.0
       - date: '3070-01-01'
-        population:
-          value: 6267253079.0
+        population: 6267253079.0
       - date: '3079-01-01'
         population:
+          source: canon
           value: 6350000000.0
       - date: '3079-01-12'
         faction:
@@ -858,41 +642,32 @@ planet:
           value:
             - Stone
       - date: '3080-01-01'
-        population:
-          value: 6350820116.0
+        population: 6350820116.0
       - date: '3081-01-24'
         faction:
           source: canon
           value:
             - ROS
       - date: '3090-01-01'
-        population:
-          value: 6396715320.0
+        population: 6396715320.0
       - date: '3095-01-01'
-        socioIndustrial:
-          value: A-A-A-A-A
+        socioIndustrial: A-A-A-A-A
       - date: '3100-01-01'
-        population:
-          value: 6437807968.0
+        population: 6437807968.0
       - date: '3110-01-01'
-        population:
-          value: 6459720824.0
+        population: 6459720824.0
       - date: '3120-01-01'
-        population:
-          value: 6460958095.0
+        population: 6460958095.0
       - date: '3130-01-01'
-        population:
-          value: 6477708559.0
+        population: 6477708559.0
       - date: '3132-08-07'
         hpg:
           source: canon
           value: X
       - date: '3140-01-01'
-        population:
-          value: 6517938233.0
+        population: 6517938233.0
       - date: '3145-01-01'
-        population:
-          value: 6555834723.0
+        population: 6555834723.0
   - name:
       source: canon
       value: Mars
@@ -904,26 +679,16 @@ planet:
       source: canon
       value: 4
     icon: mars
-    pressure:
-      value: TRACE
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
-    gravity:
-      value: 0.38
-    diameter:
-      value: 6779
-    density:
-      value: 3.9335
-    dayLength:
-      value: 24
-    yearLength:
-      value: 1.88
-    temperature:
-      value: 12
-    water:
-      value: 14
+    pressure: TRACE
+    atmosphere: TOXICPOISON
+    composition: Carbon Dioxide, Argon, and Nitrogen, plus trace gases
+    gravity: 0.38
+    diameter: 6779
+    density: 3.9335
+    dayLength: 24
+    yearLength: 1.88
+    temperature: 12
+    water: 14
     desc: |-
       3028 - In 2017, Mars was the first planet explored by humankind and was colonised soon after. In 2110, humanity's first attempt at terraforming began on Mars with the seeding of the two polar icecaps with a genetically enhanced plant that eventually caused the ice to melt and evaporate into the atmosphere. Other areas of Mars were planted with other hardy plants to convert carbon dioxide to oxygen and capture the sun's radiant heat. Ice asteroids were crashed into Mars to provide additional water and the resultant deep impact craters became the sites of domed cities. By 2201, rebreathers were no longer required and the temperature was above freezing. Mining companies began to actively exploit the metal depoists and industry soon followed. By the creation of the Star League, Mars had a population of over one million people in 20 domed cities. In 2601, the War Academy of Mars was completed. The Academy consisted of a vast complex of buildings, spaceports, battlefields and barracks located ind a hugh canyon approximately 100 kilometres southeast of Olympus Mons.
 
@@ -941,301 +706,211 @@ planet:
           source: canon
           value: BREATHABLE
         faction:
-          value:
-            - TA
-        population:
-          value: 10282.0
-        pressure:
-          value: THIN
+          - TA
+        population: 10282.0
+        pressure: THIN
         water:
           source: canon
           value: 39
       - date: '2210-01-01'
-        population:
-          value: 21775.0
+        population: 21775.0
       - date: '2220-01-01'
-        population:
-          value: 43993.0
+        population: 43993.0
       - date: '2230-01-01'
-        population:
-          value: 79096.0
+        population: 79096.0
       - date: '2240-01-01'
-        population:
-          value: 129077.0
+        population: 129077.0
       - date: '2250-01-01'
-        population:
-          value: 194107.0
+        population: 194107.0
       - date: '2260-01-01'
-        population:
-          value: 272893.0
+        population: 272893.0
       - date: '2270-01-01'
-        population:
-          value: 362600.0
+        population: 362600.0
       - date: '2280-01-01'
-        population:
-          value: 459438.0
+        population: 459438.0
       - date: '2290-01-01'
-        population:
-          value: 560128.0
+        population: 560128.0
       - date: '2300-01-01'
-        population:
-          value: 659618.0
+        population: 659618.0
       - date: '2310-01-01'
-        population:
-          value: 755443.0
+        population: 755443.0
       - date: '2316-04-29'
         faction:
           source: canon
           value:
             - TH
       - date: '2320-01-01'
-        population:
-          value: 845127.0
+        population: 845127.0
       - date: '2330-01-01'
-        population:
-          value: 924106.0
+        population: 924106.0
       - date: '2340-01-01'
-        population:
-          value: 988519.0
+        population: 988519.0
       - date: '2350-01-01'
-        population:
-          value: 1041982.0
+        population: 1041982.0
       - date: '2360-01-01'
-        population:
-          value: 1091660.0
+        population: 1091660.0
       - date: '2370-01-01'
-        population:
-          value: 1135215.0
+        population: 1135215.0
       - date: '2380-01-01'
-        population:
-          value: 1176663.0
+        population: 1176663.0
       - date: '2390-01-01'
-        population:
-          value: 1218254.0
+        population: 1218254.0
       - date: '2400-01-01'
-        population:
-          value: 1258362.0
+        population: 1258362.0
       - date: '2410-01-01'
-        population:
-          value: 1291834.0
+        population: 1291834.0
       - date: '2420-01-01'
-        population:
-          value: 1328345.0
+        population: 1328345.0
       - date: '2430-01-01'
-        population:
-          value: 1351768.0
+        population: 1351768.0
       - date: '2440-01-01'
-        population:
-          value: 1370864.0
+        population: 1370864.0
       - date: '2450-01-01'
-        population:
-          value: 1392464.0
+        population: 1392464.0
       - date: '2460-01-01'
-        population:
-          value: 1410369.0
+        population: 1410369.0
       - date: '2470-01-01'
-        population:
-          value: 1425470.0
+        population: 1425470.0
       - date: '2480-01-01'
-        population:
-          value: 1438223.0
+        population: 1438223.0
       - date: '2490-01-01'
-        population:
-          value: 1446889.0
+        population: 1446889.0
       - date: '2500-01-01'
-        population:
-          value: 1446192.0
+        population: 1446192.0
       - date: '2510-01-01'
-        population:
-          value: 1437632.0
+        population: 1437632.0
       - date: '2520-01-01'
-        population:
-          value: 1437372.0
+        population: 1437372.0
       - date: '2530-01-01'
-        population:
-          value: 1440562.0
+        population: 1440562.0
       - date: '2540-01-01'
-        population:
-          value: 1440838.0
+        population: 1440838.0
       - date: '2550-01-01'
-        population:
-          value: 1431188.0
+        population: 1431188.0
       - date: '2560-01-01'
-        population:
-          value: 1421873.0
+        population: 1421873.0
       - date: '2570-01-01'
-        population:
-          value: 1417197.0
+        population: 1417197.0
       - date: '2580-01-01'
-        population:
-          value: 1698118.0
+        population: 1698118.0
       - date: '2590-01-01'
-        population:
-          value: 2067096.0
+        population: 2067096.0
       - date: '2600-01-01'
-        population:
-          value: 2523849.0
+        population: 2523849.0
       - date: '2610-01-01'
-        population:
-          value: 3095186.0
+        population: 3095186.0
       - date: '2620-01-01'
-        population:
-          value: 3820360.0
+        population: 3820360.0
       - date: '2630-01-01'
-        population:
-          value: 4710698.0
+        population: 4710698.0
       - date: '2640-01-01'
-        population:
-          value: 5810866.0
+        population: 5810866.0
       - date: '2650-01-01'
-        population:
-          value: 7120575.0
+        population: 7120575.0
       - date: '2660-01-01'
-        population:
-          value: 8686971.0
+        population: 8686971.0
       - date: '2670-01-01'
-        population:
-          value: 10600077.0
+        population: 10600077.0
       - date: '2680-01-01'
-        population:
-          value: 13038938.0
+        population: 13038938.0
       - date: '2690-01-01'
-        population:
-          value: 16067978.0
+        population: 16067978.0
       - date: '2700-01-01'
-        population:
-          value: 19836546.0
+        population: 19836546.0
       - date: '2710-01-01'
-        population:
-          value: 24474225.0
+        population: 24474225.0
       - date: '2720-01-01'
-        population:
-          value: 30226538.0
+        population: 30226538.0
       - date: '2730-01-01'
-        population:
-          value: 37240895.0
+        population: 37240895.0
       - date: '2740-01-01'
-        population:
-          value: 45947618.0
+        population: 45947618.0
       - date: '2750-01-01'
-        population:
-          value: 56428392.0
+        population: 56428392.0
       - date: '2760-01-01'
-        population:
-          value: 68841607.0
+        population: 68841607.0
       - date: '2767-03-06'
         faction:
           source: canon
           value:
             - RWR
       - date: '2770-01-01'
-        population:
-          value: 72481756.0
+        population: 72481756.0
       - date: '2779-10-13'
         faction:
           source: canon
           value:
             - TH
       - date: '2780-01-01'
-        population:
-          value: 66145803.0
+        population: 66145803.0
       - date: '2788-06-25'
         faction:
           source: canon
           value:
             - CS
       - date: '2790-01-01'
-        population:
-          value: 60274531.0
+        population: 60274531.0
       - date: '2800-01-01'
-        population:
-          value: 55046340.0
+        population: 55046340.0
       - date: '2810-01-01'
-        population:
-          value: 50215932.0
+        population: 50215932.0
       - date: '2820-01-01'
-        population:
-          value: 45843274.0
+        population: 45843274.0
       - date: '2830-01-01'
-        population:
-          value: 41635384.0
+        population: 41635384.0
       - date: '2840-01-01'
-        population:
-          value: 37722998.0
+        population: 37722998.0
       - date: '2850-01-01'
-        population:
-          value: 34159308.0
+        population: 34159308.0
       - date: '2860-01-01'
-        population:
-          value: 30937996.0
+        population: 30937996.0
       - date: '2870-01-01'
-        population:
-          value: 28087858.0
+        population: 28087858.0
       - date: '2880-01-01'
-        population:
-          value: 25457911.0
+        population: 25457911.0
       - date: '2890-01-01'
-        population:
-          value: 22984843.0
+        population: 22984843.0
       - date: '2900-01-01'
-        population:
-          value: 20790401.0
+        population: 20790401.0
       - date: '2910-01-01'
-        population:
-          value: 18948493.0
+        population: 18948493.0
       - date: '2920-01-01'
-        population:
-          value: 17368983.0
+        population: 17368983.0
       - date: '2930-01-01'
-        population:
-          value: 15850683.0
+        population: 15850683.0
       - date: '2940-01-01'
-        population:
-          value: 14459759.0
+        population: 14459759.0
       - date: '2950-01-01'
-        population:
-          value: 13203085.0
+        population: 13203085.0
       - date: '2960-01-01'
-        population:
-          value: 12084622.0
+        population: 12084622.0
       - date: '2970-01-01'
-        population:
-          value: 11022140.0
+        population: 11022140.0
       - date: '2980-01-01'
-        population:
-          value: 10015984.0
+        population: 10015984.0
       - date: '2990-01-01'
-        population:
-          value: 9101675.0
+        population: 9101675.0
       - date: '3000-01-01'
-        population:
-          value: 8287659.0
+        population: 8287659.0
       - date: '3010-01-01'
-        population:
-          value: 7552025.0
+        population: 7552025.0
       - date: '3020-01-01'
-        population:
-          value: 6912276.0
+        population: 6912276.0
       - date: '3030-01-01'
-        population:
-          value: 6320879.0
+        population: 6320879.0
       - date: '3040-01-01'
-        population:
-          value: 5792912.0
+        population: 5792912.0
       - date: '3050-01-01'
-        population:
-          value: 5324766.0
+        population: 5324766.0
       - date: '3057-02-28'
         faction:
           source: canon
           value:
             - WOB
       - date: '3060-01-01'
-        population:
-          value: 4895356.0
+        population: 4895356.0
       - date: '3070-01-01'
-        population:
-          value: 4493097.0
+        population: 4493097.0
       - date: '3077-01-01'
         population:
           source: canon
@@ -1253,34 +928,26 @@ planet:
           value:
             - Stone
       - date: '3080-01-01'
-        population:
-          value: 4261917.0
+        population: 4261917.0
       - date: '3081-09-06'
         faction:
           source: canon
           value:
             - ROS
       - date: '3090-01-01'
-        population:
-          value: 4288423.0
+        population: 4288423.0
       - date: '3100-01-01'
-        population:
-          value: 4293572.0
+        population: 4293572.0
       - date: '3110-01-01'
-        population:
-          value: 4321139.0
+        population: 4321139.0
       - date: '3120-01-01'
-        population:
-          value: 4376805.0
+        population: 4376805.0
       - date: '3130-01-01'
-        population:
-          value: 4458084.0
+        population: 4458084.0
       - date: '3140-01-01'
-        population:
-          value: 4542688.0
+        population: 4542688.0
       - date: '3145-01-01'
-        population:
-          value: 4586508.0
+        population: 4586508.0
   - name:
       source: canon
       value: Main Asteroid Belt
@@ -1292,10 +959,8 @@ planet:
       source: canon
       value: 5
     icon: asteroid1
-    yearLength:
-      value: 4.44
-    temperature:
-      value: -91
+    yearLength: 4.44
+    temperature: -91
   - name:
       source: canon
       value: Jupiter
@@ -1307,68 +972,51 @@ planet:
       source: canon
       value: 6
     icon: jupiter
-    pressure:
-      value: VERY_HIGH
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Hydrogen and Helium, plus trace gases
-    gravity:
-      value: 2.53
-    diameter:
-      value: 139820
-    density:
-      value: 1.33
-    dayLength:
-      value: 9
-    yearLength:
-      value: 12.0
-    ring:
-      value: yes
-    smallMoons:
-      value: 73
+    pressure: VERY_HIGH
+    atmosphere: TOXICPOISON
+    composition: Hydrogen and Helium, plus trace gases
+    gravity: 2.53
+    diameter: 139820
+    density: 1.33
+    dayLength: 9
+    yearLength: 12.0
+    ring: yes
+    smallMoons: 73
     satellite:
       - name:
           source: canon
           value: Ganymede
-        size:
-          value: large
+        size: large
         icon: rock16
       - name:
           source: canon
           value: Callisto
-        size:
-          value: large
+        size: large
         icon: rock7
       - name:
           source: canon
           value: Io
-        size:
-          value: large
+        size: large
         icon: rock17
       - name:
           source: canon
           value: Europa
-        size:
-          value: large
+        size: large
         icon: rock2
       - name:
           source: canon
           value: Amalthea
-        size:
-          value: medium
+        size: medium
         icon: rock13
       - name:
           source: canon
           value: Himalia
-        size:
-          value: medium
+        size: medium
         icon: rock5
       - name:
           source: canon
           value: Thebe
-        size:
-          value: medium
+        size: medium
         icon: oddmoon2
   - name:
       source: canon
@@ -1381,92 +1029,71 @@ planet:
       source: canon
       value: 7
     icon: saturn
-    pressure:
-      value: VERY_HIGH
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Hydrogen and Helium, plus trace gases
-    gravity:
-      value: 1.07
-    diameter:
-      value: 116460
-    density:
-      value: 0.687
-    dayLength:
-      value: 10
-    yearLength:
-      value: 29.0
-    ring:
-      value: yes
-    smallMoons:
-      value: 51
+    pressure: VERY_HIGH
+    atmosphere: TOXICPOISON
+    composition: Hydrogen and Helium, plus trace gases
+    gravity: 1.07
+    diameter: 116460
+    density: 0.687
+    dayLength: 10
+    yearLength: 29.0
+    ring: yes
+    smallMoons: 51
     satellite:
       - name:
           source: canon
           value: Titan
-        size:
-          value: giant
+        size: giant
         icon: rock17
       - name:
           source: canon
           value: Rhea
-        size:
-          value: large
+        size: large
         icon: rock15
       - name:
           source: canon
           value: Iapetus
-        size:
-          value: large
+        size: large
         icon: rock2
       - name:
           source: canon
           value: Dione
-        size:
-          value: large
+        size: large
         icon: rock1
       - name:
           source: canon
           value: Tethys
-        size:
-          value: large
+        size: large
         icon: rock11
       - name:
           source: canon
           value: Enceladus
-        size:
-          value: large
+        size: large
         icon: rock6
       - name:
           source: canon
           value: Mimas
-        size:
-          value: medium
+        size: medium
         icon: oddmoon2
       - name:
           source: canon
           value: Hyperion
-        size:
-          value: medium
+        size: medium
         icon: oddmoon3
       - name:
           source: canon
           value: Phoebe
-        size:
-          value: medium
+        size: medium
         icon: oddmoon1
       - name:
           source: canon
           value: Janus
-        size:
-          value: medium
+        size: medium
         icon: rock9
       - name:
           source: canon
           value: Epimetheus
-        size:
-          value: medium
+        size: medium
         icon: rock8
   - name:
       source: canon
@@ -1479,22 +1106,14 @@ planet:
       source: canon
       value: 8
     icon: uranus
-    pressure:
-      value: VERY_HIGH
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Hydrogen and Helium, plus trace gases
-    gravity:
-      value: 0.89
-    diameter:
-      value: 50724
-    density:
-      value: 1.27
-    dayLength:
-      value: 17
-    yearLength:
-      value: 84.0
+    pressure: VERY_HIGH
+    atmosphere: TOXICPOISON
+    composition: Hydrogen and Helium, plus trace gases
+    gravity: 0.89
+    diameter: 50724
+    density: 1.27
+    dayLength: 17
+    yearLength: 84.0
     smallMoons:
       source: canon
       value: 22
@@ -1502,32 +1121,27 @@ planet:
       - name:
           source: canon
           value: Titania
-        size:
-          value: large
+        size: large
         icon: rock12
       - name:
           source: canon
           value: Oberon
-        size:
-          value: large
+        size: large
         icon: rock4
       - name:
           source: canon
           value: Umbriel
-        size:
-          value: large
+        size: large
         icon: rock17
       - name:
           source: canon
           value: Ariel
-        size:
-          value: large
+        size: large
         icon: rock11
       - name:
           source: canon
           value: Miranda
-        size:
-          value: medium
+        size: medium
         icon: rock3
   - name:
       source: canon
@@ -1540,22 +1154,14 @@ planet:
       source: canon
       value: 9
     icon: neptune
-    pressure:
-      value: VERY_HIGH
-    atmosphere:
-      value: TOXICPOISON
-    composition:
-      value: Hydrogen and Helium, plus trace gases
-    gravity:
-      value: 1.14
-    diameter:
-      value: 49244
-    density:
-      value: 1.64
-    dayLength:
-      value: 16
-    yearLength:
-      value: 164.8
+    pressure: VERY_HIGH
+    atmosphere: TOXICPOISON
+    composition: Hydrogen and Helium, plus trace gases
+    gravity: 1.14
+    diameter: 49244
+    density: 1.64
+    dayLength: 16
+    yearLength: 164.8
     smallMoons:
       source: canon
       value: 8
@@ -1563,36 +1169,30 @@ planet:
       - name:
           source: canon
           value: Triton
-        size:
-          value: large
+        size: large
         icon: rock3
       - name:
           source: canon
           value: Proteus
-        size:
-          value: medium
+        size: medium
         icon: rock6
       - name:
           source: canon
           value: Nereid
-        size:
-          value: medium
+        size: medium
         icon: rock1
       - name:
           source: canon
           value: Larissa
-        size:
-          value: medium
+        size: medium
         icon: rock2
       - name:
           source: canon
           value: Galatea
-        size:
-          value: medium
+        size: medium
         icon: rock5
       - name:
           source: canon
           value: Despina
-        size:
-          value: medium
+        size: medium
         icon: rock7
