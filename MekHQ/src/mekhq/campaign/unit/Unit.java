@@ -5547,6 +5547,10 @@ public class Unit implements ITechnology {
             if (!getTransportCapabilities(TACTICAL_TRANSPORT).isEmpty()) {
                 getCampaign().addCampaignTransport(TACTICAL_TRANSPORT, this);
             }
+
+            if (!getTransportCapabilities(TOW_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(TOW_TRANSPORT, this);
+            }
         }
     }
 

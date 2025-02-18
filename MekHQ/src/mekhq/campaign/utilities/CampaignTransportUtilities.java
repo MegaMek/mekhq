@@ -66,6 +66,7 @@ public class CampaignTransportUtilities {
 
     /**
      * Most slots are 1:1, infantry use their tonnage in some cases
+     * TANK_TRAILER_HITCH use the maximum pulling capacity of its tractor
      *
      * @param transporterType type (Enum) of Transporter
      * @param transportedUnit Entity we want the capacity usage of
@@ -79,6 +80,8 @@ public class CampaignTransportUtilities {
             else if (transporterType == INFANTRY_COMPARTMENT) {
                 return calcInfantryCompartmentWeight(transportedUnit);
             }
+        } else if (transporterType == TANK_TRAILER_HITCH) {
+            return transportedUnit.getWeight();
         }
         return 1.0;
     }

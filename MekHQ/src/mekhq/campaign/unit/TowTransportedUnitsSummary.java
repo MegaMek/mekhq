@@ -1,7 +1,7 @@
 package mekhq.campaign.unit;
 
-import megamek.common.Entity;
 import megamek.common.Tank;
+import megamek.common.TankTrailerHitch;
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -10,6 +10,7 @@ import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 
@@ -18,6 +19,13 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
 
     public TowTransportedUnitsSummary(Unit transport) {
         super(transport);
+    }
+
+    @Override
+    protected void init() {
+        if (transport.getEntity() != null && transport.getEntity() instanceof Tank tractor && transport.getEntity().isTractor()) {
+            recalculateTransportCapacity(new Vector<>(tractor.getTransports().stream().filter(t -> t instanceof TankTrailerHitch).collect(Collectors.toSet())));
+        }
     }
 
     /**
@@ -43,10 +51,41 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
 
     @Override
     public void recalculateTransportCapacity(Vector<Transporter> transporters) {
-        if (transport.getEntity() instanceof Tank tank) {
-            //tank.get
+        Set<Transporter> trailerHitches = transporters.stream().filter(t -> t instanceof TankTrailerHitch).collect(Collectors.toSet());
+        if (trailerHitches.isEmpty()) {
+            return;
         }
-        super.recalculateTransportCapacity(transporters);
+        if (transport.getEntity() instanceof Tank tank) {
+            Unit tractor;
+
+            if (tank.isTrailer()) {
+                if (transport.hasTransportAssignment(TOW_TRANSPORT)) {
+                    tractor = transport.getTransportAssignment(TOW_TRANSPORT).getTransport();
+                    while (tractor.hasTransportAssignment(TOW_TRANSPORT)) {
+                        tractor = transport.getTransportAssignment(TOW_TRANSPORT).getTransport();
+                    }
+                } else {
+                    // No tractor, no towing!
+                    setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, Double.MIN_VALUE);
+                    return;
+                }
+            } else {
+                tractor = transport;
+            }
+            Vector<Unit> otherTrailers = new Vector<>();
+            if (tractor.hasTransportedUnits(TOW_TRANSPORT)) {
+                Unit towingUnit = tractor.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
+                otherTrailers.add(towingUnit);
+                while (towingUnit != null && towingUnit.hasTransportedUnits(TOW_TRANSPORT)) {
+                    towingUnit = towingUnit.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
+                    otherTrailers.add(towingUnit);
+                }
+            }
+
+            // Finally calculate our towing capacity
+            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, tractor.getEntity().getWeight()
+                - otherTrailers.stream().mapToDouble(u -> u.getEntity().getWeight()).sum());
+        }
     }
 
     /**
