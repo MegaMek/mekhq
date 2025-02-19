@@ -55,7 +55,9 @@ public enum TransporterType {
     BATTLE_ARMOR_HANDLES_TANK(BattleArmorHandlesTank.class),
     CLAMP_MOUNT_MEK(ClampMountMek.class),
     CLAMP_MOUNT_TANK(ClampMountTank.class),
-    PROTO_MEK_CLAMP_MOUNT(ProtoMekClampMount.class);
+    PROTO_MEK_CLAMP_MOUNT(ProtoMekClampMount.class),
+    CARGO_BAY(CargoBay.class);
+    // TODO from MekHQ#5928: CARGO_CONTAINER(CargoContainer.class) - Add this once CargoContainer implements Transporter
 
     // endregion Enum declarations
 
