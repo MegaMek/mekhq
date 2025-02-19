@@ -160,8 +160,8 @@
             <firstname>Julius</firstname>
             <age>32</age>
             <clan>true</clan>
-            <phenotype>MekWarrior</phenotype>
-            <primaryRole>MekWarrior</primaryRole>
+            <phenotype>MEKWARRIOR</phenotype>
+            <primaryRole>MEKWARRIOR</primaryRole>
             <edge>3</edge>
             <editOrigin>false</editOrigin>
             <editBirthday>false</editBirthday>
