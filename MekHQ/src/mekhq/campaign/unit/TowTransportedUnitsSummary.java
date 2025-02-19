@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
  *
  *  This file is part of MekHQ.
  *
@@ -19,12 +19,14 @@
 
 package mekhq.campaign.unit;
 
+import megamek.common.Entity;
 import megamek.common.Tank;
 import megamek.common.TankTrailerHitch;
 import megamek.common.Transporter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.enums.TransporterType;
 
 import java.util.*;
@@ -32,18 +34,23 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 
+/**
+ * Tracks what units this tractor is towing, and its current capacity for towing more units if it
+ * is the lead tractor. Tractors and towing are weirder than other CampaignTransportTypes so
+ * there is a lot more "hard-coding" to this being used with TANK_TRAILER_HITCHes because of
+ * the unique rules around tractors and trailers.
+ *
+ * @see AbstractTransportedUnitsSummary
+ * @see CampaignTransportType#TOW_TRANSPORT
+ * @see TankTrailerHitch
+ * @see TransporterType#TANK_TRAILER_HITCH
+ *
+ */
 public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
     private static final MMLogger logger = MMLogger.create(TowTransportedUnitsSummary.class);
 
     public TowTransportedUnitsSummary(Unit transport) {
         super(transport);
-    }
-
-    @Override
-    protected void init() {
-        if (transport.getEntity() != null && transport.getEntity() instanceof Tank tractor && !transport.getEntity().isTrailer()) {
-            recalculateTransportCapacity(tractor);
-        }
     }
 
     /**
@@ -67,10 +74,21 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
         recalculateTransportCapacity(transport.getEntity().getTransports());
     }
 
+    /**
+     * Recalculates transport capacity - Pass in all the transporters if you want,
+     * but it just matters if it has a TANK_TRAILER_HITCH. This is special for tow
+     * transport and will only calculate it for the TANK_TRAILER_HITCH, and it will
+     * only calculate the transport capacity if this unit is the tractor pulling
+     * all the trailers, otherwise it sets the unit's capacity to 0.
+     * @param transporters What transporters are we recalculating?
+     * @see Entity#getTransports()
+     * @see TankTrailerHitch
+     */
     @Override
     public void recalculateTransportCapacity(Vector<Transporter> transporters) {
-        Set<Transporter> trailerHitches = transporters.stream().filter(t -> t instanceof TankTrailerHitch).collect(Collectors.toSet());
-        if (trailerHitches.isEmpty()) {
+        // Make sure we have a trailer hitch for towing first
+        boolean noTrailerHitch = transporters.stream().noneMatch(t -> t instanceof TankTrailerHitch);
+        if (noTrailerHitch) {
             return;
         }
         Unit tractor = getTractor();
@@ -103,6 +121,91 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
         setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, tractor.getEntity().getWeight()
             - otherTrailers.stream().filter(u -> u.getEntity() != null).mapToDouble(u -> u.getEntity().getWeight()).sum());
     }
+
+    /**
+     * Fixes references after loading
+     *
+     * @param campaign
+     * @param unit
+     */
+    @Override
+    public void fixReferences(Campaign campaign, Unit unit) {
+
+        Set<Unit> oldTransportedUnits = new HashSet<>(getTransportedUnits());
+        clearTransportedUnits();
+        for (Unit towTransportedUnit : oldTransportedUnits) {
+            if (towTransportedUnit instanceof Unit.UnitRef) {
+                Unit realUnit = campaign.getHangar().getUnit(towTransportedUnit.getId());
+                if (realUnit != null) {
+                    if (realUnit.hasTransportAssignment(TOW_TRANSPORT)) {
+                        towTrailer(realUnit, null, realUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
+                    } else {
+                        logger.error("Unit {} ('{}') references tow transported unit {} which has no transport assignment",
+                                unit.getId(), unit.getName(), towTransportedUnit.getId());
+                    }
+                } else {
+                    logger.error("Unit {} ('{}') references missing tow transported unit {}",
+                            unit.getId(), unit.getName(), towTransportedUnit.getId());
+                }
+            } else {
+                towTrailer(towTransportedUnit, null, towTransportedUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
+            }
+        }
+    }
+
+    /**
+     * Designate a unit to be towed by the transport. Will update transport capacities.
+     * The transport assignments will be between the specific units that are attached,
+     * essentially forming a linked list. We only want to attach to the front-most
+     * unit though because that unit determines the towing capacity.
+     * @param towedUnit unit assigned as being towed
+     * @param transportedLocation specific hitch being used
+     * @param transporterType transporter type
+     * @return unit that was previously pulling this unit, or null
+     */
+    public Unit towTrailer(Unit towedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+        Unit oldTractor = null;
+        if (towedUnit.getTransportAssignment(TOW_TRANSPORT) != null) {
+            oldTractor = towedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport();
+            if (oldTractor != null && !oldTractor.equals(transport)) {
+                oldTractor.unloadFromTransport(TOW_TRANSPORT);
+            }
+        }
+        if (transportedLocation != null) {
+            towedUnit.setTransportAssignment(TOW_TRANSPORT, new TransportAssignment(transport, transportedLocation));
+        }
+        else if (transporterType != null){
+            towedUnit.setTransportAssignment(TOW_TRANSPORT,new TransportAssignment(transport, transporterType));
+        } else {
+            logger.error("Cannot load transport ({}) with unit ({}) without a transported location or transporter!", transport.getId(), towedUnit.getId());
+            return oldTractor;
+        }
+        addTransportedUnit(Objects.requireNonNull(towedUnit));
+
+        // Update Transport Capacities
+        if (!Objects.equals(oldTractor, transport)) {
+            if (transport.getEntity() != null & !transport.getEntity().isTrailer() && transport.getEntity() instanceof Tank tank) {
+                recalculateTransportCapacity(tank);
+            }
+            else {
+                Unit tractor = getTractor();
+
+                if (tractor != null && tractor.getTransportedUnitsSummary(TOW_TRANSPORT) != null && tractor.getEntity() instanceof Tank tractorTank) {
+                    ((TowTransportedUnitsSummary) tractor.getTransportedUnitsSummary(TOW_TRANSPORT)).recalculateTransportCapacity(tractorTank);
+                }
+            }
+        }
+
+        return oldTractor;
+    }
+
+    @Override
+    protected void init() {
+        if (transport.getEntity() != null && transport.getEntity() instanceof Tank tractor && !transport.getEntity().isTrailer()) {
+            recalculateTransportCapacity(tractor);
+        }
+    }
+
 
     @Override
     protected void unloadTransport(Unit transportedUnit) {
@@ -149,79 +252,6 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
             tractor = transport;
         }
         return tractor;
-    }
-
-    /**
-     * Fixes references after loading
-     *
-     * @param campaign
-     * @param unit
-     */
-    @Override
-    public void fixReferences(Campaign campaign, Unit unit) {
-
-        Set<Unit> oldTransportedUnits = new HashSet<>(getTransportedUnits());
-        clearTransportedUnits();
-        for (Unit towTransportedUnit : oldTransportedUnits) {
-            if (towTransportedUnit instanceof Unit.UnitRef) {
-                Unit realUnit = campaign.getHangar().getUnit(towTransportedUnit.getId());
-                if (realUnit != null) {
-                    if (realUnit.hasTransportAssignment(TOW_TRANSPORT)) {
-                        towTrailer(realUnit, null, realUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
-                    } else {
-                        logger.error(
-                            String.format("Unit %s ('%s') references tow transported unit %s which has no transport assignment",
-                                unit.getId(), unit.getName(), towTransportedUnit.getId()));
-                    }
-                } else {
-                    logger.error(
-                        String.format("Unit %s ('%s') references missing tow transported unit %s",
-                            unit.getId(), unit.getName(), towTransportedUnit.getId()));
-                }
-            } else {
-                towTrailer(towTransportedUnit, null, towTransportedUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
-            }
-        }
-    }
-
-    public Unit loadTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
-        return towTrailer(transportedUnit, transportedLocation, transporterType);
-    }
-
-    public Unit towTrailer(Unit towedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
-        Unit oldTractor = null;
-        if (towedUnit.getTransportAssignment(TOW_TRANSPORT) != null) {
-            oldTractor = towedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport();
-            if (oldTractor != null && !oldTractor.equals(transport)) {
-                oldTractor.unloadFromTransport(TOW_TRANSPORT);
-            }
-        }
-        if (transportedLocation != null) {
-            towedUnit.setTransportAssignment(TOW_TRANSPORT, new TransportAssignment(transport, transportedLocation));
-        }
-        else if (transporterType != null){
-            towedUnit.setTransportAssignment(TOW_TRANSPORT,new TransportAssignment(transport, transporterType));
-        } else {
-            logger.error(String.format("Cannot load transport (%s) with unit (%s) without a transported location or transporter!", transport.getId(), towedUnit.getId()));
-            return oldTractor;
-        }
-        addTransportedUnit(Objects.requireNonNull(towedUnit));
-
-        // Update Transport Capacities
-        if (!Objects.equals(oldTractor, transport)) {
-            if (transport.getEntity() != null & !transport.getEntity().isTrailer() && transport.getEntity() instanceof Tank tank) {
-                recalculateTransportCapacity(tank);
-            }
-            else {
-                Unit tractor = getTractor();
-
-                if (tractor != null && tractor.getTransportedUnitsSummary(TOW_TRANSPORT) != null && tractor.getEntity() instanceof Tank tractorTank) {
-                    ((TowTransportedUnitsSummary) tractor.getTransportedUnitsSummary(TOW_TRANSPORT)).recalculateTransportCapacity(tractorTank);
-                }
-            }
-        }
-
-        return oldTractor;
     }
 
     private void recalculateTransportCapacity(Tank tractor) {

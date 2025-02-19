@@ -22,15 +22,12 @@ import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.UUID;
 import java.util.Vector;
 
-import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

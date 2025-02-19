@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
  *
  *  This file is part of MekHQ.
  *
@@ -23,8 +23,6 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
-
-import static mekhq.campaign.enums.CampaignTransportType.*;
 
 /**
  * We need to determine what units in game are transports, and what units they're transporting.

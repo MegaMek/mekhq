@@ -49,7 +49,9 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static mekhq.campaign.enums.CampaignTransportType.*;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 
 /**

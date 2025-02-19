@@ -82,7 +82,9 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
-import static mekhq.campaign.enums.CampaignTransportType.*;
+import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
