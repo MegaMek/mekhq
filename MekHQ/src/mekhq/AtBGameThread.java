@@ -506,8 +506,8 @@ public class AtBGameThread extends GameThread {
 
                         if (transport.hasTransportedUnits(TOW_TRANSPORT)) {
                             towUnits = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.text", transport.getName()),
-                                MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TACTICAL_TRANSPORT.title"), JOptionPane.YES_NO_OPTION));
+                                MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.text", transport.getName()),
+                                MHQInternationalization.getFormattedTextAt("mekhq.resources.AssignForceToTransport", "AtBGameThread.loadTransportDialog.TOW_TRANSPORT.title"), JOptionPane.YES_NO_OPTION));
                         }
 
                         // Now, send the load commands
@@ -515,11 +515,10 @@ public class AtBGameThread extends GameThread {
                             // Convert the list of Unit UUIDs to MM EntityIds
                             Unit towedUnit = campaign.getUnit(potentialTransports.getTransportedUnits(TOW_TRANSPORT, transportId).get(0));
                             if (towedUnit != null && towedUnit.getEntity() != null) {
-                            client.sendUpdateEntity(transport.getEntity());
-                            // And now load the units.
-                            Utilities.towPlayerTrailers(transport.getEntity().getId(), towedUnit.getEntity().getId(),
-                                client, towUnits, alreadyResetTransport.contains(transportId));
-                            alreadyResetTransport.add(transportId);
+                                // And now load the units.
+                                Utilities.towPlayerTrailers(transport.getEntity().getId(), towedUnit.getEntity().getId(),
+                                    client, towUnits, alreadyResetTransport.contains(transportId));
+                                alreadyResetTransport.add(transportId);
                             }
                         }
                     }

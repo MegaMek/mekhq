@@ -1173,11 +1173,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 unassignTacticalTransportMenuClass(unitsInForces, popup);
                 unassignFromTacticalTransportMenuClass(unitsInForces, popup);
 
-                if (unitsInForces.size() == 1) {
-                    JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTowTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
-                    detachFromTractorTransportMenuClass(units, popup);
-                    detachTrailerTransportMenuClass(units, popup);
-                }
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTowTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
+                detachFromTractorTransportMenuClass(units, popup);
+                detachTrailerTransportMenuClass(units, popup);
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);

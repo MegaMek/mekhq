@@ -550,6 +550,9 @@ public class Unit implements ITechnology {
      * @return transport the unit was assigned to
      */
     public Unit unloadFromTransport(CampaignTransportType campaignTransportType) {
+        if (!hasTransportAssignment(campaignTransportType)) {
+            return null;
+        }
         Unit oldTransport = getTransportAssignment(campaignTransportType).getTransport();
         oldTransport.getTransportedUnitsSummary(campaignTransportType).unloadTransport(this);
         return oldTransport;
@@ -2493,8 +2496,29 @@ public class Unit implements ITechnology {
                 + "\"" + transportedLocation + "/>");
         }
 
-        for (Unit unit : getTacticalTransportedUnits()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tacticalTransportedUnitId", unit.getId());
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            // Some transports were set up before this and use a different saving & loading pattern. Let's ignore them.
+            if (campaignTransportType.equals(SHIP_TRANSPORT)) {
+                continue;
+            }
+
+            if (hasTransportAssignment(campaignTransportType)) {
+                String transportedLocation = "";
+                if (getTransportAssignment(campaignTransportType).hasTransportedLocation()) {
+                    transportedLocation += " transportedLocation=\"" + getTransportAssignment(campaignTransportType).getTransportedLocation() + "\"";
+                } else if (getTransportAssignment(campaignTransportType).hasTransporterType()) {
+                    transportedLocation += " transporterType=\"" + getTransportAssignment(campaignTransportType).getTransporterType() + "\"";
+                }
+                pw.println(MHQXMLUtility.indentStr(indent) + "<transportAssignment id=\""
+                    + getTransportAssignment(campaignTransportType).getTransport().getId()
+                    + "\"" + transportedLocation + " campaignTransportType=\"" + campaignTransportType + "\"/>");
+            }
+
+            for (Unit unit : getTransportedUnits(campaignTransportType)) {
+                pw.println(MHQXMLUtility.indentStr(indent) + "<transportedUnit id=\"" + unit.getId()
+                    + "\" " + "campaignTransportType=\"" + campaignTransportType + "\"/>");
+
+            }
         }
 
         // END new transports
@@ -2656,25 +2680,37 @@ public class Unit implements ITechnology {
                     needsBayInitialization = false;
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportAssignment")) {
                     NamedNodeMap attributes = wn2.getAttributes();
+                    CampaignTransportType campaignTransportType;
+                    if (attributes.getNamedItem("campaignTransportType") != null) {
+                        campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem("campaignTransportType").getTextContent());
+                    } else {
+                        // Tactical transports were added before the campaignTransportType attribute was. Assume it's a tactical transport.
+                        campaignTransportType = CampaignTransportType.TACTICAL_TRANSPORT;
+                    }
                     UUID id = UUID.fromString(attributes.getNamedItem("id").getTextContent());
                     Transporter transportedLocation = null;
                     if (attributes.getNamedItem("transportedLocation") != null) {
                         int transportedLocationHash = Integer.parseInt(attributes.getNamedItem("transportedLocation").getTextContent());
-                        retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id), transportedLocationHash));
+                        retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id), transportedLocationHash));
                     } else if (attributes.getNamedItem("transporterType") != null) {
                         try {
                             TransporterType transporterType = TransporterType.valueOf((attributes.getNamedItem("transporterType").getTextContent()));
-                            retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id), transporterType));
+                            retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id), transporterType));
                         }
                         catch (IllegalArgumentException e) {
                             logger.error(e, "Could not find transporter type.");
-                            retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id)));
+                            retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
                         }
                     } else {
-                        retVal.setTacticalTransportAssignment(new TransportAssignment(new UnitRef(id)));
+                        retVal.setTransportAssignment(campaignTransportType, new TransportAssignment(new UnitRef(id)));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("tacticalTransportedUnitId")) {
+                    // Legacy support for 50.03 tactical transport saves
                     retVal.addTacticalTransportedUnit(new UnitRef(UUID.fromString(wn2.getTextContent())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportedUnit")){
+                    NamedNodeMap attributes = wn2.getAttributes();
+                    CampaignTransportType campaignTransportType = CampaignTransportType.valueOf(attributes.getNamedItem("campaignTransportType").getTextContent());
+                    retVal.addTransportedUnit(campaignTransportType, new UnitRef(UUID.fromString(attributes.getNamedItem("id").getTextContent())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
                     retVal.forceId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {

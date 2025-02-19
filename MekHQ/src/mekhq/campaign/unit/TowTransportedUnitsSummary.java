@@ -23,8 +23,8 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
 
     @Override
     protected void init() {
-        if (transport.getEntity() != null && transport.getEntity() instanceof Tank tractor && transport.getEntity().isTractor()) {
-            recalculateTransportCapacity(new Vector<>(tractor.getTransports().stream().filter(t -> t instanceof TankTrailerHitch).collect(Collectors.toSet())));
+        if (transport.getEntity() != null && transport.getEntity() instanceof Tank tractor && !transport.getEntity().isTrailer()) {
+            recalculateTransportCapacity(tractor);
         }
     }
 
@@ -55,37 +55,78 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
         if (trailerHitches.isEmpty()) {
             return;
         }
-        if (transport.getEntity() instanceof Tank tank) {
-            Unit tractor;
+        Unit tractor = getTractor();
 
+        // Can't finish the calculations if the tractor isn't initialized yet, let's get out of here.
+        if (tractor == null || tractor.getEntity() == null) {
+            return;
+        }
+
+        Vector<Unit> otherTrailers = new Vector<>();
+        if (tractor.hasTransportedUnits(TOW_TRANSPORT)) {
+            Unit towingUnit = tractor.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
+            otherTrailers.add(towingUnit);
+            while (towingUnit != null && towingUnit.hasTransportedUnits(TOW_TRANSPORT)) {
+                towingUnit = towingUnit.getTransportedUnits(TOW_TRANSPORT).iterator().next();
+                otherTrailers.add(towingUnit);
+            }
+        }
+
+        // Finally calculate our towing capacity
+        if (tractor.equals(transport)) {
+            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, tractor.getEntity().getWeight()
+                - otherTrailers.stream().filter(u -> u.getEntity() != null).mapToDouble(u -> u.getEntity().getWeight()).sum());
+        } else {
+            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, 0.0);
+        }
+    }
+
+    @Override
+    protected void unloadTransport(Unit transportedUnit) {
+        super.unloadTransport(transportedUnit);
+
+        if ((transportedUnit.hasTransportAssignment(TOW_TRANSPORT)
+                && transportedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport().equals(transport))) {
+            transportedUnit.setTransportAssignment(TOW_TRANSPORT, null);
+        }
+
+        if (transportedUnit.getEntity() != null && transport.getEntity() != null) {
+            Unit tractor = getTractor();
+            if (tractor != null && tractor.hasTransportedUnits(TOW_TRANSPORT) &&  tractor.getEntity() != null && tractor.getEntity() instanceof Tank tank) {
+                TowTransportedUnitsSummary tractorTransportedUnitsSummary = (TowTransportedUnitsSummary) tractor.getTransportedUnitsSummary(TOW_TRANSPORT);
+                tractorTransportedUnitsSummary.recalculateTransportCapacity(tank);
+            }
+        }
+    }
+
+    /**
+     * Find the tractor pulling this whole train
+     *
+     * @return the tractor pulling the entire train of trailers
+     */
+    private Unit getTractor() {
+        Unit tractor;
+        if (transport.getEntity() instanceof Tank tank) {
             if (tank.isTrailer()) {
                 if (transport.hasTransportAssignment(TOW_TRANSPORT)) {
                     tractor = transport.getTransportAssignment(TOW_TRANSPORT).getTransport();
                     while (tractor.hasTransportAssignment(TOW_TRANSPORT)) {
-                        tractor = transport.getTransportAssignment(TOW_TRANSPORT).getTransport();
+                        tractor = tractor.getTransportAssignment(TOW_TRANSPORT).getTransport();
                     }
                 } else {
                     // No tractor, no towing!
                     setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, Double.MIN_VALUE);
-                    return;
+                    return null;
                 }
             } else {
+                // If we aren't a trailer then we're the tractor
                 tractor = transport;
             }
-            Vector<Unit> otherTrailers = new Vector<>();
-            if (tractor.hasTransportedUnits(TOW_TRANSPORT)) {
-                Unit towingUnit = tractor.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
-                otherTrailers.add(towingUnit);
-                while (towingUnit != null && towingUnit.hasTransportedUnits(TOW_TRANSPORT)) {
-                    towingUnit = towingUnit.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
-                    otherTrailers.add(towingUnit);
-                }
-            }
-
-            // Finally calculate our towing capacity
-            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, tractor.getEntity().getWeight()
-                - otherTrailers.stream().mapToDouble(u -> u.getEntity().getWeight()).sum());
+        } else {
+            // Only tanks can tow, let's just assume the tractor is this transport
+            tractor = transport;
         }
+        return tractor;
     }
 
     /**
@@ -104,7 +145,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
                 Unit realUnit = campaign.getHangar().getUnit(towTransportedUnit.getId());
                 if (realUnit != null) {
                     if (realUnit.hasTransportAssignment(TOW_TRANSPORT)) {
-                        towTrailer(realUnit, null, realUnit.getTacticalTransportAssignment().getTransporterType());
+                        towTrailer(realUnit, null, realUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
                     } else {
                         logger.error(
                             String.format("Unit %s ('%s') references tow transported unit %s which has no transport assignment",
@@ -116,7 +157,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
                             unit.getId(), unit.getName(), towTransportedUnit.getId()));
                 }
             } else {
-                towTrailer(towTransportedUnit, null, towTransportedUnit.getTacticalTransportAssignment().getTransporterType());
+                towTrailer(towTransportedUnit, null, towTransportedUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());
             }
         }
     }
@@ -129,7 +170,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
         Unit oldTractor = null;
         if (towedUnit.getTransportAssignment(TOW_TRANSPORT) != null) {
             oldTractor = towedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport();
-            if (oldTractor != null) {
+            if (oldTractor != null && !oldTractor.equals(transport)) {
                 oldTractor.unloadFromTransport(TOW_TRANSPORT);
             }
         }
@@ -146,10 +187,22 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
 
         // Update Transport Capacities
         if (!Objects.equals(oldTractor, transport)) {
-            setCurrentTransportCapacity(transporterType,
-                getCurrentTransportCapacity(transporterType) - CampaignTransportUtilities.transportCapacityUsage(transporterType, towedUnit.getEntity()));
+            if (transport.getEntity() != null & !transport.getEntity().isTrailer() && transport.getEntity() instanceof Tank tank) {
+                recalculateTransportCapacity(tank);
+            }
+            else {
+                Unit tractor = getTractor();
+
+                if (tractor != null && tractor.getTransportedUnitsSummary(TOW_TRANSPORT) != null && tractor.getEntity() instanceof Tank tractorTank) {
+                    ((TowTransportedUnitsSummary) tractor.getTransportedUnitsSummary(TOW_TRANSPORT)).recalculateTransportCapacity(tractorTank);
+                }
+            }
         }
 
         return oldTractor;
+    }
+
+    private void recalculateTransportCapacity(Tank tractor) {
+        recalculateTransportCapacity(new Vector<>(tractor.getTransports().stream().filter(t -> t instanceof TankTrailerHitch).collect(Collectors.toSet())));
     }
 }
