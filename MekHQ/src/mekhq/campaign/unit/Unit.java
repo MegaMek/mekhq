@@ -82,9 +82,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.max;
 import static megamek.common.MiscType.F_CARGO;
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 import static mekhq.campaign.parts.enums.PartQuality.*;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 
@@ -316,7 +313,7 @@ public class Unit implements ITechnology {
      */
     public void initializeShipTransportSpace() {
         // Initialize the bay capacity
-        initializeTransportSpace(SHIP_TRANSPORT);
+        initializeTransportSpace(CampaignTransportType.SHIP_TRANSPORT);
     }
 
     /**
@@ -328,7 +325,7 @@ public class Unit implements ITechnology {
      * @see CampaignTransportType#TACTICAL_TRANSPORT
      */
     public void initializeTacticalTransportSpace() {
-        initializeTransportSpace(TACTICAL_TRANSPORT);
+        initializeTransportSpace(CampaignTransportType.TACTICAL_TRANSPORT);
     }
 
     /**
@@ -348,11 +345,11 @@ public class Unit implements ITechnology {
 
 
     private ShipTransportedUnitsSummary getShipTransportedUnitsSummary() {
-        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(SHIP_TRANSPORT);
+        return (ShipTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.SHIP_TRANSPORT);
     }
 
     private TacticalTransportedUnitsSummary getTacticalTransportedUnitsSummary() {
-        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummary(TACTICAL_TRANSPORT);
+        return (TacticalTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.TACTICAL_TRANSPORT);
     }
 
     /**
@@ -595,14 +592,14 @@ public class Unit implements ITechnology {
      * transporting units.
      */
     public boolean hasShipTransportedUnits() {
-        return hasTransportedUnits(SHIP_TRANSPORT);
+        return hasTransportedUnits(CampaignTransportType.SHIP_TRANSPORT);
     }
 
     /**
      * @return the set of units being transported by this unit.
      */
     public Set<Unit> getShipTransportedUnits() {
-        return getTransportedUnits(SHIP_TRANSPORT);
+        return getTransportedUnits(CampaignTransportType.SHIP_TRANSPORT);
     }
 
     /**
@@ -611,7 +608,7 @@ public class Unit implements ITechnology {
      * @param unit The unit being transported by this instance.
      */
     public void addShipTransportedUnit(Unit unit) {
-        addTransportedUnit(SHIP_TRANSPORT, unit);
+        addTransportedUnit(CampaignTransportType.SHIP_TRANSPORT, unit);
     }
 
     /**
@@ -1776,8 +1773,8 @@ public class Unit implements ITechnology {
     /**
      * Get only collars to which a DropShip has been assigned Capacity
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
@@ -1790,8 +1787,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param docks
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -1814,8 +1811,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a light tank has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -1829,8 +1826,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -1853,7 +1850,7 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a heavy tank has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT, appropriate bay class)
      * to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
@@ -1868,8 +1865,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -1892,8 +1889,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a super heavy tank has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
      */
@@ -1906,8 +1903,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -1930,8 +1927,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a ba squad has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -1945,8 +1942,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -1969,8 +1966,8 @@ public class Unit implements ITechnology {
 
     /** Return the unused tonnage of any conventional infantry bays
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -1985,8 +1982,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param tonnage
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -2009,8 +2006,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a fighter has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -2024,8 +2021,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -2048,8 +2045,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a small craft has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -2064,8 +2061,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -2088,8 +2085,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a mek has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -2103,8 +2100,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -2127,8 +2124,8 @@ public class Unit implements ITechnology {
 
     /** Get only bays to which a protomek has been assigned
      * @deprecated this only checks ship transport type, use
-     * getCurrentTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * to replicate this
+     * getCurrentTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) to replicate this
      * @return capacity
      * @see Unit#getCurrentTransportCapacity(CampaignTransportType, TransporterType)
      * @see CampaignTransportType#SHIP_TRANSPORT
@@ -2142,8 +2139,8 @@ public class Unit implements ITechnology {
      * @deprecated this only sets for ship transport type. Transport Capacities
      * should not be manually updated with this, it should happen inside of any
      * loading flows. If you really need to replicate this use
-     * setCurrentShipTransportCapacity(SHIP_TRANSPORT, appropriate bay class)
-     * - but you probably don't want to do that
+     * setCurrentShipTransportCapacity(CampaignTransportType.SHIP_TRANSPORT,
+     * appropriate bay class) - but you probably don't want to do that
      * @param bays
      * @see Unit#initializeTransportSpace(CampaignTransportType)
      * @see Unit#setCurrentShipTransportCapacity(TransporterType, double)
@@ -2289,7 +2286,7 @@ public class Unit implements ITechnology {
      * @return true if the unit is assigned tactical transports
      */
     public boolean hasTacticalTransportedUnits() {
-        if (hasTransportedUnitsType(TACTICAL_TRANSPORT)) {
+        if (hasTransportedUnitsType(CampaignTransportType.TACTICAL_TRANSPORT)) {
             return getTacticalTransportedUnitsSummary().hasTransportedUnits();
         }
         return false;
@@ -2380,7 +2377,7 @@ public class Unit implements ITechnology {
      * @see TransporterType#TANK_TRAILER_HITCH
      */
     public Unit towTrailer(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
-        return ((TowTransportedUnitsSummary) getTransportedUnitsSummary(TOW_TRANSPORT)).towTrailer(transportedUnit, transportedLocation, transporterType);
+        return ((TowTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.TOW_TRANSPORT)).towTrailer(transportedUnit, transportedLocation, transporterType);
     }
 
 
@@ -2516,7 +2513,7 @@ public class Unit implements ITechnology {
 
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             // Some transports were set up before this and use a different saving & loading pattern. Let's ignore them.
-            if (campaignTransportType.equals(SHIP_TRANSPORT)) {
+            if (campaignTransportType.equals(CampaignTransportType.SHIP_TRANSPORT)) {
                 continue;
             }
 
@@ -5509,12 +5506,12 @@ public class Unit implements ITechnology {
         // We don't want to clear transport assignments, but we do want to remove the
         // transport from the list of potential transports, if it's a transport.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(SHIP_TRANSPORT, this);
+            if (!getTransportCapabilities(CampaignTransportType.SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().removeCampaignTransporter(CampaignTransportType.SHIP_TRANSPORT, this);
             }
 
-            if (!getTransportCapabilities(TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().removeCampaignTransporter(TACTICAL_TRANSPORT, this);
+            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
+                getCampaign().removeCampaignTransporter(CampaignTransportType.TACTICAL_TRANSPORT, this);
             }
         }
     }
@@ -5594,16 +5591,16 @@ public class Unit implements ITechnology {
         // If this unit is a transport, let's add it to the campaign's
         // transporter map.
         if (campaign != null) {
-            if (!getTransportCapabilities(SHIP_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(SHIP_TRANSPORT, this);
+            if (!getTransportCapabilities(CampaignTransportType.SHIP_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(CampaignTransportType.SHIP_TRANSPORT, this);
             }
 
-            if (!getTransportCapabilities(TACTICAL_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(TACTICAL_TRANSPORT, this);
+            if (!getTransportCapabilities(CampaignTransportType.TACTICAL_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(CampaignTransportType.TACTICAL_TRANSPORT, this);
             }
 
-            if (!getTransportCapabilities(TOW_TRANSPORT).isEmpty()) {
-                getCampaign().addCampaignTransport(TOW_TRANSPORT, this);
+            if (!getTransportCapabilities(CampaignTransportType.TOW_TRANSPORT).isEmpty()) {
+                getCampaign().addCampaignTransport(CampaignTransportType.TOW_TRANSPORT, this);
             }
         }
     }
