@@ -1422,7 +1422,7 @@ public class Utilities {
         }
     }
 
-    public static void sendTowEntity(Client client, int trailerId, int tractorId) {
+    private static void sendTowEntity(Client client, int trailerId, int tractorId) {
         client.sendTowEntity(trailerId, tractorId);
         // Add a wait to make sure that we don't start processing client.sendTowEntity
         // out of order

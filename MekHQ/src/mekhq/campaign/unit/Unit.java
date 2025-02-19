@@ -2363,6 +2363,22 @@ public class Unit implements ITechnology {
         return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation, transporterType, transportedUnit);
     }
 
+
+    /**
+     * Trailer hitching utility used when assigning a trailer to a tractor.
+     * It's a bit different from normal loading so it gets its own method.
+     * This should be called on the towing unit (or towing entity) - the unit
+     * that is specifically pulling the transportedUnit. Do not pass in the
+     * tractor that is pulling the entire "train" unless you want the
+     * transportedUnit specifically attached to the tractor.
+     *
+     * @param transportedUnit trailer Unit that should be towed
+     * @param transportedLocation specific hitch the trailer should be attached to
+     * @param transporterType type of transporter towing the trailer, should
+     *                        probably be a TANK_TRAILER_HITCH
+     * @return original towing unit (Unit) that was pulling the transportedUnit
+     * @see TransporterType#TANK_TRAILER_HITCH
+     */
     public Unit towTrailer(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         return ((TowTransportedUnitsSummary) getTransportedUnitsSummary(TOW_TRANSPORT)).towTrailer(transportedUnit, transportedLocation, transporterType);
     }
