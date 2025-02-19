@@ -160,8 +160,8 @@
             <firstname>Julius</firstname>
             <age>32</age>
             <clan>true</clan>
-            <phenotype>MekWarrior</phenotype>
-            <primaryRole>MekWarrior</primaryRole>
+            <phenotype>MEKWARRIOR</phenotype>
+            <primaryRole>MEKWARRIOR</primaryRole>
             <edge>3</edge>
             <editOrigin>false</editOrigin>
             <editBirthday>false</editBirthday>
@@ -4876,10 +4876,10 @@
                     <id>828189ee-a14f-4c7a-bb33-b62883757152</id>
                     <givenName>Tobias</givenName>
                     <bloodname>Malthus</bloodname>
-                    <primaryRole>MekWarrior</primaryRole>
+                    <primaryRole>MEKWARRIOR</primaryRole>
                     <faction>CJF</faction>
                     <clan>true</clan>
-                    <phenotype>MekWarrior</phenotype>
+                    <phenotype>MEKWARRIOR</phenotype>
                     <portrait>
                         <category></category>
                         <filename>Tobias.jpg</filename>
