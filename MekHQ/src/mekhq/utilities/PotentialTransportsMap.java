@@ -100,7 +100,7 @@ public class PotentialTransportsMap {
      * @param unit the Unit we want to transport on its assigned transport, if it has one
      */
     public void tryToAddTransportedUnit(Unit unit) {
-        for (CampaignTransportType campaignTransportType : prioritizedTransportTypes()) {
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             if (unit.hasTransportAssignment(campaignTransportType)) {
                 Unit transport = unit.getTransportAssignment(campaignTransportType).getTransport();
 
@@ -110,10 +110,6 @@ public class PotentialTransportsMap {
                 }
             }
         }
-    }
-
-    private EnumSet<CampaignTransportType> prioritizedTransportTypes() {
-        return EnumSet.of(SHIP_TRANSPORT, TACTICAL_TRANSPORT, TOW_TRANSPORT);
     }
 
     /**

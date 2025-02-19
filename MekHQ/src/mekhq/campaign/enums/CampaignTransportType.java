@@ -35,6 +35,9 @@ import mekhq.campaign.unit.enums.TransporterType;
 public enum CampaignTransportType
 {
     //region Enum declarations
+    // ORDER MATTERS! This enum's order is used for prioritizing
+    // which transport assignment should be used when loading
+    // units in the MegaMek lobby.
     /**
      * Units assigned a ship transport, if both units are in the battle
      * the unit will attempt to load onto the transport when deployed into battle.
