@@ -1415,6 +1415,7 @@ public class Campaign implements ITechManager {
             unit.getEntity().setId(game.getNextEntityId());
         }
 
+        // Entity should exist before we initialize transport space
         game.addEntity(unit.getEntity());
 
         unit.initializeAllTransportSpace();
@@ -8226,8 +8227,7 @@ public class Campaign implements ITechManager {
     public boolean hasTransports(CampaignTransportType campaignTransportType) {
         if (campaignTransportType.isTacticalTransport()) {
             return hasTacticalTransports();
-        }
-        else if (campaignTransportType.isShipTransport()) {
+        } else if (campaignTransportType.isShipTransport()) {
             return hasShipTransports();
         } else if (campaignTransportType.isTowTransport()) {
             return hasTowTransports();
