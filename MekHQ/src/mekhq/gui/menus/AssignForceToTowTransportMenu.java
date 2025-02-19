@@ -36,9 +36,9 @@ import java.util.Set;
 import static mekhq.campaign.enums.CampaignTransportType.TOW_TRANSPORT;
 
 /**
- * Menu for assigning a force to a specific Tactical transport
- * @see CampaignTransportType#TACTICAL_TRANSPORT
- * @see mekhq.campaign.unit.TacticalTransportedUnitsSummary
+ * Menu for assigning a force to a specific Tow transport
+ * @see CampaignTransportType#TOW_TRANSPORT
+ * @see mekhq.campaign.unit.TowTransportedUnitsSummary
  * @see mekhq.campaign.unit.TransportAssignment
  */
 public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
@@ -47,7 +47,7 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
      * Constructor for a new tow transport Menu
      * @param campaign current campaign
      * @param units selected units to try and assign
-     * @see CampaignTransportType#TACTICAL_TRANSPORT
+     * @see CampaignTransportType#TOW_TRANSPORT
      */
     public AssignForceToTowTransportMenu(Campaign campaign, Set<Unit> units) {
         super(TOW_TRANSPORT, campaign, units);
@@ -55,7 +55,7 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
 
     /**
      * Returns a Set of Transporters that the provided units could all be loaded into
-     * for Tactical Transport.
+     * for Tow Transport.
      * @param units filter the Transporter list based on what these units could use
      * @return most Transporter types except cargo and hitches
      */
@@ -79,7 +79,7 @@ public class AssignForceToTowTransportMenu extends AssignForceToTransportMenu {
     }
 
     /**
-     * Assign a unit to a Tactical Transport.
+     * Assign a unit to a Tow Transport.
      * @param evt             ActionEvent from the selection happening
      * @param transporterType transporter type selected in an earlier menu
      * @param transport       transport (Unit) that will load these units

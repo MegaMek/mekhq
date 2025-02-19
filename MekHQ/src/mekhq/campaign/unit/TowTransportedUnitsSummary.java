@@ -58,7 +58,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
 
         // And now reset the Transported values for all the units we just booted
         campaign.getHangar().forEachUnit(u -> {
-            if (u.hasTransportShipAssignment()
+            if (u.hasTransportAssignment(TOW_TRANSPORT)
                 && Objects.equals(transport, u.getTransportAssignment(TOW_TRANSPORT).getTransport())) {
                 u.setTransportAssignment(TOW_TRANSPORT, null);
             }
@@ -75,13 +75,20 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
         }
         Unit tractor = getTractor();
 
+        // Not a tractor/doesn't have  tractor, no towing!
+        if (tractor == null || !tractor.equals(transport)) {
+            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, Double.MIN_VALUE);
+            return;
+        }
+
         // Can't finish the calculations if the tractor isn't initialized yet, let's get out of here.
-        if (tractor == null || tractor.getEntity() == null) {
+        if (tractor.getEntity() == null) {
             return;
         }
 
         Vector<Unit> otherTrailers = new Vector<>();
         if (tractor.hasTransportedUnits(TOW_TRANSPORT)) {
+            // The tractor will only be listed as towing the unit directly behind it, so we can "findAny"
             Unit towingUnit = tractor.getTransportedUnits(TOW_TRANSPORT).stream().findAny().orElse(null);
             otherTrailers.add(towingUnit);
             while (towingUnit != null && towingUnit.hasTransportedUnits(TOW_TRANSPORT)) {
@@ -90,13 +97,11 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
             }
         }
 
-        // Finally calculate our towing capacity
-        if (tractor.equals(transport)) {
-            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, tractor.getEntity().getWeight()
-                - otherTrailers.stream().filter(u -> u.getEntity() != null).mapToDouble(u -> u.getEntity().getWeight()).sum());
-        } else {
-            setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, 0.0);
-        }
+        // Finally calculate our towing capacity - Get the tractor's weight then
+        // get the entity for each trailer,  sum the trailer weights, and subtract
+        // that from the tractor's weight to get the remaining towing capacity.
+        setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, tractor.getEntity().getWeight()
+            - otherTrailers.stream().filter(u -> u.getEntity() != null).mapToDouble(u -> u.getEntity().getWeight()).sum());
     }
 
     @Override
@@ -133,7 +138,6 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
                     }
                 } else {
                     // No tractor, no towing!
-                    setCurrentTransportCapacity(TransporterType.TANK_TRAILER_HITCH, Double.MIN_VALUE);
                     return null;
                 }
             } else {

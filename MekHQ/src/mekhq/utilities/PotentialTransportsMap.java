@@ -100,30 +100,20 @@ public class PotentialTransportsMap {
      * @param unit the Unit we want to transport on its assigned transport, if it has one
      */
     public void tryToAddTransportedUnit(Unit unit) {
-        if (unit.hasTransportShipAssignment()) {
-            Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
+        for (CampaignTransportType campaignTransportType : prioritizedTransportTypes()) {
+            if (unit.hasTransportAssignment(campaignTransportType)) {
+                Unit transport = unit.getTransportAssignment(campaignTransportType).getTransport();
 
-            if (containsTransportKey(SHIP_TRANSPORT, transportShip.getId())) {
-                addTransportedUnit(SHIP_TRANSPORT, transportShip.getId(), unit.getId());
-                return;
+                if (containsTransportKey(campaignTransportType, transport.getId())) {
+                    addTransportedUnit(campaignTransportType, transport.getId(), unit.getId());
+                    return;
+                }
             }
         }
-        if (unit.hasTacticalTransportAssignment()) {
-            Unit transport = unit.getTacticalTransportAssignment().getTransport();
+    }
 
-            if (containsTransportKey(TACTICAL_TRANSPORT, transport.getId())) {
-                addTransportedUnit(TACTICAL_TRANSPORT, transport.getId(), unit.getId());
-                return;
-            }
-        }
-        if (unit.hasTransportAssignment(TOW_TRANSPORT)) {
-            Unit transport = unit.getTransportAssignment(TOW_TRANSPORT).getTransport();
-
-            if (containsTransportKey(TOW_TRANSPORT, transport.getId())) {
-                addTransportedUnit(TOW_TRANSPORT, transport.getId(), unit.getId());
-                return;
-            }
-        }
+    private EnumSet<CampaignTransportType> prioritizedTransportTypes() {
+        return EnumSet.of(SHIP_TRANSPORT, TACTICAL_TRANSPORT, TOW_TRANSPORT);
     }
 
     /**
