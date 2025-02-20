@@ -117,19 +117,6 @@ import static mekhq.utilities.ImageUtilities.scaleImageIconToWidth;
 public class AtBContract extends Contract {
     private static final MMLogger logger = MMLogger.create(AtBContract.class);
 
-    public static final int EVT_NOEVENT = -1;
-    public static final int EVT_BONUSROLL = 0;
-    public static final int EVT_SPECIAL_SCENARIO = 1;
-    public static final int EVT_CIVILDISTURBANCE = 2;
-    public static final int EVT_SPORADICUPRISINGS = 3;
-    public static final int EVT_REBELLION = 4;
-    public static final int EVT_BETRAYAL = 5;
-    public static final int EVT_TREACHERY = 6;
-    public static final int EVT_LOGISTICSFAILURE = 7;
-    public static final int EVT_REINFORCEMENTS = 8;
-    public static final int EVT_SPECIALEVENTS = 9;
-    public static final int EVT_BIGBATTLE = 10;
-
     /** The minimum intensity below which no scenarios will be generated */
     public static final double MINIMUM_INTENSITY = 0.01;
 
@@ -942,29 +929,29 @@ public class AtBContract extends Contract {
             }
 
             switch (getContractType().generateEventType(campaign)) {
-                case EVT_BONUSROLL:
+                case BONUSROLL:
                     campaign.addReport("<b>Special Event:</b> ");
                     doBonusRoll(campaign, false);
                     break;
-                case EVT_SPECIAL_SCENARIO:
+                case SPECIAL_SCENARIO:
                     campaign.addReport("<b>Special Event:</b> Special scenario this month");
                     specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                     specialEventScenarioType = getContractType().generateSpecialScenarioType(campaign);
                     break;
-                case EVT_CIVILDISTURBANCE:
+                case CIVILDISTURBANCE:
                     campaign.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
                     moraleMod++;
                     break;
-                case EVT_SPORADICUPRISINGS:
+                case SPORADICUPRISINGS:
                     campaign.addReport("<b>Special Event:</b> Sporadic uprisings<br />+2 to next enemy morale roll");
                     moraleMod += 2;
                     break;
-                case EVT_REBELLION:
+                case REBELLION:
                     campaign.addReport("<b>Special Event:</b> Rebellion<br />+2 to next enemy morale roll");
                     specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                     specialEventScenarioType = AtBScenario.CIVILIANRIOT;
                     break;
-                case EVT_BETRAYAL:
+                case BETRAYAL:
                     String text = "<b>Special Event:</b> Betrayal (employer minor breach)<br />";
                     switch (d6()) {
                         case 1:
@@ -992,23 +979,23 @@ public class AtBContract extends Contract {
                     employerMinorBreaches++;
                     campaign.addReport(text);
                     break;
-                case EVT_TREACHERY:
+                case TREACHERY:
                     campaign.addReport(
                             "<b>Special Event:</b> Treachery<br />Bad information from employer. Next Enemy Morale roll gets +1. Employer minor breach.");
                     moraleMod++;
                     employerMinorBreaches++;
                     break;
-                case EVT_LOGISTICSFAILURE:
+                case LOGISTICSFAILURE:
                     campaign.addReport(
                             "<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
                     partsAvailabilityLevel--;
                     priorLogisticsFailure = true;
                     break;
-                case EVT_REINFORCEMENTS:
+                case REINFORCEMENTS:
                     campaign.addReport("<b>Special Event:</b> Reinforcements<br />The next Enemy Morale roll gets a -1.");
                     moraleMod--;
                     break;
-                case EVT_SPECIALEVENTS:
+                case SPECIALEVENTS:
                     text = "<b>Special Event:</b> ";
                     switch (d6()) {
                         case 1:
@@ -1054,7 +1041,7 @@ public class AtBContract extends Contract {
                     }
                     campaign.addReport(text);
                     break;
-                case EVT_BIGBATTLE:
+                case BIGBATTLE:
                     campaign.addReport("<b>Special Event:</b> Big battle this month");
                     specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                     specialEventScenarioType = getContractType().generateBigBattleType();

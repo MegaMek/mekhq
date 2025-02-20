@@ -218,9 +218,9 @@ public enum AtBContractType {
      * {@link #generateStratConEvent()} method.</p>
      *
      * @param campaign the {@link Campaign} instance for which the event is being generated.
-     * @return an integer representing the event type.
+     * @return an AtBEvent enum representing the event type.
      */
-    public int generateEventType(Campaign campaign) {
+    public AtBEventType generateEventType(Campaign campaign) {
         if (campaign.getCampaignOptions().isUseStratCon()) {
             return generateStratConEvent();
         }
@@ -232,108 +232,66 @@ public enum AtBContractType {
             case OBJECTIVE_RAID:
             case RECON_RAID:
             case EXTRACTION_RAID:
-                if (roll < 10) {
-                    return AtBContract.EVT_BONUSROLL;
-                } else if (roll < 14) {
-                    return AtBContract.EVT_SPECIAL_SCENARIO;
-                } else if (roll < 16) {
-                    return AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    return AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    return AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    return AtBContract.EVT_REINFORCEMENTS;
-                } else if (roll < 20) {
-                    return AtBContract.EVT_SPECIALEVENTS;
-                } else {
-                    return AtBContract.EVT_BIGBATTLE;
+                switch (roll) {
+                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
+                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15, 14 -> { return AtBEventType.BETRAYAL; }
+                    case 13, 12, 11, 10 -> { return AtBEventType.SPECIAL_SCENARIO; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             case GARRISON_DUTY:
-                if (roll < 8) {
-                    return AtBContract.EVT_BONUSROLL;
-                } else if (roll < 12) {
-                    return AtBContract.EVT_SPECIAL_SCENARIO;
-                } else if (roll < 13) {
-                    return AtBContract.EVT_CIVILDISTURBANCE;
-                } else if (roll < 14) {
-                    return AtBContract.EVT_SPORADICUPRISINGS;
-                } else if (roll < 15) {
-                    return AtBContract.EVT_REBELLION;
-                } else if (roll < 16) {
-                    return AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    return AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    return AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    return AtBContract.EVT_REINFORCEMENTS;
-                } else if (roll < 20) {
-                    return AtBContract.EVT_SPECIALEVENTS;
-                } else {
-                    return AtBContract.EVT_BIGBATTLE;
+                switch (roll) {
+                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
+                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14 -> { return AtBEventType.REBELLION; }
+                    case 13 -> { return AtBEventType.SPORADICUPRISINGS; }
+                    case 12 -> { return AtBEventType.CIVILDISTURBANCE; }
+                    case 11, 10, 9, 8 -> { return AtBEventType.SPECIAL_SCENARIO; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             case RIOT_DUTY:
-                if (roll < 8) {
-                    return AtBContract.EVT_BONUSROLL;
-                } else if (roll < 11) {
-                    return AtBContract.EVT_SPECIAL_SCENARIO;
-                } else if (roll < 12) {
-                    return AtBContract.EVT_CIVILDISTURBANCE;
-                } else if (roll < 13) {
-                    return AtBContract.EVT_SPORADICUPRISINGS;
-                } else if (roll < 15) {
-                    return AtBContract.EVT_REBELLION;
-                } else if (roll < 16) {
-                    return AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    return AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    return AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    return AtBContract.EVT_REINFORCEMENTS;
-                } else if (roll < 20) {
-                    return AtBContract.EVT_SPECIALEVENTS;
-                } else {
-                    return AtBContract.EVT_BIGBATTLE;
+                switch (roll) {
+                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
+                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14, 13 -> { return AtBEventType.REBELLION; }
+                    case 12 -> { return AtBEventType.SPORADICUPRISINGS; }
+                    case 11 -> { return AtBEventType.CIVILDISTURBANCE; }
+                    case 10, 9, 8 -> { return AtBEventType.SPECIAL_SCENARIO; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             case PIRATE_HUNTING:
-                if (roll < 10) {
-                    return AtBContract.EVT_BONUSROLL;
-                } else if (roll < 14) {
-                    return AtBContract.EVT_SPECIAL_SCENARIO;
-                } else if (roll < 15) {
-                    return AtBContract.EVT_CIVILDISTURBANCE;
-                } else if (roll < 16) {
-                    return AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    return AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    return AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    return AtBContract.EVT_REINFORCEMENTS;
-                } else if (roll < 20) {
-                    return AtBContract.EVT_SPECIALEVENTS;
-                } else {
-                    return AtBContract.EVT_BIGBATTLE;
+                switch (roll) {
+                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
+                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14 -> { return AtBEventType.CIVILDISTURBANCE; }
+                    case 13, 12, 11, 10 -> { return AtBEventType.SPECIAL_SCENARIO; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             default:
-                if (roll < 10) {
-                    return AtBContract.EVT_BONUSROLL;
-                } else if (roll < 15) {
-                    return AtBContract.EVT_SPECIAL_SCENARIO;
-                } else if (roll < 16) {
-                    return AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    return AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    return AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    return AtBContract.EVT_REINFORCEMENTS;
-                } else if (roll < 20) {
-                    return AtBContract.EVT_SPECIALEVENTS;
-                } else {
-                    return AtBContract.EVT_BIGBATTLE;
+                switch (roll) {
+                    case 21, 20 -> { return AtBEventType.BIGBATTLE; }
+                    case 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14, 13, 12, 11, 10 -> { return AtBEventType.SPECIAL_SCENARIO; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
         }
     }
@@ -347,100 +305,68 @@ public enum AtBContractType {
      *
      * @return an integer representing the event type.
      */
-    public int generateStratConEvent() {
+    public AtBEventType generateStratConEvent() {
         final int roll = Compute.randomInt(20) + 1;
 
-        return switch (this) {
+        switch (this) {
             case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID -> {
-                if (roll < 14) {
-                    yield AtBContract.EVT_BONUSROLL;
-                } else if (roll < 16) {
-                    yield AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    yield AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    yield AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    yield AtBContract.EVT_REINFORCEMENTS;
-                } else {
-                    yield AtBContract.EVT_SPECIALEVENTS;
+                switch (roll) {
+                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15, 14 -> { return AtBEventType.BETRAYAL; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             }
             case GARRISON_DUTY -> {
-                if (roll < 12) {
-                    yield AtBContract.EVT_BONUSROLL;
-                } else if (roll < 13) {
-                    yield AtBContract.EVT_CIVILDISTURBANCE;
-                } else if (roll < 14) {
-                    yield AtBContract.EVT_SPORADICUPRISINGS;
-                } else if (roll < 15) {
-                    yield AtBContract.EVT_REBELLION;
-                } else if (roll < 16) {
-                    yield AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    yield AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    yield AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    yield AtBContract.EVT_REINFORCEMENTS;
-                } else {
-                    yield AtBContract.EVT_SPECIALEVENTS;
+                switch (roll) {
+                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14 -> { return AtBEventType.REBELLION; }
+                    case 13 -> { return AtBEventType.SPORADICUPRISINGS; }
+                    case 12 -> { return AtBEventType.CIVILDISTURBANCE; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             }
             case RIOT_DUTY -> {
-                if (roll < 11) {
-                    yield AtBContract.EVT_BONUSROLL;
-                } else if (roll < 12) {
-                    yield AtBContract.EVT_CIVILDISTURBANCE;
-                } else if (roll < 13) {
-                    yield AtBContract.EVT_SPORADICUPRISINGS;
-                } else if (roll < 15) {
-                    yield AtBContract.EVT_REBELLION;
-                } else if (roll < 16) {
-                    yield AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    yield AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    yield AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    yield AtBContract.EVT_REINFORCEMENTS;
-                } else {
-                    yield AtBContract.EVT_SPECIALEVENTS;
+                switch (roll) {
+                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14, 13 -> { return AtBEventType.REBELLION; }
+                    case 12 -> { return AtBEventType.SPORADICUPRISINGS; }
+                    case 11 -> { return AtBEventType.CIVILDISTURBANCE; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             }
             case PIRATE_HUNTING -> {
-                if (roll < 14) {
-                    yield AtBContract.EVT_BONUSROLL;
-                } else if (roll < 15) {
-                    yield AtBContract.EVT_CIVILDISTURBANCE;
-                } else if (roll < 16) {
-                    yield AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    yield AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    yield AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    yield AtBContract.EVT_REINFORCEMENTS;
-                } else {
-                    yield AtBContract.EVT_SPECIALEVENTS;
+                switch (roll) {
+                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    case 14 -> { return AtBEventType.CIVILDISTURBANCE; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             }
             default -> {
-                if (roll < 15) {
-                    yield AtBContract.EVT_BONUSROLL;
-                } else if (roll < 16) {
-                    yield AtBContract.EVT_BETRAYAL;
-                } else if (roll < 17) {
-                    yield AtBContract.EVT_TREACHERY;
-                } else if (roll < 18) {
-                    yield AtBContract.EVT_LOGISTICSFAILURE;
-                } else if (roll < 19) {
-                    yield AtBContract.EVT_REINFORCEMENTS;
-                } else {
-                    yield AtBContract.EVT_SPECIALEVENTS;
+                switch (roll) {
+                    case 21, 20, 19 -> { return AtBEventType.SPECIALEVENTS; }
+                    case 18 -> { return AtBEventType.REINFORCEMENTS; }
+                    case 17 -> { return AtBEventType.LOGISTICSFAILURE; }
+                    case 16 -> { return AtBEventType.TREACHERY; }
+                    case 15 -> { return AtBEventType.BETRAYAL; }
+                    default -> { return AtBEventType.BONUSROLL; }
                 }
             }
-        };
+        }
     }
 
     public int generateSpecialScenarioType(final Campaign campaign) {
