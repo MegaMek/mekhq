@@ -50,6 +50,7 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.AssignForceToShipTransportMenu;
 import mekhq.gui.menus.AssignForceToTacticalTransportMenu;
+import mekhq.gui.menus.AssignForceToTowTransportMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -60,8 +61,7 @@ import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
+import static mekhq.campaign.enums.CampaignTransportType.*;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
@@ -1172,6 +1172,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTacticalTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
                 unassignTacticalTransportMenuClass(unitsInForces, popup);
                 unassignFromTacticalTransportMenuClass(unitsInForces, popup);
+
+                JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTowTransportMenu(gui.getCampaign(), new HashSet<>(unitsInForces)));
+                detachFromTractorTransportMenuClass(units, popup);
+                detachTrailerTransportMenuClass(units, popup);
             }
         } else if (unitsSelected) {
             Unit unit = units.get(0);
@@ -1406,6 +1410,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             unassignTacticalTransportMenuClass(units, popup);
             unassignFromTacticalTransportMenuClass(units, popup);
 
+            JMenuHelpers.addMenuIfNonEmpty(popup, new AssignForceToTowTransportMenu(gui.getCampaign(), new HashSet<>(units)));
+            detachFromTractorTransportMenuClass(units, popup);
+            detachTrailerTransportMenuClass(units, popup);
+
             if (!multipleSelection) {
                 popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
 
@@ -1510,6 +1518,18 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
+    private void detachTrailerTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
+        if (units.stream().allMatch(u -> u.hasTransportedUnits(TOW_TRANSPORT)) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassign.TOW_TRANSPORT.text"));
+            menuItem.addActionListener(evt -> {
+                unassignTransportAction(TOW_TRANSPORT, units.toArray(new Unit[0]));
+            });
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
+        }
+    }
+
+
     private void unassignTransportAction(CampaignTransportType campaignTransportType, Unit... units) {
         Set<Unit> transportsToUpdate = new HashSet<>();
         for (Unit transportedUnit : units) {
@@ -1548,6 +1568,17 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassignFrom.TACTICAL_TRANSPORT.text"));
             menuItem.addActionListener(evt -> {
                 unassignFromTransportAction(TACTICAL_TRANSPORT, units.toArray(new Unit[0]));
+            });
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
+        }
+    }
+
+    private void detachFromTractorTransportMenuClass(Vector<Unit> units, JPopupMenu popup) {
+        if (units.stream().allMatch(u -> u.hasTransportAssignment(TOW_TRANSPORT)) && !StaticChecks.areAnyUnitsDeployed(units)) {
+            JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt("mekhq.resources.AssignForceToTransport", "TOEMouseAdapter.unassignFrom.TOW_TRANSPORT.text"));
+            menuItem.addActionListener(evt -> {
+                unassignTransportAction(TOW_TRANSPORT, units.toArray(new Unit[0]));
             });
             menuItem.setEnabled(true);
             popup.add(menuItem);

@@ -1378,6 +1378,62 @@ public class Utilities {
     }
 
     /**
+     * Handles towing a player's trailers by their tractors once a
+     * megamek scenario has actually started.
+     *
+     *
+     * @param tractorId          - The MM id of the tractor entity we want to tow with
+     * @param trailerId         - Entity id for the unit we want to tow
+     * @param client         - the player's Client instance
+     * @param isAlreadyReset - transports loaded via "Ship" will have been reset once, don't do it again here
+     * @see mekhq.campaign.enums.CampaignTransportType#TOW_TRANSPORT
+     * @see ITransportAssignment
+     */
+    public static void towPlayerTrailers(int tractorId, int trailerId, Client client,
+                                            boolean towTrailers, boolean isAlreadyReset) {
+        Set<Entity> alreadyTransportedEntities = new HashSet<>();
+        if (!towTrailers) {
+            // Nothing to do. Get outta here!
+            return;
+        }
+        Entity tractor = client.getEntity(tractorId);
+        Entity trailer = client.getEntity(trailerId);
+
+        if (tractor == null || trailer == null) {
+            return;
+        }
+
+        // Reset transporter status, as unit might still
+        // retain updates from when the Unit
+        // was assigned to the tractor on the TO&E tab
+        if (isAlreadyReset) {
+            alreadyTransportedEntities.addAll(tractor.getLoadedUnits());
+        }
+        tractor.resetTransporter();
+
+
+        //Restore the normal transported entities
+        for (Entity alreadyTransportedEntity : alreadyTransportedEntities) {
+            tractor.load(alreadyTransportedEntity, alreadyTransportedEntity.getTargetBay());
+        }
+        //Towed units should deploy on their tractor's turn
+        if (tractor.canTow(trailerId)) {
+            sendTowEntity(client, trailerId, tractorId);
+        }
+    }
+
+    private static void sendTowEntity(Client client, int trailerId, int tractorId) {
+        client.sendTowEntity(trailerId, tractorId);
+        // Add a wait to make sure that we don't start processing client.sendTowEntity
+        // out of order
+        try {
+            Thread.sleep(500);
+        } catch (Exception ex) {
+            logger.error("", ex);
+        }
+    }
+
+    /**
      * Method that loops through a Transport ship's bays and finds one with enough
      * available space to load the Cargo unit
      * Helps assign a bay number to the Unit record so that transport bays can be

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2025 The MegaMek Team. All Rights Reserved.
  *
  *  This file is part of MekHQ.
  *
@@ -23,9 +23,6 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
-
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 
 /**
  * We need to determine what units in game are transports, and what units they're transporting.
@@ -101,20 +98,14 @@ public class PotentialTransportsMap {
      * @param unit the Unit we want to transport on its assigned transport, if it has one
      */
     public void tryToAddTransportedUnit(Unit unit) {
-        if (unit.hasTransportShipAssignment()) {
-            Unit transportShip = unit.getTransportShipAssignment().getTransportShip();
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (unit.hasTransportAssignment(campaignTransportType)) {
+                Unit transport = unit.getTransportAssignment(campaignTransportType).getTransport();
 
-            if (containsTransportKey(SHIP_TRANSPORT, transportShip.getId())) {
-                addTransportedUnit(SHIP_TRANSPORT, transportShip.getId(), unit.getId());
-                return;
-            }
-        }
-        if ( unit.hasTacticalTransportAssignment()) {
-            Unit transport = unit.getTacticalTransportAssignment().getTransport();
-
-            if (containsTransportKey(TACTICAL_TRANSPORT, transport.getId())) {
-                addTransportedUnit(TACTICAL_TRANSPORT, transport.getId(), unit.getId());
-                return;
+                if (containsTransportKey(campaignTransportType, transport.getId())) {
+                    addTransportedUnit(campaignTransportType, transport.getId(), unit.getId());
+                    return;
+                }
             }
         }
     }

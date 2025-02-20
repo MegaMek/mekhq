@@ -154,8 +154,6 @@ import static java.lang.Math.max;
 import static megamek.common.Compute.d6;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_MONTH;
 import static mekhq.campaign.CampaignOptions.TRANSIT_UNIT_WEEK;
-import static mekhq.campaign.enums.CampaignTransportType.SHIP_TRANSPORT;
-import static mekhq.campaign.enums.CampaignTransportType.TACTICAL_TRANSPORT;
 import static mekhq.campaign.force.CombatTeam.getStandardForceSize;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
@@ -197,8 +195,9 @@ public class Campaign implements ITechManager {
     // and more still - we're tracking DropShips and WarShips in a separate set so
     // that we can assign units to transports
     private final Hangar units = new Hangar();
-    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, SHIP_TRANSPORT);
-    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, TACTICAL_TRANSPORT);
+    CampaignTransporterMap shipTransporters = new CampaignTransporterMap(this, CampaignTransportType.SHIP_TRANSPORT);
+    CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this, CampaignTransportType.TACTICAL_TRANSPORT);
+    CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
@@ -1410,6 +1409,14 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
 
+        // Assign an entity ID to our new unit
+        if (Entity.NONE == unit.getEntity().getId()) {
+            unit.getEntity().setId(game.getNextEntityId());
+        }
+
+        // Entity should exist before we initialize transport space
+        game.addEntity(unit.getEntity());
+
         unit.initializeAllTransportSpace();
 
         if (!unit.isMothballed()) {
@@ -1420,12 +1427,6 @@ public class Campaign implements ITechManager {
             }
         }
 
-        // Assign an entity ID to our new unit
-        if (Entity.NONE == unit.getEntity().getId()) {
-            unit.getEntity().setId(game.getNextEntityId());
-        }
-
-        game.addEntity(unit.getEntity());
     }
 
 
@@ -1443,6 +1444,8 @@ public class Campaign implements ITechManager {
             shipTransporters.addTransporter(unit);
         } else if (campaignTransportType.isTacticalTransport()) {
             tacticalTransporters.addTransporter(unit);
+        } else if (campaignTransportType.isTowTransport()) {
+            towTransporters.addTransporter(unit);
         }
     }
 
@@ -1472,6 +1475,8 @@ public class Campaign implements ITechManager {
             shipTransporters.removeTransport(unit);
         } else if (campaignTransportType.isTacticalTransport()) {
             tacticalTransporters.removeTransport(unit);
+        } else if (campaignTransportType.isTowTransport()) {
+            towTransporters.removeTransport(unit);
         }
     }
 
@@ -1555,17 +1560,8 @@ public class Campaign implements ITechManager {
         en.setGame(game);
         en.setExternalIdAsString(unit.getId().toString());
 
-        unit.initializeAllTransportSpace();
         // Added to avoid the 'default force bug' when calculating cargo
         removeUnitFromForce(unit);
-
-        if (!unit.isMothballed()) {
-            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
-                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
-                    addCampaignTransport(campaignTransportType, unit);
-                }
-            }
-        }
 
         unit.initializeParts(true);
         unit.runDiagnostic(false);
@@ -1590,6 +1586,16 @@ public class Campaign implements ITechManager {
             en.setId(game.getNextEntityId());
         }
         game.addEntity(en);
+
+        unit.initializeAllTransportSpace();
+
+        if (!unit.isMothballed()) {
+            for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+                if (!unit.getTransportCapabilities(campaignTransportType).isEmpty()) {
+                    addCampaignTransport(campaignTransportType, unit);
+                }
+            }
+        }
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
@@ -8102,6 +8108,8 @@ public class Campaign implements ITechManager {
         }
         else if (campaignTransportType.isShipTransport()) {
             return shipTransporters;
+        } else if (campaignTransportType.isTowTransport()) {
+            return towTransporters;
         }
         return null;
     }
@@ -8158,6 +8166,10 @@ public class Campaign implements ITechManager {
         return shipTransporters.hasTransporters();
     }
 
+    private boolean hasTowTransports() {
+        return towTransporters.hasTransporters();
+    }
+
     /**
      * Do we have transports for the kind of transport?
      * @param campaignTransportType class of the TransportDetail
@@ -8166,9 +8178,10 @@ public class Campaign implements ITechManager {
     public boolean hasTransports(CampaignTransportType campaignTransportType) {
         if (campaignTransportType.isTacticalTransport()) {
             return hasTacticalTransports();
-        }
-        else if (campaignTransportType.isShipTransport()) {
+        } else if (campaignTransportType.isShipTransport()) {
             return hasShipTransports();
+        } else if (campaignTransportType.isTowTransport()) {
+            return hasTowTransports();
         }
         return false;
     }

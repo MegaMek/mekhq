@@ -23,6 +23,7 @@ import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
@@ -133,8 +134,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 transport.append("<br>Transported by: ")
                     .append(unit.getTacticalTransportAssignment().getTransport().getName());
             }
+            String towTransport = "";
+            if (unit.hasTransportAssignment(CampaignTransportType.TOW_TRANSPORT)) {
+                transport.append("<br>Towed by: ")
+                    .append(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT).getTransport().getName());
+            }
 
-            String text = name + ", " + unitName + c3network + transport + tacticalTransport;
+            String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
             if((null != person) && (null != force) && (person.getId().equals(force.getForceCommanderID()))) {

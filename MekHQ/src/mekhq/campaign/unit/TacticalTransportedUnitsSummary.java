@@ -120,7 +120,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
      * @param transportedUnit unit being loaded
      * @return old transport; what was the unit's previous transport, if it had one
      */
-    public Unit loadTransport(@Nullable Transporter transportedLocation, TransporterType transporterType, Unit transportedUnit) {
+    public @Nullable Unit loadTransport(@Nullable Transporter transportedLocation, TransporterType transporterType, Unit transportedUnit) {
         Unit oldTransport = null;
         TransporterType oldTransporterType = null;
 
