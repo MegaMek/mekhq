@@ -118,6 +118,12 @@ public class ContractTest {
         assertEquals(Money.of(17.10), contract.getMonthlyPayOut());
     }
 
+    @Test
+    public void testGetSharesPercentDefaultsTo30() {
+        initializeTest();
+        assertEquals(30, contract.getSharesPercent());
+    }
+
     private void initializeTest() {
         final PlanetarySystem mockPlanetarySystem = mock(PlanetarySystem.class);
 

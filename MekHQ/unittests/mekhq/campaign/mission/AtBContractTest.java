@@ -124,4 +124,11 @@ public class AtBContractTest {
         // Ensure the parent is null because it is not the correct type of contract
         assertNull(child.getParentContract());
     }
+
+    @Test
+    public void atbContractSharesPercentMatchesPreviousSetting() {
+        AtBContract contract = new AtBContract("Test");
+        contract.setAtBSharesPercent(50);
+        assertEquals(50, contract.getSharesPercent());
+    }
 }
