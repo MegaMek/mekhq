@@ -163,7 +163,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
      * @param transporterType transporter type
      * @return unit that was previously pulling this unit, or null
      */
-    public Unit towTrailer(Unit towedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+    public @Nullable Unit towTrailer(Unit towedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         Unit oldTractor = null;
         if (towedUnit.getTransportAssignment(TOW_TRANSPORT) != null) {
             oldTractor = towedUnit.getTransportAssignment(TOW_TRANSPORT).getTransport();
@@ -230,7 +230,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary{
      *
      * @return the tractor pulling the entire train of trailers
      */
-    private Unit getTractor() {
+    private @Nullable Unit getTractor() {
         Unit tractor;
         if (transport.getEntity() instanceof Tank tank) {
             if (tank.isTrailer()) {

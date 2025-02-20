@@ -514,7 +514,7 @@ public class Unit implements ITechnology {
      * @param campaignTransportType the transport type (enum) we're interested in
      * @return corresponding transport assignment, or null if there isn't one
      */
-    public ITransportAssignment getTransportAssignment(CampaignTransportType campaignTransportType) {
+    public @Nullable ITransportAssignment getTransportAssignment(CampaignTransportType campaignTransportType) {
         if (campaignTransportType.isShipTransport()) {
             return transportShipAssignment;
         } else if (campaignTransportType.isTacticalTransport()) {
@@ -531,7 +531,7 @@ public class Unit implements ITechnology {
      * @param assignment the assignment we're setting for this unit
      * @see CampaignTransportType
      */
-    public void setTransportAssignment(CampaignTransportType campaignTransportType, ITransportAssignment assignment) {
+    public void setTransportAssignment(CampaignTransportType campaignTransportType, @Nullable ITransportAssignment assignment) {
         if (campaignTransportType.isShipTransport()) {
             if (assignment.getClass().isAssignableFrom(campaignTransportType.getTransportAssignmentType())) {
                 setTransportShipAssignment((TransportShipAssignment) assignment);
@@ -2356,7 +2356,7 @@ public class Unit implements ITechnology {
      * @param transporterType type (Enum) of bay or Transporter
      * @return the old transport of the unit, or an empty set if none
      */
-    public Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+    public @Nullable Unit loadTacticalTransport(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         return getTacticalTransportedUnitsSummary().loadTransport(transportedLocation, transporterType, transportedUnit);
     }
 
@@ -2376,7 +2376,7 @@ public class Unit implements ITechnology {
      * @return original towing unit (Unit) that was pulling the transportedUnit
      * @see TransporterType#TANK_TRAILER_HITCH
      */
-    public Unit towTrailer(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
+    public @Nullable Unit towTrailer(Unit transportedUnit, @Nullable Transporter transportedLocation, TransporterType transporterType) {
         return ((TowTransportedUnitsSummary) getTransportedUnitsSummary(CampaignTransportType.TOW_TRANSPORT)).towTrailer(transportedUnit, transportedLocation, transporterType);
     }
 
