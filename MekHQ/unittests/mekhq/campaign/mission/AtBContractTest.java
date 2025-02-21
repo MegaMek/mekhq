@@ -203,7 +203,7 @@ public class AtBContractTest {
 
     @ParameterizedTest
     @MethodSource("provideContractDifficultyParametersGBV")
-    void new_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV,
+    public void new_calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV,
                                                                        double playerBV,
                                                                        int expectedResult) {
         contract = spy(contract);
