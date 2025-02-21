@@ -43,6 +43,7 @@ MEKHQ VERSION HISTORY:
 + PR #6029: Linked scenario unit selection
 + PR #6031: Convert planetary system data to yaml + general planetary system overhaul
 + Fix #6025: Young Wolves Storyarc doesn't correctly assign main character or Tobias to the Mechwarrior Trueborn Caste
++ PR #6051: Read user force icons data from user directory
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
