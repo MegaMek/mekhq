@@ -18,15 +18,48 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.common.EquipmentType;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.Systems;
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class AtBContractTest {
+    private AtBContract contract;
+    private Campaign campaign;
+    private CampaignOptions options;
+
+    @BeforeAll
+    public static void setup() {
+        EquipmentType.initializeTypes();
+        Ranks.initializeRankSystems();
+        try {
+            Factions.setInstance(Factions.loadDefault());
+            Systems.setInstance(Systems.loadDefault());
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+        }
+    }
+
+    @BeforeEach
+    void setUp() {
+        campaign = mock(Campaign.class);
+        options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        contract = new AtBContract();
+    }
 
     @Test
     public void atbContractRestoreDoesNothingWithoutParent() {
@@ -130,5 +163,166 @@ public class AtBContractTest {
         AtBContract contract = new AtBContract("Test");
         contract.setAtBSharesPercent(50);
         assertEquals(50, contract.getSharesPercent());
+    }
+
+    /*
+     *  TODO: The following tests prefixed with old_* should be removed along with the deprecated methods
+     *  they're testing when deemed safe to do so (roughly 0.50.4 or 0.50.5).
+     */
+
+    @Test
+    void old_calculateContractDifficultyEqualSkillShouldBe10() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(0.0).when(contract).estimatePlayerPower(any(Campaign.class));
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(campaign);
+        assertEquals(10, difficulty);
+    }
+
+    @Test
+    void old_calculateContractDifficultyEqualSkillShouldBe5() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(500.0).when(contract).estimatePlayerPower(any(Campaign.class));
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(campaign);
+        assertEquals(5, difficulty);
+    }
+
+    @Test
+    void old_calculateContractDifficultyEqualSkillShouldBe1() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(2000.0).when(contract).estimatePlayerPower(any(Campaign.class));
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(campaign);
+        assertEquals(1, difficulty);
+    }
+
+    @Test
+    void old_calculateContractDifficultyEqualSkillShouldBe4() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(525.0).when(contract).estimatePlayerPower(any(Campaign.class));
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(campaign);
+        assertEquals(4, difficulty);
+    }
+
+    @Test
+    void old_calculateContractDifficultyEqualSkillShouldBe7() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(350.0).when(contract).estimatePlayerPower(any(Campaign.class));
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(campaign);
+        assertEquals(7, difficulty);
+    }
+
+    @Test
+    void old_calculateContractDifficultyNoEnemyRatingShouldBeError() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(0.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(0.0).when(contract).estimatePlayerPower(any(Campaign.class));
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(campaign);
+        assertEquals(-99, difficulty);
+    }
+
+    @Test
+    void new_calculateContractDifficultyEqualSkillShouldBe10() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(0.0).when(contract).estimatePlayerPower(anyList(), anyBoolean());
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
+        assertEquals(10, difficulty);
+    }
+
+    @Test
+    void new_calculateContractDifficultyEqualSkillShouldBe5() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(500.0).when(contract).estimatePlayerPower(anyList(), anyBoolean());
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
+        assertEquals(5, difficulty);
+    }
+
+    @Test
+    void new_calculateContractDifficultyEqualSkillShouldBe1() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(2000.0).when(contract).estimatePlayerPower(anyList(), anyBoolean());
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
+        assertEquals(1, difficulty);
+    }
+
+    @Test
+    void new_calculateContractDifficultyEqualSkillShouldBe4() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(525.0).when(contract).estimatePlayerPower(anyList(), anyBoolean());
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
+        assertEquals(4, difficulty);
+    }
+
+    @Test
+    void new_calculateContractDifficultyEqualSkillShouldBe7() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(500.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(350.0).when(contract).estimatePlayerPower(anyList(), anyBoolean());
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
+        assertEquals(7, difficulty);
+    }
+
+    @Test
+    void new_calculateContractDifficultyNoEnemyRatingShouldBeError() {
+        contract = spy(contract);
+        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
+        doReturn(0.0).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
+        doReturn(0.0).when(contract).estimatePlayerPower(anyList(), anyBoolean());
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(options.isUseGenericBattleValue()).thenReturn(true);
+
+        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
+        assertEquals(-99, difficulty);
     }
 }
