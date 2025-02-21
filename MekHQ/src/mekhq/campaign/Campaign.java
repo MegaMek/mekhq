@@ -51,6 +51,7 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -8961,5 +8962,23 @@ public class Campaign implements ITechManager {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns a list of entities (units) from all combat forces.
+     *
+     * @return a list of entities representing all combat units in the player force
+     */
+    public List<Entity> getAllCombatEntities() {
+        List<Entity> units = new ArrayList<>();
+        for (Force force : getAllForces()) {
+            if (!force.isForceType(ForceType.STANDARD)) {
+                continue;
+            }
+            for (UUID unitID : force.getUnits()) {
+                units.add(getUnit(unitID).getEntity());
+            }
+        }
+        return units;
     }
 }
