@@ -363,7 +363,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(MHQTabType.MEK_LAB.ordinal());
+            gui.getTabMain().setSelectedIndex(gui.getTabMain().getTabCount()-1);
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
