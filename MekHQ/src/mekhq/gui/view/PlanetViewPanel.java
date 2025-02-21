@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,6 +23,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -137,13 +138,13 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblPlanetType = new JLabel(resourceMap.getString("lblPlanetaryType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblPlanetType, gbcLabel);
-        JLabel txtPlanetType = new JLabel(planet.getPlanetType());
+        JLabel txtPlanetType = new JLabel(planet.getPlanetType().toString());
         gbcText.gridy = infoRow;
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
 
         //System Position
-        if (!"Asteroid Belt".equals(planet.getPlanetType())) {
+        if (planet.getPlanetType() != PlanetaryType.ASTEROID_BELT) {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDiameter, gbcLabel);
@@ -336,8 +337,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         gbcLabel.gridy = infoRow;
         panel.add(lblHiringHall, gbcLabel);
         JLabel textHiringHall = new JLabel(StringUtils.capitalize(
-            planet.getParentSystem()
-            .getHiringHallLevel(currentDate)
+            planet.getHiringHallLevel(currentDate)
             .name()
             .toLowerCase()));
         gbcText.gridy = infoRow;
@@ -396,7 +396,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private static JLabel getTxtPosition(Planet planet) {
         String text;
         if (null != planet.getOrbitRadius()) {
-            if (planet.getPlanetType().equals("Asteroid Belt")) {
+            if (planet.getPlanetType() == PlanetaryType.ASTEROID_BELT) {
                 text = String.format("%.3f AU",
                         planet.getOrbitRadius());
             } else {
@@ -432,7 +432,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblStarType, gbcLabel);
-        JLabel txtStarType = new JLabel(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ')');
+        JLabel txtStarType = new JLabel(system.getStar().toString() + " (" + system.getRechargeTimeText(currentDate) + ')');
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);
         ++ infoRow;

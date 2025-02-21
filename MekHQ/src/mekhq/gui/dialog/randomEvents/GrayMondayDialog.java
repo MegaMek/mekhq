@@ -103,7 +103,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
 
         // Get speaker details
         String speakerName = speaker.getFullTitle();
-        if (campaign.getLocalDate().equals(EVENT_DATE_GRAY_MONDAY.plusDays(2))) {
+        if (campaign.getLocalDate().equals(EVENT_DATE_GRAY_MONDAY.plusDays(3))) {
             if (chosenContract != null) {
                 speakerName = chosenContract.getEmployerName(campaign.getGameYear());
             }
@@ -112,7 +112,7 @@ public class GrayMondayDialog extends MHQDialogImmersive {
         // Add speaker image (icon)
         ImageIcon speakerIcon = getSpeakerIcon(campaign, speaker);
 
-        if (campaign.getLocalDate().equals(EVENT_DATE_GRAY_MONDAY.plusDays(2))) {
+        if (campaign.getLocalDate().equals(EVENT_DATE_GRAY_MONDAY.plusDays(3))) {
             if (chosenContract != null) {
                 String employerCode = chosenContract.getEmployerCode();
                 speakerIcon = Factions.getFactionLogo(campaign, employerCode, true);

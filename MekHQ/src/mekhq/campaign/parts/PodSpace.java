@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -103,7 +103,8 @@ public class PodSpace implements IPartWork {
         //Iterate through all pod-mounted equipment in space and remove them.
         for (int pid : childPartIds) {
             final Part part = campaign.getWarehouse().getPart(pid);
-            if (part != null) {
+            // Don't remove missing parts! We'll need to fix them.
+            if (part != null && !(part instanceof MissingPart)) {
                 part.remove(salvage);
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
@@ -142,8 +143,13 @@ public class PodSpace implements IPartWork {
 
     @Override
     public @Nullable String checkFixable() {
-        if (isSalvaging() || location < 0) {
-            return null;
+        if ((isSalvaging() && !childPartIds.isEmpty()) || location < 0) {
+            for (int partId : childPartIds) {
+                // If all remaining parts are already missing, we don't need to keep salvaging
+                 if (!(campaign.getWarehouse().getPart(partId) instanceof MissingPart)) {
+                     return null;
+                 }
+            }
         }
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location

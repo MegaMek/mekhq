@@ -1025,7 +1025,7 @@ public class AtBContract extends Contract {
 
                                 if (campaignState != null) {
                                     text += ": -1 Support Point";
-                                    campaignState.addSupportPoints(-1);
+                                    campaignState.changeSupportPoints(-1);
                                 }
                             }
                             break;
@@ -1519,15 +1519,8 @@ public class AtBContract extends Contract {
         this.moraleLevel = moraleLevel;
     }
 
-    /**
-     * Retrieves the dynamic shares percentage for this contract.
-     * This method shouldn't be called directly,
-     * instead use contract.getSharesPercent()
-     *
-     *
-     * @return the dynamic shares percentage
-     */
-    public int getAtBSharesPercentage() {
+    @Override
+    public int getSharesPercent() {
         return sharesPct;
     }
 

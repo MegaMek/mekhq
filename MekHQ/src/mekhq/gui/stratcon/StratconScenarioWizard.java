@@ -36,6 +36,7 @@ import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.StratconPanel;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.lang3.ArrayUtils;
@@ -90,11 +91,15 @@ public class StratconScenarioWizard extends JDialog {
 
     private JPanel contentPanel;
     private JButton btnCommit;
+    private JButton btnCancel;
 
     private static final MMLogger logger = MMLogger.create(StratconScenarioWizard.class);
 
-    public StratconScenarioWizard(Campaign campaign) {
+    private final StratconPanel parent;
+
+    public StratconScenarioWizard(Campaign campaign, StratconPanel parent) {
         this.campaign = campaign;
+        this.parent = parent;
         this.setModalityType(ModalityType.APPLICATION_MODAL);
 
         for (CampaignTransportType campaignTransportType : getLeadershipDropdownVectorPair().stream().map(Pair::getValue).collect(Collectors.toSet())) {
@@ -664,7 +669,7 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void setNavigationButtons(GridBagConstraints constraints, boolean isPrimaryForce) {
         // Create the commit button
-        btnCommit = new JButton("Commit");
+        btnCommit = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCommit.text"));
         btnCommit.setActionCommand("COMMIT_CLICK");
         if (isPrimaryForce) {
             btnCommit.addActionListener(evt -> btnCommitClicked(evt,
@@ -674,9 +679,33 @@ public class StratconScenarioWizard extends JDialog {
             btnCommit.setEnabled(currentCampaignState.getSupportPoints() > 0);
         }
 
-        // Configure layout constraints for the button
-        constraints.gridheight = GridBagConstraints.REMAINDER;
+        btnCancel = new JButton(MHQInternationalization.getTextAt(resourcePath, "leadershipCancel.text"));
+        btnCancel.setActionCommand("CANCEL_CLICK");
+        btnCancel.addActionListener(evt -> closeWizard());
+        btnCancel.setEnabled(true);
+
+        // Configure layout constraints for the buttons
         constraints.gridwidth = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.CENTER;
+
+        //Final instructions:
+        if (isPrimaryForce) {
+            String instructions;
+            Force primaryForce = currentScenario.getBackingScenario().getForces(campaign)
+                .getAllSubForces().stream().findFirst().orElse(null);
+            if (primaryForce != null) {
+                instructions = MHQInternationalization.getFormattedTextAt(resourcePath, "lblLeadershipCommitForces.text", primaryForce.getName());
+            }
+            else { instructions = MHQInternationalization.getTextAt(resourcePath, "lblLeadershipCommitForces.fallback.text"); }
+
+            contentPanel.add(new JLabel(instructions), constraints);
+        }
+
+        // Allign and add cancel button to the content panel
+        constraints.gridy++;
+        constraints.gridheight = GridBagConstraints.REMAINDER;
+        constraints.anchor = GridBagConstraints.WEST;
+        contentPanel.add(btnCancel, constraints);
         constraints.anchor = GridBagConstraints.CENTER;
 
         // Add the commit button to the content panel
@@ -900,6 +929,10 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void btnCommitClicked(ActionEvent evt, @Nullable Integer reinforcementTargetNumber,
                                   boolean isGMReinforcement) {
+        if (parent != null ) {
+            parent.setCommitForces(true);
+        }
+
         // go through all the force lists and add the selected forces to the scenario
         for (String templateID : availableForceLists.keySet()) {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
@@ -961,6 +994,10 @@ public class StratconScenarioWizard extends JDialog {
             scaleObjectiveTimeLimits(currentScenario.getBackingScenario(), campaign);
         }
 
+        closeWizard();
+    }
+
+    private void closeWizard() {
         this.getParent().repaint();
 
         dispose();

@@ -37,6 +37,7 @@ import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.EraFlag;
+import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
@@ -510,8 +511,8 @@ public class RandomDeath {
      * @return the HPG access multiplier, or 0 if no modifier is required.
      */
     private double getHpgAccessMultiplier() {
-        Integer hpgRating = campaign.getLocation().getPlanet().getHPG(campaign.getLocalDate());
-        if (hpgRating != null && hpgRating <= EquipmentType.RATING_B) {
+        HPGRating hpgRating = campaign.getLocation().getPlanet().getHPG(campaign.getLocalDate());
+        if (hpgRating != null && hpgRating.compareTo(HPGRating.B) >= 0) {
             return MEDICAL_MULTIPLIER_HPG_ACCESS;
         }
         return 0;

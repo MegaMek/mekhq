@@ -22,6 +22,7 @@ import java.io.File;
 
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.fileUtils.ImageFileFactory;
@@ -80,8 +81,16 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // something fails
             parseForceIconDirectory = false;
             try {
-                forceIconDirectory = new DirectoryItems(new File("data/images/force"), // TODO : Remove inline file path
+                forceIconDirectory = new DirectoryItems(new File(MHQConstants.FORCE_ICON_PATH),
                         new ImageFileFactory());
+
+                String userDir = PreferenceManager.getClientPreferences().getUserDir();
+                File forceIconUserDir = new File(userDir + "/" + MHQConstants.FORCE_ICON_PATH);
+                if (!userDir.isBlank() && forceIconUserDir.isDirectory()) {
+                    DirectoryItems userDirForceIcon = new DirectoryItems(forceIconUserDir, new ImageFileFactory());
+                    forceIconDirectory.merge(userDirForceIcon);
+                }
+
             } catch (Exception e) {
                 logger.error("Could not parse the force icon directory!", e);
             }

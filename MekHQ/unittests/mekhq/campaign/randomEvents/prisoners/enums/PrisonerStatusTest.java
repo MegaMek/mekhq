@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,7 +58,7 @@ public class PrisonerStatusTest {
     public void testGetLabel_notInvalid() {
         for (PrisonerStatus status : PrisonerStatus.values()) {
             String label = status.getLabel();
-            assertTrue(isTitleExtensionValid(label));
+            assertTrue(isResourceKeyValid(label));
         }
     }
 
@@ -65,24 +66,7 @@ public class PrisonerStatusTest {
     public void testGetTitleExtension_notInvalid() {
         for (PrisonerStatus status : PrisonerStatus.values()) {
             String titleExtension = status.getTitleExtension();
-            assertTrue(isTitleExtensionValid(titleExtension));
+            assertTrue(isResourceKeyValid(titleExtension));
         }
-    }
-
-    /**
-     * Checks if the given text is a valid title extension. A valid title extension
-     * does not start or end with an exclamation mark ('!').
-     *
-     * <p>If {@link mekhq.utilities.MHQInternationalization} fails to fetch a valid return it
-     * returns the key between two {@code !}. So by checking the returned string doesn't begin and
-     * end with that punctuation, we can easily verify that all statuses have been provided results
-     * for the keys we're using.</p>
-     *
-     * @param text The text to validate as a title extension.
-     * @return true if the text is valid (does not start or end with an '!');
-     *         false otherwise.
-     */
-    public static boolean isTitleExtensionValid(String text) {
-        return !text.startsWith("!") && !text.endsWith("!");
     }
 }
