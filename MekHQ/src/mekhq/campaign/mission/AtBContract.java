@@ -1974,16 +1974,20 @@ public class AtBContract extends Contract {
      *   <li>If the enemy's forces are stronger, the difficulty is adjusted upward from a baseline of 5.</li>
      *   <li>If an error is encountered, the difficulty is returned as -99</li>
      * </ul>
-     * The result is clamped to fit between the valid range of 1 and 10. Or -99 if an error is encounterd.
+     * The result is clamped to fit between the valid range of 1 and 10. Or -99 if an error is encountered.
      *
+     * TODO: Remove when it's deemed safe to do so. This is being deprecated in favor of the overload below.
      */
+    @Deprecated
     public int calculateContractDifficulty(Campaign campaign) {
         final int ERROR = -99;
 
         // Estimate the power of the enemy forces
         SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
         double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        double enemyPower = estimateMekStrength(campaign, enemyCode, enemyQuality);
+        int gameYear = campaign.getGameYear();
+        boolean useGenericBV = campaign.getCampaignOptions().isUseGenericBattleValue();
+        double enemyPower = estimateMekStrength(gameYear, useGenericBV, enemyCode, enemyQuality);
 
         // If we cannot calculate enemy power, abort.
         if (enemyPower == 0) {
@@ -2009,7 +2013,95 @@ public class AtBContract extends Contract {
         if (allyRatio > 0) {
             SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
             double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            double allyPower = estimateMekStrength(campaign, employerCode, allyQuality);
+            double allyPower = estimateMekStrength(gameYear, useGenericBV, employerCode, allyQuality);
+            allyPower = allyPower * allySkillMultiplier;
+            // If we cannot calculate ally's power, use player power as a fallback.
+            if (allyPower == 0) {
+                allyPower = playerPower;
+            }
+            playerPower += allyRatio * allyPower;
+            enemyPower += allyRatio * enemyPower;
+        }
+
+        // Calculate difficulty based on the percentage difference between the two forces.
+        double difference = enemyPower - playerPower;
+        double percentDifference = (difference / playerPower) * 100;
+
+        int mappedValue = (int) ceil(Math.abs(percentDifference) / 20);
+        if (percentDifference < 0) {
+            mappedValue = 5 - mappedValue;
+        } else {
+            mappedValue = 5 + mappedValue;
+        }
+
+        return min(max(mappedValue, 1), 10);
+    }
+
+    /**
+     * Calculates the difficulty of a contract based on the relative power of enemy forces,
+     * player forces, and any allied forces involved in the campaign.
+     *
+     * <p>The method evaluates the enemy's estimated power against the player's strengths
+     * and considers allied contributions depending on the assigned command rights.
+     * The result is a difficulty level mapped between 1 and 10, where higher values
+     * represent more challenging contracts.</p>
+     *
+     * @param gameYear          The current year in the campaign (e.g., from {@link Campaign#getGameYear()})
+     * @param useGenericBV      Whether "Use Generic BV" is enabled in the Campaign Options
+     * @param playerCombatUnits List of Entities representing all combat units for the player. This
+     *                          can be obtained via {@link Campaign#getAllCombatEntities()}.
+     *
+     * @return An integer representing the difficulty of the contract:
+     * <ul>
+     *    <li>1 = very easy</li>
+     *    <li>10 = extremely difficult</li>
+     * </ul>
+     * <p>
+     * <b>WARNING: </b>Returns `-99` (defined as `ERROR`) if the enemy's power cannot be calculated.
+     * </p>
+     * <p><b>Mapped Result Explanation:</b></p>
+     * The method divides the absolute percentage difference between enemy and player forces by 20
+     * (rounding up), then adjusts the difficulty accordingly:
+     * <ul>
+     *   <li>If the player's forces are stronger, the difficulty is adjusted downward from a baseline of 5.</li>
+     *   <li>If the enemy's forces are stronger, the difficulty is adjusted upward from a baseline of 5.</li>
+     *   <li>If an error is encountered, the difficulty is returned as -99</li>
+     * </ul>
+     * The result is clamped to fit between the valid range of 1 and 10. Or -99 if an error is encountered.
+     **/
+    public int calculateContractDifficulty(int gameYear, boolean useGenericBV, List<Entity> playerCombatUnits) {
+        final int ERROR = -99;
+
+        // Estimate the power of the enemy forces
+        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
+        double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
+        double enemyPower = estimateMekStrength(gameYear, useGenericBV, enemyCode, enemyQuality);
+
+        // If we cannot calculate enemy power, abort.
+        if (enemyPower == 0) {
+            return ERROR;
+        }
+
+        enemyPower = (int) round(enemyPower * enemySkillMultiplier);
+
+        // Estimate player power
+        double playerPower = estimatePlayerPower(playerCombatUnits, useGenericBV);
+
+        // Estimate the power of allied forces
+        // TODO pull these directly from Force Generation instead of using magic numbers
+        // TODO estimate the LIAISON ratio by going through each combat lance and
+        // getting the actual average (G)BV for an allied heavy/assault mek.
+        double allyRatio = switch (getCommandRights()) {
+            case INDEPENDENT    -> 0; // no allies
+            case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
+            case HOUSE          -> 0.25; // allies with 25% the player's (G)BV budget
+            case INTEGRATED     -> 0.5; // allies with 50% the player's (G)BV budget
+        };
+
+        if (allyRatio > 0) {
+            SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
+            double allySkillMultiplier = getSkillMultiplier(alliedSkill);
+            double allyPower = estimateMekStrength(gameYear, useGenericBV, employerCode, allyQuality);
             allyPower = allyPower * allySkillMultiplier;
             // If we cannot calculate ally's power, use player power as a fallback.
             if (allyPower == 0) {
@@ -2040,7 +2132,7 @@ public class AtBContract extends Contract {
      * @param skillLevel   the original skill level
      * @return the modified skill level
      */
-    private static SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
+    SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
         if (Objects.equals(factionCode, "SOC")) {
             return ELITE;
         }
@@ -2058,7 +2150,8 @@ public class AtBContract extends Contract {
      * @param campaign the object containing the forces and units of the player
      * @return average battle value per player unit OR total BV2 divided by total GBV
      */
-    private static double estimatePlayerPower(Campaign campaign) {
+    @Deprecated
+    double estimatePlayerPower(Campaign campaign) {
         int playerPower = 0;
         int playerGBV = 0;
         int playerUnitCount = 0;
@@ -2076,6 +2169,23 @@ public class AtBContract extends Contract {
         }
 
         if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) playerPower) / playerGBV;
+        } else {
+            return ((double) playerPower) / playerUnitCount;
+        }
+    }
+
+    double estimatePlayerPower(List<Entity> units, boolean useGenericBV) {
+        int playerPower = 0;
+        int playerGBV = 0;
+        int playerUnitCount = 0;
+        for (Entity unit : units) {
+            playerPower += unit.calculateBattleValue();
+            playerGBV += unit.getGenericBattleValue();
+            playerUnitCount ++;
+        }
+
+        if (useGenericBV) {
             return ((double) playerPower) / playerGBV;
         } else {
             return ((double) playerPower) / playerUnitCount;
@@ -2104,13 +2214,14 @@ public class AtBContract extends Contract {
      * Estimates the relative strength for Mek units of a specific faction and quality.
      * Excludes salvage.
      *
-     * @param campaign the campaign to estimate the average Mek strength for
+     * @param gameYear the year of the current campaign
+     * @param useGenericBV whether to use generic BV for strength calculations
      * @param factionCode the code of the faction to estimate the average Mek strength for
      * @param quality the quality of the Meks to calculate the average strength for
      * @return the average battle value OR total BV2 divided by total GBV
      * for Meks of the specified faction and quality OR 0 on error
      */
-    private static double estimateMekStrength(Campaign campaign, String factionCode, int quality) {
+    double estimateMekStrength(int gameYear, boolean useGenericBV, String factionCode, int quality) {
         final double ERROR = 0;
 
         RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
@@ -2125,7 +2236,7 @@ public class AtBContract extends Contract {
             unitTable = findTable(
                 faction,
                 MEK,
-                campaign.getGameYear(),
+                gameYear,
                 String.valueOf(quality),
                 new ArrayList<>(),
                 NETWORK_NONE,
@@ -2161,7 +2272,7 @@ public class AtBContract extends Contract {
             rollingCount += weight;
         }
 
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+        if (useGenericBV) {
             return ((double) totalBattleValue) / totalGBV;
         } else {
             return ((double) totalBattleValue) / rollingCount;
