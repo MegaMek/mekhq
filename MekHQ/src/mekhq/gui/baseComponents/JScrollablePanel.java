@@ -28,7 +28,6 @@ import javax.swing.*;
  *
  * @author aarong original author
  */
-@Deprecated // Replace with AbstractMHQScrollablePanel and DefaultMHQScrollablePanel
 public class JScrollablePanel extends JPanel implements Scrollable {
     //region Variable Declarations
     // by default, track the width, and re-size as needed.
