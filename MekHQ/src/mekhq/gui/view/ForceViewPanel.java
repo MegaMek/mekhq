@@ -23,6 +23,7 @@ import megamek.common.Entity;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceType;
@@ -594,6 +595,13 @@ public class ForceViewPanel extends JScrollablePanel {
         if (unit.hasTacticalTransportAssignment()) {
             toReturn += "<br><i>" + "Transported by: ";
             toReturn += unit.getTacticalTransportAssignment().getTransport().getName();
+            toReturn += "</i>";
+        }
+
+        //Can't forget what's towing this unit!
+        if (unit.hasTransportAssignment(CampaignTransportType.TOW_TRANSPORT)) {
+            toReturn += "<br><i>" + "Towed by: ";
+            toReturn += unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT).getTransport().getName();
             toReturn += "</i>";
         }
         toReturn += "</font></html>";
