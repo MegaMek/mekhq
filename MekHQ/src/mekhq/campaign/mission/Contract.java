@@ -703,19 +703,13 @@ public class Contract extends Mission {
 
     /**
      * Retrieves the percentage of shares for this contract.
-     * If the instance is of type AtBContract, it retrieves the dynamic Shares
-     * percentage.
-     * Otherwise, it returns a default value of 30.
+     * This currently returns a default value of 30.
      *
      * @return the percentage of shares
      */
     public int getSharesPercent() {
-        if (this instanceof AtBContract) {
-            return ((AtBContract) this).getAtBSharesPercentage();
-        } else {
-            // TODO make this campaign option configurable
-            return 30;
-        }
+        // TODO make this campaign option configurable
+        return 30;
     }
 
     @Override
