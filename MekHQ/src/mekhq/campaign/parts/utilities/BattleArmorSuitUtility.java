@@ -32,10 +32,10 @@ import java.util.List;
 /**
  * Battle Armor Suits and Missing Battle Armor Suits do not
  * track enough information to determine if two suits with
- * different chassis are actually the same - for example,
- * an Elemental [Flamer](Sqd5) suit being used for
- * Elemental [Flamer](Sqd3). This utility class will look
- * up a BA part's corresponding entity and can be used
+ * same chassis but different model names are actually the
+ * same - for example, an Elemental [Flamer](Sqd5) suit being
+ * used for Elemental [Flamer](Sqd3). This utility class will
+ * look up a BA part's corresponding entity and can be used
  * to get the information needed for the part/missing part
  * to make the comparison.
  *
