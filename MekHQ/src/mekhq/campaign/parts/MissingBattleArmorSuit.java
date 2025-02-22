@@ -53,6 +53,13 @@ public class MissingBattleArmorSuit extends MissingPart {
     protected EntityMovementMode jumpType;
     protected int weightClass;
 
+    // It is costly looking up entity, which is used to compare if two suits
+    // are the same even if the chassis name doesn't match. So let's save these
+    // values if we've already calculated them once.
+    private boolean entityDetailsCached = false;
+    private transient int suitBV;
+    private transient int weaponTypeListHash;
+
     public MissingBattleArmorSuit() {
         super(0, null);
     }
@@ -120,14 +127,19 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof BattleArmorSuit
-                && chassis.equals(((BattleArmorSuit) part).getChassis())
-                && removeBattleArmorSquadSize(model)
-                    .equals(removeBattleArmorSquadSize(((BattleArmorSuit) part).getModel()));
+        return part instanceof BattleArmorSuit baSuit
+            && getSuitBV() == baSuit.getSuitBV()
+            && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash();
     }
 
-    private String removeBattleArmorSquadSize(String model) {
-        return model.replaceAll("(\\(Sqd\\d)\\)$", "");
+    public int getSuitBV() {
+        refreshEntityDetailsCache();
+        return suitBV;
+    }
+
+    public int getWeaponTypeListHash() {
+        refreshEntityDetailsCache();
+        return weaponTypeListHash;
     }
 
     @Override
@@ -322,5 +334,15 @@ public class MissingBattleArmorSuit extends MissingPart {
     @Override
     public TechAdvancement getTechAdvancement() {
         return BattleArmor.getConstructionTechAdvancement(weightClass);
+    }
+
+    private void refreshEntityDetailsCache() {
+        if (!entityDetailsCached) {
+            mekhq.campaign.parts.utilities.BattleArmorSuitUtility battleArmorSuitUtility
+                = new  mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
+            suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
+            weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();
+            entityDetailsCached = true;
+        }
     }
 }
