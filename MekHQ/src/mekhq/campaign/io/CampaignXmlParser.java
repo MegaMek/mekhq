@@ -1561,10 +1561,9 @@ public class CampaignXmlParser {
      * @return Whether it's an old MASC.
      */
     private static boolean isLegacyMASC(Part p) {
-        return (p instanceof EquipmentPart) &&
-                !(p instanceof MASC) &&
-                ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
-                (((EquipmentPart) p).getType() instanceof MiscType);
+        return (p instanceof EquipmentPart equipmentPart) && !(p instanceof MASC)
+            && (equipmentPart.getType() instanceof MiscType miscType)
+            && miscType.hasFlag(MiscType.F_MASC);
     }
 
     /**
@@ -1575,10 +1574,9 @@ public class CampaignXmlParser {
      * @return Whether it's an old "missing" MASC.
      */
     private static boolean isLegacyMissingMASC(Part p) {
-        return (p instanceof MissingEquipmentPart) &&
-                !(p instanceof MissingMASC) &&
-                ((MissingEquipmentPart) p).getType().hasFlag(MiscType.F_MASC) &&
-                (((MissingEquipmentPart) p).getType() instanceof MiscType);
+        return (p instanceof MissingEquipmentPart missingPart) && !(p instanceof MissingMASC)
+            && (missingPart.getType() instanceof MiscType miscType)
+            && miscType.hasFlag(MiscType.F_MASC);
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
