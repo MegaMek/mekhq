@@ -44,7 +44,7 @@ public class SourceableValueLabel extends JLabel {
     }
 
     private void initialize() {
-        setText(String.format(format, sourcedValue.getValue().toString()));
+        setText(String.format(format, sourcedValue.getValue()));
         setToolTipText("<html><b>Source:</b> " + (sourcedValue.isCanon() ? sourcedValue.getSource() : "noncanon") + "</html>");
     }
 }
