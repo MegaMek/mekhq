@@ -227,7 +227,7 @@ public class AtBContractTest {
     }
 
     @Test
-    void setContractTypeUpdatesParentMissionType() {
+    public void setContractTypeUpdatesParentMissionType() {
         contract.setContractType(AtBContractType.CADRE_DUTY);
         assertEquals(AtBContractType.CADRE_DUTY, contract.getContractType());
         assertEquals("Cadre Duty", contract.getType());
@@ -245,13 +245,13 @@ public class AtBContractTest {
 
     @ParameterizedTest
     @MethodSource("provideEnemyFactionAndYear")
-    void getEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
+    public void getEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
         contract.setEnemyCode(enemyCode);
         assertEquals(fullName, contract.getEnemyName(year));
     }
 
     @Test
-    void getEnemyNameReturnsCorrectValueWhenMerc() {
+    public void getEnemyNameReturnsCorrectValueWhenMerc() {
         String name = "Testing Merc";
         contract.setEnemyCode("MERC");
         contract.setEnemyBotName(name);
@@ -271,7 +271,7 @@ public class AtBContractTest {
 
     @ParameterizedTest
     @MethodSource("provideEmployerNamesAndMercStatus")
-    void getEmployerNameReturnsCorrectName(int year, boolean isMercSubcontract, String employerCode, String fullName) {
+    public void getEmployerNameReturnsCorrectName(int year, boolean isMercSubcontract, String employerCode, String fullName) {
         contract.setEmployerCode(employerCode, year);
         contract.setMercSubcontract(isMercSubcontract);
         assertEquals(fullName, contract.getEmployerName(year));
