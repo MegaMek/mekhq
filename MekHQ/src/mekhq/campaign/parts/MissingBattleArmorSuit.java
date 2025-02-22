@@ -122,7 +122,12 @@ public class MissingBattleArmorSuit extends MissingPart {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof BattleArmorSuit
                 && chassis.equals(((BattleArmorSuit) part).getChassis())
-                && model.equals(((BattleArmorSuit ) part).getModel());
+                && removeBattleArmorSquadSize(model)
+                    .equals(removeBattleArmorSquadSize(((BattleArmorSuit) part).getModel()));
+    }
+
+    private String removeBattleArmorSquadSize(String model) {
+        return model.replaceAll("(\\(Sqd\\d)\\)$", "");
     }
 
     @Override
