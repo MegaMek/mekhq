@@ -47,7 +47,7 @@ public class AtBContractTest {
     private CampaignOptions options;
 
     @BeforeAll
-    public static void setup() {
+    public static void initSingletons() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         try {
@@ -59,7 +59,7 @@ public class AtBContractTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         campaign = mock(Campaign.class);
         options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
@@ -256,5 +256,9 @@ public class AtBContractTest {
         contract.setEnemyCode("MERC");
         contract.setEnemyBotName(name);
         assertEquals(name, contract.getEnemyName(3025));
+    }
+
+    @Test
+    void getEmployerName() {
     }
 }
