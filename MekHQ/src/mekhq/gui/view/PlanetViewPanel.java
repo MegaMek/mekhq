@@ -178,7 +178,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         ++ infoRow;
 
         //Year length
-        if (null != planet.getYearLength()) {
+        if (null != planet.getSourcedYearLength()) {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);
@@ -189,7 +189,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //day length
-        if (null != planet.getDayLength(currentDate)) {
+        if (null != planet.getSourcedDayLength(currentDate)) {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);
@@ -200,7 +200,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Gravity
-        if (null != planet.getGravity()) {
+        if (null != planet.getSourcedGravity()) {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblGravity, gbcLabel);
@@ -211,7 +211,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Atmosphere
-        if (null != planet.getAtmosphere(currentDate)) {
+        if (null != planet.getSourcedAtmosphere(currentDate)) {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAtmosphere, gbcLabel);
@@ -222,7 +222,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Atmospheric Pressure
-        if (null != planet.getPressure(currentDate)) {
+        if (null != planet.getSourcedPressure(currentDate)) {
             JLabel lblPressure = new JLabel(resourceMap.getString("lblPressure1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPressure, gbcLabel);
@@ -233,7 +233,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Atmospheric composition
-        if (null != planet.getComposition(currentDate)) {
+        if (null != planet.getSourcedComposition(currentDate)) {
             JLabel lblComposition = new JLabel(resourceMap.getString("lblComposition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblComposition, gbcLabel);
@@ -244,7 +244,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Temperature
-        if ((null != planet.getTemperature(currentDate))) {
+        if ((null != planet.getSourcedTemperature(currentDate))) {
             JLabel lblTemp = new JLabel(resourceMap.getString("lblTemp1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
@@ -256,7 +256,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Water
-        if (null != planet.getPercentWater(currentDate)) {
+        if (null != planet.getSourcedPercentWater(currentDate)) {
             JLabel lblWater = new JLabel(resourceMap.getString("lblWater1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblWater, gbcLabel);
@@ -267,7 +267,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //native life forms
-        if (null != planet.getLifeForm(currentDate)) {
+        if (null != planet.getSourcedLifeForm(currentDate)) {
             JLabel lblAnimal = new JLabel(resourceMap.getString("lblAnimal1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAnimal, gbcLabel);
@@ -300,7 +300,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //Population
-        if (null != planet.getPopulation(currentDate)) {
+        if (null != planet.getSourcedPopulation(currentDate)) {
             JLabel lblPopulation = new JLabel(resourceMap.getString("lblPopulation.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPopulation, gbcLabel);
@@ -327,7 +327,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //HPG status
-        if (null != planet.getHPGClass(currentDate)) {
+        if (null != planet.getSourcedHPG(currentDate)) {
             JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblHPG, gbcLabel);
