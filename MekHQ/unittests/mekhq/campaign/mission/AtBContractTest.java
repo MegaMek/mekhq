@@ -232,4 +232,29 @@ public class AtBContractTest {
         assertEquals(AtBContractType.CADRE_DUTY, contract.getContractType());
         assertEquals("Cadre Duty", contract.getType());
     }
+
+    private static Stream<Arguments> provideEnemyFactionAndYear() {
+        return Stream.of(
+            Arguments.of(3025, "LA", "Lyran Commonwealth"),
+            Arguments.of(3059, "LA", "Lyran Alliance"),
+            Arguments.of(-1, "LA", "Lyran Commonwealth"),
+            Arguments.of(3025, "??", "Unknown"),
+            Arguments.of(3025, "MERC", "")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEnemyFactionAndYear")
+    void getEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
+        contract.setEnemyCode(enemyCode);
+        assertEquals(fullName, contract.getEnemyName(year));
+    }
+
+    @Test
+    void getEnemyNameReturnsCorrectValueWhenMerc() {
+        String name = "Testing Merc";
+        contract.setEnemyCode("MERC");
+        contract.setEnemyBotName(name);
+        assertEquals(name, contract.getEnemyName(3025));
+    }
 }
