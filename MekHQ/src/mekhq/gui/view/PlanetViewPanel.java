@@ -23,14 +23,17 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.SourceableValue;
 import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.SourceableValueLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
+import javax.xml.transform.Source;
 import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
@@ -138,7 +141,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblPlanetType = new JLabel(resourceMap.getString("lblPlanetaryType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblPlanetType, gbcLabel);
-        JLabel txtPlanetType = new JLabel(planet.getPlanetType().toString());
+        SourceableValueLabel txtPlanetType = new SourceableValueLabel(planet.getSourcedPlanetType());
         gbcText.gridy = infoRow;
         panel.add(txtPlanetType, gbcText);
         ++ infoRow;
@@ -148,8 +151,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblDiameter = new JLabel(resourceMap.getString("lblDiameter.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDiameter, gbcLabel);
-            JLabel txtDiameter = new JLabel( String.format("%.1f km",
-                    planet.getDiameter()));
+            SourceableValueLabel txtDiameter = new SourceableValueLabel(planet.getSourcedDiameter(), "%.1f km");
             gbcText.gridy = infoRow;
             panel.add(txtDiameter, gbcText);
             ++ infoRow;
@@ -180,7 +182,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);
-            JLabel txtYear = new JLabel(planet.getYearLength() + " Terran years");
+            SourceableValueLabel txtYear = new SourceableValueLabel(planet.getSourcedYearLength(), "%s Terran years");
             gbcText.gridy = infoRow;
             panel.add(txtYear, gbcText);
             ++ infoRow;
@@ -191,7 +193,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);
-            JLabel txtDay = new JLabel(planet.getDayLength(currentDate) + " hours");
+            SourceableValueLabel txtDay = new SourceableValueLabel(planet.getSourcedDayLength(currentDate), "%s hours");
             gbcText.gridy = infoRow;
             panel.add(txtDay, gbcText);
             ++ infoRow;
@@ -202,7 +204,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblGravity, gbcLabel);
-            JLabel txtGravity = new JLabel(planet.getGravityText());
+            SourceableValueLabel txtGravity = new SourceableValueLabel(planet.getSourcedGravity(), "%sg");
             gbcText.gridy = infoRow;
             panel.add(txtGravity, gbcText);
             ++ infoRow;
@@ -213,7 +215,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAtmosphere, gbcLabel);
-            JLabel txtAtmosphere = new JLabel(planet.getAtmosphereName(currentDate));
+            SourceableValueLabel txtAtmosphere = new SourceableValueLabel(planet.getSourcedAtmosphere(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtAtmosphere, gbcText);
             ++ infoRow;
@@ -224,7 +226,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblPressure = new JLabel(resourceMap.getString("lblPressure1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPressure, gbcLabel);
-            JLabel txtPressure = new JLabel(planet.getPressureName(currentDate));
+            SourceableValueLabel txtPressure = new SourceableValueLabel(planet.getSourcedPressure(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtPressure, gbcText);
             ++ infoRow;
@@ -235,7 +237,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblComposition = new JLabel(resourceMap.getString("lblComposition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblComposition, gbcLabel);
-            JLabel txtComposition = new JLabel("<html>" + planet.getComposition(currentDate) + "</html>");
+            SourceableValueLabel txtComposition = new SourceableValueLabel(planet.getSourcedComposition(currentDate), "<html>%s</html>");
             gbcText.gridy = infoRow;
             panel.add(txtComposition, gbcText);
             ++ infoRow;
@@ -247,7 +249,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
             //Using Unicode for the degree symbol as it is required for proper display on certain systems
-            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "°" + 'C');
+            SourceableValueLabel txtTemp = new SourceableValueLabel(planet.getSourcedTemperature(currentDate), "%s°C");
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
             ++ infoRow;
@@ -258,7 +260,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblWater = new JLabel(resourceMap.getString("lblWater1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblWater, gbcLabel);
-            JLabel txtWater = new JLabel(planet.getPercentWater(currentDate) + " percent");
+            SourceableValueLabel txtWater = new SourceableValueLabel(planet.getSourcedPercentWater(currentDate), "%s percent");
             gbcText.gridy = infoRow;
             panel.add(txtWater, gbcText);
             ++ infoRow;
@@ -269,7 +271,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblAnimal = new JLabel(resourceMap.getString("lblAnimal1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblAnimal, gbcLabel);
-            JLabel txtAnimal = new JLabel(planet.getLifeFormName(currentDate));
+            SourceableValueLabel txtAnimal = new SourceableValueLabel(planet.getSourcedLifeForm(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtAnimal, gbcText);
             ++ infoRow;
@@ -302,7 +304,9 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblPopulation = new JLabel(resourceMap.getString("lblPopulation.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPopulation, gbcLabel);
-            JLabel txtPopulation = new JLabel(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
+            SourceableValueLabel txtPopulation = new SourceableValueLabel(planet.getSourcedPopulation(currentDate), "%,d");
+            // for this case, we need to override the default text to get commas
+            txtPopulation.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
             gbcText.gridy = infoRow;
             panel.add(txtPopulation, gbcText);
             ++ infoRow;
@@ -315,7 +319,8 @@ public class PlanetViewPanel extends JScrollablePanel {
             panel.add(lblSocioIndustrial, gbcLabel);
             SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
             String sidText = (null == sid) ? "" : sid.getHTMLDescription();
-            JLabel txtSocioIndustrial = new JLabel(sidText);
+            //JLabel txtSocioIndustrial = new JLabel(sidText);
+            SourceableValueLabel txtSocioIndustrial = new SourceableValueLabel(planet.getSourcedSocioIndustrial(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtSocioIndustrial, gbcText);
             ++ infoRow;
@@ -326,7 +331,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblHPG = new JLabel(resourceMap.getString("lblHPG1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblHPG, gbcLabel);
-            JLabel txtHPG = new JLabel(planet.getHPGClass(currentDate));
+            SourceableValueLabel txtHPG = new SourceableValueLabel(planet.getSourcedHPG(currentDate));
             gbcText.gridy = infoRow;
             panel.add(txtHPG, gbcText);
             ++ infoRow;
@@ -432,7 +437,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblStarType, gbcLabel);
-        JLabel txtStarType = new JLabel(system.getStar().toString() + " (" + system.getRechargeTimeText(currentDate) + ')');
+        SourceableValueLabel txtStarType = new SourceableValueLabel(system.getSourcedStar(), "%s (" + system.getRechargeTimeText(currentDate) + ')');
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);
         ++ infoRow;
