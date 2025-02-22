@@ -178,7 +178,7 @@ public class AtBContractTest {
         return Stream.of(
             Arguments.of(500.0, 0.0, true, 10),
             Arguments.of(500.0, 0.0, false, 10),
-            Arguments.of(500.0, 500.0, false, 5),
+            Arguments.of(500.0, 500.0, true, 5),
             Arguments.of(500.0, 500.0, false, 5),
             Arguments.of(500.0, 2000.0, true, 1),
             Arguments.of(500.0, 2000.0, false, 1),
