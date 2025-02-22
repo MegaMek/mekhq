@@ -58,6 +58,14 @@ public class BattleArmorSuitUtility {
     }
 
     /**
+     * The entity might be null if there was an exception.
+     * @return true if the entity exists, false if the entity is null
+     */
+    public boolean hasEntity() {
+        return entity != null;
+    }
+
+    /**
      * The same BA chassis in different sizes should have the same suit BV
      * @return int BV of the individual BA suit
      */

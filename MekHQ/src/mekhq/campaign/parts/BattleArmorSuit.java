@@ -328,13 +328,21 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        // because of the linked children parts, we always need to consider these as
-        // different
-        // return false;
-        return part instanceof BattleArmorSuit baSuit
+        refreshEntityDetailsCache();
+        if (entityDetailsCached) {
+            return part instanceof BattleArmorSuit baSuit
                 && getSuitBV() == baSuit.getSuitBV()
                 && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash()
                 && getStickerPrice().equals(baSuit.getStickerPrice());
+        }
+        // If we didn't successfully cache entity details, use the old method for comparing.
+        // because of the linked children parts, we always need to consider these as
+        // different
+        // return false;
+        return part instanceof BattleArmorSuit
+            && chassis.equals(((BattleArmorSuit) part).getChassis())
+            && model.equals(((BattleArmorSuit) part).getModel())
+            && getStickerPrice().equals(part.getStickerPrice());
     }
 
     public int getSuitBV() {
@@ -669,9 +677,11 @@ public class BattleArmorSuit extends Part {
         if (!entityDetailsCached) {
             mekhq.campaign.parts.utilities.BattleArmorSuitUtility battleArmorSuitUtility
                 = new  mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
-            suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
-            weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();
-            entityDetailsCached = true;
+            if (battleArmorSuitUtility.hasEntity()) {
+                suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
+                weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();
+                entityDetailsCached = true;
+            }
         }
     }
 }
