@@ -23,6 +23,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
@@ -223,5 +224,12 @@ public class AtBContractTest {
 
         int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
         assertEquals(expectedResult, difficulty);
+    }
+
+    @Test
+    void setContractTypeUpdatesParentMissionType() {
+        contract.setContractType(AtBContractType.CADRE_DUTY);
+        assertEquals(AtBContractType.CADRE_DUTY, contract.getContractType());
+        assertEquals("Cadre Duty", contract.getType());
     }
 }
