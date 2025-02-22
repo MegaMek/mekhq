@@ -56,7 +56,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     // It is costly looking up entity, which is used to compare if two suits
     // are the same even if the chassis name doesn't match. So let's save these
     // values if we've already calculated them once.
-    private boolean entityDetailsCached = false;
+    private transient boolean entityDetailsCached = false;
     private transient int suitBV;
     private transient int weaponTypeListHash;
 
