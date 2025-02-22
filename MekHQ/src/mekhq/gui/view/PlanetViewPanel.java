@@ -313,7 +313,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //SIC codes
-        if (null != planet.getSocioIndustrial(currentDate)) {
+        if (null != planet.getSourcedSocioIndustrial(currentDate)) {
             JLabel lblSocioIndustrial = new JLabel(resourceMap.getString("lblSocioIndustrial1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSocioIndustrial, gbcLabel);
