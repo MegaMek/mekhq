@@ -258,7 +258,22 @@ public class AtBContractTest {
         assertEquals(name, contract.getEnemyName(3025));
     }
 
-    @Test
-    void getEmployerName() {
+    private static Stream<Arguments> provideEmployerNamesAndMercStatus() {
+        return Stream.of(
+            Arguments.of(3025, false, "LA", "Lyran Commonwealth"),
+            Arguments.of(3059, false, "LA", "Lyran Alliance"),
+            Arguments.of(3025, true, "LA", "Mercenary (Lyran Commonwealth)"),
+            Arguments.of(3059, true, "LA", "Mercenary (Lyran Alliance)"),
+            Arguments.of(-1, true, "LA", "Mercenary (Lyran Commonwealth)"),
+            Arguments.of(3025, true, "??", "Mercenary (Unknown)")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEmployerNamesAndMercStatus")
+    void getEmployerNameReturnsCorrectName(int year, boolean isMercSubcontract, String employerCode, String fullName) {
+        contract.setEmployerCode(employerCode, year);
+        contract.setMercSubcontract(isMercSubcontract);
+        assertEquals(fullName, contract.getEmployerName(year));
     }
 }
