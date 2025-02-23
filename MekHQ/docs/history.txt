@@ -47,6 +47,8 @@ MEKHQ VERSION HISTORY:
 + Fix #6033: RFE - MekHQ to MM trailer support
 + Refactor shares percent to be polymorphic #6060
 + Fix #5814: Change meklab check to last index check
++ PR #6068: Allow Battle Armor suits from different squad sizes to be used as replacements
++ Fix #6065: Unit History in UnitViewPanel does not wrap.
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
