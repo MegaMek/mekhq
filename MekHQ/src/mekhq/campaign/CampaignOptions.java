@@ -79,6 +79,8 @@ public class CampaignOptions {
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
+    public static final int REPUTATION_PERFORMANCE_CUT_OFF_YEARS = 10;
+
     public static String getTechLevelName(final int techLevel) {
         return switch (techLevel) {
             case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
@@ -95,6 +97,9 @@ public class CampaignOptions {
     // region General Tab
     private UnitRatingMethod unitRatingMethod;
     private int manualUnitRatingModifier;
+    private boolean clampReputationPayMultiplier;
+    private boolean reduceReputationPerformanceModifier;
+    private boolean reputationPerformanceModifierCutOff;
     // endregion General Tab
 
     // region Repair and Maintenance Tab
@@ -603,6 +608,9 @@ public class CampaignOptions {
         // region General Tab
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         manualUnitRatingModifier = 0;
+        clampReputationPayMultiplier = false;
+        reduceReputationPerformanceModifier = false;
+        reputationPerformanceModifierCutOff = false;
         // endregion General Tab
 
         // region Repair and Maintenance Tab
@@ -1224,6 +1232,30 @@ public class CampaignOptions {
 
     public void setManualUnitRatingModifier(final int manualUnitRatingModifier) {
         this.manualUnitRatingModifier = manualUnitRatingModifier;
+    }
+
+    public boolean isClampReputationPayMultiplier() {
+        return clampReputationPayMultiplier;
+    }
+
+    public void setClampReputationPayMultiplier(final boolean clampReputationPayMultiplier) {
+        this.clampReputationPayMultiplier = clampReputationPayMultiplier;
+    }
+
+    public boolean isReduceReputationPerformanceModifier() {
+        return reduceReputationPerformanceModifier;
+    }
+
+    public void setReduceReputationPerformanceModifier(final boolean reduceReputationPerformanceModifier) {
+        this.reduceReputationPerformanceModifier = reduceReputationPerformanceModifier;
+    }
+
+    public boolean isReputationPerformanceModifierCutOff() {
+        return reputationPerformanceModifierCutOff;
+    }
+
+    public void setReputationPerformanceModifierCutOff(final boolean reputationPerformanceModifierCutOff) {
+        this.reputationPerformanceModifierCutOff = reputationPerformanceModifierCutOff;
     }
     // endregion General Tab
 
@@ -4579,6 +4611,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
         // region General Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "manualUnitRatingModifier", getManualUnitRatingModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clampReputationPayMultiplier", isClampReputationPayMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reduceReputationPerformanceModifier", isReduceReputationPerformanceModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputationPerformanceModifierCutOff", isReputationPerformanceModifierCutOff());
         // endregion General Tab
 
         // region Repair and Maintenance Tab
@@ -5313,6 +5348,12 @@ public class CampaignOptions {
                     retVal.setUnitRatingMethod(UnitRatingMethod.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("manualUnitRatingModifier")) {
                     retVal.setManualUnitRatingModifier(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("clampReputationPayMultiplier")) {
+                    retVal.setClampReputationPayMultiplier(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("reduceReputationPerformanceModifier")) {
+                    retVal.setReduceReputationPerformanceModifier(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("reputationPerformanceModifierCutOff")) {
+                    retVal.setReputationPerformanceModifierCutOff(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {

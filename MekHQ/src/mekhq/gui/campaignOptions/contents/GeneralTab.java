@@ -80,6 +80,9 @@ public class GeneralTab {
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
     private JLabel lblManualUnitRatingModifier;
     private JSpinner manualUnitRatingModifier;
+    private JCheckBox chkClampReputationPayMultiplier;
+    private JCheckBox chkReduceReputationPerformanceModifier;
+    private JCheckBox chkReputationPerformanceModifierCutOff;
     private JLabel lblDate;
     private JButton btnDate;
     private LocalDate date;
@@ -149,6 +152,9 @@ public class GeneralTab {
         lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier",
             0, -200, 200, 1);
+        chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier");
+        chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier");
+        chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff");
 
         // Date
         lblDate = new CampaignOptionsLabel("Date");
@@ -213,6 +219,13 @@ public class GeneralTab {
         layout.gridy++;
         panel.add(lblManualUnitRatingModifier, layout);
         panel.add(manualUnitRatingModifier, layout);
+        layout.gridy++;
+        layout.gridwidth = 3;
+        panel.add(chkClampReputationPayMultiplier, layout);
+        layout.gridy++;
+        panel.add(chkReduceReputationPerformanceModifier, layout);
+        layout.gridy++;
+        panel.add(chkReputationPerformanceModifierCutOff, layout);
 
         layout.gridy++;
         layout.gridwidth = 5;
@@ -301,6 +314,10 @@ public class GeneralTab {
 
         lblManualUnitRatingModifier = new JLabel();
         manualUnitRatingModifier = new JSpinner();
+
+        chkClampReputationPayMultiplier = new JCheckBox();
+        chkReduceReputationPerformanceModifier = new JCheckBox();
+         chkReputationPerformanceModifierCutOff = new JCheckBox();
 
         lblDate = new JLabel();
         btnDate = new JButton();
@@ -498,6 +515,9 @@ public class GeneralTab {
 
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod());
         manualUnitRatingModifier.setValue(options.getManualUnitRatingModifier());
+        chkClampReputationPayMultiplier.setSelected(options.isClampReputationPayMultiplier());
+        chkReduceReputationPerformanceModifier.setSelected(options.isReduceReputationPerformanceModifier());
+        chkReputationPerformanceModifierCutOff.setSelected(options.isReputationPerformanceModifierCutOff());
 
         date = campaign.getLocalDate();
         if (presetDate != null) {
@@ -554,5 +574,8 @@ public class GeneralTab {
 
         options.setUnitRatingMethod(unitRatingMethodCombo.getSelectedItem());
         options.setManualUnitRatingModifier((int) manualUnitRatingModifier.getValue());
+        options.setClampReputationPayMultiplier(chkClampReputationPayMultiplier.isSelected());
+        options.setReduceReputationPerformanceModifier(chkReduceReputationPerformanceModifier.isSelected());
+        options.setReputationPerformanceModifierCutOff(chkReputationPerformanceModifierCutOff.isSelected());
     }
 }
