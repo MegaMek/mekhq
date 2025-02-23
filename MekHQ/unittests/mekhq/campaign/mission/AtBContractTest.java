@@ -24,6 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.AtBContract.AtBContractRef;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
@@ -247,6 +248,8 @@ public class AtBContractTest {
     @MethodSource("provideEnemyFactionAndYear")
     public void getEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
         contract.setEnemyCode(enemyCode);
+        // TODO: fix this in the production code
+        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
         assertEquals(fullName, contract.getEnemyName(year));
     }
 
