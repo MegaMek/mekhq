@@ -665,8 +665,8 @@ public class MRMSDialog extends JDialog {
 
     private JSpinner createMRMSDailyTimeSpinner(int selectedValue, boolean enabled,
                                                JPanel pnlItems, int rowIdx, int columnIdx) {
-        JSpinner dailyTimeSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 0, 480, 5));
-        ((DefaultEditor) dailyTimeSpn.getEditor()).getTextField().setEditable(false);
+        JSpinner dailyTimeSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 0, 480, 30));
+        ((DefaultEditor) dailyTimeSpn.getEditor()).getTextField().setEditable(true);
         dailyTimeSpn.setEnabled(enabled);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
