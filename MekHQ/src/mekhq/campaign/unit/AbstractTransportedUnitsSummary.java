@@ -37,6 +37,10 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
 
     AbstractTransportedUnitsSummary(Unit transport) {
         this.transport = transport;
+        init();
+    }
+
+    protected void init() {
         if (transport.getEntity() != null) {
             recalculateTransportCapacity(transport.getEntity().getTransports());
         }
@@ -150,7 +154,7 @@ public abstract class AbstractTransportedUnitsSummary implements ITransportedUni
      */
     @Override
     public void setCurrentTransportCapacity(TransporterType transporterType, double capacity) {
-        transportCapacity.replace(transporterType, capacity);
+        transportCapacity.put(transporterType, capacity);
     }
 
     /**
