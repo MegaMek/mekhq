@@ -52,6 +52,9 @@ public class AtBContractTest {
     public static void initSingletons() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
+        // TODO: fix this in the production code
+        RandomCallsignGenerator.getInstance(); // Required in this codepath to generate a random merc company name
+        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
         try {
             Factions.setInstance(Factions.loadDefault());
             Systems.setInstance(Systems.loadDefault());
@@ -262,9 +265,6 @@ public class AtBContractTest {
     @Test
     public void getEnemyNameReturnsNonNullWhenMercAndBotNameNotSet() {
         contract.setEnemyCode("MERC");
-        // TODO: fix this in the production code
-        RandomCallsignGenerator.getInstance(); // Required in this codepath to generate a random merc company name
-        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
         assertNotEquals("", contract.getEnemyName(3025));
     }
 
