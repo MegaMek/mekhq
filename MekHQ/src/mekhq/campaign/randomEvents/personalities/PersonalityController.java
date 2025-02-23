@@ -123,7 +123,14 @@ public class PersonalityController {
 
         StringBuilder personalityDescription = new StringBuilder();
 
-        for (int i = 0; i < traitDescriptions.size(); i++) {
+        // Append the first trait description, if exists, without wrapping in <p>
+        // We do this so that we don't end up with weird spacing
+        if (!traitDescriptions.isEmpty()) {
+            personalityDescription.append(traitDescriptions.get(0));
+            personalityDescription.append(' ');
+        }
+
+        for (int i = 1; i < traitDescriptions.size(); i++) {
             if (i % 2 == 0) {
                 personalityDescription.append("<p>");
             }
