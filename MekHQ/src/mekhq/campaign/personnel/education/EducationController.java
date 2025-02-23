@@ -40,8 +40,12 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static megamek.common.Compute.d6;
+import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.SkillType.EXP_VETERAN;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generatePersonalityQuirk;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
 
 /**
  * The EducationController class is responsible for managing the education
@@ -1486,6 +1490,14 @@ public class EducationController {
         if (academy.isReeducationCamp()) {
             if (campaign.getCampaignOptions().isUseReeducationCamps()) {
                 person.setOriginFaction(campaign.getFaction());
+            }
+
+            // People coming out of re-education camps have a chance to become a little weird
+            if (person.getPersonalityQuirk().isNone()) {
+                if (randomInt(PERSONALITY_QUIRK_CHANCE / 2) == 0) {
+                    person.setPersonalityQuirk(generatePersonalityQuirk());
+                    writeDescription(person);
+                }
             }
 
             // brainwashed personnel should have higher than average loyalty, so they roll

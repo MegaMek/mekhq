@@ -29,10 +29,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
+    public static int PERSONALITY_QUIRK_CHANCE = 10;
+
     /**
      * Generates a personality for the given person. The method assigns various personality traits,
      * intelligence, and potential quirks to the person.
@@ -52,14 +55,14 @@ public class PersonalityController {
         for (int table = 0; table < 4; table++) {
             // we only want a 1 in 6 chance of getting a personality trait, per table
             // this prevents trait bloat and helps reduce repetitiveness
-            if (randomInt(6) == 0) {
+            if (d6() == 1) {
                 setPersonalityTrait(person, table, randomInt(26));
             }
         }
 
         // we only want 1 in 10 persons to have a quirk,
         // as these helps reduce repetitiveness and keeps them unique
-        if (randomInt(10) == 0) {
+        if (randomInt(PERSONALITY_QUIRK_CHANCE) == 0) {
             person.setPersonalityQuirk(generatePersonalityQuirk());
         }
 
@@ -178,7 +181,7 @@ public class PersonalityController {
     /**
      * @return a random personality quirk for a person.
      */
-    private static PersonalityQuirk generatePersonalityQuirk() {
+    public static PersonalityQuirk generatePersonalityQuirk() {
         Random random = new Random();
         PersonalityQuirk[] values = PersonalityQuirk.values();
 
