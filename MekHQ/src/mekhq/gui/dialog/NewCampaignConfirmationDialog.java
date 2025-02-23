@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,12 +18,13 @@
  */
 package mekhq.gui.dialog;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class NewCampaignConfirmationDialog {
   public int YesNoOption() {
-    return JOptionPane.showConfirmDialog(null, "Are you sure you want to start a new campaign?\n" +
-            "Do not save your current campaign if you cancel after this point!", "Start New Campaign?",
+    return JOptionPane.showConfirmDialog(null,
+        "Are you sure you want to start a new campaign?",
+        "Start New Campaign?",
         JOptionPane.YES_NO_OPTION);
   }
 }

@@ -75,6 +75,9 @@ public class FinanceTableModel extends DataTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
+        if (row < 0 || row >= getRowCount() || col < 0 || col >= getColumnCount()) {
+            return "";
+        }
         Transaction transaction = getTransaction(row);
         Money amount = transaction.getAmount();
         Money balance = Money.zero();

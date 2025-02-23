@@ -1,7 +1,7 @@
 /*
  * AtBScenario.java
  *
- * Copyright (C) 2014-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2024 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2014 Carl Spain. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -40,16 +40,19 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.StrategicFormation;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.IAtBScenario;
-import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
+import mekhq.campaign.stratcon.StratconCampaignState;
+import mekhq.campaign.stratcon.StratconScenario;
+import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.utilities.MHQXMLUtility;
@@ -140,12 +143,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             EntityWeightClass.WEIGHT_HEAVY
     };
 
-    public static final int NO_LANCE = -1;
+    public static final int NO_COMBAT_TEAM = -1;
 
     private boolean attacker;
-    private int strategicFormationId; // -1 if scenario is not generated for a specific lance (special scenario, big
+    private int combatTeamId; // -1 if scenario is not generated for a specific lance (special scenario, big
                               // battle)
-    private AtBLanceRole lanceRole; /*
+    private CombatRole combatRole; /*
                                      * set when scenario is created in case it is changed for the next week before
                                      * the scenario is resolved;
                                      * specifically affects scenarios generated for scout lances, in which the
@@ -154,7 +157,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                      */
 
     private int deploymentDelay;
-    private int lanceCount;
+    private int forceCount;
     private int rerollsRemaining;
     private int enemyHome;
 
@@ -207,8 +210,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public AtBScenario() {
         super();
-        strategicFormationId = -1;
-        lanceRole = AtBLanceRole.UNASSIGNED;
+        combatTeamId = NO_COMBAT_TEAM;
+        combatRole = CombatRole.RESERVE;
         alliesPlayer = new ArrayList<>();
         alliesPlayerStub = new ArrayList<>();
         attachedUnitIds = new ArrayList<>();
@@ -218,13 +221,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         numPlayerMinefields = new HashMap<>();
 
         deploymentDelay = 0;
-        lanceCount = 0;
+        forceCount = 0;
         rerollsRemaining = 0;
         TCO = TerrainConditionsOddsManifest.getInstance();
         SB = StratconBiomeManifest.getInstance();
     }
 
-    public void initialize(Campaign c, StrategicFormation lance, boolean attacker, LocalDate date) {
+    public void initialize(Campaign campaign, CombatTeam combatTeam, boolean attacker, LocalDate date) {
         setAttacker(attacker);
 
         alliesPlayer = new ArrayList<>();
@@ -235,16 +238,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         survivalBonus = new ArrayList<>();
         entityIds = new HashMap<>();
 
-        if (null == lance) {
-            strategicFormationId = -1;
-            lanceRole = AtBLanceRole.UNASSIGNED;
+        if (null == combatTeam) {
+            combatTeamId = NO_COMBAT_TEAM;
+            combatRole = CombatRole.RESERVE;
         } else {
-            this.strategicFormationId = lance.getForceId();
-            lanceRole = lance.getRole();
-            setMissionId(lance.getMissionId());
+            this.combatTeamId = combatTeam.getForceId();
+            combatRole = combatTeam.getRole();
+            setMissionId(combatTeam.getMissionId());
 
-            for (UUID id : c.getForce(lance.getForceId()).getAllUnits(true)) {
-                entityIds.put(id, c.getUnit(id).getEntity());
+            for (UUID id : campaign.getForce(combatTeam.getForceId()).getAllUnits(true)) {
+                entityIds.put(id, campaign.getUnit(id).getEntity());
             }
         }
 
@@ -256,7 +259,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         gravity = (float) 1.0;
         deploymentDelay = 0;
         setDate(date);
-        lanceCount = 0;
+        forceCount = 0;
         rerollsRemaining = 0;
 
         if (isStandardScenario()) {
@@ -265,7 +268,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             setName(getScenarioTypeDescription());
         }
 
-        initBattle(c);
+        initBattle(campaign);
     }
 
     public String getDesc() {
@@ -321,15 +324,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setMapSize();
         setMapFile();
         if (isStandardScenario()) {
-            lanceCount = 1;
+            forceCount = 1;
         } else if (isBigBattle()) {
-            lanceCount = 2;
+            forceCount = 2;
         }
 
-        if (null != getStrategicFormation(campaign)) {
-            getStrategicFormation(campaign).refreshCommander(campaign);
-            if (null != getStrategicFormation(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS)) {
-                rerollsRemaining = getStrategicFormation(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS).getLevel();
+        if (null != getCombatTeamById(campaign)) {
+            getCombatTeamById(campaign).refreshCommander(campaign);
+            if (null != getCombatTeamById(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS)) {
+                rerollsRemaining = getCombatTeamById(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS).getLevel();
             }
         }
     }
@@ -404,8 +407,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             // assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                setAtmosphere(Atmosphere.getAtmosphere(
-                        ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere().ordinal())));
+                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
                 setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }
@@ -438,23 +440,23 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public int getMapX() {
-        int base = getMapSizeX() + 5 * lanceCount;
+        int base = getMapSizeX() + 5 * forceCount;
 
         return Math.max(base, 20);
     }
 
     public int getMapY() {
-        int base = getMapSizeY() + 5 * lanceCount;
+        int base = getMapSizeY() + 5 * forceCount;
 
         return Math.max(base, 20);
     }
 
     public int getBaseMapX() {
-        return (5 * getLanceCount()) + getMapSizeX();
+        return (5 * getForceCount()) + getMapSizeX();
     }
 
     public int getBaseMapY() {
-        return (5 * getLanceCount()) + getMapSizeY();
+        return (5 * getForceCount()) + getMapSizeY();
     }
 
     public void setMapFile(String terrainType) {
@@ -702,7 +704,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private void setStandardScenarioForces(Campaign campaign) {
         /* Find the number of attached units required by the command rights clause */
         int attachedUnitWeight = EntityWeightClass.WEIGHT_MEDIUM;
-        if (lanceRole.isScouting() || lanceRole.isTraining()) {
+        if (combatRole.isPatrol() || combatRole.isTraining()) {
             attachedUnitWeight = EntityWeightClass.WEIGHT_LIGHT;
         }
         int numAttachedPlayer = 0;
@@ -832,7 +834,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                     getContract(campaign).getEnemy()),
                             EntityWeightClass.WEIGHT_ASSAULT, campaign);
                 }
-            } else if (getLanceRole().isScouting()) {
+            } else if (getCombatRole().isPatrol()) {
                 /*
                  * Set allied forces to deploy in (6 - speed) turns just as player's units,
                  * but only if not deploying by DropShip.
@@ -888,7 +890,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), campaign);
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+
+        if (combatTeam != null) {
+            addEnemyForce(enemyEntities, combatTeam.getWeightClass(campaign), campaign);
+        }
         addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities), campaign);
     }
 
@@ -994,7 +1000,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         addLance(list, getContract(campaign).getEnemyCode(),
                 getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
                 weight, maxWeight, campaign);
-        lanceCount++;
+        forceCount++;
     }
 
     /**
@@ -1453,12 +1459,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
             // TODO: replace with TeamLoadoutGenerator call once 0.50.1 errata go in
             boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
-
-            TeamLoadOutGenerator.populateAeroBombs(aircraft,
-                    campaign.getGameYear(),
-                    !isAeroMap,
-                    contract.getEnemyQuality(),
-                    contract.getEnemy().isPirate());
+            TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(campaign.getGame());
+            tlg.populateAeroBombs(
+                aircraft,
+                campaign.getGameYear(),
+                !isAeroMap,
+                contract.getEnemyQuality(),
+                contract.getEnemy().isPirate(),
+                contract.getEnemy().getShortName()
+            );
 
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");
@@ -1640,10 +1649,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attacker", isAttacker());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceForceId", strategicFormationId);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceRole", lanceRole.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceForceId", combatTeamId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatRole", combatRole.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceCount", forceCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "modifiedTemperature", modifiedTemperature);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
@@ -1734,15 +1743,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 if (wn2.getNodeName().equalsIgnoreCase("attacker")) {
                     setAttacker(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
-                    strategicFormationId = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
-                    lanceRole = AtBLanceRole.parseFromString(wn2.getTextContent().trim());
+                    combatTeamId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatRole")) {
+                    combatRole = CombatRole.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deploymentDelay")) {
                     deploymentDelay = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")) {
-                    lanceCount = Integer.parseInt(wn2.getTextContent());
+                // <50.02 compatibility handler
+                } else if (wn2.getNodeName().equalsIgnoreCase("lanceCount")
+                    || wn2.getNodeName().equalsIgnoreCase("forceCount")) {
+                    forceCount = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
                     rerollsRemaining = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("modifiedTemperature")) {
@@ -1962,20 +1973,24 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return retVal;
     }
 
-    public int getStrategicFormationId() {
-        return strategicFormationId;
+    public int getCombatTeamId() {
+        return combatTeamId;
     }
 
-    public AtBLanceRole getLanceRole() {
-        return lanceRole;
+    public CombatRole getCombatRole() {
+        return combatRole;
     }
 
-    public StrategicFormation getStrategicFormation(Campaign campaign) {
-        return campaign.getStrategicFormationsTable().get(strategicFormationId);
+    public @Nullable CombatTeam getCombatTeamById(Campaign campaign) {
+        if (combatTeamId == NO_COMBAT_TEAM) {
+            return null;
+        }
+
+        return campaign.getCombatTeamsTable().get(combatTeamId);
     }
 
-    public void setLance(StrategicFormation strategicFormation) {
-        strategicFormationId = strategicFormation.getForceId();
+    public void setCombatTeam(CombatTeam combatTeam) {
+        combatTeamId = combatTeam.getForceId();
     }
 
     /**
@@ -2020,12 +2035,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         this.deploymentDelay = delay;
     }
 
-    public int getLanceCount() {
-        return lanceCount;
+    public int getForceCount() {
+        return forceCount;
     }
 
-    public void setLanceCount(int lanceCount) {
-        this.lanceCount = lanceCount;
+    public void setForceCount(int forceCount) {
+        this.forceCount = forceCount;
     }
 
     public int getRerollsRemaining() {
@@ -2102,5 +2117,52 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     public boolean canStartScenario(Campaign c) {
         return c.getLocalDate().equals(getDate()) && super.canStartScenario(c);
+    }
+
+    /**
+     * Retrieves the {@link StratconScenario} associated with the current mission ID.
+     *
+     * <p>The method first retrieves the {@link AtBContract} from the given campaign.
+     * If the contract, its {@link StratconCampaignState}, or any required track data
+     * is unavailable, the method returns {@code null}. It iterates through all
+     * {@link StratconTrackState} objects in the campaign state and their associated scenarios.
+     * If a {@link StratconScenario} contains a non-null {@link AtBDynamicScenario} whose
+     * mission ID matches the current mission ID, it is returned.
+     *
+     * @param campaign the {@link Campaign} instance being queried for the scenario
+     * @return the matching {@link StratconScenario} if found, or {@code null} if no match
+     *         is found or any required data is missing
+     * @throws NullPointerException if {@code campaign} is {@code null}
+     */
+    public @Nullable StratconScenario getStratconScenario(Campaign campaign) {
+        // Get contract
+        AtBContract contract = getContract(campaign);
+        if (contract == null) {
+            return null;
+        }
+
+        // Fetch campaign state
+        StratconCampaignState campaignState = contract.getStratconCampaignState();
+        if (campaignState == null) {
+            return null;
+        }
+
+        // Find associated StratCon Scenario, if any
+        for (StratconTrackState track : campaignState.getTracks()) {
+            Collection<StratconScenario> trackScenarios = track.getScenarios().values();
+
+            for (StratconScenario scenario : trackScenarios) {
+                AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+                if (backingScenario == null) {
+                    continue;
+                }
+
+                if (backingScenario.getMissionId() == getMissionId()) {
+                    return scenario;
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -37,5 +37,8 @@
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
+        <roleChoices>
+            <forceRole>BOMBER</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

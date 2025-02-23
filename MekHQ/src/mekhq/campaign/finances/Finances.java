@@ -19,25 +19,6 @@
  */
 package mekhq.campaign.finances;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -52,6 +33,25 @@ import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -68,6 +68,9 @@ public class Finances {
     private int loanDefaults;
     private int failedCollateral;
     private LocalDate wentIntoDebt;
+
+    private Money balance;
+    private int transactionSize = -1;
 
     public Finances() {
         transactions = new ArrayList<>();
@@ -126,9 +129,39 @@ public class Finances {
         this.wentIntoDebt = wentIntoDebt;
     }
 
+    /**
+     * Current campaign balance. Will calculate the current campaign balance
+     * based on the campaign's transactions. Cached using the current transaction count.
+     * @see #clearCachedBalance()
+     * @return current balance (Money)
+     */
     public Money getBalance() {
-        Money balance = Money.zero();
-        return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+        Money newBalance = Money.zero();
+
+        // If our # of transactions matches what we expect, and the balance isn't null, we should return the cached balance:
+        if (transactions.size() == transactionSize && balance != null) {
+            return newBalance.plus(balance);
+        }
+
+        // Recalculate the current balance
+        newBalance = newBalance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
+
+        // Update our cached balance & note the transactions size.
+        balance = Money.zero();
+        balance = balance.plus(newBalance);
+        transactionSize = transactions.size();
+
+        return newBalance;
+    }
+
+    /**
+     * Next time getBalance() is called force it to recalculate the current balance
+     * Should be called if transactions are modified or deleted. Should not be needed
+     * when adding new transactions - the balance should automatically recalculate.
+     * @see #getBalance()
+     */
+    public void clearCachedBalance() {
+        transactionSize = -1;
     }
 
     public Money getLoanBalance() {
@@ -159,6 +192,17 @@ public class Finances {
         return 0;
     }
 
+    /**
+     * Debits (removes) money from the campaign's balance.
+     * Consider the debit method that takes a Map of Person to Money
+     * if this debit is for paying your crew.
+     * @param type TransactionType being debited
+     * @param date when the transaction occurred
+     * @param amount Money to remove from the campaign's balanace
+     * @param reason String displayed in the ledger
+     * @return true if the transaction succeeds, false if it doesn't,
+     * such as from insufficient balance
+     */
     public boolean debit(final TransactionType type, final LocalDate date, final Money amount,
             final String reason) {
         if (getBalance().isLessThan(amount)) {
@@ -171,6 +215,41 @@ public class Finances {
         }
         MekHQ.triggerEvent(new TransactionDebitEvent(t));
         return true;
+    }
+
+
+    /**
+     * Debits (removes) money from the campaign's balance.
+     * When debiting money to people in the Campaign,
+     * if TrackTotalEarnings is true we'll want to pay each
+     * Person what they're owed. Use this method to debit (remove)
+     * money from your Campaign's balance while paying it to
+     * the provided people (Person) in the individualPayoutsMap.
+     * @param type TransactionType being debited
+     * @param date when the transaction occurred
+     * @param amount total money - it's usually displayed outside of this method
+     * @param reason String displayed in the ledger
+     * @param individualPayouts Map of Person to the Money they're owed
+     * @param isTrackTotalEarnings true if we want to apply earnings to individual people (Person)
+     * @return true if the transaction succeeds, false if it doesn't,
+     * such as from insufficient balance
+     */
+    public boolean debit(final TransactionType type, final LocalDate date, Money amount, String reason, Map<Person, Money> individualPayouts, boolean isTrackTotalEarnings) {
+        if (debit(type, date, amount, reason)) {
+            if (isTrackTotalEarnings && !individualPayouts.isEmpty()) {
+                for (Person person : individualPayouts.keySet()) {
+                    Money payout = individualPayouts.get(person);
+                    if (person != null) { // Null person will be used for temp personnel
+                        person.payPerson(payout);
+                    }
+                }
+            } else {
+                logger.error(String.format("Individual Payouts is Empty! Transaction Type: %s Date: %s Reason: %s",type, date, reason));
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public void credit(final TransactionType type, final LocalDate date, final Money amount,
@@ -200,6 +279,7 @@ public class Finances {
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
+        clearCachedBalance();
 
         credit(
                 TransactionType.FINANCIAL_TERM_END_CARRYOVER,
@@ -312,19 +392,17 @@ public class Finances {
             }
 
             if (campaign.getCampaignOptions().isPayForSalaries()) {
+
                 Money payRollCost = campaign.getAccountant().getPayRoll();
 
                 if (debit(TransactionType.SALARIES, today, payRollCost,
-                        resourceMap.getString("Salaries.title"))) {
+                        resourceMap.getString("Salaries.title"),
+                        campaign.getAccountant().getPayRollSummary(),
+                        campaign.getCampaignOptions().isTrackTotalEarnings())) {
                     campaign.addReport(
-                            String.format(resourceMap.getString("Salaries.text"),
-                                    payRollCost.toAmountAndSymbolString()));
+                    String.format(resourceMap.getString("Salaries.text"),
+                        payRollCost.toAmountAndSymbolString()));
 
-                    if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
-                        for (Person person : campaign.getActivePersonnel()) {
-                            person.payPersonSalary(campaign);
-                        }
-                    }
                 } else {
                     campaign.addReport(
                             String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
@@ -445,36 +523,50 @@ public class Finances {
         if (campaign.getCampaignOptions().isUseAtB() && campaign.getCampaignOptions().isUseShareSystem()
                 && (contract instanceof AtBContract)) {
             Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent())
-                    .dividedBy(100);
-            if (debit(TransactionType.SALARIES, date, shares,
+                .dividedBy(100);
+            if (shares.isGreaterThan(Money.zero())) {
+                if (debit(TransactionType.SALARIES, date, shares,
                     String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {
-                campaign.addReport(resourceMap.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
+                    campaign.addReport(resourceMap.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
 
-                if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
-                    int numberOfShares = 0;
-                    boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
-                    for (Person person : campaign.getActivePersonnel()) {
-                        numberOfShares += person.getNumShares(campaign, sharesForAll);
-                    }
-
-                    Money singleShare = shares.dividedBy(numberOfShares);
-                    for (Person person : campaign.getActivePersonnel()) {
-                        person.payPersonShares(campaign, singleShare, sharesForAll);
-                    }
-                }
-            } else {
-                /*
-                 * This should not happen, as the shares payment should be less than the
-                 * contract
-                 * payment that has just been made.
-                 */
-                campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + resourceMap.getString("InsufficientFunds.text"), resourceMap.getString("Shares.text"),
+                    payOutSharesToPersonnel(campaign, shares);
+                } else {
+                    /*
+                     * This should not happen, as the shares payment should be less than the
+                     * contract payment that has just been made.
+                     */
+                    campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                            + resourceMap.getString("InsufficientFunds.text"), resourceMap.getString("Shares.text"),
                         "</font>");
-                logger.error("Attempted to payout share amount larger than the payment of the contract");
+                    logger.error("Attempted to payout share amount larger than the payment of the contract");
+                }
             }
         }
     }
+
+/**
+ * Shares calculate the amount debited without iterating
+ * through all the personnel, so it's not more efficient
+ * to provide that information to debit. Pay out shares
+ * manually for now.
+ * @param campaign where to pull personnel from
+ * @param shares total value of the shares to pay out
+ */
+public void payOutSharesToPersonnel(Campaign campaign, Money shares) {
+    if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
+        boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
+
+        int numberOfShares = campaign.getActivePersonnel().stream()
+            .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
+            .sum();
+
+        Money singleShare = shares.dividedBy(numberOfShares);
+
+        for (Person person : campaign.getActivePersonnel()) {
+            person.payPersonShares(campaign, singleShare, sharesForAll);
+        }
+    }
+}
 
     public Money checkOverdueLoanPayments(Campaign campaign) {
         List<Loan> newLoans = new ArrayList<>();

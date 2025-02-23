@@ -207,20 +207,32 @@ public abstract class AbstractPersonnelGenerator {
     }
 
     /**
-     * Generates the birthday for a {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
-     * @param person The {@link Person} being generated.
-     * @param expLvl The experience level of {@code person}.
-     * @param isClanPersonnel A value indicating if {@code person} is from the Clans.
+     * Generates the birthday for a {@link Person} based on their experience level and affiliation.
+     * <p>
+     * The method calculates the person's age using {@link Utilities#getAgeByExpLevel(int, boolean)}
+     * and subtracts it from the current campaign date to determine their year of birth.
+     * A random day within that year is then selected, ensuring the generated birthday is
+     * always on or before the current campaign date, so the person's age is accurate.
+     * </p>
+     *
+     * @param campaign        The {@link Campaign} containing metadata such as the current local date.
+     * @param person          The {@link Person} whose birthday is being generated.
+     * @param expLvl          The experience level of the {@code person}, which determines their age.
+     * @param isClanPersonnel Indicates whether the {@code person} belongs to the Clans,
+     *                        which affects the calculated age.
      */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanPersonnel) {
-        LocalDate birthday = campaign.getLocalDate();
-        birthday = birthday.minusYears(Utilities.getAgeByExpLevel(expLvl, isClanPersonnel));
+        LocalDate currentDate = campaign.getLocalDate();
+        int age = Utilities.getAgeByExpLevel(expLvl, isClanPersonnel);
 
-        // choose a random day and month
-        int nDays = birthday.isLeapYear() ? 366 : 365;
+        // Subtract age to get the target year
+        LocalDate birthday = currentDate.minusYears(age);
 
-        int randomDay = Compute.randomInt(nDays) + 1;
+        // Constrain the random day to ensure the birthday is on or before the current date
+        int daysInYear = birthday.isLeapYear() ? 366 : 365;
+        int maxDay = Math.min(currentDate.getDayOfYear(), daysInYear);
+        int randomDay = Compute.randomInt(maxDay) + 1;
+
         person.setDateOfBirth(birthday.withDayOfYear(randomDay));
     }
 }

@@ -37,10 +37,11 @@ import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
@@ -362,7 +363,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(MHQTabType.MEK_LAB.ordinal());
+            gui.getTabMain().setSelectedIndex(gui.getTabMain().getTabCount()-1);
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -477,8 +478,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     gui.getFrame(), "Name for this unit?", "Unit Name",
                     JOptionPane.QUESTION_MESSAGE, null, null,
                     selectedUnit.getFluffName());
-            selectedUnit.setFluffName((fluffName != null) ? fluffName : "");
-            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            String oldFluffName = selectedUnit.getFluffName();
+            selectedUnit.setFluffName((fluffName != null) ? fluffName : oldFluffName);
+            if (fluffName != null) {
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            }
         } else if (command.equals(COMMAND_RESTORE_UNIT)) {
             IUnitAction restoreUnitAction = new RestoreUnitAction();
             for (Unit u : units) {
@@ -1009,6 +1013,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem = new JMenuItem("Undeploy Unit");
                     menuItem.setActionCommand(COMMAND_UNDEPLOY);
                     menuItem.addActionListener(this);
+
+                    boolean enable = true;
+                    int scenarioId = unit.getScenarioId();
+                    Scenario scenario = gui.getCampaign().getScenario(scenarioId);
+
+                    if (scenario != null && scenario.getHasTrack()) {
+                        enable = false;
+                    }
+
+                    menuItem.setEnabled(enable);
                     menu.add(menuItem);
                 }
 

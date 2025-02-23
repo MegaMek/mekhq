@@ -21,55 +21,56 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.UnmaintainedUnitsNagLogic.campaignHasUnmaintainedUnits;
 
 /**
- * A dialog that displays a nag message if there are unmaintained units in the campaign's hangar.
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A nag dialog that alerts the user about unmaintained units in the campaign's hangar.
+ *
+ * <p>
+ * This dialog identifies units that require maintenance but have not received it yet,
+ * excluding units marked as salvage. It provides a reminder to the player to keep
+ * active units in proper working order.
+ * </p>
  */
 public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "UnmaintainedUnitsNagDialog";
-    private static String DIALOG_TITLE = "UnmaintainedUnitsNagDialog.title";
-    private static String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
-
     /**
-     * Checks if there are any unmaintained units in the given campaign's hangar.
+     * Constructs the nag dialog for unmaintained units.
      *
-     * @param campaign the {@link Campaign} containing the hangar to check
-     * @return {@code true} if there are unmaintained units in the hangar, {@code false} otherwise
+     * <p>
+     * This constructor initializes the dialog with relevant campaign details and
+     * formats the displayed message to include context for the commander.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} object representing the current campaign.
      */
-    static boolean checkHanger(Campaign campaign) {
-        for (Unit u : campaign.getHangar().getUnits()) {
-            if ((u.isUnmaintained()) && (!u.isSalvage())) {
-                    return true;
-            }
-        }
-        return false;
+    public UnmaintainedUnitsNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
+
+        final String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false)));
+        showDialog();
     }
 
     /**
-     * Creates a new instance of the {@link UnmaintainedUnitsNagDialog} class.
+     * Checks if a nag dialog should be displayed for the inability to afford loan payments in the given campaign.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for the inability to afford loan payments has not been ignored in the user options.</li>
+     *     <li>If the campaign is unable to afford its loan payments.</li>
+     * </ul>
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    //region Constructors
-    public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
-    }
-    //endregion Constructors
+    public static boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_UNMAINTAINED_UNITS;
 
-    /**
-     * Checks if there is a nag message to display.
-     *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
-     */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && checkHanger(getCampaign());
+        return campaign.getCampaignOptions().isCheckMaintenance()
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && campaignHasUnmaintainedUnits(campaign);
     }
 }

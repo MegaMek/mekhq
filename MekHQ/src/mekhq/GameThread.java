@@ -23,9 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
@@ -33,8 +31,7 @@ import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
-import megamek.client.ui.swing.ClientGUI;
-import megamek.client.ui.swing.MegaMekGUI;
+import megamek.client.ui.swing.*;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
@@ -54,7 +51,8 @@ class GameThread extends Thread implements CloseClientListener {
     protected String myname;
     protected String password;
     protected Client client;
-    protected ClientGUI swingGui;
+    protected IClientGUI swingGui;
+    protected ILocalBots localBots;
     protected MegaMekController controller;
     protected MekHQ app;
     protected Campaign campaign;
@@ -137,19 +135,28 @@ class GameThread extends Thread implements CloseClientListener {
         return client;
     }
 
+    protected Map<String, AbstractClient> getLocalBots() {
+        if (localBots == null) {
+            return Collections.emptyMap();
+        }
+        return localBots.getLocalBots();
+    }
+
     @Override
     public void run() {
         client.addCloseClientListener(this);
 
-        if (swingGui != null) {
-            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
+        if (!getLocalBots().isEmpty()) {
+            for (AbstractClient client2 : getLocalBots().values()) {
                 client2.die();
             }
-            swingGui.getLocalBots().clear();
+            getLocalBots().clear();
         }
+
         createController();
         swingGui = new ClientGUI(client, controller);
         controller.clientgui = swingGui;
+        localBots = (ClientGUI) swingGui;
         swingGui.initialize();
 
         try {
@@ -268,9 +275,9 @@ class GameThread extends Thread implements CloseClientListener {
                 for (int i = 0; i < scenario.getNumBots(); i++) {
                     BotForce bf = scenario.getBotForce(i);
                     String name = bf.getName();
-                    if (swingGui.getLocalBots().containsKey(name)) {
+                    if (getLocalBots().containsKey(name)) {
                         int append = 2;
-                        while (swingGui.getLocalBots().containsKey(name + append)) {
+                        while (getLocalBots().containsKey(name + append)) {
                             append++;
                         }
                         name += append;
@@ -284,7 +291,7 @@ class GameThread extends Thread implements CloseClientListener {
                         logger.error(
                                 String.format("Could not connect with Bot name %s", bf.getName()), e);
                     }
-                    swingGui.getLocalBots().put(name, botClient);
+                    getLocalBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
@@ -299,11 +306,17 @@ class GameThread extends Thread implements CloseClientListener {
             Sentry.captureException(e);
             logger.error("", e);
         } finally {
-            swingGui.setDisconnectQuietly(true);
+            disconnectGuiSilently();
             client.die();
             client = null;
             swingGui = null;
             controller = null;
+        }
+    }
+
+    protected void disconnectGuiSilently() {
+        if (swingGui != null && swingGui instanceof IDisconnectSilently disconnectSilently) {
+            disconnectSilently.setDisconnectQuietly(true);
         }
     }
 

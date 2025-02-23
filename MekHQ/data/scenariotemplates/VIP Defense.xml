@@ -82,6 +82,10 @@
                 <syncDeploymentType>SameEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>COMMAND</forceRole>
+                    <forceRole>APC</forceRole>
+                </roleChoices>
             </value>
         </entry>
         <entry>
@@ -115,7 +119,7 @@
         </entry>
     </scenarioForces>
     <scenarioObjectives>
-        <objective>
+        <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>VIP</associatedForceName>
             </associatedForceNames>
@@ -141,7 +145,7 @@
             <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
-        </objective>
+        </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>OpFor</associatedForceName>

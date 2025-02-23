@@ -475,6 +475,10 @@
             <value>data/images/stratcon/Stratcon_Mars.png</value>
         </entry>
         <entry>
+            <key>ColdFacility</key>
+            <value>data/images/stratcon/Stratcon_Cold_Facility.png</value>
+        </entry>
+        <entry>
             <key>ColdForest</key>
             <value>data/images/stratcon/Stratcon_Cold_Forest.png</value>
         </entry>
@@ -511,6 +515,10 @@
             <value>data/images/stratcon/Stratcon_Forest.png</value>
         </entry>
         <entry>
+            <key>FrozenFacility</key>
+            <value>data/images/stratcon/Stratcon_Frozen_Facility.png</value>
+        </entry>
+        <entry>
             <key>FrozenSea</key>
             <value>data/images/stratcon/Stratcon_Frozen_Sea.png</value>
         </entry>
@@ -545,6 +553,10 @@
         <entry>
             <key>HotHillsWet</key>
             <value>data/images/stratcon/Stratcon_Hot_Hills_Wet.png</value>
+        </entry>
+        <entry>
+            <key>HotFacility</key>
+            <value>data/images/stratcon/Stratcon_Hot_Facility.png</value>
         </entry>
         <entry>
             <key>HotSea</key>
@@ -603,6 +615,10 @@
             <value>data/images/stratcon/Stratcon_Swamp.png</value>
         </entry>
         <entry>
+            <key>TemperateFacility</key>
+            <value>data/images/stratcon/Stratcon_Temperate_Facility.png</value>
+        </entry>
+        <entry>
             <key>Tundra</key>
             <value>data/images/stratcon/Stratcon_Tundra.png</value>
         </entry>
@@ -638,8 +654,8 @@
             <value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
         </entry>
         <entry>
-            <key>FacilityAlliedSupplyDepot</key>
-            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
+            <key>FacilityAlliedSpacePort</key>
+            <value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png</value>
         </entry>
         <entry>
             <key>FacilityAlliedDataCenter</key>
@@ -687,8 +703,8 @@
             <value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
         </entry>
         <entry>
-            <key>FacilityHostileSupplyDepot</key>
-            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
+            <key>FacilityHostileSpacePort</key>
+            <value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png</value>
         </entry>
         <entry>
             <key>FacilityHostileDataCenter</key>

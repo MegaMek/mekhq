@@ -30,5 +30,8 @@
         <syncDeploymentType>SameEdge</syncDeploymentType>
         <syncedForceName>Player</syncedForceName>
         <useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>INTERCEPTOR</forceRole>
+        </roleChoices>
     </forceDefinition>
 </AtBScenarioModifier>

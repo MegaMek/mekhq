@@ -47,11 +47,11 @@ public class AeroSensor extends Part {
         this(0, false, null);
     }
 
-    public AeroSensor(int tonnage, boolean lc, Campaign c) {
-        super(tonnage, c);
+    public AeroSensor(int tonnage, boolean largeCraft, Campaign campaign) {
+        super(tonnage, campaign);
         this.name = "Aerospace Sensors";
-        this.largeCraft = lc;
-        this.unitTonnageMatters = true;
+        this.largeCraft = largeCraft;
+        this.unitTonnageMatters = !largeCraft;
     }
 
     @Override

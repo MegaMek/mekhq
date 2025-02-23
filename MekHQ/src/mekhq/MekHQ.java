@@ -26,16 +26,22 @@ import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
+import megamek.client.HeadlessClient;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ui.dialogs.AutoResolveChanceDialog;
+import megamek.client.ui.dialogs.AutoResolveProgressDialog;
+import megamek.client.ui.dialogs.AutoResolveSimulationLogDialog;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.common.Board;
 import megamek.common.annotations.Nullable;
+import megamek.common.autoresolve.acar.SimulatedClient;
+import megamek.common.autoresolve.converter.SingletonForces;
+import megamek.common.autoresolve.event.AutoResolveConcludedEvent;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
@@ -44,26 +50,24 @@ import megamek.server.totalwarfare.TWGameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
-import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.autoresolve.AtBSetupForces;
+import mekhq.campaign.handler.PostScenarioDialogHandler;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.panels.StartupScreenPanel;
 import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
+import mekhq.utilities.MHQInternationalization;
 
 import javax.swing.*;
 import javax.swing.text.DefaultEditorKit;
@@ -75,10 +79,11 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputFilter.Config;
-import java.util.HashMap;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
+
+import static megamek.MMConstants.LOCALHOST_IP;
 
 /**
  * The main class of the application.
@@ -113,11 +118,12 @@ public class MekHQ implements GameListener {
     private CampaignController campaignController;
     private CampaignGUI campaignGUI;
 
-    private IconPackage iconPackage = new IconPackage();
+    private final IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
+    private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -207,7 +213,7 @@ public class MekHQ implements GameListener {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
             // TODO: complete integration of Suite Preferences, including GUIPreferences
-            selectedTheme = new ObservableString("selectedTheme", GUIPreferences.UI_THEME);
+            selectedTheme = new ObservableString("selectedTheme", "");
             selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
             preferences.manage(new StringPreference(selectedTheme));
 
@@ -239,14 +245,17 @@ public class MekHQ implements GameListener {
         }
     }
 
-    public void exit() {
-        int savePrompt = JOptionPane.showConfirmDialog(null, "Do you want to save the game before quitting MekHQ?",
-                "Save First?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-        if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
-            return;
-        } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
-            // When the user did not actually save the game, don't close MHQ
-            return;
+    public void exit(boolean includeSavePrompt) {
+        if (includeSavePrompt) {
+            int savePrompt = JOptionPane.showConfirmDialog(null,
+                "Do you want to save the game before quitting MekHQ?",
+                    "Save First?", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if ((savePrompt == JOptionPane.CANCEL_OPTION) || (savePrompt == JOptionPane.CLOSED_OPTION)) {
+                return;
+            } else if ((savePrompt == JOptionPane.YES_OPTION) && !getCampaigngui().saveCampaign(null)) {
+                // When the user did not actually save the game, don't close MHQ
+                return;
+            }
         }
 
         // Actually close MHQ
@@ -303,6 +312,9 @@ public class MekHQ implements GameListener {
 
         // Finally, let's handle startup
         SwingUtilities.invokeLater(() -> MekHQ.getInstance().startup());
+
+        // log jvm parameters
+        logger.info(ManagementFactory.getRuntimeMXBean().getInputArguments());
     }
 
     public static void initializeLogging(final String originProject) {
@@ -442,15 +454,20 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         }
-
-        client = new Client(playerName, "127.0.0.1", port);
+        // Refactor this into a factory
+        var useExperimentalPacarGui = getCampaign().getCampaignOptions().isAutoResolveExperimentalPacarGuiEnabled();
+        if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
+            client = new HeadlessClient(playerName, LOCALHOST_IP, port);
+        } else {
+            client = new Client(playerName, LOCALHOST_IP, port);
+        }
 
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        // Start the game thread
+        // Start the game thread - also refactor this into a factory
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
-            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings);
+            gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario, autoResolveBehaviorSettings, useExperimentalPacarGui, true);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
         }
@@ -516,139 +533,190 @@ public class MekHQ implements GameListener {
         // Why Empty?
     }
 
+    /**
+     * This method is called automatically when the megamek game is over.
+     * @param gve
+     */
     @Override
     public void gameVictory(PostGameResolution gve) {
         // Prevent double run
         if (gameThread.stopRequested()) {
             return;
         }
-
         try {
-            boolean control = JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
-                    "Did your side control the battlefield at the end of the scenario?", "Control of Battlefield?",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+            boolean control = yourSideControlsTheBattlefieldDialogAsk(
+                MHQInternationalization.getText("ResolveDialog.control.message"),
+                MHQInternationalization.getText("ResolveDialog.control.title"));
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, getCampaign(), control);
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
             tracker.processGame();
 
-            ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
-                    tracker);
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(campaignGUI.getCampaign(), campaignGUI.getFrame(),
+                    true, tracker);
             resolveDialog.setVisible(true);
 
-            if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                        campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
-
-                if (!rdd.wasAborted()) {
-                    getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-                }
+            if (resolveDialog.wasAborted()) {
+                return;
             }
 
-            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-                HashMap<UUID, Integer> personnel = new HashMap<>();
-                HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), currentScenario, tracker, control);
 
-                for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                    Person person = getCampaign().getPerson(personId);
-                    PersonStatus status = tracker.getPeopleStatus().get(personId);
-                    int injuryCount = 0;
-
-                    if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                        if (status.getHits() > person.getHitsPrior()) {
-                            injuryCount = status.getHits() - person.getHitsPrior();
-                        }
-                    }
-
-                    personnel.put(personId, injuryCount);
-                    scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
-                }
-
-                boolean isCivilianHelp = false;
-
-                if (tracker.getScenario() instanceof AtBScenario) {
-                    isCivilianHelp = ((AtBScenario) tracker.getScenario())
-                            .getScenarioType() == AtBScenario.CIVILIANHELP;
-                }
-
-                AutoAwardsController autoAwardsController = new AutoAwardsController();
-                autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
-            }
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-
-                if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
-                            PersonnelStatus.POW);
-                }
-            }
-
-            // we need to trigger ScenarioResolvedEvent before stopping the thread or
-            // currentScenario may become null
-            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-            gameThread.requestStop();
-
-            // MegaMek dumps these in the deployment phase to free memory
-            if (getCampaign().getCampaignOptions().isUseAtB()) {
-                RandomUnitGenerator.getInstance();
-                RandomNameGenerator.getInstance();
-            }
-
-            // MegaMek creates some temporary files that MHQ needs to remove between runs
-            final File tempImageDirectory = new File("data/images/temp");
-            if (tempImageDirectory.isDirectory()) {
-                // This can't be null because of the above
-                Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png"))
-                        .forEach(File::delete);
-            }
         } catch (Exception ex) {
             logger.error(ex, "gameVictory()");
+        } finally {
+            gameThread.requestStop();
         }
     }
 
+    /**
+     * This method is called when player wants to manually resolve the scenario providing MUL files.
+     */
+    public void resolveScenario(Scenario selectedScenario) {
+        if (null == selectedScenario) {
+            return;
+        }
+        boolean control = yourSideControlsTheBattlefieldDialogAsk(
+            MHQInternationalization.getText("ResolveDialog.control.message"),
+            MHQInternationalization.getText("ResolveDialog.control.title"));
+
+        ResolveScenarioTracker tracker = new ResolveScenarioTracker(selectedScenario, getCampaign(), control);
+
+        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(campaignGUI.getFrame(), true, tracker);
+        chooseFilesDialog.setVisible(true);
+        if (chooseFilesDialog.wasCancelled()) {
+            return;
+        }
+
+        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getCampaign(),
+            campaignGUI.getFrame(), true, tracker);
+        resolveDialog.setVisible(true);
+
+        if (resolveDialog.wasAborted()) {
+            return;
+        }
+
+        PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), selectedScenario, tracker, control);
+    }
+
+    private boolean yourSideControlsTheBattlefieldDialogAsk(String message, String title) {
+        return JOptionPane.showConfirmDialog(campaignGUI.getFrame(),
+            message, title,
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+    }
+
+
+    // region Event Handling Methods that are not implemented
+    // These methods are here because MekHQ implements GameListener
+    // but currently only needs to hear the post game resolution event
+
     @Override
     public void gamePlayerChange(GamePlayerChangeEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gamePlayerChat(GamePlayerChatEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gamePlayerConnected(GamePlayerConnectedEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gamePlayerDisconnected(GamePlayerDisconnectedEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameReport(GameReportEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameSettingsChange(GameSettingsChangeEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameTurnChange(GameTurnChangeEvent e) {
-        // Why Empty?
     }
 
     @Override
     public void gameClientFeedbackRequest(GameCFREvent e) {
-        // Why Empty?
     }
+    // end region
 
     public IconPackage getIconPackage() {
         return iconPackage;
+    }
+
+    /**
+     * This method is called when the player wants to auto resolve the scenario using ACAR method
+     * @param units The list of player units involved in the scenario
+     */
+    public void startAutoResolve(AtBScenario scenario, List<Unit> units) {
+
+        this.autosaveService.requestBeforeMissionAutosave(getCampaign());
+
+        if (getCampaign().getCampaignOptions().isAutoResolveVictoryChanceEnabled()) {
+            var proceed = AutoResolveChanceDialog
+                .showDialog(
+                    campaignGUI.getFrame(),
+                    getCampaign().getCampaignOptions().getAutoResolveNumberOfScenarios(),
+                    Runtime.getRuntime().availableProcessors(),
+                    1,
+                    new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
+                    new Board(scenario.getBaseMapX(), scenario.getBaseMapY())) == JOptionPane.YES_OPTION;
+            if (!proceed) {
+                return;
+            }
+        }
+
+        var event = AutoResolveProgressDialog.showDialog(
+            campaignGUI.getFrame(),
+            new AtBSetupForces(getCampaign(), units, scenario, new SingletonForces()),
+            new Board(scenario.getBaseMapX(), scenario.getBaseMapY()));
+
+        var autoResolveBattleReport = new AutoResolveSimulationLogDialog(campaignGUI.getFrame(), event.getLogFile());
+        autoResolveBattleReport.setModal(true);
+        autoResolveBattleReport.setVisible(true);
+
+        autoResolveConcluded(event, scenario);
+    }
+
+    /**
+     * This method is called when the auto resolve game is over.
+     * @param autoResolveConcludedEvent The event that contains the results of the auto resolve game.
+     */
+    public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, AtBScenario scenario) {
+        try {
+            String message = autoResolveConcludedEvent.controlledScenario() ?
+                MHQInternationalization.getText("AutoResolveDialog.message.victory") :
+                MHQInternationalization.getText("AutoResolveDialog.message.defeat");
+            String title = autoResolveConcludedEvent.controlledScenario() ?
+                MHQInternationalization.getText("AutoResolveDialog.victory") :
+                MHQInternationalization.getText("AutoResolveDialog.defeat");
+            boolean control = yourSideControlsTheBattlefieldDialogAsk(message, title);
+
+            ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
+            tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame()));
+            tracker.setEvent(autoResolveConcludedEvent);
+            tracker.processGame();
+
+            ResolveScenarioWizardDialog resolveDialog =
+                new ResolveScenarioWizardDialog(getCampaign(), campaignGUI.getFrame(),
+                    true, tracker);
+            resolveDialog.setVisible(true);
+            if (resolveDialog.wasAborted()) {
+                for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                    Person person = getCampaign().getPerson(personId);
+                    person.setHits(person.getHitsPrior());
+                }
+                return;
+            }
+            PostScenarioDialogHandler.handle(campaignGUI, getCampaign(), scenario, tracker,
+                autoResolveConcludedEvent.controlledScenario());
+        } catch (Exception ex) {
+            logger.error("Error during auto resolve concluded", ex);
+        }
     }
 
     /*
@@ -678,11 +746,28 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
-        final String theme = themeName.isBlank() ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+        final String theme = themeName.isBlank() || themeName.equals("UITheme") ? defaultTheme : themeName;
 
         Runnable runnable = () -> {
             try {
                 UIManager.setLookAndFeel(theme);
+                if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
+                    // Ensure OSX key bindings are used for copy, paste etc
+                    addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("FormattedTextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextField.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
+                    addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
+                }
+
+                UIUtil.updateAfterUiChange();
+                return;
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | UnsupportedLookAndFeelException e) {
+                logger.error(e, "setLookAndFeel()");
+            }
+            try {
+                UIManager.setLookAndFeel(defaultTheme);
                 if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
                     // Ensure OSX key bindings are used for copy, paste etc
                     addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
@@ -703,7 +788,7 @@ public class MekHQ implements GameListener {
 
     public static void updateGuiScaling() {
         System.setProperty("flatlaf.uiScale", Double.toString(GUIPreferences.getInstance().getGUIScale()));
-        setLookAndFeel(GUIPreferences.getInstance().getUITheme());
+        setLookAndFeel(selectedTheme.getValue());
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

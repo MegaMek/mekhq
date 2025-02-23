@@ -1,7 +1,7 @@
 /*
  * TransportShipAssignment.java
  *
- * Copyright (c) 2020 The Megamek Team. All rights reserved.
+ * Copyright (c) 2020-2025 The Megamek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,13 +21,19 @@
 
 package mekhq.campaign.unit;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.CampaignTransportType;
+
 import java.util.Objects;
 
 /**
  * Represents an assignment to a specific bay on a transport ship.
+ * Currently only used by SHIP_TRANSPORT
+ * but this could be used by other transport types.
+ * @see ShipTransportedUnitsSummary
+ * @see CampaignTransportType#SHIP_TRANSPORT
  */
-public class TransportShipAssignment {
-    private final Unit transportShip;
+public class TransportShipAssignment extends TransportAssignment{
     private final int bayNumber;
 
     /**
@@ -36,15 +42,19 @@ public class TransportShipAssignment {
      * @param bayNumber The bay number on the transport ship.
      */
     public TransportShipAssignment(Unit transportShip, int bayNumber) {
-        this.transportShip = Objects.requireNonNull(transportShip);
+        super(transportShip);
         this.bayNumber = bayNumber;
+
+        if (getTransportShip().getEntity() != null) {
+            setTransportedLocation(transportShip.getEntity().getBayById(bayNumber));
+        }
     }
 
     /**
      * Gets the transport ship for this assignment.
      */
     public Unit getTransportShip() {
-        return transportShip;
+        return transport;
     }
 
     /**
@@ -52,6 +62,29 @@ public class TransportShipAssignment {
      */
     public int getBayNumber() {
         return bayNumber;
+    }
+
+    /**
+     * After loading UnitRefs need converted to Units
+     *
+     * @param campaign Campaign we need to fix references for
+     * @param unit the unit that needs references fixed
+     * @see Unit#fixReferences(Campaign campaign)
+     */
+    @Override
+    public void fixReferences(Campaign campaign, Unit unit) {
+        if (getTransportShip() instanceof Unit.UnitRef){
+            Unit transportShip = campaign.getHangar().getUnit(getTransportShip().getId());
+            if (transportShip != null) {
+                setTransport(transportShip);
+            } else {
+                logger.error(
+                    String.format("Unit %s ('%s') references missing transport ship %s",
+                        unit.getId(), unit.getName(), getTransportShip().getId()));
+
+                unit.setTransportShipAssignment(null);
+            }
+        }
     }
 
     @Override
@@ -66,6 +99,7 @@ public class TransportShipAssignment {
                     && (getBayNumber() == other.getBayNumber());
         }
     }
+
 
     @Override
     public int hashCode() {

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Random;
 
 import static java.lang.Math.min;
+import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateInitialSupportPoints;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -74,7 +75,7 @@ public class StratconContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int maximumTrackIndex = Math.max(0, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = Math.max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < maximumTrackIndex; x++) {
@@ -92,7 +93,7 @@ public class StratconContractInitializer {
         // a campaign will have X tracks going at a time, where
         // X = # required lances / 3, rounded up. The last track will have fewer
         // required lances.
-        int oddLanceCount = contract.getRequiredLances() % NUM_LANCES_PER_TRACK;
+        int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
         if (oddLanceCount > 0) {
             int scenarioOdds = contractDefinition.getScenarioOdds()
                     .get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
@@ -108,7 +109,7 @@ public class StratconContractInitializer {
         // now seed the tracks with objectives and facilities
         for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
             int objectiveCount = objectiveParams.objectiveCount > 0 ? (int) objectiveParams.objectiveCount
-                    : (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredLances());
+                    : (int) Math.max(1, -objectiveParams.objectiveCount * contract.getRequiredCombatTeams());
 
             List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTracks().size());
 
@@ -165,7 +166,7 @@ public class StratconContractInitializer {
         // non-objective allied facilities
         int facilityCount = contractDefinition.getAlliedFacilityCount() > 0
                 ? (int) contractDefinition.getAlliedFacilityCount()
-                : (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredLances());
+                : (int) (-contractDefinition.getAlliedFacilityCount() * contract.getRequiredCombatTeams());
 
         List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size());
 
@@ -179,7 +180,7 @@ public class StratconContractInitializer {
         // non-objective hostile facilities
         facilityCount = contractDefinition.getHostileFacilityCount() > 0
                 ? (int) contractDefinition.getHostileFacilityCount()
-                : (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredLances());
+                : (int) (-contractDefinition.getHostileFacilityCount() * contract.getRequiredCombatTeams());
 
         trackObjects = trackObjectDistribution(facilityCount, campaignState.getTracks().size());
 
@@ -202,7 +203,7 @@ public class StratconContractInitializer {
         }
 
         // Determine starting morale
-        if (contract.getContractType().isGarrisonType()) {
+        if (contract.getContractType().isGarrisonDuty()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
 
             LocalDate routEnd = contract.getStartDate().plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
@@ -222,7 +223,27 @@ public class StratconContractInitializer {
         }
 
         // Determine starting Support Points
-        campaign.negotiateAdditionalSupportPoints();
+        negotiateInitialSupportPoints(campaign, contract);
+
+        // Roll to see if a hidden cache is present
+        if (campaign.getLocalDate().isAfter(LocalDate.of(2900, 1, 1))) {
+//            if (Compute.randomInt(100) == 0) {
+//                ScenarioTemplate template = ScenarioTemplate.Deserialize(
+//                    "data/scenariotemplates/Chasing a Rumor.xml");
+//
+//                if (template != null) {
+//                    StratconScenario hiddenCache = addHiddenExternalScenario(campaign, contract,
+//                        null, template, false);
+//
+//                    if (hiddenCache != null) {
+//                        logger.info(String.format("A secret cache has been spawned for contract %s",
+//                            contract.getName()));
+//                    }
+//                } else {
+//                    logger.error("'Chasing a Rumor' scenario failed to deserialize");
+//                }
+//            }
+        }
 
         // now we're done
     }
@@ -346,8 +367,31 @@ public class StratconContractInitializer {
     }
 
     /**
-     * Worker function that takes a trackstate and plops down the given number of
-     * facilities owned by the given faction
+     * Initializes and populates a StratCon track with a specified number of objective scenarios.
+     * This method selects scenario templates, places them on the track in unoccupied coordinates,
+     * and optionally assigns facilities and objectives based on predefined rules.
+     *
+     * <p>The key steps of this method include:
+     * <ul>
+     *   <li>Selecting scenario templates from the provided list of objective scenarios.</li>
+     *   <li>Identifying unoccupied coordinates on the track to place each scenario.</li>
+     *   <li>Adding facilities if the scenario template requires them (hostile or allied).</li>
+     *   <li>Generating and configuring scenarios with relevant attributes and modifiers:</li>
+     *   <ul>
+     *     <li>Clearing scenario dates to maintain persistence.</li>
+     *     <li>Marking scenarios as strategic objectives.</li>
+     *     <li>Adding optional modifiers to provide additional effects or conditions.</li>
+     *   </ul>
+     *   <li>Tracking newly added scenarios as strategic objectives for gameplay purposes.</li>
+     * </ul>
+     *
+     * @param campaign            the {@link Campaign} managing the state of the overall gameplay
+     * @param contract            the {@link AtBContract} related to the current StratCon campaign
+     * @param trackState          the {@link StratconTrackState} representing the track where objectives are placed
+     * @param numScenarios        the number of objective scenarios to generate
+     * @param objectiveScenarios  a list of {@link String} identifiers for potential scenarios that can be generated
+     * @param objectiveModifiers  a list of optional {@link String} modifiers to apply to the generated scenarios;
+     *                             can be {@code null} if no modifiers are required
      */
     private static void initializeObjectiveScenarios(Campaign campaign, AtBContract contract,
             StratconTrackState trackState,
@@ -389,13 +433,14 @@ public class StratconContractInitializer {
 
             // create scenario - don't assign a force yet
             StratconScenario scenario = StratconRulesManager.generateScenario(campaign, contract, trackState,
-                    Force.FORCE_NONE, coords, template);
+                    Force.FORCE_NONE, coords, template, null);
 
             // clear dates, because we don't want the scenario disappearing on us
             scenario.setDeploymentDate(null);
             scenario.setActionDate(null);
             scenario.setReturnDate(null);
             scenario.setStrategicObjective(true);
+            scenario.setTurningPoint(true);
             scenario.getBackingScenario().setCloaked(true);
             // apply objective mods
             if (objectiveModifiers != null) {

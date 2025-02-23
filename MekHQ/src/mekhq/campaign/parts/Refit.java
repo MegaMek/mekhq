@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.enums.CampaignTransportType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1273,7 +1274,12 @@ public class Refit extends Part implements IAcquisitionWork {
         oldUnit.setRefit(this);
         // Bay space might change, and either way all cargo needs to be unloaded while
         // the refit is in progress
-        oldUnit.unloadTransportShip();
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (oldUnit.hasTransportedUnits(campaignTransportType)) {
+                oldUnit.unloadTransport(campaignTransportType);
+            }
+        }
+
         newEntity.setOwner(oldUnit.getEntity().getOwner());
 
         // We don't want to require waiting for a refit kit if all that is missing is
@@ -1575,8 +1581,8 @@ public class Refit extends Part implements IAcquisitionWork {
 
     
     /**
-     * Aborts this refit and releases the various marked parts to be used for other purposes. 
-     * 
+     * Aborts this refit and releases the various marked parts to be used for other purposes.
+     *
      * TODO: WeaverThree - Is it safe to call this on an un-started refit? Looks like no.
      */
     public void cancel() {
@@ -1713,10 +1719,10 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         // dont forget to switch entities!
-        // ----------------- from here on oldUnit refers to the new entity ------------------------- 
+        // ----------------- from here on oldUnit refers to the new entity -------------------------
         oldUnit.setEntity(newEntity);
         // Bay capacities might have changed - reset them
-        oldUnit.initializeBaySpace();
+        oldUnit.initializeAllTransportSpace();
 
         // set up new parts
         ArrayList<Part> newParts = new ArrayList<>();
@@ -1894,8 +1900,8 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Writes the configuration for the new side of the refit to a 
-     * .mtf or .blk file in the customs directory. 
+     * Writes the configuration for the new side of the refit to a
+     * .mtf or .blk file in the customs directory.
      * @throws EntityLoadingException
      */
     public void saveCustomization() throws EntityLoadingException {
@@ -1926,13 +1932,13 @@ public class Refit extends Part implements IAcquisitionWork {
             String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
             String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
             fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
-            
+
             // if this file already exists then don't overwrite it or we might break another unit
             if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
                 throw new IOException("A file already exists with the custom name " + fileNameCampaign
                         + ". Please choose a different name. (Unit name and/or model)");
             }
-            
+
             if (newEntity instanceof Mek) {
                 try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                         PrintStream p = new PrintStream(out)) {
@@ -1996,7 +2002,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * @return Have we failed a refit check? If so, the quality of the parts will decrease. 
+     * @return Have we failed a refit check? If so, the quality of the parts will decrease.
      * unless it's a refurbishment, at least.
      */
     public boolean hasFailedCheck() {
@@ -2020,7 +2026,7 @@ public class Refit extends Part implements IAcquisitionWork {
         // Refit kit bonus added below in getAllMods
     }
 
-    
+
     /**
      * @param tech - a Person whose attribute may modify this roll
      * @return a TargetRoll describing all of our difficulty modifiers
@@ -2079,7 +2085,7 @@ public class Refit extends Part implements IAcquisitionWork {
         } else {
             return ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                    "The customization of " + oldUnit.getEntity().getShortName() 
+                    "The customization of " + oldUnit.getEntity().getShortName()
                     + " will take <b>" + getTimeLeft() + " additional minutes</b> to complete.");
         }
     }
@@ -2133,7 +2139,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
     /**
      * A refit has the same base and actual time
-     * @return minutes to complete refit 
+     * @return minutes to complete refit
      */
     @Override
     public int getBaseTime() {
@@ -3032,7 +3038,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Gets a value indicating whether or not this refit is a custom job. 
+     * Gets a value indicating whether or not this refit is a custom job.
      * If false, this is a Refit Kit (CamOps 212).\
      * @return is custom job?
      */
@@ -3041,7 +3047,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * @return Has a refit kit for this refit been found (if applicable). 
+     * @return Has a refit kit for this refit been found (if applicable).
      */
     public boolean kitFound() {
         return kitFound;

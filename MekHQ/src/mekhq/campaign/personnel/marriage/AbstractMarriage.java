@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,8 +29,8 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.MergingSurnameStyle;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -112,19 +112,34 @@ public abstract class AbstractMarriage {
     public @Nullable String canMarry(final LocalDate today, final Person person, final boolean randomMarriage) {
         if (!person.isMarriageable()) {
             return resources.getString("cannotMarry.NotMarriageable.text");
-        } else if (person.getGenealogy().hasSpouse()) {
+        }
+
+        if (person.getGenealogy().hasSpouse()) {
             return resources.getString("cannotMarry.AlreadyMarried.text");
-        } else if (!person.getStatus().isActive()) {
+        }
+
+        if (!person.getStatus().isActive()) {
             return resources.getString("cannotMarry.Inactive.text");
-        } else if (person.isDeployed()) {
+        }
+
+        if (person.isDeployed()) {
             return resources.getString("cannotMarry.Deployed.text");
-        } else if (person.isChild(today)) {
+        }
+
+        // Not allowing under-18s to marry is project policy
+        if (person.isChild(today, true)) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
+        }
+
+        if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
             return resources.getString("cannotMarry.ClanPersonnel.text");
-        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
+        }
+
+        if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
-        } else if (randomMarriage) {
+        }
+
+        if (randomMarriage) {
             if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
                 return resources.getString("cannotMarry.RandomClanPersonnel.text");
             } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
@@ -255,8 +270,9 @@ public abstract class AbstractMarriage {
      * @param campaign the campaign to process
      * @param today the current day
      * @param person the person to process
+     * @param isBackground whether the marriage occurred in a character's background
      */
-    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person, boolean isBackground) {
         if (canMarry(today, person, true) != null) {
             return;
         }
@@ -282,7 +298,7 @@ public abstract class AbstractMarriage {
                 isInterUnit = true;
             }
 
-            marryRandomSpouse(campaign, today, person, isSameSex, isInterUnit, true);
+            marryRandomSpouse(campaign, today, person, isSameSex, isInterUnit, isBackground);
         }
     }
 
@@ -391,7 +407,7 @@ public abstract class AbstractMarriage {
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().minusYears(difference));
         } else if (externalSpouseAge > externalSpouseMaxAge) {
-            int difference = externalSpouseMaxAge - externalSpouseAge;
+            int difference = externalSpouseAge - externalSpouseMaxAge;
 
             externalSpouse.setDateOfBirth(externalSpouse.getDateOfBirth().plusYears(difference));
         }

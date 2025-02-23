@@ -31,9 +31,7 @@
 			<objectiveType>SpecificScenarioVictory</objectiveType>
 			<objectiveCount>-0.5</objectiveCount>
 			<objectiveScenarios>
-				<objectiveScenario>VIP Capture.xml</objectiveScenario>
-				<objectiveScenario>Remote VIP Capture.xml</objectiveScenario>
-				<objectiveScenario>Frontline VIP Capture.xml</objectiveScenario>
+				<objectiveScenario>VIP Ambush.xml</objectiveScenario>
                 <objectiveScenario>Covert Strike.xml</objectiveScenario>
                 <objectiveScenario>Convoy Interdiction.xml</objectiveScenario>
                 <objectiveScenario>Convoy Raid.xml</objectiveScenario>

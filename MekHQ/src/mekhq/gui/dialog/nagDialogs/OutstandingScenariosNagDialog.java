@@ -21,68 +21,72 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
-import java.time.LocalDate;
-import java.util.List;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.getOutstandingScenarios;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.OutstandingScenariosNagLogic.hasOutStandingScenarios;
 
 /**
- * This class represents a nag dialog displayed when the campaign one or more unresolved scenarios.
- * It extends the {@link AbstractMHQNagDialog} class.
+ * Represents a nag dialog for displaying the list of outstanding scenarios in a campaign.
+ *
+ * <p>
+ * This dialog checks for active scenarios within the campaign, categorizes them by
+ * their state (e.g., unresolved or requiring a track), and displays a list of these
+ * scenarios to the user. Scenarios are considered "outstanding" if they are unresolved or
+ * require attention on the current campaign date.
+ * </p>
+ *
+ * <p>
+ * The dialog includes logic to account for both AtB contracts and StratCon-enabled campaigns,
+ * formatting the outstanding scenarios with additional details when appropriate.
+ * </p>
  */
 public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "OutstandingScenariosNagDialog";
-    private static String DIALOG_TITLE = "OutstandingScenariosNagDialog.title";
-    private static String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
-
     /**
-     * Checks if there are any outstanding scenarios in the given campaign.
-     * An outstanding scenario is defined as a scenario whose date is the same as the current date.
+     * Constructs the OutstandingScenariosNagDialog for the given campaign.
      *
-     * @param campaign the campaign to check for outstanding scenarios
-     * @return {@code true} if there are outstanding scenarios, {@code false} otherwise
+     * <p>
+     * Upon initialization, this dialog prepares a formatted string of outstanding
+     * scenarios (if any) and sets up the dialog UI for display.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} associated with this nag dialog.
      */
-    static boolean checkForOutstandingScenarios(Campaign campaign) {
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts(true);
+    public OutstandingScenariosNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
 
-        LocalDate today = campaign.getLocalDate();
+        final String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
 
-        for (AtBContract contract : activeContracts) {
-            for (AtBScenario scenario : contract.getCurrentAtBScenarios()) {
-                LocalDate scenarioDate = scenario.getDate();
+        String outstandingScenarios = getOutstandingScenarios(campaign);
 
-                if (scenarioDate.equals(today)) {
-                    return true;
-                }
-            }
+        String addendum = "";
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            addendum = resources.getString("OutstandingScenariosNagDialog.stratCon");
         }
 
-        return false;
+        setRightDescriptionMessage(String.format(resources.getString(DIALOG_BODY),
+            campaign.getCommanderAddress(false), outstandingScenarios, addendum));
+        showDialog();
     }
 
-    //region Constructors
     /**
-     * Creates a new instance of the {@link OutstandingScenariosNagDialog} class.
+     * Checks if a nag dialog should be displayed for outstanding scenarios in the given campaign.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the campaign is set to use AtB (Against the Bot) rules.</li>
+     *     <li>If the nag dialog for outstanding scenarios has not been ignored in the user options.</li>
+     *     <li>If there are outstanding scenarios in the campaign.</li>
+     * </ul>
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
-    }
-    //endregion Constructors
+    public static boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_OUTSTANDING_SCENARIOS;
 
-    /**
-     * Checks if there is a nag message to display.
-     *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
-     */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && checkForOutstandingScenarios(getCampaign());
+        return campaign.getCampaignOptions().isUseAtB()
+            && !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasOutStandingScenarios(campaign);
     }
 }

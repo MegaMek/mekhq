@@ -106,8 +106,12 @@
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>CIVILIAN</forceRole>
-                    <forceRole>CARGO</forceRole>
                     <forceRole>SUPPORT</forceRole>
+                    <forceRole>SUPPORT</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>APC</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
             </value>
@@ -148,7 +152,7 @@
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
+                    <effectType>SupplyCache</effectType>
                     <effectScaling>Linear</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>

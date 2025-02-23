@@ -42,6 +42,7 @@ import java.util.List;
 
 import static mekhq.campaign.market.enums.UnitMarketRarity.*;
 import static mekhq.campaign.market.enums.UnitMarketType.getPricePercentage;
+import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     //region Constructors
@@ -80,48 +81,49 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         Faction faction = campaign.getFaction();
         int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();
 
-        addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.OPEN, UnitType.MEK,
-                faction, IUnitRating.DRAGOON_F, 1);
+        addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+            UnitMarketType.OPEN, UnitType.MEK, faction, IUnitRating.DRAGOON_F, 1);
 
-        addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.OPEN, UnitType.AEROSPACEFIGHTER,
-                faction, IUnitRating.DRAGOON_F, 1);
+        addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+            UnitMarketType.OPEN, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_F, 1);
 
-        addOffers(campaign, getMarketItemCount(VERY_COMMON, rarityModifier), UnitMarketType.OPEN, UnitType.TANK,
-                faction, IUnitRating.DRAGOON_F, 1);
+        addOffers(campaign, getMarketItemCount(campaign, VERY_COMMON, rarityModifier),
+            UnitMarketType.OPEN, UnitType.TANK, faction, IUnitRating.DRAGOON_F, 1);
 
-        addOffers(campaign, getMarketItemCount(COMMON, rarityModifier), UnitMarketType.OPEN, UnitType.CONV_FIGHTER,
-                faction, IUnitRating.DRAGOON_F, 1);
+        addOffers(campaign, getMarketItemCount(campaign, COMMON, rarityModifier),
+            UnitMarketType.OPEN, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_F, 1);
 
-        if ((contract != null) && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
+        if ((contract != null)
+            && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
             // Employer Market
             faction = contract.getEmployerFaction();
 
-            addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.EMPLOYER, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_D, -1);
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.MEK, faction, IUnitRating.DRAGOON_D, -1);
 
-            addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_D, -1);
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_D, -1);
 
-            addOffers(campaign, getMarketItemCount(COMMON, rarityModifier), UnitMarketType.EMPLOYER, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_D, -1);
+            addOffers(campaign, getMarketItemCount(campaign, COMMON, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.TANK, faction, IUnitRating.DRAGOON_D, -1);
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_D, -1);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_D, -1);
 
             // Unwanted Salvage Market
             faction = contract.getEnemy();
 
-            addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.EMPLOYER, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_F, 2);
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.MEK, faction, IUnitRating.DRAGOON_F, 2);
 
-            addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_F, 2);
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_F, 2);
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.EMPLOYER, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_F, 2);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.TANK, faction, IUnitRating.DRAGOON_F, 2);
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_F, 2);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_F, 2);
         }
 
         // Mercenary Market
@@ -134,17 +136,17 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 modifier = -1;
             }
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.MERCENARY, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_C, modifier);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.MERCENARY, UnitType.MEK, faction, IUnitRating.DRAGOON_C, modifier);
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.MERCENARY, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_C, modifier);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.MERCENARY, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_C, modifier);
 
-            addOffers(campaign, getMarketItemCount(VERY_COMMON, rarityModifier), UnitMarketType.MERCENARY, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_C, modifier);
+            addOffers(campaign, getMarketItemCount(campaign, VERY_COMMON, rarityModifier),
+                UnitMarketType.MERCENARY, UnitType.TANK, faction, IUnitRating.DRAGOON_C, modifier);
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.MERCENARY, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_C, modifier);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.MERCENARY, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_C, modifier);
         }
 
         // Factory Market
@@ -153,17 +155,17 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     .getFactionSet(campaign.getLocalDate()));
 
             if ((!campaign.getFaction().isClan()) && (faction != null) && (!faction.isClan())) {
-                addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.FACTORY, UnitType.MEK,
-                        faction, IUnitRating.DRAGOON_A, 2);
+                addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                    UnitMarketType.FACTORY, UnitType.MEK, faction, IUnitRating.DRAGOON_A, 2);
 
-                addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER,
-                        faction, IUnitRating.DRAGOON_A, 2);
+                addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                    UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_A, 2);
 
-                addOffers(campaign, getMarketItemCount(COMMON, rarityModifier), UnitMarketType.FACTORY, UnitType.TANK,
-                        faction, IUnitRating.DRAGOON_A, 2);
+                addOffers(campaign, getMarketItemCount(campaign, COMMON, rarityModifier),
+                    UnitMarketType.FACTORY, UnitType.TANK, faction, IUnitRating.DRAGOON_A, 2);
 
-                addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.FACTORY, UnitType.CONV_FIGHTER,
-                        faction, IUnitRating.DRAGOON_A, 2);
+                addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                    UnitMarketType.FACTORY, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_A, 2);
             }
         }
 
@@ -171,14 +173,14 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
         // Clan Factory Market
         if ((faction.isClan()) && (campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate()).contains(faction))) {
-            addOffers(campaign, getMarketItemCount(VERY_COMMON, rarityModifier), UnitMarketType.FACTORY, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_A, -4);
+            addOffers(campaign, getMarketItemCount(campaign, VERY_COMMON, rarityModifier),
+                UnitMarketType.FACTORY, UnitType.MEK, faction, IUnitRating.DRAGOON_A, -4);
 
-            addOffers(campaign, getMarketItemCount(COMMON, rarityModifier), UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_A, -4);
+            addOffers(campaign, getMarketItemCount(campaign, COMMON, rarityModifier),
+                UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_A, -4);
 
-            addOffers(campaign, getMarketItemCount(UNCOMMON, rarityModifier), UnitMarketType.FACTORY, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_A, -4);
+            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, rarityModifier),
+                UnitMarketType.FACTORY, UnitType.TANK, faction, IUnitRating.DRAGOON_A, -4);
         }
 
         // Black Market
@@ -186,17 +188,17 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             faction = ObjectUtility.getRandomItem(campaign.getCurrentSystem()
                     .getFactionSet(campaign.getLocalDate()));
 
-            addOffers(campaign, getMarketItemCount(VERY_RARE, rarityModifier), UnitMarketType.BLACK_MARKET, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_A, -8);
+            addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+                UnitMarketType.BLACK_MARKET, UnitType.MEK, faction, IUnitRating.DRAGOON_A, -8);
 
-            addOffers(campaign, getMarketItemCount(VERY_RARE, rarityModifier), UnitMarketType.BLACK_MARKET, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_A, -8);
+            addOffers(campaign, getMarketItemCount(campaign, VERY_RARE, rarityModifier),
+                UnitMarketType.BLACK_MARKET, UnitType.AEROSPACEFIGHTER, faction, IUnitRating.DRAGOON_A, -8);
 
-            addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.BLACK_MARKET, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_A, -8);
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                UnitMarketType.BLACK_MARKET, UnitType.TANK, faction, IUnitRating.DRAGOON_A, -8);
 
-            addOffers(campaign, getMarketItemCount(RARE, rarityModifier), UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_A, -8);
+            addOffers(campaign, getMarketItemCount(campaign, RARE, rarityModifier),
+                UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER, faction, IUnitRating.DRAGOON_A, -8);
         }
 
         writeRefreshReport(campaign);
@@ -209,10 +211,15 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      * @param rarityModifier the unit count modifier specified in campaign options
      * @return an integer representing the count of market items
      */
-    private int getMarketItemCount(UnitMarketRarity rarity, int rarityModifier) {
+    private int getMarketItemCount(Campaign campaign, UnitMarketRarity rarity, int rarityModifier) {
+        int totalRarity = rarity.ordinal() + rarityModifier;
+
+        if (isGrayMonday(campaign)) {
+            totalRarity -= 4;
+        }
+
         return Compute.d6(1)
-                + rarity.ordinal()
-                + rarityModifier
+                + totalRarity
                 - 3;
     }
 
@@ -229,6 +236,10 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             market = UnitMarketType.OPEN;
         }
 
+        if (num <= 1) {
+            return;
+        }
+
         for (int i = 0; i < num; i++) {
             final Collection<EntityMovementMode> movementModes = new ArrayList<>();
             final Collection<MissionRole> missionRoles = new ArrayList<>();
@@ -243,21 +254,20 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
                         // this will need to be incremented by 1,
                         // whenever we add additional unit types to this special handler
-                        int roll = Compute.randomInt(2);
+                        int roll = Compute.randomInt(6);
 
                         // while this gives even chances for each role,
                         // it gives greater control to the user
                         // to define how often they want to see special units.
-                        // really, this is just a band-aid fix, and ideally we wouldn't be filtering out these units in the first place
+                        // really, this is just a Band-Aid fix, and ideally we wouldn't be filtering out these units in the first place
                         switch (roll) {
-                            case 0:
-                                missionRoles.add(MissionRole.SUPPORT);
-                                break;
-                            case 1:
-                                missionRoles.add(MissionRole.ARTILLERY);
-                                break;
-                            default:
-                                throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: " + roll);
+                            case 0 -> missionRoles.add(MissionRole.CIVILIAN);
+                            case 1 -> missionRoles.add(MissionRole.SUPPORT);
+                            case 2 -> missionRoles.add(MissionRole.CARGO);
+                            case 3, 4, 5 -> missionRoles.add(MissionRole.ARTILLERY);
+                            default -> throw new IllegalStateException(
+                                "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: "
+                                    + roll);
                         }
                     }
                 }

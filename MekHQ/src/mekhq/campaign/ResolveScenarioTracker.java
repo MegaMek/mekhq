@@ -2,7 +2,7 @@
  * ResolveScenarioTracker.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,9 +21,10 @@
  */
 package mekhq.campaign;
 
-import megamek.client.Client;
+import megamek.client.IClient;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.autoresolve.acar.SimulatedClient;
 import megamek.common.event.PostGameResolution;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
@@ -40,8 +41,8 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
@@ -89,7 +90,7 @@ public class ResolveScenarioTracker {
     Campaign campaign;
     Scenario scenario;
     Optional<File> unitList = Optional.empty();
-    Client client;
+    IClient client;
     Boolean control;
     private PostGameResolution victoryEvent;
 
@@ -137,6 +138,10 @@ public class ResolveScenarioTracker {
         }
     }
 
+    public boolean isAutoResolve() {
+        return this.client instanceof SimulatedClient;
+    }
+
     public void findUnitFile() {
         unitList = FileDialogs.openUnits(null);
     }
@@ -145,7 +150,7 @@ public class ResolveScenarioTracker {
         return unitList.map(File::getAbsolutePath).orElse("No file selected");
     }
 
-    public void setClient(Client c) {
+    public void setClient(IClient c) {
         client = c;
     }
 
@@ -363,6 +368,12 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
+                // MekHQ doesn't support gun emplacements, so we don't want the player salvaging them
+                if (wreck instanceof GunEmplacement) {
+                    appendKillCredit(wreck);
+                    continue;
+                }
+
                 if (wreck.isDropShip() && scenario.getBoardType() != Scenario.T_SPACE) {
                     double dropShipBonusPercentage =
                         (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
@@ -371,7 +382,7 @@ public class ResolveScenarioTracker {
                         dropShipBonus = dropShipBonus.plus(
                             generateNewTestUnit(wreck).getSellValue().multipliedBy(dropShipBonusPercentage));
                     }
-
+                    appendKillCredit(wreck);
                     continue;
                 }
 
@@ -1468,7 +1479,7 @@ public class ResolveScenarioTracker {
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
                 if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
-                    person.increaseFatigue(
+                    person.changeFatigue(
                             campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
                 }
 
@@ -1495,7 +1506,7 @@ public class ResolveScenarioTracker {
             }
 
             if (!status.isDead()) {
-                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                person.changeFatigue(campaign.getCampaignOptions().getFatigueRate());
 
                 if (campaign.getCampaignOptions().isUseFatigue()) {
                     Fatigue.processFatigueActions(campaign, person);
@@ -1734,7 +1745,7 @@ public class ResolveScenarioTracker {
         }
 
         for (Loot loot : actualLoot) {
-            loot.getLoot(campaign, scenario);
+            loot.getLoot(campaign, scenario, unitsStatus);
         }
 
         scenario.setStatus(resolution);

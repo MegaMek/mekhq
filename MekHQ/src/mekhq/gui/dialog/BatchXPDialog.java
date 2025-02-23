@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2016-2024 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,6 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -91,8 +90,6 @@ public final class BatchXPDialog extends JDialog {
         personnelModel.refreshData();
 
         initComponents();
-
-        setUserPreferences();
     }
 
     private void initComponents() {
@@ -103,41 +100,6 @@ public final class BatchXPDialog extends JDialog {
 
         pack();
         setLocationRelativeTo(getParent());
-    }
-
-    private void setUserPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(BatchXPDialog.class);
-
-            choiceType.setName("primaryRole");
-            preferences.manage(new JComboBoxPreference(choiceType));
-
-            choiceExp.setName("experienceLevel");
-            preferences.manage(new JComboBoxPreference(choiceExp));
-
-            choiceRank.setName("rank");
-            preferences.manage(new JComboBoxPreference(choiceRank));
-
-            onlyOfficers.setName("onlyOfficers");
-            preferences.manage(new JToggleButtonPreference(onlyOfficers));
-
-            noOfficers.setName("noOfficers");
-            preferences.manage(new JToggleButtonPreference(noOfficers));
-
-            choiceSkill.setName("skill");
-            preferences.manage(new JComboBoxPreference(choiceSkill));
-
-            skillLevel.setName("skillLevel");
-            preferences.manage(new JIntNumberSpinnerPreference(skillLevel));
-
-            allowPrisoners.setName("allowPrisoners");
-            preferences.manage(new JToggleButtonPreference(allowPrisoners));
-
-            this.setName("dialog");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            logger.error("Failed to set user preferences", ex);
-        }
     }
 
     private JComponent getPersonnelTable() {
@@ -208,8 +170,9 @@ public final class BatchXPDialog extends JDialog {
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
         personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null));
-        for (int i = SkillLevel.ULTRA_GREEN.ordinal(); i < SkillLevel.ELITE.ordinal(); i++) {
-            personExpModel.addElement(new PersonTypeItem(Skills.SKILL_LEVELS[i].toString(), i));
+        for (int i = SkillLevel.ULTRA_GREEN.ordinal(); i <= SkillLevel.ELITE.ordinal(); i++) {
+            final SkillLevel skillLevel = SkillLevel.parseFromInteger(i);
+            personExpModel.addElement(new PersonTypeItem(skillLevel.toString(), skillLevel.getAdjustedValue()));
         }
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);
@@ -299,7 +262,7 @@ public final class BatchXPDialog extends JDialog {
                     skillLevel.setEnabled(true);
                     ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
                     skillLevel.getModel().setValue(
-                            MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 0, maxSkillLevel));
+                            MathUtility.clamp((Integer) skillLevel.getModel().getValue(), 1, maxSkillLevel));
                     buttonSpendXP.setEnabled(true);
                 }
             }
@@ -310,7 +273,7 @@ public final class BatchXPDialog extends JDialog {
         panel.add(Box.createRigidArea(new Dimension(10, 10)));
         panel.add(new JLabel(resourceMap.getString("targetSkillLevel.text")));
 
-        skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
+        skillLevel = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
         skillLevel.addChangeListener(evt -> {
             personnelFilter.setMaxSkillLevel((Integer) skillLevel.getModel().getValue());

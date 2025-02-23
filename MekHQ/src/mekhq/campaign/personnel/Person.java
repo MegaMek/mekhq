@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,7 +47,6 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -57,6 +56,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -168,8 +168,9 @@ public class Person {
     private UUID doctorId;
     private List<Unit> techUnits;
 
+    private int vocationalXPTimer;
+
     // days of rest
-    private int idleMonths;
     private int daysToWaitForHealing;
 
     // Our rank
@@ -216,7 +217,7 @@ public class Person {
     private int eduEducationTime;
     private int eduDaysOfTravel;
     private List<UUID> eduTagAlongs;
-    private List<Academy> eduFailedApplications;
+    private List<String> eduFailedApplications;
     // endregion Education
 
     // region Personality
@@ -895,7 +896,7 @@ public class Person {
         return getSecondaryRole().getName(isClanPersonnel());
     }
 
-    public boolean canPerformRole(LocalDate today, Person person, final PersonnelRole role, final boolean primary) {
+    public boolean canPerformRole(LocalDate today, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
             // We only do a few here, as it is better on the UX-side to correct the issues
@@ -931,7 +932,7 @@ public class Person {
             }
         }
 
-        if (person.isChild(today)) {
+        if (isChild(today)) {
             return false;
         }
 
@@ -944,8 +945,7 @@ public class Person {
             case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
             case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
             case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC)
-                    && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC);
             case VEHICLE_CREW ->
                 Stream.of(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
                     SkillType.S_TECH_BA, SkillType.S_DOCTOR, SkillType.S_MEDTECH, SkillType.S_ASTECH)
@@ -959,18 +959,11 @@ public class Person {
             case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
             case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
             case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAV);
-            case MEK_TECH ->
-                hasSkill(SkillType.S_TECH_MEK)
-                        && (getSkill(SkillType.S_TECH_MEK).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case AERO_TEK ->
-                hasSkill(SkillType.S_TECH_AERO)
-                        && (getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case BA_TECH ->
-                hasSkill(SkillType.S_TECH_BA)
-                        && (getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case MEK_TECH -> hasSkill(SkillType.S_TECH_MEK);
+            case AERO_TEK -> hasSkill(SkillType.S_TECH_AERO);
+            case BA_TECH -> hasSkill(SkillType.S_TECH_BA);
             case ASTECH -> hasSkill(SkillType.S_ASTECH);
-            case DOCTOR -> hasSkill(SkillType.S_DOCTOR)
-                    && (getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case DOCTOR -> hasSkill(SkillType.S_DOCTOR);
             case MEDIC -> hasSkill(SkillType.S_MEDTECH);
             case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR ->
                 hasSkill(SkillType.S_ADMIN);
@@ -1077,13 +1070,13 @@ public class Person {
                 setRetirement(today);
 
                 break;
+            case STUDENT:
+                // log entries and reports are handled by the education package
+                // (mekhq/campaign/personnel/education)
+                break;
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
-            case STUDENT:
-                // log entries & reports are handled by the education package
-                // (mekhq/campaign/personnel/education)
-                break;
             default:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
@@ -1096,7 +1089,7 @@ public class Person {
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
-                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
+                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), this);
             }
 
             // log death across genealogy
@@ -1316,12 +1309,12 @@ public class Person {
         this.status = status;
     }
 
-    public int getIdleMonths() {
-        return idleMonths;
+    public int getVocationalXPTimer() {
+        return vocationalXPTimer;
     }
 
-    public void setIdleMonths(final int idleMonths) {
-        this.idleMonths = idleMonths;
+    public void setVocationalXPTimer(final int vocationalXPTimer) {
+        this.vocationalXPTimer = vocationalXPTimer;
     }
 
     public int getDaysToWaitForHealing() {
@@ -1481,8 +1474,33 @@ public class Person {
         return id;
     }
 
+    /**
+     * Checks if the person is considered a child based on their age and today's date.
+     *
+     * <p>This method uses the default context where the person is not being checked
+     * for procreation-specific thresholds.</p>
+     *
+     * @param today the current date to calculate the age against
+     * @return {@code true} if the person's age is less than 16; {@code false} otherwise
+     */
     public boolean isChild(final LocalDate today) {
-        return getAge(today) < 18;
+        return isChild(today, false);
+    }
+
+    /**
+     * Checks if the person is considered a child based on their age, today's date, and procreation
+     * status.
+     *
+     * @param today the current date to calculate the age against
+     * @param use18 if {@code true}, the threshold considers a person a child
+     *                      if their age is less than 18; otherwise, the default age threshold of
+     *                      16 applies
+     * @return {@code true} if the person's age is less than the specified threshold
+     *         (procreation or default), {@code false} otherwise
+     */
+    public boolean isChild(final LocalDate today, boolean use18) {
+        int age = getAge(today);
+        return age < (use18 ? 18 : 16);
     }
 
     public Genealogy getGenealogy() {
@@ -1560,8 +1578,20 @@ public class Person {
         this.fatigue = fatigue;
     }
 
-    public void increaseFatigue(final int fatigue) {
-        this.fatigue = this.fatigue + fatigue;
+    /**
+     * Adjusts the current fatigue level by the specified amount.
+     *
+     * <p>
+     * This method modifies the fatigue level by adding the value of {@code change}
+     * to the current fatigue. Positive values will increase the fatigue, while
+     * negative values will decrease it.
+     * </p>
+     *
+     * @param change The amount to adjust the fatigue by. Positive values increase fatigue,
+     *               and negative values decrease it.
+     */
+    public void changeFatigue(final int change) {
+        this.fatigue = this.fatigue + change;
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -1722,14 +1752,12 @@ public class Person {
         this.eduTagAlongs.add(tagAlong);
     }
 
-    public List<Academy> getEduFailedApplications() {
+    public List<String> getEduFailedApplications() {
         return eduFailedApplications;
     }
 
-    public void addEduFailedApplications(final Academy eduFailedApplications) {
-        if (!this.eduFailedApplications.contains(eduFailedApplications)) {
-            this.eduFailedApplications.add(eduFailedApplications);
-        }
+    public void addEduFailedApplications(final String failedApplication) {
+        eduFailedApplications.add(failedApplication);
     }
 
     /**
@@ -1985,8 +2013,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "biography", biography);
             }
 
-            if (idleMonths > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleMonths", idleMonths);
+            if (vocationalXPTimer > 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "vocationalXPTimer", vocationalXPTimer);
             }
 
             if (!genealogy.isEmpty()) {
@@ -2174,6 +2202,16 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduTagAlongs");
             }
 
+            if (!eduTagAlongs.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "eduFailedApplications");
+
+                for (String failedApplication : eduFailedApplications) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduFailedApplication", failedApplication);
+                }
+
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduFailedApplications");
+            }
+
             if (eduAcademySystem != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
             }
@@ -2337,8 +2375,10 @@ public class Person {
                     retVal.secondaryDesignator = ROMDesignation.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("vocationalXPTimer")
+                    // <50.03 compatibility handler
+                    || wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
+                    retVal.vocationalXPTimer = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("genealogy")) {
@@ -2547,6 +2587,18 @@ public class Person {
                             }
                         }
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduFailedApplications")) {
+                    if (wn2.getNodeName().equalsIgnoreCase("eduFailedApplications")) {
+                        NodeList nodes = wn2.getChildNodes();
+
+                        for (int j = 0; j < nodes.getLength(); j++) {
+                            Node node = nodes.item(j);
+
+                            if (node.getNodeName().equalsIgnoreCase("eduFailedApplication")) {
+                                retVal.eduFailedApplications.add(node.getTextContent());
+                            }
+                        }
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
                     retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
@@ -2566,44 +2618,61 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.aggression = Aggression.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.aggression = Aggression.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.aggression = Aggression.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.ambition = Ambition.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.ambition = Ambition.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.ambition = Ambition.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.greed = Greed.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.greed = Greed.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.greed = Greed.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.social = Social.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.social = Social.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.social = Social.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
-                    retVal.social = Social.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.personalityQuirk = PersonalityQuirk.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.personalityQuirk = PersonalityQuirk.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.personalityQuirk = PersonalityQuirk.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
                     try {
                         // <50.01 compatibility handler
-                        retVal.intelligence = Intelligence.parseFromString(wn2.getTextContent());
-                    } catch (Exception e) {
+                        retVal.intelligence = Intelligence.valueOf(wn2.getTextContent()
+                            .toUpperCase()
+                            .replaceAll("-", "_")
+                            .replaceAll(" ", "_"));
+                    } catch (IllegalArgumentException e) {
                         retVal.intelligence = Intelligence.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
@@ -2678,6 +2747,22 @@ public class Person {
             // I don't know when this metric was added, so we check all versions
             if (retVal.getRecruitment() == null) {
                 retVal.setRecruitment(c.getLocalDate());
+            }
+
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
+            // potentially as far back as 2014. The next two handlers should never be removed.
+            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getPrimaryRole(), true)) {
+                retVal.setPrimaryRole(c, PersonnelRole.NONE);
+                logger.info(String.format("%s was found to be ineligible for their" +
+                    " primary role. That role has been removed and they were assigned the" +
+                    " NONE role.", retVal.getFullTitle()));
+            }
+
+            if (!retVal.canPerformRole(c.getLocalDate(), retVal.getSecondaryRole(), false)) {
+                retVal.setSecondaryRole(PersonnelRole.NONE);
+                logger.info(String.format("%s was found to be ineligible for their" +
+                    " secondary role. That role has been removed and they were assigned the" +
+                    " NONE role.", retVal.getFullTitle()));
             }
         } catch (Exception e) {
             logger.error("Failed to read person {} from file", retVal.getFullName(), e);
@@ -2816,7 +2901,6 @@ public class Person {
      */
     private static void removeUnusedEdgeTriggers(Person retVal, List<String> edgeOptionList) {
         for (String edgeTrigger : edgeOptionList) {
-            logger.info(edgeTrigger);
             String advName = Crew.parseAdvantageName(edgeTrigger);
 
             try {
@@ -2835,22 +2919,17 @@ public class Person {
     }
 
     /**
-     * This is used to pay a person
+     * This is used to pay a person. Preventing negative payments
+     * is intentional to ensure we don't accidentally
+     * change someone when trying to give them money.
+     * To charge a person, implement a new method.
+     * (And then add a @see here)
      *
      * @param money the amount of money to add to their total earnings
      */
     public void payPerson(final Money money) {
-        totalEarnings = getTotalEarnings().plus(money);
-    }
-
-    /**
-     * This is used to pay a person their salary
-     *
-     * @param campaign the campaign the person is a part of
-     */
-    public void payPersonSalary(final Campaign campaign) {
-        if (getStatus().isActive()) {
-            payPerson(getSalary(campaign));
+        if (money.isPositiveOrZero()) {
+            totalEarnings = getTotalEarnings().plus((money));
         }
     }
 
@@ -3290,6 +3369,81 @@ public class Person {
             default:
                 return SkillType.EXP_NONE;
         }
+    }
+
+    /**
+     * Retrieves the skills associated with the character's profession.
+     * The skills returned depend on whether the personnel's primary or secondary role
+     * is being queried and may also vary based on the campaign's configuration settings, such as
+     * whether artillery skills are enabled.
+     *
+     * <p>This method identifies the {@link PersonnelRole} associated with the personnel and returns
+     * a list of corresponding skills. The resulting skills depend on the profession and specific
+     * conditions, such as whether artillery is enabled in the campaign options.</p>
+     *
+     * <p>Examples of skill mappings include:
+     * <ul>
+     *     <li><strong>MEKWARRIOR:</strong> Includes gun and piloting skills for meks, with optional
+     *     artillery skills if enabled in the campaign.</li>
+     *     <li><strong>LAM_PILOT:</strong> Covers skills for both meks and aerospace combat.</li>
+     *     <li><strong>GROUND_VEHICLE_DRIVER:</strong> Includes piloting skills for ground vehicles.</li>
+     *     <li><strong>VEHICLE_GUNNER:</strong> Includes vehicle gunnery skills, with optional artillery skills
+     *         if enabled.</li>
+     *     <li><strong>AEROSPACE_PILOT:</strong> Covers skills for aerospace gunnery and piloting.</li>
+     *     <li><strong>ADMINISTRATORS:</strong> Includes administrative, negotiation, and scrounging skills.</li>
+     *     <li><strong>DEPENDENT or NONE:</strong> Returns no specific skills.</li>
+     * </ul>
+     *
+     * @param campaign  the current {@link Campaign}
+     * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true})
+     *                  or primary ({@code false}) profession of the character
+     * @return a {@link List} of skill identifiers ({@link String}) associated with the personnel's role,
+     *         possibly modified by campaign settings
+     */
+    public List<String> getProfessionSkills(final Campaign campaign, final boolean secondary) {
+        final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
+        final boolean isUseArtillery = campaign.getCampaignOptions().isUseArtillery();
+
+        return switch (profession) {
+            case MEKWARRIOR -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+                }
+            }
+            case LAM_PILOT -> List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK,
+                SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case GROUND_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER -> List.of(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER -> {
+                if (isUseArtillery) {
+                    yield List.of(SkillType.S_GUN_VEE, SkillType.S_ARTILLERY);
+                } else {
+                    yield List.of(SkillType.S_GUN_VEE);
+                }
+            }
+            case VEHICLE_CREW, MECHANIC -> List.of(SkillType.S_TECH_MECHANIC);
+            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> List.of(SkillType.S_PILOT_SPACE);
+            case VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE);
+            case VESSEL_CREW -> List.of(SkillType.S_TECH_VESSEL);
+            case VESSEL_NAVIGATOR -> List.of(SkillType.S_NAV);
+            case MEK_TECH -> List.of(SkillType.S_TECH_MEK);
+            case AERO_TEK -> List.of(SkillType.S_TECH_AERO);
+            case BA_TECH -> List.of(SkillType.S_TECH_BA);
+            case ASTECH -> List.of(SkillType.S_ASTECH);
+            case DOCTOR -> List.of(SkillType.S_DOCTOR);
+            case MEDIC -> List.of(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT,
+                 ADMINISTRATOR_HR -> List.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+            case DEPENDENT, NONE -> List.of(String.valueOf(SkillType.EXP_NONE));
+        };
     }
 
     /**
@@ -3923,7 +4077,7 @@ public class Person {
     public boolean isTechExpanded() {
         return isTechMek() || isTechAero() || isTechMechanic() || isTechBA() || isTechLargeVessel();
     }
-    
+
     public boolean isTechLargeVessel() {
         boolean hasSkill = hasSkill(SkillType.S_TECH_VESSEL);
         return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
@@ -3955,6 +4109,10 @@ public class Person {
 
     public boolean isDoctor() {
         return hasSkill(SkillType.S_DOCTOR) && (getPrimaryRole().isDoctor() || getSecondaryRole().isDoctor());
+    }
+
+    public boolean isDependent() {
+        return (getPrimaryRole().isDependent() || getSecondaryRole().isDependent());
     }
 
     public boolean isTaskOvertime(final IPartWork partWork) {

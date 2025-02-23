@@ -111,58 +111,6 @@ public enum Aggression {
 
     // region File I/O
     /**
-     * Parses a given string and returns the corresponding Aggression enum.
-     * Accepts either the ENUM ordinal value or its name
-     *
-     * @param aggression the string to be parsed
-     * @return the Aggression enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid
-     *                               Aggression
-     */
-    @Deprecated
-    public static Aggression parseFromString(final String aggression) {
-        return switch (aggression) {
-            case "0", "None" -> NONE;
-            // Minor Characteristics
-            case "1", "Bold" -> BOLD;
-            case "2", "Aggressive" -> AGGRESSIVE;
-            case "3", "Assertive" -> ASSERTIVE;
-            case "4", "Belligerent" -> BELLIGERENT;
-            case "5", "Brash" -> BRASH;
-            case "6", "Confident" -> CONFIDENT;
-            case "7", "Courageous" -> COURAGEOUS;
-            case "8", "Daring" -> DARING;
-            case "9", "Decisive" -> DECISIVE;
-            case "10", "Determined" -> DETERMINED;
-            case "11", "Domineering" -> DOMINEERING;
-            case "12", "Fearless" -> FEARLESS;
-            case "13", "Hostile" -> HOSTILE;
-            case "14", "Hot-Headed" -> HOT_HEADED;
-            case "15", "Impetuous" -> IMPETUOUS;
-            case "16", "Impulsive" -> IMPULSIVE;
-            case "17", "Inflexible" -> INFLEXIBLE;
-            case "18", "Intrepid" -> INTREPID;
-            case "19", "Overbearing" -> OVERBEARING;
-            case "20", "Reckless" -> RECKLESS;
-            case "21", "Resolute" -> RESOLUTE;
-            case "22", "Stubborn" -> STUBBORN;
-            case "23", "Tenacious" -> TENACIOUS;
-            case "24", "Vigilant" -> VIGILANT;
-            // Major Characteristics
-            case "25", "Bloodthirsty" -> BLOODTHIRSTY;
-            case "26", "Diplomatic" -> DIPLOMATIC;
-            case "27", "Murderous" -> MURDEROUS;
-            case "28", "Pacifistic" -> PACIFISTIC;
-            case "29", "Sadistic" -> SADISTIC;
-            case "30", "Savage" -> SAVAGE;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromString: "
-                                + aggression);
-        };
-    }
-
-    /**
      * Returns the {@link Aggression} associated with the given ordinal.
      *
      * @param ordinal the ordinal value of the {@link Aggression}
@@ -170,13 +118,11 @@ public enum Aggression {
      * {@code NONE} if not found
      */
     public static Aggression fromOrdinal(int ordinal) {
-        for (Aggression aggression : values()) {
-            if (aggression.ordinal() == ordinal) {
-                return aggression;
-            }
+        if ((ordinal >= 0) && (ordinal < values().length)) {
+            return values()[ordinal];
         }
 
-        final MMLogger logger = MMLogger.create(Aggression.class);
+        MMLogger logger = MMLogger.create(Aggression.class);
         logger.error(String.format("Unknown Aggression ordinal: %s - returning NONE.", ordinal));
 
         return NONE;

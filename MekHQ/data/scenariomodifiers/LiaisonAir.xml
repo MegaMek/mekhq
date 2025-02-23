@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-    <additionalBriefingText>Your employer has deployer an observer to monitor your performance.</additionalBriefingText>
+    <additionalBriefingText>Your employer has deployed an observer to monitor your performance.</additionalBriefingText>
     <benefitsPlayer>true</benefitsPlayer>
     <eventTiming>PreForceGeneration</eventTiming>
     <forceDefinition>
@@ -30,5 +30,8 @@
         <syncDeploymentType>SameEdge</syncDeploymentType>
         <syncedForceName>Player</syncedForceName>
         <useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>INTERCEPTOR</forceRole>
+        </roleChoices>
     </forceDefinition>
 </AtBScenarioModifier>

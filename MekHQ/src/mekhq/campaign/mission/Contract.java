@@ -2,7 +2,7 @@
  * Contract.java
  *
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2024 The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -135,6 +135,11 @@ public class Contract extends Mission {
         this.employer = s;
     }
 
+    /**
+     * Returns the contract length in months.
+     *
+     * @return the number and corresponding length of the contact in months as an integer
+    */
     public int getLength() {
         return nMonths;
     }
@@ -183,12 +188,20 @@ public class Contract extends Mission {
         return transportComp;
     }
 
+    public String getTransportCompString() {
+        return String.valueOf(transportComp) + "%";
+    }
+
     public void setTransportComp(int s) {
         transportComp = s;
     }
 
     public int getStraightSupport() {
         return straightSupport;
+    }
+
+    public String getStraightSupportString() {
+        return String.valueOf(straightSupport) + "%";
     }
 
     public void setStraightSupport(int s) {
@@ -215,12 +228,20 @@ public class Contract extends Mission {
         return battleLossComp;
     }
 
+    public String getBattleLossCompString() {
+        return String.valueOf(battleLossComp) + "%";
+    }
+
     public void setBattleLossComp(int s) {
         battleLossComp = Math.max(0, Math.min(100, s));
     }
 
     public int getSalvagePct() {
         return salvagePct;
+    }
+
+    public String getSalvagePctString() {
+        return String.valueOf(salvagePct) + "%";
     }
 
     public void setSalvagePct(int s) {
@@ -362,7 +383,7 @@ public class Contract extends Mission {
         return transitAmount;
     }
 
-    protected void setTransitAmount(Money amount) {
+    public void setTransitAmount(Money amount) {
         transitAmount = amount;
     }
 
@@ -682,19 +703,13 @@ public class Contract extends Mission {
 
     /**
      * Retrieves the percentage of shares for this contract.
-     * If the instance is of type AtBContract, it retrieves the dynamic Shares
-     * percentage.
-     * Otherwise, it returns a default value of 30.
+     * This currently returns a default value of 30.
      *
      * @return the percentage of shares
      */
     public int getSharesPercent() {
-        if (this instanceof AtBContract) {
-            return ((AtBContract) this).getAtBSharesPercentage();
-        } else {
-            // TODO make this campaign option configurable
-            return 30;
-        }
+        // TODO make this campaign option configurable
+        return 30;
     }
 
     @Override

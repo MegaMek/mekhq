@@ -23,6 +23,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
@@ -49,7 +50,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
     @Override
     public int getMapX() {
-        return 18 + getLanceCount();
+        return 18 + getForceCount();
     }
 
     @Override
@@ -80,9 +81,11 @@ public class ChaseBuiltInScenario extends AtBScenario {
             addBotForce(allyEntitiesForce, campaign);
         }
 
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
+        CombatTeam combatTeam = getCombatTeamById(campaign);
+        int weightClass = combatTeam != null ? combatTeam.getWeightClass(campaign) : EntityWeightClass.WEIGHT_LIGHT;
+        addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 0,
                 -1, campaign);
-        addEnemyForce(enemyEntities, getStrategicFormation(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT, 0,
+        addEnemyForce(enemyEntities, weightClass, EntityWeightClass.WEIGHT_ASSAULT, 0,
                 -1, campaign);
 
         BotForce botForce = getEnemyBotForce(getContract(campaign), startEdge, getEnemyHome(), enemyEntities);

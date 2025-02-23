@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,7 +23,9 @@ import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
@@ -32,7 +34,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
-import static mekhq.campaign.force.Force.STRATEGIC_FORMATION_OVERRIDE_NONE;
+import static mekhq.campaign.force.Force.COMBAT_TEAM_OVERRIDE_NONE;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -53,7 +55,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         if (value instanceof Unit unit) {
             String name = ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
-            if (((Unit) value).getEntity() instanceof GunEmplacement) {
+            if (unit.getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
             String c3network = "";
@@ -127,10 +129,21 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 transport.append("<br>Transported by: ")
                         .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
-            String text = name + ", " + unitName + c3network + transport;
+            String tacticalTransport = "";
+            if (unit.hasTacticalTransportAssignment()) {
+                transport.append("<br>Transported by: ")
+                    .append(unit.getTacticalTransportAssignment().getTransport().getName());
+            }
+            String towTransport = "";
+            if (unit.hasTransportAssignment(CampaignTransportType.TOW_TRANSPORT)) {
+                transport.append("<br>Towed by: ")
+                    .append(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT).getTransport().getName());
+            }
+
+            String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
             Force force = unit.getCampaign().getForce(unit.getForceId());
-            if((null != person) && (null != force) && (person.getId() == force.getForceCommanderID())) {
+            if((null != person) && (null != force) && (person.getId().equals(force.getForceCommanderID()))) {
                 text = "<b>" + text + "</b>";
             }
             setText("<html>" + text + "</html>");
@@ -149,16 +162,18 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 setOpaque(true);
             }
 
-            String format;
-            if (force.isStrategicFormation()) {
-                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
-                    "<html><b><u>%s</u></b></html>" : "<html><b>%s</b></html>";
-            } else {
-                format = (force.getOverrideStrategicFormation() != STRATEGIC_FORMATION_OVERRIDE_NONE) ?
-                    "<html><u>%s</u></html>" : "%s";
-            }
+            ForceType forceType = force.getForceType();
+            String typeKey = forceType.getSymbol();
 
-            setText(String.format(format, force.getName()));
+            String formattedForceName = String.format("<html>%s%s%s%s%s%s</html>",
+                force.isCombatTeam() ? "<b>" : "",
+                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "<u>" : "",
+                force.getName(),
+                force.isCombatTeam() ? "</b>" : "",
+                force.getOverrideCombatTeam() != COMBAT_TEAM_OVERRIDE_NONE ? "</u>" : "",
+                typeKey);
+
+            setText(formattedForceName);
         } else {
             logger.error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));

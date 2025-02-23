@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 MegaMek team
+ * Copyright (C) 2016-2025 MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -18,22 +18,15 @@
  */
 package mekhq.campaign.universe;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.logging.MMLogger;
-import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.*;
 
 /** Static method only helper class for stars */
 public final class StarUtil {
@@ -67,6 +60,7 @@ public final class StarUtil {
     public static final double SOLAR_TEMP = 5778.0;
     /** Gravitational constant (in m^3 kg^-1 s^-2 */
     public static final double GRAV_CONSTANT = 6.673848e-11;
+    private static final double STEFAN_BOLTZMANN_CONSTANT = 5.67e-8;
 
     // Temperature, mass, luminosity and size are all linked together. When
     // modifying those tables,
@@ -130,7 +124,7 @@ public final class StarUtil {
 
     // taken from Dropships and Jumpships sourcebook, pg. 17. L- and T-classes
     // estimated
-    private static final double[] DISTANCE_TO_JUMP_POINT = {
+    public static final double[] DISTANCE_TO_JUMP_POINT = {
             Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
             Double.POSITIVE_INFINITY,
             Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -155,22 +149,22 @@ public final class StarUtil {
 
     // Slightly modified IO Beta table
     private static final int[] REALISTIC_SPECTRAL_TYPE = {
-            PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_G,
-            PlanetarySystem.SPECTRAL_K, PlanetarySystem.SPECTRAL_M,
-            PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M,
-            PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_L, -1 };
+            StarType.SPECTRAL_F, StarType.SPECTRAL_M, StarType.SPECTRAL_G,
+        StarType.SPECTRAL_K, StarType.SPECTRAL_M,
+            StarType.SPECTRAL_M, StarType.SPECTRAL_M, StarType.SPECTRAL_M,
+            StarType.SPECTRAL_M, StarType.SPECTRAL_L, -1 };
 
     private static final int[] HOT_SPECTRAL_TYPE = {
-            PlanetarySystem.SPECTRAL_B, PlanetarySystem.SPECTRAL_B, PlanetarySystem.SPECTRAL_A,
-            PlanetarySystem.SPECTRAL_A, PlanetarySystem.SPECTRAL_A,
-            PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F,
-            PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F };
+            StarType.SPECTRAL_B, StarType.SPECTRAL_B, StarType.SPECTRAL_A,
+            StarType.SPECTRAL_A, StarType.SPECTRAL_A,
+            StarType.SPECTRAL_F, StarType.SPECTRAL_F, StarType.SPECTRAL_F,
+            StarType.SPECTRAL_F, StarType.SPECTRAL_F, StarType.SPECTRAL_F };
 
     private static final int[] LIFEFRIENDLY_SPECTRAL_TYPE = new int[] {
-            PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M, PlanetarySystem.SPECTRAL_M,
-            PlanetarySystem.SPECTRAL_K, PlanetarySystem.SPECTRAL_K,
-            PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_G, PlanetarySystem.SPECTRAL_F,
-            PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F, PlanetarySystem.SPECTRAL_F };
+            StarType.SPECTRAL_M, StarType.SPECTRAL_M, StarType.SPECTRAL_M,
+            StarType.SPECTRAL_K, StarType.SPECTRAL_K,
+            StarType.SPECTRAL_G, StarType.SPECTRAL_G, StarType.SPECTRAL_F,
+            StarType.SPECTRAL_F, StarType.SPECTRAL_F, StarType.SPECTRAL_F };
 
     private static final double[] MIN_LIFE_ZONE = {
             Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -218,13 +212,13 @@ public final class StarUtil {
             328645.0, 277705.0, 231795.0, 190715.0, 154262.0
     };
 
-    private static final double[] RECHARGE_HOURS_CLASS_L = {
+    public static final double[] RECHARGE_HOURS_CLASS_L = {
             512.0, 616.0, 717.0, 901.0, 1142.0, 1462.0, 1767.0, 2325.0, 3617.0, 5038.0, 7973.0 };
 
-    private static final double[] RECHARGE_HOURS_CLASS_T = {
+    public static final double[] RECHARGE_HOURS_CLASS_T = {
             7973.0, 13371.0, 21315.0, 35876.0, 70424.0, 134352.0, 215620.0, 32188.0, 569703.0, 892922.0, 10000000.0 };
 
-    private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<>();
+    public static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<>();
     static {
         VALID_WHITE_DWARF_SUBCLASSES.addAll(Arrays.asList(
                 ("A,B,O,Q,Z,AB,AO,AQ,AZ,BO,BQ,BZ,QZ,ABO,ABQ,ABZ,AOQ,AOZ,AQZ,BOQ,"
@@ -240,28 +234,6 @@ public final class StarUtil {
     private static boolean starIconDataLoaded = false;
 
     // Generators
-
-    public static String generateSpectralType(Random rnd, boolean lifeFriendly) {
-        return generateSpectralType(rnd, lifeFriendly, -1);
-    }
-
-    public static String generateSpectralType(Random rnd, boolean lifeFriendly, int spectralTypeOverride) {
-        int spectralType = spectralTypeOverride;
-        if (spectralTypeOverride < 0) {
-            if (lifeFriendly) {
-                spectralType = LIFEFRIENDLY_SPECTRAL_TYPE[rnd.nextInt(6) + rnd.nextInt(6)];
-            } else {
-                spectralType = REALISTIC_SPECTRAL_TYPE[rnd.nextInt(6) + rnd.nextInt(6)];
-                if (spectralType < 0) {
-                    spectralType = HOT_SPECTRAL_TYPE[rnd.nextInt(6) + rnd.nextInt(6)];
-                }
-            }
-        }
-        // Slightly weighted towards the higher numbers
-        int subType = (int) Math.floor(MathUtility.lerp(0.0, 10.0, Math.pow(rnd.nextDouble(), 0.8)));
-        return getSpectralType(spectralType, subType * 1.0, PlanetarySystem.LUM_V);
-    }
-
     public static double generateTemperature(Random rnd, int spectral, double subtype) {
         return MathUtility.lerp(getMinTemperature(spectral, subtype), getMaxTemperature(spectral, subtype),
                 rnd.nextDouble());
@@ -354,404 +326,6 @@ public final class StarUtil {
         return 0.0;
     }
 
-    /**
-     * Distance to jump point given a spectral class and subtype measured in
-     * kilometers
-     */
-    public static double getDistanceToJumpPoint(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int) subtype;
-        double remainder = subtype - (int) subtype;
-        return MathUtility.lerp(getDistanceToJumpPoint(spectralTypeNumber), getDistanceToJumpPoint(spectralTypeNumber),
-                remainder);
-    }
-
-    public static double getMaxLifeZone(int spectralTypeNumber) {
-        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MAX_LIFE_ZONE.length)) {
-            return MAX_LIFE_ZONE[spectralTypeNumber];
-        }
-        return 0.0;
-    }
-
-    public static double getMaxLifeZone(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int) subtype;
-        double remainder = subtype - (int) subtype;
-        return MathUtility.lerp(getMaxLifeZone(spectralTypeNumber), getMaxLifeZone(spectralTypeNumber), remainder);
-    }
-
-    public static double getMinLifeZone(int spectralTypeNumber) {
-        if ((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_LIFE_ZONE.length)) {
-            return MIN_LIFE_ZONE[spectralTypeNumber];
-        }
-        return 0.0;
-    }
-
-    public static double getMinLifeZone(int spectral, double subtype) {
-        int spectralTypeNumber = spectral * 10 + (int) subtype;
-        double remainder = subtype - (int) subtype;
-        return MathUtility.lerp(getMinLifeZone(spectralTypeNumber), getMinLifeZone(spectralTypeNumber), remainder);
-    }
-
-    public static double getSolarRechargeTime(int spectralClass, double subtype) {
-        if (spectralClass == PlanetarySystem.SPECTRAL_Q) {
-            // Not a star, can't recharge here
-            return Double.POSITIVE_INFINITY;
-        }
-        int intSubtype = (int) subtype;
-        if (spectralClass == PlanetarySystem.SPECTRAL_T) {
-            // months!
-            return MathUtility.lerp(RECHARGE_HOURS_CLASS_T[intSubtype], RECHARGE_HOURS_CLASS_T[intSubtype + 1],
-                    subtype - intSubtype);
-        } else if (spectralClass == PlanetarySystem.SPECTRAL_L) {
-            // weeks!
-            return MathUtility.lerp(RECHARGE_HOURS_CLASS_L[intSubtype], RECHARGE_HOURS_CLASS_L[intSubtype + 1],
-                    subtype - intSubtype);
-        } else {
-            return 141 + 10 * spectralClass + subtype;
-        }
-    }
-
-    public static int getSpectralClassFrom(String spectral) {
-        switch (spectral.trim().toUpperCase(Locale.ROOT)) {
-            case "O":
-                return PlanetarySystem.SPECTRAL_O;
-            case "B":
-                return PlanetarySystem.SPECTRAL_B;
-            case "A":
-                return PlanetarySystem.SPECTRAL_A;
-            case "F":
-                return PlanetarySystem.SPECTRAL_F;
-            case "G":
-                return PlanetarySystem.SPECTRAL_G;
-            case "K":
-                return PlanetarySystem.SPECTRAL_K;
-            case "M":
-                return PlanetarySystem.SPECTRAL_M;
-            case "L":
-                return PlanetarySystem.SPECTRAL_L;
-            case "T":
-                return PlanetarySystem.SPECTRAL_T;
-            case "Y":
-                return PlanetarySystem.SPECTRAL_Y;
-            default:
-                return -1;
-        }
-    }
-
-    public static String getSpectralClassName(int spectral) {
-        switch (spectral) {
-            case PlanetarySystem.SPECTRAL_O:
-                return "O";
-            case PlanetarySystem.SPECTRAL_B:
-                return "B";
-            case PlanetarySystem.SPECTRAL_A:
-                return "A";
-            case PlanetarySystem.SPECTRAL_F:
-                return "F";
-            case PlanetarySystem.SPECTRAL_G:
-                return "G";
-            case PlanetarySystem.SPECTRAL_K:
-                return "K";
-            case PlanetarySystem.SPECTRAL_M:
-                return "M";
-            case PlanetarySystem.SPECTRAL_L:
-                return "L";
-            case PlanetarySystem.SPECTRAL_T:
-                return "T";
-            case PlanetarySystem.SPECTRAL_Y:
-                return "Y";
-            default:
-                return "?";
-        }
-    }
-
-    /**
-     * @return canonical name for the given combination of spectral class, subtype
-     *         and luminosity
-     */
-    public static String getSpectralType(Integer spectralClass, Double subtype, String luminosity) {
-        if (null == spectralClass || null == subtype) {
-            return null;
-        }
-
-        if (spectralClass == PlanetarySystem.SPECTRAL_Q) {
-            return (null != luminosity) ? "Q" + luminosity : "Q";
-        }
-
-        // Formatting subtype value up to two decimal points, if needed
-        int subtypeValue = MathUtility.clamp((int) Math.round(subtype * 100d), 0, 999);
-
-        String subtypeFormat = "%.2f";
-        if (subtypeValue % 100 == 0) {
-            subtypeFormat = "%.0f";
-        } else if (subtypeValue % 10 == 0) {
-            subtypeFormat = "%.1f";
-        }
-
-        if (null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI)) {
-            // subdwarfs
-            return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
-        } else if (null != luminosity && luminosity.equals(PlanetarySystem.LUM_VI_PLUS)) {
-            // extreme subdwarfs
-            return "esd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0);
-        } else if (null != luminosity && luminosity.equals(PlanetarySystem.LUM_VII)) {
-            // white dwarfs
-            return String.format(Locale.ROOT, "D" + subtypeFormat, subtypeValue / 100.0);
-        } else {
-            // main class
-            return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s",
-                    getSpectralClassName(spectralClass),
-                    subtypeValue / 100.0, (null != luminosity ? luminosity : PlanetarySystem.LUM_V));
-        }
-    }
-
-    /** Parser for spectral type strings */
-    public static SpectralDefinition parseSpectralType(String type) {
-        if ((null == type) || type.isEmpty()) {
-            return null;
-        }
-
-        // We make sure to not rewrite the subtype, in case we need whatever special
-        // part is behind it
-        String parsedSpectralType = type;
-        Integer parsedSpectralClass = null;
-        Double parsedSubtype = null;
-        String parsedLuminosity = null;
-
-        // Non-stellar objects
-        if (type.startsWith("Q")) {
-            return new SpectralDefinition(type, PlanetarySystem.SPECTRAL_Q, 0.0, type.substring(1));
-        }
-
-        // Subdwarf prefix parsing
-        if ((type.length() > 2) && type.startsWith("sd")) {
-            // subdwarf
-            parsedLuminosity = PlanetarySystem.LUM_VI;
-            type = type.substring(2);
-        } else if ((type.length() > 3) && type.startsWith("esd")) {
-            // extreme subdwarf
-            parsedLuminosity = PlanetarySystem.LUM_VI_PLUS;
-            type = type.substring(3);
-        }
-
-        if (type.length() < 1) {
-            // We can't parse an empty string
-            return null;
-        }
-        String mainClass = type.substring(0, 1);
-
-        if (mainClass.equals("D") && type.length() > 1 && null == parsedLuminosity /* prevent "sdD..." */) {
-            // white dwarf
-            parsedLuminosity = PlanetarySystem.LUM_VII;
-            String whiteDwarfVariant = type.substring(1).replaceAll("([A-Z]*).*?$", "$1");
-            if (!VALID_WHITE_DWARF_SUBCLASSES.contains(whiteDwarfVariant)) {
-                // Don't just make up D-class variants, that's silly ...
-                return null;
-            }
-            String subTypeString = type.substring(1 + whiteDwarfVariant.length()).replaceAll("^([0-9\\.]*).*?$", "$1");
-            try {
-                parsedSubtype = Double.parseDouble(subTypeString);
-            } catch (NumberFormatException nfex) {
-                return null;
-            }
-            // We're done here, white dwarfs have a special spectral class
-            parsedSpectralClass = PlanetarySystem.SPECTRAL_D;
-        } else if (getSpectralClassFrom(mainClass) >= 0) {
-            parsedSpectralClass = getSpectralClassFrom(mainClass);
-            String subTypeString = type.length() > 1 ? type.substring(1).replaceAll("^([0-9\\.]*).*?$", "$1") : "5" /*
-                                                                                                                     * default
-                                                                                                                     */;
-            try {
-                parsedSubtype = Double.parseDouble(subTypeString);
-            } catch (NumberFormatException nfex) {
-                return null;
-            }
-            if (type.length() > 1 + subTypeString.length() && null == parsedLuminosity) {
-                // We might have a luminosity, try to parse it
-                parsedLuminosity = validateLuminosity(type.substring(1 + subTypeString.length()));
-                // Taharqa: This was code from akjosch, trying to be all realistic. However, the
-                // code in Campaign Ops conflicts with this which causes null values and NPE
-                // bugs, so
-                // I don't really care how white dwarfs really work
-                // if ( null != parsedLuminosity &&
-                // parsedLuminosity.equals(PlanetarySystem.LUM_VII) ) {
-                // That's not how white dwarfs work
-                // return null;
-                // }
-            }
-        }
-
-        if (null != parsedSpectralClass && null != parsedLuminosity) {
-            return new SpectralDefinition(parsedSpectralType, parsedSpectralClass, parsedSubtype, parsedLuminosity);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @param lc string which starts with some luminosity description
-     * @return the canonical luminosity string based on how this string starts, or
-     *         <i>null</i> if it doesn't look like luminosity
-     */
-    private static String validateLuminosity(String lc) {
-        // The order of entries here is important
-        if (lc.startsWith("I/II")) {
-            return PlanetarySystem.LUM_II_EVOLVED;
-        }
-        if (lc.startsWith("I-II")) {
-            return PlanetarySystem.LUM_II_EVOLVED;
-        }
-        if (lc.startsWith("Ib/II")) {
-            return PlanetarySystem.LUM_II_EVOLVED;
-        }
-        if (lc.startsWith("Ib-II")) {
-            return PlanetarySystem.LUM_II_EVOLVED;
-        }
-        if (lc.startsWith("II/III")) {
-            return PlanetarySystem.LUM_III_EVOLVED;
-        }
-        if (lc.startsWith("II-III")) {
-            return PlanetarySystem.LUM_III_EVOLVED;
-        }
-        if (lc.startsWith("III/IV")) {
-            return PlanetarySystem.LUM_IV_EVOLVED;
-        }
-        if (lc.startsWith("III-IV")) {
-            return PlanetarySystem.LUM_IV_EVOLVED;
-        }
-        if (lc.startsWith("IV/V")) {
-            return PlanetarySystem.LUM_V_EVOLVED;
-        }
-        if (lc.startsWith("IV-V")) {
-            return PlanetarySystem.LUM_V_EVOLVED;
-        }
-        if (lc.startsWith("III")) {
-            return PlanetarySystem.LUM_III;
-        }
-        if (lc.startsWith("II")) {
-            return PlanetarySystem.LUM_II;
-        }
-        if (lc.startsWith("IV")) {
-            return PlanetarySystem.LUM_IV;
-        }
-        if (lc.startsWith("Ia-0")) {
-            return PlanetarySystem.LUM_0;
-        } // Alias
-        if (lc.startsWith("Ia0")) {
-            return PlanetarySystem.LUM_0;
-        } // Alias
-        if (lc.startsWith("Ia+")) {
-            return PlanetarySystem.LUM_0;
-        } // Alias
-        if (lc.startsWith("Iab")) {
-            return PlanetarySystem.LUM_IAB;
-        }
-        if (lc.startsWith("Ia")) {
-            return PlanetarySystem.LUM_IA;
-        }
-        if (lc.startsWith("Ib")) {
-            return PlanetarySystem.LUM_IB;
-        }
-        if (lc.startsWith("I")) {
-            return PlanetarySystem.LUM_I;
-        } // includes Ia, Iab and Ib
-        if (lc.startsWith("O")) {
-            return PlanetarySystem.LUM_0;
-        }
-        if (lc.startsWith("VII")) {
-            return PlanetarySystem.LUM_VII;
-        }
-        if (lc.startsWith("VI+")) {
-            return PlanetarySystem.LUM_VI_PLUS;
-        }
-        if (lc.startsWith("VI")) {
-            return PlanetarySystem.LUM_VI;
-        }
-        if (lc.startsWith("V")) {
-            return PlanetarySystem.LUM_V;
-        }
-        return null;
-    }
-
-    public static String getPopulationRatingString(int pops) {
-        if (pops < 0) {
-            return "None";
-        }
-        switch (pops) {
-            case 0:
-                return "Few";
-            case 1:
-                return "Tens";
-            case 2:
-                return "Hundreds";
-            case 3:
-                return "Thousands";
-            case 4:
-                return "Tens of thousands";
-            case 5:
-                return "Hundreds of thousands";
-            case 6:
-                return "Millions";
-            case 7:
-                return "Tens of millions";
-            case 8:
-                return "Hundreds of millions";
-            case 9:
-                return "Billions";
-            case 10:
-                return "Tens of billions";
-            case 11:
-                return "Hundreds of billions";
-            case 12:
-                return "Trillions";
-            default:
-                return "Uncountable";
-        }
-    }
-
-    public static String getControlRatingString(int cr) {
-        if (cr < 0) {
-            return "in total anarchy";
-        }
-        switch (cr) {
-            case 0:
-                return "in anarchy";
-            case 1:
-                return "very free society";
-            case 2:
-                return "free society";
-            case 3:
-                return "moderately free society";
-            case 4:
-                return "controlled society";
-            case 5:
-                return "repressive";
-            case 6:
-                return "under total control";
-            default:
-                return "enslaved population";
-        }
-    }
-
-    public static String getHPGClass(Integer hpg) {
-        if (null == hpg) {
-            return null;
-        }
-        switch (hpg) {
-            case EquipmentType.RATING_A:
-                return "A-rated HPG";
-            case EquipmentType.RATING_B:
-                return "B-rated HPG";
-            case EquipmentType.RATING_C:
-                return "C-rated Service (pony express)";
-            case EquipmentType.RATING_D:
-                return "D-rated Service (pony express)";
-            case EquipmentType.RATING_X:
-                return "none";
-            default:
-                return "unknown";
-        }
-    }
-
     public static String getIconImage(Planet planet) {
         if (!planetIconDataLoaded) {
             try (FileReader fr = new FileReader(new File("data", PLANET_ICON_DATA_FILE));
@@ -802,7 +376,63 @@ public final class StarUtil {
         return STAR_ICON_DATA.get(ObjectUtility.nonNull(system.getIcon(), "default"));
     }
 
-    private StarUtil() {
+    /**
+     * Estimates the radius of a star using its luminosity and temperature, based on the
+     * Stefan-Boltzmann law:
+     * <pre>
+     * R = √(L / (4πσT^4))
+     * </pre>
+     *
+     * Where:
+     * <ul>
+     *     <li><b>R</b> is the radius of the star (in meters).</li>
+     *     <li><b>L</b> is the luminosity of the star (in watts).</li>
+     *     <li><b>T</b> is the effective temperature of the star (in Kelvin).</li>
+     *     <li><b>σ</b> is the Stefan-Boltzmann constant (5.67 × 10^-8 W·m^-2 · K^-4).</li>
+     * </ul>
+     *
+     * @param luminosity The luminosity of the star in watts. Must be greater than 0.
+     * @param temperature The effective temperature of the star in Kelvin. Must be greater than 0.
+     * @return The radius of the star in meters.
+     * @throws IllegalArgumentException if luminosity or temperature is less than or equal to 0.
+     */
+    public static double estimateStarRadius(double luminosity, double temperature) {
+        // Temperature raised to the 4th power
+        double temperaturePower4 = Math.pow(temperature, 4);
 
+        // Denominator: 4 * π * σ * T^4
+        double denominator = 4 * Math.PI * STEFAN_BOLTZMANN_CONSTANT * temperaturePower4;
+
+        // Radius calculation
+        return Math.sqrt(luminosity / denominator);
+    }
+
+    /**
+     * Calculates the spectral type number for a planetary system by combining its spectral class
+     * and spectral subclass. The spectral class is multiplied by 10, and the subclass is extracted
+     * as a numeric value from the provided spectral type string.
+     *
+     * <p>The spectral type is a combination of letters and numbers (e.g., "F5V").
+     * This method extracts the numeric part (e.g., "5") from the spectral type and adds it to the
+     * spectral class (multiplied by 10).</p>
+     *
+     * @param spectralClass The spectral class of the planetary system as an integer. Multiplied by
+     *                     10 in the calculation.
+     * @param spectralType The spectral type of the planetary system as a string (e.g., "F5V"),
+     *                     from which the subclass (numeric portion) will be extracted.
+     * @return The combined spectral type number, calculated as {@code spectralClass * 10 + spectralSubClass},
+     *         where {@code spectralSubClass} is the numeric portion of the spectral type string.
+     */
+    public static int getSpectralTypeNumber(int spectralClass, String spectralType) {
+        spectralClass *= 10;
+
+        int spectralSubClass = 5;
+        try {
+            spectralSubClass = Integer.parseInt(spectralType.replaceAll("\\D", ""));
+        } catch (NumberFormatException e) {
+            logger.info("Failed to fetch spectralSubClass from spectralType: " + spectralType);
+        }
+
+        return spectralClass + spectralSubClass;
     }
 }

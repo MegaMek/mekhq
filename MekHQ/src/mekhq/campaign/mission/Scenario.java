@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2011-2016 - The MegaMek Team. All Rights Reserved.
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,34 +22,13 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.Vector;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.planetaryconditions.BlowingSand;
-import megamek.common.planetaryconditions.EMI;
-import megamek.common.planetaryconditions.Fog;
-import megamek.common.planetaryconditions.Light;
-import megamek.common.planetaryconditions.PlanetaryConditions;
-import megamek.common.planetaryconditions.Weather;
-import megamek.common.planetaryconditions.Wind;
+import megamek.common.planetaryconditions.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -58,8 +38,17 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -78,6 +67,7 @@ public class Scenario implements IPlayerSettings {
     private int boardType = T_GROUND;
 
     private String name;
+    private ScenarioType stratConScenarioType;
     private String desc;
     private String report;
     private ScenarioStatus status;
@@ -100,6 +90,9 @@ public class Scenario implements IPlayerSettings {
     /** Lists of enemy forces **/
     protected List<BotForce> botForces;
     protected List<BotForceStub> botForcesStubs;
+
+    // linked Interception Scenario
+    private int linkedScenarioID;
 
     // stores external id of bot forces
     private Map<String, Entity> externalIDLookup;
@@ -145,8 +138,9 @@ public class Scenario implements IPlayerSettings {
         this(null);
     }
 
-    public Scenario(String n) {
-        this.name = n;
+    public Scenario(String name) {
+        this.name = name;
+        stratConScenarioType = ScenarioType.NONE;
         desc = "";
         report = "";
         setStatus(ScenarioStatus.CURRENT);
@@ -159,6 +153,7 @@ public class Scenario implements IPlayerSettings {
         botForces = new ArrayList<>();
         botForcesStubs = new ArrayList<>();
         externalIDLookup = new HashMap<>();
+        linkedScenarioID = 0;
 
         light = Light.DAY;
         weather = Weather.CLEAR;
@@ -193,6 +188,14 @@ public class Scenario implements IPlayerSettings {
         this.name = n;
     }
 
+    public ScenarioType getStratConScenarioType() {
+        return stratConScenarioType;
+    }
+
+    public void setStratConScenarioType(ScenarioType type) {
+        this.stratConScenarioType = type;
+    }
+
     public String getDescription() {
         return desc;
     }
@@ -225,6 +228,14 @@ public class Scenario implements IPlayerSettings {
         this.date = date;
     }
 
+    public int getLinkedScenario() {
+        return linkedScenarioID;
+    }
+
+    public void setlinkedScenarioID(int ScenarioID) {
+        linkedScenarioID = ScenarioID;
+    }
+
     public boolean hasObjectives() {
         return (scenarioObjectives != null) && !scenarioObjectives.isEmpty();
     }
@@ -248,6 +259,7 @@ public class Scenario implements IPlayerSettings {
         this.cloaked = cloaked;
     }
 
+    @Override
     public int getStartingPos() {
         return startingPos;
     }
@@ -472,7 +484,7 @@ public class Scenario implements IPlayerSettings {
 
     /**
      * Create a PlanetaryConditions object from variables
-     * 
+     *
      * @return PlanetaryConditions object
      */
     public PlanetaryConditions createPlanetaryConditions() {
@@ -498,7 +510,7 @@ public class Scenario implements IPlayerSettings {
      * Read the values from a PlanetaryConditions object into the Scenario variables
      * for planetary conditions.
      * This is necessary because MekHQ has XML and MegaMek doesn't.
-     * 
+     *
      * @param planetaryConditions A PlanetaryConditions object
      */
     public void readPlanetaryConditions(PlanetaryConditions planetaryConditions) {
@@ -531,7 +543,7 @@ public class Scenario implements IPlayerSettings {
 
     /**
      * Adds a transport-cargo pair to the internal transport relationship store.
-     * 
+     *
      * @param transportId the UUID of the transport object
      * @param cargoId     the UUID of the cargo being transported
      */
@@ -701,7 +713,7 @@ public class Scenario implements IPlayerSettings {
      * Get a List of all traitor Units in this scenario. This function just combines
      * the results from
      * BotForce#getTraitorUnits across all BotForces.
-     * 
+     *
      * @param c - A Campaign pointer
      * @return a List of traitor Units
      */
@@ -718,7 +730,7 @@ public class Scenario implements IPlayerSettings {
      * external id values. This should
      * also be usable against entities that are ejected pilots from the original
      * traitor entity.
-     * 
+     *
      * @param en a MegaMek Entity
      * @param c  a Campaign pointer
      * @return a boolean indicating whether this entity is a traitor in this
@@ -736,16 +748,14 @@ public class Scenario implements IPlayerSettings {
         }
         // also make sure that the crew's external id does not match a traitor in
         // case of ejected pilots
-        if ((null != en.getCrew()) && !"-1".equals(en.getCrew().getExternalIdAsString()) &&
-                isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()))) {
-            return true;
-        }
-        return false;
+        return (null != en.getCrew())
+            && !"-1".equals(en.getCrew().getExternalIdAsString())
+            && isTraitor(UUID.fromString(en.getCrew().getExternalIdAsString()));
     }
 
     /**
      * Given a Person's id, is that person a traitor in this Scenario
-     * 
+     *
      * @param personId - a UUID giving a person's id in the campaign
      * @return a boolean indicating if this person is a traitor in the Scenario
      */
@@ -772,7 +782,7 @@ public class Scenario implements IPlayerSettings {
      * the unit type will be checked to make sure it is valid. The function also
      * checks to see if the unit is
      * a traitor unit which will disallow deployment.
-     * 
+     *
      * @param unit     - The Unit to be deployed
      * @param campaign - a pointer to the Campaign
      * @return true if the unit is eligible, otherwise false
@@ -809,10 +819,7 @@ public class Scenario implements IPlayerSettings {
             }
         }
         if (null != deploymentLimit) {
-            if ((deploymentLimit.getCurrentQuantity(this, campaign) + additionalQuantity) > deploymentLimit
-                    .getQuantityCap(campaign)) {
-                return false;
-            }
+            return (deploymentLimit.getCurrentQuantity(this, campaign) + additionalQuantity) <= deploymentLimit.getQuantityCap(campaign);
         }
         return true;
     }
@@ -839,10 +846,7 @@ public class Scenario implements IPlayerSettings {
             }
         }
         if (null != deploymentLimit) {
-            if ((deploymentLimit.getCurrentQuantity(this, c) + additionalQuantity) > deploymentLimit
-                    .getQuantityCap(c)) {
-                return false;
-            }
+            return (deploymentLimit.getCurrentQuantity(this, c) + additionalQuantity) <= deploymentLimit.getQuantityCap(c);
         }
         return true;
     }
@@ -866,6 +870,7 @@ public class Scenario implements IPlayerSettings {
     }
 
     public boolean canStartScenario(Campaign c) {
+
         if (!getStatus().isCurrent()) {
             return false;
         }
@@ -875,10 +880,7 @@ public class Scenario implements IPlayerSettings {
         if (!includesRequiredPersonnel(c)) {
             return false;
         }
-        if (!includesRequiredUnits(c)) {
-            return false;
-        }
-        return true;
+        return includesRequiredUnits(c);
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -889,6 +891,7 @@ public class Scenario implements IPlayerSettings {
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenario", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConScenarioType", stratConScenarioType.name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "report", report);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingPos", startingPos);
@@ -900,6 +903,7 @@ public class Scenario implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEy", startingAnySEy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "linkedScenarioID", linkedScenarioID);
         if (null != stub) {
             stub.writeToXML(pw, indent);
         } else {
@@ -1023,6 +1027,8 @@ public class Scenario implements IPlayerSettings {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.setName(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("stratConScenarioType")) {
+                    retVal.setStratConScenarioType(ScenarioType.parseFromString(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(ScenarioStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
@@ -1033,6 +1039,8 @@ public class Scenario implements IPlayerSettings {
                     retVal.setReport(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
                     retVal.stub = ForceStub.generateInstanceFromXML(wn2, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("linkedScenarioID")) {
+                    retVal.linkedScenarioID = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cloaked")) {

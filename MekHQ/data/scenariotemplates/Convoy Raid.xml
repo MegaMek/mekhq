@@ -77,7 +77,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
+                <allowedUnitType>1</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
@@ -107,7 +107,6 @@
                 <roleChoices>
                     <forceRole>CIVILIAN</forceRole>
                     <forceRole>CARGO</forceRole>
-                    <forceRole>SUPPORT</forceRole>
                     <forceRole>APC</forceRole>
                 </roleChoices>
             </value>
@@ -148,15 +147,14 @@
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
+                    <effectType>SupplyCache</effectType>
                     <effectScaling>Linear</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects />
             <additionalDetails />
-            <description>Capture intact units from the following force(s) for additional support
-                points:</description>
+            <description>Capture intact units from the following force(s) for additional support points:</description>
             <destinationEdge>NONE</destinationEdge>
             <fixedAmount>1</fixedAmount>
             <objectiveCriterion>Capture</objectiveCriterion>

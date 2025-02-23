@@ -33,5 +33,8 @@
 		<syncDeploymentType>SameEdge</syncDeploymentType>
 		<syncedForceName>OpFor</syncedForceName>
 		<useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>COMMAND</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

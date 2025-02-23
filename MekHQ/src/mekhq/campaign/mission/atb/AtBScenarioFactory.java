@@ -21,13 +21,15 @@ package mekhq.campaign.mission.atb;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.StrategicFormation;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.scenario.*;
 
 import java.time.LocalDate;
 import java.util.*;
+
+import static mekhq.campaign.mission.AtBScenario.NO_COMBAT_TEAM;
 
 public class AtBScenarioFactory {
     private static final MMLogger logger = MMLogger.create(AtBScenarioFactory.class);
@@ -67,7 +69,7 @@ public class AtBScenarioFactory {
         return scenarioMap.get(type);
     }
 
-    public static AtBScenario createScenario(Campaign c, StrategicFormation lance, int type, boolean attacker, LocalDate date) {
+    public static AtBScenario createScenario(Campaign c, CombatTeam lance, int type, boolean attacker, LocalDate date) {
         List<Class<IAtBScenario>> classList = getScenarios(type);
         Class<IAtBScenario> selectedClass;
 
@@ -126,9 +128,9 @@ public class AtBScenarioFactory {
         }
 
         // If we have an active contract, then we can progress with generation
-        Hashtable<Integer, StrategicFormation> strategicFormations = campaign.getStrategicFormationsTable();
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsTable();
 
-        List<AtBScenario> sList;
+        List<AtBScenario> scenarios;
         List<Integer> assignedLances = new ArrayList<>();
         List<Integer> dontGenerateForces;
         boolean hasBaseAttack;
@@ -137,7 +139,7 @@ public class AtBScenarioFactory {
         // We only need to process active AtB contracts that haven't hit their end date
         for (final AtBContract contract : campaign.getActiveAtBContracts()) {
             // region Value Initialization
-            sList = new ArrayList<>();
+            scenarios = new ArrayList<>();
             dontGenerateForces = new ArrayList<>();
             hasBaseAttack = false;
             hasBaseAttackAttacker = false;
@@ -151,13 +153,15 @@ public class AtBScenarioFactory {
             // the generation rules are followed for all active scenarios not just new
             // scenarios
             for (final AtBScenario scenario : contract.getCurrentAtBScenarios()) {
-                // Add any currently assigned strategicFormations to the assignedLances
-                assignedLances.add(scenario.getStrategicFormationId());
+                // Add any currently assigned combatTeamsTable to the assignedLances
+                if (scenario.getCombatTeamId() != NO_COMBAT_TEAM) {
+                    assignedLances.add(scenario.getCombatTeamId());
+                }
 
                 // Remove any active scenarios from the contract, and add them to the current
                 // scenarios list instead
                 contract.getScenarios().remove(scenario);
-                sList.add(scenario);
+                scenarios.add(scenario);
                 dontGenerateForces.add(scenario.getId());
 
                 // If we have a current base attack (attacker) scenario, no other scenarios
@@ -174,14 +178,14 @@ public class AtBScenarioFactory {
             // endregion Current Scenarios
 
             // region Generate Scenarios
-            // Generate scenarios for strategicFormations based on their current situation
+            // Generate scenarios for combatTeamsTable based on their current situation
             if (!hasBaseAttackAttacker) {
-                for (StrategicFormation strategicFormation : strategicFormations.values()) {
-                    // Don't generate scenarios for any strategicFormations already assigned, those assigned to a
-                    // different contract, those not assigned to a contract, or for illegible strategicFormations
-                    if (assignedLances.contains(strategicFormation.getForceId()) || (strategicFormation.getContract(campaign) == null)
-                            || !strategicFormation.isEligible(campaign) || (strategicFormation.getMissionId() != contract.getId())
-                            || !strategicFormation.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
+                for (CombatTeam combatTeam : combatTeamsTable.values()) {
+                    // Don't generate scenarios for any combatTeamsTable already assigned, those assigned to a
+                    // different contract, those not assigned to a contract, or for illegible combatTeamsTable
+                    if (assignedLances.contains(combatTeam.getForceId()) || (combatTeam.getContract(campaign) == null)
+                            || !combatTeam.isEligible(campaign) || (combatTeam.getMissionId() != contract.getId())
+                            || !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                         continue;
                     }
 
@@ -191,13 +195,13 @@ public class AtBScenarioFactory {
                         continue;
                     }
 
-                    // Attempt to generate a scenario for the strategicFormation
-                    AtBScenario scenario = strategicFormation.checkForBattle(campaign);
+                    // Attempt to generate a scenario for the combatTeam
+                    AtBScenario scenario = combatTeam.checkForBattle(campaign);
 
                     // If one is generated, then add it to the scenario list
                     if (scenario != null) {
-                        sList.add(scenario);
-                        assignedLances.add(strategicFormation.getForceId());
+                        scenarios.add(scenario);
+                        assignedLances.add(combatTeam.getForceId());
 
                         // We care if the scenario is a Base Attack, as one must be generated if the
                         // current contract's morale is Unbreakable
@@ -226,64 +230,66 @@ public class AtBScenarioFactory {
                      * first to those assigned to the same contract,
                      * then to those assigned to defense roles
                      */
-                    List<StrategicFormation> lList = new ArrayList<>();
-                    for (StrategicFormation strategicFormation : strategicFormations.values()) {
-                        if ((strategicFormation.getMissionId() == contract.getId())
-                            && strategicFormation.getRole().isDefence() && strategicFormation.isEligible(campaign)) {
-                            lList.add(strategicFormation);
+                    List<CombatTeam> lList = new ArrayList<>();
+                    for (CombatTeam combatTeam : combatTeamsTable.values()) {
+                        if ((combatTeam.getMissionId() == contract.getId())
+                            && combatTeam.getRole().isFrontline() && combatTeam.isEligible(campaign)) {
+                            lList.add(combatTeam);
                         }
                     }
 
                     if (lList.isEmpty()) {
-                        for (StrategicFormation strategicFormation : strategicFormations.values()) {
-                            if ((strategicFormation.getMissionId() == contract.getId()) && strategicFormation.isEligible(campaign)) {
-                                lList.add(strategicFormation);
+                        for (CombatTeam combatTeam : combatTeamsTable.values()) {
+                            if ((combatTeam.getMissionId() == contract.getId()) && combatTeam.isEligible(campaign)) {
+                                lList.add(combatTeam);
                             }
                         }
                     }
 
                     if (lList.isEmpty()) {
-                        for (StrategicFormation strategicFormation : strategicFormations.values()) {
-                            if (strategicFormation.isEligible(campaign)) {
-                                lList.add(strategicFormation);
+                        for (CombatTeam combatTeam : combatTeamsTable.values()) {
+                            if (combatTeam.isEligible(campaign)) {
+                                lList.add(combatTeam);
                             }
                         }
                     }
 
                     if (!lList.isEmpty()) {
-                        StrategicFormation strategicFormation = ObjectUtility.getRandomItem(lList);
-                        AtBScenario atbScenario = AtBScenarioFactory.createScenario(campaign, strategicFormation,
-                                AtBScenario.BASEATTACK, false, StrategicFormation.getBattleDate(campaign.getLocalDate()));
+                        CombatTeam combatTeam = ObjectUtility.getRandomItem(lList);
+                        AtBScenario atbScenario = AtBScenarioFactory.createScenario(campaign, combatTeam,
+                                AtBScenario.BASEATTACK, false, CombatTeam.getBattleDate(campaign.getLocalDate()));
                         if (atbScenario != null) {
-                            if ((strategicFormation.getMissionId() == atbScenario.getMissionId())
-                                    || (strategicFormation.getMissionId() == StrategicFormation.NO_MISSION)) {
-                                for (int i = 0; i < sList.size(); i++) {
-                                    if (sList.get(i).getStrategicFormationId() == strategicFormation.getForceId()) {
+                            if ((combatTeam.getMissionId() == atbScenario.getMissionId())
+                                    || (combatTeam.getMissionId() == CombatTeam.NO_MISSION)) {
+                                for (int i = 0; i < scenarios.size(); i++) {
+                                    if ((scenarios.get(i).getCombatTeamId() != NO_COMBAT_TEAM)
+                                        && (scenarios.get(i).getCombatTeamId() == combatTeam.getForceId())) {
                                         if (dontGenerateForces.contains(atbScenario.getId())) {
                                             dontGenerateForces.remove(atbScenario.getId());
                                         }
-                                        sList.set(i, atbScenario);
+                                        scenarios.set(i, atbScenario);
                                         break;
                                     }
                                 }
                             } else {
-                                // edge case: strategicFormation assigned to another mission gets assigned the scenario,
+                                // edge case: combatTeam assigned to another mission gets assigned the scenario,
                                 // we need to remove any scenario they are assigned to already
-                                campaign.getMission(strategicFormation.getMissionId()).getScenarios()
+                                campaign.getMission(combatTeam.getMissionId()).getScenarios()
                                         .removeIf(scenario -> (scenario instanceof AtBScenario)
-                                                && (((AtBScenario) scenario).getStrategicFormationId() == strategicFormation.getForceId()));
+                                            && (((AtBScenario) scenario).getCombatTeamId() != NO_COMBAT_TEAM)
+                                            && (((AtBScenario) scenario).getCombatTeamId() == combatTeam.getForceId()));
                             }
-                            if (!sList.contains(atbScenario)) {
-                                sList.add(atbScenario);
+                            if (!scenarios.contains(atbScenario)) {
+                                scenarios.add(atbScenario);
                             }
-                            if (!assignedLances.contains(strategicFormation.getForceId())) {
-                                assignedLances.add(strategicFormation.getForceId());
+                            if (!assignedLances.contains(combatTeam.getForceId())) {
+                                assignedLances.add(combatTeam.getForceId());
                             }
                         } else {
                             logger.error("Unable to generate Base Attack scenario.");
                         }
                     } else {
-                        logger.warn("No strategicFormations assigned to mission " + contract.getName()
+                        logger.warn("No combatTeamsTable assigned to mission " + contract.getName()
                                 + ". Can't generate an Unbreakable Morale base defense mission for this force.");
                     }
                 }
@@ -295,7 +301,7 @@ public class AtBScenarioFactory {
             // until it happens.
             // Therefore, all other currently generated scenarios need to be cleared
             if (hasBaseAttackAttacker) {
-                sList.removeIf(atbScenario -> !(atbScenario.isAttacker()
+                scenarios.removeIf(atbScenario -> !(atbScenario.isAttacker()
                         && (atbScenario.getScenarioType() == AtBScenario.BASEATTACK)));
             }
             // endregion Base Attack (Attacker) Generated
@@ -304,8 +310,8 @@ public class AtBScenarioFactory {
             // Finally, sort the scenarios by date and add to the campaign, and generate
             // forces
             // for the scenario if required
-            sList.sort((s1, s2) -> ObjectUtility.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
-            for (AtBScenario atbScenario : sList) {
+            scenarios.sort((s1, s2) -> ObjectUtility.compareNullable(s1.getDate(), s2.getDate(), LocalDate::compareTo));
+            for (AtBScenario atbScenario : scenarios) {
                 campaign.addScenario(atbScenario, contract);
                 if (!dontGenerateForces.contains(atbScenario.getId())) {
                     atbScenario.setForces(campaign);

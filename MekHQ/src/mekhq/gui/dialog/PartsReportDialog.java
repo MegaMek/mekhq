@@ -18,33 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.GroupLayout;
-
-import static javax.swing.GroupLayout.Alignment;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.LayoutStyle;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -59,13 +32,26 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.utilities.JScrollPaneWithSpeed;
 
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.*;
+
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
  * taken from the Overview tab originally but now a dialog.
  */
 public class PartsReportDialog extends JDialog {
 
-    private JCheckBox ignoreMothballedCheck;
+    private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
+    private JButton topUpButton, topUpGMButton, resetRequestedStockButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
@@ -81,22 +67,29 @@ public class PartsReportDialog extends JDialog {
         this.gui = gui;
         this.campaign = gui.getCampaign();
         initComponents();
-        refreshOverviewPartsInUse();
+        updateOverviewPartsInUse();
         pack();
         setLocationRelativeTo(gui.getFrame());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onClose(); // Call a custom method
+            }
+        });
     }
 
     private void initComponents() {
-   
+
         this.setTitle(resourceMap.getString("Form.title"));
 
         Container container = this.getContentPane();
-        
+
         GroupLayout layout = new GroupLayout(container);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         container.setLayout(layout);
-        
+
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
@@ -127,6 +120,7 @@ public class PartsReportDialog extends JDialog {
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_REQUSTED_STOCK, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
         // Default starting sort
@@ -139,10 +133,10 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 campaign.getShoppingList().addShoppingItem(partToBuy, 1, campaign);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
 
@@ -150,19 +144,19 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1,
+                        "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                         CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 if (quantity <= 0) {
                     return;
                 }
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
 
@@ -224,29 +218,29 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
         Action addInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1,
+                        "How Many " + partInUse.getPartToBuy().getAcquisitionName(), quantity, 1,
                         CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                IAcquisitionWork partToBuy = partInUse.getPartToBuy();
                 while (quantity > 0) {
                     campaign.getQuartermaster().addPart((Part) partToBuy.getNewEquipment(), 0);
                     --quantity;
                 }
-                refreshOverviewSpecificPart(row, piu, partToBuy);
+                refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
 
@@ -265,6 +259,40 @@ public class PartsReportDialog extends JDialog {
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
+        ignoreMothballedCheck.setSelected(campaign.getIgnoreMothballed());
+
+
+        topUpWeeklyCheck = new JCheckBox(resourceMap.getString("chkTopUpWeekly.text"));
+        topUpWeeklyCheck.addActionListener(evt -> refreshOverviewPartsInUse());
+        topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
+
+
+        topUpButton = new JButton();
+        topUpButton.setText(resourceMap.getString("topUpBtn.text"));
+        topUpButton.setIcon(null);
+        topUpButton.setFocusPainted(false);
+        topUpButton.setEnabled(true);
+        topUpButton.setBorder(null);
+        topUpButton.setMargin(new Insets(10,20,10,20));
+        topUpButton.addActionListener(evt -> topUp());
+
+        topUpGMButton = new JButton();
+        topUpGMButton.setText(resourceMap.getString("topUpGMBtn.text"));
+        topUpGMButton.setIcon(null);
+        topUpGMButton.setFocusPainted(false);
+        topUpGMButton.setEnabled(true);
+        topUpGMButton.setBorder(null);
+        topUpGMButton.setMargin(new Insets(10,20,10,20));
+        topUpGMButton.addActionListener(evt -> topUpGM());
+
+        resetRequestedStockButton = new JButton();
+        resetRequestedStockButton.setText(resourceMap.getString("resetRequestedStockBtn.text"));
+        resetRequestedStockButton.setIcon(null);
+        resetRequestedStockButton.setFocusPainted(false);
+        resetRequestedStockButton.setEnabled(true);
+        resetRequestedStockButton.setBorder(null);
+        resetRequestedStockButton.setMargin(new Insets(10,20,10,20));
+        resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
 
         boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
         String[] qualities = {
@@ -280,10 +308,19 @@ public class PartsReportDialog extends JDialog {
         ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
         ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
         JLabel ignorePartsUnderLabel = new JLabel(resourceMap.getString("lblIgnoreSparesUnderQuality.text"));
+        if (campaign.getIgnoreSparesUnderQuality() != null) {
+            ignoreSparesUnderQualityCB.setSelectedItem(campaign.getIgnoreSparesUnderQuality());
+        } else {
+            ignoreSparesUnderQualityCB.setSelectedItem(" ");
+        }
+
 
         JButton btnClose = new JButton("Close");
-        btnClose.addActionListener(evt -> setVisible(false));
-        
+        btnClose.addActionListener(evt -> {
+            setVisible(false);
+            onClose();
+        });
+
         layout.setHorizontalGroup(layout.createParallelGroup()
             .addComponent(tableScroll)
             .addGroup(layout.createSequentialGroup()
@@ -292,6 +329,10 @@ public class PartsReportDialog extends JDialog {
                     .addComponent(ignorePartsUnderLabel)
                     .addComponent(ignoreSparesUnderQualityCB)
                     .addComponent(ignoreMothballedCheck)
+                    .addComponent(topUpWeeklyCheck)
+                    .addComponent(topUpButton)
+                    .addComponent(topUpGMButton)
+                    .addComponent(resetRequestedStockButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnClose))));
 
@@ -301,6 +342,10 @@ public class PartsReportDialog extends JDialog {
                 .addComponent(ignoreMothballedCheck)
                 .addComponent(ignorePartsUnderLabel)
                 .addComponent(ignoreSparesUnderQualityCB)
+                .addComponent(topUpWeeklyCheck)
+                .addComponent(topUpButton)
+                .addComponent(topUpGMButton)
+                .addComponent(resetRequestedStockButton)
                 .addComponent(btnClose)));
 
         setPreferredSize(UIUtil.scaleForGUI(1400,1000));
@@ -313,6 +358,9 @@ public class PartsReportDialog extends JDialog {
      * @return minimum internal quality level to use
      */
     private PartQuality getMinimumQuality(String rating) {
+        if (rating == null) {
+            rating = " ";
+        }
         if (rating.equals(" ")) {
             // The blank spot always means "everything", so minimum = lowest
             return PartQuality.QUALITY_A;
@@ -321,10 +369,11 @@ public class PartsReportDialog extends JDialog {
         }
     }
 
-    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
-        if (piu.equals(new PartInUse((Part) newPart))) {
+    private void refreshOverviewSpecificPart(int row, PartInUse partInUse, IAcquisitionWork newPart) {
+        storePartInUseRequestedStock(partInUse);
+        if (partInUse.equals(new PartInUse((Part) newPart))) {
             // Simple update
-            campaign.updatePartInUse(piu, ignoreMothballedCheck.isSelected(),
+            campaign.updatePartInUse(partInUse, ignoreMothballedCheck.isSelected(),
                     getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem()));
             overviewPartsModel.fireTableRowsUpdated(row, row);
         } else {
@@ -333,9 +382,9 @@ public class PartsReportDialog extends JDialog {
         }
     }
 
-    private void refreshOverviewPartsInUse() {
+    private void updateOverviewPartsInUse() {
         overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
-                getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
+            false, getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
                 .getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
@@ -344,6 +393,75 @@ public class PartsReportDialog extends JDialog {
         column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK)
                 .getCellRenderer();
         column.setEnabled(campaign.isGM());
+        topUpGMButton.setEnabled(campaign.isGM());
     }
 
+    private void refreshOverviewPartsInUse() {
+        storePartInUseRequestedStockMap();
+        updateOverviewPartsInUse();
+    }
+
+    private Set<PartInUse> getPartsInUseFromTable() {
+        Set<PartInUse> partsInUse = new HashSet<PartInUse>();
+        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            partsInUse.add(overviewPartsModel.getPartInUse(row));
+        }
+        return partsInUse;
+    }
+
+    private void topUp() {
+        campaign.stockUpPartsInUse(getPartsInUseFromTable());
+        storePartInUseRequestedStockMap(); // This is nescessary to prevent request stock values from resetting when topping up
+        refreshOverviewPartsInUse();
+    }
+
+    private void topUpGM() {
+        campaign.stockUpPartsInUseGM(getPartsInUseFromTable());
+        storePartInUseRequestedStockMap(); // This is nescessary to prevent request stock values from resetting when topping up
+        refreshOverviewPartsInUse();
+    }
+
+    public void storePartInUseRequestedStockMap() {
+        campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
+        campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
+        if (ignoreSparesUnderQualityCB == null) {
+            campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
+        } else {
+            campaign.setIgnoreSparesUnderQuality(getMinimumQuality(ignoreSparesUnderQualityCB.getSelectedItem().toString()));
+        }
+
+        Map<String,Double> stockMap = new LinkedHashMap<>();
+        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+        }
+        campaign.setPartsInUseRequestedStockMap(stockMap);
+    }
+
+    private void storePartInUseRequestedStock(PartInUse partInUse) {
+        Map<String,Double> stockMap = campaign.getPartsInUseRequestedStockMap();
+        stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+    }
+
+    private Map<String,Double> getCurrentRequestedStockMap() {
+        Map<String,Double> stockMap = new LinkedHashMap<>();
+        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+            PartInUse partInUse = overviewPartsModel.getPartInUse(row);
+            stockMap.put(partInUse.getDescription(), partInUse.getRequestedStock());
+        }
+
+        return stockMap;
+    }
+
+    private void onClose() {
+        storePartInUseRequestedStockMap();
+    }
+
+    /**
+     * Wipes the requested stock numbers back to their defaults
+     */
+    private void resetRequestedStock() {
+        campaign.wipePartsInUseMap();
+        updateOverviewPartsInUse();
+    }
 }

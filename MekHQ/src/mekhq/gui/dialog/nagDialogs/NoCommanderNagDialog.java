@@ -23,46 +23,61 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
-import javax.swing.*;
+import static mekhq.gui.dialog.nagDialogs.nagLogic.NoCommanderNagLogic.hasNoCommander;
 
 /**
- * This class represents a nag dialog displayed when the campaign has no assigned commander
- * It extends the {@link AbstractMHQNagDialog} class.
+ * A dialog used to notify the user that their campaign lacks a designated commander.
+ *
+ * <p>
+ * This nag dialog is displayed when the campaign does not currently have a commander,
+ * and checks whether the user has opted to ignore such notifications in the future.
+ * If shown, the user has the option to dismiss the dialog or address the issue.
+ * </p>
+ *
+ * <strong>Features:</strong>
+ * <ul>
+ *   <li>Handles the "No Commander" notification for campaigns.</li>
+ *   <li>Localized message fetched using resource bundles.</li>
+ *   <li>Extends the {@link AbstractMHQNagDialog} for reusable dialog behavior.</li>
+ * </ul>
+ *
+ * @see AbstractMHQNagDialog
  */
 public class NoCommanderNagDialog extends AbstractMHQNagDialog {
-    private static String DIALOG_NAME = "NoCommanderNagDialog";
-    private static String DIALOG_TITLE = "NoCommanderNagDialog.title";
-    private static String DIALOG_BODY = "NoCommanderNagDialog.text";
-
-
     /**
-     * Checks if the given {@link Campaign} is missing a commander.
+     * Constructs a {@code NoCommanderNagDialog} for a campaign.
      *
-     * @param campaign the campaign to check for a missing commander
-     * @return {@code true} if the campaign is missing a commander, otherwise {@code false}
+     * <p>
+     * This dialog uses the localization key {@code "NoCommanderNagDialog.text"}
+     * to display a message informing the user about the absence of a commander in their campaign.
+     * </p>
+     *
+     * @param campaign The {@link Campaign} for which the nag dialog is being triggered.
      */
-    static boolean isCommanderMissing (Campaign campaign) {
-        return (campaign.getFlaggedCommander() == null);
+    public NoCommanderNagDialog(final Campaign campaign) {
+        super(campaign, MHQConstants.NAG_NO_COMMANDER);
+
+        final String DIALOG_BODY = "NoCommanderNagDialog.text";
+        setRightDescriptionMessage(resources.getString(DIALOG_BODY));
+        showDialog();
     }
 
     /**
-     * Creates a new instance of the {@link EndContractNagDialog} class.
+     * Checks if a nag dialog should be displayed for the absence of a commander in the given campaign.
      *
-     * @param frame the parent JFrame for the dialog
-     * @param campaign the {@link Campaign} associated with the dialog
+     * <p>The method evaluates the following conditions to determine if the nag dialog should appear:</p>
+     * <ul>
+     *     <li>If the nag dialog for the absence of a commander has not been ignored in the user options.</li>
+     *     <li>If the campaign does not have a commander assigned.</li>
+     * </ul>
+     *
+     * @param campaign the {@link Campaign} to check for nagging conditions
+     * @return {@code true} if the nag dialog should be displayed, {@code false} otherwise
      */
-    public NoCommanderNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_NO_COMMANDER);
-    }
+    static public boolean checkNag(Campaign campaign) {
+        final String NAG_KEY = MHQConstants.NAG_NO_COMMANDER;
 
-    /**
-     * Checks if there is a nag message to display.
-     *
-     * @return {@code true} if there is a nag message to display, {@code false} otherwise
-     */
-    @Override
-    protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isCommanderMissing(getCampaign());
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_KEY)
+            && hasNoCommander(campaign);
     }
 }

@@ -26,6 +26,7 @@ import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -301,7 +302,7 @@ public class UnitPersonTest {
         verify(unit, times(1)).resetPilotAndEntity();
 
         // Ensure when getting the gunner that it is the same gunner
-        List<Person> gunners = unit.getGunners();
+        Set<Person> gunners = unit.getGunners();
         assertTrue(gunners.contains(mockGunner));
         assertTrue(unit.isGunner(mockGunner));
 

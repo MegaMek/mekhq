@@ -20,12 +20,16 @@
  */
 package mekhq.campaign.finances;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -227,5 +231,28 @@ public class Accountant {
         } else {
             return getTheoreticalPayroll(getCampaignOptions().isInfantryDontCount());
         }
+    }
+
+    /**
+     * Returns a map of every Person and their salary.
+     *
+     * @see Finances#debit(TransactionType, LocalDate, Money, String, Map, boolean)
+     * @return map of personnel to their pay, including pool as a null key
+     */
+    public Map<Person, Money> getPayRollSummary() {
+        Map<Person, Money> payRollSummary = new HashMap<>();
+        for (Person p : getCampaign().getActivePersonnel()) {
+                payRollSummary.put(p, p.getSalary(getCampaign()));
+            }
+        // And pay our pool
+        payRollSummary.put(null, Money.of(
+            (getCampaign().getCampaignOptions().getRoleBaseSalaries()
+                [PersonnelRole.ASTECH.ordinal()].getAmount().doubleValue()
+                * getCampaign().getAstechPool())
+            + (getCampaign().getCampaignOptions().getRoleBaseSalaries()
+                [PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue()
+                * getCampaign().getMedicPool())));
+
+        return payRollSummary;
     }
 }

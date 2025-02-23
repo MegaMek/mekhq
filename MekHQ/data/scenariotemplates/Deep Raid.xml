@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Deep Raid</name>
     <shortBriefing>Destroy or cripple DropShip.</shortBriefing>
-    <detailedBriefing>A grounded DropShip must be destroyed or crippled within 30 turns before it lifts off. This raid takes place deep behind enemy lines, and the DropShip’s defenders are not important. Preserve 50% of your forces during the operation to ensure mission success.</detailedBriefing>
+    <detailedBriefing>A grounded DropShip must be destroyed or crippled before it lifts off. This raid takes place deep behind enemy lines, and the DropShip’s defenders are not important. Preserve 50% of your forces during the operation to ensure mission success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

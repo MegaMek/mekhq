@@ -33,7 +33,7 @@
 			<objectiveScenarios>
 				<objectiveScenario>Recon Evasion.xml</objectiveScenario>
 				<objectiveScenario>Heavy Recon Evasion.xml</objectiveScenario>
-				<objectiveScenario>Remote VIP Capture.xml</objectiveScenario>
+				<objectiveScenario>VIP Ambush.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>
