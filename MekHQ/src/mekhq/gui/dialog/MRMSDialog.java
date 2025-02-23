@@ -544,6 +544,12 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(maxBTHLabel, gridBagConstraints);
 
+        JLabel minDailyTimeLabel = new JLabel(resources.getString("minDailyTimeLabel.text"));
+        minDailyTimeLabel.setName("minDailyTimeLabel");
+        minDailyTimeLabel.setFont(boldFont);
+        gridBagConstraints.gridx = gridRowIdx++;
+        pnlItems.add(minDailyTimeLabel, gridBagConstraints);
+
         gridRowIdx = 1;
 
         mrmsOptionControls = new HashMap<>();
@@ -617,6 +623,8 @@ public class MRMSDialog extends JDialog {
                 mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
         mrmsOptionControl.setMaxBTHSpn(createMRMSSkillBTHSpinner(mrmsOption.getBthMax(),
                 mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
+        mrmsOptionControl.setMinDailyTimeSpn(createMRMSDailyTimeSpinner(mrmsOption.getDailyTimeMin(),
+            mrmsOption.isActive(), pnlItems, rowIdx, columnIdx++));
 
         mrmsOptionControl.getActiveBox().addActionListener(evt -> {
             if (mrmsOptionControl.getActiveBox().isSelected()) {
@@ -624,11 +632,13 @@ public class MRMSDialog extends JDialog {
                 mrmsOptionControl.getMaxSkillCBox().setEnabled(true);
                 mrmsOptionControl.getMinBTHSpn().setEnabled(true);
                 mrmsOptionControl.getMaxBTHSpn().setEnabled(true);
+                mrmsOptionControl.getMinDailyTimeSpn().setEnabled(true);
             } else {
                 mrmsOptionControl.getMinSkillCBox().setEnabled(false);
                 mrmsOptionControl.getMaxSkillCBox().setEnabled(false);
                 mrmsOptionControl.getMinBTHSpn().setEnabled(false);
                 mrmsOptionControl.getMaxBTHSpn().setEnabled(false);
+                mrmsOptionControl.getMinDailyTimeSpn().setEnabled(false);
             }
         });
 
@@ -651,6 +661,24 @@ public class MRMSDialog extends JDialog {
         pnlItems.add(skillBTHSpn, gridBagConstraints);
 
         return skillBTHSpn;
+    }
+
+    private JSpinner createMRMSDailyTimeSpinner(int selectedValue, boolean enabled,
+                                               JPanel pnlItems, int rowIdx, int columnIdx) {
+        JSpinner dailyTimeSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 0, 480, 5));
+        ((DefaultEditor) dailyTimeSpn.getEditor()).getTextField().setEditable(false);
+        dailyTimeSpn.setEnabled(enabled);
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = columnIdx;
+        gridBagConstraints.gridy = rowIdx;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 5);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+
+        pnlItems.add(dailyTimeSpn, gridBagConstraints);
+
+        return dailyTimeSpn;
     }
 
     private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled,
@@ -1055,7 +1083,8 @@ public class MRMSDialog extends JDialog {
                     mrmsOptionControl.getMinSkillCBox().getSelectedIndex(),
                     mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
                     (Integer) mrmsOptionControl.getMinBTHSpn().getValue(),
-                    (Integer) mrmsOptionControl.getMaxBTHSpn().getValue());
+                    (Integer) mrmsOptionControl.getMaxBTHSpn().getValue(),
+                    (Integer) mrmsOptionControl.getMinDailyTimeSpn().getValue());
 
             campaignOptions.addMRMSOption(mrmsOption);
         }
@@ -1122,6 +1151,7 @@ public class MRMSDialog extends JDialog {
         private JComboBox<String> maxSkillCBox = null;
         private JSpinner minBTHSpn = null;
         private JSpinner maxBTHSpn = null;
+        private JSpinner minDailyTimeSpn = null;
 
         public JCheckBox getActiveBox() {
             return activeBox;
@@ -1161,6 +1191,14 @@ public class MRMSDialog extends JDialog {
 
         public void setMaxBTHSpn(JSpinner maxBTHSpn) {
             this.maxBTHSpn = maxBTHSpn;
+        }
+
+        public JSpinner getMinDailyTimeSpn() {
+            return minDailyTimeSpn;
+        }
+
+        public void setMinDailyTimeSpn(JSpinner minDailyTimeSpn) {
+            this.minDailyTimeSpn = minDailyTimeSpn;
         }
     }
 }
