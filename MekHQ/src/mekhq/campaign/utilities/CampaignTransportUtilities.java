@@ -52,12 +52,22 @@ public class CampaignTransportUtilities {
      * @return Transporter types that could potentially transport this entity
      */
     public static EnumSet<TransporterType> mapEntityToTransporters(CampaignTransportType campaignTransportType, Entity unit) {
+        if (campaignTransportType.isTowTransport()) {
+            if (unit.isTrailer()) {
+                return EnumSet.of(TANK_TRAILER_HITCH);
+            }
+            else {
+                return EnumSet.noneOf(TransporterType.class);
+            }
+        }
         return getTransportTypeClassifier(unit).map(v -> v.getTransporterTypes(unit, campaignTransportType)).orElse(EnumSet.noneOf(TransporterType.class));
     }
 
 
     /**
      * Most slots are 1:1, infantry use their tonnage in some cases
+     * TANK_TRAILER_HITCH use the maximum pulling capacity of its
+     * tractor so return the transported unit's weight
      *
      * @param transporterType type (Enum) of Transporter
      * @param transportedUnit Entity we want the capacity usage of
@@ -71,6 +81,8 @@ public class CampaignTransportUtilities {
             else if (transporterType == INFANTRY_COMPARTMENT) {
                 return calcInfantryCompartmentWeight(transportedUnit);
             }
+        } else if (transporterType == TANK_TRAILER_HITCH) {
+            return transportedUnit.getWeight();
         }
         return 1.0;
     }

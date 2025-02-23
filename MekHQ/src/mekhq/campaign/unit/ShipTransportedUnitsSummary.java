@@ -20,6 +20,7 @@
 package mekhq.campaign.unit;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -100,7 +101,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         return oldTransports;
     }
 
-    private Unit loadTransport(TransporterType transporterType, Unit transportedUnit) {
+    private @Nullable Unit loadTransport(TransporterType transporterType, Unit transportedUnit) {
         Unit oldTransport = null;
         int bayNumber = Utilities.selectBestBayFor(transportedUnit.getEntity(), transport.getEntity());
 
