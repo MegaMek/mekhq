@@ -1975,27 +1975,4 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
-
-
-    /**
-     * Event handler for "Continue as Reinforcements" Button that
-     * adjusts boolean used after scenario resolution to signal
-     * player wants to send units to linked scenario
-     */
-    private class ReinforcementListener implements ActionListener {
-
-        public ReinforcementListener() {
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            reinforcementsSent = (!reinforcementsSent);
-
-            if(reinforcementsSent){
-            ((JButton)evt.getSource()).setBackground(new Color(6, 64, 43));
-            }else{
-            ((JButton) evt.getSource()).setBackground(UIManager.getColor("Button.background"));
-            }
-        }
-    }
 }
