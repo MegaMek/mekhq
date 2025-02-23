@@ -521,30 +521,35 @@ public class MRMSDialog extends JDialog {
         pnlItems.add(itemLabel, gridBagConstraints);
 
         JLabel minSkillLabel = new JLabel(resources.getString("minSkillLabel.text"));
+        minSkillLabel.setToolTipText(resources.getString("minSkillLabel.toolTipText"));
         minSkillLabel.setName("minSkillLabel");
         minSkillLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(minSkillLabel, gridBagConstraints);
 
         JLabel maxSkillLabel = new JLabel(resources.getString("maxSkillLabel.text"));
+        maxSkillLabel.setToolTipText(resources.getString("maxSkillLabel.toolTipText"));
         maxSkillLabel.setName("maxSkillLabel");
         maxSkillLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(maxSkillLabel, gridBagConstraints);
 
         JLabel minBTHLabel = new JLabel(resources.getString("minBTHLabel.text"));
+        minBTHLabel.setToolTipText(resources.getString("minBTHLabel.toolTipText"));
         minBTHLabel.setName("minBTHLabel");
         minBTHLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(minBTHLabel, gridBagConstraints);
 
         JLabel maxBTHLabel = new JLabel(resources.getString("maxBTHLabel.text"));
+        maxBTHLabel.setToolTipText(resources.getString("maxBTHLabel.toolTipText"));
         maxBTHLabel.setName("maxBTHLabel");
         maxBTHLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(maxBTHLabel, gridBagConstraints);
 
         JLabel minDailyTimeLabel = new JLabel(resources.getString("minDailyTimeLabel.text"));
+        minDailyTimeLabel.setToolTipText(resources.getString("minDailyTimeLabel.toolTipText"));
         minDailyTimeLabel.setName("minDailyTimeLabel");
         minDailyTimeLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
