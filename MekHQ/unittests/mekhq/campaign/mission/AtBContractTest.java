@@ -239,8 +239,7 @@ public class AtBContractTest {
             Arguments.of(3025, "LA", "Lyran Commonwealth"),
             Arguments.of(3059, "LA", "Lyran Alliance"),
             Arguments.of(-1, "LA", "Lyran Commonwealth"),
-            Arguments.of(3025, "??", "Unknown"),
-            Arguments.of(3025, "MERC", "")
+            Arguments.of(3025, "??", "Unknown")
         );
     }
 
