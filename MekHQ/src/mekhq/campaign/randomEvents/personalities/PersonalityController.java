@@ -34,7 +34,7 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
 public class PersonalityController {
-    public static int PERSONALITY_QUIRK_CHANCE = 10;
+    public final static int PERSONALITY_QUIRK_CHANCE = 10;
 
     /**
      * Generates a personality for the given person. The method assigns various personality traits,
