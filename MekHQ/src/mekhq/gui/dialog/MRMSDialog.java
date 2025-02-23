@@ -67,6 +67,8 @@ import mekhq.service.mrms.MRMSOption;
 import mekhq.service.mrms.MRMSService;
 import mekhq.service.mrms.MRMSService.MRMSPartSet;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * @author Kipsta
  */
@@ -433,7 +435,7 @@ public class MRMSDialog extends JDialog {
         GridBagConstraints gridBagConstraints;
 
         useRepairBox = new JCheckBox(resources.getString("useRepairBox.text"));
-        useRepairBox.setToolTipText(resources.getString("useRepairBox.toolTipText"));
+        useRepairBox.setToolTipText(wordWrap(resources.getString("useRepairBox.toolTipText")));
         useRepairBox.setName("useRepairBox");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -444,52 +446,52 @@ public class MRMSDialog extends JDialog {
         pnlOptions.add(useRepairBox, gridBagConstraints);
 
         useSalvageBox = new JCheckBox(resources.getString("useSalvageBox.text"));
-        useSalvageBox.setToolTipText(resources.getString("useSalvageBox.toolTipText"));
+        useSalvageBox.setToolTipText(wordWrap(resources.getString("useSalvageBox.toolTipText")));
         useSalvageBox.setName("useSalvageBox");
         gridBagConstraints.gridy = gridRowIdx++;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         pnlOptions.add(useSalvageBox, gridBagConstraints);
 
         useExtraTimeBox = new JCheckBox(resources.getString("useExtraTimeBox.text"));
-        useExtraTimeBox.setToolTipText(resources.getString("useExtraTimeBox.toolTipText"));
+        useExtraTimeBox.setToolTipText(wordWrap(resources.getString("useExtraTimeBox.toolTipText")));
         useExtraTimeBox.setName("useExtraTimeBox");
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(useExtraTimeBox, gridBagConstraints);
 
         useRushJobBox = new JCheckBox(resources.getString("useRushJobBox.text"));
-        useRushJobBox.setToolTipText(resources.getString("useRushJobBox.toolTipText"));
+        useRushJobBox.setToolTipText(wordWrap(resources.getString("useRushJobBox.toolTipText")));
         useRushJobBox.setName("useRushJobBox");
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(useRushJobBox, gridBagConstraints);
 
         allowCarryoverBox = new JCheckBox(resources.getString("allowCarryoverBox.text"));
-        allowCarryoverBox.setToolTipText(resources.getString("allowCarryoverBox.toolTipText"));
+        allowCarryoverBox.setToolTipText(wordWrap(resources.getString("allowCarryoverBox.toolTipText")));
         allowCarryoverBox.setName("allowCarryoverBox");
         allowCarryoverBox.addActionListener(e -> optimizeToCompleteTodayBox.setEnabled(allowCarryoverBox.isSelected()));
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(allowCarryoverBox, gridBagConstraints);
 
         optimizeToCompleteTodayBox = new JCheckBox(resources.getString("optimizeToCompleteTodayBox.text"));
-        optimizeToCompleteTodayBox.setToolTipText(resources.getString("optimizeToCompleteTodayBox.toolTipText"));
+        optimizeToCompleteTodayBox.setToolTipText(wordWrap(resources.getString("optimizeToCompleteTodayBox.toolTipText")));
         optimizeToCompleteTodayBox.setName("optimizeToCompleteTodayBox");
         gridBagConstraints.gridy = gridRowIdx++;
         pnlOptions.add(optimizeToCompleteTodayBox, gridBagConstraints);
 
         if (!getMode().isWarehouse()) {
             useAssignedTechsFirstBox = new JCheckBox(resources.getString("useAssignedTechsFirstBox.text"));
-            useAssignedTechsFirstBox.setToolTipText(resources.getString("useAssignedTechsFirstBox.toolTipText"));
+            useAssignedTechsFirstBox.setToolTipText(wordWrap(resources.getString("useAssignedTechsFirstBox.toolTipText")));
             useAssignedTechsFirstBox.setName("useAssignedTechsFirstBox");
             gridBagConstraints.gridy = gridRowIdx++;
             pnlOptions.add(useAssignedTechsFirstBox, gridBagConstraints);
 
             scrapImpossibleBox = new JCheckBox(resources.getString("scrapImpossibleBox.text"));
-            scrapImpossibleBox.setToolTipText(resources.getString("scrapImpossibleBox.toolTipText"));
+            scrapImpossibleBox.setToolTipText(wordWrap(resources.getString("scrapImpossibleBox.toolTipText")));
             scrapImpossibleBox.setName("scrapImpossibleBox");
             gridBagConstraints.gridy = gridRowIdx++;
             pnlOptions.add(scrapImpossibleBox, gridBagConstraints);
 
             replacePodPartsBox = new JCheckBox(resources.getString("replacePodPartsBox.text"));
-            replacePodPartsBox.setToolTipText(resources.getString("replacePodPartsBox.toolTipText"));
+            replacePodPartsBox.setToolTipText(wordWrap(resources.getString("replacePodPartsBox.toolTipText")));
             replacePodPartsBox.setName("replacePodPartsBox");
             gridBagConstraints.gridy = gridRowIdx++;
             pnlOptions.add(replacePodPartsBox, gridBagConstraints);
@@ -521,35 +523,35 @@ public class MRMSDialog extends JDialog {
         pnlItems.add(itemLabel, gridBagConstraints);
 
         JLabel minSkillLabel = new JLabel(resources.getString("minSkillLabel.text"));
-        minSkillLabel.setToolTipText(resources.getString("minSkillLabel.toolTipText"));
+        minSkillLabel.setToolTipText(wordWrap(resources.getString("minSkillLabel.toolTipText")));
         minSkillLabel.setName("minSkillLabel");
         minSkillLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(minSkillLabel, gridBagConstraints);
 
         JLabel maxSkillLabel = new JLabel(resources.getString("maxSkillLabel.text"));
-        maxSkillLabel.setToolTipText(resources.getString("maxSkillLabel.toolTipText"));
+        maxSkillLabel.setToolTipText(wordWrap(resources.getString("maxSkillLabel.toolTipText")));
         maxSkillLabel.setName("maxSkillLabel");
         maxSkillLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(maxSkillLabel, gridBagConstraints);
 
         JLabel minBTHLabel = new JLabel(resources.getString("minBTHLabel.text"));
-        minBTHLabel.setToolTipText(resources.getString("minBTHLabel.toolTipText"));
+        minBTHLabel.setToolTipText(wordWrap(resources.getString("minBTHLabel.toolTipText")));
         minBTHLabel.setName("minBTHLabel");
         minBTHLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(minBTHLabel, gridBagConstraints);
 
         JLabel maxBTHLabel = new JLabel(resources.getString("maxBTHLabel.text"));
-        maxBTHLabel.setToolTipText(resources.getString("maxBTHLabel.toolTipText"));
+        maxBTHLabel.setToolTipText(wordWrap(resources.getString("maxBTHLabel.toolTipText")));
         maxBTHLabel.setName("maxBTHLabel");
         maxBTHLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
         pnlItems.add(maxBTHLabel, gridBagConstraints);
 
         JLabel minDailyTimeLabel = new JLabel(resources.getString("minDailyTimeLabel.text"));
-        minDailyTimeLabel.setToolTipText(resources.getString("minDailyTimeLabel.toolTipText"));
+        minDailyTimeLabel.setToolTipText(wordWrap(resources.getString("minDailyTimeLabel.toolTipText")));
         minDailyTimeLabel.setName("minDailyTimeLabel");
         minDailyTimeLabel.setFont(boldFont);
         gridBagConstraints.gridx = gridRowIdx++;
@@ -714,7 +716,7 @@ public class MRMSDialog extends JDialog {
             int columnIdx) {
         JCheckBox optionItemBox = new JCheckBox();
         optionItemBox.setText(resources.getString(text));
-        optionItemBox.setToolTipText(resources.getString(toolTipText));
+        optionItemBox.setToolTipText(wordWrap(resources.getString(toolTipText)));
         optionItemBox.setName(name);
         optionItemBox.setSelected(selected);
         if (name.equals("mrmsItemPod") && !getMode().isWarehouse()) {
@@ -757,20 +759,20 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
         btnSelectNone = new JButton(resources.getString("btnSelectNone.text"));
-        btnSelectNone.setToolTipText(resources.getString("btnSelectNone.toolTipText"));
+        btnSelectNone.setToolTipText(wordWrap(resources.getString("btnSelectNone.toolTipText")));
         btnSelectNone.setName("btnSelectNone");
         btnSelectNone.addActionListener(this::btnUnitsSelectNoneActionPerformed);
         pnlButtons.add(btnSelectNone, gridBagConstraints);
 
         btnSelectAssigned = new JButton(resources.getString("btnSelectAssigned.text"));
-        btnSelectAssigned.setToolTipText(resources.getString("btnSelectAssigned.toolTipText"));
+        btnSelectAssigned.setToolTipText(wordWrap(resources.getString("btnSelectAssigned.toolTipText")));
         btnSelectAssigned.setName("btnSelectAssigned");
         btnSelectAssigned.addActionListener(this::btnUnitsSelectAssignedActionPerformed);
         gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectAssigned, gridBagConstraints);
 
         btnSelectUnassigned = new JButton(resources.getString("btnSelectUnassigned.text"));
-        btnSelectUnassigned.setToolTipText(resources.getString("btnSelectUnassigned.toolTipText"));
+        btnSelectUnassigned.setToolTipText(wordWrap(resources.getString("btnSelectUnassigned.toolTipText")));
         btnSelectUnassigned.setName("btnSelectUnassigned");
         btnSelectUnassigned.addActionListener(this::btnUnitsSelectUnassignedActionPerformed);
         gridBagConstraints.gridx = btnIdx++;
@@ -779,18 +781,18 @@ public class MRMSDialog extends JDialog {
         JButton btnHideUnits = new JButton(resources.getString(pnlUnits.isVisible()
                 ? "btnHideUnits.Hide.text"
                 : "btnHideUnits.Show.text"));
-        btnHideUnits.setToolTipText(resources.getString(pnlUnits.isVisible()
+        btnHideUnits.setToolTipText(wordWrap(resources.getString(pnlUnits.isVisible()
                 ? "btnHideUnits.Hide.toolTipText"
-                : "btnHideUnits.Show.toolTipText"));
+                : "btnHideUnits.Show.toolTipText")));
         btnHideUnits.setName("btnHideUnits");
         btnHideUnits.addActionListener(evt -> {
             pnlUnits.setVisible(!pnlUnits.isVisible());
             btnHideUnits.setText(resources.getString(pnlUnits.isVisible()
                     ? "btnHideUnits.Hide.text"
                     : "btnHideUnits.Show.text"));
-            btnHideUnits.setToolTipText(resources.getString(pnlUnits.isVisible()
+            btnHideUnits.setToolTipText(wordWrap(resources.getString(pnlUnits.isVisible()
                     ? "btnHideUnits.Hide.toolTipText"
-                    : "btnHideUnits.Show.toolTipText"));
+                    : "btnHideUnits.Show.toolTipText")));
             this.pack();
         });
         gridBagConstraints.gridx = btnIdx++;
@@ -847,13 +849,13 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
         JButton btnDeselectParts = new JButton(resources.getString("btnDeselectParts.text"));
-        btnDeselectParts.setToolTipText(resources.getString("btnDeselectParts.toolTipText"));
+        btnDeselectParts.setToolTipText(wordWrap(resources.getString("btnDeselectParts.toolTipText")));
         btnDeselectParts.setName("btnDeselectParts");
         btnDeselectParts.addActionListener(this::btnUnselectPartsActionPerformed);
         pnlButtons.add(btnDeselectParts, gridBagConstraints);
 
         btnSelectAllParts = new JButton(resources.getString("btnSelectAllParts.text"));
-        btnSelectAllParts.setToolTipText(resources.getString("btnSelectAllParts.toolTipText"));
+        btnSelectAllParts.setToolTipText(wordWrap(resources.getString("btnSelectAllParts.toolTipText")));
         btnSelectAllParts.setName("btnSelectAllParts");
         btnSelectAllParts.addActionListener(this::btnSelectAllPartsActionPerformed);
         gridBagConstraints.gridx = btnIdx++;
@@ -862,18 +864,18 @@ public class MRMSDialog extends JDialog {
         JButton btnHideParts = new JButton(resources.getString(pnlParts.isVisible()
                 ? "btnHideParts.Hide.text"
                 : "btnHideParts.Show.text"));
-        btnHideParts.setToolTipText(resources.getString(pnlParts.isVisible()
+        btnHideParts.setToolTipText(wordWrap(resources.getString(pnlParts.isVisible()
                 ? "btnHideParts.Hide.toolTipText"
-                : "btnHideParts.Show.toolTipText"));
+                : "btnHideParts.Show.toolTipText")));
         btnHideParts.setName("btnHideParts");
         btnHideParts.addActionListener(evt -> {
             pnlParts.setVisible(!pnlParts.isVisible());
             btnHideParts.setText(resources.getString(pnlParts.isVisible()
                     ? "btnHideParts.Hide.text"
                     : "btnHideParts.Show.text"));
-            btnHideParts.setToolTipText(resources.getString(pnlParts.isVisible()
+            btnHideParts.setToolTipText(wordWrap(resources.getString(pnlParts.isVisible()
                     ? "btnHideParts.Hide.toolTipText"
-                    : "btnHideParts.Show.toolTipText"));
+                    : "btnHideParts.Show.toolTipText")));
             this.pack();
         });
         gridBagConstraints.gridx = btnIdx++;
