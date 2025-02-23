@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.EquipmentType;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -262,6 +263,7 @@ public class AtBContractTest {
     public void getEnemyNameReturnsNonNullWhenMercAndBotNameNotSet() {
         contract.setEnemyCode("MERC");
         // TODO: fix this in the production code
+        RandomCallsignGenerator.getInstance(); // Required in this codepath to generate a random merc company name
         RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
         assertNotEquals("", contract.getEnemyName(3025));
     }
