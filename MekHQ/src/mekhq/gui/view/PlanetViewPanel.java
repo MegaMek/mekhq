@@ -347,8 +347,9 @@ public class PlanetViewPanel extends JScrollablePanel {
             panel.add(lblSocioIndustrial, gbcLabel);
             SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
             String sidText = (null == sid) ? "" : sid.getHTMLDescription();
-            //JLabel txtSocioIndustrial = new JLabel(sidText);
             SourceableValueLabel txtSocioIndustrial = new SourceableValueLabel(planet.getSourcedSocioIndustrial(currentDate));
+            // replace with greater detail
+            txtSocioIndustrial.setText(sidText);
             gbcText.gridy = infoRow;
             panel.add(txtSocioIndustrial, gbcText);
             ++ infoRow;
