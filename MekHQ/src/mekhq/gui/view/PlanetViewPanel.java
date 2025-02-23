@@ -439,7 +439,9 @@ public class PlanetViewPanel extends JScrollablePanel {
         } else {
             text = planet.getDisplayableSystemPosition();
         }
-        JLabel txtPosition = new JLabel(text);
+        SourceableValueLabel txtPosition = new SourceableValueLabel(planet.getSourcedSystemPosition());
+        // replace with our text
+        txtPosition.setText(text);
         return txtPosition;
     }
 
