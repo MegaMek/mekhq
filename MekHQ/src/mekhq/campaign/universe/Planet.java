@@ -210,19 +210,8 @@ public class Planet {
         return ring;
     }
 
-    public List<String> getLandMasses() {
-        return new ArrayList<>();
-        //return null != landMasses ? new ArrayList<>(landMasses) : null;
-    }
-
-    public String getLandMassDescription() {
-        if(null == landMasses || landMasses.size() == 0) {
-            return "";
-        }
-        List<String> descLandMass = landMasses.stream()
-            .map(LandMass::getDescription)
-            .collect(Collectors.toList());
-        return Utilities.combineString(descLandMass, ", ");
+    public List<LandMass> getLandMasses() {
+        return null != landMasses ? new ArrayList<>(landMasses) : null;
     }
 
     public Double getDayLength(LocalDate when) {

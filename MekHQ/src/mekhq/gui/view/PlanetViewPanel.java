@@ -307,10 +307,24 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblLandMass = new JLabel(resourceMap.getString("lblLandMass1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblLandMass, gbcLabel);
-            JLabel txtLandMass = new JLabel("<html>" + planet.getLandMassDescription() + "</html>");
-            gbcText.gridy = infoRow;
-            panel.add(txtLandMass, gbcText);
-            ++ infoRow;
+            SourceableValueLabel txtLandMass;
+            String capitalIndent;
+            for(LandMass landmass : planet.getLandMasses()) {
+                capitalIndent = "";
+                if((null != landmass.getSourcedName())) {
+                    txtLandMass = new SourceableValueLabel(landmass.getSourcedName(), "<html>%s</html>");
+                    gbcText.gridy = infoRow;
+                    panel.add(txtLandMass, gbcText);
+                    capitalIndent = "&nbsp;&nbsp;&nbsp;";
+                    ++ infoRow;
+                }
+                if((null != landmass.getSourcedCapital())) {
+                    txtLandMass = new SourceableValueLabel(landmass.getSourcedCapital(), "<html>" + capitalIndent + "<i>Capital:</i> %s</html>");
+                    gbcText.gridy = infoRow;
+                    panel.add(txtLandMass, gbcText);
+                    ++ infoRow;
+                }
+            }
         }
 
         //Population
