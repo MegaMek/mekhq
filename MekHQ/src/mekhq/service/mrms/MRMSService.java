@@ -729,6 +729,12 @@ public class MRMSService {
 
             debugLog("Checking tech %s", "repairPart", tech.getFullName());
 
+            // If this tech has less time than required, ignore them for this part
+            if (tech.getMinutesLeft() < mrmsOptions.getDailyTimeMin()) {
+                debugLog("... doesn't have enough time left due to configuration", "repairPart");
+                continue;
+            }
+
             Skill skill = tech.getSkillForWorkingOn(partWork);
 
             if (partWork instanceof Part) {
