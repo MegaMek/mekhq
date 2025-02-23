@@ -1114,9 +1114,11 @@ public class CampaignGUI extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
                 try {
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     getCampaignController().advanceDay();
                 } finally {
                     btnAdvanceDay.setEnabled(true);
+                    setCursor(Cursor.getDefaultCursor());
                 }
             });
         });
