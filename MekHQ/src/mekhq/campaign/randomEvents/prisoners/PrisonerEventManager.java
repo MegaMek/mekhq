@@ -120,6 +120,10 @@ public class PrisonerEventManager {
             return;
         }
 
+        if (!campaign.hasActiveAtBContract(false)) {
+            return;
+        }
+
         // Monthly events
         if (isFirstOfMonth) {
             checkForRansomEvents();
