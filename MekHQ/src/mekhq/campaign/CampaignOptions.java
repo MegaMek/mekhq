@@ -174,7 +174,6 @@ public class CampaignOptions {
     private boolean allowISPurchases;
     private boolean allowCanonOnly;
     private boolean allowCanonRefitOnly;
-    private boolean allowRefitFromParts;
     private int techLevel;
     private boolean variableTechLevel;
     private boolean factionIntroDate;
@@ -705,7 +704,6 @@ public class CampaignOptions {
         allowISPurchases = true;
         allowCanonOnly = false;
         allowCanonRefitOnly = false;
-        allowRefitFromParts = false;
         techLevel = TECH_EXPERIMENTAL;
         variableTechLevel = false;
         factionIntroDate = false;
@@ -3716,14 +3714,6 @@ public class CampaignOptions {
         this.allowCanonRefitOnly = allowCanonRefitOnly;
     }
 
-    public boolean isAllowRefitFromParts() {
-        return allowRefitFromParts;
-    }
-
-    public void setAllowRefitFromParts(final boolean allowRefitFromParts) {
-        this.allowRefitFromParts = allowRefitFromParts;
-    }
-
     public boolean isVariableTechLevel() {
         return variableTechLevel;
     }
@@ -4645,7 +4635,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowISPurchases", allowISPurchases);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonOnly", allowCanonOnly);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonRefitOnly", allowCanonRefitOnly);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowRefitFromParts", allowRefitFromParts);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableTechLevel", variableTechLevel);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", factionIntroDate);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", useAmmoByType);
@@ -5311,8 +5300,6 @@ public class CampaignOptions {
                     retVal.allowCanonOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
                     retVal.allowCanonRefitOnly = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("allowRefitFromParts")) {
-                    retVal.allowRefitFromParts = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
                     retVal.useAmmoByType = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
