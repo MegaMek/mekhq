@@ -21,11 +21,8 @@ package mekhq.gui.view;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.SourceableValue;
+import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.enums.PlanetaryType;
-import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.SourceableValueLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -278,14 +275,31 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         //satellites
-        if (null != planet.getSatellites() || planet.getSmallMoons()>0) {
+        if ((null != planet.getSatellites()) || (planet.getSmallMoons()>0) || (planet.hasRing())) {
             JLabel lblSatellite = new JLabel(resourceMap.getString("lblSatellite1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblSatellite, gbcLabel);
-            JLabel txtSatellite = new JLabel("<html>" + planet.getSatelliteDescription() + "</html>");
-            gbcText.gridy = infoRow;
-            panel.add(txtSatellite, gbcText);
-            ++ infoRow;
+            SourceableValueLabel txtSatellite;
+            if((null != planet.getSatellites())) {
+                for(Satellite satellite : planet.getSatellites()) {
+                    txtSatellite = new SourceableValueLabel(satellite.getSourcedName(), "%s (" + satellite.getSize() + ")");
+                    gbcText.gridy = infoRow;
+                    panel.add(txtSatellite, gbcText);
+                    ++ infoRow;
+                }
+            }
+            if(planet.getSmallMoons()>0) {
+                txtSatellite = new SourceableValueLabel(planet.getSourcedSmallMoons(), "%s small moons");
+                gbcText.gridy = infoRow;
+                panel.add(txtSatellite, gbcText);
+                ++ infoRow;
+            }
+            if(planet.hasRing()) {
+                txtSatellite = new SourceableValueLabel(planet.getSourcedRing(), "dust ring");
+                gbcText.gridy = infoRow;
+                panel.add(txtSatellite, gbcText);
+                ++ infoRow;
+            }
         }
 
         //landmasses

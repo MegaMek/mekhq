@@ -202,29 +202,6 @@ public class Planet {
         return smallMoons;
     }
 
-    public String getSatelliteDescription() {
-        String desc = "";
-        if (null != satellites) {
-            List<String> satNames = new ArrayList<>();
-            for (Satellite satellite : satellites) {
-                satNames.add(satellite.getDescription());
-            }
-            desc = Utilities.combineString(satNames, ", ");
-        }
-        if (getSmallMoons() > 0) {
-            String smallDesc = getSmallMoons() + " small moons";
-            if (desc.isBlank()) {
-                desc = smallDesc;
-            } else {
-                desc = desc + ", " + smallDesc;
-            }
-        }
-        if (hasRing()) {
-            desc = desc + ", and a dust ring";
-        }
-        return desc;
-    }
-
     public Boolean hasRing() {
         return (null == getSourcedRing()) ? false : getSourcedRing().getValue();
     }
