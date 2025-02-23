@@ -323,7 +323,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
                     person.setPrimaryRole(gui.getCampaign(), role);
-                    writeDescription(gui.getCampaign(), person);
+                    writeDescription(person);
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().isUsePortraitForRole(role)
                             && gui.getCampaign().getCampaignOptions().isAssignPortraitOnRoleChange()
@@ -1134,7 +1134,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_PERSONALITY: {
                 for (Person person : people) {
-                    PersonalityController.generatePersonality(gui.getCampaign(), person);
+                    PersonalityController.generatePersonality(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1155,7 +1155,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
-                    writeDescription(gui.getCampaign(), person);
+                    writeDescription(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;

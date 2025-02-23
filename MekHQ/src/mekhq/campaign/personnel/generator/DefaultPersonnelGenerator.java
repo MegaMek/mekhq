@@ -140,7 +140,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         BackgroundsController.generateBackground(campaign, person);
 
         // generate personality
-        PersonalityController.generatePersonality(campaign, person);
+        PersonalityController.generatePersonality(person);
 
         return person;
     }

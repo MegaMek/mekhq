@@ -1485,7 +1485,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setIntelligence(comboIntelligence.getSelectedItem());
-            PersonalityController.writeDescription(campaign, person);
+            PersonalityController.writeDescription(person);
         }
 
         person.setPortrait(portrait);

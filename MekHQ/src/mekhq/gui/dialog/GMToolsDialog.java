@@ -1571,7 +1571,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
             getLblCurrentName().setText((getLastGeneratedName()[0] + ' ' + getLastGeneratedName()[1]).trim());
             getPerson().setGivenName(getLastGeneratedName()[0]);
             getPerson().setSurname(getLastGeneratedName()[1]);
-            PersonalityController.writeDescription(gui.getCampaign(), person);
+            PersonalityController.writeDescription(person);
             MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
         }
     }

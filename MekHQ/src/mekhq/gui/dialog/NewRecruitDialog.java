@@ -222,7 +222,7 @@ public class NewRecruitDialog extends JDialog {
                 person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
-        PersonalityController.writeDescription(hqView.getCampaign(), person);
+        PersonalityController.writeDescription(person);
         refreshView();
     }
 

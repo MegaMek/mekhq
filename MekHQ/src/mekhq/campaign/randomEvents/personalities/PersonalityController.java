@@ -37,10 +37,9 @@ public class PersonalityController {
      * Generates a personality for the given person. The method assigns various personality traits,
      * intelligence, and potential quirks to the person.
      *
-     * @param campaign the current campaign context in which the person's personality is being generated
      * @param person   the person for whom the personality will be generated and updated
      */
-    public static void generatePersonality(Campaign campaign, Person person) {
+    public static void generatePersonality(Person person) {
         // first, we wipe any pre-existing personality traits
         person.setAggression(Aggression.NONE);
         person.setAmbition(Ambition.NONE);
@@ -67,7 +66,7 @@ public class PersonalityController {
         person.setIntelligence(generateIntelligence(randomInt(8346)));
 
         // finally, write the description
-        writeDescription(campaign, person);
+        writeDescription(person);
 
         // check at least one characteristic has been generated, if not, then repeat the
         // process
@@ -75,7 +74,7 @@ public class PersonalityController {
         // probability says we can only expect 1 additional loop, 2 in exceptional
         // circumstances
         if (Objects.equals(person.getPersonalityDescription(), "")) {
-            generatePersonality(campaign, person);
+            generatePersonality(person);
         }
     }
 
@@ -116,8 +115,8 @@ public class PersonalityController {
      *
      * @param person the person whose personality description will be set
      */
-    public static void writeDescription(Campaign campaign, Person person) {
-        List<String> traitDescriptions = getTraitDescriptions(campaign, person);
+    public static void writeDescription(Person person) {
+        List<String> traitDescriptions = getTraitDescriptions(person);
 
         StringBuilder personalityDescription = new StringBuilder();
 
@@ -143,11 +142,10 @@ public class PersonalityController {
      * personality trait is processed to generate a corresponding description, which is then added
      * to the resulting list.
      *
-     * @param campaign the current campaign
      * @param person   the person whose personality trait descriptions are to be retrieved
      * @return a list of strings containing descriptions of the person's personality traits
      */
-    private static List<String> getTraitDescriptions(Campaign campaign, Person person) {
+    private static List<String> getTraitDescriptions(Person person) {
         List<String> traitDescriptions = new ArrayList<>();
 
         if (!person.getAggression().isNone()) {
