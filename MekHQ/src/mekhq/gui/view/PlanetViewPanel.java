@@ -333,8 +333,6 @@ public class PlanetViewPanel extends JScrollablePanel {
             gbcLabel.gridy = infoRow;
             panel.add(lblPopulation, gbcLabel);
             SourceableValueLabel txtPopulation = new SourceableValueLabel(planet.getSourcedPopulation(currentDate), "%,d");
-            // for this case, we need to override the default text to get commas
-            txtPopulation.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
             gbcText.gridy = infoRow;
             panel.add(txtPopulation, gbcText);
             ++ infoRow;
