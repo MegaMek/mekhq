@@ -247,8 +247,6 @@ public class AtBContractTest {
     @MethodSource("provideEnemyFactionAndYear")
     public void getEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
         contract.setEnemyCode(enemyCode);
-        // TODO: fix this in the production code
-        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
         assertEquals(fullName, contract.getEnemyName(year));
     }
 
@@ -258,6 +256,14 @@ public class AtBContractTest {
         contract.setEnemyCode("MERC");
         contract.setEnemyBotName(name);
         assertEquals(name, contract.getEnemyName(3025));
+    }
+
+    @Test
+    public void getEnemyNameReturnsNonNullWhenMercAndBotNameNotSet() {
+        contract.setEnemyCode("MERC");
+        // TODO: fix this in the production code
+        RandomCompanyNameGenerator.getInstance(); // Required in this codepath to generate a random merc company name
+        assertNotEquals("", contract.getEnemyName(3025));
     }
 
     private static Stream<Arguments> provideEmployerNamesAndMercStatus() {
