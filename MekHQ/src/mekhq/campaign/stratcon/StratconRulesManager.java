@@ -2661,33 +2661,42 @@ public class StratconRulesManager {
 
     /**
      * Processes completion of a Stratcon scenario that is linked to another scenario
-     * pulls forces off completed scenario and moves them to linked one.
-     *
+     * pulls force off completed scenario, checks to see if entire force is moving on or subset of units
+     * 
      * Should only be used after a scenario is resolved
      */
-    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, List<Integer> forces) {
+    public static void linkedScenarioProcessing(ResolveScenarioTracker tracker, HashMap<Integer, List<UUID>> linkedForces) {
         Scenario nextScenario = tracker.getCampaign().getScenario(tracker.getScenario().getLinkedScenario());
-
+        Campaign campaign = tracker.getCampaign();
+   
         if (nextScenario instanceof AtBScenario nextAtBScenario) {
-            StratconCampaignState campaignState = nextAtBScenario.getContract(tracker.getCampaign())
-                    .getStratconCampaignState();
+
+            StratconCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratconCampaignState();
             if (campaignState == null) {
                 return;
-            }
+                }
+
             for (StratconTrackState track : campaignState.getTracks()) {
                 if (track.getBackingScenariosMap().containsKey(nextScenario.getId())) {
                     StratconScenario scenario = track.getBackingScenariosMap().get(nextScenario.getId());
-                    for (int forceID : forces) {
-                        track.unassignForce(forceID);
-                        nextScenario.addForces(forceID);
+        //Go through each force that was in previous scenario undeploy it and check to see if entire force is moving on
+        //if so deploy whole force.  Otherwise just deploy selected units.
+                    for(int forceId : linkedForces.keySet()){
+                        track.unassignForce(forceId);
+                
+                        if(linkedForces.get(forceId).size() == campaign.getForce(forceId).getAllUnits(false).size()){
+                            scenario.addForce(campaign.getForce(forceId), ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID, campaign);
+                        } else {
+                            for( UUID unitId : linkedForces.get(forceId)){
+                                scenario.addUnit(campaign.getUnit(unitId), ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID, false);
+                            }          
+                        }
                     }
-
                 }
-
             }
-
         }
     }
+
 
     /**
      * Worker function that updates strategic objectives relevant to the passed in

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,6 +30,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Systems.HPGLink;
+import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 import javax.imageio.ImageIO;
@@ -600,26 +601,26 @@ public class InterstellarMapPanel extends JPanel {
                         if (isSystemVisible(system, true)) {
                             double x = map2scrX(system.getX());
                             double y = map2scrY(system.getY());
-                            int hpgRating = ObjectUtility.nonNull(system.getHPG(now), EquipmentType.RATING_X);
-                            if (hpgRating == RATING_A) {
+                            HPGRating hpgRating = ObjectUtility.nonNull(system.getHPG(now), HPGRating.X);
+                            if (hpgRating == HPGRating.A) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(thick);
                                 g2.draw(arc);
                             }
-                            if (hpgRating == RATING_A || hpgRating == EquipmentType.RATING_B) {
+                            if (hpgRating == HPGRating.A || hpgRating == HPGRating.B) {
                                 g2.setPaint(Color.BLUE);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(thin);
                                 g2.draw(arc);
                             }
-                            if (hpgRating == EquipmentType.RATING_C) {
+                            if (hpgRating == HPGRating.C) {
                                 g2.setPaint(Color.ORANGE);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(dashed);
                                 g2.draw(arc);
                             }
-                            if (hpgRating == EquipmentType.RATING_D) {
+                            if (hpgRating == HPGRating.D) {
                                 g2.setPaint(Color.RED);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(dotted);
@@ -631,13 +632,13 @@ public class InterstellarMapPanel extends JPanel {
                         PlanetarySystem p1 = link.primary;
                         PlanetarySystem p2 = link.secondary;
                         if (isSystemVisible(p1, false) || isSystemVisible(p2, false)) {
-                            if (link.rating == RATING_A) {
+                            if (link.rating == HPGRating.A) {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(thick);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
                                         map2scrY(p2.getY())));
                             }
-                            if (link.rating == EquipmentType.RATING_B) {
+                            if (link.rating == HPGRating.B) {
                                 g2.setPaint(Color.BLUE);
                                 g2.setStroke(dashed);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()),
@@ -734,8 +735,7 @@ public class InterstellarMapPanel extends JPanel {
                                             360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
                                         g2.fill(arc);
                                     } else {
-                                        if (campaign.getCampaignOptions().isUseAtB()
-                                            && (system.getHiringHallLevel(campaign.getLocalDate()) == HiringHallLevel.GREAT)) {
+                                        if (system.getHiringHallLevel(campaign.getLocalDate()) == HiringHallLevel.GREAT) {
                                             g2.setPaint(new Color(176, 196, 222));
                                             arc.setArcByCenter(x, y, size + 5, 0,
                                                 360.0 * (1 - ((double) i) / factions.size()), Arc2D.OPEN);
@@ -1174,16 +1174,16 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         if (optHPG.isSelected()) {
-            Integer hpg = p.getHPG(campaign.getLocalDate());
+            HPGRating hpg = p.getHPG(campaign.getLocalDate());
             if (null == hpg) {
                 return Color.BLACK;
             }
             // use two shades of gray for C and D as this is pony express
             return switch (hpg) {
-                case EquipmentType.RATING_D -> new Color(84, 84, 84);
-                case EquipmentType.RATING_C -> new Color(168, 168, 168);
-                case EquipmentType.RATING_B -> new Color(222, 73, 104);
-                case RATING_A -> new Color(252, 253, 191);
+                case D -> new Color(84, 84, 84);
+                case C -> new Color(168, 168, 168);
+                case B -> new Color(222, 73, 104);
+                case A -> new Color(252, 253, 191);
                 default -> Color.BLACK;
             };
         }

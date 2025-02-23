@@ -312,6 +312,7 @@ public class CampaignXmlParser {
                             BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR)
                         );
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
+                    //TODO: deal with this
                     updatePlanetaryEventsFromXML(wn);
                 } else if (xn.equalsIgnoreCase("partsInUse")) {
                     processPartsInUse(retVal, wn);
@@ -1583,100 +1584,11 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
-        List<PlanetaryEvent> events;
-        Map<Integer, List<PlanetaryEvent>> eventsMap = new HashMap<>();
-
-        NodeList wList = wn.getChildNodes();
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
-
-            // If it's not an element node, we ignore it.
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (wn2.getNodeName().equalsIgnoreCase("system")) {
-                NodeList systemNodes = wn2.getChildNodes();
-                String systemId = null;
-                List<PlanetarySystemEvent> sysEvents = new ArrayList<>();
-                eventsMap.clear();
-                for (int n = 0; n < systemNodes.getLength(); ++n) {
-                    Node systemNode = systemNodes.item(n);
-                    if (systemNode.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    if (systemNode.getNodeName().equalsIgnoreCase("id")) {
-                        systemId = systemNode.getTextContent();
-                    } else if (systemNode.getNodeName().equalsIgnoreCase("event")) {
-                        PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
-                        if (null != event) {
-                            event.custom = true;
-                            sysEvents.add(event);
-                        }
-                    } else if (systemNode.getNodeName().equalsIgnoreCase("planet")) {
-                        NodeList planetNodes = systemNode.getChildNodes();
-                        int sysPos = 0;
-                        events = new ArrayList<>();
-                        for (int j = 0; j < planetNodes.getLength(); ++j) {
-                            Node planetNode = planetNodes.item(j);
-                            if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
-                                continue;
-                            }
-                            if (planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
-                                sysPos = Integer.parseInt(planetNode.getTextContent());
-                            } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
-                                PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                                if (null != event) {
-                                    event.custom = true;
-                                    events.add(event);
-                                }
-                            }
-                        }
-                        if (sysPos > 0 && !events.isEmpty()) {
-                            eventsMap.put(sysPos, events);
-                        }
-                    }
-                }
-                if (null != systemId) {
-                    // iterate through events hash and assign events to planets
-                    Iterator<Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Entry<Integer, List<PlanetaryEvent>> pair = it.next();
-                        Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
-                    }
-                    // check for system-wide events
-                    if (!sysEvents.isEmpty()) {
-                        Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
-                    }
-                }
-            }
-
-            // legacy code for before switch to planetary systems if planet is at top level
-            if (wn2.getNodeName().equalsIgnoreCase("planet")) {
-                NodeList planetNodes = wn2.getChildNodes();
-                String planetId = null;
-                events = new ArrayList<>();
-                for (int n = 0; n < planetNodes.getLength(); ++n) {
-                    Node planetNode = planetNodes.item(n);
-                    if (planetNode.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-
-                    if (planetNode.getNodeName().equalsIgnoreCase("id")) {
-                        planetId = planetNode.getTextContent();
-                    } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
-                        PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
-                        if (null != event) {
-                            event.custom = true;
-                            events.add(event);
-                        }
-                    }
-                }
-                if (null != planetId) {
-                    Systems.getInstance().updatePlanetaryEvents(planetId, events, true);
-                }
-            }
-        }
+        //TODO: we are no longer tracking planetary events from XML. We weren't allowing this
+        // except by hand-editing the original code anyway since the planetary system XML reboot
+        // so I think its time to retire this code. A future feature will allow players to add
+        // planetary events that can be saved to the campaign file. But until that happens nothing
+        // will actually happen here.
     }
 
     private static void processPartsInUse(Campaign retVal, Node wn) {

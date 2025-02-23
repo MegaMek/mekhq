@@ -54,7 +54,7 @@ import mekhq.utilities.MHQXMLUtility;
  * that modular equipment can now be removed separately. We still need to figure
  * out how to acquire
  * new suits that come pre-packaged with all of their equipment.
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorSuit extends Part {
@@ -326,8 +326,13 @@ public class BattleArmorSuit extends Part {
         // return false;
         return part instanceof BattleArmorSuit
                 && chassis.equals(((BattleArmorSuit) part).getChassis())
-                && model.equals(((BattleArmorSuit) part).getModel())
+                && removeBattleArmorSquadSize(model)
+                    .equals(removeBattleArmorSquadSize(((BattleArmorSuit) part).getModel()))
                 && getStickerPrice().equals(part.getStickerPrice());
+    }
+
+    private String removeBattleArmorSquadSize(String model) {
+        return model.replaceAll("(\\(Sqd\\d)\\)$", "");
     }
 
     @Override
