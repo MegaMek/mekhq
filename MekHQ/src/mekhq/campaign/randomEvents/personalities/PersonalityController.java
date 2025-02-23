@@ -166,12 +166,12 @@ public class PersonalityController {
             traitDescriptions.add(person.getSocial().getDescription(person));
         }
 
-        if (!person.getIntelligence().isAverage()) {
+        if (!person.getIntelligence().isAverageType()) {
             traitDescriptions.add(person.getIntelligence().getDescription(person));
         }
 
         if (!person.getPersonalityQuirk().isNone()) {
-            traitDescriptions.add(person.getPersonalityQuirk().getDescription(campaign, person));
+            traitDescriptions.add(person.getPersonalityQuirk().getDescription(person));
         }
 
         return traitDescriptions;

@@ -291,7 +291,7 @@ public enum PersonalityQuirk {
      * @param person the {@code Person} object for whom the description is being generated
      * @return a formatted description string tailored to the specified person
      */
-    public String getDescription(Campaign campaign, Person person) {
+    public String getDescription(Person person) {
         PersonnelRole primaryRole = person.getPrimaryRole();
 
         if (primaryRole.isDependent() || primaryRole.isNone()) {
@@ -324,7 +324,7 @@ public enum PersonalityQuirk {
             formationKey = "lance";
         }
 
-        Faction faction = campaign.getFaction();
+        Faction faction = person.getOriginFaction();
 
         String factionKey;
         if (faction.isClan()) {

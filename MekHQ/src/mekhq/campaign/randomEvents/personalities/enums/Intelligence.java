@@ -29,34 +29,76 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 public enum Intelligence {
     // region Enum Declarations
-    BRAIN_DEAD,
-    UNINTELLIGENT,
-    FOOLISH,
-    SIMPLE,
-    SLOW,
-    UNINSPIRED,
-    DULL,
-    DIMWITTED,
-    OBTUSE,
-    BELOW_AVERAGE,
-    UNDER_PERFORMING,
-    LIMITED_INSIGHT,
-    AVERAGE,
-    ABOVE_AVERAGE,
-    STUDIOUS,
-    DISCERNING,
-    SHARP,
-    QUICK_WITTED,
-    PERCEPTIVE,
-    BRIGHT,
-    CLEVER,
-    INTELLECTUAL,
-    BRILLIANT,
-    EXCEPTIONAL,
-    GENIUS;
+    // Although we no longer use the descriptive names for intelligence traits, we've kept them
+    // here as it avoids needing to create a handler for old characters
+    BRAIN_DEAD(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    UNINTELLIGENT(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    FOOLISH(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    SIMPLE(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    SLOW(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    UNINSPIRED(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    DULL(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    DIMWITTED(IntelligenceComparison.SIGNIFICANTLY_BELOW_AVERAGE),
+    OBTUSE(IntelligenceComparison.BELOW_AVERAGE),
+    LIMITED_INSIGHT(IntelligenceComparison.BELOW_AVERAGE),
+    UNDER_PERFORMING(IntelligenceComparison.SLIGHTLY_BELOW_AVERAGE),
+    BELOW_AVERAGE(IntelligenceComparison.AVERAGE),
+    AVERAGE(IntelligenceComparison.AVERAGE),
+    ABOVE_AVERAGE(IntelligenceComparison.AVERAGE),
+    STUDIOUS(IntelligenceComparison.SLIGHTLY_ABOVE_AVERAGE),
+    DISCERNING(IntelligenceComparison.ABOVE_AVERAGE),
+    SHARP(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE),
+    QUICK_WITTED(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE),
+    PERCEPTIVE(IntelligenceComparison.SIGNIFICANTLY_ABOVE_AVERAGE),
+    BRIGHT(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
+    CLEVER(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
+    INTELLECTUAL(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
+    BRILLIANT(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
+    EXCEPTIONAL(IntelligenceComparison.VASTLY_ABOVE_AVERAGE),
+    GENIUS(IntelligenceComparison.VASTLY_ABOVE_AVERAGE);
+
+    /**
+     * Enum representing different levels of intelligence comparison. Used when fetching the
+     * user-facing description of any given {@link Intelligence} enum.
+     *
+     * <p>We use this so that we can 'weight' descriptions without needing to create n descriptions
+     * per individual Intelligence level. This way intelligence levels with lower frequency can
+     * share descriptions reducing the overall writing load.</p>
+     */
+    public enum IntelligenceComparison {
+        SIGNIFICANTLY_BELOW_AVERAGE,
+        BELOW_AVERAGE,
+        SLIGHTLY_BELOW_AVERAGE,
+        AVERAGE,
+        SLIGHTLY_ABOVE_AVERAGE,
+        ABOVE_AVERAGE,
+        SIGNIFICANTLY_ABOVE_AVERAGE,
+        VASTLY_ABOVE_AVERAGE,
+    }
     // endregion Enum Declarations
 
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
+
+    private final IntelligenceComparison comparison;
+
+    /**
+     * Constructs an instance of the {@link Intelligence} enum, with an associated
+     * {@link IntelligenceComparison} value.
+     *
+     * @param comparison the {@link IntelligenceComparison} enum value to associate with this
+     *                  {@link Intelligence} enum value
+     */
+    Intelligence(IntelligenceComparison comparison) {
+        this.comparison = comparison;
+    }
+
+    /**
+     * Retrieves the {@link IntelligenceComparison} associated with this {@link Intelligence} enum
+     * value.
+     */
+    public IntelligenceComparison getComparison() {
+        return comparison;
+    }
 
     /**
      * Retrieves the label associated with the current enumeration value.
@@ -83,7 +125,7 @@ public enum Intelligence {
      */
     public String getDescription(Person person) {
         int descriptionIndex = person.getIntelligenceDescriptionIndex();
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
+        final String RESOURCE_KEY = this.getComparison().name() + ".description." + descriptionIndex;
 
         Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
@@ -99,8 +141,13 @@ public enum Intelligence {
     }
 
     // region Boolean Comparison Methods
-    public boolean isAverage() {
-        return this == AVERAGE;
+    /**
+     * Check if the current instance belongs to the average type category.
+     *
+     * @return {@code true} if the instance is of average type, {@code false} otherwise.
+     */
+    public boolean isAverageType() {
+        return this.comparison == IntelligenceComparison.AVERAGE;
     }
     // endregion Boolean Comparison Methods
 

@@ -412,7 +412,7 @@ public class Person {
         personalityQuirk = PersonalityQuirk.NONE;
         personalityQuirkDescriptionIndex = randomInt(3);
         intelligence = Intelligence.AVERAGE;
-        intelligenceDescriptionIndex = randomInt(3);
+        intelligenceDescriptionIndex = randomInt(25);
         personalityDescription = "";
 
         // region Flags
@@ -1856,64 +1856,88 @@ public class Person {
         return aggressionDescriptionIndex;
     }
 
-    public Ambition getAmbition() {
-        return ambition;
+    public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
+        this.aggressionDescriptionIndex = aggressionDescriptionIndex;
     }
 
-    public int getAmbitionDescriptionIndex() {
-        return ambitionDescriptionIndex;
+    public Ambition getAmbition() {
+        return ambition;
     }
 
     public void setAmbition(final Ambition ambition) {
         this.ambition = ambition;
     }
 
-    public Greed getGreed() {
-        return greed;
+    public int getAmbitionDescriptionIndex() {
+        return ambitionDescriptionIndex;
     }
 
-    public int getGreedDescriptionIndex() {
-        return greedDescriptionIndex;
+    public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
+        this.ambitionDescriptionIndex = ambitionDescriptionIndex;
+    }
+
+    public Greed getGreed() {
+        return greed;
     }
 
     public void setGreed(final Greed greed) {
         this.greed = greed;
     }
 
-    public Social getSocial() {
-        return social;
+    public int getGreedDescriptionIndex() {
+        return greedDescriptionIndex;
     }
 
-    public int getSocialDescriptionIndex() {
-        return socialDescriptionIndex;
+    public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
+        this.greedDescriptionIndex = greedDescriptionIndex;
+    }
+
+    public Social getSocial() {
+        return social;
     }
 
     public void setSocial(final Social social) {
         this.social = social;
     }
 
-    public PersonalityQuirk getPersonalityQuirk() {
-        return personalityQuirk;
+    public int getSocialDescriptionIndex() {
+        return socialDescriptionIndex;
     }
 
-    public int getPersonalityQuirkDescriptionIndex() {
-        return personalityQuirkDescriptionIndex;
+    public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
+        this.socialDescriptionIndex = socialDescriptionIndex;
+    }
+
+    public PersonalityQuirk getPersonalityQuirk() {
+        return personalityQuirk;
     }
 
     public void setPersonalityQuirk(final PersonalityQuirk personalityQuirk) {
         this.personalityQuirk = personalityQuirk;
     }
 
+    public int getPersonalityQuirkDescriptionIndex() {
+        return personalityQuirkDescriptionIndex;
+    }
+
+    public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
+        this.personalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
+    }
+
     public Intelligence getIntelligence() {
         return intelligence;
+    }
+
+    public void setIntelligence(final Intelligence intelligence) {
+        this.intelligence = intelligence;
     }
 
     public int getIntelligenceDescriptionIndex() {
         return intelligenceDescriptionIndex;
     }
 
-    public void setIntelligence(final Intelligence intelligence) {
-        this.intelligence = intelligence;
+    public void setIntelligenceDescriptionIndex(final int intelligenceDescriptionIndex) {
+        this.intelligenceDescriptionIndex = intelligenceDescriptionIndex;
     }
 
     public String getPersonalityDescription() {

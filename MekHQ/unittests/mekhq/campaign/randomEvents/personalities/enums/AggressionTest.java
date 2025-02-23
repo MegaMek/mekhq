@@ -24,7 +24,10 @@ import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.DECISIVE;
 import static mekhq.campaign.randomEvents.personalities.enums.Aggression.NONE;
+import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.AVERAGE;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -69,26 +72,23 @@ public class AggressionTest {
         Campaign campaign = mock(Campaign.class);
         Person person = new Person(campaign);
 
-        for (Aggression status : Aggression.values()) {
-            String titleExtension = status.getDescription(person);
-            assertTrue(isResourceKeyValid(titleExtension));
+        for (Aggression trait : Aggression.values()) {
+            for (int i = 0; i < 3; i++) {
+                person.setAggressionDescriptionIndex(i);
+                String description = trait.getDescription(person);
+                assertTrue(isResourceKeyValid(description));
+            }
         }
     }
 
-    /**
-     * Checks if the given text is a valid title extension. A valid title extension
-     * does not start or end with an exclamation mark ('!').
-     *
-     * <p>If {@link mekhq.utilities.MHQInternationalization} fails to fetch a valid return it
-     * returns the key between two {@code !}. So by checking the returned string doesn't begin and
-     * end with that punctuation, we can easily verify that all statuses have been provided results
-     * for the keys we're using.</p>
-     *
-     * @param text The text to validate as a title extension.
-     * @return true if the text is valid (does not start or end with an '!');
-     *         false otherwise.
-     */
-    public static boolean isResourceKeyValid(String text) {
-        return !text.startsWith("!") && !text.endsWith("!");
+    @Test
+    public void testGetDescription_InvalidDescriptionIndex() {
+        Campaign campaign = mock(Campaign.class);
+
+        Person person = new Person(campaign);
+        person.setAggressionDescriptionIndex(Integer.MAX_VALUE);
+
+        String description = NONE.getDescription(person);
+        assertFalse(isResourceKeyValid(description));
     }
 }

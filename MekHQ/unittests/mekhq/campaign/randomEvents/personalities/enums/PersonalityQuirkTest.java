@@ -20,11 +20,17 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.Test;
 
+import static mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC;
+import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.CLAUSTROPHOBIA;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.OBJECT;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -57,38 +63,46 @@ public class PersonalityQuirkTest {
     }
 
     @Test
-    public void testGetLabel_notInvalid() {
-        for (PersonalityQuirk status : PersonalityQuirk.values()) {
-            String label = status.getLabel();
-            assertTrue(isResourceKeyValid(label));
+    public void testGetDescription_notInvalid_Combatant() {
+        Campaign campaign = mock(Campaign.class);
+
+        Person person = new Person(campaign);
+        person.setPrimaryRole(campaign, MEKWARRIOR);
+
+        for (PersonalityQuirk trait : PersonalityQuirk.values()) {
+            for (int i = 0; i < 3; i++) {
+                person.setPersonalityQuirkDescriptionIndex(i);
+                String description = trait.getDescription(person);
+                assertTrue(isResourceKeyValid(description));
+            }
         }
     }
 
     @Test
-    public void testGetDescription_notInvalid() {
+    public void testGetDescription_notInvalid_Support() {
         Campaign campaign = mock(Campaign.class);
-        Person person = new Person(campaign);
 
-        for (PersonalityQuirk status : PersonalityQuirk.values()) {
-            String titleExtension = status.getDescription(campaign, person);
-            assertTrue(isResourceKeyValid(titleExtension));
+        Person person = new Person(campaign);
+        person.setPrimaryRole(campaign, MECHANIC);
+
+        for (PersonalityQuirk trait : PersonalityQuirk.values()) {
+            for (int i = 0; i < 3; i++) {
+                person.setPersonalityQuirkDescriptionIndex(i);
+                String description = trait.getDescription(person);
+                assertTrue(isResourceKeyValid(description));
+            }
         }
     }
 
-    /**
-     * Checks if the given text is a valid title extension. A valid title extension
-     * does not start or end with an exclamation mark ('!').
-     *
-     * <p>If {@link mekhq.utilities.MHQInternationalization} fails to fetch a valid return it
-     * returns the key between two {@code !}. So by checking the returned string doesn't begin and
-     * end with that punctuation, we can easily verify that all statuses have been provided results
-     * for the keys we're using.</p>
-     *
-     * @param text The text to validate as a title extension.
-     * @return true if the text is valid (does not start or end with an '!');
-     *         false otherwise.
-     */
-    public static boolean isResourceKeyValid(String text) {
-        return !text.startsWith("!") && !text.endsWith("!");
+    @Test
+    public void testGetDescription_InvalidDescriptionIndex() {
+        Campaign campaign = mock(Campaign.class);
+
+        Person person = new Person(campaign);
+        person.setPrimaryRole(campaign, MEKWARRIOR);
+        person.setPersonalityQuirkDescriptionIndex(Integer.MAX_VALUE);
+
+        String description = NONE.getDescription(person);
+        assertFalse(isResourceKeyValid(description));
     }
 }
