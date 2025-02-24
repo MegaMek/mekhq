@@ -27,6 +27,7 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -43,9 +44,9 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import static java.lang.Math.floor;
-import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
-
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.d6;
+import static mekhq.campaign.mission.AtBContract.getEffectiveNumUnits;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 
 /**
@@ -495,6 +496,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         double multiplier = 1.0;
 
         // Operations tempo
@@ -512,8 +514,14 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         // Reputation multiplier
-        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (campaign.getReputation().getReputationModifier() * 0.2) + 0.5;
+        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+            double reputationFactor = campaign.getReputation().getReputationFactor();
+
+            if (campaignOptions.isClampReputationPayMultiplier()) {
+                reputationFactor = clamp(reputationFactor, 0.5, 2.0);
+            }
+
+            multiplier *= reputationFactor;
         } else {
             int unitRatingMod = campaign.getAtBUnitRatingMod();
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
