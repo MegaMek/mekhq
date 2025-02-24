@@ -47,7 +47,7 @@ import static java.lang.Math.round;
 import static java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.force.ForceType.SECURITY;
-import static mekhq.campaign.rating.CamOpsReputation.CommandRating.getPersonalityValue;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -349,7 +349,8 @@ public class PrisonerEventManager {
     private boolean makeEventCheck(PrisonerEventData eventData, int choiceIndex) {
         int responseModifier = 0;
         if (speaker != null) {
-            responseModifier = getPersonalityValue(campaign, speaker);
+            responseModifier = getPersonalityValue(campaign.getCampaignOptions().isUseRandomPersonalities(),
+                speaker.getAggression(), speaker.getAmbition(), speaker.getGreed(), speaker.getSocial());
         }
 
         if (speaker == null) {
