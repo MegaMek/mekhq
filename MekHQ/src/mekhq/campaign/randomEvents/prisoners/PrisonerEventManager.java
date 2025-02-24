@@ -24,6 +24,7 @@ import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -78,6 +79,16 @@ public class PrisonerEventManager {
 
     public static final int DEFAULT_TEMPORARY_CAPACITY = 100;
     public static final double TEMPORARY_CAPACITY_DEGRADE_RATE = 0.1;
+
+    // These values are based on CamOps. CamOps states a squad of CI or one squad of BA can
+    // handle 100 prisoners. As there are usually around 21 soldiers in a CI platoon and 5 BA
+    // in a Clan BA Squad, we extrapolated from there to more easily handle different platoon and
+    // squad sizes. However, the idea that a single squad of 7 soldiers can manage 100 prisoners is
+    // a stretch, so we suggested errata-ing it to 100 per platoon, and these numbers reflect that.
+    public static final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 5;
+    public static final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
+    public static final int PRISONER_CAPACITY_OTHER = 2;
+    public static final int PRISONER_CAPACITY_CAM_OPS_MULTIPLIER = 3;
 
     // Fixed Dialog Options
     private final int CHOICE_FREE = 1;
@@ -216,20 +227,27 @@ public class PrisonerEventManager {
 
         int overflow = prisonerCapacityUsage - prisonerCapacity;
 
-        if (overflow <= 0) {
+        if (overflow <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
             // No risk of event
             return List.of(false, false);
         }
 
-        boolean minorEvent = randomInt(100) < overflow;
+        int eventRoll = randomInt(100);
+        boolean minorEvent = eventRoll < overflow;
+
+        if (eventRoll == 0) {
+            minorEvent = true;
+        }
+
         // Does the minor event escalate into a major event?
+        eventRoll = randomInt(100);
         boolean majorEvent = minorEvent
             && (totalPrisoners > MINIMUM_PRISONER_COUNT)
-            && (randomInt(100) < overflow);
+            && (eventRoll < overflow || eventRoll == 0);
 
         // If there is no event, throw up a warning and give the player an opportunity to do
         // something about the situation.
-        if (!minorEvent) {
+        if (!minorEvent && overflow > 0) {
             if (!isHeadless) {
                 processWarning(overflow);
             }
@@ -240,7 +258,7 @@ public class PrisonerEventManager {
         if (!isHeadless) {
             processRandomEvent(majorEvent);
         }
-        return List.of(minorEvent, majorEvent);
+        return List.of(true, majorEvent);
     }
 
     /**
@@ -482,16 +500,9 @@ public class PrisonerEventManager {
      * @return The total prisoner capacity.
      */
     public static int calculatePrisonerCapacity(Campaign campaign) {
-        PrisonerCaptureStyle captureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        PrisonerCaptureStyle captureStyle = campaignOptions.getPrisonerCaptureStyle();
         boolean isMekHQCaptureStyle = captureStyle.isMekHQ();
-
-        // These values are based on CamOps. CamOps states a platoon of CI or one squad of BA can
-        // handle 100 prisoners. As there are usually around 28 soldiers in a CI platoon and 5 BA
-        // in a BA Squad, we extrapolated from there to more easily handle different platoon and
-        // squad sizes.
-        final int PRISONER_CAPACITY_CONVENTIONAL_INFANTRY = 4;
-        final int PRISONER_CAPACITY_BATTLE_ARMOR = 20;
-        final int PRISONER_CAPACITY_OTHER = 2;
 
         int prisonerCapacity = 0;
 
@@ -518,7 +529,9 @@ public class PrisonerEventManager {
                     int crewSize = unit.getCrew().size();
                     for (int trooper = 0; trooper < crewSize; trooper++) {
                         if (unit.isBattleArmorSuitOperable(trooper)) {
-                            prisonerCapacity += PRISONER_CAPACITY_BATTLE_ARMOR;
+                            prisonerCapacity += isMekHQCaptureStyle
+                                ? PRISONER_CAPACITY_BATTLE_ARMOR
+                                : PRISONER_CAPACITY_BATTLE_ARMOR * PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
 
@@ -528,7 +541,9 @@ public class PrisonerEventManager {
                 if (unit.isConventionalInfantry()) {
                     for (Person soldier : unit.getCrew()) {
                         if (!soldier.needsFixing()) {
-                            prisonerCapacity += PRISONER_CAPACITY_CONVENTIONAL_INFANTRY;
+                            prisonerCapacity += isMekHQCaptureStyle
+                                ? PRISONER_CAPACITY_CONVENTIONAL_INFANTRY
+                                : PRISONER_CAPACITY_CONVENTIONAL_INFANTRY * PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
                     continue;
