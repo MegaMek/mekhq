@@ -20,11 +20,10 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 
+import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
@@ -32,6 +31,22 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Represents various personality quirks that can define an individual's behavior or habits.
+ *
+ * <p>
+ * This enumeration describes a wide array of personality quirks that may manifest in characters,
+ * ranging from minor habits like "FIDGETS" or "CLEANER" to more distinct and situational traits
+ * like "DRAMATIC" or "BATTLEFIELD_NOSTALGIA." These quirks provide depth and individuality to
+ * characters in campaigns, aiding storytelling and immersion in the MekHQ ecosystem.
+ * </p>
+ *
+ * <p>
+ * Each personality quirk is paired with localized labels and descriptions using resource bundles,
+ * enabling custom, gender-specific, and role-based descriptions such as combat or support roles.
+ * Additionally, quirks can integrate with broader faction-based labels for more tailored storytelling.
+ * </p>
+ */
 public enum PersonalityQuirk {
     // region Enum Declarations
     NONE,
@@ -269,6 +284,15 @@ public enum PersonalityQuirk {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     /**
+     * Defines the number of individual description variants available for each trait.
+     *
+     * <p>Note that this should be equal to the number of description variants for each type of
+     * role (combat or support) and not both combined. i.e., if there are three variants for Combat
+     * and three for Support, this should equal 3 and not 6.</p>
+     */
+    public final static int MAXIMUM_VARIATIONS = 3;
+
+    /**
      * Retrieves the label associated with the current enumeration value.
      *
      * <p>The label is determined based on the resource bundle for the application,
@@ -285,20 +309,34 @@ public enum PersonalityQuirk {
     }
 
     /**
-     * Generates a description for a specified person based on their social description index,
-     * pronoun, and other properties specific to the person and resource bundle.
+     * Generates a localized and detailed description for a person based on their role, personality,
+     * gender, faction origin, and given name.
+     * <p>
+     * This method uses the provided role and personality quirk index, along with character attributes
+     * like gender and faction, to generate a formatted description string. The description incorporates
+     * pronouns and other character-specific details, tailoring the result for the user.
+     * </p>
      *
-     * @param person the {@code Person} object for whom the description is being generated
-     * @return a formatted description string tailored to the specified person
+     * @param primaryRole       the primary {@link PersonnelRole} of the person. If the role is
+     *                         marked as "dependent" or "None", no description is generated.
+     * @param personalityQuirkIndex an index representing the person's personality quirk description
+     *                             variant. This is clamped to a valid range from 0 to
+     *                             {@code MAXIMUM_VARIATIONS - 1}.
+     * @param gender            the {@link Gender} of the person, used to determine pronouns for
+     *                         the description.
+     * @param originFaction     the {@link Faction} representing the person's origin.
+     * @param givenName         the given name of the person. This <b>MUST</b> use 'person.getGivenName()'
+     *                         and <b>NOT</b> 'person.getFirstName()'
+     * @return                  a formatted description string tailored to the specified person. Returns
+     *                          an empty string if the {@code primaryRole} is "dependent" or "none.
      */
-    public String getDescription(Person person) {
-        PersonnelRole primaryRole = person.getPrimaryRole();
-
+    public String getDescription(final PersonnelRole primaryRole, int personalityQuirkIndex,
+                                 final Gender gender, final Faction originFaction, final String givenName) {
         if (primaryRole.isDependent() || primaryRole.isNone()) {
             return "";
         }
 
-        int descriptionIndex = person.getPersonalityQuirkDescriptionIndex();
+        personalityQuirkIndex = clamp(personalityQuirkIndex, 0, MAXIMUM_VARIATIONS - 1);
 
         String professionKey;
         if (primaryRole.isCombat()) {
@@ -307,9 +345,8 @@ public enum PersonalityQuirk {
             professionKey = "SUPPORT";
         }
 
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex + '.' + professionKey;
+        final String RESOURCE_KEY = name() + ".description." + personalityQuirkIndex + '.' + professionKey;
 
-        Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
         String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
         String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
@@ -324,12 +361,10 @@ public enum PersonalityQuirk {
             formationKey = "lance";
         }
 
-        Faction faction = person.getOriginFaction();
-
         String factionKey;
-        if (faction.isClan()) {
+        if (originFaction.isClan()) {
             factionKey = "clan";
-        } else if (faction.isComStarOrWoB()) {
+        } else if (originFaction.isComStarOrWoB()) {
             factionKey = "comStar";
         } else {
             factionKey = "innerSphere";
@@ -339,9 +374,9 @@ public enum PersonalityQuirk {
         String lanceLabelUppercase  = getFormattedTextAt(RESOURCE_BUNDLE,
             formationKey + '.' + factionKey + ".uppercase");
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, person.getGivenName(),
-            subjectPronoun, subjectPronounLowerCase, objectPronoun, objectPronounLowerCase,
-            possessivePronoun, possessivePronounLowerCase, lanceLabelUppercase, lanceLabelLowercase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
+            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
+            possessivePronounLowerCase, lanceLabelUppercase, lanceLabelLowercase);
     }
     // endregion Getters
 

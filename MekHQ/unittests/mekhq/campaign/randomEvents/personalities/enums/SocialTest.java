@@ -22,12 +22,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC;
 import static mekhq.campaign.randomEvents.personalities.enums.Social.FRIENDLY;
+import static mekhq.campaign.randomEvents.personalities.enums.Social.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Social.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -74,7 +73,7 @@ public class SocialTest {
         Person person = new Person(campaign);
 
         for (Social trait : Social.values()) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
                 person.setSocialDescriptionIndex(i);
                 String description = trait.getDescription(person);
                 assertTrue(isResourceKeyValid(description));
@@ -87,9 +86,9 @@ public class SocialTest {
         Campaign campaign = mock(Campaign.class);
 
         Person person = new Person(campaign);
-        person.setSocialDescriptionIndex(Integer.MAX_VALUE);
+        person.setSocialDescriptionIndex(MAXIMUM_VARIATIONS);
 
         String description = NONE.getDescription(person);
-        assertFalse(isResourceKeyValid(description));
+        assertTrue(isResourceKeyValid(description));
     }
 }

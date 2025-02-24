@@ -23,11 +23,10 @@ import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.randomEvents.personalities.enums.Ambition.ASPIRING;
+import static mekhq.campaign.randomEvents.personalities.enums.Ambition.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Ambition.NONE;
-import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.AVERAGE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -73,7 +72,7 @@ public class AmbitionTest {
         Person person = new Person(campaign);
 
         for (Ambition trait : Ambition.values()) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
                 person.setAmbitionDescriptionIndex(i);
                 String description = trait.getDescription(person);
                 assertTrue(isResourceKeyValid(description));
@@ -86,9 +85,9 @@ public class AmbitionTest {
         Campaign campaign = mock(Campaign.class);
 
         Person person = new Person(campaign);
-        person.setAmbitionDescriptionIndex(Integer.MAX_VALUE);
+        person.setAmbitionDescriptionIndex(MAXIMUM_VARIATIONS);
 
         String description = NONE.getDescription(person);
-        assertFalse(isResourceKeyValid(description));
+        assertTrue(isResourceKeyValid(description));
     }
 }

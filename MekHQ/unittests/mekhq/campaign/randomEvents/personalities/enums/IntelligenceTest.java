@@ -23,10 +23,10 @@ import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.AVERAGE;
+import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.OBTUSE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -72,7 +72,7 @@ public class IntelligenceTest {
         Person person = new Person(campaign);
 
         for (Intelligence trait : Intelligence.values()) {
-            for (int i = 0; i < 25; i++) {
+            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
                 person.setIntelligenceDescriptionIndex(i);
                 String description = trait.getDescription(person);
                 assertTrue(isResourceKeyValid(description));
@@ -85,9 +85,9 @@ public class IntelligenceTest {
         Campaign campaign = mock(Campaign.class);
 
         Person person = new Person(campaign);
-        person.setIntelligenceDescriptionIndex(Integer.MAX_VALUE);
+        person.setIntelligenceDescriptionIndex(MAXIMUM_VARIATIONS);
 
         String description = AVERAGE.getDescription(person);
-        assertFalse(isResourceKeyValid(description));
+        assertTrue(isResourceKeyValid(description));
     }
 }

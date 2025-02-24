@@ -55,8 +55,8 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.randomEvents.personalities.enums.*;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -78,6 +78,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.lang.Math.abs;
+import static megamek.codeUtilities.MathUtility.clamp;
 import static megamek.common.Compute.randomInt;
 
 /**
@@ -404,17 +405,17 @@ public class Person {
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
         aggression = Aggression.NONE;
-        aggressionDescriptionIndex = randomInt(3);
+        aggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
         ambition = Ambition.NONE;
-        ambitionDescriptionIndex = randomInt(3);
+        ambitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
         greed = Greed.NONE;
-        greedDescriptionIndex = randomInt(3);
+        greedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
         social = Social.NONE;
-        socialDescriptionIndex = randomInt(3);
+        socialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
         personalityQuirk = PersonalityQuirk.NONE;
-        personalityQuirkDescriptionIndex = randomInt(3);
+        personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         intelligence = Intelligence.AVERAGE;
-        intelligenceDescriptionIndex = randomInt(25);
+        intelligenceDescriptionIndex = randomInt(Intelligence.MAXIMUM_VARIATIONS);
         personalityDescription = "";
 
         // region Flags
@@ -1871,8 +1872,16 @@ public class Person {
         return aggressionDescriptionIndex;
     }
 
+    /**
+     * Sets the index value for the {@link Aggression} description.
+     *
+     * @param aggressionDescriptionIndex The index value to set for the aggression description.
+     *                                    It will be clamped to ensure it remains within the valid
+     *                                    range.
+     */
     public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = aggressionDescriptionIndex;
+        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex,
+            0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
     public Ambition getAmbition() {
@@ -1887,8 +1896,15 @@ public class Person {
         return ambitionDescriptionIndex;
     }
 
+    /**
+     * Sets the index value for the {@link Ambition} description.
+     *
+     * @param ambitionDescriptionIndex The index value to set for the Ambition description. It will
+     *                                be clamped to ensure it remains within the valid range.
+     */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = ambitionDescriptionIndex;
+        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex,
+            0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     public Greed getGreed() {
@@ -1903,8 +1919,15 @@ public class Person {
         return greedDescriptionIndex;
     }
 
+    /**
+     * Sets the index value for the {@link Greed} description.
+     *
+     * @param greedDescriptionIndex The index value to set for the Greed description. It will be
+     *                             clamped to ensure it remains within the valid range.
+     */
     public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = greedDescriptionIndex;
+        this.greedDescriptionIndex = clamp(greedDescriptionIndex,
+            0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
     public Social getSocial() {
@@ -1919,8 +1942,15 @@ public class Person {
         return socialDescriptionIndex;
     }
 
+    /**
+     * Sets the index value for the {@link Social} description.
+     *
+     * @param socialDescriptionIndex The index value to set for the Social description. It will be
+     *                              clamped to ensure it remains within the valid range.
+     */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = socialDescriptionIndex;
+        this.socialDescriptionIndex = clamp(socialDescriptionIndex,
+            0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     public PersonalityQuirk getPersonalityQuirk() {
@@ -1935,8 +1965,16 @@ public class Person {
         return personalityQuirkDescriptionIndex;
     }
 
+    /**
+     * Sets the index value for the {@link PersonalityQuirk} description.
+     *
+     * @param personalityQuirkDescriptionIndex The index value to set for the quirk description.
+     *                                    It will be clamped to ensure it remains within the valid
+     *                                    range.
+     */
     public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
-        this.personalityQuirkDescriptionIndex = personalityQuirkDescriptionIndex;
+        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
+            0, PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
 
     public Intelligence getIntelligence() {
@@ -1951,8 +1989,16 @@ public class Person {
         return intelligenceDescriptionIndex;
     }
 
+    /**
+     * Sets the index value for the {@link Intelligence} description.
+     *
+     * @param intelligenceDescriptionIndex The index value to set for the intelligence description.
+     *                                    It will be clamped to ensure it remains within the valid
+     *                                    range.
+     */
     public void setIntelligenceDescriptionIndex(final int intelligenceDescriptionIndex) {
-        this.intelligenceDescriptionIndex = intelligenceDescriptionIndex;
+        this.intelligenceDescriptionIndex = clamp(intelligenceDescriptionIndex,
+            0, Intelligence.MAXIMUM_VARIATIONS - 1);
     }
 
     public String getPersonalityDescription() {

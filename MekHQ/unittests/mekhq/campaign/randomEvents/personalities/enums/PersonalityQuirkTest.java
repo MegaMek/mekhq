@@ -20,17 +20,15 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.Test;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.CLAUSTROPHOBIA;
+import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.OBJECT;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -86,7 +84,7 @@ public class PersonalityQuirkTest {
         person.setPrimaryRole(campaign, MECHANIC);
 
         for (PersonalityQuirk trait : PersonalityQuirk.values()) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
                 person.setPersonalityQuirkDescriptionIndex(i);
                 String description = trait.getDescription(person);
                 assertTrue(isResourceKeyValid(description));
@@ -100,9 +98,9 @@ public class PersonalityQuirkTest {
 
         Person person = new Person(campaign);
         person.setPrimaryRole(campaign, MEKWARRIOR);
-        person.setPersonalityQuirkDescriptionIndex(Integer.MAX_VALUE);
+        person.setPersonalityQuirkDescriptionIndex(MAXIMUM_VARIATIONS);
 
         String description = NONE.getDescription(person);
-        assertFalse(isResourceKeyValid(description));
+        assertTrue(isResourceKeyValid(description));
     }
 }

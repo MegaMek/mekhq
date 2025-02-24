@@ -20,13 +20,30 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.Person;
 
+import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Represents various levels and traits of intelligence in a personality.
+ *
+ * <p>
+ * This enumeration defines a wide range of intelligence-related traits, each categorized
+ * based on its comparison level. Traits are associated with a broader classification
+ * through {@link IntelligenceComparison}, allowing for simplified grouping and weighting
+ * of intelligence levels.
+ * </p>
+ *
+ * <p>
+ * The intelligence levels range from significantly below average to vastly above average,
+ * with the ability to generate user-facing descriptions and labels using internationalized
+ * resource bundles. Traits also integrate with {@link Gender} to provide personalized and
+ * localized descriptions using gender-specific pronouns.
+ * </p>
+ */
 public enum Intelligence {
     // region Enum Declarations
     // Although we no longer use the descriptive names for intelligence traits, we've kept them
@@ -82,6 +99,11 @@ public enum Intelligence {
     private final IntelligenceComparison comparison;
 
     /**
+     * Defines the number of individual description variants available for each trait.
+     */
+    public final static int MAXIMUM_VARIATIONS = 25;
+
+    /**
      * Constructs an instance of the {@link Intelligence} enum, with an associated
      * {@link IntelligenceComparison} value.
      *
@@ -117,17 +139,28 @@ public enum Intelligence {
     }
 
     /**
-     * Generates a description for a specified person based on their social description index,
-     * pronoun, and other properties specific to the person and resource bundle.
+     * Generates a localized and personalized description for the current enumeration value.
+     * <p>
+     * This method retrieves a description using the enumeration's name and a specific key suffix
+     * derived from the given ambition description index. The description is further customized
+     * using the provided gender-specific pronouns, the individual's given name, and other localized
+     * text from the resource bundle.
+     * </p>
      *
-     * @param person the {@code Person} object for whom the description is being generated
-     * @return a formatted description string tailored to the specified person
+     * @param intelligenceDescriptionIndex an index representing the type/variation of the description.
+     *                                   This value is clamped to ensure it falls within a valid range.
+     * @param gender                     the {@link Gender} of the individual, used to determine
+     *                                   appropriate pronouns for the description.
+     * @param givenName                  the given name of the person. This <b>MUST</b> use
+     *                                  'person.getGivenName()' and <b>NOT</b> 'person.getFirstName()'
+     * @return                           a formatted description string based on the enum,
+     *                                   the individual's gender, name, and aggression description index.
      */
-    public String getDescription(Person person) {
-        int descriptionIndex = person.getIntelligenceDescriptionIndex();
+    public String getDescription(int intelligenceDescriptionIndex, final Gender gender, final String givenName) {
+        final int descriptionIndex = clamp(intelligenceDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+
         final String RESOURCE_KEY = this.getComparison().name() + ".description." + descriptionIndex;
 
-        Gender gender = person.getGender();
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
         String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
         String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
@@ -135,9 +168,9 @@ public enum Intelligence {
         String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
         String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, person.getFirstName(),
-            subjectPronoun, subjectPronounLowerCase, objectPronoun, objectPronounLowerCase,
-            possessivePronoun, possessivePronounLowerCase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
+            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
+            possessivePronounLowerCase);
     }
 
     // region Boolean Comparison Methods

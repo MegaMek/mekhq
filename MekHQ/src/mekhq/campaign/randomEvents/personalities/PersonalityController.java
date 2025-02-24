@@ -19,51 +19,79 @@
 
 package mekhq.campaign.randomEvents.personalities;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.personalities.enums.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Random;
 
 import static megamek.common.Compute.d6;
 import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.randomEvents.personalities.enums.Intelligence.*;
 
+/**
+ * This class is responsible for generating and managing personalities for characters. It assigns
+ * traits such as aggression, ambition, greed, social behavior, intelligence, and personality
+ * quirks to a person, and generates a descriptive personality summary.
+ *
+ * <p>Additionally, this class includes methods for handling fallback personality logic, generating
+ * trait values, and calculating a personality's overall value for campaign mechanics.
+ */
 public class PersonalityController {
     public final static int PERSONALITY_QUIRK_CHANCE = 10;
 
     /**
-     * Generates a personality for the given person. The method assigns various personality traits,
-     * intelligence, and potential quirks to the person.
+     * Generates a personality for the given person by assigning various personality characteristics
+     * such as aggression, ambition, greed, social behavior, intelligence, and optional quirks.
      *
-     * @param person   the person for whom the personality will be generated and updated
+     * <p>The method ensures that each personality characteristic is generated with a specified
+     * probability (1 in 6 by default). If no characteristic is assigned, a fallback mechanism
+     * generates at least one characteristic to ensure a meaningful personality.
+     *
+     * @param person the person for whom the personality will be generated; this person's
+     *               attributes will be updated based on generated traits
      */
     public static void generatePersonality(Person person) {
-        // first, we wipe any pre-existing personality traits
-        person.setAggression(Aggression.NONE);
-        person.setAmbition(Ambition.NONE);
-        person.setGreed(Greed.NONE);
-        person.setSocial(Social.NONE);
-        person.setPersonalityQuirk(PersonalityQuirk.NONE);
-
-        // next, we roll to determine which tables we're rolling on,
-        // then we roll to determine what traits we get on those tables
-        for (int table = 0; table < 4; table++) {
-            // we only want a 1 in 6 chance of getting a personality trait, per table
-            // this prevents trait bloat and helps reduce repetitiveness
-            if (d6() == 1) {
-                setPersonalityTrait(person, table, randomInt(26));
-            }
+        // AGGRESSION
+        // we only want a 1 in 6 chance of getting a personality trait, per characteristic, this
+        // prevents trait bloat and helps reduce repetitiveness
+        if (d6() == 1) {
+            String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+            person.setAggression(Aggression.fromString(traitIndex));
+        } else {
+            person.setAggression(Aggression.NONE);
         }
 
-        // we only want 1 in 10 persons to have a quirk,
-        // as these helps reduce repetitiveness and keeps them unique
-        if (randomInt(PERSONALITY_QUIRK_CHANCE) == 0) {
-            person.setPersonalityQuirk(generatePersonalityQuirk());
+        // AMBITION
+        if (d6() == 1) {
+            String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+            person.setAmbition(Ambition.fromString(traitIndex));
+        } else {
+            person.setAmbition(Ambition.NONE);
+        }
+
+        // GREED
+        if (d6() == 1) {
+            String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+            person.setGreed(Greed.fromString(traitIndex));
+        } else {
+            person.setGreed(Greed.NONE);
+        }
+
+        // SOCIAL
+        if (d6() == 1) {
+            String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+            person.setSocial(Social.fromString(traitIndex));
+        } else {
+            person.setSocial(Social.NONE);
+        }
+
+        // PERSONALITY QUIRK
+        if (d6() == 1) {
+            generateAndApplyPersonalityQuirk(person);
+        } else {
+            person.setPersonalityQuirk(PersonalityQuirk.NONE);
         }
 
         person.setIntelligence(generateIntelligence(randomInt(8346)));
@@ -71,52 +99,89 @@ public class PersonalityController {
         // finally, write the description
         writeDescription(person);
 
-        // check at least one characteristic has been generated, if not, then repeat the
-        // process
-        // while this might create a couple of loops,
-        // probability says we can only expect 1 additional loop, 2 in exceptional
-        // circumstances
-        if (Objects.equals(person.getPersonalityDescription(), "")) {
-            generatePersonality(person);
+        // check at least one characteristic has been generated, if not, then pick a characteristic
+        // at random
+        if (person.getPersonalityDescription().isBlank()) {
+            performPersonalityGenerationFallback(person);
+            writeDescription(person);
         }
     }
 
     /**
-     * Sets the personality traits of a person based on the given table roll and
-     * trait roll.
+     * Generates and applies a personality quirk to the given person. This method ensures the quirk
+     * index is valid by rolling a random value between 1 and the number of quirk constants in the
+     * {@link PersonalityQuirk} enum.
      *
-     * @param person    the person whose personality traits will be set
-     * @param tableRoll the table roll used to determine which personality trait to
-     *                  set
-     * @param traitRoll the roll used to generate the value of the personality trait
-     * @throws IllegalStateException if an unexpected value is rolled for tableRoll
-     *                               parameter
+     * @param person the person to whom the personality quirk will be applied; their quirk
+     *               attribute is updated based on the rolled quirk
      */
-    private static void setPersonalityTrait(Person person, int tableRoll, int traitRoll) {
-        // We want major traits to have a low chance of occurring.
-        // This ensures each trait only has a 1 in 25 chance of spawning
-        if (traitRoll == 25) {
+    private static void generateAndApplyPersonalityQuirk(Person person) {
+        // This ensures we're rolling a value between 1 and the maximum index in the enum
+        int traitRoll = 1 + randomInt(PersonalityQuirk.values().length - 1);
+        String traitIndex = String.valueOf(traitRoll);
+
+        person.setPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
+    }
+
+    /**
+     * Fallback mechanism to ensure the person has at least one personality characteristic. If
+     * no characteristics were generated during the initial roll in {@link #generatePersonality},
+     * this method assigns one characteristic at random.
+     *
+     * @param person the person whose personality will be updated with a fallback characteristic
+     */
+    private static void performPersonalityGenerationFallback(Person person) {
+        int roll = randomInt(5);
+
+        switch (roll) {
+            case 0 -> {
+                String traitIndex = getTraitIndex(Aggression.MAJOR_TRAITS_START_INDEX);
+                person.setAggression(Aggression.fromString(traitIndex));
+            }
+            case 1 -> {
+                String traitIndex = getTraitIndex(Ambition.MAJOR_TRAITS_START_INDEX);
+                person.setAmbition(Ambition.fromString(traitIndex));
+            }
+            case 2 -> {
+                String traitIndex = getTraitIndex(Greed.MAJOR_TRAITS_START_INDEX);
+                person.setGreed(Greed.fromString(traitIndex));
+            }
+            case 3 -> {
+                String traitIndex = getTraitIndex(Social.MAJOR_TRAITS_START_INDEX);
+                person.setSocial(Social.fromString(traitIndex));
+            }
+            default -> generateAndApplyPersonalityQuirk(person);
+        }
+    }
+
+    /**
+     * Generates a trait index based on the provided starting index for major traits.
+     *
+     * <p>The method rolls a random integer between 0 and the provided index, and if the
+     * major traits index is rolled, it further rolls a value between 0 and 5 to cover the
+     * extended major traits range.
+     *
+     * @param majorTraitsStartIndex the starting index for major traits in the enum
+     * @return a {@link String} representation of a valid trait index within the trait range
+     */
+    private static String getTraitIndex(final int majorTraitsStartIndex) {
+        // This gives us a random number between 1 and the start of the major traits
+        int traitRoll = randomInt(majorTraitsStartIndex + 1);
+
+        if (traitRoll == majorTraitsStartIndex) {
+            // We're deliberately not using d6() here as we want 0 to be a possibility
             traitRoll += randomInt(6);
         }
 
-        String rollString = String.valueOf(traitRoll);
-
-        switch (tableRoll) {
-            case 0 -> person.setAggression(Aggression.fromString(rollString));
-            case 1 -> person.setAmbition(Ambition.fromString(rollString));
-            case 2 -> person.setGreed(Greed.fromString(rollString));
-            case 3 -> person.setSocial(Social.fromString(rollString));
-            default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/setPersonalityTrait: "
-                            + tableRoll);
-        }
+        return String.valueOf(traitRoll);
     }
 
     /**
-     * Sets the personality description of a person based on their personality
-     * traits.
+     * Generates and sets a descriptive personality summary for the given person based on their
+     * assigned personality traits and quirks. It combines descriptions for each non-default
+     * characteristic and formats them into paragraphs.
      *
-     * @param person the person whose personality description will be set
+     * @param person the person whose personality description will be generated and updated
      */
     public static void writeDescription(Person person) {
         List<String> traitDescriptions = getTraitDescriptions(person);
@@ -148,66 +213,99 @@ public class PersonalityController {
     }
 
     /**
-     * Retrieves descriptions for various personality traits of the given person. Each non-default
-     * personality trait is processed to generate a corresponding description, which is then added
-     * to the resulting list.
+     * Retrieves the descriptions of all assigned personality traits for the given person. Each
+     * trait is processed to generate a detailed description, which is then collated into a list of
+     * strings.
      *
-     * @param person   the person whose personality trait descriptions are to be retrieved
-     * @return a list of strings containing descriptions of the person's personality traits
+     * @param person the person whose personality traits will be described
+     * @return a list of strings representing the descriptions of the person's traits, excluding
+     * default values
      */
     private static List<String> getTraitDescriptions(Person person) {
         List<String> traitDescriptions = new ArrayList<>();
 
-        if (!person.getAggression().isNone()) {
-            traitDescriptions.add(person.getAggression().getDescription(person));
+        final Gender gender = person.getGender();
+        final String givenName = person.getGivenName();
+
+        // AGGRESSION
+        Aggression aggression = person.getAggression();
+        if (!aggression.isNone()) {
+            String traitDescription = aggression.getDescription(
+                person.getAggressionDescriptionIndex(), gender, givenName);
+
+            if (!traitDescription.isBlank()) {
+                traitDescriptions.add(traitDescription);
+            }
         }
 
-        if (!person.getAmbition().isNone()) {
-            traitDescriptions.add(person.getAmbition().getDescription(person));
+        // AMBITION
+        Ambition ambition = person.getAmbition();
+        if (!ambition.isNone()) {
+            String traitDescription = ambition.getDescription(
+                person.getAmbitionDescriptionIndex(), gender, givenName);
+
+            if (!traitDescription.isBlank()) {
+                traitDescriptions.add(traitDescription);
+            }
         }
 
-        if (!person.getGreed().isNone()) {
-            traitDescriptions.add(person.getGreed().getDescription(person));
+        // GREED
+        Greed greed = person.getGreed();
+        if (!greed.isNone()) {
+            String traitDescription = greed.getDescription(
+                person.getGreedDescriptionIndex(), gender, givenName);
+
+            if (!traitDescription.isBlank()) {
+                traitDescriptions.add(traitDescription);
+            }
         }
 
-        if (!person.getSocial().isNone()) {
-            traitDescriptions.add(person.getSocial().getDescription(person));
+        // SOCIAL
+        Social social = person.getSocial();
+        if (!social.isNone()) {
+            String traitDescription = social.getDescription(
+                person.getSocialDescriptionIndex(), gender, givenName);
+
+            if (!traitDescription.isBlank()) {
+                traitDescriptions.add(traitDescription);
+            }
         }
 
-        if (!person.getIntelligence().isAverageType()) {
-            traitDescriptions.add(person.getIntelligence().getDescription(person));
+        // INTELLIGENCE
+        Intelligence intelligence = person.getIntelligence();
+        if (!intelligence.isAverageType()) {
+            String traitDescription = intelligence.getDescription(
+                person.getIntelligenceDescriptionIndex(), gender, givenName);
+
+            if (!traitDescription.isBlank()) {
+                traitDescriptions.add(traitDescription);
+            }
         }
 
-        if (!person.getPersonalityQuirk().isNone()) {
-            traitDescriptions.add(person.getPersonalityQuirk().getDescription(person));
+        // PERSONALITY QUIRK
+        PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
+        if (!personalityQuirk.isNone()) {
+            String traitDescription = personalityQuirk.getDescription(
+                person.getPrimaryRole(), person.getPersonalityQuirkDescriptionIndex(), gender,
+                person.getOriginFaction(), givenName
+            );
+
+            if (!traitDescription.isBlank()) {
+                traitDescriptions.add(traitDescription);
+            }
         }
 
         return traitDescriptions;
     }
 
     /**
-     * @return a random personality quirk for a person.
-     */
-    public static PersonalityQuirk generatePersonalityQuirk() {
-        Random random = new Random();
-        PersonalityQuirk[] values = PersonalityQuirk.values();
-
-        PersonalityQuirk randomQuirk = PersonalityQuirk.NONE;
-
-        // we want to keep re-rolling until we hit a quirk that isn't 'NONE.'
-        while (randomQuirk == PersonalityQuirk.NONE) {
-            randomQuirk = values[random.nextInt(values.length)];
-        }
-
-        return randomQuirk;
-    }
-
-    /**
-     * Generates an Intelligence enum value based on a random roll.
+     * Generates an Intelligence enum value for a person based on a randomly rolled value. Each
+     * intelligence level is mapped to a specific range of values, with lower rolls producing less
+     * intelligent results and higher rolls producing more intelligent results.
      *
-     * @param roll the random roll used to determine the Intelligence enum value
-     * @return the generated Intelligence enum value
-     * @throws IllegalStateException if an unexpected value is rolled
+     * @param roll the random roll value used to determine the Intelligence enum value
+     * @return the Intelligence enum value corresponding to the rolled range
+     * @throws IllegalStateException if the roll exceeds the expected value range
      */
     private static Intelligence generateIntelligence(int roll) {
         if (roll < 1) {
@@ -268,50 +366,53 @@ public class PersonalityController {
     }
 
     /**
-     * Calculates the total value of a person's personality characteristics.
+     * Calculates the total personality value for a person based on their assigned personality
+     * traits (aggression, ambition, greed, and social behavior) and whether personalities are
+     * enabled in the campaign options.
      *
-     * @param campaign the current campaign
-     * @param person   the person to calculate the personality value for
-     * @return the total personality value of the person in the campaign
+     * <p>The calculation assigns positive or negative values to each trait depending on whether it
+     * is considered positive or negative, with major traits contributing more heavily to the total
+     * value. If personality mechanics are disabled, the method will return 0.</p>
+     *
+     * @param isUseRandomPersonalities a flag indicating whether random personalities are enabled in
+     *                                 the campaign options; if false, the method will return 0
+     * @param aggression the {@link Aggression} trait assigned to the person
+     * @param ambition the {@link Ambition} trait assigned to the person
+     * @param greed the {@link Greed} trait assigned to the person
+     * @param social the {@link Social} trait assigned to the person
+     * @return the total personality value, which is the sum of values contributed by each trait,
+     *         or 0 if personalities are not enabled
      */
-    public static int getPersonalityValue(Campaign campaign, Person person) {
-        if (person == null) {
+    public static int getPersonalityValue(final boolean isUseRandomPersonalities,
+                                          final Aggression aggression, final Ambition ambition,
+                                          final Greed greed, final Social social) {
+        if (!isUseRandomPersonalities) {
             return 0;
         }
 
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int personalityValue = 0;
+        int modifier;
 
-        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseRandomPersonalityReputation()) {
-            int personalityValue = 0;
-            int modifier;
-
-            Aggression aggression = person.getAggression();
-            if (!person.getAggression().isNone()) {
-                modifier = aggression.isTraitPositive() ? 1 : -1;
-                personalityValue += aggression.isTraitMajor() ? modifier * 2 : modifier;
-            }
-
-            Ambition ambition = person.getAmbition();
-            if (!person.getAmbition().isNone()) {
-                modifier = ambition.isTraitPositive() ? 1 : -1;
-                personalityValue += ambition.isTraitMajor() ? modifier * 2 : modifier;
-            }
-
-            Greed greed = person.getGreed();
-            if (!person.getGreed().isNone()) {
-                modifier = greed.isTraitPositive() ? 1 : -1;
-                personalityValue += greed.isTraitMajor() ? modifier * 2 : modifier;
-            }
-
-            Social social = person.getSocial();
-            if (!person.getSocial().isNone()) {
-                modifier = social.isTraitPositive() ? 1 : -1;
-                personalityValue += social.isTraitMajor() ? modifier * 2 : modifier;
-            }
-
-            return personalityValue;
-        } else {
-            return 0;
+        if (!aggression.isNone()) {
+            modifier = aggression.isTraitPositive() ? 1 : -1;
+            personalityValue += aggression.isTraitMajor() ? modifier * 2 : modifier;
         }
+
+        if (!ambition.isNone()) {
+            modifier = ambition.isTraitPositive() ? 1 : -1;
+            personalityValue += ambition.isTraitMajor() ? modifier * 2 : modifier;
+        }
+
+        if (!greed.isNone()) {
+            modifier = greed.isTraitPositive() ? 1 : -1;
+            personalityValue += greed.isTraitMajor() ? modifier * 2 : modifier;
+        }
+
+        if (!social.isNone()) {
+            modifier = social.isTraitPositive() ? 1 : -1;
+            personalityValue += social.isTraitMajor() ? modifier * 2 : modifier;
+        }
+
+        return personalityValue;
     }
 }

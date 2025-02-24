@@ -20,6 +20,7 @@ package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
@@ -58,8 +59,15 @@ public class CommandRating {
         // where we'd add that data
         commandRating.put("traits", 0);
 
-        // this will return 0 if personalities are disabled
-        commandRating.put("personality", getPersonalityValue(campaign, commander));
+        int personalityValue = 0;
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        if (campaignOptions.isUseRandomPersonalityReputation() && commander != null) {
+            personalityValue = getPersonalityValue(campaignOptions.isUseRandomPersonalities(),
+                commander.getAggression(), commander.getAmbition(), commander.getGreed(),
+                commander.getSocial());
+        }
+        commandRating.put("personality", personalityValue);
 
         commandRating.put("total", commandRating.values().stream().mapToInt(rating -> rating).sum());
 

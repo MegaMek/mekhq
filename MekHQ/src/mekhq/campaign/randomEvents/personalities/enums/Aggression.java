@@ -20,13 +20,25 @@ package mekhq.campaign.randomEvents.personalities.enums;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.campaign.personnel.Person;
 
+import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HE_SHE_THEY;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIM_HER_THEM;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
+/**
+ * Represents various levels and traits of aggression in a personality.
+ *
+ * <p>This enumeration defines a wide range of traits that can be associated with a person's
+ * personality. Traits are characterized as either "positive" or not and can optionally be "major"
+ * traits. The enumeration also handles metadata such as retrieving localized labels and
+ * descriptions.</p>
+ *
+ * <p>Some traits, referred to as "Major Traits," denote stronger personality attributes
+ * and are to be handled distinctly. These traits are always listed at the end of the
+ * enumeration.</p>
+ */
 public enum Aggression {
     // region Enum Declarations
     NONE(false, false),
@@ -79,6 +91,16 @@ public enum Aggression {
     final private String RESOURCE_BUNDLE = "mekhq.resources." + getClass().getSimpleName();
 
     /**
+     * Defines the number of individual description variants available for each trait.
+     */
+    public final static int MAXIMUM_VARIATIONS = 3;
+
+    /**
+     * The index at which major traits begin within the enumeration.
+     */
+    public final static int MAJOR_TRAITS_START_INDEX = 25;
+
+    /**
      * Retrieves the label associated with the current enumeration value.
      *
      * <p>The label is determined based on the resource bundle for the application,
@@ -95,19 +117,31 @@ public enum Aggression {
     }
 
     /**
-     * Retrieves the description of the current enumeration value.
+     * Generates a localized and personalized description for the current enumeration value.
+     * <p>
+     * This method retrieves a description using the enumeration's name and a specific key suffix
+     * derived from the given aggression description index. The description is further customized
+     * using the provided gender-specific pronouns, the individual's given name, and other localized
+     * text from the resource bundle.
+     * </p>
      *
-     * <p>The label is determined based on the resource bundle for the application,
-     * utilizing the enum name combined with a specific key suffix to fetch the
-     * relevant localized string.</p>
+     * @param aggressionDescriptionIndex an index representing the type/variation of the description.
+     *                                   This value is clamped to ensure it falls within a valid range.
+     * @param gender                     the {@link Gender} of the individual, used to determine
+     *                                   appropriate pronouns for the description.
+     * @param givenName                  the given name of the person. This <b>MUST</b> use
+     *                                  'person.getGivenName()' and <b>NOT</b> 'person.getFirstName()'
+     * @return                           a formatted description string based on the enum,
+     *                                   the individual's gender, name, and aggression description index.
      *
-     * @return the description associated with this enumeration value
+     * @see Gender
      */
-    public String getDescription(Person person) {
-        int descriptionIndex = person.getAggressionDescriptionIndex();
-        final String RESOURCE_KEY = name() + ".description." + descriptionIndex;
+    public String getDescription(int aggressionDescriptionIndex, final Gender gender,
+                                 final String givenName) {
+        aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
-        Gender gender = person.getGender();
+        final String RESOURCE_KEY = name() + ".description." + aggressionDescriptionIndex;
+
         String subjectPronoun = HE_SHE_THEY.getDescriptorCapitalized(gender);
         String subjectPronounLowerCase = HE_SHE_THEY.getDescriptor(gender);
         String objectPronoun = HIM_HER_THEM.getDescriptorCapitalized(gender);
@@ -115,9 +149,9 @@ public enum Aggression {
         String possessivePronoun = HIS_HER_THEIR.getDescriptorCapitalized(gender);
         String possessivePronounLowerCase = HIS_HER_THEIR.getDescriptor(gender);
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, person.getFirstName(),
-            subjectPronoun, subjectPronounLowerCase, objectPronoun, objectPronounLowerCase,
-            possessivePronoun, possessivePronounLowerCase);
+        return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY, givenName, subjectPronoun,
+            subjectPronounLowerCase, objectPronoun, objectPronounLowerCase, possessivePronoun,
+            possessivePronounLowerCase);
     }
 
     /**
