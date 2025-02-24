@@ -85,8 +85,8 @@ import static java.lang.Math.abs;
  */
 public class Person {
     // region Variable Declarations
-    private static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
-    private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
+    public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
+    public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
     private PersonAwardController awardController;
 
@@ -162,6 +162,7 @@ public class Person {
     private String bloodname;
     private Faction originFaction;
     private Planet originPlanet;
+    private LocalDate becomingBondsmanEndDate;
 
     // assignments
     private Unit unit;
@@ -334,6 +335,7 @@ public class Person {
 
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
+        becomingBondsmanEndDate = null;
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
@@ -452,6 +454,14 @@ public class Person {
         this.originPlanet = originPlanet;
     }
 
+    public LocalDate getBecomingBondsmanEndDate() {
+        return becomingBondsmanEndDate;
+    }
+
+    public void setBecomingBondsmanEndDate(final LocalDate becomingBondsmanEndDate) {
+        this.becomingBondsmanEndDate = becomingBondsmanEndDate;
+    }
+
     public PrisonerStatus getPrisonerStatus() {
         return prisonerStatus;
     }
@@ -479,7 +489,7 @@ public class Person {
         switch (prisonerStatus) {
             case PRISONER:
             case PRISONER_DEFECTOR:
-            case BONDSMAN:
+            case BECOMING_BONDSMAN:
                 setRecruitment(null);
                 setLastRankChangeDate(null);
                 if (log) {
@@ -491,6 +501,11 @@ public class Person {
                                 campaign.getName(), "");
                     }
                 }
+                break;
+            case BONDSMAN:
+                LocalDate today = campaign.getLocalDate();
+                setRecruitment(today);
+                setLastRankChangeDate(today);
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
@@ -1549,7 +1564,7 @@ public class Person {
     }
 
     /**
-     * @return the name corresponding to a individual's loyalty modifier.
+     * @return the name corresponding to an individual's loyalty modifier.
      *
      * @param loyaltyModifier the loyalty modifier
      * @throws IllegalStateException if an unexpected value is passed for
@@ -2001,6 +2016,11 @@ public class Person {
                         originPlanet.getParentSystem().getId(), originPlanet.getId());
             }
 
+            if (becomingBondsmanEndDate != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "becomingBondsmanEndDate",
+                    becomingBondsmanEndDate);
+            }
+
             if (!getPhenotype().isNone()) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
@@ -2356,6 +2376,8 @@ public class Person {
                     } catch (NullPointerException e) {
                         logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("becomingBondsmanEndDate")) {
+                    retVal.becomingBondsmanEndDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
@@ -3461,11 +3483,27 @@ public class Person {
                 getId(), getFullTitle());
     }
 
+    /**
+     * Constructs and returns the full title by combining the rank and full name. If the rank is
+     * not available or an exception occurs while retrieving it, the method will only return the
+     * full name.
+     *
+     * @return the full title as a combination of rank and full name, or just the full name if the
+     * rank is unavailable
+     */
     public String getFullTitle() {
-        String rank = getRankName();
+        String rank = "";
 
-        if (!rank.isBlank()) {
-            rank = rank + ' ';
+        try {
+            rank = getRankName();
+
+            if (!rank.isBlank()) {
+                rank = rank + ' ';
+            }
+        } catch (Exception ignored) {
+            // This try-catch exists to allow us to more easily test Person objects. Previously, if
+            // a method included 'getFullTitle' it would break if the Person object hadn't been
+            // assigned a Rank System.
         }
 
         return rank + getFullName();

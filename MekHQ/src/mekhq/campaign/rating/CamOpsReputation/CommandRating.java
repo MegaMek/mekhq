@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -105,7 +105,7 @@ public class CommandRating {
      * @param person   the person to calculate the personality value for
      * @return the total personality value of the person in the campaign
      */
-    private static int getPersonalityValue(Campaign campaign, Person person) {
+    public static int getPersonalityValue(Campaign campaign, Person person) {
         if (person == null) {
             return 0;
         }

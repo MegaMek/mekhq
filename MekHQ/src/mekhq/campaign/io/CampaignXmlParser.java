@@ -316,6 +316,8 @@ public class CampaignXmlParser {
                     updatePlanetaryEventsFromXML(wn);
                 } else if (xn.equalsIgnoreCase("partsInUse")) {
                     processPartsInUse(retVal, wn);
+                } else if (xn.equalsIgnoreCase("temporaryPrisonerCapacity")) {
+                    retVal.setTemporaryPrisonerCapacity(Integer.parseInt(wn.getTextContent().trim()));
                 }
             } else {
                 // If it's a text node or attribute or whatever at this level,
