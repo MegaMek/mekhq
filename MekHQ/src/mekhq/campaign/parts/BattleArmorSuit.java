@@ -74,6 +74,13 @@ public class BattleArmorSuit extends Part {
     private int introYear;
     private boolean isReplacement;
 
+    // It is costly looking up entity, which is used to compare if two suits
+    // are the same even if the chassis name doesn't match. So let's save these
+    // values if we've already calculated them once.
+    private transient boolean entityDetailsCached = false;
+    private transient int suitBV;
+    private transient int weaponTypeListHash;
+
     public BattleArmorSuit() {
         super(0, null);
         this.trooper = 0;
@@ -321,18 +328,31 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
+        refreshEntityDetailsCache();
+        if (entityDetailsCached) {
+            return part instanceof BattleArmorSuit baSuit
+                && getSuitBV() == baSuit.getSuitBV()
+                && getWeaponTypeListHash() == baSuit.getWeaponTypeListHash()
+                && getStickerPrice().equals(baSuit.getStickerPrice());
+        }
+        // If we didn't successfully cache entity details, use the old method for comparing.
         // because of the linked children parts, we always need to consider these as
         // different
         // return false;
         return part instanceof BattleArmorSuit
-                && chassis.equals(((BattleArmorSuit) part).getChassis())
-                && removeBattleArmorSquadSize(model)
-                    .equals(removeBattleArmorSquadSize(((BattleArmorSuit) part).getModel()))
-                && getStickerPrice().equals(part.getStickerPrice());
+            && chassis.equals(((BattleArmorSuit) part).getChassis())
+            && model.equals(((BattleArmorSuit) part).getModel())
+            && getStickerPrice().equals(part.getStickerPrice());
     }
 
-    private String removeBattleArmorSquadSize(String model) {
-        return model.replaceAll("(\\(Sqd\\d)\\)$", "");
+    public int getSuitBV() {
+        refreshEntityDetailsCache();
+        return suitBV;
+    }
+
+    public int getWeaponTypeListHash() {
+        refreshEntityDetailsCache();
+        return weaponTypeListHash;
     }
 
     @Override
@@ -651,5 +671,17 @@ public class BattleArmorSuit extends Part {
     @Override
     public PartRepairType getMRMSOptionType() {
         return PartRepairType.ARMOUR;
+    }
+
+    private void refreshEntityDetailsCache() {
+        if (!entityDetailsCached) {
+            mekhq.campaign.parts.utilities.BattleArmorSuitUtility battleArmorSuitUtility
+                = new  mekhq.campaign.parts.utilities.BattleArmorSuitUtility(chassis, model);
+            if (battleArmorSuitUtility.hasEntity()) {
+                suitBV = battleArmorSuitUtility.getBattleArmorSuitBV();
+                weaponTypeListHash = battleArmorSuitUtility.getWeaponTypeListHash();
+                entityDetailsCached = true;
+            }
+        }
     }
 }
