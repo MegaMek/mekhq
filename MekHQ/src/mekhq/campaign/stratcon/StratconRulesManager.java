@@ -41,6 +41,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache;
 import mekhq.campaign.mission.resupplyAndCaches.StarLeagueCache.CacheType;
 import mekhq.campaign.personnel.Person;
@@ -171,7 +172,7 @@ public class StratconRulesManager {
                                                  AtBContract contract, StratconTrackState track) {
         // maps scenarios to force IDs
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
 
         int scenarioRolls = track.getRequiredLanceCount();
 
@@ -232,7 +233,7 @@ public class StratconRulesManager {
         final boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
         // get this list just so we have it available
-        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
+        List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
 
         // Build the available force pool - this ensures operational forces have an increased
         // chance of being picked
@@ -392,7 +393,7 @@ public class StratconRulesManager {
          boolean autoAssignLances = contract.getCommandRights().isIntegrated();
 
          // Grab the available lances and sort them by map type
-         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
+         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
          Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs, campaign);
 
          // Select the target coords.
@@ -589,9 +590,9 @@ public class StratconRulesManager {
      * @param autoAssignLances  Flag indicating whether lances are to be auto-assigned.
      * @param scenario        The {@link StratconScenario} scenario to be finalized.
      */
-    private static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
-                        @Nullable StratconTrackState track, boolean autoAssignLances,
-                        StratconScenario scenario) {
+    public static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
+                                               @Nullable StratconTrackState track, boolean autoAssignLances,
+                                               StratconScenario scenario) {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
         // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
@@ -682,35 +683,34 @@ public class StratconRulesManager {
      * @param scenario The {@link StratconScenario} being evaluated to determine if it is a Turning Point.
      */
     private static void determineIfTurningPointScenario(AtBContract contract, StratconScenario scenario) {
-        ScenarioTemplate template = scenario.getScenarioTemplate();
-        boolean isResupply = scenario.getBackingScenario().getStratConScenarioType().isResupply();
+        ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+        boolean isResupply = scenarioType.isResupply();
+        boolean isJailBreak = scenarioType.isJailBreak();
 
-        if (isResupply) {
+        if (isResupply || isJailBreak) {
             scenario.setTurningPoint(false);
             return;
         }
 
         boolean isObjective = scenario.isStrategicObjective();
 
-        if (template == null || !template.getStratConScenarioType().isResupply()) {
-            ContractCommandRights commandRights = contract.getCommandRights();
-            switch (commandRights) {
-                case INTEGRATED -> {
+        ContractCommandRights commandRights = contract.getCommandRights();
+        switch (commandRights) {
+            case INTEGRATED -> {
+                scenario.setTurningPoint(true);
+                if (randomInt(3) == 0 || isObjective) {
+                    setAttachedUnitsModifier(scenario, contract);
+                }
+            }
+            case HOUSE, LIAISON -> {
+                if (randomInt(3) == 0 || isObjective) {
                     scenario.setTurningPoint(true);
-                    if (randomInt(3) == 0 || isObjective) {
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
+                    setAttachedUnitsModifier(scenario, contract);
                 }
-                case HOUSE, LIAISON -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                        setAttachedUnitsModifier(scenario, contract);
-                    }
-                }
-                case INDEPENDENT -> {
-                    if (randomInt(3) == 0 || isObjective) {
-                        scenario.setTurningPoint(true);
-                    }
+            }
+            case INDEPENDENT -> {
+                if (randomInt(3) == 0 || isObjective) {
+                    scenario.setTurningPoint(true);
                 }
             }
         }
@@ -1023,7 +1023,7 @@ public class StratconRulesManager {
                     track.getAssignedCoordForces().get(coords), contract, campaign, track);
             // Otherwise, pick a random force from those available
             } else {
-                List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract);
+                List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
                 Collections.shuffle(availableForceIDs);
 
                 // If the player doesn't have any available forces, we grab a force at random to
@@ -1115,7 +1115,7 @@ public class StratconRulesManager {
      * @param track     The relevant StratCon track.
      * @return The newly set up {@link StratconScenario}.
      */
-    private static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
+    public static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID, Campaign campaign,
                                                   AtBContract contract, StratconTrackState track) {
         return setupScenario(coords, forceID, campaign, contract, track, null, false, null);
     }
@@ -1141,7 +1141,7 @@ public class StratconRulesManager {
      *                         pick a random day within the next 7 days.
      * @return The newly set up {@link StratconScenario}.
      */
-    private static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID,
+    public static @Nullable StratconScenario setupScenario(StratconCoords coords, int forceID,
                                                             Campaign campaign, AtBContract contract,
                                                             StratconTrackState track,
                                                             @Nullable ScenarioTemplate template,
@@ -1831,7 +1831,7 @@ public class StratconRulesManager {
      * @param forceIDs List of force IDs to check
      * @return Sorted hash map
      */
-    private static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
+    public static Map<MapLocation, List<Integer>> sortForcesByMapType(List<Integer> forceIDs, Campaign campaign) {
         Map<MapLocation, List<Integer>> retVal = new HashMap<>();
 
         retVal.put(AllGroundTerrain, new ArrayList<>());
@@ -2139,21 +2139,26 @@ public class StratconRulesManager {
     }
 
     /**
-     * Retrieves a list of force IDs for all combat teams that are both available and suitable for
-     * deployment under a specific contract.
+     * Retrieves a list of force IDs corresponding to combat teams that are eligible for deployment
+     * under a specific contract. The eligibility is determined based on various criteria such as
+     * assignment to the current contract, deployment status, and combat role restrictions.
      *
-     * <p>This method filters out combat teams that do not meet the following criteria:
+     * <p>The method identifies suitable combat teams for deployment by:
      * <ul>
-     *   <li>The combat team must be assigned to the specified contract.</li>
-     *   <li>The combat team must not currently be deployed.</li>
-     *   <li>The combat team must have a role other than "In Reserve".</li>
+     *   <li>Filtering combat teams assigned to the specified contract.</li>
+     *   <li>Excluding combat teams that are already actively deployed.</li>
+     *   <li>Ensuring that combat teams have roles other than "In Reserve" or "Auxiliary"
+     *       (unless role restrictions are bypassed).</li>
+     *   <li>If the team role is "Training," it is included only when the contract type is a Cadre Duty.</li>
      * </ul>
      *
-     * @param campaign The {@link Campaign} object containing all contracts, formations, and states.
-     * @param contract The {@link AtBContract} under which the combat teams are evaluated for deployment.
-     * @return A {@link List} of force IDs ({@link Integer}) corresponding to all suitable combat teams ready for deployment.
+     * @param campaign The {@link Campaign} containing data regarding contracts, combat teams, and their statuses.
+     * @param contract The {@link AtBContract} contract for which combat teams are evaluated based on their eligibility.
+     * @param bypassRoleRestrictions A boolean flag to indicate whether restrictions based on combat roles should be ignored.
+     *                               If {@code true}, all combat teams assigned to the contract are considered eligible.
+     * @return A {@link List} of {@link Integer} force IDs representing combat teams that are ready and suitable for deployment.
      */
-    public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract) {
+    public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract, boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
         ArrayList<CombatTeam> combatTeams = campaign.getAllCombatTeams();
 
@@ -2173,12 +2178,17 @@ public class StratconRulesManager {
 
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
             CombatRole combatRole = combatTeam.getRole();
-            if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
-
+            if (bypassRoleRestrictions) {
+                suitableForces.add(combatTeam.getForceId());
+            } else if (!combatRole.isReserve() && !combatRole.isAuxiliary()) {
                 if (!combatRole.isTraining() || contract.getContractType().isCadreDuty()) {
                     suitableForces.add(combatTeam.getForceId());
                 }
             }
+        }
+
+        if (suitableForces.isEmpty()) {
+            suitableForces = getAvailableForceIDs(campaign, contract, true);
         }
 
         return suitableForces;
@@ -2810,7 +2820,8 @@ public class StratconRulesManager {
 
                 track.removeScenario(scenario);
 
-                if (scenario.getBackingScenario().getStratConScenarioType().isResupply()) {
+                ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+                if (scenarioType.isResupply() || scenarioType.isJailBreak()) {
                     return true;
                 }
 

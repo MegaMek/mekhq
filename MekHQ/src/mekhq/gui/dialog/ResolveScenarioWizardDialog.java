@@ -29,10 +29,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.GunEmplacement;
-import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
@@ -46,6 +44,7 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -129,9 +128,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Prisoner status panel components
      */
-    private JButton prisonerRansomAllButton;
     private final List<JCheckBox> prisonerCapturedBtns = new ArrayList<>();
-    private final List<JCheckBox> prisonerRansomedBtns = new ArrayList<>();
     private final List<JCheckBox> prisonerKiaBtns = new ArrayList<>();
     private final List<JSlider> pr_hitSliders = new ArrayList<>();
     private final List<OppositionPersonnelStatus> prstatuses = new ArrayList<>();
@@ -717,19 +714,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         int gridx = 1;
 
-        prisonerRansomAllButton = new JButton(resourceMap.getString("prisonerRansomAllButton.text"));
-
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx=2;
-        gridBagConstraints.gridy=0;
-        gridBagConstraints.gridwidth=3;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPrisonerStatus.add(prisonerRansomAllButton, gridBagConstraints);
-
-        prisonerRansomAllButton.addActionListener(evt -> prisonerRansomAll());
-
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = gridx++;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
@@ -739,9 +724,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         gridBagConstraints.gridx = gridx++;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
-
-        gridBagConstraints.gridx = gridx++;
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisonerRansomed.text")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx++;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
@@ -797,15 +779,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = gridx++;
             pnlPrisonerStatus.add(prisonerCapturedCheck, gridBagConstraints);
 
-            JCheckBox prisonerRansomedCheck = new JCheckBox("");
-            prisonerRansomedCheck.setName("prisonerRansomedCheck");
-            prisonerRansomedCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("prisonerRansomed.text"));
-            prisonerRansomedCheck.setEnabled(!status.isCaptured());
-            prisonerRansomedCheck.addItemListener(evt -> checkPrisonerStatus());
-            prisonerRansomedBtns.add(prisonerRansomedCheck);
-            gridBagConstraints.gridx = gridx++;
-            pnlPrisonerStatus.add(prisonerRansomedCheck, gridBagConstraints);
-
             JCheckBox kiaCheck = new JCheckBox("");
             kiaCheck.setName("kiaCheck");
             kiaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("kia"));
@@ -820,15 +793,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
 
             // if the person is dead, set the checkbox and skip all this captured stuff
+            PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().getPrisonerCaptureStyle();
             if ((status.getHits() > 5) || status.isDead()) {
                 kiaCheck.setSelected(true);
-            } else if (status.isCaptured()
-                    && tracker.getCampaign().getCampaignOptions().getPrisonerCaptureStyle().isAtB()) {
+            } else if (status.isCaptured() && !prisonerCaptureStyle.isNone()) {
                 boolean wasCaptured;
                 if (status.wasPickedUp()) {
                     wasCaptured = true;
                 } else {
-                    wasCaptured = rollForCapture(tracker.getCampaign(), status);
+                    wasCaptured = tracker.getCapturePrisoners().attemptCaptureOfNPC(false);
                 }
                 prisonerCapturedCheck.setSelected(wasCaptured);
             }
@@ -845,46 +818,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         return pnlPrisonerStatus;
     }
-
-
-    /**
-     * Check Ransom box for every prisoner that has Captured checked.
-     */
-    private void prisonerRansomAll() {
-        Iterator<JCheckBox> capturedBoxes = prisonerCapturedBtns.iterator();
-        Iterator<JCheckBox> ransomedBoxes = prisonerRansomedBtns.iterator();
-        while (capturedBoxes.hasNext() && ransomedBoxes.hasNext()) {
-            JCheckBox capturedBox = capturedBoxes.next();
-            JCheckBox ransomedBox = ransomedBoxes.next();
-            if (capturedBox.isSelected()) {
-                ransomedBox.setSelected(true);
-            }
-        }
-    }
-
-
-    /**
-     * Rolls the dice to determine if the opposition personnel is captured.
-     *
-     * @param status The opposition personnel status object.
-     * @return True if the opposition personnel was captured, false otherwise.
-     */
-    private static boolean rollForCapture(Campaign campaign, OppositionPersonnelStatus status) {
-        int target = 6;
-
-        if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)) {
-            target = 5;
-        }
-
-        for (int n = 0; n < status.getHits() + 1; n++) {
-            if (Utilities.dice(1, 6) >= target) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 
     // region Make Kills
     /**
@@ -1549,7 +1482,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 status.setHits(pr_hitSliders.get(i).getValue());
             }
             status.setCaptured(prisonerCapturedBtns.get(i).isSelected());
-            status.setRansomed(prisonerRansomedBtns.get(i).isSelected());
             status.setDead(prisonerKiaBtns.get(i).isSelected());
         }
 
@@ -1742,28 +1674,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void checkPrisonerStatus() {
         for (int i = 0; i < prisonerCapturedBtns.size(); i++) {
             JCheckBox captured = prisonerCapturedBtns.get(i);
-            JCheckBox ransomed = prisonerRansomedBtns.get(i);
             JCheckBox kia = prisonerKiaBtns.get(i);
             JSlider wounds = pr_hitSliders.get(i);
             if (kia.isSelected()) {
                 captured.setSelected(false);
                 captured.setEnabled(false);
-                ransomed.setSelected(false);
-                ransomed.setEnabled(false);
                 wounds.setEnabled(false);
-            } else if (ransomed.isSelected()) {
-                captured.setSelected(true);
-                captured.setEnabled(false);
-                kia.setSelected(false);
-                wounds.setEnabled(true);
             } else if (captured.isSelected()) {
                 captured.setEnabled(true);
-                ransomed.setEnabled(true);
                 kia.setSelected(false);
                 wounds.setEnabled(true);
             } else {
                 captured.setEnabled(true);
-                ransomed.setEnabled(false);
                 wounds.setEnabled(true);
             }
         }

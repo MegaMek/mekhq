@@ -85,7 +85,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
@@ -149,7 +149,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
 
-    private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
     private static final String CMD_EXECUTE = "EXECUTE";
     private static final String CMD_JETTISON = "JETTISON";
@@ -629,14 +628,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 } catch (Exception e) {
                     logger.error("Unknown PrisonerStatus Option. No changes will be made.", e);
-                }
-                break;
-            }
-            case CMD_IMPRISON: {
-                for (Person person : people) {
-                    if (!person.getPrisonerStatus().isCurrentPrisoner()) {
-                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.PRISONER, true);
-                    }
                 }
                 break;
             }
@@ -1296,6 +1287,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().removePerson(prisoner);
             }
         }
+
+        processAdHocExecution(gui.getCampaign(), prisoners.length);
     }
 
     private void loadGMToolsForPerson(Person person) {
@@ -1454,22 +1447,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         popup.add(menu);
 
-        if (StaticChecks.areAnyFree(selected)) {
-            popup.add(newMenuItem(resources.getString("imprison.text"), CMD_IMPRISON));
+        if (gui.getCampaign().getLocation().isOnPlanet()) {
+            popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+            popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
         } else {
-            if (gui.getCampaign().getLocation().isOnPlanet()) {
-                popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
-                popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
-            } else {
-                popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
-            }
+            popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPrisoners(selected)) {
+        if (StaticChecks.areAllPrisoners(selected) && gui.getCampaign().isGM()) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
-        }
-
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPow(selected)) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
         }
 

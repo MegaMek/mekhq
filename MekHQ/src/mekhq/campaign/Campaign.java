@@ -51,6 +51,7 @@ import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceType;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -65,10 +66,8 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
-import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.CombatRole;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.mission.enums.ScenarioStatus;
+import mekhq.campaign.mission.enums.*;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -101,6 +100,9 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.GrayMonday;
+import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
+import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
@@ -169,6 +171,8 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_CLARION_NOTE;
 import static mekhq.campaign.randomEvents.GrayMonday.EVENT_DATE_GRAY_MONDAY;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratcon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_BASIC;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
@@ -309,11 +313,18 @@ public class Campaign implements ITechManager {
     private final FameAndInfamyController fameAndInfamy;
     private BehaviorSettings autoResolveBehaviorSettings;
     private List<Unit> automatedMothballUnits;
+    private int temporaryPrisonerCapacity;
 
     //options relating to parts in use and restock
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
     private PartQuality ignoreSparesUnderQuality;
+
+    // Libraries
+    // We deliberately don't write this data to the save file as we want it rebuilt every time the
+    // campaign loads. This ensures updates can be applied and there is no risk of bugs being
+    // permanently locked into the campaign file.
+    RandomEventLibraries randomEventLibraries;
 
     /**
      * Represents the different types of administrative specializations.
@@ -398,9 +409,13 @@ public class Campaign implements ITechManager {
         fameAndInfamy = new FameAndInfamyController();
         autoResolveBehaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
         automatedMothballUnits = new ArrayList<>();
+        temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         topUpWeekly = false;
         ignoreMothballed =  false;
         ignoreSparesUnderQuality = QUALITY_A;
+
+        // Library initialization
+        randomEventLibraries = new RandomEventLibraries();
 
     }
 
@@ -2296,7 +2311,7 @@ public class Campaign implements ITechManager {
      * @return a {@link List} of {@link Person} objects representing combat-capable personnel
      */
     public List<Person> getActiveCombatPersonnel() {
-        return getActivePersonnel().stream()
+        return getActivePersonnel(true).stream()
             .filter(p -> p.getPrimaryRole().isCombat() || p.getSecondaryRole().isCombat())
             .collect(Collectors.toList());
     }
@@ -2320,6 +2335,17 @@ public class Campaign implements ITechManager {
     public List<Person> getCurrentPrisoners() {
         return getActivePersonnel().stream()
             .filter(person -> person.getPrisonerStatus().isCurrentPrisoner())
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active prisoners who are willing to defect.
+     *
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getPrisonerDefectors() {
+        return getActivePersonnel(false).stream()
+            .filter(person -> person.getPrisonerStatus().isPrisonerDefector())
             .collect(Collectors.toList());
     }
 
@@ -4182,8 +4208,14 @@ public class Campaign implements ITechManager {
                                 (AtBDynamicScenario) scenario, contract.getStratconCampaignState());
 
                         if (stub) {
-                            if (scenario.getStratConScenarioType().isResupply()) {
+                            ScenarioType scenarioType = scenario.getStratConScenarioType();
+                            if (scenarioType.isResupply()) {
                                 processAbandonedConvoy(this, contract, (AtBDynamicScenario) scenario);
+                            }
+
+                            if (scenarioType.isJailBreak()) {
+                                StratconCampaignState campaignState = contract.getStratconCampaignState();
+                                campaignState.changeSupportPoints(-1);
                             }
 
                             scenario.convertToStub(this, ScenarioStatus.REFUSED_ENGAGEMENT);
@@ -4396,6 +4428,8 @@ public class Campaign implements ITechManager {
      * @see #getPersonnelFilteringOutDeparted() Filters out departed personnel before daily processing
      */
     public void processNewDayPersonnel() {
+        RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(this, faction, getAtBUnitRatingMod());
+
         // This list ensures we don't hit a concurrent modification error
         List<Person> personnel = getPersonnelFilteringOutDeparted();
 
@@ -4421,6 +4455,22 @@ public class Campaign implements ITechManager {
             }
 
             // Daily events
+            if (person.getStatus().isMIA()) {
+                recovery.attemptRescueOfPlayerCharacter(person);
+            }
+
+            if (person.getPrisonerStatus().isBecomingBondsman()) {
+                // We use 'isAfter' to avoid situations where we somehow manage to miss the date.
+                // This shouldn't be necessary, but a safety net never hurt
+                if (currentDay.isAfter(person.getBecomingBondsmanEndDate().minusDays(1))) {
+                    person.setPrisonerStatus(this, BONDSMAN, true);
+                    addReport(String.format(resources.getString("becomeBondsman.text"),
+                        person.getHyperlinkedName(),
+                        spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        CLOSING_SPAN_TAG));
+                }
+            }
+
             person.resetMinutesLeft();
             person.setAcquisition(0);
 
@@ -4879,6 +4929,11 @@ public class Campaign implements ITechManager {
         if ((location.isOnPlanet()) && (currentDay.getDayOfMonth() == 1)) {
             RandomDependents randomDependents = new RandomDependents(this);
             randomDependents.processMonthlyRemovalAndAddition();
+        }
+
+        // Prisoner events can occur on Monday or the 1st of the month depending on the type of event
+        if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY || currentDay.getDayOfMonth() == 1) {
+            new PrisonerEventManager(this);
         }
 
         resetAstechMinutes();
@@ -5615,7 +5670,7 @@ public class Campaign implements ITechManager {
         return crimeRating + crimePirateModifier;
     }
 
-    public LocalDate getDateOfLastCrime() {
+    public @Nullable LocalDate getDateOfLastCrime() {
         return dateOfLastCrime;
     }
 
@@ -5821,6 +5876,18 @@ public class Campaign implements ITechManager {
         this.automatedMothballUnits = automatedMothballUnits;
     }
 
+    public int getTemporaryPrisonerCapacity() {
+        return temporaryPrisonerCapacity;
+    }
+
+    public void setTemporaryPrisonerCapacity(int temporaryPrisonerCapacity) {
+        this.temporaryPrisonerCapacity = temporaryPrisonerCapacity;
+    }
+
+    public RandomEventLibraries getRandomEventLibraries() {
+        return randomEventLibraries;
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -6021,6 +6088,7 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mothballedUnit", unit.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "automatedMothballUnits");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temporaryPrisonerCapacity", temporaryPrisonerCapacity);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, ++indent, "partsInUse");
         writePartInUseToXML(pw, indent);
@@ -8961,5 +9029,23 @@ public class Campaign implements ITechManager {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns a list of entities (units) from all combat forces.
+     *
+     * @return a list of entities representing all combat units in the player force
+     */
+    public List<Entity> getAllCombatEntities() {
+        List<Entity> units = new ArrayList<>();
+        for (Force force : getAllForces()) {
+            if (!force.isForceType(ForceType.STANDARD)) {
+                continue;
+            }
+            for (UUID unitID : force.getUnits()) {
+                units.add(getUnit(unitID).getEntity());
+            }
+        }
+        return units;
     }
 }
