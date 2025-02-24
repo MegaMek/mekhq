@@ -36,6 +36,7 @@ import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.randomEvents.prisonerDialogs.PrisonerEscapeeScenarioDialog;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 import static megamek.common.Board.START_SW;
@@ -218,7 +219,7 @@ public class PrisonEscapeScenario {
      */
     private void createEscapeeScenario(List<Unit> mobUnits) {
         final String DIRECTORY = "data/scenariotemplates/";
-        final String GENERIC = DIRECTORY + "Intercept the Escapees.xml";
+        final String GENERIC = Paths.get(DIRECTORY + "Intercept the Escapees.xml").toString();
 
         ScenarioTemplate template = ScenarioTemplate.Deserialize(GENERIC);
 

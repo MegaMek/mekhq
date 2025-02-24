@@ -25,6 +25,7 @@ import mekhq.campaign.randomEvents.prisoners.yaml.PrisonerEventDataWrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,15 +38,15 @@ public class RandomEventLibraries {
     /**
      * Directory path where event YAML files are located.
      */
-    private final String DIRECTORY = "data\\randomEvents\\";
+    private final String DIRECTORY = "data/randomEvents/";
 
     /**
      * File extension for the YAML files.
      */
     private final String EXTENSION = ".yml";
 
-    private final String PRISONER_EVENTS_MAJOR = DIRECTORY + "PrisonerMajorEventData" + EXTENSION;
-    private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
+    private final String PRISONER_EVENTS_MAJOR = Paths.get(DIRECTORY + "PrisonerMajorEventData" + EXTENSION).toString();
+    private final String PRISONER_EVENTS_MINOR = Paths.get(DIRECTORY + "PrisonerMinorEventData" + EXTENSION).toString();
 
     // lists
     private List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
