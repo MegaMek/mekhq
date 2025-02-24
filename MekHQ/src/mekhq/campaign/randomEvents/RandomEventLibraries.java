@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.io.File.separator;
+
 /**
  * A utility class that manages the loading and retrieval of random event data
  * from YAML files. Organizes the events into separate lists for later use.
@@ -37,7 +39,7 @@ public class RandomEventLibraries {
     /**
      * Directory path where event YAML files are located.
      */
-    private final String DIRECTORY = "data/randomEvents/";
+    private final String DIRECTORY = "data" + separator + "randomEvents" + separator;
 
     /**
      * File extension for the YAML files.
