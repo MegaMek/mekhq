@@ -37,7 +37,7 @@ public class RandomEventLibraries {
     /**
      * Directory path where event YAML files are located.
      */
-    private final String DIRECTORY = "data/randomEvents/";
+    private final String DIRECTORY = "data\\randomEvents\\";
 
     /**
      * File extension for the YAML files.
