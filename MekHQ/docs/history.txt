@@ -49,6 +49,15 @@ MEKHQ VERSION HISTORY:
 + Fix #5814: Change meklab check to last index check
 + PR #6068: Allow Battle Armor suits from different squad sizes to be used as replacements
 + Fix #6065: Unit History in UnitViewPanel does not wrap.
++ PR #5824: Extract AtB Event Types to enum
++ PR #6016: Implemented Prisoners of War & Abstracted Search and Rescue System
++ PR #6064: Add Tests for calculateContractDifficulty()
++ PR #6071: Further enhancement for BA Suit swappability in MekHQ
++ PR #6072: Add source information to PlanetViewPanel
++ Fix #6073: uses the correct getInstance instead of accessing directly the static map
++ PR #6075: Pintle turret and flags (MML #1741)
++ PR #6076: Added Reputation Sanity Options to Campaign Settings
++ PR #6077: When advancing day set cursor to wait cursor
 
 0.50.03 (2025-02-02 2030 UTC)
 + PR #5568: Spare parts rules reference adjustment
