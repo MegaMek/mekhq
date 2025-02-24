@@ -37,8 +37,15 @@ public class Satellite {
     @JsonProperty("icon")
     private String icon;
 
-    public String getDescription() {
-        return name.getValue() + " (" + size.getValue() + ")";
+    public SourceableValue getSourcedName() {
+        return name;
+    }
+
+    public String getSize() {
+        if(null == size) {
+            return "medium";
+        }
+        return size.getValue();
     }
 
     public String getIcon() {
