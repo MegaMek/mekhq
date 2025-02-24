@@ -97,13 +97,13 @@ public class PersonalityController {
         person.setIntelligence(generateIntelligence(randomInt(8346)));
 
         // finally, write the description
-        writeDescription(person);
+        writePersonalityDescription(person);
 
         // check at least one characteristic has been generated, if not, then pick a characteristic
         // at random
         if (person.getPersonalityDescription().isBlank()) {
             performPersonalityGenerationFallback(person);
-            writeDescription(person);
+            writePersonalityDescription(person);
         }
     }
 
@@ -115,7 +115,7 @@ public class PersonalityController {
      * @param person the person to whom the personality quirk will be applied; their quirk
      *               attribute is updated based on the rolled quirk
      */
-    private static void generateAndApplyPersonalityQuirk(Person person) {
+    public static void generateAndApplyPersonalityQuirk(Person person) {
         // This ensures we're rolling a value between 1 and the maximum index in the enum
         int traitRoll = 1 + randomInt(PersonalityQuirk.values().length - 1);
         String traitIndex = String.valueOf(traitRoll);
@@ -183,7 +183,7 @@ public class PersonalityController {
      *
      * @param person the person whose personality description will be generated and updated
      */
-    public static void writeDescription(Person person) {
+    public static void writePersonalityDescription(Person person) {
         List<String> traitDescriptions = getTraitDescriptions(person);
 
         StringBuilder personalityDescription = new StringBuilder();

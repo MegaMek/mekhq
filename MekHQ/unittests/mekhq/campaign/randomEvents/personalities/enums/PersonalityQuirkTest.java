@@ -18,11 +18,12 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
+import megamek.common.enums.Gender;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.Test;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC;
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.MAXIMUM_VARIATIONS;
 import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
@@ -30,7 +31,6 @@ import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.O
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class PersonalityQuirkTest {
     @Test
@@ -62,15 +62,10 @@ public class PersonalityQuirkTest {
 
     @Test
     public void testGetDescription_notInvalid_Combatant() {
-        Campaign campaign = mock(Campaign.class);
-
-        Person person = new Person(campaign);
-        person.setPrimaryRole(campaign, MEKWARRIOR);
-
+        Faction originFaction = Factions.getInstance().getFaction("MERC");
         for (PersonalityQuirk trait : PersonalityQuirk.values()) {
             for (int i = 0; i < 3; i++) {
-                person.setPersonalityQuirkDescriptionIndex(i);
-                String description = trait.getDescription(person);
+                String description = trait.getDescription(MEKWARRIOR, i, Gender.MALE, originFaction, "Barry");
                 assertTrue(isResourceKeyValid(description));
             }
         }
@@ -78,15 +73,10 @@ public class PersonalityQuirkTest {
 
     @Test
     public void testGetDescription_notInvalid_Support() {
-        Campaign campaign = mock(Campaign.class);
-
-        Person person = new Person(campaign);
-        person.setPrimaryRole(campaign, MECHANIC);
-
+        Faction originFaction = Factions.getInstance().getFaction("MERC");
         for (PersonalityQuirk trait : PersonalityQuirk.values()) {
-            for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
-                person.setPersonalityQuirkDescriptionIndex(i);
-                String description = trait.getDescription(person);
+            for (int i = 0; i < 3; i++) {
+                String description = trait.getDescription(ADMINISTRATOR_HR, i, Gender.MALE, originFaction, "Barry");
                 assertTrue(isResourceKeyValid(description));
             }
         }
@@ -94,13 +84,9 @@ public class PersonalityQuirkTest {
 
     @Test
     public void testGetDescription_InvalidDescriptionIndex() {
-        Campaign campaign = mock(Campaign.class);
+        Faction originFaction = Factions.getInstance().getFaction("MERC");
 
-        Person person = new Person(campaign);
-        person.setPrimaryRole(campaign, MEKWARRIOR);
-        person.setPersonalityQuirkDescriptionIndex(MAXIMUM_VARIATIONS);
-
-        String description = NONE.getDescription(person);
+        String description = NONE.getDescription(MEKWARRIOR, MAXIMUM_VARIATIONS, Gender.MALE, originFaction, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 }

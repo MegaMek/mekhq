@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.*;
 
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.RESUPPLY_LOOT_BOX_NAME;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 /**
  * @author Taharqa
@@ -812,7 +812,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             // presented to the user.
             // We therefore need to re-generate the personality description at this point,
             // as this is the earliest point in which that description is visible to the user
-            writeDescription(status.getPerson());
+            writePersonalityDescription(status.getPerson());
             prisonerIndex++;
         }
 

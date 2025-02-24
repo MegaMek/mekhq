@@ -44,8 +44,8 @@ import static megamek.common.Compute.randomInt;
 import static mekhq.campaign.personnel.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.SkillType.EXP_VETERAN;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.PERSONALITY_QUIRK_CHANCE;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.generatePersonalityQuirk;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeDescription;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.generateAndApplyPersonalityQuirk;
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 
 /**
  * The EducationController class is responsible for managing the education
@@ -1495,8 +1495,8 @@ public class EducationController {
             // People coming out of re-education camps have a chance to become a little weird
             if (person.getPersonalityQuirk().isNone()) {
                 if (randomInt(PERSONALITY_QUIRK_CHANCE / 2) == 0) {
-                    person.setPersonalityQuirk(generatePersonalityQuirk());
-                    writeDescription(person);
+                    generateAndApplyPersonalityQuirk(person);
+                    writePersonalityDescription(person);
                 }
             }
 

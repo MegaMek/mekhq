@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,7 @@ public class SocialTest {
         for (Social trait : Social.values()) {
             for (int i = 0; i < MAXIMUM_VARIATIONS; i++) {
                 person.setSocialDescriptionIndex(i);
-                String description = trait.getDescription(person);
+                String description = trait.getDescription(i, Gender.MALE, "Barry");
                 assertTrue(isResourceKeyValid(description));
             }
         }
@@ -83,12 +84,7 @@ public class SocialTest {
 
     @Test
     public void testGetDescription_InvalidDescriptionIndex() {
-        Campaign campaign = mock(Campaign.class);
-
-        Person person = new Person(campaign);
-        person.setSocialDescriptionIndex(MAXIMUM_VARIATIONS);
-
-        String description = NONE.getDescription(person);
+        String description = NONE.getDescription(MAXIMUM_VARIATIONS, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 }
