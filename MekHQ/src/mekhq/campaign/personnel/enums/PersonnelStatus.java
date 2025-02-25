@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2025 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -80,7 +80,11 @@ public enum PersonnelStatus {
     UNDETERMINED("PersonnelStatus.UNDETERMINED.text", "PersonnelStatus.UNDETERMINED.toolTipText",
             "PersonnelStatus.UNDETERMINED.reportText", "PersonnelStatus.UNDETERMINED.logText"),
     SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText",
-        "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText");
+        "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText"),
+    ENEMY_BONDSMAN("PersonnelStatus.ENEMY_BONDSMAN.text", "PersonnelStatus.ENEMY_BONDSMAN.toolTipText",
+                     "PersonnelStatus.ENEMY_BONDSMAN.reportText", "PersonnelStatus.ENEMY_BONDSMAN.logText"),
+    BONDSREF("PersonnelStatus.BONDSREF.text", "PersonnelStatus.BONDSREF.toolTipText",
+                     "PersonnelStatus.BONDSREF.reportText", "PersonnelStatus.BONDSREF.logText");
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -391,19 +395,40 @@ public enum PersonnelStatus {
     }
 
     /**
+     * Checks if the character has the {@code ENEMY_BONDSMAN} personnel status.
+     *
+     * @return {@code true} if the character has the {@code ENEMY_BONDS} personnel status {@code false}
+     * otherwise.
+     */
+    public boolean isEnemyBondsman() {
+        return this == ENEMY_BONDSMAN;
+    }
+
+    /**
+     * Checks if the character has the {@code BONDSREF} personnel status.
+     *
+     * @return {@code true} if the character has the {@code BONDSREF} personnel status {@code false}
+     * otherwise.
+     */
+    public boolean isBondsref() {
+        return this == BONDSREF;
+    }
+
+    /**
      * @return {@code true} if a person is currently absent from the core force, otherwise
      *         {@code false}
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isOnMaternityLeave() || isAwol() || isStudent() || isMissing();
+        return isMIA() || isPoW() || isEnemyBondsman() || isOnLeave() || isOnMaternityLeave()
+            || isAwol() || isStudent() || isMissing();
     }
 
     /**
      * @return {@code true} if a person has left the unit, otherwise {@code false}
      */
     public boolean isDepartedUnit() {
-        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected() || isMissing()
-                || isLeft();
+        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected()
+            || isMissing() || isLeft() || isEnemyBondsman();
     }
 
     /**
@@ -412,7 +437,7 @@ public enum PersonnelStatus {
     public boolean isDead() {
         return isKIA() || isHomicide() || isWounds() || isDisease() || isAccidental()
                 || isNaturalCauses() || isOldAge() || isMedicalComplications()
-                || isPregnancyComplications() || isUndetermined() || isSuicide();
+                || isPregnancyComplications() || isUndetermined() || isSuicide() || isBondsref();
     }
 
     /**
@@ -494,6 +519,8 @@ public enum PersonnelStatus {
                     return SACKED;
                 case 23:
                     return ON_MATERNITY_LEAVE;
+                case 24:
+                    return ENEMY_BONDSMAN;
                 default:
                     break;
             }

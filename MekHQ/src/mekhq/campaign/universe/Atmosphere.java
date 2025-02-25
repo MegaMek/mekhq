@@ -38,6 +38,9 @@ public enum Atmosphere {
         this.name = name;
     }
 
+    @Override
+    public String toString() { return name; }
+
     public boolean isNone() {
         return this == NONE;
     }

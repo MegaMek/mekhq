@@ -372,8 +372,7 @@ public abstract class AbstractProcreation {
         final Person father = determineFather(campaign, mother);
 
         // Determine Prisoner Status
-        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().isPrisonerBabyStatus()
-                ? mother.getPrisonerStatus() : PrisonerStatus.FREE;
+        final PrisonerStatus prisonerStatus = PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
         if (size > 1) {

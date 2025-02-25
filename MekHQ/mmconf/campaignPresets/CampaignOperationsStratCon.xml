@@ -7,6 +7,9 @@
 	<gm>true</gm>
 	<campaignOptions>
 		<manualUnitRatingModifier>0</manualUnitRatingModifier>
+        <clampReputationPayMultiplier>false</clampReputationPayMultiplier>
+        <reduceReputationPerformanceModifier>false</reduceReputationPerformanceModifier>
+        <reputationPerformanceModifierCutOff>false</reputationPerformanceModifierCutOff>
 		<logMaintenance>false</logMaintenance>
 		<defaultMaintenanceTime>4</defaultMaintenanceTime>
 		<mrmsUseRepair>true</mrmsUseRepair>

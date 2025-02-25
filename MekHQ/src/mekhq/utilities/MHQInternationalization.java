@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024-2025 - The MegaMek Team. All Rights Reserved.
  *
  *  This file is part of MekHQ.
  *
@@ -128,10 +128,10 @@ public class MHQInternationalization {
      * s we're using.</p>
      *
      * @param text The text to validate.
-     * @return {@code true} if the text is valid (does not start or end with an '!'); {@code false}
+     * @return {@code true} if the text is valid (does not start and end with an '!'); {@code false}
      * otherwise.
      */
     public static boolean isResourceKeyValid(String text) {
-        return !text.startsWith(MISSING_RESOURCE_TAG) && !text.endsWith(MISSING_RESOURCE_TAG);
+        return !(text.startsWith(MISSING_RESOURCE_TAG) && text.endsWith(MISSING_RESOURCE_TAG));
     }
 }
