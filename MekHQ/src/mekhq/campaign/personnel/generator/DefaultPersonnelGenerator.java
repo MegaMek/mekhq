@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2024 MegaMek team
+ * Copyright (C) 2019-2025 MegaMek team
  *
  * This file is part of MekHQ.
  *
@@ -25,7 +25,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
@@ -135,9 +135,6 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         // set starting education
         setInitialEducationLevel(campaign, person);
-
-        // generate personality
-        PersonalityController.generatePersonality(person);
 
         // generate background
         BackgroundsController.generateBackground(campaign, person);

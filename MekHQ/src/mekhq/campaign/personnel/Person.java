@@ -51,11 +51,11 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.personalities.enums.*;
 import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -78,6 +78,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.lang.Math.abs;
+import static megamek.codeUtilities.MathUtility.clamp;
+import static megamek.common.Compute.randomInt;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -223,11 +225,17 @@ public class Person {
 
     // region Personality
     private Aggression aggression;
+    private int aggressionDescriptionIndex;
     private Ambition ambition;
+    private int ambitionDescriptionIndex;
     private Greed greed;
+    private int greedDescriptionIndex;
     private Social social;
+    private int socialDescriptionIndex;
     private PersonalityQuirk personalityQuirk;
+    private int personalityQuirkDescriptionIndex;
     private Intelligence intelligence;
+    private int intelligenceDescriptionIndex;
     private String personalityDescription;
     // endregion Personality
 
@@ -397,11 +405,17 @@ public class Person {
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
         aggression = Aggression.NONE;
+        aggressionDescriptionIndex = randomInt(Aggression.MAXIMUM_VARIATIONS);
         ambition = Ambition.NONE;
+        ambitionDescriptionIndex = randomInt(Ambition.MAXIMUM_VARIATIONS);
         greed = Greed.NONE;
+        greedDescriptionIndex = randomInt(Greed.MAXIMUM_VARIATIONS);
         social = Social.NONE;
+        socialDescriptionIndex = randomInt(Social.MAXIMUM_VARIATIONS);
         personalityQuirk = PersonalityQuirk.NONE;
+        personalityQuirkDescriptionIndex = randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS);
         intelligence = Intelligence.AVERAGE;
+        intelligenceDescriptionIndex = randomInt(Intelligence.MAXIMUM_VARIATIONS);
         personalityDescription = "";
 
         // region Flags
@@ -1854,12 +1868,43 @@ public class Person {
         this.aggression = aggression;
     }
 
+    public int getAggressionDescriptionIndex() {
+        return aggressionDescriptionIndex;
+    }
+
+    /**
+     * Sets the index value for the {@link Aggression} description.
+     *
+     * @param aggressionDescriptionIndex The index value to set for the aggression description.
+     *                                    It will be clamped to ensure it remains within the valid
+     *                                    range.
+     */
+    public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
+        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex,
+            0, Aggression.MAXIMUM_VARIATIONS - 1);
+    }
+
     public Ambition getAmbition() {
         return ambition;
     }
 
     public void setAmbition(final Ambition ambition) {
         this.ambition = ambition;
+    }
+
+    public int getAmbitionDescriptionIndex() {
+        return ambitionDescriptionIndex;
+    }
+
+    /**
+     * Sets the index value for the {@link Ambition} description.
+     *
+     * @param ambitionDescriptionIndex The index value to set for the Ambition description. It will
+     *                                be clamped to ensure it remains within the valid range.
+     */
+    public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
+        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex,
+            0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     public Greed getGreed() {
@@ -1870,12 +1915,42 @@ public class Person {
         this.greed = greed;
     }
 
+    public int getGreedDescriptionIndex() {
+        return greedDescriptionIndex;
+    }
+
+    /**
+     * Sets the index value for the {@link Greed} description.
+     *
+     * @param greedDescriptionIndex The index value to set for the Greed description. It will be
+     *                             clamped to ensure it remains within the valid range.
+     */
+    public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
+        this.greedDescriptionIndex = clamp(greedDescriptionIndex,
+            0, Greed.MAXIMUM_VARIATIONS - 1);
+    }
+
     public Social getSocial() {
         return social;
     }
 
     public void setSocial(final Social social) {
         this.social = social;
+    }
+
+    public int getSocialDescriptionIndex() {
+        return socialDescriptionIndex;
+    }
+
+    /**
+     * Sets the index value for the {@link Social} description.
+     *
+     * @param socialDescriptionIndex The index value to set for the Social description. It will be
+     *                              clamped to ensure it remains within the valid range.
+     */
+    public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
+        this.socialDescriptionIndex = clamp(socialDescriptionIndex,
+            0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     public PersonalityQuirk getPersonalityQuirk() {
@@ -1886,12 +1961,44 @@ public class Person {
         this.personalityQuirk = personalityQuirk;
     }
 
+    public int getPersonalityQuirkDescriptionIndex() {
+        return personalityQuirkDescriptionIndex;
+    }
+
+    /**
+     * Sets the index value for the {@link PersonalityQuirk} description.
+     *
+     * @param personalityQuirkDescriptionIndex The index value to set for the quirk description.
+     *                                    It will be clamped to ensure it remains within the valid
+     *                                    range.
+     */
+    public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
+        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
+            0, PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
+    }
+
     public Intelligence getIntelligence() {
         return intelligence;
     }
 
     public void setIntelligence(final Intelligence intelligence) {
         this.intelligence = intelligence;
+    }
+
+    public int getIntelligenceDescriptionIndex() {
+        return intelligenceDescriptionIndex;
+    }
+
+    /**
+     * Sets the index value for the {@link Intelligence} description.
+     *
+     * @param intelligenceDescriptionIndex The index value to set for the intelligence description.
+     *                                    It will be clamped to ensure it remains within the valid
+     *                                    range.
+     */
+    public void setIntelligenceDescriptionIndex(final int intelligenceDescriptionIndex) {
+        this.intelligenceDescriptionIndex = clamp(intelligenceDescriptionIndex,
+            0, Intelligence.MAXIMUM_VARIATIONS - 1);
     }
 
     public String getPersonalityDescription() {
@@ -2265,28 +2372,46 @@ public class Person {
             }
 
             if (aggression != Aggression.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.name());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggressionDescriptionIndex",
+                aggressionDescriptionIndex);
 
             if (ambition != Ambition.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.name());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambitionDescriptionIndex",
+                ambitionDescriptionIndex);
 
             if (greed != Greed.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.name());
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greedDescriptionIndex",
+                greedDescriptionIndex);
+
             if (social != Social.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.ordinal());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.name());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "socialDescriptionIndex",
+                socialDescriptionIndex);
 
             if (personalityQuirk != PersonalityQuirk.NONE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.ordinal());
             }
 
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirkDescriptionIndex",
+                personalityQuirkDescriptionIndex);
+
             if (intelligence != Intelligence.AVERAGE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligence", intelligence.ordinal());
             }
+
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligenceDescriptionIndex",
+                intelligenceDescriptionIndex);
 
             if (!StringUtility.isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
@@ -2638,65 +2763,29 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
                     retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.aggression = Aggression.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.aggression = Aggression.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.aggression = Aggression.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("aggressionDescriptionIndex")) {
+                    retVal.aggressionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.ambition = Ambition.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.ambition = Ambition.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.ambition = Ambition.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("ambitionDescriptionIndex")) {
+                    retVal.ambitionDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.greed = Greed.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.greed = Greed.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.greed = Greed.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("greedDescriptionIndex")) {
+                    retVal.greedDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.social = Social.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.social = Social.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.social = Social.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("socialDescriptionIndex")) {
+                    retVal.socialDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.personalityQuirk = PersonalityQuirk.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.personalityQuirk = PersonalityQuirk.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.personalityQuirk = PersonalityQuirk.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirkDescriptionIndex")) {
+                    retVal.personalityQuirkDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
-                    try {
-                        // <50.01 compatibility handler
-                        retVal.intelligence = Intelligence.valueOf(wn2.getTextContent()
-                            .toUpperCase()
-                            .replaceAll("-", "_")
-                            .replaceAll(" ", "_"));
-                    } catch (IllegalArgumentException e) {
-                        retVal.intelligence = Intelligence.fromOrdinal(Integer.parseInt(wn2.getTextContent()));
-                    }
+                    retVal.intelligence = Intelligence.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("intelligenceDescriptionIndex")) {
+                    retVal.intelligenceDescriptionIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
